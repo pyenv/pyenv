@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+cd "$HOME/.rbenv/shims"
+rm *
+
+for file in ../versions/*/bin/*; do
+  ln -fs ../bin/rbenv-shim "${file##*/}"
+done

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+set -e
+
+read_version_file() {
+  egrep -m 1 '[^[:space:]]' "$1"
+}
+
+find_version_file() {
+  root="$(pwd)"
+  while [ -n "$root" ]; do
+    if [ -e "${root}/.rbenv-version" ]; then
+      echo "${root}/.rbenv-version"
+      return 0
+    fi
+    root="${root%/*}"
+  done
+  return 1
+}
+
+find_default_version_file() {
+  default_path="$HOME/.rbenv/default"
+  if [ -e "$default_path" ]; then
+    echo "$default_path"
+    return 0
+  fi
+  return 1
+}
+
+if [ -z "$RBENV_VERSION" ]; then
+  RBENV_VERSION_FILE="$(find_version_file || find_default_version_file || true)"
+
+  if [ -n "$RBENV_VERSION_FILE" ]; then
+    RBENV_VERSION="$(read_version_file "$RBENV_VERSION_FILE")"
+  else
+    echo "rbenv: no default version specified" >&2
+    exit 1
+  fi
+fi
+
+RBENV_VERSION_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}"
+
+if [ -d "$RBENV_VERSION_PATH" ]; then
+  echo "$RBENV_VERSION"
+else
+  echo "rbenv: version \`$RBENV_VERSION' is not installed" >&2
+  exit 1
+fi

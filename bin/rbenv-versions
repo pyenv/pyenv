@@ -1,0 +1,15 @@
+#!/bin/bash
+
+RBENV_VERSION="$(rbenv-version)"
+
+for path in ~/.rbenv/versions/*; do
+  if [ -d "$path" ]; then
+    version="${path##*/}"
+
+    if [ "$version" == "$RBENV_VERSION" ]; then
+      echo "* ${version##*/}"
+    else
+      echo "  ${version##*/}"
+    fi
+  fi
+done

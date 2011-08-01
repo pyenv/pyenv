@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+RBENV_VERSION="$(rbenv-version)"
+RBENV_COMMAND="$1"
+RBENV_COMMAND_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
+
+if [ -x "$RBENV_COMMAND_PATH" ]; then
+  echo "$RBENV_COMMAND_PATH"
+else
+  echo "rbenv: $1: command not found" >&2
+  exit 127
+fi

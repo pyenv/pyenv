@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+RBENV_COMMAND="$1"
+if [ -z "$RBENV_COMMAND" ]; then
+  echo "usage: rbenv exec COMMAND [arg1 arg2...]" >&2
+  exit 1
+fi
+
+RBENV_COMMAND_PATH="$(rbenv-which "$RBENV_COMMAND")"
+
+shift 1
+exec -a "$RBENV_COMMAND" "$RBENV_COMMAND_PATH" $*
