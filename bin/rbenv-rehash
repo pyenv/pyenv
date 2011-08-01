@@ -2,7 +2,7 @@
 
 set -e
 
-cd "$HOME/.rbenv/shims"
+cd "${HOME}/.rbenv/shims"
 rm *
 
 for file in ../versions/*/bin/*; do

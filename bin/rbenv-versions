@@ -9,9 +9,9 @@ for path in ~/.rbenv/versions/*; do
     version="${path##*/}"
 
     if [ "$version" == "$RBENV_VERSION" ]; then
-      echo "* ${version##*/}"
+      echo "* $version"
     else
-      echo "  ${version##*/}"
+      echo "  $version"
     fi
   fi
 done
