@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+RBENV_VERSION="$1"
+if [ -z "$RBENV_VERSION" ]; then
+  echo "usage: rbenv set-local VERSION" >&2
+  exit 1
+fi
+
+# Make sure the specified version is installed
+rbenv-path "$RBENV_VERSION" >/dev/null
+
+echo "$RBENV_VERSION" > .rbenv-version
