@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -n "$1" ]; then
+  RBENV_VERSION="$1"
+elif [ -z "$RBENV_VERSION" ]; then
+  RBENV_VERSION="$(rbenv-version)"
+fi
+
+RBENV_VERSION_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}"
+if [ ! -d "$RBENV_VERSION_PATH" ]; then
+  echo "rbenv: version \`${RBENV_VERSION}' not installed" >&2
+  exit 1
+fi
+
+echo "$RBENV_VERSION_PATH"

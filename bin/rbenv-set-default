@@ -8,10 +8,7 @@ if [ -z "$RBENV_VERSION" ]; then
   exit 1
 fi
 
-RBENV_VERSION_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}"
-if [ ! -d "$RBENV_VERSION_PATH" ]; then
-  echo "rbenv: version \`${RBENV_VERSION}' not installed" >&2
-  exit 1
-fi
+# Make sure the specified version is installed
+rbenv-path "$RBENV_VERSION" >/dev/null
 
 echo "$RBENV_VERSION" > "${HOME}/.rbenv/default"
