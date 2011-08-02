@@ -2,6 +2,7 @@
 
 set -e
 
+mkdir -p "${HOME}/.rbenv/shims"
 cd "${HOME}/.rbenv/shims"
 rm *
 
