@@ -4,7 +4,7 @@ set -e
 
 mkdir -p "${HOME}/.rbenv/shims"
 cd "${HOME}/.rbenv/shims"
-rm *
+rm -f *
 
 for file in ../versions/*/bin/*; do
   ln -fs ../bin/rbenv-shim "${file##*/}"
