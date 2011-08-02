@@ -8,7 +8,7 @@ for file in ../versions/*/bin/*; do
   shim="${file##*/}"
   cat > "$shim" <<SH
 #!/bin/sh
-exec rbenv exec ${file##*/} \$@
+exec rbenv exec $shim \$@
 SH
   chmod +x "$shim"
 done
