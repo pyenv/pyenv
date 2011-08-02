@@ -14,5 +14,5 @@ else
   fi
 
   shift 1
-  exec "$command_path" $*
+  exec "$command_path" "$@"
 fi
