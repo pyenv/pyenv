@@ -7,7 +7,7 @@ read_version_file() {
 }
 
 find_version_file() {
-  root="$(pwd)"
+  local root="$(pwd)"
   while [ -n "$root" ]; do
     if [ -e "${root}/.rbenv-version" ]; then
       echo "${root}/.rbenv-version"
@@ -19,7 +19,7 @@ find_version_file() {
 }
 
 find_default_version_file() {
-  default_path="$HOME/.rbenv/default"
+  local default_path="$HOME/.rbenv/default"
   if [ -e "$default_path" ]; then
     echo "$default_path"
     return 0
