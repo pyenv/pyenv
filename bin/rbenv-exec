@@ -11,4 +11,4 @@ fi
 RBENV_COMMAND_PATH="$(rbenv-which "$RBENV_COMMAND")"
 
 shift 1
-exec -a "$RBENV_COMMAND" "$RBENV_COMMAND_PATH" $*
+exec -a "$RBENV_COMMAND" "$RBENV_COMMAND_PATH" "$@"

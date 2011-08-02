@@ -2,4 +2,4 @@
 
 set -e
 
-exec rbenv-exec "${0##*/}" $*
+exec rbenv-exec "${0##*/}" "$@"
