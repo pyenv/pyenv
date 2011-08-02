@@ -1,5 +1,3 @@
-#!/bin/bash
-
-set -e
+#!/bin/bash -e
 
 exec rbenv-exec "${0##*/}" "$@"

@@ -1,6 +1,4 @@
-#!/bin/bash
-
-set -e
+#!/bin/bash -e
 
 RBENV_VERSION="$1"
 if [ -z "$RBENV_VERSION" ]; then

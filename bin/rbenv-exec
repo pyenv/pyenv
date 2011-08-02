@@ -1,6 +1,4 @@
-#!/bin/bash
-
-set -e
+#!/bin/bash -e
 
 RBENV_COMMAND="$1"
 if [ -z "$RBENV_COMMAND" ]; then
