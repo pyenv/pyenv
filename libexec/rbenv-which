@@ -7,6 +7,16 @@ RBENV_COMMAND_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND
 if [ -x "$RBENV_COMMAND_PATH" ]; then
   echo "$RBENV_COMMAND_PATH"
 else
-  echo "rbenv: $1: command not found" >&2
+  echo "rbenv: $RBENV_COMMAND: command not found" >&2
+
+  versions="$(rbenv-whence "$RBENV_COMMAND" || true)"
+  if [ -n "$versions" ]; then
+    { echo
+      echo "The \`$1' command exists in these Ruby versions:"
+      echo "$versions" | sed 's/^/  /g'
+      echo
+    } >&2
+  fi
+
   exit 127
 fi
