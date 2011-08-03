@@ -1,22 +1,21 @@
 #!/usr/bin/env bash -e
 
 abs_dirname() {
-  orig_dir=`pwd`
-  path="$1"
+  local cwd="$(pwd)"
+  local path="$1"
+
   while [ -n "$path" ]; do
-    cd `dirname "$path"`
-    name=`basename "$path"`
-    path=`readlink "$name" || true`
+    cd "$(dirname "$path")"
+    local name="$(basename "$path")"
+    path="$(readlink "$name" || true)"
   done
-  unset name path
 
   pwd
-  cd "$orig_dir"
-  unset orig_dir
+  cd "$cwd"
 }
 
-bindir=`abs_dirname $0`
-export PATH="$bindir:$PATH"
+libexec_path="$(abs_dirname "$0")"
+export PATH="${libexec_path}:${PATH}"
 
 command="$1"
 if [ -z "$command" ]; then
