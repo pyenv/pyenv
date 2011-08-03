@@ -8,5 +8,13 @@ fi
 
 RBENV_COMMAND_PATH="$(rbenv-which "$RBENV_COMMAND")"
 
+shopt -s nullglob
+RBENV_EXEC_PLUGINS=(/etc/rbenv.d/exec/*.bash ${HOME}/.rbenv/rbenv.d/exec/*.bash)
+shopt -u nullglob
+
+for script in $RBENV_EXEC_PLUGINS; do
+  source $script
+done
+
 shift 1
 exec -a "$RBENV_COMMAND" "$RBENV_COMMAND_PATH" "$@"
