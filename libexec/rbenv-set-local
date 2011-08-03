@@ -7,6 +7,6 @@ if [ -z "$RBENV_VERSION" ]; then
 fi
 
 # Make sure the specified version is installed
-rbenv-path "$RBENV_VERSION" >/dev/null
+rbenv-prefix "$RBENV_VERSION" >/dev/null
 
 echo "$RBENV_VERSION" > .rbenv-version
