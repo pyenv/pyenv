@@ -18,5 +18,10 @@ whence() {
 }
 
 RBENV_COMMAND="$1"
+if [ -z "$RBENV_COMMAND" ]; then
+  echo "usage: rbenv whence [--path] COMMAND" >&2
+  exit 1
+fi
+
 result="$(whence "$RBENV_COMMAND")"
 [ -n "$result" ] && echo "$result"
