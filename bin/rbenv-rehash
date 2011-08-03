@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env bash -e
 
 mkdir -p "${HOME}/.rbenv/shims"
 cd "${HOME}/.rbenv/shims"

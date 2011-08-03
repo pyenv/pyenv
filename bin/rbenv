@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env bash -e
 
 command="$1"
 if [ -z "$command" ]; then
