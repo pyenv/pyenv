@@ -6,6 +6,12 @@ elif [ -z "$RBENV_VERSION" ]; then
   RBENV_VERSION="$(rbenv-version)"
 fi
 
+if [ "$RBENV_VERSION" = "system" ]; then
+  RUBY_PATH="$(rbenv-which ruby)"
+  echo "${RUBY_PATH%/*}"
+  exit
+fi
+
 RBENV_PREFIX_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}"
 if [ ! -d "$RBENV_PREFIX_PATH" ]; then
   echo "rbenv: version \`${RBENV_VERSION}' not installed" >&2
