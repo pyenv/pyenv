@@ -1,0 +1,22 @@
+#!/usr/bin/env bash -e
+
+if [ "$1" = "--path" ]; then
+  print_paths="1"
+  shift
+else
+  print_paths=""
+fi
+
+whence() {
+  local command="$1"
+  rbenv-versions --bare | while read version; do
+    path="$(rbenv-prefix "$version")/bin/${command}"
+    if [ -x "$path" ]; then
+      [ "$print_paths" ] && echo "$path" || echo "$version"
+    fi
+  done
+}
+
+RBENV_COMMAND="$1"
+result="$(whence "$RBENV_COMMAND")"
+[ -n "$result" ] && echo "$result"
