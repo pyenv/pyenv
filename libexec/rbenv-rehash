@@ -1,14 +1,28 @@
 #!/usr/bin/env bash -e
 
+make_shims() {
+  local glob="$@"
+
+  for file in $glob; do
+    local shim="${file##*/}"
+    cat > "$shim" <<SH
+#!/bin/sh
+exec rbenv exec $shim "\$@"
+SH
+    chmod +x "$shim"
+  done
+}
+
 mkdir -p "${HOME}/.rbenv/shims"
 cd "${HOME}/.rbenv/shims"
 rm -f *
 
-for file in ../versions/*/bin/*; do
-  shim="${file##*/}"
-  cat > "$shim" <<SH
-#!/bin/sh
-exec rbenv exec $shim "\$@"
-SH
-  chmod +x "$shim"
+make_shims ../versions/*/bin/*
+
+shopt -s nullglob
+RBENV_REHASH_PLUGINS=(/etc/rbenv.d/rehash/*.bash ${HOME}/.rbenv/rbenv.d/rehash/*.bash)
+shopt -u nullglob
+
+for script in $RBENV_REHASH_PLUGINS; do
+  source $script
 done

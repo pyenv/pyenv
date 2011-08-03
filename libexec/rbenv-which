@@ -4,6 +4,14 @@ RBENV_VERSION="$(rbenv-version)"
 RBENV_COMMAND="$1"
 RBENV_COMMAND_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
 
+shopt -s nullglob
+RBENV_WHICH_PLUGINS=(/etc/rbenv.d/which/*.bash ${HOME}/.rbenv/rbenv.d/which/*.bash)
+shopt -u nullglob
+
+for script in $RBENV_WHICH_PLUGINS; do
+  source $script
+done
+
 if [ -x "$RBENV_COMMAND_PATH" ]; then
   echo "$RBENV_COMMAND_PATH"
 else
