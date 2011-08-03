@@ -1,3 +1,0 @@
-#!/usr/bin/env bash -e
-
-exec rbenv-exec "${0##*/}" "$@"

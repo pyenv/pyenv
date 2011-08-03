@@ -5,5 +5,10 @@ cd "${HOME}/.rbenv/shims"
 rm -f *
 
 for file in ../versions/*/bin/*; do
-  ln -fs ../bin/rbenv-shim "${file##*/}"
+  shim="${file##*/}"
+  cat > "$shim" <<SH
+#!/bin/sh
+exec rbenv exec $shim "\$@"
+SH
+  chmod +x "$shim"
 done
