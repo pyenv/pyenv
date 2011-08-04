@@ -21,9 +21,7 @@ abs_dirname() {
 }
 root="$(abs_dirname "$0")/.."
 
-if [ -d "$HOME/.rbenv/shims" ]; then
-  echo 'export PATH="$HOME/.rbenv/shims:$PATH"'
-fi
+echo 'export PATH="$HOME/.rbenv/shims:$PATH"'
 
 if [ "$shell" = "bash" ]; then
   echo "source \"$root/completions/rbenv.bash\""
