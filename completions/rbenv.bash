@@ -12,16 +12,18 @@ _rbenv_versions() {
 }
 
 _rbenv() {
-  local cur prev
   COMPREPLY=()
-  cur="${COMP_WORDS[COMP_CWORD]}"
-  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-  if [ "$prev" = "set-default" ]; then
+  case "$prev" in
+  set-* | prefix )
     _rbenv_versions
-  else
+    ;;
+  * )
     _rbenv_commands
-  fi
+    ;;
+  esac
 }
 
 complete -F _rbenv rbenv
