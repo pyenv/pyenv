@@ -1,0 +1,30 @@
+#!/usr/bin/env bash -e
+
+shell=$1
+
+if [ -z "$shell" ]; then
+  shell=$(basename $SHELL)
+fi
+
+abs_dirname() {
+  local cwd="$(pwd)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(readlink "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+root="$(abs_dirname "$0")/.."
+
+if [ -d "$HOME/.rbenv/shims" ]; then
+  echo 'PATH="$HOME/.rbenv/shims:$PATH"'
+fi
+
+if [ "$shell" = "bash" ]; then
+  echo "source \"$root/completions/rbenv.bash\""
+fi
