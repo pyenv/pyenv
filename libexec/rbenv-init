@@ -27,5 +27,5 @@ if [ -d "$HOME/.rbenv/shims" ]; then
 fi
 
 if [ "$shell" = "bash" ]; then
-  echo "source $root/completions/rbenv.bash"
+  echo "source \"$root/completions/rbenv.bash\""
 fi
