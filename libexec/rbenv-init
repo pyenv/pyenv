@@ -22,7 +22,6 @@ abs_dirname() {
 root="$(abs_dirname "$0")/.."
 
 if [ -d "$HOME/.rbenv/shims" ]; then
-  rbenv-rehash
   echo 'PATH="$HOME/.rbenv/shims:$PATH"'
 fi
 
