@@ -1,4 +1,4 @@
-_commands() {
+_rbenv_commands() {
   local cur commands
   COMPREPLY=()
   cur="${COMP_WORDS[COMP_CWORD]}"
@@ -8,16 +8,16 @@ _commands() {
   COMPREPLY=( $( compgen -W "$commands" -- $cur ) )
 }
 
-_rubies() {
-  local cur rubies
+_rbenv_versions() {
+  local cur versions
   local ROOT="${HOME}/.rbenv/versions"
   COMPREPLY=()
   cur=${COMP_WORDS[COMP_CWORD]}
-  rubies=($ROOT/*)
+  versions=($ROOT/*)
   # remove all but the final part of the name
-  rubies="${rubies[@]##*/}"
+  versions="${versions[@]##*/}"
 
-  COMPREPLY=( $( compgen -W "$rubies" -- $cur ) )
+  COMPREPLY=( $( compgen -W "$versions" -- $cur ) )
 }
 
 _rbenv() {
@@ -27,9 +27,9 @@ _rbenv() {
   prev="${COMP_WORDS[COMP_CWORD-1]}"
 
   if [ "$prev" = "set-default" ]; then
-    _rubies
+    _rbenv_versions
   else
-    _commands
+    _rbenv_commands
   fi
 }
 
