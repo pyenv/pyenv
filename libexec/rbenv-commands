@@ -1,0 +1,11 @@
+#!/usr/bin/env bash -e
+
+shopt -s nullglob
+
+{ for path in ${PATH//:/$'\n'}; do
+    for command in "${path}/rbenv-"*; do
+      echo "${command##*rbenv-}"
+    done
+  done
+} | sort | uniq
+
