@@ -5,8 +5,8 @@ abs_dirname() {
   local path="$1"
 
   while [ -n "$path" ]; do
-    cd "$(dirname "$path")"
-    local name="$(basename "$path")"
+    cd "${path%/*}"
+    local name="${path##*/}"
     path="$(readlink "$name" || true)"
   done
 
