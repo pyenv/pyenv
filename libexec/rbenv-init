@@ -1,9 +1,14 @@
 #!/usr/bin/env bash -e
 
-shell=$1
+print=""
+if [ "$1" = "-" ]; then
+  print=1
+  shift
+fi
 
+shell="$1"
 if [ -z "$shell" ]; then
-  shell=$(basename $SHELL)
+  shell="$(basename "$SHELL")"
 fi
 
 abs_dirname() {
@@ -19,9 +24,33 @@ abs_dirname() {
   pwd
   cd "$cwd"
 }
+
 root="$(abs_dirname "$0")/.."
 
-echo 'export PATH="$HOME/.rbenv/shims:$PATH"'
+if [ -z "$print" ]; then
+  case "$shell" in
+  bash )
+    profile='~/.bash_profile'
+    ;;
+  zsh )
+    profile='~/.zshrc'
+    ;;
+  * )
+    profile='your profile'
+    ;;
+  esac
+
+  { echo "# Load rbenv automatically by adding"
+    echo "# the following to ${profile}:"
+    echo
+    echo 'eval "$(rbenv init -)"'
+    echo
+  } >&2
+
+  exit 1
+fi
+
+echo 'export PATH="${HOME}/.rbenv/shims:${PATH}"'
 
 if [ "$shell" = "bash" ]; then
   echo "source \"$root/completions/rbenv.bash\""
