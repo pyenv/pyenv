@@ -23,6 +23,6 @@ shopt -s nullglob
 RBENV_REHASH_PLUGINS=(/etc/rbenv.d/rehash/*.bash ${HOME}/.rbenv/rbenv.d/rehash/*.bash)
 shopt -u nullglob
 
-for script in $RBENV_REHASH_PLUGINS; do
+for script in ${RBENV_REHASH_PLUGINS[@]}; do
   source $script
 done

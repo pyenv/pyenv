@@ -8,7 +8,7 @@ shopt -s nullglob
 RBENV_WHICH_PLUGINS=(/etc/rbenv.d/which/*.bash ${HOME}/.rbenv/rbenv.d/which/*.bash)
 shopt -u nullglob
 
-for script in $RBENV_WHICH_PLUGINS; do
+for script in ${RBENV_WHICH_PLUGINS[@]}; do
   source $script
 done
 
