@@ -16,10 +16,11 @@ find_version_file() {
   return 1
 }
 
+DEFAULT_PATH="${HOME}/.rbenv/default"
+
 find_default_version_file() {
-  local default_path="$HOME/.rbenv/default"
-  if [ -e "$default_path" ]; then
-    echo "$default_path"
+  if [ -e "$DEFAULT_PATH" ]; then
+    echo "$DEFAULT_PATH"
     return 0
   fi
   return 1
@@ -31,8 +32,8 @@ if [ -z "$RBENV_VERSION" ]; then
   if [ -n "$RBENV_VERSION_FILE" ]; then
     RBENV_VERSION="$(read_version_file "$RBENV_VERSION_FILE")"
   else
-    echo "rbenv: no default version specified" >&2
-    exit 1
+    echo system > "$DEFAULT_PATH"
+    RBENV_VERSION=system
   fi
 fi
 

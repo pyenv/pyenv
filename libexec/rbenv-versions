@@ -1,6 +1,6 @@
 #!/usr/bin/env bash -e
 
-RBENV_VERSION="$(rbenv-version 2>/dev/null || true)"
+RBENV_VERSION="$(rbenv-version)"
 
 hit_prefix="* "
 miss_prefix="  "

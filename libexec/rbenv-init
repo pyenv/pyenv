@@ -51,7 +51,6 @@ if [ -z "$print" ]; then
 fi
 
 mkdir -p "${HOME}/.rbenv/{shims,versions}"
-[ -e "${HOME}/.rbenv/default" ] || echo system > "${HOME}/.rbenv/default"
 
 echo 'export PATH="${HOME}/.rbenv/shims:${PATH}"'
 
