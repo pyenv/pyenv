@@ -6,10 +6,8 @@ _rbenv_commands() {
 
 _rbenv_versions() {
   COMPREPLY=()
-  local cur=${COMP_WORDS[COMP_CWORD]}
-  local versions=(system $(rbenv versions --bare))
-  versions="${versions[@]}"
-
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local versions="$(echo system; rbenv versions --bare)"
   COMPREPLY=( $( compgen -W "$versions" -- $cur ) )
 }
 
