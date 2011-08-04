@@ -9,13 +9,10 @@ _rbenv_commands() {
 }
 
 _rbenv_versions() {
-  local cur versions
-  local ROOT="${HOME}/.rbenv/versions"
   COMPREPLY=()
-  cur=${COMP_WORDS[COMP_CWORD]}
-  versions=($ROOT/*)
-  # remove all but the final part of the name
-  versions="${versions[@]##*/}"
+  local cur=${COMP_WORDS[COMP_CWORD]}
+  local versions=(system $(rbenv versions --bare))
+  versions="${versions[@]}"
 
   COMPREPLY=( $( compgen -W "$versions" -- $cur ) )
 }
