@@ -1,11 +1,7 @@
 _rbenv_commands() {
-  local cur commands
   COMPREPLY=()
-  cur="${COMP_WORDS[COMP_CWORD]}"
-  commands="exec prefix rehash set-default set-local version versions\
-    whence which"
-
-  COMPREPLY=( $( compgen -W "$commands" -- $cur ) )
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  COMPREPLY=( $( compgen -W "$(rbenv commands)" -- $cur ) )
 }
 
 _rbenv_versions() {
