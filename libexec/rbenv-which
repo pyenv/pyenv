@@ -1,8 +1,35 @@
 #!/usr/bin/env bash -e
 
+expand_path() {
+  local cwd="$(pwd)"
+  cd "$1"
+  pwd
+  cd "$cwd"
+}
+
+remove_from_path() {
+  local path_to_remove="$(expand_path "$1")"
+  local result=""
+
+  for path in ${PATH//:/$'\n'}; do
+    path="$(expand_path "$path" || true)"
+    if [ "$path" != "$path_to_remove" ]; then
+      result="${result}${path}:"
+    fi
+  done
+
+  echo "${result%:}"
+}
+
 RBENV_VERSION="$(rbenv-version)"
 RBENV_COMMAND="$1"
-RBENV_COMMAND_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
+
+if [ "$RBENV_VERSION" = "system" ]; then
+  PATH="$(remove_from_path "${HOME}/.rbenv/shims")"
+  RBENV_COMMAND_PATH="$(command -v "$RBENV_COMMAND")"
+else
+  RBENV_COMMAND_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
+fi
 
 shopt -s nullglob
 RBENV_WHICH_PLUGINS=(/etc/rbenv.d/which/*.bash ${HOME}/.rbenv/rbenv.d/which/*.bash)
