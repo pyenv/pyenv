@@ -22,7 +22,7 @@ abs_dirname() {
 root="$(abs_dirname "$0")/.."
 
 if [ -d "$HOME/.rbenv/shims" ]; then
-  echo 'PATH="$HOME/.rbenv/shims:$PATH"'
+  echo 'export PATH="$HOME/.rbenv/shims:$PATH"'
 fi
 
 if [ "$shell" = "bash" ]; then
