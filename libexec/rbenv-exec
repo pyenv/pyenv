@@ -7,6 +7,7 @@ if [ -z "$RBENV_COMMAND" ]; then
 fi
 
 RBENV_COMMAND_PATH="$(rbenv-which "$RBENV_COMMAND")"
+RBENV_BIN_PATH="${RBENV_COMMAND_PATH%/*}"
 
 shopt -s nullglob
 RBENV_EXEC_PLUGINS=(/etc/rbenv.d/exec/*.bash ${HOME}/.rbenv/rbenv.d/exec/*.bash)
@@ -17,4 +18,5 @@ for script in ${RBENV_EXEC_PLUGINS[@]}; do
 done
 
 shift 1
+export PATH="${RBENV_BIN_PATH}:${PATH}"
 exec -a "$RBENV_COMMAND" "$RBENV_COMMAND_PATH" "$@"
