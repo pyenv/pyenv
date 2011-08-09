@@ -21,7 +21,7 @@ remove_from_path() {
   echo "${result%:}"
 }
 
-RBENV_VERSION="$(rbenv-version)"
+RBENV_VERSION="$(rbenv-version-name)"
 RBENV_COMMAND="$1"
 
 if [ "$RBENV_VERSION" = "system" ]; then

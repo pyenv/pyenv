@@ -1,0 +1,29 @@
+#!/usr/bin/env bash -e
+
+find_version_file() {
+  local root="$(pwd)"
+  while [ -n "$root" ]; do
+    if [ -e "${root}/.rbenv-version" ]; then
+      echo "${root}/.rbenv-version"
+      return 0
+    fi
+    root="${root%/*}"
+  done
+  return 1
+}
+
+DEFAULT_PATH="${HOME}/.rbenv/default"
+
+find_default_version_file() {
+  if [ -e "$DEFAULT_PATH" ]; then
+    echo "$DEFAULT_PATH"
+    return 0
+  fi
+  return 1
+}
+
+if [ -z "$RBENV_VERSION" ]; then
+  find_version_file || find_default_version_file || true
+else
+  echo "RBENV_VERSION environment variable"
+fi
