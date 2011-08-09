@@ -1,0 +1,32 @@
+#!/usr/bin/env bash -e
+
+read_version_file() {
+  egrep -m 1 '[^[:space:]]' "$1"
+}
+
+DEFAULT_PATH="${HOME}/.rbenv/default"
+
+if [ -z "$RBENV_VERSION" ]; then
+  RBENV_VERSION_FILE="$(rbenv-version-origin)"
+
+  if [ -n "$RBENV_VERSION_FILE" ]; then
+    RBENV_VERSION="$(read_version_file "$RBENV_VERSION_FILE")"
+  else
+    echo system > "$DEFAULT_PATH"
+    RBENV_VERSION=system
+  fi
+fi
+
+if [ "$RBENV_VERSION" = "system" ]; then
+  echo "$RBENV_VERSION"
+  exit
+fi
+
+RBENV_VERSION_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}"
+
+if [ -d "$RBENV_VERSION_PATH" ]; then
+  echo "$RBENV_VERSION"
+else
+  echo "rbenv: version \`$RBENV_VERSION' is not installed" >&2
+  exit 1
+fi

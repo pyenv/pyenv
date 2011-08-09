@@ -3,7 +3,7 @@
 if [ -n "$1" ]; then
   RBENV_VERSION="$1"
 elif [ -z "$RBENV_VERSION" ]; then
-  RBENV_VERSION="$(rbenv-version)"
+  RBENV_VERSION="$(rbenv-version-name)"
 fi
 
 if [ "$RBENV_VERSION" = "system" ]; then

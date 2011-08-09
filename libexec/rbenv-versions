@@ -1,21 +1,23 @@
 #!/usr/bin/env bash -e
 
-RBENV_VERSION="$(rbenv-version)"
-
-hit_prefix="* "
-miss_prefix="  "
+RBENV_VERSION_NAME="$(rbenv-version-name)"
 
 if [ "$1" = "--bare" ]; then
   hit_prefix=""
   miss_prefix=""
+  print_version="$RBENV_VERSION_NAME"
+else
+  hit_prefix="* "
+  miss_prefix="  "
+  print_version="$(rbenv-version)"
 fi
 
 for path in "${HOME}/.rbenv/versions/"*; do
   if [ -d "$path" ]; then
     version="${path##*/}"
 
-    if [ "$version" == "$RBENV_VERSION" ]; then
-      echo "${hit_prefix}${version}"
+    if [ "$version" == "$RBENV_VERSION_NAME" ]; then
+      echo "${hit_prefix}${print_version}"
     else
       echo "${miss_prefix}${version}"
     fi
