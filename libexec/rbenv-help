@@ -32,7 +32,7 @@ For a quick guide to rbenv, see: https://gist.github.com/1120938"
 set-default) echo "usage: rbenv set-default <version>
 
 Sets the default Ruby version. You can override the default at any time
-by setting a directory-specific version with \`rbenv set-default' or by
+by setting a directory-specific version with \`rbenv set-local' or by
 setting the RBENV_VERSION environment variable.
 
 $(print_set_version)"
