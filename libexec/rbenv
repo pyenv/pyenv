@@ -19,7 +19,7 @@ export PATH="${libexec_path}:${PATH}"
 
 command="$1"
 if [ -z "$command" ]; then
-  echo "rbenv 0.1.0" >&2
+  echo -e "rbenv 0.1.0\n$(rbenv-help)" >&2
 
 else
   command_path="$(command -v "rbenv-$command" || true)"
