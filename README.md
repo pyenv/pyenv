@@ -58,6 +58,11 @@ rbenv is `~/.rbenv/shims` in your `$PATH`.
 
 rbenv is a young project, so for now you must install it from source.
 
+**Compatibility note**: rbenv is _incompatible_ with rvm. Things will
+  appear to work until you try to install a gem. The problem is that
+  rvm actually overrides the `gem` command with a shell function!
+  Please remove any references to rvm before using rbenv.
+
 1. Check out rbenv into `~/.rbenv`.
 
         $ cd
