@@ -137,6 +137,13 @@ first argument. The most common subcommands are:
         $ rbenv version
         1.8.7-p352 (set by /Volumes/37signals/basecamp/.rbenv-version)
 
+* **rehash** — installs shims for all Ruby binaries known to rbenv
+    (i.e., `~/.rbenv/versions/*/bin/*`). Run this command after you
+    install a new version of Ruby, or install a gem that provides
+    binaries.
+
+        $ rbenv rehash
+
 ## Contributing
 
 The rbenv source code is [hosted on
