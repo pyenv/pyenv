@@ -1,5 +1,7 @@
 # Simple Ruby Version Management: rbenv
 
+<img src="http://cloud.github.com/downloads/sstephenson/rbenv/rbenv.png" width="894" height="464">
+
 rbenv lets you easily switch between multiple versions of Ruby. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
 tools that do one thing well.
@@ -11,7 +13,7 @@ tools that do one thing well.
 * Allow you to **override the Ruby version** with an environment
   variable.
 
-### rbenv _does not…_
+### In contrast with rvm, rbenv _does not…_
 
 * **Need to be loaded into your shell.** Instead, rbenv's shim
     approach works by adding a directory to your `$PATH`.
