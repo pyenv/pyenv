@@ -2,13 +2,13 @@
 
 rbenv lets you easily switch between multiple versions of Ruby. It's simple, unobtrusive, understandable, and follows in the Unix tradition of single-purpose tools that do one thing well. 
 
-### rbenv _does_…
+### rbenv _does…_
 
 * Let you **change the default Ruby version** on a per-user basis.
 * Provide support for **per-project Ruby versions**.
 * Allow you to **override the Ruby version** with an environment variable.
 
-### rbenv _does not_…
+### rbenv _does not…_
 
 * **Need to be loaded into your shell.** Instead, rbenv's shim approach works by adding a directory to your `$PATH`.
 * **Override shell commands like `cd`.** That's just obnoxious!
