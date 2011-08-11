@@ -36,6 +36,8 @@ tools that do one thing well.
     of executing arbitrary code, rbenv reads just the version name
     from each project. There's nothing to "trust."
 
+## Table of Contents
+
 ## How It Works ##
 
 rbenv operates on the per-user directory `~/.rbenv`. Version names in

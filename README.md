@@ -36,6 +36,8 @@ tools that do one thing well.
     of executing arbitrary code, rbenv reads just the version name
     from each project. There's nothing to "trust."
 
+## Table of Contents
+
    * [1 How It Works](#section_1)
    * [2 Installation](#section_2)
    * [3 Usage](#section_3)
