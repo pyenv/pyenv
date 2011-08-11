@@ -21,7 +21,7 @@ tools that do one thing well.
 * **Have a configuration file.** There's nothing to configure except
     which version of Ruby you want to use.
 * **Install Ruby.** You can build and install Ruby yourself, or use
-    [ruby-build](https://github.com/sstephenson/ruby-build.git) to
+    [ruby-build](https://github.com/sstephenson/ruby-build) to
     automate the process.
 * **Manage gemsets.** [Bundler](http://gembundler.com/) is a better
     way to manage application dependencies. If you have projects that
