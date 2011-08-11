@@ -27,7 +27,7 @@ Some useful rbenv commands are:
    versions      List all Ruby versions known by rbenv
 
 See 'rbenv help <command>' for more information on a specific command.
-For a quick guide to rbenv, see: https://gist.github.com/1120938"
+For more information, see: https://github.com/sstephenson/rbenv#readme
 ;;
 set-default) echo "usage: rbenv set-default <version>
 
