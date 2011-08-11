@@ -1,8 +1,8 @@
 # Simple Ruby Version Management: rbenv
 
 rbenv lets you easily switch between multiple versions of Ruby. It's
-simple, unobtrusive, understandable, and follows in the Unix tradition
-of single-purpose tools that do one thing well.
+simple, unobtrusive, and follows the UNIX tradition of single-purpose
+tools that do one thing well.
 
 ### rbenv _does…_
 
