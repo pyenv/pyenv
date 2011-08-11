@@ -55,7 +55,7 @@ def mdtoc(markdown)
     end
 
     name = section.join(".")
-    lines[line_no] = %(#{"#" * level} <a name="section_#{name}">#{name}</a> #{text})
+    lines[line_no] = %(#{"#" * level} <a name="section_#{name}"></a> #{name} #{text})
 
     title_info << section
     last_section = section
