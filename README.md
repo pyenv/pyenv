@@ -1,6 +1,6 @@
 # Simple Ruby Version Management: rbenv
 
-<img src="http://cloud.github.com/downloads/sstephenson/rbenv/rbenv.png" width="894" height="464">
+<img src="http://i.sstephenson.us/rbenv.png" width="894" height="464">
 
 rbenv lets you easily switch between multiple versions of Ruby. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
