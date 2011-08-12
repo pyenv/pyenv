@@ -17,7 +17,8 @@ tools that do one thing well.
 
 * **Need to be loaded into your shell.** Instead, rbenv's shim
     approach works by adding a directory to your `$PATH`.
-* **Override shell commands like `cd`.** That's just obnoxious!
+* **Override shell commands like `cd`.** That's dangerous and
+    error-prone.
 * **Have a configuration file.** There's nothing to configure except
     which version of Ruby you want to use.
 * **Install Ruby.** You can build and install Ruby yourself, or use
