@@ -1,4 +1,5 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
+set -e
 
 RBENV_COMMAND="$1"
 if [ -z "$RBENV_COMMAND" ]; then
