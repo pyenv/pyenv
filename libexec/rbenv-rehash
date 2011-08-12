@@ -1,8 +1,10 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
+set -e
 
 create_prototype_shim() {
   cat > .rbenv-shim <<SH
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
+set -e
 exec rbenv exec "\${0##*/}" "\$@"
 SH
   chmod +x .rbenv-shim
