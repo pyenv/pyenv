@@ -1,0 +1,12 @@
+#!/usr/bin/env bash -e
+
+RBENV_VERSION="$1"
+if [ -z "$RBENV_VERSION" ]; then
+  echo "usage: rbenv default VERSION" >&2
+  exit 1
+fi
+
+# Make sure the specified version is installed
+rbenv-prefix "$RBENV_VERSION" >/dev/null
+
+echo "$RBENV_VERSION" > "${HOME}/.rbenv/default"

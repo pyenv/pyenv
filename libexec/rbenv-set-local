@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 set -e
 
-RBENV_VERSION="$1"
-if [ -z "$RBENV_VERSION" ]; then
-  echo "usage: rbenv set-local VERSION" >&2
-  exit 1
-fi
-
-# Make sure the specified version is installed
-rbenv-prefix "$RBENV_VERSION" >/dev/null
-
-echo "$RBENV_VERSION" > .rbenv-version
+echo "set-local has been renamed to local" >&2
+rbenv-local "$@"

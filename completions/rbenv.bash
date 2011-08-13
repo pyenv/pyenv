@@ -17,7 +17,7 @@ _rbenv() {
   local prev="${COMP_WORDS[COMP_CWORD-1]}"
 
   case "$prev" in
-  set-* | prefix )
+  default | local | prefix )
     _rbenv_versions
     ;;
   * )

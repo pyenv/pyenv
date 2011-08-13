@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 set -e
 
-RBENV_VERSION="$1"
-if [ -z "$RBENV_VERSION" ]; then
-  echo "usage: rbenv set-default VERSION" >&2
-  exit 1
-fi
-
-# Make sure the specified version is installed
-rbenv-prefix "$RBENV_VERSION" >/dev/null
-
-echo "$RBENV_VERSION" > "${HOME}/.rbenv/default"
+echo "set-default has been renamed to default" >&2
+rbenv-default "$@"
