@@ -22,8 +22,8 @@ case "$1" in
 Some useful rbenv commands are:
    commands      List all commands
    rehash        Rehash rbenv shims (run this after installing binaries)
-   default       Set the default Ruby version
-   local         Set a local directory-specific Ruby version
+   default       Set or show the default Ruby version
+   local         Set or show the local directory-specific Ruby version
    version       Show the current Ruby version
    versions      List all Ruby versions known by rbenv
 
