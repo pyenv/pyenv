@@ -19,11 +19,11 @@ libexec_path="$(abs_dirname "$0")"
 export PATH="${libexec_path}:${PATH}"
 
 command="$1"
-case $command in
-"" | "-h" | "--help")
-  echo -e "rbenv 0.1.0\n$(rbenv-help)" >&2
+case "$command" in
+"" | "-h" | "--help" )
+  echo -e "rbenv 0.1.1\n$(rbenv-help)" >&2
   ;;
-*)
+* )
   command_path="$(command -v "rbenv-$command" || true)"
   if [ -z "$command_path" ]; then
     echo "rbenv: no such command \`$command'" >&2
