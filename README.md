@@ -102,14 +102,14 @@ can manually add `$HOME/.rbenv/shims` to your path in step 2.)
 5. Install Ruby versions into `~/.rbenv/versions`. For example, to
 install Ruby 1.9.2-p290, download and unpack the source, then run:
 
-        $ ./configure --prefix=~/.rbenv/versions/1.9.2-p290
+        $ ./configure --prefix=$HOME/.rbenv/versions/1.9.2-p290
         $ make
         $ make install
 
     The [ruby-build](https://github.com/sstephenson/ruby-build)
     project simplifies this process to a single command:
 
-        $ ruby-build 1.9.2-p290 ~/.rbenv/versions/1.9.2-p290
+        $ ruby-build 1.9.2-p290 $HOME/.rbenv/versions/1.9.2-p290
 
 6. Rebuild the shim binaries. You should do this any time you install
 a new Ruby binary (for example, when installing a new Ruby version, or
