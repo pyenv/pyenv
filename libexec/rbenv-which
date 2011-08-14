@@ -2,6 +2,10 @@
 set -e
 
 expand_path() {
+  if [ ! -d "$1" ]; then
+    return 1
+  fi
+
   local cwd="$(pwd)"
   cd "$1"
   pwd
@@ -14,7 +18,7 @@ remove_from_path() {
 
   for path in ${PATH//:/$'\n'}; do
     path="$(expand_path "$path" || true)"
-    if [ "$path" != "$path_to_remove" ]; then
+    if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
       result="${result}${path}:"
     fi
   done
