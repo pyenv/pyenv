@@ -17,7 +17,8 @@ tools that do one thing well.
 
 * **Need to be loaded into your shell.** Instead, rbenv's shim
     approach works by adding a directory to your `$PATH`.
-* **Override shell commands like `cd`.** That's just obnoxious!
+* **Override shell commands like `cd`.** That's dangerous and
+    error-prone.
 * **Have a configuration file.** There's nothing to configure except
     which version of Ruby you want to use.
 * **Install Ruby.** You can build and install Ruby yourself, or use
@@ -90,14 +91,14 @@ can manually add `$HOME/.rbenv/shims` to your path in step 2.)
 5. Install Ruby versions into `~/.rbenv/versions`. For example, to
 install Ruby 1.9.2-p290, download and unpack the source, then run:
 
-        $ ./configure --prefix=~/.rbenv/versions/1.9.2-p290
+        $ ./configure --prefix=$HOME/.rbenv/versions/1.9.2-p290
         $ make
         $ make install
 
     The [ruby-build](https://github.com/sstephenson/ruby-build)
     project simplifies this process to a single command:
 
-        $ ruby-build 1.9.2-p290 ~/.rbenv/versions/1.9.2-p290
+        $ ruby-build 1.9.2-p290 $HOME/.rbenv/versions/1.9.2-p290
 
 6. Rebuild the shim binaries. You should do this any time you install
 a new Ruby binary (for example, when installing a new Ruby version, or
