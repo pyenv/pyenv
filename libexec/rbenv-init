@@ -58,3 +58,5 @@ echo 'export PATH="${HOME}/.rbenv/shims:${PATH}"'
 if [ "$shell" = "bash" ]; then
   echo "source \"$root/completions/rbenv.bash\""
 fi
+
+echo 'rbenv rehash 2>/dev/null'
