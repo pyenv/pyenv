@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
+resolve_link() {
+  $(type -p greadlink readlink | head -1) $1
+}
+
 abs_dirname() {
   local cwd="$(pwd)"
   local path="$1"
@@ -8,7 +12,7 @@ abs_dirname() {
   while [ -n "$path" ]; do
     cd "${path%/*}"
     local name="${path##*/}"
-    path="$(readlink "$name" || true)"
+    path="$(resolve_link "$name" || true)"
   done
 
   pwd
