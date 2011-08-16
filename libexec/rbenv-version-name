@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
+# Read the first non-whitespace word from the specified file.
 read_version_file() {
-  egrep -m 1 '[^[:space:]]' "$1"
+  local words version
+  while read -a words; do
+    version="${words[0]}"
+    if [ -n "$version" ]; then
+      echo "$version"
+      break
+    fi
+  done < "$1"
 }
 
 DEFAULT_PATH="${HOME}/.rbenv/default"
