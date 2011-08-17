@@ -59,10 +59,10 @@ cd "$SHIM_PATH"
 
 # Create the prototype shim, then make shims for all known binaries.
 create_prototype_shim
+shopt -s nullglob
 make_shims ../versions/*/bin/*
 
 # Find and run any plugins that might want to make shims too.
-shopt -s nullglob
 RBENV_REHASH_PLUGINS=(/etc/rbenv.d/rehash/*.bash ${HOME}/.rbenv/rbenv.d/rehash/*.bash)
 shopt -u nullglob
 
