@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-DEFAULT_PATH="${HOME}/.rbenv/default"
-
 root="$(pwd)"
 while [ -n "$root" ]; do
   if [ -e "${root}/.rbenv-version" ]; then
@@ -12,4 +10,13 @@ while [ -n "$root" ]; do
   root="${root%/*}"
 done
 
-echo "$DEFAULT_PATH"
+GLOBAL_PATH="${HOME}/.rbenv/global"
+DEFAULT_PATH="${HOME}/.rbenv/default"
+
+if [ -e "$GLOBAL_PATH" ]; then
+  echo "$GLOBAL_PATH"
+elif [ -e "$DEFAULT_PATH" ]; then
+  echo "$DEFAULT_PATH"
+else
+  echo "$GLOBAL_PATH"
+fi

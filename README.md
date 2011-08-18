@@ -8,7 +8,7 @@ tools that do one thing well.
 
 ### rbenv _does…_
 
-* Let you **change the default Ruby version** on a per-user basis.
+* Let you **change the global Ruby version** on a per-user basis.
 * Provide support for **per-project Ruby versions**.
 * Allow you to **override the Ruby version** with an environment
   variable.
@@ -42,7 +42,7 @@ tools that do one thing well.
    * [1 How It Works](#section_1)
    * [2 Installation](#section_2)
    * [3 Usage](#section_3)
-      * [3.1 default](#section_3.1)
+      * [3.1 global](#section_3.1)
       * [3.2 local](#section_3.2)
       * [3.3 versions](#section_3.3)
       * [3.4 version](#section_3.4)
@@ -122,26 +122,26 @@ when installing a gem that provides a binary).
 Like `git`, the `rbenv` command delegates to subcommands based on its
 first argument. The most common subcommands are:
 
-### <a name="section_3.1"></a> 3.1 default
+### <a name="section_3.1"></a> 3.1 global
 
-Sets the default version of Ruby to be used in all shells by writing
-the version name to the `~/.rbenv/default` file. This version can be
+Sets the global version of Ruby to be used in all shells by writing
+the version name to the `~/.rbenv/global` file. This version can be
 overridden by a per-project `.rbenv-version` file, or by setting the
 `RBENV_VERSION` environment variable.
 
-    $ rbenv default 1.9.2-p290
+    $ rbenv global 1.9.2-p290
 
 The special version name `system` tells rbenv to use the system Ruby
 (detected by searching your `$PATH`).
 
-When run without a version number, `rbenv default` reports the
-currently configured default version.
+When run without a version number, `rbenv global` reports the
+currently configured global version.
 
 ### <a name="section_3.2"></a> 3.2 local
 
 Sets a local per-project Ruby version by writing the version name to
 an `.rbenv-version` file in the current directory. This version
-overrides the default, and can be overridden itself by setting the
+overrides the global, and can be overridden itself by setting the
 `RBENV_VERSION` environment variable.
 
     $ rbenv local rbx-1.2.4
@@ -157,7 +157,7 @@ the currently active version.
     $ rbenv versions
       1.8.7-p352
       1.9.2-p290
-    * 1.9.3-preview1 (set by /Users/sam/.rbenv/default)
+    * 1.9.3-preview1 (set by /Users/sam/.rbenv/global)
       jruby-1.6.3
       rbx-1.2.4
       ree-1.8.7-2011.03

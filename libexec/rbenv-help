@@ -22,7 +22,7 @@ case "$1" in
 Some useful rbenv commands are:
    commands      List all commands
    rehash        Rehash rbenv shims (run this after installing binaries)
-   default       Set or show the default Ruby version
+   global        Set or show the global Ruby version
    local         Set or show the local directory-specific Ruby version
    version       Show the current Ruby version
    versions      List all Ruby versions known by rbenv
@@ -30,11 +30,11 @@ Some useful rbenv commands are:
 See 'rbenv help <command>' for more information on a specific command.
 For more information, see: https://github.com/sstephenson/rbenv#readme"
 ;;
-default) echo "usage: rbenv default <version>
+global) echo "usage: rbenv global <version>
 
-Sets the default Ruby version. You can override the default at any time
-by setting a directory-specific version with \`rbenv local' or by
-setting the RBENV_VERSION environment variable.
+Sets the global Ruby version. You can override the global version at
+any time by setting a directory-specific version with \`rbenv local'
+or by setting the RBENV_VERSION environment variable.
 
 $(print_set_version)"
 ;;
@@ -45,8 +45,8 @@ name to a file named '.rbenv-version'.
 
 When you run a Ruby command, rbenv will look for an '.rbenv-version'
 file in the current directory and each parent directory. If no such
-file is found in the tree, rbenv will use the default Ruby version
-specified with \`rbenv default', or the version specified in the
+file is found in the tree, rbenv will use the global Ruby version
+specified with \`rbenv global', or the version specified in the
 RBENV_VERSION environment variable.
 
 $(print_set_version)"

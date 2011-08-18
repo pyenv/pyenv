@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-DEFAULT_PATH="${HOME}/.rbenv/default"
-
 if [ -z "$RBENV_VERSION" ]; then
   RBENV_VERSION_FILE="$(rbenv-version-file)"
   RBENV_VERSION="$(rbenv-version-file-read "$RBENV_VERSION_FILE" || true)"
