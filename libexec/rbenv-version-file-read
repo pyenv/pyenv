@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+VERSION_FILE="$1"
+
+if [ -e "$VERSION_FILE" ]; then
+  # Read and print the first non-whitespace word from the specified
+  # version file.
+  while read -a words; do
+    version="${words[0]}"
+    if [ -n "$version" ]; then
+      echo "$version"
+      break
+    fi
+  done < "$VERSION_FILE"
+else
+  exit 1
+fi

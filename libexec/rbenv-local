@@ -1,17 +1,14 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
+set -e
 
 RBENV_VERSION="$1"
-VERSION_FILE=".rbenv-version"
-if [ -z "$RBENV_VERSION" ]; then
-  if [[ -e "$VERSION_FILE" ]]; then
-    cat "$VERSION_FILE"
-  else
-    echo "No local version configured - set with: rbenv local <version>"
-  fi
+RBENV_VERSION_FILE=".rbenv-version"
+
+if [ -n "$RBENV_VERSION" ]; then
+  rbenv-version-file-write "$RBENV_VERSION_FILE" "$RBENV_VERSION"
 else
-  # Make sure the specified version is installed
-  rbenv-prefix "$RBENV_VERSION" >/dev/null
-
-  echo "$RBENV_VERSION" > "$VERSION_FILE"
+  rbenv-version-file-read "$RBENV_VERSION_FILE" ||
+  { echo "rbenv: no local version configured for this directory"
+    exit 1
+  } >&2
 fi
-

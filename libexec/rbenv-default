@@ -1,16 +1,11 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
+set -e
 
 RBENV_VERSION="$1"
-VERSION_FILE="${HOME}/.rbenv/default"
-if [ -z "$RBENV_VERSION" ]; then
-  if [[ -e "$VERSION_FILE" ]]; then
-    cat "$VERSION_FILE"
-  else
-    echo "No default version configured - set with: rbenv default <version>"
-  fi
-else
-  # Make sure the specified version is installed
-  rbenv-prefix "$RBENV_VERSION" >/dev/null
+RBENV_VERSION_FILE="${HOME}/.rbenv/default"
 
-  echo "$RBENV_VERSION" > "$VERSION_FILE"
+if [ -n "$RBENV_VERSION" ]; then
+  rbenv-version-file-write "$RBENV_VERSION_FILE" "$RBENV_VERSION"
+else
+  rbenv-version-file-read "$RBENV_VERSION_FILE" || echo system
 fi

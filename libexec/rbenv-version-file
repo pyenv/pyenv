@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+
+DEFAULT_PATH="${HOME}/.rbenv/default"
+
+root="$(pwd)"
+while [ -n "$root" ]; do
+  if [ -e "${root}/.rbenv-version" ]; then
+    echo "${root}/.rbenv-version"
+    exit
+  fi
+  root="${root%/*}"
+done
+
+echo "$DEFAULT_PATH"
