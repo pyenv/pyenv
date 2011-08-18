@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-echo "set-default has been renamed to default" >&2
-rbenv-default "$@"
+{ echo "rbenv: warning: \`set-default' has been renamed to \`default'"
+  echo "       and will be removed in v0.3.0"
+  echo
+} >&2
+
+exec rbenv-default "$@"

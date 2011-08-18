@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-echo "set-local has been renamed to local" >&2
-rbenv-local "$@"
+{ echo "rbenv: warning: \`set-local' has been renamed to \`local'"
+  echo "       and will be removed in v0.3.0"
+  echo
+} >&2
+
+exec rbenv-local "$@"
