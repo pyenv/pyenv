@@ -8,7 +8,7 @@ tools that do one thing well.
 
 ### rbenv _does…_
 
-* Let you **change the default Ruby version** on a per-user basis.
+* Let you **change the global Ruby version** on a per-user basis.
 * Provide support for **per-project Ruby versions**.
 * Allow you to **override the Ruby version** with an environment
   variable.
@@ -111,26 +111,32 @@ when installing a gem that provides a binary).
 Like `git`, the `rbenv` command delegates to subcommands based on its
 first argument. The most common subcommands are:
 
-### set-default ###
+### global ###
 
-Sets the default version of Ruby to be used in all shells by writing
-the version name to the `~/.rbenv/default` file. This version can be
+Sets the global version of Ruby to be used in all shells by writing
+the version name to the `~/.rbenv/global` file. This version can be
 overridden by a per-project `.rbenv-version` file, or by setting the
 `RBENV_VERSION` environment variable.
 
-    $ rbenv set-default 1.9.2-p290
+    $ rbenv global 1.9.2-p290
 
 The special version name `system` tells rbenv to use the system Ruby
 (detected by searching your `$PATH`).
 
-### set-local ###
+When run without a version number, `rbenv global` reports the
+currently configured global version.
+
+### local ###
 
 Sets a local per-project Ruby version by writing the version name to
 an `.rbenv-version` file in the current directory. This version
-overrides the default, and can be overridden itself by setting the
+overrides the global, and can be overridden itself by setting the
 `RBENV_VERSION` environment variable.
 
-    $ rbenv set-local rbx-1.2.4
+    $ rbenv local rbx-1.2.4
+
+When run without a version number, `rbenv local` reports the currently
+configured local version.
 
 ### versions ###
 
@@ -140,7 +146,7 @@ the currently active version.
     $ rbenv versions
       1.8.7-p352
       1.9.2-p290
-    * 1.9.3-preview1 (set by /Users/sam/.rbenv/default)
+    * 1.9.3-preview1 (set by /Users/sam/.rbenv/global)
       jruby-1.6.3
       rbx-1.2.4
       ree-1.8.7-2011.03
