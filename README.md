@@ -134,8 +134,8 @@ overridden by a per-project `.rbenv-version` file, or by setting the
 The special version name `system` tells rbenv to use the system Ruby
 (detected by searching your `$PATH`).
 
-When run without a version number the currently configured default
-version is reported.
+When run without a version number, `rbenv default` reports the
+currently configured default version.
 
 ### <a name="section_3.2"></a> 3.2 local
 
@@ -146,8 +146,8 @@ overrides the default, and can be overridden itself by setting the
 
     $ rbenv local rbx-1.2.4
 
-When run without a version number the currently configured local
-version is reported.
+When run without a version number, `rbenv local` reports the currently
+configured local version.
 
 ### <a name="section_3.3"></a> 3.3 versions
 
