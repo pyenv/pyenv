@@ -14,7 +14,7 @@ _rbenv_versions() {
 
 _rbenv() {
   case "$words[2]" in
-    set-local | set-default | prefix ) _rbenv_versions ;;
+    set-* | default | local | prefix ) _rbenv_versions ;;
     * ) _rbenv_commands ;;
   esac
 }
