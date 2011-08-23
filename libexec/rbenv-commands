@@ -1,11 +1,25 @@
 #!/usr/bin/env bash
 set -e
 
+if [ "$1" = "--sh" ]; then
+  sh=1
+  shift
+fi
+
 shopt -s nullglob
 
 { for path in ${PATH//:/$'\n'}; do
     for command in "${path}/rbenv-"*; do
-      echo "${command##*rbenv-}"
+      command="${command##*rbenv-}"
+      if [ -n "$sh" ]; then
+        if [ ${command:0:3} = "sh-" ]; then
+          echo ${command##sh-}
+        fi
+      else
+        if [ ${command:0:3} != "sh-" ]; then
+          echo $command
+        fi
+      fi
     done
   done
 } | sort | uniq
