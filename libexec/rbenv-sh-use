@@ -1,0 +1,2 @@
+#!/bin/sh
+echo "export RBENV_VERSION=$1"
