@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-SHIM_PATH="${HOME}/.rbenv/shims"
+SHIM_PATH="${RBENV_HOME}/shims"
 PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.rbenv-shim"
 
 # Create the shims directory if it doesn't already exist.
@@ -63,7 +63,7 @@ shopt -s nullglob
 make_shims ../versions/*/bin/*
 
 # Find and run any plugins that might want to make shims too.
-RBENV_REHASH_PLUGINS=(/etc/rbenv.d/rehash/*.bash ${HOME}/.rbenv/rbenv.d/rehash/*.bash)
+RBENV_REHASH_PLUGINS=(/etc/rbenv.d/rehash/*.bash ${RBENV_HOME}/rbenv.d/rehash/*.bash)
 shopt -u nullglob
 
 for script in ${RBENV_REHASH_PLUGINS[@]}; do
