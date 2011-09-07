@@ -66,3 +66,18 @@ bash | zsh )
 esac
 
 echo 'rbenv rehash 2>/dev/null'
+
+commands=(`rbenv commands --sh`)
+IFS="|"
+cat <<EOS
+function rbenv () {
+  command=\$1;
+  shift;
+  case \$command in
+  ${commands[*]})
+    eval \`rbenv sh-\$command \$@\`;;
+  *)
+    command rbenv \$command \$@;;
+  esac;
+};
+EOS
