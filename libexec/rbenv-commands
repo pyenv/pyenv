@@ -6,6 +6,11 @@ if [ "$1" = "--sh" ]; then
   shift
 fi
 
+if [ "$1" = "--no-sh" ]; then
+  nosh=1
+  shift
+fi
+
 shopt -s nullglob
 
 { for path in ${PATH//:/$'\n'}; do
@@ -15,12 +20,13 @@ shopt -s nullglob
         if [ ${command:0:3} = "sh-" ]; then
           echo ${command##sh-}
         fi
-      else
+      elif [ -n "$nosh" ]; then
         if [ ${command:0:3} != "sh-" ]; then
-          echo $command
+          echo ${command##sh-}
         fi
+      else
+        echo ${command##sh-}
       fi
     done
   done
 } | sort | uniq
-
