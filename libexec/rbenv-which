@@ -16,6 +16,11 @@ remove_from_path() {
   local path_to_remove="$(expand_path "$1")"
   local result=""
 
+  if [ -z "$path_to_remove" ]; then
+    echo "${PATH}"
+    return
+  fi
+
   for path in ${PATH//:/$'\n'}; do
     path="$(expand_path "$path" || true)"
     if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
