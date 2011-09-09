@@ -6,8 +6,8 @@ if [ -z "$RBENV_VERSION" ]; then
   RBENV_VERSION="$(rbenv-version-file-read "$RBENV_VERSION_FILE" || true)"
 fi
 
-if [ "$RBENV_VERSION" = "system" ]; then
-  echo "$RBENV_VERSION"
+if [ -z "$RBENV_VERSION" ] || [ "$RBENV_VERSION" = "system" ]; then
+  echo "system"
   exit
 fi
 
