@@ -12,5 +12,12 @@ version=$1
 if [ -d "$HOME/.rbenv/versions/$version" ]; then
   echo "export RBENV_VERSION=$version"
 else
-  echo "rbenv: version \`$version' is not installed" >&2
+  case $version in
+    default|reset)
+      echo "unset RBENV_VERSION"
+      ;;
+    *)
+      echo "rbenv: version \`$version' is not installed" >&2
+      exit 1
+  esac
 fi
