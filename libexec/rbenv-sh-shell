@@ -13,7 +13,7 @@ if [ -d "$HOME/.rbenv/versions/$version" ]; then
   echo "export RBENV_VERSION=$version"
 else
   case $version in
-    default|reset)
+    default)
       echo "unset RBENV_VERSION"
       ;;
     *)
