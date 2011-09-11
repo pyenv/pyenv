@@ -1,23 +1,24 @@
-#!/bin/sh
+#!/usr/bin/env bash
+set -e
 
-if [ -z "$1" ]; then
-  echo "Please specify one of the following Ruby versions to use:" >&2
-  echo "" >&2
-  echo "$(rbenv-versions)" >&2
+version="$1"
+
+if [ -z "$version" ]; then
+  if [ -z "$RBENV_VERSION" ]; then
+    echo "rbenv: no shell-specific version configured" >&2
+    exit 1
+  else
+    echo "echo \"\$RBENV_VERSION\""
+    exit
+  fi
+fi
+
+if [ "$version" = "--unset" ]; then
+  echo "unset RBENV_VERSION"
   exit 1
 fi
 
-version=$1
+# Make sure the specified version is installed.
+rbenv-prefix "$version" >/dev/null
 
-if [ -d "$HOME/.rbenv/versions/$version" ]; then
-  echo "export RBENV_VERSION=$version"
-else
-  case $version in
-    default)
-      echo "unset RBENV_VERSION"
-      ;;
-    *)
-      echo "rbenv: version \`$version' is not installed" >&2
-      exit 1
-  esac
-fi
+echo "export RBENV_VERSION=\"${version}\""
