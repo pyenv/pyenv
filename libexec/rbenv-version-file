@@ -10,8 +10,8 @@ while [ -n "$root" ]; do
   root="${root%/*}"
 done
 
-GLOBAL_PATH="${RBENV_HOME}/global"
-DEFAULT_PATH="${RBENV_HOME}/default"
+GLOBAL_PATH="${RBENV_ROOT}/global"
+DEFAULT_PATH="${RBENV_ROOT}/default"
 
 if [ -e "$GLOBAL_PATH" ]; then
   echo "$GLOBAL_PATH"

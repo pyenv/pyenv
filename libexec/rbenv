@@ -20,7 +20,7 @@ abs_dirname() {
 }
 
 rbenv_install_location=$(abs_dirname "$(dirname $0)")
-export RBENV_HOME="${rbenv_install_location}"
+export RBENV_ROOT="${rbenv_install_location}"
 
 libexec_path="$(abs_dirname "$0")"
 export PATH="${libexec_path}:${PATH}"
