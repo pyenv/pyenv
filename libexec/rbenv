@@ -19,6 +19,9 @@ abs_dirname() {
   cd "$cwd"
 }
 
+rbenv_install_location=$(abs_dirname "$(dirname $0)")
+export RBENV_HOME="${rbenv_install_location}"
+
 libexec_path="$(abs_dirname "$0")"
 export PATH="${libexec_path}:${PATH}"
 

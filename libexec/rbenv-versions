@@ -13,7 +13,7 @@ else
   print_version="$(rbenv-version)"
 fi
 
-for path in "${HOME}/.rbenv/versions/"*; do
+for path in "${RBENV_HOME}/versions/"*; do
   if [ -d "$path" ]; then
     version="${path##*/}"
 

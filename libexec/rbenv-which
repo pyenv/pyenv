@@ -35,14 +35,14 @@ RBENV_VERSION="$(rbenv-version-name)"
 RBENV_COMMAND="$1"
 
 if [ "$RBENV_VERSION" = "system" ]; then
-  PATH="$(remove_from_path "${HOME}/.rbenv/shims")"
+  PATH="$(remove_from_path "${RBENV_HOME}/shims")"
   RBENV_COMMAND_PATH="$(command -v "$RBENV_COMMAND")"
 else
-  RBENV_COMMAND_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
+  RBENV_COMMAND_PATH="${RBENV_HOME}/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
 fi
 
 shopt -s nullglob
-RBENV_WHICH_PLUGINS=(/etc/rbenv.d/which/*.bash ${HOME}/.rbenv/rbenv.d/which/*.bash)
+RBENV_WHICH_PLUGINS=(/etc/rbenv.d/which/*.bash ${RBENV_HOME}/rbenv.d/which/*.bash)
 shopt -u nullglob
 
 for script in ${RBENV_WHICH_PLUGINS[@]}; do

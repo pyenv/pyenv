@@ -2,12 +2,12 @@
 set -e
 
 RBENV_VERSION="$1"
-RBENV_VERSION_FILE="${HOME}/.rbenv/global"
+RBENV_VERSION_FILE="${RBENV_HOME}/global"
 
 if [ -n "$RBENV_VERSION" ]; then
   rbenv-version-file-write "$RBENV_VERSION_FILE" "$RBENV_VERSION"
 else
   rbenv-version-file-read "$RBENV_VERSION_FILE" ||
-  rbenv-version-file-read "${HOME}/.rbenv/default" ||
+  rbenv-version-file-read "${RBENV_HOME}/default" ||
   echo system
 fi

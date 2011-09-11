@@ -11,7 +11,7 @@ if [ -z "$RBENV_VERSION" ] || [ "$RBENV_VERSION" = "system" ]; then
   exit
 fi
 
-RBENV_VERSION_PATH="${HOME}/.rbenv/versions/${RBENV_VERSION}"
+RBENV_VERSION_PATH="${RBENV_HOME}/versions/${RBENV_VERSION}"
 
 if [ -d "$RBENV_VERSION_PATH" ]; then
   echo "$RBENV_VERSION"
