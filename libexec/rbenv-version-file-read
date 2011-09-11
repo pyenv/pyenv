@@ -10,7 +10,7 @@ if [ -e "$VERSION_FILE" ]; then
     version="${words[0]}"
     if [ -n "$version" ]; then
       echo "$version"
-      break
+      exit
     fi
   done < <( cat "$VERSION_FILE" && echo )
 fi
