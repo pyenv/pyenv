@@ -1,12 +1,12 @@
 compctl -K _rbenv rbenv
 
 function _rbenv_commands() {
-  cmds_str="$(rbenv commands)"
+  local cmds_str="$(rbenv commands)"
   reply=("${(ps:\n:)cmds_str}")
 }
 
 _rbenv_versions() {
-  versions_str="$(rbenv versions --bare)"
+  local versions_str="$(rbenv versions --bare)"
   reply=(system "${(ps:\n:)versions_str}")
 }
 
