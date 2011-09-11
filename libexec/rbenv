@@ -19,8 +19,10 @@ abs_dirname() {
   cd "$cwd"
 }
 
-rbenv_install_location=$(abs_dirname "$(dirname $0)")
-export RBENV_ROOT="${rbenv_install_location}"
+if [ -z "${RBENV_ROOT}" ]; then
+  RBENV_ROOT="${HOME}/.rbenv"
+fi
+export RBENV_ROOT
 
 libexec_path="$(abs_dirname "$0")"
 export PATH="${libexec_path}:${PATH}"
