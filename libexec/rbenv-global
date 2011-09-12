@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+[ -n "$RBENV_DEBUG" ] && set -x
 
 RBENV_VERSION="$1"
 RBENV_VERSION_FILE="${RBENV_ROOT}/global"

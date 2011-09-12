@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+[ -n "$RBENV_DEBUG" ] && set -x
 
 if [ "$1" = "--path" ]; then
   print_paths="1"

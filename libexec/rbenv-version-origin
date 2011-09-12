@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+[ -n "$RBENV_DEBUG" ] && set -x
 
 if [ -n "$RBENV_VERSION" ]; then
   echo "RBENV_VERSION environment variable"
