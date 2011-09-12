@@ -37,6 +37,7 @@ create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
 set -e
+export RBENV_ROOT="$RBENV_ROOT"
 exec rbenv exec "\${0##*/}" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
