@@ -2,6 +2,12 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec rbenv-versions --bare
+fi
+
 if [ -n "$1" ]; then
   export RBENV_VERSION="$1"
 elif [ -z "$RBENV_VERSION" ]; then

@@ -4,7 +4,6 @@ set -e
 
 # Provide rbenv completions
 if [ "$1" = "--complete" ]; then
-  shift
   echo system --unset
   exec rbenv-versions --bare
 fi
