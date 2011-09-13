@@ -1,29 +1,14 @@
-_rbenv_commands() {
-  COMPREPLY=()
-  local cur="${COMP_WORDS[COMP_CWORD]}"
-  COMPREPLY=( $( compgen -W "$(rbenv commands)" -- $cur ) )
-}
-
-_rbenv_versions() {
-  COMPREPLY=()
-  local cur="${COMP_WORDS[COMP_CWORD]}"
-  local versions="$(echo system; rbenv versions --bare)"
-  COMPREPLY=( $( compgen -W "$versions" -- $cur ) )
-}
-
 _rbenv() {
   COMPREPLY=()
-  local cur="${COMP_WORDS[COMP_CWORD]}"
-  local prev="${COMP_WORDS[COMP_CWORD-1]}"
+  local word="${COMP_WORDS[COMP_CWORD]}"
 
-  case "$prev" in
-  set-* | global | local | shell | prefix )
-    _rbenv_versions
-    ;;
-  * )
-    _rbenv_commands
-    ;;
-  esac
+  if [ "$COMP_CWORD" -eq 1 ]; then
+    COMPREPLY=( $(compgen -W "$(rbenv commands)" -- "$word") )
+  else
+    local command="${COMP_WORDS[1]}"
+    local completions="$(rbenv completions "$command")"
+    COMPREPLY=( $(compgen -W "$completions" -- "$word") )
+  fi
 }
 
 complete -F _rbenv rbenv

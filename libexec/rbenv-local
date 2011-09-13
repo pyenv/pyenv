@@ -2,6 +2,13 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  shift
+  echo system
+  exec rbenv-versions --bare
+fi
+
 RBENV_VERSION="$1"
 RBENV_VERSION_FILE=".rbenv-version"
 

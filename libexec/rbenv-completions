@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+COMMAND="$1"
+if [ -z "$COMMAND" ]; then
+  echo "usage: rbenv completions COMMAND [arg1 arg2...]" >&2
+  exit 1
+fi
+
+COMMAND_PATH="$(command -v "rbenv-$COMMAND")"
+if grep -i "^# provide rbenv completions" "$COMMAND_PATH" >/dev/null; then
+  shift
+  exec "$COMMAND_PATH" --complete "$@"
+fi
