@@ -3,7 +3,7 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
 if [ -n "$1" ]; then
-  RBENV_VERSION="$1"
+  export RBENV_VERSION="$1"
 elif [ -z "$RBENV_VERSION" ]; then
   RBENV_VERSION="$(rbenv-version-name)"
 fi
