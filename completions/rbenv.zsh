@@ -1,19 +1,15 @@
 compctl -K _rbenv rbenv
 
-function _rbenv_commands() {
-  local cmds_str="$(rbenv commands)"
-  reply=("${(ps:\n:)cmds_str}")
-}
-
-_rbenv_versions() {
-  local versions_str="$(rbenv versions --bare)"
-  reply=(system "${(ps:\n:)versions_str}")
-}
-
 _rbenv() {
+  local word words completions
   read -cA words
-  case "$words[2]" in
-    set-* | global | local | shell | prefix ) _rbenv_versions ;;
-    * ) _rbenv_commands ;;
-  esac
+  word="${words[2]}"
+
+  if [ "${#words}" -eq 2 ]; then
+    completions="$(rbenv commands)"
+  else
+    completions="$(rbenv completions "${word}")"
+  fi
+
+  reply=("${(ps:\n:)completions}")
 }

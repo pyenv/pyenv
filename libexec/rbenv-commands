@@ -4,7 +4,8 @@ set -e
 
 # Provide rbenv completions
 if [ "$1" = "--complete" ]; then
-  echo --sh --no-sh
+  echo --sh
+  echo --no-sh
   exit
 fi
 
