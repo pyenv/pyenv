@@ -2,12 +2,16 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  echo --sh --no-sh
+  exit
+fi
+
 if [ "$1" = "--sh" ]; then
   sh=1
   shift
-fi
-
-if [ "$1" = "--no-sh" ]; then
+elif [ "$1" = "--no-sh" ]; then
   nosh=1
   shift
 fi
