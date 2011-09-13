@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  echo --short
+  exit
+fi
+
+for command in "${RBENV_ROOT}/shims/"*; do
+  if [ "$1" = "--short" ]; then
+    echo "${command##*/}"
+  else
+    echo "$command"
+  fi
+done | sort
