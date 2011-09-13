@@ -2,6 +2,14 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  for command in "${RBENV_ROOT}/shims/"*; do
+    echo "${command##*/}"
+  done
+  exit
+fi
+
 RBENV_COMMAND="$1"
 if [ -z "$RBENV_COMMAND" ]; then
   echo "usage: rbenv exec COMMAND [arg1 arg2...]" >&2
