@@ -35,6 +35,11 @@ remove_from_path() {
 RBENV_VERSION="$(rbenv-version-name)"
 RBENV_COMMAND="$1"
 
+if [ -z "$RBENV_COMMAND" ]; then
+  echo "usage: rbenv which COMMAND" >&2
+  exit 1
+fi
+
 if [ "$RBENV_VERSION" = "system" ]; then
   PATH="$(remove_from_path "${RBENV_ROOT}/shims")"
   RBENV_COMMAND_PATH="$(command -v "$RBENV_COMMAND")"
