@@ -109,7 +109,7 @@ install Ruby 1.9.2-p290, download and unpack the source, then run:
     The [ruby-build](https://github.com/sstephenson/ruby-build)
     project simplifies this process to a single command:
 
-        $ ruby-build 1.9.2-p290 $HOME/.rbenv/versions/1.9.2-p290
+        $ rbenv install 1.9.2-p290
 
 6. Rebuild the shim binaries. You should do this any time you install
 a new Ruby binary (for example, when installing a new Ruby version, or
