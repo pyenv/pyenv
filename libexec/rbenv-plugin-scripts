@@ -11,9 +11,9 @@ if [ "$1" = "--complete" ]; then
 fi
 
 shopt -s nullglob
-RBENV_EXEC_PLUGINS=(/etc/rbenv.d/$1/*.bash ${RBENV_ROOT}/rbenv.d/$1/*.bash)
+SCRIPTS=(/etc/rbenv.d/$1/*.bash ${RBENV_ROOT}/rbenv.d/$1/*.bash)
 shopt -u nullglob
 
-for script in ${RBENV_EXEC_PLUGINS[@]}; do
+for script in ${SCRIPTS[@]}; do
   echo $script
 done
