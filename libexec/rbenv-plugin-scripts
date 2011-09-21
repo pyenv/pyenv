@@ -17,9 +17,9 @@ if [ -z "$RBENV_COMMAND" ]; then
 fi
 
 shopt -s nullglob
-SCRIPTS=(/etc/rbenv.d/"$RBENV_COMMAND"/*.bash ${RBENV_ROOT}/rbenv.d/"$RBENV_COMMAND"/*.bash)
-shopt -u nullglob
-
-for script in ${SCRIPTS[@]}; do
-  echo $script
+for path in ${RBENV_PLUGIN_PATH//:/$'\n'}; do
+  for script in $path/"$RBENV_COMMAND"/*.bash; do
+    echo $script
+  done
 done
+shopt -u nullglob
