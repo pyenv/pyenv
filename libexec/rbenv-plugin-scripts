@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  echo exec
+  echo rehash
+  echo which
+  exit
+fi
+
+shopt -s nullglob
+RBENV_EXEC_PLUGINS=(/etc/rbenv.d/$1/*.bash ${RBENV_ROOT}/rbenv.d/$1/*.bash)
+shopt -u nullglob
+
+for script in ${RBENV_EXEC_PLUGINS[@]}; do
+  echo $script
+done
