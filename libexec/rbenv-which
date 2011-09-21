@@ -52,12 +52,8 @@ else
   RBENV_COMMAND_PATH="${RBENV_ROOT}/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
 fi
 
-shopt -s nullglob
-RBENV_WHICH_PLUGINS=(/etc/rbenv.d/which/*.bash ${RBENV_ROOT}/rbenv.d/which/*.bash)
-shopt -u nullglob
-
-for script in ${RBENV_WHICH_PLUGINS[@]}; do
-  source $script
+for script in $(rbenv-plugin-scripts which); do
+  source "$script"
 done
 
 if [ -x "$RBENV_COMMAND_PATH" ]; then

@@ -16,12 +16,8 @@ fi
 RBENV_COMMAND_PATH="$(rbenv-which "$RBENV_COMMAND")"
 RBENV_BIN_PATH="${RBENV_COMMAND_PATH%/*}"
 
-shopt -s nullglob
-RBENV_EXEC_PLUGINS=(/etc/rbenv.d/exec/*.bash ${RBENV_ROOT}/rbenv.d/exec/*.bash)
-shopt -u nullglob
-
-for script in ${RBENV_EXEC_PLUGINS[@]}; do
-  source $script
+for script in $(rbenv-plugin-scripts exec); do
+  source "$script"
 done
 
 shift 1

@@ -67,13 +67,9 @@ create_prototype_shim
 shopt -s nullglob
 make_shims ../versions/*/bin/*
 
-# Find and run any plugins that might want to make shims too.
-RBENV_REHASH_PLUGINS=(/etc/rbenv.d/rehash/*.bash ${RBENV_ROOT}/rbenv.d/rehash/*.bash)
-shopt -u nullglob
-
 # Restore the previous working directory.
 cd "$CUR_PATH"
 
-for script in ${RBENV_REHASH_PLUGINS[@]}; do
-  source $script
+for script in $(rbenv-plugin-scripts rehash); do
+  source "$script"
 done

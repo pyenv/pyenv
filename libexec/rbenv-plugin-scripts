@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  echo exec
+  echo rehash
+  echo which
+  exit
+fi
+
+RBENV_COMMAND="$1"
+if [ -z "$RBENV_COMMAND" ]; then
+  echo "usage: rbenv plugin-scripts COMMAND" >&2
+  exit 1
+fi
+
+shopt -s nullglob
+for path in ${RBENV_PLUGIN_PATH//:/$'\n'}; do
+  for script in $path/"$RBENV_COMMAND"/*.bash; do
+    echo $script
+  done
+done
+shopt -u nullglob
