@@ -71,5 +71,5 @@ make_shims ../versions/*/bin/*
 cd "$CUR_PATH"
 
 for script in $(rbenv-plugin-scripts rehash); do
-  source $script;
+  source "$script"
 done

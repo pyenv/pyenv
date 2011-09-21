@@ -53,7 +53,7 @@ else
 fi
 
 for script in $(rbenv-plugin-scripts which); do
-  source $script;
+  source "$script"
 done
 
 if [ -x "$RBENV_COMMAND_PATH" ]; then
