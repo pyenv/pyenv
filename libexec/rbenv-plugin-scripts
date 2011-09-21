@@ -10,8 +10,14 @@ if [ "$1" = "--complete" ]; then
   exit
 fi
 
+RBENV_COMMAND="$1"
+if [ -z "$RBENV_COMMAND" ]; then
+  echo "usage: rbenv plugin-scripts COMMAND" >&2
+  exit 1
+fi
+
 shopt -s nullglob
-SCRIPTS=(/etc/rbenv.d/$1/*.bash ${RBENV_ROOT}/rbenv.d/$1/*.bash)
+SCRIPTS=(/etc/rbenv.d/"$RBENV_COMMAND"/*.bash ${RBENV_ROOT}/rbenv.d/"$RBENV_COMMAND"/*.bash)
 shopt -u nullglob
 
 for script in ${SCRIPTS[@]}; do
