@@ -52,7 +52,7 @@ else
   RBENV_COMMAND_PATH="${RBENV_ROOT}/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
 fi
 
-for script in $(rbenv-plugin-scripts which); do
+for script in $(rbenv-hooks which); do
   source "$script"
 done
 

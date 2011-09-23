@@ -28,7 +28,7 @@ fi
 export RBENV_ROOT
 
 
-export RBENV_PLUGIN_PATH="${RBENV_PLUGIN_PATH}:${RBENV_ROOT}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d"
+export RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d"
 
 libexec_path="$(abs_dirname "$0")"
 export PATH="${libexec_path}:${PATH}"

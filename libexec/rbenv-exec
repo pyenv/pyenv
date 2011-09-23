@@ -16,7 +16,7 @@ fi
 RBENV_COMMAND_PATH="$(rbenv-which "$RBENV_COMMAND")"
 RBENV_BIN_PATH="${RBENV_COMMAND_PATH%/*}"
 
-for script in $(rbenv-plugin-scripts exec); do
+for script in $(rbenv-hooks exec); do
   source "$script"
 done
 
