@@ -16,10 +16,29 @@ if [ -z "$RBENV_COMMAND" ]; then
   exit 1
 fi
 
+resolve_link() {
+  $(type -p greadlink readlink | head -1) $1
+}
+
+realpath() {
+  local cwd="$(pwd)"
+  local base="$(basename $1)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  echo "$(pwd)/$base"
+  cd "$cwd"
+}
+
 shopt -s nullglob
 for path in ${RBENV_PLUGIN_PATH//:/$'\n'}; do
   for script in $path/"$RBENV_COMMAND"/*.bash; do
-    echo $script
+    echo $(realpath $script)
   done
 done
 shopt -u nullglob
