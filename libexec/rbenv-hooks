@@ -12,7 +12,7 @@ fi
 
 RBENV_COMMAND="$1"
 if [ -z "$RBENV_COMMAND" ]; then
-  echo "usage: rbenv plugin-scripts COMMAND" >&2
+  echo "usage: rbenv hooks COMMAND" >&2
   exit 1
 fi
 
@@ -36,7 +36,7 @@ realpath() {
 }
 
 shopt -s nullglob
-for path in ${RBENV_PLUGIN_PATH//:/$'\n'}; do
+for path in ${RBENV_HOOK_PATH//:/$'\n'}; do
   for script in $path/"$RBENV_COMMAND"/*.bash; do
     echo $(realpath $script)
   done

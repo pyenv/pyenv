@@ -28,10 +28,22 @@ fi
 export RBENV_ROOT
 
 
-export RBENV_PLUGIN_PATH="${RBENV_PLUGIN_PATH}:${RBENV_ROOT}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d"
+shopt -s nullglob
 
-libexec_path="$(abs_dirname "$0")"
-export PATH="${libexec_path}:${PATH}"
+bin_path="$(abs_dirname "$0")"
+for plugin_bin in "${RBENV_ROOT}/plugins/"*/bin; do
+  bin_path="${bin_path}:${plugin_bin}"
+done
+export PATH="${bin_path}:${PATH}"
+
+hook_path="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d"
+for plugin_hook in "${RBENV_ROOT}/plugins/"*/etc/rbenv.d; do
+  hook_path="${hook_path}:${plugin_hook}"
+done
+export RBENV_HOOK_PATH="$hook_path"
+
+shopt -u nullglob
+
 
 command="$1"
 case "$command" in

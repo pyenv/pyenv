@@ -70,6 +70,6 @@ make_shims ../versions/*/bin/*
 # Restore the previous working directory.
 cd "$CUR_PATH"
 
-for script in $(rbenv-plugin-scripts rehash); do
+for script in $(rbenv-hooks rehash); do
   source "$script"
 done
