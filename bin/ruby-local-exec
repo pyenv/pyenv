@@ -12,9 +12,5 @@
 # `cd` into the project first.
 
 set -e
-
-if [ -z "$RBENV_DIR" ]; then
-  export RBENV_DIR="${1%/*}"
-fi
-
+export RBENV_DIR="${1%/*}"
 exec ruby "$@"
