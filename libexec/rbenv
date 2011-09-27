@@ -27,6 +27,11 @@ else
 fi
 export RBENV_ROOT
 
+if [ -z "${RBENV_DIR}" ]; then
+  RBENV_DIR="$(pwd)"
+fi
+export RBENV_DIR
+
 
 shopt -s nullglob
 

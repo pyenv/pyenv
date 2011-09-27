@@ -13,11 +13,8 @@
 
 set -e
 
-cwd="$(pwd)"
-dirname="${1%/*}"
-
-cd "$dirname"
-export RBENV_VERSION="$(rbenv version-name)"
-cd "$cwd"
+if [ -z "$RBENV_DIR" ]; then
+  export RBENV_DIR="${1%/*}"
+fi
 
 exec ruby "$@"

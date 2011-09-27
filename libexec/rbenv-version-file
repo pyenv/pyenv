@@ -2,7 +2,7 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
-root="$(pwd)"
+root="$RBENV_DIR"
 while [ -n "$root" ]; do
   if [ -e "${root}/.rbenv-version" ]; then
     echo "${root}/.rbenv-version"
