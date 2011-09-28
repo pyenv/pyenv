@@ -25,6 +25,7 @@ Some useful rbenv commands are:
    rehash        Rehash rbenv shims (run this after installing binaries)
    global        Set or show the global Ruby version
    local         Set or show the local directory-specific Ruby version
+   shell         Set or show the shell-specific Ruby version
    version       Show the current Ruby version
    versions      List all Ruby versions known by rbenv
 
@@ -40,6 +41,7 @@ or by setting the RBENV_VERSION environment variable.
 $(print_set_version)"
 ;;
 local) echo "usage: rbenv local <version>
+       rbenv local --unset
 
 Sets the local directory-specific Ruby version by writing the version
 name to a file named '.rbenv-version'.
@@ -49,6 +51,15 @@ file in the current directory and each parent directory. If no such
 file is found in the tree, rbenv will use the global Ruby version
 specified with \`rbenv global', or the version specified in the
 RBENV_VERSION environment variable.
+
+$(print_set_version)"
+;;
+shell) echo "usage: rbenv shell <version>
+       rbenv shell --unset
+
+Sets a shell-specific Ruby version by setting the 'RBENV_VERSION'
+environment variable in your shell. This version overrides both
+project-specific versions and the global version.
 
 $(print_set_version)"
 ;;
