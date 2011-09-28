@@ -100,13 +100,13 @@ easy to fork and contribute any changes back upstream.
 
         $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> .bash_profile
 
-    **ZSH note**: Modifiy your `~/.zshrc` file instead of `~/.bash_profile`.
+    **Zsh note**: Modifiy your `~/.zshrc` file instead of `~/.bash_profile`.
 
 3. Add rbenv init to your shell to enable shims and autocompletion.
 
         $ echo 'eval "$(rbenv init -)"' >> .bash_profile
 
-    **ZSH note**: Modifiy your `~/.zshrc` file instead of `~/.bash_profile`.
+    **Zsh note**: Modifiy your `~/.zshrc` file instead of `~/.bash_profile`.
 
 4. Restart your shell so the path changes take effect. You can now
    begin using rbenv.
@@ -187,7 +187,7 @@ Heres what `rbenv init` actually does:
 
 2. Installs autocompletion. This is entirely optional but pretty
    useful. Sourcing `~/.rbenv/completions/rbenv.bash` will set that
-   up. There is also a `~/.rbenv/completions/rbenv.zsh` for ZSH
+   up. There is also a `~/.rbenv/completions/rbenv.zsh` for Zsh
    users.
 
 3. Initial rehash. From time to time you'll need to rebuild you're
@@ -334,7 +334,7 @@ tracker](https://github.com/sstephenson/rbenv/issues).
 * Added support for debugging rbenv via `set -x` when the
   `$RBENV_DEBUG` environment variable is set.
 * Refactored the autocompletion system so that completions are now
-  built-in to each command and shared between bash and zsh.
+  built-in to each command and shared between bash and Zsh.
 * Added support for plugin bundles in `~/.rbenv/plugins` as documented
   in [issue #102](https://github.com/sstephenson/rbenv/pull/102).
 * Added `/usr/local/etc/rbenv.d` to the list of directories searched
@@ -350,7 +350,7 @@ tracker](https://github.com/sstephenson/rbenv/issues).
 * Made the `rbenv rehash` command operate atomically.
 * Modified the `rbenv init` script to automatically run `rbenv
   rehash` so that shims are recreated whenever a new shell is opened.
-* Added initial support for zsh autocompletion.
+* Added initial support for Zsh autocompletion.
 * Removed the dependency on egrep for reading version files.
 
 **0.1.1** (August 14, 2011)
