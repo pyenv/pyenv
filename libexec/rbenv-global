@@ -9,12 +9,13 @@ if [ "$1" = "--complete" ]; then
 fi
 
 RBENV_VERSION="$1"
-RBENV_VERSION_FILE="${RBENV_ROOT}/global"
+RBENV_VERSION_FILE="${RBENV_ROOT}/version"
 
 if [ -n "$RBENV_VERSION" ]; then
   rbenv-version-file-write "$RBENV_VERSION_FILE" "$RBENV_VERSION"
 else
   rbenv-version-file-read "$RBENV_VERSION_FILE" ||
+  rbenv-version-file-read "${RBENV_ROOT}/global" ||
   rbenv-version-file-read "${RBENV_ROOT}/default" ||
   echo system
 fi

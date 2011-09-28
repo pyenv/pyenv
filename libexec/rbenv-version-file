@@ -11,13 +11,14 @@ while [ -n "$root" ]; do
   root="${root%/*}"
 done
 
-GLOBAL_PATH="${RBENV_ROOT}/global"
-DEFAULT_PATH="${RBENV_ROOT}/default"
+global_version_file="${RBENV_ROOT}/version"
 
-if [ -e "$GLOBAL_PATH" ]; then
-  echo "$GLOBAL_PATH"
-elif [ -e "$DEFAULT_PATH" ]; then
-  echo "$DEFAULT_PATH"
+if [ -e "$global_version_file" ]; then
+  echo "$global_version_file"
+elif [ -e "${RBENV_ROOT}/global" ]; then
+  echo "${RBENV_ROOT}/global"
+elif [ -e "${RBENV_ROOT}/default" ]; then
+  echo "${RBENV_ROOT}/default"
 else
-  echo "$GLOBAL_PATH"
+  echo "$global_version_file"
 fi
