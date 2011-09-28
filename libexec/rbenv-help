@@ -21,13 +21,15 @@ case "$1" in
 "") echo "usage: rbenv <command> [<args>]
 
 Some useful rbenv commands are:
-   commands      List all commands
+   commands      List all rbenv commands
    rehash        Rehash rbenv shims (run this after installing binaries)
    global        Set or show the global Ruby version
    local         Set or show the local directory-specific Ruby version
    shell         Set or show the shell-specific Ruby version
    version       Show the current Ruby version
    versions      List all Ruby versions known by rbenv
+   which         Show the full path for the given Ruby command
+   whence        List all Ruby versions with the given command
 
 See 'rbenv help <command>' for more information on a specific command.
 For more information, see: https://github.com/sstephenson/rbenv#readme"
@@ -62,6 +64,15 @@ environment variable in your shell. This version overrides both
 project-specific versions and the global version.
 
 $(print_set_version)"
+;;
+which) echo "usage: rbenv which <command>
+
+Displays the full path to the binary that rbenv will execute when you
+run the given command."
+;;
+whence) echo "usage: rbenv whence <command>
+
+Lists all Ruby versions with the given command installed."
 ;;
 *) echo "No command arguments needed or invalid/undocumented command."
 esac

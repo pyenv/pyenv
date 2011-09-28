@@ -48,6 +48,8 @@ tools that do one thing well.
       * [3.4 rbenv versions](#section_3.4)
       * [3.5 rbenv version](#section_3.5)
       * [3.6 rbenv rehash](#section_3.6)
+      * [3.7 rbenv which](#section_3.7)
+      * [3.8 rbenv whence](#section_3.8)
    * [4 Contributing](#section_4)
       * [4.1 License](#section_4.1)
 
@@ -56,11 +58,11 @@ tools that do one thing well.
 rbenv operates on the per-user directory `~/.rbenv`. Version names in
 rbenv correspond to subdirectories of `~/.rbenv/versions`. For
 example, you might have `~/.rbenv/versions/1.8.7-p354` and
-`~/.rbenv/versions/1.9.3-preview1`.
+`~/.rbenv/versions/1.9.3-rc1`.
 
 Each version is a working tree with its own binaries, like
 `~/.rbenv/versions/1.8.7-p354/bin/ruby` and
-`~/.rbenv/versions/1.9.3-preview1/irb`. rbenv makes _shim binaries_
+`~/.rbenv/versions/1.9.3-rc1/bin/irb`. rbenv makes _shim binaries_
 for every such binary across all installed versions of Ruby.
 
 These shims are simple wrapper scripts that live in `~/.rbenv/shims`
@@ -104,7 +106,8 @@ zsh users should add this line to `.zshrc` instead:
 
         $ echo 'eval "$(rbenv init -)"' >> .zshrc
 
-4. Restart your shell. You can now begin using rbenv.
+4. Restart your shell so the path changes take effect. You can now
+begin using rbenv.
 
         $ exec $SHELL
 
@@ -168,7 +171,7 @@ Sets a shell-specific Ruby version by setting the `RBENV_VERSION`
 environment variable in your shell. This version overrides both
 project-specific versions and the global version.
 
-    $ rbenv shell jruby-1.6.3
+    $ rbenv shell jruby-1.6.4
 
 When run without a version number, `rbenv shell` reports the current
 value of `RBENV_VERSION`. You can also unset the shell version:
@@ -180,7 +183,7 @@ the installation instructions) in order to use this command. If you
 prefer not to use shell integration, you may simply set the
 `RBENV_VERSION` variable yourself:
 
-    $ export RBENV_VERSION=jruby-1.6.3
+    $ export RBENV_VERSION=jruby-1.6.4
 
 ### <a name="section_3.4"></a> 3.4 rbenv versions
 
@@ -190,8 +193,8 @@ the currently active version.
     $ rbenv versions
       1.8.7-p352
       1.9.2-p290
-    * 1.9.3-preview1 (set by /Users/sam/.rbenv/global)
-      jruby-1.6.3
+    * 1.9.3-rc1 (set by /Users/sam/.rbenv/global)
+      jruby-1.6.4
       rbx-1.2.4
       ree-1.8.7-2011.03
 
@@ -210,6 +213,23 @@ Installs shims for all Ruby binaries known to rbenv (i.e.,
 version of Ruby, or install a gem that provides binaries.
 
     $ rbenv rehash
+
+### <a name="section_3.7"></a> 3.7 rbenv which
+
+Displays the full path to the binary that rbenv will execute when you
+run the given command.
+
+    $ rbenv which irb
+    /Users/sam/.rbenv/versions/1.9.2-p290/bin/irb
+
+### <a name="section_3.8"></a> 3.8 rbenv whence
+
+Lists all Ruby versions with the given command installed.
+
+    $ rbenv whence rackup
+    1.9.3-rc1
+    jruby-1.6.4
+    ree-1.8.7-2011.03
 
 ## <a name="section_4"></a> 4 Contributing
 
