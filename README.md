@@ -41,6 +41,7 @@ tools that do one thing well.
 
    * [1 How It Works](#section_1)
    * [2 Installation](#section_2)
+      * [2.1 Upgrading an existing installation](#section_2.1)
    * [3 Usage](#section_3)
       * [3.1 rbenv global](#section_3.1)
       * [3.2 rbenv local](#section_3.2)
@@ -129,6 +130,28 @@ a new Ruby binary (for example, when installing a new Ruby version, or
 when installing a gem that provides a binary).
 
         $ rbenv rehash
+
+### <a name="section_2.1"></a> 2.1 Upgrading an existing installation
+
+If you've installed rbenv using the instructions above, you can
+upgrade your installation at any time using git.
+
+To upgrade to the latest development version of rbenv, use `git pull`:
+
+    $ cd ~/.rbenv
+    $ git pull
+
+To upgrade to a specific release of rbenv, check out the corresponding
+tag:
+
+    $ cd ~/.rbenv
+    $ git fetch
+    $ git tag
+    v0.1.0
+    v0.1.1
+    v0.1.2
+    v0.2.0
+    $ git checkout v0.2.0
 
 ## <a name="section_3"></a> 3 Usage
 
