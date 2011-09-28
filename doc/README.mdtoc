@@ -158,12 +158,10 @@ profile is doing.
 
 `rbenv init` is the only command that crosses the line of loading
 extra commands into your shell. Coming from rvm, some of you might be
-opposed to this idea.
-
-Heres what `rbenv init` actually does:
+opposed to this idea. Here's what `rbenv init` actually does:
 
 1. Sets up your shims path. This is the only requirement for rbenv to
-   functional properly. You can do this by hand by prepending
+   function properly. You can do this by hand by prepending
    `~/.rbenv/shims` to your `$PATH`.
 
 2. Installs autocompletion. This is entirely optional but pretty
@@ -171,18 +169,19 @@ Heres what `rbenv init` actually does:
    up. There is also a `~/.rbenv/completions/rbenv.zsh` for Zsh
    users.
 
-3. Initial rehash. From time to time you'll need to rebuild you're
+3. Rehashes shims. From time to time you'll need to rebuild your
    shim files. Doing this on init makes sure everything is up to
-   date. `rbenv rehash` can always be ran manually.
+   date. You can always run `rbenv rehash` manually.
 
-4. Install sh dispatcher. This bit is also optional but allows rbenv
-   and plugins to change variables in your current shell. This makes
-   commands like `rbenv shell` possible. This doesn't do anything
-   crazy like override `cd` or hack your shell prompt. But for some
-   reason you may need `rbenv` to be a real script rather than a shell
-   function.
+4. Installs the sh dispatcher. This bit is also optional, but allows
+   rbenv and plugins to change variables in your current shell, making
+   commands like `rbenv shell` possible. The sh dispatcher doesn't do
+   anything crazy like override `cd` or hack your shell prompt, but if
+   for some reason you need `rbenv` to be a real script rather than a
+   shell function, you can safely skip it.
 
-Run `rbenv init -` for yourself to see exactly whats its doing.
+Run `rbenv init -` for yourself to see exactly what happens under the
+hood.
 
 ## Usage ##
 
