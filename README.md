@@ -92,7 +92,7 @@ command-line utility.
 
         $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> .bash_profile
 
-zsh users should add this line to `.zshrc` instead:
+    zsh users should add this line to `.zshrc` instead:
 
         $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> .zshrc
 
@@ -102,7 +102,7 @@ can manually add `$HOME/.rbenv/shims` to your path in step 2.)
 
         $ echo 'eval "$(rbenv init -)"' >> .bash_profile
 
-zsh users should add this line to `.zshrc` instead:
+    zsh users should add this line to `.zshrc` instead:
 
         $ echo 'eval "$(rbenv init -)"' >> .zshrc
 
