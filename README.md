@@ -51,8 +51,9 @@ tools that do one thing well.
       * [3.6 rbenv rehash](#section_3.6)
       * [3.7 rbenv which](#section_3.7)
       * [3.8 rbenv whence](#section_3.8)
-   * [4 Contributing](#section_4)
-      * [4.1 License](#section_4.1)
+   * [4 Development](#section_4)
+      * [4.1 Version History](#section_4.1)
+      * [4.2 License](#section_4.2)
 
 ## <a name="section_1"></a> 1 How It Works
 
@@ -254,7 +255,7 @@ Lists all Ruby versions with the given command installed.
     jruby-1.6.4
     ree-1.8.7-2011.03
 
-## <a name="section_4"></a> 4 Contributing
+## <a name="section_4"></a> 4 Development
 
 The rbenv source code is [hosted on
 GitHub](https://github.com/sstephenson/rbenv). It's clean, modular,
@@ -263,7 +264,58 @@ and easy to understand, even if you're not a shell hacker.
 Please feel free to submit pull requests and file bugs on the [issue
 tracker](https://github.com/sstephenson/rbenv/issues).
 
-### <a name="section_4.1"></a> 4.1 License
+### <a name="section_4.1"></a> 4.1 Version History
+
+**HEAD**
+
+* Renamed `rbenv set-default` to `rbenv global` and `rbenv set-local`
+  to `rbenv local`. The `set-` commands are deprecated and will be
+  removed in the next major release.
+* rbenv now uses `greadlink` on Solaris.
+* Added a `ruby-local-exec` command which can be used in shebangs in
+  place of `#!/usr/bin/env ruby` to properly set the project-specific
+  Ruby version regardless of current working directory.
+* Fixed an issue with `rbenv rehash` when no binaries are present.
+* Added support for `rbenv-sh-*` commands, which run inside the
+  current shell instead of in a child process.
+* Added an `rbenv shell` command for conveniently setting the
+  `$RBENV_VERSION` environment variable.
+* Added support for storing rbenv versions and shims in directories
+  other than `~/.rbenv` with the `$RBENV_ROOT` environment variable.
+* Added support for debugging rbenv via `set -x` when the
+  `$RBENV_DEBUG` environment variable is set.
+* Refactored the autocompletion system so that completions are now
+  built-in to each command and shared between bash and zsh.
+* Added support for plugin bundles in `~/.rbenv/plugins` as documented
+  in [issue #102](https://github.com/sstephenson/rbenv/pull/102).
+* Added `/usr/local/etc/rbenv.d` to the list of directories searched
+  for rbenv hooks.
+* Added support for an `$RBENV_DIR` environment variable which
+  defaults to the current working directory for specifying where rbenv
+  searches for local version files.
+
+**0.1.2** (August 16, 2011)
+
+* Fixed rbenv to be more resilient against nonexistent entries in
+  `$PATH`.
+* Made the `rbenv rehash` command operate atomically.
+* Modified the `rbenv init` script to automatically run `rbenv
+  rehash` so that shims are recreated whenever a new shell is opened.
+* Added initial support for zsh autocompletion.
+* Removed the dependency on egrep for reading version files.
+
+**0.1.1** (August 14, 2011)
+
+* Fixed a syntax error in the `rbenv help` command.
+* Removed `-e` from the shebang in favor of `set -e` at the top of
+  each file for compatibility with operating systems that do not
+  support more than one argument in the shebang.
+
+**0.1.0** (August 11, 2011)
+
+* Initial public release.
+
+### <a name="section_4.2"></a> 4.2 License
 
 (The MIT license)
 
