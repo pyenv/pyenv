@@ -41,7 +41,8 @@ tools that do one thing well.
 
    * [1 How It Works](#section_1)
    * [2 Installation](#section_2)
-      * [2.1 Upgrading an existing installation](#section_2.1)
+      * [2.1 Basic GitHub Checkout](#section_2.1)
+         * [2.1.1 Upgrading](#section_2.1.1)
       * [2.2 Homebrew on Mac OS X](#section_2.2)
       * [2.3 Neckbeard Configuration](#section_2.3)
    * [3 Usage](#section_3)
@@ -79,46 +80,59 @@ rbenv is `~/.rbenv/shims` in your `$PATH`.
 
 ## <a name="section_2"></a> 2 Installation
 
-**Compatibility note**: rbenv is _incompatible_ with rvm. Things will appear to work until you try to install a gem. The problem is that rvm actually overrides the `gem` command with a shell function! Please remove any references to rvm before using rbenv.
+**Compatibility note**: rbenv is _incompatible_ with rvm. Things will
+  appear to work until you try to install a gem. The problem is that
+  rvm actually overrides the `gem` command with a shell function!
+  Please remove any references to rvm before using rbenv.
 
-### Basic GitHub checkout
+### <a name="section_2.1"></a> 2.1 Basic GitHub Checkout
 
-This will get you going with the latest version of rbenv and make it easy to fork and contribute any changes back upstream.
+This will get you going with the latest version of rbenv and make it
+easy to fork and contribute any changes back upstream.
 
 1. Check out rbenv into `~/.rbenv`.
 
         $ cd
         $ git clone git://github.com/sstephenson/rbenv.git .rbenv
 
-2. Add `~/.rbenv/bin` to your `$PATH` for access to the `rbenv` command-line utility.
+2. Add `~/.rbenv/bin` to your `$PATH` for access to the `rbenv`
+   command-line utility.
 
         $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> .bash_profile
 
-**ZSH note**: Modifiy your `~/.zshrc` file instead of `~/.bash_profile`.
+    **ZSH note**: Modifiy your `~/.zshrc` file instead of `~/.bash_profile`.
 
 3. Add rbenv init to your shell to enable shims and autocompletion.
 
         $ echo 'eval "$(rbenv init -)"' >> .bash_profile
 
-4. Restart your shell so the path changes take effect. You can now begin using rbenv.
+    **ZSH note**: Modifiy your `~/.zshrc` file instead of `~/.bash_profile`.
+
+4. Restart your shell so the path changes take effect. You can now
+   begin using rbenv.
 
         $ exec $SHELL
 
-5. Install Ruby versions into `~/.rbenv/versions`. For example, to install Ruby 1.9.2-p290, download and unpack the source, then run:
+5. Install Ruby versions into `~/.rbenv/versions`. For example, to
+   install Ruby 1.9.2-p290, download and unpack the source, then run:
 
         $ ./configure --prefix=$HOME/.rbenv/versions/1.9.2-p290
         $ make
         $ make install
 
-The [ruby-build](https://github.com/sstephenson/ruby-build) provides an `rbenv install` command that simplifies the process of installing new Ruby versions to:
+   The [ruby-build](https://github.com/sstephenson/ruby-build)
+   provides an `rbenv install` command that simplifies the process of
+   installing new Ruby versions to:
 
         $ rbenv install 1.9.2-p290
 
-6. Rebuild the shim binaries. You should do this any time you install a new Ruby binary (for example, when installing a new Ruby version, or when installing a gem that provides a binary).
+6. Rebuild the shim binaries. You should do this any time you install
+   a new Ruby binary (for example, when installing a new Ruby version,
+   or when installing a gem that provides a binary).
 
         $ rbenv rehash
 
-### <a name="section_2.1"></a> 2.1 Upgrading an existing installation
+#### <a name="section_2.1.1"></a> 2.1.1 Upgrading
 
 If you've installed rbenv using the instructions above, you can
 upgrade your installation at any time using git.
@@ -142,7 +156,9 @@ tag:
 
 ### <a name="section_2.2"></a> 2.2 Homebrew on Mac OS X
 
-You can also install rbenv using the [Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS X.
+You can also install rbenv using the
+[Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS
+X.
 
     $ brew update
     $ brew install rbenv
@@ -150,20 +166,40 @@ You can also install rbenv using the [Homebrew](http://mxcl.github.com/homebrew/
 
 The same commands can be used for upgrading.
 
-Afterwards you'll still need to add `eval "$(rbenv init -)"` to your profile as stated in the caveats. You'll only ever have to do this once.
+Afterwards you'll still need to add `eval "$(rbenv init -)"` to your
+profile as stated in the caveats. You'll only ever have to do this
+once.
 
 ### <a name="section_2.3"></a> 2.3 Neckbeard Configuration
 
-Skip this section unless you must know what every line in your shell profile is doing.
+Skip this section unless you must know what every line in your shell
+profile is doing.
 
-`rbenv init` is the only command that crosses the line of loading extra commands into your shell. Coming from rvm, some of you might be opposed to this idea.
+`rbenv init` is the only command that crosses the line of loading
+extra commands into your shell. Coming from rvm, some of you might be
+opposed to this idea.
 
 Heres what `rbenv init` actually does:
 
-1. Sets up your shims path. This is the only requirement for rbenv to functional properly. You can do this by hand by prepending `~/.rbenv/shims` to your `$PATH`.
-2. Installs autocompletion. This is entirely optional but pretty useful. Sourcing `~/.rbenv/completions/rbenv.bash` will set that up. There is also a `~/.rbenv/completions/rbenv.zsh` for ZSH users.
-3. Initial rehash. From time to time you'll need to rebuild you're shim files. Doing this on init makes sure everything is up to date. `rbenv rehash` can always be ran manually.
-4. Install sh dispatcher. This bit is also optional but allows rbenv and plugins to change variables in your current shell. This makes commands like `rbenv shell` possible. This doesn't do anything crazy like override `cd` or hack your shell prompt. But for some reason you may need `rbenv` to be a real script rather than a shell function.
+1. Sets up your shims path. This is the only requirement for rbenv to
+   functional properly. You can do this by hand by prepending
+   `~/.rbenv/shims` to your `$PATH`.
+
+2. Installs autocompletion. This is entirely optional but pretty
+   useful. Sourcing `~/.rbenv/completions/rbenv.bash` will set that
+   up. There is also a `~/.rbenv/completions/rbenv.zsh` for ZSH
+   users.
+
+3. Initial rehash. From time to time you'll need to rebuild you're
+   shim files. Doing this on init makes sure everything is up to
+   date. `rbenv rehash` can always be ran manually.
+
+4. Install sh dispatcher. This bit is also optional but allows rbenv
+   and plugins to change variables in your current shell. This makes
+   commands like `rbenv shell` possible. This doesn't do anything
+   crazy like override `cd` or hack your shell prompt. But for some
+   reason you may need `rbenv` to be a real script rather than a shell
+   function.
 
 Run `rbenv init -` for yourself to see exactly whats its doing.
 
