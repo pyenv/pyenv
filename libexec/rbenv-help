@@ -31,8 +31,8 @@ Some useful rbenv commands are:
    which         Show the full path for the given Ruby command
    whence        List all Ruby versions with the given command
 
-See 'rbenv help <command>' for more information on a specific command.
-For more information, see: https://github.com/sstephenson/rbenv#readme"
+See 'rbenv help <command>' for information on a specific command.
+For full documentation, see: https://github.com/sstephenson/rbenv#readme"
 ;;
 global) echo "usage: rbenv global <version>
 
@@ -74,5 +74,15 @@ whence) echo "usage: rbenv whence <command>
 
 Lists all Ruby versions with the given command installed."
 ;;
-*) echo "No command arguments needed or invalid/undocumented command."
+*)
+  command_path="$(command -v "rbenv-$1" || true)"
+  if [ -n "$command_path" ]; then
+    echo "Sorry, the \`$1' command isn't documented yet."
+    echo
+    echo "You can view the command's source here:"
+    echo "$command_path"
+    echo
+  else
+    echo "rbenv: no such command \`$1'"
+  fi
 esac
