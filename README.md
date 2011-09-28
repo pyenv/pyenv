@@ -314,7 +314,7 @@ tracker](https://github.com/sstephenson/rbenv/issues).
 
 ### <a name="section_4.1"></a> 4.1 Version History
 
-**HEAD**
+**0.2.0** (September 28, 2011)
 
 * Renamed `rbenv set-default` to `rbenv global` and `rbenv set-local`
   to `rbenv local`. The `set-` commands are deprecated and will be
