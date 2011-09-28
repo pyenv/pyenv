@@ -120,9 +120,9 @@ easy to fork and contribute any changes back upstream.
         $ make
         $ make install
 
-   The [ruby-build](https://github.com/sstephenson/ruby-build)
-   provides an `rbenv install` command that simplifies the process of
-   installing new Ruby versions to:
+    The [ruby-build](https://github.com/sstephenson/ruby-build)
+    provides an `rbenv install` command that simplifies the process of
+    installing new Ruby versions to:
 
         $ rbenv install 1.9.2-p290
 
