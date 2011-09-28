@@ -116,6 +116,28 @@ when installing a gem that provides a binary).
 
         $ rbenv rehash
 
+### Upgrading an existing installation ###
+
+If you've installed rbenv using the instructions above, you can
+upgrade your installation at any time using git.
+
+To upgrade to the latest development version of rbenv, use `git pull`:
+
+    $ cd ~/.rbenv
+    $ git pull
+
+To upgrade to a specific release of rbenv, check out the corresponding
+tag:
+
+    $ cd ~/.rbenv
+    $ git fetch
+    $ git tag
+    v0.1.0
+    v0.1.1
+    v0.1.2
+    v0.2.0
+    $ git checkout v0.2.0
+
 ## Usage ##
 
 Like `git`, the `rbenv` command delegates to subcommands based on its
