@@ -42,6 +42,7 @@ tools that do one thing well.
    * [1 How It Works](#section_1)
    * [2 Installation](#section_2)
       * [2.1 Upgrading an existing installation](#section_2.1)
+      * [2.2 Homebrew on Mac OS X](#section_2.2)
    * [3 Usage](#section_3)
       * [3.1 rbenv global](#section_3.1)
       * [3.2 rbenv local](#section_3.2)
@@ -153,6 +154,20 @@ tag:
     v0.1.2
     v0.2.0
     $ git checkout v0.2.0
+
+### <a name="section_2.2"></a> 2.2 Homebrew on Mac OS X
+
+You can also install rbenv using the
+[Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS
+X.
+
+    $ brew update
+    $ brew install rbenv
+
+You'll need to add rbenv's shims directory to your path afterwards
+(installation step 3 above). Follow the instructions above for
+installing Ruby versions. (The ruby-build package can be installed
+with Homebrew as well.)
 
 ## <a name="section_3"></a> 3 Usage
 

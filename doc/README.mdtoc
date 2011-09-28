@@ -138,6 +138,20 @@ tag:
     v0.2.0
     $ git checkout v0.2.0
 
+### Homebrew on Mac OS X ###
+
+You can also install rbenv using the
+[Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS
+X.
+
+    $ brew update
+    $ brew install rbenv
+
+You'll need to add rbenv's shims directory to your path afterwards
+(installation step 3 above). Follow the instructions above for
+installing Ruby versions. (The ruby-build package can be installed
+with Homebrew as well.)
+
 ## Usage ##
 
 Like `git`, the `rbenv` command delegates to subcommands based on its
