@@ -104,7 +104,7 @@ easy to fork and contribute any changes back upstream.
 
 3. Add rbenv init to your shell to enable shims and autocompletion.
 
-        $ echo 'eval "$(rbenv init -)"' >> .bash_profile
+        $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
 
     **Zsh note**: Modifiy your `~/.zshrc` file instead of `~/.bash_profile`.
 
