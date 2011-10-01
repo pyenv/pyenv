@@ -29,6 +29,8 @@ export RBENV_ROOT
 
 if [ -z "${RBENV_DIR}" ]; then
   RBENV_DIR="$(pwd)"
+else
+  RBENV_DIR="$(abs_dirname "$RBENV_DIR")"
 fi
 export RBENV_DIR
 
