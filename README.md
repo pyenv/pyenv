@@ -314,6 +314,13 @@ tracker](https://github.com/sstephenson/rbenv/issues).
 
 ### <a name="section_4.1"></a> 4.1 Version History
 
+**0.2.1** (October 1, 2011)
+
+* Changed the `rbenv` command to ensure that `RBENV_DIR` is always an
+  absolute path. This fixes an issue where Ruby scripts using the
+  `ruby-local-exec` wrapper would go into an infinite loop when
+  invoked with a relative path from the command line.
+
 **0.2.0** (September 28, 2011)
 
 * Renamed `rbenv set-default` to `rbenv global` and `rbenv set-local`
