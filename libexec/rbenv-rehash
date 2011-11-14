@@ -55,9 +55,6 @@ make_shims() {
   done
 }
 
-# Save the working directory.
-CUR_PATH=$PWD
-
 # Empty out the shims directory and make it the working directory.
 rm -f "$SHIM_PATH"/*
 cd "$SHIM_PATH"
@@ -68,7 +65,7 @@ shopt -s nullglob
 make_shims ../versions/*/bin/*
 
 # Restore the previous working directory.
-cd "$CUR_PATH"
+cd "$OLDPWD"
 
 for script in $(rbenv-hooks rehash); do
   source "$script"
