@@ -41,6 +41,9 @@ if [ -z "$print" ]; then
   zsh )
     profile='~/.zshrc'
     ;;
+  ksh )
+    profile='~/.profile'
+    ;;
   * )
     profile='your profile'
     ;;
@@ -71,7 +74,7 @@ echo 'rbenv rehash 2>/dev/null'
 commands=(`rbenv commands --sh`)
 IFS="|"
 cat <<EOS
-function rbenv() {
+function rbenv {
   command="\$1"
   if [ "\$#" -gt 0 ]; then
     shift
