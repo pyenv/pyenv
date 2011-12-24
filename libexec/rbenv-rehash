@@ -22,7 +22,7 @@ set +o noclobber
 
 # If we were able to obtain a lock, register a trap to clean up the
 # prototype shim when the process exits.
-trap remove_prototype_shim SIGINT SIGTERM EXIT
+trap remove_prototype_shim EXIT
 
 remove_prototype_shim() {
   rm -f "$PROTOTYPE_SHIM_PATH"
@@ -125,8 +125,7 @@ remove_stale_shims() {
 }
 
 
-# Save the working directory and change to the shims directory.
-CUR_PATH=$PWD
+# Change to the shims directory.
 cd "$SHIM_PATH"
 
 # Create the prototype shim, then register shims for all known binaries.
@@ -135,7 +134,7 @@ shopt -s nullglob
 make_shims ../versions/*/bin/*
 
 # Restore the previous working directory.
-cd "$CUR_PATH"
+cd "$OLDPWD"
 
 # Allow plugins to register shims.
 for script in $(rbenv-hooks rehash); do
