@@ -43,26 +43,93 @@ SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
 }
 
-# Make shims by iterating over every filename argument and creating a
-# hard link from the prototype shim to a file of the same name in the
-# shims directory, if one does not already exist.
+# The basename of each argument passed to `make_shims` will be
+# registered for installation as a shim. In this way, plugins may call
+# `make_shims` with a glob to register many shims at once.
 make_shims() {
-  local glob="$@"
+  local shims="$@"
 
-  for file in $glob; do
+  for file in $shims; do
     local shim="${file##*/}"
+    register_shim "$shim"
+  done
+}
+
+# Create an empty array for the list of registered shims.
+registered_shims=()
+
+# We will keep track of shims registered for installation with the
+# global `reigstered_shims` array and with a global variable for each
+# shim. The array will let us iterate over all registered shims. The
+# global variables will let us quickly check whether a shim with the
+# given name has been registered or not.
+register_shim() {
+  local shim="$@"
+  local var="$(shim_variable_name "$shim")"
+
+  if [ -z "${!var}" ]; then
+    registered_shims[${#registered_shims[*]}]="$shim"
+    eval "${var}=1"
+  fi
+}
+
+# To compute the global variable name for a given shim we must first
+# escape any non-alphanumeric characters. If the shim name is
+# alphanumeric (including a hyphen or underscore) we can take a
+# shorter path. Otherwise, we must iterate over each character and
+# escape the non-alphanumeric ones using `printf`.
+shim_variable_name() {
+  local shim="$1"
+  local result="_shim_"
+
+  if [[ ! "$shim" =~ [^[:alnum:]_-] ]]; then
+    shim="${shim//_/_5f}"
+    shim="${shim//-/_2d}"
+    result+="$shim"
+  else
+    local length="${#shim}"
+    local char i
+
+    for ((i=0; i<length; i++)); do
+      char="${shim:$i:1}"
+      if [[ "$char" =~ [[:alnum:]] ]]; then
+        result+="$char"
+      else
+        result+="$(printf "_%02x" \'"$char")"
+      fi
+    done
+  fi
+
+  echo "$result"
+}
+
+# To install all the registered shims, we iterate over the
+# `registered_shims` array and create a link if one does not already
+# exist.
+install_registered_shims() {
+  for shim in "${registered_shims[@]}"; do
     [ -e "$shim" ] || ln -f "$PROTOTYPE_SHIM_PATH" "$shim"
   done
 }
 
-# Save the working directory.
-CUR_PATH=$PWD
+# Once the registered shims have been installed, we make a second pass
+# over the contents of the shims directory. Any file that is present
+# in the directory but has not been registered as a shim should be
+# removed.
+remove_stale_shims() {
+  local var
+  for shim in *; do
+    var="$(shim_variable_name "$shim")"
+    [ -z "${!var}" ] && rm -f "$shim"
+  done
+}
 
-# Empty out the shims directory and make it the working directory.
-rm -f "$SHIM_PATH"/*
+
+# Save the working directory and change to the shims directory.
+CUR_PATH=$PWD
 cd "$SHIM_PATH"
 
-# Create the prototype shim, then make shims for all known binaries.
+# Create the prototype shim, then register shims for all known binaries.
 create_prototype_shim
 shopt -s nullglob
 make_shims ../versions/*/bin/*
@@ -70,6 +137,13 @@ make_shims ../versions/*/bin/*
 # Restore the previous working directory.
 cd "$CUR_PATH"
 
+# Allow plugins to register shims.
 for script in $(rbenv-hooks rehash); do
   source "$script"
 done
+
+# Change back to the shims directory to install the registered shims
+# and remove stale shims.
+cd "$SHIM_PATH"
+install_registered_shims
+remove_stale_shims
