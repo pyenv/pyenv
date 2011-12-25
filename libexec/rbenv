@@ -30,7 +30,12 @@ export RBENV_ROOT
 if [ -z "${RBENV_DIR}" ]; then
   RBENV_DIR="$(pwd)"
 else
-  RBENV_DIR="$(abs_dirname "$RBENV_DIR")"
+  cd "$RBENV_DIR" 2>/dev/null || {
+    echo "rbenv: cannot change working directory to \`$RBENV_DIR'"
+    exit 1
+  } >&2
+  RBENV_DIR="$(pwd)"
+  cd "$OLDPWD"
 fi
 export RBENV_DIR
 
