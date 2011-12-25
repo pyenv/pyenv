@@ -4,7 +4,7 @@ rbenv lets you easily switch between multiple versions of Ruby. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
 tools that do one thing well.
 
-<img src="http://i.sstephenson.us/rbenv.png" width="894" height="464">
+<img src="http://i.sstephenson.us/rbenv2.png" width="894" height="464">
 
 ### rbenv _does…_
 
