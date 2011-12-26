@@ -295,6 +295,24 @@ tracker](https://github.com/sstephenson/rbenv/issues).
 
 ### Version History ###
 
+**0.3.0** (December 25, 2011)
+
+* Added an `rbenv root` command which prints the value of
+  `$RBENV_ROOT`, or the default root directory if it's unset.
+* Clarified Zsh installation instructions in the readme.
+* Removed some redundant code in `rbenv rehash`.
+* Fixed an issue with calling `readlink` for paths with spaces.
+* Changed Zsh initialization code to install completion hooks only for
+  interactive shells.
+* Added preliminary support for ksh.
+* `rbenv rehash` creates or removes shims only when necessary instead
+  of removing and re-creating all shims on each invocation.
+* Fixed that `RBENV_DIR`, when specified, would be incorrectly
+  expanded to its parent directory.
+* Removed the deprecated `set-default` and `set-local` commands.
+* Added a `--no-rehash` option to `rbenv init` for skipping the
+  automatic rehash when opening a new shell.
+
 **0.2.1** (October 1, 2011)
 
 * Changed the `rbenv` command to ensure that `RBENV_DIR` is always an
