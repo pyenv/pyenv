@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-set -e
-
-{ echo "rbenv: warning: \`set-default' has been renamed to \`global'"
-  echo "       and will be removed in v0.3.0"
-  echo
-} >&2
-
-exec rbenv-global "$@"
