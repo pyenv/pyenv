@@ -8,6 +8,12 @@ if [ "$1" = "-" ]; then
   shift
 fi
 
+no_rehash=""
+if [ "$1" = "--no-rehash" ]; then
+  no_rehash=1
+  shift
+fi
+
 shell="$1"
 if [ -z "$shell" ]; then
   shell="$(basename "$SHELL")"
@@ -69,7 +75,9 @@ bash | zsh )
   ;;
 esac
 
-echo 'rbenv rehash 2>/dev/null'
+if [ -z "$no_rehash" ]; then
+  echo 'rbenv rehash 2>/dev/null'
+fi
 
 commands=(`rbenv commands --sh`)
 IFS="|"
