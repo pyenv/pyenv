@@ -120,7 +120,9 @@ remove_stale_shims() {
   local var
   for shim in *; do
     var="$(shim_variable_name "$shim")"
-    [ -z "${!var}" ] && rm -f "$shim"
+    if [ -z "${!var}" ]; then
+      rm -f "$shim" 
+    fi
   done
 }
 
