@@ -27,7 +27,10 @@ remove_from_path() {
     return
   fi
 
-  for path in ${PATH//:/$'\n'}; do
+  local paths
+  IFS=: paths=($PATH)
+
+  for path in "${paths[@]}"; do
     path="$(expand_path "$path" || true)"
     if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
       result="${result}${path}:"
