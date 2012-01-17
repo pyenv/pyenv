@@ -3,16 +3,19 @@ set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
 print=""
-if [ "$1" = "-" ]; then
-  print=1
-  shift
-fi
-
 no_rehash=""
-if [ "$1" = "--no-rehash" ]; then
-  no_rehash=1
-  shift
-fi
+for args in "$@"
+do
+  if [ "$args" = "-" ]; then
+    print=1
+		shift
+  fi
+
+  if [ "$args" = "--no-rehash" ]; then
+    no_rehash=1
+    shift
+  fi
+done
 
 shell="$1"
 if [ -z "$shell" ]; then
