@@ -48,7 +48,7 @@ for plugin_bin in "${RBENV_ROOT}/plugins/"*/bin; do
 done
 export PATH="${bin_path}:${PATH}"
 
-hook_path="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d"
+hook_path="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 for plugin_hook in "${RBENV_ROOT}/plugins/"*/etc/rbenv.d; do
   hook_path="${hook_path}:${plugin_hook}"
 done
