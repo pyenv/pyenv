@@ -100,13 +100,13 @@ easy to fork and contribute any changes back upstream.
 
         $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
 
-    **Zsh note**: Modifiy your `~/.zshenv` file instead of `~/.bash_profile`.
+    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
 
 3. Add rbenv init to your shell to enable shims and autocompletion.
 
         $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
 
-    **Zsh note**: Modifiy your `~/.zshenv` file instead of `~/.bash_profile`.
+    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
 
 4. Restart your shell so the path changes take effect. You can now
    begin using rbenv.
