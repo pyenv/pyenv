@@ -203,7 +203,7 @@ opposed to this idea. Here's what `rbenv init` actually does:
 Run `rbenv init -` for yourself to see exactly what happens under the
 hood.
 
-### <a neme="section_2.4"></a> 2.4 Uninstalling Rubies
+### <a name="section_2.4"></a> 2.4 Uninstalling Rubies
 
 As time goes on, ruby versions you install will accumulate in your
 `~/.rbenv/versions` directory.
