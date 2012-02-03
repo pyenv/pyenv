@@ -208,7 +208,7 @@ hood.
 As time goes on, ruby versions you install will accumulate in your
 `~/.rbenv/versions` directory.
 
-There is no uninstall or remove command in rbenv, so removing old
+There is no uninstall or remove command in `rbenv`, so removing old
 versions is a simple matter of `rm -rf` the directory of the relevant
 ruby version you want removed under `~/.rbenv/versions`
 
