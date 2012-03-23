@@ -34,6 +34,12 @@ Some useful rbenv commands are:
 See 'rbenv help <command>' for information on a specific command.
 For full documentation, see: https://github.com/sstephenson/rbenv#readme"
 ;;
+commands) echo "usage: rbenv commands
+       rbenv commands --sh
+       rbenv commands --no-sh
+
+List all rbenv commands."
+;;
 global) echo "usage: rbenv global <version>
 
 Sets the global Ruby version. You can override the global version at
@@ -64,6 +70,11 @@ environment variable in your shell. This version overrides both
 project-specific versions and the global version.
 
 $(print_set_version)"
+;;
+versions) echo "usage: rbenv versions
+       rbenv versions --bare
+
+Lists all Ruby versions known by rbenv."
 ;;
 which) echo "usage: rbenv which <command>
 
