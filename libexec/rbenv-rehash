@@ -85,7 +85,7 @@ shim_variable_name() {
   if [[ ! "$shim" =~ [^[:alnum:]_-] ]]; then
     shim="${shim//_/_5f}"
     shim="${shim//-/_2d}"
-    result+="$shim"
+    result="$result$shim"
   else
     local length="${#shim}"
     local char i
@@ -93,9 +93,9 @@ shim_variable_name() {
     for ((i=0; i<length; i++)); do
       char="${shim:$i:1}"
       if [[ "$char" =~ [[:alnum:]] ]]; then
-        result+="$char"
+        result="$result$char"
       else
-        result+="$(printf "_%02x" \'"$char")"
+        result="$result$(printf "_%02x" \'"$char")"
       fi
     done
   fi
