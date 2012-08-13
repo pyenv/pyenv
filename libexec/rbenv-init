@@ -82,7 +82,7 @@ if [ -z "$no_rehash" ]; then
   echo 'rbenv rehash 2>/dev/null'
 fi
 
-commands=(`rbenv commands --sh`)
+commands=(`rbenv-commands --sh`)
 IFS="|"
 cat <<EOS
 rbenv() {
