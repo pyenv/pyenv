@@ -92,8 +92,7 @@ easy to fork and contribute any changes back upstream.
 
 1. Check out rbenv into `~/.rbenv`.
 
-        $ cd
-        $ git clone git://github.com/sstephenson/rbenv.git .rbenv
+        $ git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
 
 2. Add `~/.rbenv/bin` to your `$PATH` for access to the `rbenv`
    command-line utility.
