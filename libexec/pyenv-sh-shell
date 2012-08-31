@@ -9,30 +9,24 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-versions --bare
 fi
 
-versions=()
-for version in "$@"; do
-  versions=("${versions[@]}" "$version")
-done
+version="$1"
 
-if [ -z "$versions" ]; then
+if [ -z "$version" ]; then
   if [ -z "$PYENV_VERSION" ]; then
     echo "pyenv: no shell-specific version configured" >&2
     exit 1
   else
-    echo "echo \"\${PYENV_VERSION[@]}\""
+    echo "echo \"\$PYENV_VERSION\""
     exit
   fi
 fi
 
-if [ "$versions" = "--unset" ]; then
+if [ "$version" = "--unset" ]; then
   echo "unset PYENV_VERSION"
   exit 1
 fi
 
 # Make sure the specified version is installed.
-pyenv-prefix $versions >/dev/null
+pyenv-prefix $version >/dev/null
 
-{
-  IFS=:
-  echo "export PYENV_VERSION=(\"${versions[@]}\")"
-}
+echo "export PYENV_VERSION=\"${version}\""

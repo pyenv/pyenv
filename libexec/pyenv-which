@@ -40,7 +40,8 @@ remove_from_path() {
   echo "${result%:}"
 }
 
-IFS=: PYENV_VERSION=($(pyenv-version-name))
+IFS=: versions=($(pyenv-version-name))
+PYENV_VERSION=("${versions[@]}")
 PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then
