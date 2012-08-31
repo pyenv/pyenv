@@ -1,0 +1,14 @@
+before_install_package() {
+  local package_name="$1"
+  case "$package_name" in
+  Python*)
+    fetch_url "https://raw.github.com/saghul/pythonz/346450868902fed0fe654c472b7b58e2e31fde70/pythonz/patches/all/common/patch-setup.py.diff" > setup.patch
+    patch -p0 < setup.patch
+  ;;
+  esac
+}
+
+require_gcc
+install_package "Python-2.6.6" "http://www.python.org/ftp/python/2.6.6/Python-2.6.6.tgz"
+install_package "distribute-0.6.28" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.28.tar.gz" python
+install_package "pip-1.1" "http://pypi.python.org/packages/source/p/pip/pip-1.1.tar.gz" python
