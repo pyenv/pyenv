@@ -7,16 +7,20 @@ VERSION_FILE="$1"
 if [ -e "$VERSION_FILE" ]; then
   # Read and print the first non-whitespace word from the specified
   # version file.
-  version=""
+  versions=()
   while read -a words; do
     word="${words[0]}"
-    if [ -z "$version" ] && [ -n "$word" ]; then
-      version="$word"
+    if [ -n "$word" ]; then
+      length="${#versions[@]}"
+      versions=("${versions[@]}" "$word")
     fi
   done < <( cat "$VERSION_FILE" && echo )
 
-  if [ -n "$version" ]; then
-    echo "$version"
+  if [ -n "$versions" ]; then
+    {
+      IFS=:
+      echo "${versions[*]}"
+    }
     exit
   fi
 fi

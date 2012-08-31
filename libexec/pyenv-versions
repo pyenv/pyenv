@@ -2,23 +2,23 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-PYENV_VERSION_NAME="$(pyenv-version-name)"
+IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name))
 
 if [ "$1" = "--bare" ]; then
   hit_prefix=""
   miss_prefix=""
-  print_version="$PYENV_VERSION_NAME"
+  print_version="$PYENV_VERSION_NAMES"
 else
   hit_prefix="* "
   miss_prefix="  "
-  print_version="$(pyenv-version)"
+  print_version="$PYENV_VERSION_NAMES (set by $(pyenv-version-origin))"
 fi
 
 for path in "${PYENV_ROOT}/versions/"*; do
   if [ -d "$path" ]; then
     version="${path##*/}"
 
-    if [ "$version" == "$PYENV_VERSION_NAME" ]; then
+    if [ "$version" == "$PYENV_VERSION_NAMES" ]; then
       echo "${hit_prefix}${print_version}"
     else
       echo "${miss_prefix}${version}"

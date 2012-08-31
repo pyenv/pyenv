@@ -40,7 +40,7 @@ remove_from_path() {
   echo "${result%:}"
 }
 
-PYENV_VERSION="$(pyenv-version-name)"
+IFS=: PYENV_VERSIONS=($(pyenv-version-name))
 PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then
@@ -48,12 +48,17 @@ if [ -z "$PYENV_COMMAND" ]; then
   exit 1
 fi
 
-if [ "$PYENV_VERSION" = "system" ]; then
-  PATH="$(remove_from_path "${PYENV_ROOT}/shims")"
-  PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND")"
-else
-  PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${PYENV_VERSION}/bin/${PYENV_COMMAND}"
-fi
+for PYENV_VERSION in "${PYENV_VERSIONS[@]}"; do
+  if [ "$PYENV_VERSION" = "system" ]; then
+    PATH="$(remote_from_path "${PYENV_ROOT}/shims")"
+    PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND")"
+  else
+    PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${PYENV_VERSION}/bin/${PYENV_COMMAND}"
+    if [ -x "$PYENV_COMMAND_PATH" ]; then
+      break
+    fi
+  fi
+done
 
 for script in $(pyenv-hooks which); do
   source "$script"
@@ -63,15 +68,5 @@ if [ -x "$PYENV_COMMAND_PATH" ]; then
   echo "$PYENV_COMMAND_PATH"
 else
   echo "pyenv: $PYENV_COMMAND: command not found" >&2
-
-  versions="$(pyenv-whence "$PYENV_COMMAND" || true)"
-  if [ -n "$versions" ]; then
-    { echo
-      echo "The \`$1' command exists in these Python versions:"
-      echo "$versions" | sed 's/^/  /g'
-      echo
-    } >&2
-  fi
-
   exit 127
 fi
