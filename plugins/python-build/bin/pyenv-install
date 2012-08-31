@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  exec python-build --definitions
+fi
+
+if [ -z "$PYENV_ROOT" ]; then
+  PYENV_ROOT="${HOME}/.pyenv"
+fi
+
+# Load shared library functions
+eval "$(python-build --lib)"
+
+usage() {
+  { echo "usage: pyenv install [-k|--keep] [-v|--verbose] VERSION"
+    echo "       pyenv install [-k|--keep] [-v|--verbose] /path/to/definition"
+    echo "       pyenv install -l|--list"
+    echo
+    echo "  -l/--list        List all available versions"
+    echo "  -k/--keep        Keep source tree in \$PYENV_BUILD_ROOT after installation"
+    echo "                   (defaults to ${PYENV_ROOT}/sources)"
+    echo "  -v/--verbose     Verbose mode: print compilation status to stdout"
+    echo
+  } >&2
+
+  [ -z "$1" ] || exit "$1"
+}
+
+unset KEEP
+unset VERBOSE
+
+parse_options "$@"
+for option in "${OPTIONS[@]}"; do
+  case "$option" in
+  "h" | "help" )
+    usage 0
+    ;;
+  "l" | "list" )
+    echo "Available versions:"
+    python-build --definitions | sed 's/^/  /'
+    exit
+    ;;
+  "k" | "keep" )
+    [ -n "${PYENV_BUILD_ROOT}" ] || PYENV_BUILD_ROOT="${PYENV_ROOT}/sources"
+    ;;
+  "v" | "verbose" )
+    VERBOSE="-v"
+    ;;
+  "version" )
+    exec python-build --version
+    ;;
+  * )
+    usage 1
+    ;;
+  esac
+done
+
+DEFINITION="${ARGUMENTS[0]}"
+[ -n "$DEFINITION" ] || usage 1
+
+for script in $(pyenv-hooks install); do
+  source "$script"
+done
+
+VERSION_NAME="${DEFINITION##*/}"
+PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
+
+# If PYENV_BUILD_ROOT is set, then always pass keep options to python-build
+if [ -n "${PYENV_BUILD_ROOT}" ]; then
+  export PYTHON_BUILD_BUILD_PATH="${PYENV_BUILD_ROOT}/${VERSION_NAME}"
+  KEEP="-k"
+fi
+
+python-build $KEEP $VERBOSE "$DEFINITION" "$PREFIX"
+pyenv rehash

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -e
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  exec pyenv versions --bare
+fi
+
+if [ -z "$PYENV_ROOT" ]; then
+  PYENV_ROOT="${HOME}/.pyenv"
+fi
+
+unset FORCE
+if [ "$1" = "-f" ]; then
+  FORCE=true
+  shift
+fi
+
+DEFINITION="$1"
+case "$DEFINITION" in
+"" | -* )
+  { echo "usage: pyenv uninstall [-f] VERSION"
+    echo
+    echo "   -f  Attempt to remove the specified version without prompting"
+    echo "       for confirmation. If the version does not exist, do not"
+    echo "       display an error message."
+    echo
+    echo "Installed versions:"
+    pyenv versions --bare | sed 's/^/  /'
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
+
+VERSION_NAME="${DEFINITION##*/}"
+PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
+
+if [ -z "$FORCE" ]; then
+  if [ ! -d "$PREFIX" ]; then
+    echo "pyenv: version \`$VERSION_NAME' not installed" >&2
+    exit 1
+  fi
+
+  read -p "pyenv: remove $PREFIX? "
+  case "$REPLY" in
+  y* | Y* ) ;;
+  * ) exit 1 ;;
+  esac
+fi
+
+if [ -d "$PREFIX" ]; then
+  rm -rf "$PREFIX"
+  pyenv rehash
+fi
