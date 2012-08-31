@@ -7,7 +7,7 @@ tools that do one thing well.
 This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and.
 [ruby-build](https://github.com/sstephenson/ruby-build) and modified for Python.
 
-<img src="http://gyazo.com/13719131550e2d53269ad38c8a0a1815.png?1346413840" width="841" height="448">
+<img src="http://gyazo.com/9c829fafdf5e58880c820349c4e9197e.png?1346414267" width="849" height="454">
 
 ### pyenv _does…_
 
