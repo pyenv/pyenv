@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  exec pyenv shims --short
+fi
+
+PYENV_COMMAND="$1"
+if [ -z "$PYENV_COMMAND" ]; then
+  echo "usage: pyenv exec COMMAND [arg1 arg2...]" >&2
+  exit 1
+fi
+
+PYENV_COMMAND_PATH="$(pyenv-which "$PYENV_COMMAND")"
+PYENV_BIN_PATH="${PYENV_COMMAND_PATH%/*}"
+
+for script in $(pyenv-hooks exec); do
+  source "$script"
+done
+
+shift 1
+export PATH="${PYENV_BIN_PATH}:${PATH}"
+exec -a "$PYENV_COMMAND" "$PYENV_COMMAND_PATH" "$@"

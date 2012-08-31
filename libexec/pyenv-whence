@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  echo --path
+  exec pyenv shims --short
+fi
+
+if [ "$1" = "--path" ]; then
+  print_paths="1"
+  shift
+else
+  print_paths=""
+fi
+
+whence() {
+  local command="$1"
+  pyenv-versions --bare | while read version; do
+    path="$(pyenv-prefix "$version")/bin/${command}"
+    if [ -x "$path" ]; then
+      [ "$print_paths" ] && echo "$path" || echo "$version"
+    fi
+  done
+}
+
+PYENV_COMMAND="$1"
+if [ -z "$PYENV_COMMAND" ]; then
+  echo "usage: pyenv whence [--path] COMMAND" >&2
+  exit 1
+fi
+
+result="$(whence "$PYENV_COMMAND")"
+[ -n "$result" ] && echo "$result"

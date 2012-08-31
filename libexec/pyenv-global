@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec pyenv-versions --bare
+fi
+
+PYENV_VERSION="$1"
+PYENV_VERSION_FILE="${PYENV_ROOT}/version"
+
+if [ -n "$PYENV_VERSION" ]; then
+  pyenv-version-file-write "$PYENV_VERSION_FILE" "$PYENV_VERSION"
+else
+  pyenv-version-file-read "$PYENV_VERSION_FILE" ||
+  pyenv-version-file-read "${PYENV_ROOT}/global" ||
+  pyenv-version-file-read "${PYENV_ROOT}/default" ||
+  echo system
+fi

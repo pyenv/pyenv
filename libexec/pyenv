@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+resolve_link() {
+  $(type -p greadlink readlink | head -1) "$1"
+}
+
+abs_dirname() {
+  local cwd="$(pwd)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+
+if [ -z "${PYENV_ROOT}" ]; then
+  PYENV_ROOT="${HOME}/.pyenv"
+else
+  PYENV_ROOT="${PYENV_ROOT%/}"
+fi
+export PYENV_ROOT
+
+if [ -z "${PYENV_DIR}" ]; then
+  PYENV_DIR="$(pwd)"
+else
+  cd "$PYENV_DIR" 2>/dev/null || {
+    echo "pyenv: cannot change working directory to \`$PYENV_DIR'"
+    exit 1
+  } >&2
+  PYENV_DIR="$(pwd)"
+  cd "$OLDPWD"
+fi
+export PYENV_DIR
+
+
+shopt -s nullglob
+
+bin_path="$(abs_dirname "$0")"
+for plugin_bin in "${PYENV_ROOT}/plugins/"*/bin; do
+  bin_path="${bin_path}:${plugin_bin}"
+done
+export PATH="${bin_path}:${PATH}"
+
+hook_path="${PYENV_HOOK_PATH}:${PYENV_ROOT}/pyenv.d:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib/pyenv/hooks"
+for plugin_hook in "${PYENV_ROOT}/plugins/"*/etc/pyenv.d; do
+  hook_path="${hook_path}:${plugin_hook}"
+done
+export PYENV_HOOK_PATH="$hook_path"
+
+shopt -u nullglob
+
+
+command="$1"
+case "$command" in
+"" | "-h" | "--help" )
+  echo -e "pyenv 0.1.0\n$(pyenv-help)" >&2
+  ;;
+* )
+  command_path="$(command -v "pyenv-$command" || true)"
+  if [ -z "$command_path" ]; then
+    echo "pyenv: no such command \`$command'" >&2
+    exit 1
+  fi
+
+  shift 1
+  exec "$command_path" "$@"
+  ;;
+esac

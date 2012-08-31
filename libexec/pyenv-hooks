@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  echo exec
+  echo rehash
+  echo which
+  exit
+fi
+
+PYENV_COMMAND="$1"
+if [ -z "$PYENV_COMMAND" ]; then
+  echo "usage: pyenv hooks COMMAND" >&2
+  exit 1
+fi
+
+resolve_link() {
+  $(type -p greadlink readlink | head -1) $1
+}
+
+realpath() {
+  local cwd="$(pwd)"
+  local base="$(basename $1)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  echo "$(pwd)/$base"
+  cd "$cwd"
+}
+
+shopt -s nullglob
+for path in ${PYENV_HOOK_PATH//:/$'\n'}; do
+  for script in $path/"$PYENV_COMMAND"/*.bash; do
+    echo $(realpath $script)
+  done
+done
+shopt -u nullglob

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+echo "$(pyenv-version-name) (set by $(pyenv-version-origin))"

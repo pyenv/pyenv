@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+if [ -n "$PYENV_VERSION" ]; then
+  echo "PYENV_VERSION environment variable"
+else
+  pyenv-version-file
+fi

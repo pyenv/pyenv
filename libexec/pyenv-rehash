@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+SHIM_PATH="${PYENV_ROOT}/shims"
+PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
+
+# Create the shims directory if it doesn't already exist.
+mkdir -p "$SHIM_PATH"
+
+# Ensure only one instance of pyenv-rehash is running at a time by
+# setting the shell's `noclobber` option and attempting to write to
+# the prototype shim file. If the file already exists, print a warning
+# to stderr and exit with a non-zero status.
+set -o noclobber
+{ echo > "$PROTOTYPE_SHIM_PATH"
+} 2>/dev/null ||
+{ echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
+  exit 1
+} >&2
+set +o noclobber
+
+# If we were able to obtain a lock, register a trap to clean up the
+# prototype shim when the process exits.
+trap remove_prototype_shim EXIT
+
+remove_prototype_shim() {
+  rm -f "$PROTOTYPE_SHIM_PATH"
+}
+
+# The prototype shim file is a script that re-execs itself, passing
+# its filename and any arguments to `pyenv exec`. This file is
+# hard-linked for every binary and then removed. The linking technique
+# is fast, uses less disk space than unique files, and also serves as
+# a locking mechanism.
+create_prototype_shim() {
+  cat > "$PROTOTYPE_SHIM_PATH" <<SH
+#!/usr/bin/env bash
+set -e
+export PYENV_ROOT="$PYENV_ROOT"
+exec pyenv exec "\${0##*/}" "\$@"
+SH
+  chmod +x "$PROTOTYPE_SHIM_PATH"
+}
+
+# The basename of each argument passed to `make_shims` will be
+# registered for installation as a shim. In this way, plugins may call
+# `make_shims` with a glob to register many shims at once.
+make_shims() {
+  local shims="$@"
+
+  for file in $shims; do
+    local shim="${file##*/}"
+    register_shim "$shim"
+  done
+}
+
+# Create an empty array for the list of registered shims.
+registered_shims=()
+
+# We will keep track of shims registered for installation with the
+# global `reigstered_shims` array and with a global variable for each
+# shim. The array will let us iterate over all registered shims. The
+# global variables will let us quickly check whether a shim with the
+# given name has been registered or not.
+register_shim() {
+  local shim="$@"
+  local var="$(shim_variable_name "$shim")"
+
+  if [ -z "${!var}" ]; then
+    registered_shims[${#registered_shims[*]}]="$shim"
+    eval "${var}=1"
+  fi
+}
+
+# To compute the global variable name for a given shim we must first
+# escape any non-alphanumeric characters. If the shim name is
+# alphanumeric (including a hyphen or underscore) we can take a
+# shorter path. Otherwise, we must iterate over each character and
+# escape the non-alphanumeric ones using `printf`.
+shim_variable_name() {
+  local shim="$1"
+  local result="_shim_"
+
+  if [[ ! "$shim" =~ [^[:alnum:]_-] ]]; then
+    shim="${shim//_/_5f}"
+    shim="${shim//-/_2d}"
+    result="$result$shim"
+  else
+    local length="${#shim}"
+    local char i
+
+    for ((i=0; i<length; i++)); do
+      char="${shim:$i:1}"
+      if [[ "$char" =~ [[:alnum:]] ]]; then
+        result="$result$char"
+      else
+        result="$result$(printf "_%02x" \'"$char")"
+      fi
+    done
+  fi
+
+  echo "$result"
+}
+
+# To install all the registered shims, we iterate over the
+# `registered_shims` array and create a link if one does not already
+# exist.
+install_registered_shims() {
+  for shim in "${registered_shims[@]}"; do
+    [ -e "$shim" ] || ln -f "$PROTOTYPE_SHIM_PATH" "$shim"
+  done
+}
+
+# Once the registered shims have been installed, we make a second pass
+# over the contents of the shims directory. Any file that is present
+# in the directory but has not been registered as a shim should be
+# removed.
+remove_stale_shims() {
+  local var
+  for shim in *; do
+    var="$(shim_variable_name "$shim")"
+    if [ -z "${!var}" ]; then
+      rm -f "$shim" 
+    fi
+  done
+}
+
+
+# Change to the shims directory.
+cd "$SHIM_PATH"
+
+# Create the prototype shim, then register shims for all known binaries.
+create_prototype_shim
+shopt -s nullglob
+make_shims ../versions/*/bin/*
+
+# Restore the previous working directory.
+cd "$OLDPWD"
+
+# Allow plugins to register shims.
+for script in $(pyenv-hooks rehash); do
+  source "$script"
+done
+
+# Change back to the shims directory to install the registered shims
+# and remove stale shims.
+cd "$SHIM_PATH"
+install_registered_shims
+remove_stale_shims

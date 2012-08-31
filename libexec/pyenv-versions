@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+PYENV_VERSION_NAME="$(pyenv-version-name)"
+
+if [ "$1" = "--bare" ]; then
+  hit_prefix=""
+  miss_prefix=""
+  print_version="$PYENV_VERSION_NAME"
+else
+  hit_prefix="* "
+  miss_prefix="  "
+  print_version="$(pyenv-version)"
+fi
+
+for path in "${PYENV_ROOT}/versions/"*; do
+  if [ -d "$path" ]; then
+    version="${path##*/}"
+
+    if [ "$version" == "$PYENV_VERSION_NAME" ]; then
+      echo "${hit_prefix}${print_version}"
+    else
+      echo "${miss_prefix}${version}"
+    fi
+  fi
+done

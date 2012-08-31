@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  exec pyenv shims --short
+fi
+
+expand_path() {
+  if [ ! -d "$1" ]; then
+    return 1
+  fi
+
+  local cwd="$(pwd)"
+  cd "$1"
+  pwd
+  cd "$cwd"
+}
+
+remove_from_path() {
+  local path_to_remove="$(expand_path "$1")"
+  local result=""
+
+  if [ -z "$path_to_remove" ]; then
+    echo "${PATH}"
+    return
+  fi
+
+  local paths
+  IFS=: paths=($PATH)
+
+  for path in "${paths[@]}"; do
+    path="$(expand_path "$path" || true)"
+    if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
+      result="${result}${path}:"
+    fi
+  done
+
+  echo "${result%:}"
+}
+
+PYENV_VERSION="$(pyenv-version-name)"
+PYENV_COMMAND="$1"
+
+if [ -z "$PYENV_COMMAND" ]; then
+  echo "usage: pyenv which COMMAND" >&2
+  exit 1
+fi
+
+if [ "$PYENV_VERSION" = "system" ]; then
+  PATH="$(remove_from_path "${PYENV_ROOT}/shims")"
+  PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND")"
+else
+  PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${PYENV_VERSION}/bin/${PYENV_COMMAND}"
+fi
+
+for script in $(pyenv-hooks which); do
+  source "$script"
+done
+
+if [ -x "$PYENV_COMMAND_PATH" ]; then
+  echo "$PYENV_COMMAND_PATH"
+else
+  echo "pyenv: $PYENV_COMMAND: command not found" >&2
+
+  versions="$(pyenv-whence "$PYENV_COMMAND" || true)"
+  if [ -n "$versions" ]; then
+    { echo
+      echo "The \`$1' command exists in these Python versions:"
+      echo "$versions" | sed 's/^/  /g'
+      echo
+    } >&2
+  fi
+
+  exit 127
+fi

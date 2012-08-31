@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+root="$PYENV_DIR"
+while [ -n "$root" ]; do
+  if [ -e "${root}/.pyenv-version" ]; then
+    echo "${root}/.pyenv-version"
+    exit
+  fi
+  root="${root%/*}"
+done
+
+global_version_file="${PYENV_ROOT}/version"
+
+if [ -e "$global_version_file" ]; then
+  echo "$global_version_file"
+elif [ -e "${PYENV_ROOT}/global" ]; then
+  echo "${PYENV_ROOT}/global"
+elif [ -e "${PYENV_ROOT}/default" ]; then
+  echo "${PYENV_ROOT}/default"
+else
+  echo "$global_version_file"
+fi

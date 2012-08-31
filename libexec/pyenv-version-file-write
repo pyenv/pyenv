@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+PYENV_VERSION_FILE="$1"
+PYENV_VERSION="$2"
+
+if [ -z "$PYENV_VERSION" ] || [ -z "$PYENV_VERSION_FILE" ]; then
+  echo "usage: pyenv write-version-file FILENAME VERSION" >&2
+  exit 1
+fi
+
+# Make sure the specified version is installed.
+pyenv-prefix "$PYENV_VERSION" >/dev/null
+
+# Write the version out to disk.
+echo "$PYENV_VERSION" > "$PYENV_VERSION_FILE"

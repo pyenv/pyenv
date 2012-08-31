@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+print=""
+no_rehash=""
+for args in "$@"
+do
+  if [ "$args" = "-" ]; then
+    print=1
+		shift
+  fi
+
+  if [ "$args" = "--no-rehash" ]; then
+    no_rehash=1
+    shift
+  fi
+done
+
+shell="$1"
+if [ -z "$shell" ]; then
+  shell="$(basename "$SHELL")"
+fi
+
+resolve_link() {
+  $(type -p greadlink readlink | head -1) $1
+}
+
+abs_dirname() {
+  local cwd="$(pwd)"
+  local path="$1"
+
+  while [ -n "$path" ]; do
+    cd "${path%/*}"
+    local name="${path##*/}"
+    path="$(resolve_link "$name" || true)"
+  done
+
+  pwd
+  cd "$cwd"
+}
+
+root="$(abs_dirname "$0")/.."
+
+if [ -z "$print" ]; then
+  case "$shell" in
+  bash )
+    profile='~/.bash_profile'
+    ;;
+  zsh )
+    profile='~/.zshrc'
+    ;;
+  ksh )
+    profile='~/.profile'
+    ;;
+  * )
+    profile='your profile'
+    ;;
+  esac
+
+  { echo "# Load pyenv automatically by adding"
+    echo "# the following to ${profile}:"
+    echo
+    echo 'eval "$(pyenv init -)"'
+    echo
+  } >&2
+
+  exit 1
+fi
+
+mkdir -p "${PYENV_ROOT}/"{shims,versions}
+
+echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+
+case "$shell" in
+bash | zsh )
+  echo "source \"$root/completions/pyenv.${shell}\""
+  ;;
+esac
+
+if [ -z "$no_rehash" ]; then
+  echo 'pyenv rehash 2>/dev/null'
+fi
+
+commands=(`pyenv commands --sh`)
+IFS="|"
+cat <<EOS
+pyenv() {
+  local command="\$1"
+  if [ "\$#" -gt 0 ]; then
+    shift
+  fi
+
+  case "\$command" in
+  ${commands[*]})
+    eval \`pyenv "sh-\$command" "\$@"\`;;
+  *)
+    command pyenv "\$command" "\$@";;
+  esac
+}
+EOS
