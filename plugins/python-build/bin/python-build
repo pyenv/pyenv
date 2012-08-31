@@ -284,19 +284,6 @@ require_gcc() {
         echo "${esc}[1mDETAILS${esc}[0m: Apple no longer includes the official GCC compiler with Xcode"
         echo "as of version 4.2. Instead, the \`gcc\` executable is a symlink to"
         echo "\`llvm-gcc\`, a modified version of GCC which outputs LLVM bytecode."
-        echo
-        echo "For most programs the \`llvm-gcc\` compiler works fine. However,"
-        echo "versions of Python older than 1.9.3-p125 are incompatible with"
-        echo "\`llvm-gcc\`. To build older versions of Python you must have the official"
-        echo "GCC compiler installed on your system."
-        echo
-        echo "${esc}[1mTO FIX THE PROBLEM${esc}[0m: Install the official GCC compiler using these"
-        echo "packages: ${esc}[4mhttps://github.com/kennethreitz/osx-gcc-installer/downloads${esc}[0m"
-        echo
-        echo "You will need to install the official GCC compiler to build older"
-        echo "versions of Python even if you have installed Apple's Command Line Tools"
-        echo "for Xcode package. The Command Line Tools for Xcode package only"
-        echo "includes \`llvm-gcc\`."
       fi
     } >&3
     return 1
@@ -343,10 +330,6 @@ verify_gcc() {
 
   local version="$("$gcc" --version || true)"
   if [ -z "$version" ]; then
-    return 1
-  fi
-
-  if echo "$version" | grep LLVM >/dev/null; then
     return 1
   fi
 
