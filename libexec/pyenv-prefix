@@ -9,24 +9,24 @@ if [ "$1" = "--complete" ]; then
 fi
 
 if [ -n "$1" ]; then
-  export PYENV_VERSIONS=($@)
+  export PYENV_VERSION=($@)
 else
-  IFS=: PYENV_VERSIONS=($(pyenv-version-name))
+  IFS=: PYENV_VERSION=($(pyenv-version-name))
 fi
 
-if [ "$PYENV_VERSIONS" = "system" ]; then
+if [ "$PYENV_VERSION" = "system" ]; then
   PYTHON_PATH="$(pyenv-which python)"
   echo "${PYTHON_PATH%/*}"
   exit
 fi
 
 PYENV_PREFIX_PATHS=()
-for PYENV_VERSION in "${PYENV_VERSIONS[@]}"; do
-  PYENV_PREFIX_PATH="${PYENV_ROOT}/versions/${PYENV_VERSION}"
+for version in "${PYENV_VERSION[@]}"; do
+  PYENV_PREFIX_PATH="${PYENV_ROOT}/versions/${version}"
   if [ -d "$PYENV_PREFIX_PATH" ]; then
     PYENV_PREFIX_PATHS=("${PYENV_PREFIX_PATHS[@]}" "$PYENV_PREFIX_PATH")
   else
-    echo "pyenv: version \`${PYENV_VERSION}' not installed" >&2
+    echo "pyenv: version \`${version}' not installed" >&2
     exit 1
   fi
 done

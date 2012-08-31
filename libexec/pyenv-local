@@ -9,21 +9,21 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-versions --bare
 fi
 
-PYENV_VERSIONS=($@)
+PYENV_VERSION=($@)
 PYENV_VERSION_FILE=".pyenv-version"
 
-if [ "$PYENV_VERSIONS" = "--unset" ]; then
+if [ "$PYENV_VERSION" = "--unset" ]; then
   rm -f "$PYENV_VERSION_FILE"
-elif [ -n "$PYENV_VERSIONS" ]; then
-  pyenv-version-file-write "$PYENV_VERSION_FILE" "${PYENV_VERSIONS[@]}"
+elif [ -n "$PYENV_VERSION" ]; then
+  pyenv-version-file-write "$PYENV_VERSION_FILE" "${PYENV_VERSION[@]}"
 else
-  IFS=: PYENV_VERSIONS=($(
+  IFS=: PYENV_VERSION=($(
     pyenv-version-file-read "$PYENV_VERSION_FILE" ||
     { echo "pyenv: no local version configured for this directory"
       exit 1
     } >&2
   ))
-  for PYENV_VERSION in "${PYENV_VERSIONS[@]}"; do
-    echo "$PYENV_VERSION"
+  for version in "${PYENV_VERSION[@]}"; do
+    echo "$version"
   done
 fi

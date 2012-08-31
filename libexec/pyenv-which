@@ -40,7 +40,7 @@ remove_from_path() {
   echo "${result%:}"
 }
 
-IFS=: PYENV_VERSIONS=($(pyenv-version-name))
+IFS=: PYENV_VERSION=($(pyenv-version-name))
 PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then
@@ -48,12 +48,12 @@ if [ -z "$PYENV_COMMAND" ]; then
   exit 1
 fi
 
-for PYENV_VERSION in "${PYENV_VERSIONS[@]}"; do
-  if [ "$PYENV_VERSION" = "system" ]; then
+for version in "${PYENV_VERSION[@]}"; do
+  if [ "$version" = "system" ]; then
     PATH="$(remote_from_path "${PYENV_ROOT}/shims")"
     PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND")"
   else
-    PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${PYENV_VERSION}/bin/${PYENV_COMMAND}"
+    PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${version}/bin/${PYENV_COMMAND}"
     if [ -x "$PYENV_COMMAND_PATH" ]; then
       break
     fi

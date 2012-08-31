@@ -15,17 +15,17 @@ for version in "$@"; do
 done
 
 if [ -z "$versions" ]; then
-  if [ -z "$PYENV_VERSIONS" ]; then
+  if [ -z "$PYENV_VERSION" ]; then
     echo "pyenv: no shell-specific version configured" >&2
     exit 1
   else
-    echo "echo \"\$PYENV_VERSIONS\""
+    echo "echo \"\${PYENV_VERSION[@]}\""
     exit
   fi
 fi
 
 if [ "$versions" = "--unset" ]; then
-  echo "unset PYENV_VERSIONS"
+  echo "unset PYENV_VERSION"
   exit 1
 fi
 
@@ -34,5 +34,5 @@ pyenv-prefix $versions >/dev/null
 
 {
   IFS=:
-  echo "export PYENV_VERSIONS=\"${versions[*]}\""
+  echo "export PYENV_VERSION=(\"${versions[@]}\")"
 }
