@@ -2,21 +2,23 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-if [ -z "$PYENV_VERSION" ]; then
+if [ -z "$PYENV_VERSIONS" ]; then
   PYENV_VERSION_FILE="$(pyenv-version-file)"
-  PYENV_VERSION="$(pyenv-version-file-read "$PYENV_VERSION_FILE" || true)"
+  IFS=: PYENV_VERSIONS=($(pyenv-version-file-read "$PYENV_VERSION_FILE" || true))
 fi
 
-if [ -z "$PYENV_VERSION" ] || [ "$PYENV_VERSION" = "system" ]; then
+if [ -z "$PYENV_VERSIONS" ] || [ "$PYENV_VERSIONS" = "system" ] ; then
   echo "system"
   exit
 fi
 
-PYENV_VERSION_PATH="${PYENV_ROOT}/versions/${PYENV_VERSION}"
+for PYENV_VERSION in "${PYENV_VERSIONS[@]}"; do
+  PYENV_VERSION_PATH="${PYENV_ROOT}/versions/${PYENV_VERSION}"
+  
+  if [ ! -d "$PYENV_VERSION_PATH" ]; then
+    echo "pyenv: version \`$PYENV_VERSION' is not installed" >&2
+    exit 1
+  fi
+done
 
-if [ -d "$PYENV_VERSION_PATH" ]; then
-  echo "$PYENV_VERSION"
-else
-  echo "pyenv: version \`$PYENV_VERSION' is not installed" >&2
-  exit 1
-fi
+IFS=: echo "${PYENV_VERSIONS[*]}"

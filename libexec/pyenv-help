@@ -44,7 +44,7 @@ global) echo "usage: pyenv global <version>
 
 Sets the global Python version. You can override the global version at
 any time by setting a directory-specific version with \`pyenv local'
-or by setting the PYENV_VERSION environment variable.
+or by setting the PYENV_VERSIONS environment variable.
 
 $(print_set_version)"
 ;;
@@ -58,14 +58,14 @@ When you run a Python command, pyenv will look for an '.pyenv-version'
 file in the current directory and each parent directory. If no such
 file is found in the tree, pyenv will use the global Python version
 specified with \`pyenv global', or the version specified in the
-PYENV_VERSION environment variable.
+PYENV_VERSIONS environment variable.
 
 $(print_set_version)"
 ;;
 shell) echo "usage: pyenv shell <version>
        pyenv shell --unset
 
-Sets a shell-specific Python version by setting the 'PYENV_VERSION'
+Sets a shell-specific Python version by setting the 'PYENV_VERSIONS'
 environment variable in your shell. This version overrides both
 project-specific versions and the global version.
 
