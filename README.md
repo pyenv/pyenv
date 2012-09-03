@@ -15,7 +15,7 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and.
 * Provide support for **per-project Python versions**.
 * Allow you to **override the Python version** with an environment
   variable.
-* Search commands from multiple versions of Python at a time.
+* Search commands from **multiple versions of Python at a time**.
   This may be helpful to test across Python versions with [tox](http://pypi.python.org/pypi/tox).
 
 ## Table of Contents
@@ -275,6 +275,10 @@ Please feel free to submit pull requests and file bugs on the [issue
 tracker](https://github.com/yyuu/pyenv/issues).
 
 ### <a name="section_4.1"></a> 4.1 Version History
+
+**0.1.1** (September 3, 2012)
+
+* Support multiple versions of Python at a time.
 
 **0.1.0** (August 31, 2012)
 
