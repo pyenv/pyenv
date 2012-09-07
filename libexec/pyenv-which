@@ -41,7 +41,7 @@ remove_from_path() {
 }
 
 IFS=: versions=($(pyenv-version-name))
-PYENV_VERSION=("${versions[@]}")
+IFS=: PYENV_VERSION="${versions[*]}"
 PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then
@@ -49,7 +49,7 @@ if [ -z "$PYENV_COMMAND" ]; then
   exit 1
 fi
 
-for version in "${PYENV_VERSION[@]}"; do
+for version in "${versions[@]}"; do
   if [ "$version" = "system" ]; then
     PATH="$(remote_from_path "${PYENV_ROOT}/shims")"
     PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND")"

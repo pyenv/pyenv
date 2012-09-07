@@ -2,17 +2,22 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-if [ -z "$PYENV_VERSION" ]; then
+if [ -n "$PYENV_VERSION" ]; then
+# IFS=: versions=($(${PYENV_VERSION})) # this does not work on zsh without `setopt shwordsplit`.
+  versions=($(echo "${PYENV_VERSION}" | tr ":" " "))
+else
   PYENV_VERSION_FILE="$(pyenv-version-file)"
-  IFS=: PYENV_VERSION=($(pyenv-version-file-read "$PYENV_VERSION_FILE" || true))
+  IFS=: versions=($(pyenv-version-file-read "$PYENV_VERSION_FILE" || true))
+  IFS=: PYENV_VERSION="${versions[*]}"
+  export PYENV_VERSION
 fi
 
-if [ -z "$PYENV_VERSION" ] || [ "$PYENV_VERSION" = "system" ] ; then
+if [ -z "$versions" ] || [ "$versions" = "system" ] ; then
   echo "system"
   exit
 fi
 
-for version in "${PYENV_VERSION[@]}"; do
+for version in "${versions[@]}"; do
   PYENV_VERSION_PATH="${PYENV_ROOT}/versions/${version}"
   
   if [ ! -d "$PYENV_VERSION_PATH" ]; then
@@ -21,4 +26,4 @@ for version in "${PYENV_VERSION[@]}"; do
   fi
 done
 
-IFS=: echo "${PYENV_VERSION[*]}"
+echo "${PYENV_VERSION}"

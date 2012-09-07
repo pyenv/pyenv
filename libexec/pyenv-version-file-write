@@ -4,23 +4,18 @@ set -e
 
 PYENV_VERSION_FILE="$1"
 shift
-PYENV_VERSION=()
-for version in "$@"; do
-  PYENV_VERSION=("${PYENV_VERSION[@]}" "$version")
-done
+versions=("$@")
 
-if [ -z "$PYENV_VERSION" ] || [ -z "$PYENV_VERSION_FILE" ]; then
+if [ -z "$versions" ] || [ -z "$PYENV_VERSION_FILE" ]; then
   echo "usage: pyenv write-version-file FILENAME VERSIONS..." >&2
   exit 1
 fi
 
 # Make sure the specified version is installed.
-for version in "${PYENV_VERSION[@]}"; do
-  pyenv-prefix "$version" >/dev/null
-done
+pyenv-prefix "${vesions[@]}" >/dev/null
 
 # Write the version out to disk.
 rm -f "$PYENV_VERSION_FILE"
-for version in "${PYENV_VERSION[@]}"; do
+for version in "${versions[@]}"; do
   echo "$version" >> "$PYENV_VERSION_FILE"
 done

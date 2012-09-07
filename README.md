@@ -170,15 +170,19 @@ The special version name `system` tells pyenv to use the system Python
 When run without a version number, `pyenv global` reports the
 currently configured global version.
 
-_pyenv extension_
-
-You can specify multiple versions for global Python. Commands within
-these versions are searched by specified order.
+And also, you can specify multiple versions as global Python. Commands
+within these Python versions are searched by specified order.
 
     $ pyenv global 2.7.3 3.2.3
     $ pyenv global
     2.7.3
     3.2.3
+    $ pyenv which python2.7
+    /home/yyuu/.pyenv/versions/2.7.3/bin/python2.7
+    $ pyenv which python3.2
+    /home/yyuu/.pyenv/versions/3.2.3/bin/python3.2
+    $ pyenv which python
+    /home/yyuu/.pyenv/versions/2.7.3/bin/python
 
 ### <a name="section_3.2"></a> 3.2 pyenv local
 
@@ -195,9 +199,19 @@ configured local version. You can also unset the local version:
 
     $ pyenv local --unset
 
-_pyenv extension_
+And also, you can specify multiple versions as local Python. Commands
+within these Python versions are searched by specified order.
 
-You can specify multiple versions for local Python.
+    $ pyenv local 2.7.3 3.2.3
+    $ pyenv local
+    2.7.3
+    3.2.3
+    $ pyenv which python2.7
+    /home/yyuu/.pyenv/versions/2.7.3/bin/python2.7
+    $ pyenv which python3.2
+    /home/yyuu/.pyenv/versions/3.2.3/bin/python3.2
+    $ pyenv which python
+    /home/yyuu/.pyenv/versions/2.7.3/bin/python
 
 ### <a name="section_3.3"></a> 3.3 pyenv shell
 
@@ -218,6 +232,16 @@ prefer not to use shell integration, you may simply set the
 `PYENV_VERSION` variable yourself:
 
     $ export PYENV_VERSION=pypy-1.9
+
+And also, you can specify multiple versions via `PYENV_VERSION`
+environment variable in your shell.
+
+    $ pyenv shell pypy-1.9 2.7.3
+    $ echo $PYENV_VERSION
+    pypy-1.9:2.7.3
+    $ pyenv version
+    pypy-1.9 (set by PYENV_VERSION environment variable)
+    2.7.3 (set by PYENV_VERSION environment variable)
 
 ### <a name="section_3.4"></a> 3.4 pyenv versions
 

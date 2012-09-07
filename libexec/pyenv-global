@@ -8,19 +8,19 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-versions --bare
 fi
 
-PYENV_VERSION=($@)
+versions=($@)
 PYENV_VERSION_FILE="${PYENV_ROOT}/version"
 
-if [ -n "$PYENV_VERSION" ]; then
-  pyenv-version-file-write "$PYENV_VERSION_FILE" "${PYENV_VERSION[@]}"
+if [ -n "$versions" ]; then
+  pyenv-version-file-write "$PYENV_VERSION_FILE" "${versions[@]}"
 else
-  IFS=: PYENV_VERSION=($(
+  IFS=: versions=($(
     pyenv-version-file-read "$PYENV_VERSION_FILE" ||
     pyenv-version-file-read "${PYENV_ROOT}/global" ||
     pyenv-version-file-read "${PYENV_ROOT}/default" ||
     echo system
   ))
-  for version in "${PYENV_VERSION[@]}"; do
+  for version in "${versions[@]}"; do
     echo "$version"
   done
 fi
