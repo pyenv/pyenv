@@ -3,8 +3,7 @@ set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 if [ -n "$PYENV_VERSION" ]; then
-# IFS=: versions=($(${PYENV_VERSION})) # this does not work on zsh without `setopt shwordsplit`.
-  versions=($(echo "${PYENV_VERSION}" | tr ":" " "))
+  IFS=: versions=($(echo "${PYENV_VERSION}"))
 else
   PYENV_VERSION_FILE="$(pyenv-version-file)"
   IFS=: versions=($(pyenv-version-file-read "$PYENV_VERSION_FILE" || true))
