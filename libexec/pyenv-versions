@@ -2,24 +2,33 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
+array_exists() {
+  local x car="$1"
+  shift
+  for x in "$@"; do
+    [ "${x}" = "${car}" ] && return 0
+  done
+  return 1
+}
+
 IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name))
 
 if [ "$1" = "--bare" ]; then
   hit_prefix=""
   miss_prefix=""
-  print_version="$PYENV_VERSION_NAMES"
+  version_origin=""
 else
   hit_prefix="* "
   miss_prefix="  "
-  print_version="$PYENV_VERSION_NAMES (set by $(pyenv-version-origin))"
+  version_origin=" (set by $(pyenv-version-origin))"
 fi
 
 for path in "${PYENV_ROOT}/versions/"*; do
   if [ -d "$path" ]; then
     version="${path##*/}"
 
-    if [ "$version" == "$PYENV_VERSION_NAMES" ]; then
-      echo "${hit_prefix}${print_version}"
+    if array_exists "$version" "${PYENV_VERSION_NAMES[@]}"; then
+      echo "${hit_prefix}${version}${version_origin}"
     else
       echo "${miss_prefix}${version}"
     fi
