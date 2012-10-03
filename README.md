@@ -9,7 +9,7 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 
 <img src="http://gyazo.com/9c829fafdf5e58880c820349c4e9197e.png?1346414267" width="849" height="454">
 
-### pyenv _does…_
+### pyenv _does..._
 
 * Let you **change the global Python version** on a per-user basis.
 * Provide support for **per-project Python versions**.
@@ -17,6 +17,21 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
   variable.
 * Search commands from **multiple versions of Python at a time**.
   This may be helpful to test across Python versions with [tox](http://pypi.python.org/pypi/tox).
+
+### In contrast with pythonbrew and pythonz, pyenv _does not..._
+
+* **Depending on Python itself.** pyenv was made from pure shell scripts.
+    There is no bootstrap problem of Python.
+* **Need to be loaded into your shell.** Instead, pyenv's shim
+    approach works by adding a directory to your `$PATH`.
+* **Have a configuration file.** There's nothing to configure except
+    which version of Python you want to use.
+* **Manage virtualenv.** Of course, you can create [virtualenv](http://pypi.python.org/pypi/virtualenv)
+    yourself, or [python-virtualenv](https://github.com/yyuu/python-virtualenv)
+    to automate the process.
+* **Prompt you with warnings when you switch to a project.** Instead
+    of executing arbitrary code, pyenv reads just the version name
+    from each project. There's nothing to "trust."
 
 ## Table of Contents
 
