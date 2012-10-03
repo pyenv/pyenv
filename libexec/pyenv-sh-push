@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name))
+versions=("$@")
+PYENV_VERSION_NAMES=("${PYENV_VERSION_NAMES[@]}" "${versions[@]}")
+
+if [ -n "$PYENV_VERSION" ]; then
+  IFS=: PYENV_VERSION="${PYENV_VERSION_NAMES[*]}"
+  echo "export PYENV_VERSION=\"${PYENV_VERSION}\""
+else
+  pyenv-version-file-write "$(pyenv-version-file)" "${PYENV_VERSION_NAMES[@]}"
+fi

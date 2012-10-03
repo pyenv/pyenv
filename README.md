@@ -199,6 +199,20 @@ within these Python versions are searched by specified order.
     $ pyenv which python
     /home/yyuu/.pyenv/versions/2.7.3/bin/python
 
+You can manage your version stack by `pyenv push` and `pyenv pop`.
+
+    $ pyenv global
+    2.7.3
+    3.2.3
+    $ pyenv push 3.3.0
+    $ pyenv global
+    2.7.3
+    3.2.3
+    3.3.0
+    $ pyenv pop
+    2.7.3
+    3.2.3
+
 ### <a name="section_3.2"></a> 3.2 pyenv local
 
 Sets a local per-project Python version by writing the version name to
@@ -227,6 +241,20 @@ within these Python versions are searched by specified order.
     /home/yyuu/.pyenv/versions/3.2.3/bin/python3.2
     $ pyenv which python
     /home/yyuu/.pyenv/versions/2.7.3/bin/python
+
+You can manage your version stack by `pyenv push` and `pyenv pop`.
+
+    $ pyenv local
+    2.7.3
+    3.2.3
+    $ pyenv push 3.3.0
+    $ pyenv local
+    2.7.3
+    3.2.3
+    3.3.0
+    $ pyenv pop
+    2.7.3
+    3.2.3
 
 ### <a name="section_3.3"></a> 3.3 pyenv shell
 
