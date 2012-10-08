@@ -6,7 +6,7 @@ RBENV_VERSION_FILE="$1"
 RBENV_VERSION="$2"
 
 if [ -z "$RBENV_VERSION" ] || [ -z "$RBENV_VERSION_FILE" ]; then
-  echo "usage: rbenv write-version-file FILENAME VERSION" >&2
+  echo "usage: rbenv version-file-write FILENAME VERSION" >&2
   exit 1
 fi
 
