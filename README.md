@@ -221,7 +221,7 @@ overrides the global, and can be overridden itself by setting the
 `PYENV_VERSION` environment variable or with the `pyenv shell`
 command.
 
-    $ pyenv local rbx-1.2.4
+    $ pyenv local 2.7.3
 
 When run without a version number, `pyenv local` reports the currently
 configured local version. You can also unset the local version:
