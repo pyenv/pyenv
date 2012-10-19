@@ -321,7 +321,7 @@ Displays the full path to the binary that pyenv will execute when you
 run the given command.
 
     $ pyenv which python3.2
-    /Users/sam/.pyenv/versions/3.2.3/bin/python3.2
+    /home/yyuu/.pyenv/versions/3.2.3/bin/python3.2
 
 ### <a name="section_3.8"></a> 3.8 pyenv whence
 
