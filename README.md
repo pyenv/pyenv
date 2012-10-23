@@ -343,6 +343,12 @@ tracker](https://github.com/yyuu/pyenv/issues).
 
 ### <a name="section_4.1"></a> 4.1 Version History
 
+**0.1.2** (October 23, 2012)
+
+* Add push/pop for version stack management.
+* Support multiple versions via environment variable.
+* Now GCC is not a requirement to build CPython and Stackless.
+
 **0.1.1** (September 3, 2012)
 
 * Support multiple versions of Python at a time.
