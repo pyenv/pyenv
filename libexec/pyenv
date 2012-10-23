@@ -60,7 +60,7 @@ shopt -u nullglob
 command="$1"
 case "$command" in
 "" | "-h" | "--help" )
-  echo -e "pyenv 0.1.2\n$(pyenv-help)" >&2
+  echo -e "pyenv 0.1.3git\n$(pyenv-help)" >&2
   ;;
 * )
   command_path="$(command -v "pyenv-$command" || true)"
