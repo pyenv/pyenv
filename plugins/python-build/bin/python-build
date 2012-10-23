@@ -414,7 +414,7 @@ usage() {
 
 list_definitions() {
   { for definition in "${PYTHON_BUILD_ROOT}/share/python-build/"*; do
-      echo "${definition##*/}"
+      test -f "${definition}" && echo "${definition##*/}"
     done
   } | sort
 }
