@@ -24,14 +24,9 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
     There is no bootstrap problem of Python.
 * **Need to be loaded into your shell.** Instead, pyenv's shim
     approach works by adding a directory to your `$PATH`.
-* **Have a configuration file.** There's nothing to configure except
-    which version of Python you want to use.
 * **Manage virtualenv.** Of course, you can create [virtualenv](http://pypi.python.org/pypi/virtualenv)
     yourself, or [python-virtualenv](https://github.com/yyuu/python-virtualenv)
     to automate the process.
-* **Prompt you with warnings when you switch to a project.** Instead
-    of executing arbitrary code, pyenv reads just the version name
-    from each project. There's nothing to "trust."
 
 ## Table of Contents
 
