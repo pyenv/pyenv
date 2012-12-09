@@ -82,16 +82,24 @@ easy to fork and contribute any changes back upstream.
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
 
+    **Ubuntu note**: Ubuntu uses `~/.profile` for enabling certain path 
+    changes. This file won't be read if you create a `~/.bash_profile`. 
+    Therefore, it's recommended that you add this line and the one in 
+    point 3 below to your `~/.profile`. This has the added advantage 
+    of working under both bash and zsh.
+
 3. Add rbenv init to your shell to enable shims and autocompletion.
 
         $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
+    
+    **Ubuntu note**: Same as Ubuntu note for point 2 above.
 
-4. Restart your shell so the path changes take effect. You can now
-   begin using rbenv.
+4. Restart your shell as a login shell so the path changes take effect. 
+    You can now begin using rbenv.
 
-        $ exec $SHELL
+        $ exec $SHELL -l
 
 5. Install Ruby versions into `~/.rbenv/versions`. For example, to
    install Ruby 1.9.3-p327, download and unpack the source, then run:
