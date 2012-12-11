@@ -45,6 +45,7 @@ tools that do one thing well.
          * [2.1.1 Upgrading](#section_2.1.1)
       * [2.2 Homebrew on Mac OS X](#section_2.2)
       * [2.3 Neckbeard Configuration](#section_2.3)
+      * [2.4 Uninstalling Ruby Versions](#section_2.4)
    * [3 Usage](#section_3)
       * [3.1 rbenv global](#section_3.1)
       * [3.2 rbenv local](#section_3.2)
@@ -200,6 +201,15 @@ opposed to this idea. Here's what `rbenv init` actually does:
 
 Run `rbenv init -` for yourself to see exactly what happens under the
 hood.
+
+### <a name="section_2.4"></a> 2.4 Uninstalling Ruby Versions
+
+As time goes on, ruby versions you install will accumulate in your
+`~/.rbenv/versions` directory.
+
+There is no uninstall or remove command in `rbenv`, so removing old
+versions is a simple matter of `rm -rf` the directory of the relevant
+ruby version you want removed under `~/.rbenv/versions`
 
 ## <a name="section_3"></a> 3 Usage
 
