@@ -242,7 +242,7 @@ Sets a shell-specific Ruby version by setting the `RBENV_VERSION`
 environment variable in your shell. This version overrides both
 project-specific versions and the global version.
 
-    $ rbenv shell jruby-1.7.0
+    $ rbenv shell jruby-1.7.1
 
 When run without a version number, `rbenv shell` reports the current
 value of `RBENV_VERSION`. You can also unset the shell version:
@@ -254,7 +254,7 @@ the installation instructions) in order to use this command. If you
 prefer not to use shell integration, you may simply set the
 `RBENV_VERSION` variable yourself:
 
-    $ export RBENV_VERSION=jruby-1.7.0
+    $ export RBENV_VERSION=jruby-1.7.1
 
 ### <a name="section_3.4"></a> 3.4 rbenv versions
 
@@ -265,7 +265,7 @@ the currently active version.
       1.8.7-p352
       1.9.2-p290
     * 1.9.3-p327 (set by /Users/sam/.rbenv/global)
-      jruby-1.7.0
+      jruby-1.7.1
       rbx-1.2.4
       ree-1.8.7-2011.03
 
@@ -299,7 +299,7 @@ Lists all Ruby versions with the given command installed.
 
     $ rbenv whence rackup
     1.9.3-p327
-    jruby-1.7.0
+    jruby-1.7.1
     ree-1.8.7-2011.03
 
 ## <a name="section_4"></a> 4 Development
