@@ -1,0 +1,39 @@
+case "$OSTYPE" in
+darwin*)
+  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-osx64.tar.bz2"
+  ;;
+linux*)
+  case $(uname -m) in
+  armel)
+    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux-armel.tar.bz2"
+    ;;
+  i386|i486|i586|i686)
+    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux.tar.bz2"
+    ;;
+  x86_64)
+    LDD_VERSION=$(ldd --version | head -1)
+    case "${LDD_VERSION#ldd \(*\) }" in
+    2.15)
+      PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.15.tar.bz2"
+      ;;
+    2.13)
+      PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.13.tar.bz2"
+      ;;
+    *)
+      echo "pypy-2.0-beta1 requires libc version 2.13 or 2.15." 1>&2
+      exit 1
+      ;;
+    esac
+    ;;
+  esac
+  ;;
+cygwin*|mingw*)
+  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-win32.zip"
+  ;;
+esac
+
+if [ -n "$PYPY_URL" ]; then
+  install_package "pypy-2.0-beta1" "$PYPY_URL" pypy
+  install_package "distribute-0.6.32" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.32.tar.gz" python
+  install_package "pip-1.2.1" "http://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz" python
+fi
