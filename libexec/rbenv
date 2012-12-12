@@ -60,7 +60,10 @@ shopt -u nullglob
 command="$1"
 case "$command" in
 "" | "-h" | "--help" )
-  echo -e "rbenv 0.3.0\n$(rbenv-help)" >&2
+  echo -e "rbenv $(rbenv---version)\n$(rbenv-help)" >&2
+  ;;
+"-v" )
+  exec rbenv---version
   ;;
 * )
   command_path="$(command -v "rbenv-$command" || true)"

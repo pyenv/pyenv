@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+version=v0.3.0
+
+cd "$RBENV_ROOT"
+git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
+
+echo ${git_revision:-$version}
