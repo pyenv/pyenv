@@ -22,8 +22,7 @@ tools that do one thing well.
 * **Have a configuration file.** There's nothing to configure except
     which version of Ruby you want to use.
 * **Install Ruby.** You can build and install Ruby yourself, or use
-    [ruby-build](https://github.com/sstephenson/ruby-build) to
-    automate the process.
+    [ruby-build][] to automate the process.
 * **Manage gemsets.** [Bundler](http://gembundler.com/) is a better
     way to manage application dependencies. If you have projects that
     are not yet using Bundler you can install the
@@ -76,15 +75,15 @@ and detect which Ruby version you want to use. They insert the
 directory for the selected version at the beginning of your `$PATH`
 and then execute the corresponding binary.
 
-Because of the simplicity of the shim approach, all you need to use
-rbenv is `~/.rbenv/shims` in your `$PATH`.
-
 ## Installation ##
 
 **Compatibility note**: rbenv is _incompatible_ with rvm. Things will
   appear to work until you try to install a gem. The problem is that
   rvm actually overrides the `gem` command with a shell function!
   Please remove any references to rvm before using rbenv.
+
+If you're on Mac OS X, consider
+[installing with Homebrew](#homebrew-on-mac-os-x).
 
 ### Basic GitHub Checkout ###
 
@@ -93,12 +92,16 @@ easy to fork and contribute any changes back upstream.
 
 1. Check out rbenv into `~/.rbenv`.
 
-        $ git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
+    ~~~ sh
+    $ git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
+    ~~~
 
 2. Add `~/.rbenv/bin` to your `$PATH` for access to the `rbenv`
    command-line utility.
 
-        $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+    ~~~ sh
+    $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+    ~~~
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
 
@@ -108,9 +111,11 @@ easy to fork and contribute any changes back upstream.
     point 3 below to your `~/.profile`. This has the added advantage 
     of working under both bash and zsh.
 
-3. Add rbenv init to your shell to enable shims and autocompletion.
+3. Add `rbenv init` to your shell to enable shims and autocompletion.
 
-        $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+    ~~~ sh
+    $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+    ~~~
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
     
@@ -119,62 +124,70 @@ easy to fork and contribute any changes back upstream.
 4. Restart your shell as a login shell so the path changes take effect. 
     You can now begin using rbenv.
 
-        $ exec $SHELL -l
+    ~~~ sh
+    $ exec $SHELL -l
+    ~~~
 
 5. Install Ruby versions into `~/.rbenv/versions`. For example, to
-   install Ruby 1.9.2-p327, download and unpack the [source](https://github.com/ruby/ruby), 
-   then run:
+   manually compile Ruby [from source](https://github.com/ruby/ruby),
+   download it and run:
 
-        $ [ -f ./configure ] || autoconf
-        $ ./configure --prefix=$HOME/.rbenv/versions/1.9.3-p327
-        $ make
-        $ make install
+    ~~~ sh
+    $ [ -f ./configure ] || autoconf
+    $ ./configure --prefix=$HOME/.rbenv/versions/1.9.3-p327
+    $ make
+    $ make install
+    ~~~
 
-    The [ruby-build](https://github.com/sstephenson/ruby-build) project
-    provides an `rbenv install` command that simplifies the process of
-    installing new Ruby versions to:
+    The [ruby-build][] project, however, provides an `rbenv install`
+    command that simplifies the process of installing new Ruby versions:
 
-        $ rbenv install 1.9.3-p327
+    ~~~
+    $ rbenv install 1.9.3-p327
+    ~~~
 
 6. Rebuild the shim binaries. You should do this any time you install
    a new Ruby binary (for example, when installing a new Ruby version,
    or when installing a gem that provides a binary).
 
-        $ rbenv rehash
+    ~~~
+    $ rbenv rehash
+    ~~~
 
 #### Upgrading ####
 
-If you've installed rbenv using the instructions above, you can
-upgrade your installation at any time using git.
+If you've installed rbenv manually using git, you can upgrade your
+installation to the cutting-edge version at any time.
 
-To upgrade to the latest development version of rbenv, use `git pull`:
+~~~ sh
+$ cd ~/.rbenv
+$ git pull
+~~~
 
-    $ cd ~/.rbenv
-    $ git pull
+To use a specific release of rbenv, check out the corresponding tag:
 
-To upgrade to a specific release of rbenv, check out the corresponding
-tag:
-
-    $ cd ~/.rbenv
-    $ git fetch
-    $ git tag
-    v0.1.0
-    v0.1.1
-    v0.1.2
-    v0.2.0
-    $ git checkout v0.2.0
+~~~ sh
+$ cd ~/.rbenv
+$ git fetch
+$ git tag
+v0.1.0
+v0.1.1
+v0.1.2
+v0.2.0
+$ git checkout v0.2.0
+~~~
 
 ### Homebrew on Mac OS X ###
 
-You can also install rbenv using the
-[Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS
-X.
+You can also install rbenv using the [Homebrew][] on Mac OS X.
 
-    $ brew update
-    $ brew install rbenv
-    $ brew install ruby-build
+~~~
+$ brew update
+$ brew install rbenv
+$ brew install ruby-build
+~~~
 
-The same commands can be used for upgrading.
+To later update these installs, use `upgrade` instead of `install`.
 
 Afterwards you'll still need to add `eval "$(rbenv init -)"` to your
 profile as stated in the caveats. You'll only ever have to do this
@@ -431,3 +444,7 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+  [ruby-build]: https://github.com/sstephenson/ruby-build
+  [homebrew]: http://mxcl.github.com/homebrew/
