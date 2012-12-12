@@ -1,4 +1,0 @@
-#!/bin/sh -e
-
-ruby mdtoc.rb README.mdtoc > ../README.md
-

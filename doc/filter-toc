@@ -1,0 +1,4 @@
+#!/bin/bash
+# Render Markdown ToC with only headings appearing after "Table of Contents"
+dir="$(dirname "$0")"
+"$dir"/mdtoc "$1" | sed -n '/table-of-contents/,$p' | grep -v table-of-contents
