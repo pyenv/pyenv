@@ -23,10 +23,13 @@ fi
 
 if [ "$version" = "--unset" ]; then
   echo "unset RBENV_VERSION"
-  exit 1
+  exit
 fi
 
 # Make sure the specified version is installed.
-rbenv-prefix "$version" >/dev/null
-
-echo "export RBENV_VERSION=\"${version}\""
+if rbenv-prefix "$version" >/dev/null; then
+  echo "export RBENV_VERSION=\"${version}\""
+else
+  echo "return 1"
+  exit 1
+fi
