@@ -12,14 +12,21 @@ else
   current_version="$(rbenv-version-name || true)"
 fi
 
+print_version() {
+  if [ "$1" == "$current_version" ]; then
+    echo "${hit_prefix}$(rbenv-version)"
+  else
+    echo "${miss_prefix}$1"
+  fi
+}
+
+# detect if there is system ruby
+if RBENV_VERSION=system rbenv-which ruby >/dev/null 2>&1; then
+  print_version system
+fi
+
 for path in "${RBENV_ROOT}/versions/"*; do
   if [ -d "$path" ]; then
-    version="${path##*/}"
-
-    if [ "$version" == "$current_version" ]; then
-      echo "${hit_prefix}$(rbenv-version)"
-    else
-      echo "${miss_prefix}${version}"
-    fi
+    print_version "${path##*/}"
   fi
 done
