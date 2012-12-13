@@ -6,10 +6,12 @@ if [ "$1" = "--bare" ]; then
   hit_prefix=""
   miss_prefix=""
   current_version=""
+  include_system=""
 else
   hit_prefix="* "
   miss_prefix="  "
   current_version="$(rbenv-version-name || true)"
+  include_system="1"
 fi
 
 print_version() {
@@ -20,8 +22,8 @@ print_version() {
   fi
 }
 
-# detect if there is system ruby
-if RBENV_VERSION=system rbenv-which ruby >/dev/null 2>&1; then
+# Include "system" in the non-bare output, if it exists
+if [ -n "$include_system" ] && RBENV_VERSION=system rbenv-which ruby >/dev/null 2>&1; then
   print_version system
 fi
 
