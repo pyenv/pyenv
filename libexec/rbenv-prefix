@@ -16,7 +16,8 @@ fi
 
 if [ "$RBENV_VERSION" = "system" ]; then
   RUBY_PATH="$(rbenv-which ruby)"
-  echo "${RUBY_PATH%/*}"
+  RUBY_PATH="${RUBY_PATH%/*}"
+  echo "${RUBY_PATH%/bin}"
   exit
 fi
 
