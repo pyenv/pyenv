@@ -60,7 +60,7 @@ shopt -u nullglob
 command="$1"
 case "$command" in
 "" | "-h" | "--help" )
-  echo -e "rbenv $(rbenv---version)\n$(rbenv-help)" >&2
+  echo -e "$(rbenv---version)\n$(rbenv-help)" >&2
   ;;
 "-v" )
   exec rbenv---version
