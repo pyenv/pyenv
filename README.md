@@ -128,23 +128,15 @@ easy to fork and contribute any changes back upstream.
     $ exec $SHELL -l
     ~~~
 
-5. Install Ruby versions into `~/.rbenv/versions`. For example, to
-   manually compile Ruby [from source](https://github.com/ruby/ruby),
-   download it and run:
-
-    ~~~ sh
-    $ [ -f ./configure ] || autoconf
-    $ ./configure --prefix=$HOME/.rbenv/versions/1.9.3-p327
-    $ make
-    $ make install
-    ~~~
-
-    The [ruby-build][] project, however, provides an `rbenv install`
-    command that simplifies the process of installing new Ruby versions:
+5. Install [ruby-build][], which provides an `rbenv install`
+   command that simplifies the process of installing new Ruby versions.
 
     ~~~
     $ rbenv install 1.9.3-p327
     ~~~
+
+   As an alternative, you can download and compile Ruby yourself into
+   `~/.rbenv/versions/`.
 
 6. Rebuild the shim binaries. You should do this any time you install
    a new Ruby binary (for example, when installing a new Ruby version,
