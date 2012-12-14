@@ -32,7 +32,7 @@ Some useful pyenv commands are:
    whence        List all Python versions with the given command
 
 See 'pyenv help <command>' for information on a specific command.
-For full documentation, see: https://github.com/sstephenson/pyenv#readme"
+For full documentation, see: https://github.com/yyuu/pyenv#readme"
 ;;
 commands) echo "usage: pyenv commands
        pyenv commands --sh
