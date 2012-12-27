@@ -37,8 +37,25 @@ create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
 set -e
+[ -n "\$RBENV_DEBUG" ] && set -x
+
+program="\${0##*/}"
+if [ "\$program" = "ruby" ]; then
+  for arg; do
+    case "\$arg" in
+    -e* | -- ) break ;;
+    */* )
+      if [ -f "\$arg" ]; then
+        export RBENV_DIR="\${arg%/*}"
+        break
+      fi
+      ;;
+    esac
+  done
+fi
+
 export RBENV_ROOT="$RBENV_ROOT"
-exec rbenv exec "\${0##*/}" "\$@"
+exec rbenv exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
 }
