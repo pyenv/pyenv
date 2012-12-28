@@ -37,10 +37,39 @@ create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
 set -e
+[ -n "\$RBENV_DEBUG" ] && set -x
+
+program="\${0##*/}"
+if [ "\$program" = "ruby" ]; then
+  for arg; do
+    case "\$arg" in
+    -e* | -- ) break ;;
+    */* )
+      if [ -f "\$arg" ]; then
+        export RBENV_DIR="\${arg%/*}"
+        break
+      fi
+      ;;
+    esac
+  done
+fi
+
 export RBENV_ROOT="$RBENV_ROOT"
-exec rbenv exec "\${0##*/}" "\$@"
+exec rbenv exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
+}
+
+# If the contents of the prototype shim file differ from the contents
+# of the first shim in the shims directory, assume rbenv has been
+# upgraded and the existing shims need to be removed.
+remove_outdated_shims() {
+  for shim in *; do
+    if ! diff "$PROTOTYPE_SHIM_PATH" "$shim" >/dev/null 2>&1; then
+      for shim in *; do rm -f "$shim"; done
+    fi
+    break
+  done
 }
 
 # The basename of each argument passed to `make_shims` will be
@@ -97,10 +126,11 @@ remove_stale_shims() {
 
 # Change to the shims directory.
 cd "$SHIM_PATH"
+shopt -s nullglob
 
 # Create the prototype shim, then register shims for all known binaries.
 create_prototype_shim
-shopt -s nullglob
+remove_outdated_shims
 make_shims ../versions/*/bin/*
 
 # Restore the previous working directory.
