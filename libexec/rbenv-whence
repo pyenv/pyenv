@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Usage: rbenv whence [--path] COMMAND
 # Summary: List all Ruby versions with the given command installed
+# Usage: rbenv whence [--path] COMMAND
+
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 

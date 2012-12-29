@@ -2,112 +2,129 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
-# content from single commented line marked with a word such as "Usage" or "Summary"
-extract_line() {
-  grep "^# ${1}:" "$2" | head -1 | cut -d ' ' -f3-
+command_path() {
+  local command="$1"
+  command -v rbenv-"$command" || command -v rbenv-sh-"$command" || true
 }
 
-# content of multiple consecutive commented lines starting with a word such as "Help"
-extract_section() {
-  sed -En "/^# ${1}: /,/^[^#]/s/^# ?//p" "$2" | sed "1s/${1}: //"
+extract_initial_comment_block() {
+  sed -ne "
+    /^#/ !{
+      q
+    }
+
+    s/^#$/# /
+
+    /^# / {
+      s/^# //
+      p
+    }
+  "
 }
 
-# print aligned command names with help summary
-print_summary() {
-  if [ ! -h "$1" ]; then
-    local summary=$(extract_line Summary "$1")
-    if [ -n "$summary" ]; then
-      local name=$(basename "$1")
-      echo "${name#rbenv-}" | awk '{ printf "   %-14s   ", $1 }'
-      echo -n $summary
-      echo
-    else
-      return 1
-    fi
+collect_documentation() {
+  awk '
+    /^Summary:/ {
+      summary = substr($0, 10)
+      next
+    }
+
+    /^Usage:/ {
+      reading_usage = 1
+      usage = usage "\n" $0
+      next
+    }
+
+    /^( *$|       )/ && reading_usage {
+      usage = usage "\n" $0
+      next
+    }
+
+    /^([^ ]|$)/ {
+      reading_usage = 0
+      help = help "\n" $0
+    }
+
+    function escape(str) {
+      gsub(/[`\\$"]/, "\\\\&", str)
+      return str
+    }
+
+    function trim(str) {
+      gsub(/^\n*/, "", str)
+      gsub(/\n*$/, "", str)
+      return str
+    }
+
+    END {
+      if (usage || summary) {
+        print "summary=\"" escape(summary) "\""
+        print "usage=\"" escape(trim(usage)) "\""
+        print "help=\"" escape(trim(help)) "\""
+      }
+    }
+  '
+}
+
+documentation_for() {
+  local filename="$(command_path "$1")"
+  if [ -n "$filename" ]; then
+    extract_initial_comment_block < "$filename" | collect_documentation
   fi
 }
 
+print_summary() {
+  local command="$1"
+  local summary usage help
+  eval "$(documentation_for "$command")"
+
+  if [ -n "$summary" ]; then
+    printf "   %-9s   %s\n" "$command" "$summary"
+  else
+    return 1
+  fi
+}
+
+print_summaries() {
+  for command; do
+    print_summary "$command"
+  done
+}
+
 print_help() {
-  local usage="$(extract_line Usage "$1")"
-  local halp="$(extract_section Help "$1")"
-  [ -z "$halp" ] && halp="$(extract_line Summary "$1")"
+  local command="$1"
+  local summary usage help
+  eval "$(documentation_for "$command")"
+  [ -n "$help" ] || help="$summary"
 
   if [ -n "$usage" ]; then
-    echo usage: $usage
-    [ -n "$halp" ] && echo && echo "$halp"
+    echo "$usage"
+    if [ -n "$help" ]; then
+      echo
+      echo "$help"
+      echo
+    fi
   else
     echo "Sorry, this command isn't documented yet." >&2
     return 1
   fi
 }
 
-print_summaries() {
-  for command in $1; do
-    print_summary "$(command -v rbenv-"$command")"
-  done
-}
-
-print_set_version() {
-  echo "<version> should be a string matching a Ruby version known by rbenv."
-
-  local versions="$(rbenv-versions --bare)"
-  if [ -z "$versions" ]; then
-    echo "There are currently no Ruby versions installed for rbenv."
-  else
-    echo "The currently installed Ruby versions are:"
-    echo "$versions" | sed 's/^/  /'
-  fi
-
+if [ -z "$1" ]; then
+  rbenv---version
+  echo "Usage: rbenv <command> [<args>]"
   echo
-  echo "The special version string 'system' will use your default system Ruby."
-}
-
-case "$1" in
-"") echo "usage: rbenv <command> [<args>]
-
-Some useful rbenv commands are:
-$(print_summaries "commands rehash global local shell version versions which whence")
-
-See 'rbenv help <command>' for information on a specific command.
-For full documentation, see: https://github.com/sstephenson/rbenv#readme"
-;;
-global) echo "usage: rbenv global <version>
-
-Sets the global Ruby version. You can override the global version at
-any time by setting a directory-specific version with \`rbenv local'
-or by setting the RBENV_VERSION environment variable.
-
-$(print_set_version)"
-;;
-local) echo "usage: rbenv local <version>
-       rbenv local --unset
-
-Sets the local directory-specific Ruby version by writing the version
-name to a file named '.rbenv-version'.
-
-When you run a Ruby command, rbenv will look for an '.rbenv-version'
-file in the current directory and each parent directory. If no such
-file is found in the tree, rbenv will use the global Ruby version
-specified with \`rbenv global', or the version specified in the
-RBENV_VERSION environment variable.
-
-$(print_set_version)"
-;;
-shell) echo "usage: rbenv shell <version>
-       rbenv shell --unset
-
-Sets a shell-specific Ruby version by setting the 'RBENV_VERSION'
-environment variable in your shell. This version overrides both
-project-specific versions and the global version.
-
-$(print_set_version)"
-;;
-*)
-  command_path="$(command -v "rbenv-$1" || true)"
-  if [ -n "$command_path" ]; then
-    print_help "$command_path"
+  echo "Some useful rbenv commands are:"
+  print_summaries commands rehash global local shell version versions which whence
+  echo
+  echo "See \`rbenv help <command>' for information on a specific command."
+  echo "For full documentation, see: https://github.com/sstephenson/rbenv#readme"
+else
+  command="$1"
+  if [ -n "$(command_path "$command")" ]; then
+    print_help "$command"
   else
-    echo "rbenv: no such command \`$1'" >&2
+    echo "rbenv: no such command \`$command'" >&2
     exit 1
   fi
-esac
+fi

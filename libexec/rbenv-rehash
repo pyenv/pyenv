@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Usage: rbenv rehash
 # Summary: Rehash rbenv shims (run this after installing binaries)
+# Usage: rbenv rehash
+
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 

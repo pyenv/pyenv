@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Usage: rbenv commands [ --sh | --no-sh ]
-# Summary: List all rbenv commands
+# Summary: List all available rbenv commands
+# Usage: rbenv commands [--sh|--no-sh]
+
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 

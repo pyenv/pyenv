@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
-# Usage: rbenv which COMMAND
-# Summary: Display full path to a binary
-# Help: Displays the full path to the binary that rbenv will execute when you
+#
+# Summary: Display the full path to a binary
+#
+# Usage: rbenv which <command>
+#
+# Displays the full path to the binary that rbenv will execute when you
 # run the given command.
+
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
