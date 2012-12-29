@@ -97,8 +97,12 @@ print_help() {
   eval "$(documentation_for "$command")"
   [ -n "$help" ] || help="$summary"
 
-  if [ -n "$usage" ]; then
-    echo "$usage"
+  if [ -n "$usage" -o -n "$summary" ]; then
+    if [ -n "$usage" ]; then
+      echo "$usage"
+    else
+      echo "Usage: rbenv ${command}"
+    fi
     if [ -n "$help" ]; then
       echo
       echo "$help"
