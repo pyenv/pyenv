@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Summary: Display the full path to a binary
+# Summary: Display the full path to an executable
 #
 # Usage: rbenv which <command>
 #
