@@ -2,14 +2,19 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
-root="$RBENV_DIR"
-while [ -n "$root" ]; do
-  if [ -e "${root}/.rbenv-version" ]; then
-    echo "${root}/.rbenv-version"
-    exit
-  fi
-  root="${root%/*}"
-done
+find_local_version_file() {
+  local root="$1"
+  while [ -n "$root" ]; do
+    if [ -e "${root}/.rbenv-version" ]; then
+      echo "${root}/.rbenv-version"
+      exit
+    fi
+    root="${root%/*}"
+  done
+}
+
+find_local_version_file "$RBENV_DIR"
+[ "$RBENV_DIR" = "$PWD" ] || find_local_version_file "$PWD"
 
 global_version_file="${RBENV_ROOT}/version"
 

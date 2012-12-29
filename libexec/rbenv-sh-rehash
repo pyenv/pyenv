@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -e
+[ -n "$RBENV_DEBUG" ] && set -x
+
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  exec rbenv-rehash --complete
+fi
+
+# When rbenv shell integration is enabled, delegate to rbenv-rehash,
+# then tell the shell to empty its command lookup cache.
+rbenv-rehash
+echo "hash -r"
