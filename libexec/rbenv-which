@@ -52,7 +52,7 @@ RBENV_VERSION="$(rbenv-version-name)"
 RBENV_COMMAND="$1"
 
 if [ -z "$RBENV_COMMAND" ]; then
-  rbenv-help which | head -1 >&2
+  rbenv-help --usage which >&2
   exit 1
 fi
 

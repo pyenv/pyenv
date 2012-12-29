@@ -30,7 +30,7 @@ whence() {
 
 RBENV_COMMAND="$1"
 if [ -z "$RBENV_COMMAND" ]; then
-  rbenv-help whence | head -1 >&2
+  rbenv-help --usage whence >&2
   exit 1
 fi
 
