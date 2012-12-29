@@ -40,7 +40,7 @@ collect_documentation() {
       next
     }
 
-    /^([^ ]|$)/ {
+    {
       reading_usage = 0
       help = help "\n" $0
     }
