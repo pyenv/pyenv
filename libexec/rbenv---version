@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Summary: Display the version of rbenv
 #
-# Displays the current revision info of rbenv from git if available,
-# or falls back to the version of the last release.
+# Displays the version number of this rbenv release, including the
+# current revision from git, if available.
 #
 # The format of the git revision is:
-#   ${version}-${num_commits}-g${git_sha}
+#   <version>-<num_commits>-<git_sha>
 # where `num_commits` is the number of commits since `version` was
 # tagged.
 

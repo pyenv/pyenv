@@ -3,7 +3,8 @@
 # Usage: rbenv prefix [<version>]
 #
 # Displays the directory where a Ruby version is installed. If no
-# version is given, it uses the currently selected version.
+# version is given, `rbenv prefix' displays the location of the
+# currently selected version.
 
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x

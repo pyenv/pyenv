@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: rbenv version-file-write FILENAME VERSION
+# Usage: rbenv version-file-write <file> <version>
 
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x

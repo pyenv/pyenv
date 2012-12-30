@@ -7,10 +7,10 @@
 # Parses and displays help contents from a command's source file.
 #
 # A command is considered documented if it starts with a comment block
-# that has at least one of the following sections: `Summary' and
-# `Usage'. Usage instructions can span multiple lines as long as
-# subsequent lines are indented.  Everything else in the comment is
-# considered to be regular help contents.
+# that has a `Summary:' or `Usage:' section. Usage instructions can
+# span multiple lines as long as subsequent lines are indented.
+# The remainder of the comment block is displayed as extended
+# documentation.
 
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
