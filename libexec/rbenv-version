@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# Summary: Show the current Ruby version and its origin
+#
+# Shows the currently selected Ruby version and how it was
+# selected. To obtain only the version string, use `rbenv
+# version-name'.
+
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 

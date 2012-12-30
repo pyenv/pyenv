@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+#
+# Summary: Display the full path to an executable
+#
+# Usage: rbenv which <command>
+#
+# Displays the full path to the binary that rbenv will execute when you
+# run the given command.
+
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
@@ -44,7 +52,7 @@ RBENV_VERSION="$(rbenv-version-name)"
 RBENV_COMMAND="$1"
 
 if [ -z "$RBENV_COMMAND" ]; then
-  echo "usage: rbenv which COMMAND" >&2
+  rbenv-help --usage which >&2
   exit 1
 fi
 
