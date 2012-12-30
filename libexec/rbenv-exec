@@ -4,8 +4,8 @@
 #
 # Usage: rbenv exec COMMAND [arg1 arg2...]
 #
-# Runs an executable by first preparing PATH so that the selected Ruby version
-# is prepended to it.
+# Runs an executable by first preparing PATH so that the selected Ruby
+# version is prepended to it.
 #
 # For example, doing:
 #   RBENV_VERSION=1.9.3-p327 rbenv exec bundle install
