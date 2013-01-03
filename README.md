@@ -69,10 +69,9 @@ and then invoke the corresponding executable.
 
 ## Installation ##
 
-**Compatibility note**: rbenv is _incompatible_ with rvm. Things will
-  appear to work until you try to install a gem. The problem is that
-  rvm actually overrides the `gem` command with a shell function!
-  Please remove any references to rvm before using rbenv.
+**Compatibility note**: rbenv is _incompatible_ with RVM. Please make
+  sure to fully uninstall RVM and remove any references to it from
+  your shell initialization files before installing rbenv.
 
 If you're on Mac OS X, consider
 [installing with Homebrew](#homebrew-on-mac-os-x).
