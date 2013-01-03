@@ -37,7 +37,7 @@ bulletproof deployments.
   * [Homebrew on Mac OS X](#homebrew-on-mac-os-x)
   * [Neckbeard Configuration](#neckbeard-configuration)
   * [Uninstalling Ruby Versions](#uninstalling-ruby-versions)
-* [Usage](#usage)
+* [Command Reference](#command-reference)
   * [rbenv global](#rbenv-global)
   * [rbenv local](#rbenv-local)
   * [rbenv shell](#rbenv-shell)
@@ -225,7 +225,7 @@ The [ruby-build](https://github.com/sstephenson/ruby-build) plugin
 provides an `rbenv uninstall` command to automate the removal
 process.
 
-## Usage ##
+## Command Reference ##
 
 Like `git`, the `rbenv` command delegates to subcommands based on its
 first argument. The most common subcommands are:
