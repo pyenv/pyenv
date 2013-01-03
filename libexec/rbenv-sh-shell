@@ -6,8 +6,8 @@
 #        rbenv shell --unset
 #
 # Sets a shell-specific Ruby version by setting the `RBENV_VERSION'
-# environment variable in your shell. This version overrides both
-# project-specific versions and the global version.
+# environment variable in your shell. This version overrides local
+# application-specific versions and the global version.
 #
 # <version> should be a string matching a Ruby version known to rbenv.
 # The special version string `system' will use your default system Ruby.

@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 #
-# Summary: Set or show the local directory-specific Ruby version
+# Summary: Set or show the local application-specific Ruby version
 #
 # Usage: rbenv local <version>
 #        rbenv local --unset
 #
-# Sets the local directory-specific Ruby version by writing the version
-# name to a file named `.ruby-version'.
+# Sets the local application-specific Ruby version by writing the
+# version name to a file named `.ruby-version'.
 #
 # When you run a Ruby command, rbenv will look for a `.ruby-version'
 # file in the current directory and each parent directory. If no such
 # file is found in the tree, rbenv will use the global Ruby version
-# specified with `rbenv global', or the version specified in the
-# RBENV_VERSION environment variable.
+# specified with `rbenv global'. A version specified with the
+# `RBENV_VERSION' environment variable takes precedence over local
+# and global versions.
 #
 # For backwards compatibility, rbenv will also read version
 # specifications from `.rbenv-version' files, but a `.ruby-version'

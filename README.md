@@ -230,8 +230,8 @@ first argument. The most common subcommands are:
 
 Sets the global version of Ruby to be used in all shells by writing
 the version name to the `~/.rbenv/version` file. This version can be
-overridden by a per-project `.ruby-version` file, or by setting the
-`RBENV_VERSION` environment variable.
+overridden by an application-specific `.ruby-version` file, or by
+setting the `RBENV_VERSION` environment variable.
 
     $ rbenv global 1.9.3-p327
 
@@ -243,8 +243,8 @@ currently configured global version.
 
 ### rbenv local ###
 
-Sets a local per-project Ruby version by writing the version name to
-a `.ruby-version` file in the current directory. This version
+Sets a local application-specific Ruby version by writing the version
+name to a `.ruby-version` file in the current directory. This version
 overrides the global, and can be overridden itself by setting the
 `RBENV_VERSION` environment variable or with the `rbenv shell`
 command.
@@ -264,8 +264,8 @@ read a local version specified in an `.rbenv-version` file, but a
 ### rbenv shell ###
 
 Sets a shell-specific Ruby version by setting the `RBENV_VERSION`
-environment variable in your shell. This version overrides both
-project-specific versions and the global version.
+environment variable in your shell. This version overrides
+application-specific versions and the global version.
 
     $ rbenv shell jruby-1.7.1
 
