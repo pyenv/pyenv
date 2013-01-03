@@ -32,9 +32,9 @@ remove_prototype_shim() {
 
 # The prototype shim file is a script that re-execs itself, passing
 # its filename and any arguments to `rbenv exec`. This file is
-# hard-linked for every binary and then removed. The linking technique
-# is fast, uses less disk space than unique files, and also serves as
-# a locking mechanism.
+# hard-linked for every executable and then removed. The linking
+# technique is fast, uses less disk space than unique files, and also
+# serves as a locking mechanism.
 create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
@@ -130,7 +130,8 @@ remove_stale_shims() {
 cd "$SHIM_PATH"
 shopt -s nullglob
 
-# Create the prototype shim, then register shims for all known binaries.
+# Create the prototype shim, then register shims for all known
+# executables.
 create_prototype_shim
 remove_outdated_shims
 make_shims ../versions/*/bin/*

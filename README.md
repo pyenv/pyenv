@@ -57,15 +57,15 @@ rbenv correspond to subdirectories of `~/.rbenv/versions`. For
 example, you might have `~/.rbenv/versions/1.8.7-p354` and
 `~/.rbenv/versions/1.9.3-p327`.
 
-Each version is a working tree with its own binaries, like
+Each version is a working tree with its own executables, like
 `~/.rbenv/versions/1.8.7-p354/bin/ruby` and
-`~/.rbenv/versions/1.9.3-p327/bin/irb`. rbenv makes _shim binaries_
-for every such binary across all installed versions of Ruby.
+`~/.rbenv/versions/1.9.3-p327/bin/irb`. rbenv makes _shim executables_
+for every such executable across all installed versions of Ruby.
 
 These shims are simple wrapper scripts that live in `~/.rbenv/shims`
 and detect which Ruby version you want to use. They insert the
 directory for the selected version at the beginning of your `$PATH`
-and then execute the corresponding binary.
+and then invoke the corresponding executable.
 
 ## Installation ##
 
@@ -131,9 +131,9 @@ easy to fork and contribute any changes back upstream.
    As an alternative, you can download and compile Ruby yourself into
    `~/.rbenv/versions/`.
 
-6. Rebuild the shim binaries. You should do this any time you install
-   a new Ruby binary (for example, when installing a new Ruby version,
-   or when installing a gem that provides a binary).
+6. Rebuild the shim executables. You should do this any time you
+   install a new Ruby executable (for example, when installing a new
+   Ruby version, or when installing a gem that provides a command).
 
     ~~~
     $ rbenv rehash
@@ -304,16 +304,16 @@ how it was set.
 
 ### rbenv rehash ###
 
-Installs shims for all Ruby binaries known to rbenv (i.e.,
+Installs shims for all Ruby executables known to rbenv (i.e.,
 `~/.rbenv/versions/*/bin/*`). Run this command after you install a new
-version of Ruby, or install a gem that provides binaries.
+version of Ruby, or install a gem that provides commands.
 
     $ rbenv rehash
 
 ### rbenv which ###
 
-Displays the full path to the binary that rbenv will execute when you
-run the given command.
+Displays the full path to the executable that rbenv will invoke when
+you run the given command.
 
     $ rbenv which irb
     /Users/sam/.rbenv/versions/1.9.3-p327/bin/irb
