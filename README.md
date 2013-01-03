@@ -213,12 +213,17 @@ hood.
 
 ### Uninstalling Ruby Versions ###
 
-As time goes on, ruby versions you install will accumulate in your
+As time goes on, Ruby versions you install will accumulate in your
 `~/.rbenv/versions` directory.
 
-There is no uninstall or remove command in `rbenv`, so removing old
-versions is a simple matter of `rm -rf` the directory of the relevant
-ruby version you want removed under `~/.rbenv/versions`
+To remove old Ruby versions, simply `rm -rf` the directory of the
+version you want to remove. You can find the directory of a particular
+Ruby verison with the `rbenv prefix` command, e.g. `rbenv prefix
+1.8.7-p357`.
+
+The [ruby-build](https://github.com/sstephenson/ruby-build) plugin
+provides an `rbenv uninstall` command to automate the removal
+process.
 
 ## Usage ##
 
