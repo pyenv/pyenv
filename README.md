@@ -1,4 +1,4 @@
-# Simple Ruby Version Management: rbenv
+# Groom your Ruby environment with rbenv.
 
 Use rbenv to pick a Ruby version for your application and guarantee
 that your development environment matches production. Put rbenv to work
