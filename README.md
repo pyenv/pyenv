@@ -1,33 +1,31 @@
 # Simple Ruby Version Management: rbenv
 
-rbenv lets you lock your application to a specific version of Ruby,
-ensuring a consistent runtime environment during development and in
-production. Use it in conjunction with
-[Bundler](http://gembundler.com/) to facilitate painless Ruby upgrades
-and bulletproof deployments.
+Use rbenv to pick a Ruby version for your application and guarantee
+that your development environment matches production. Put rbenv to work
+with [Bundler](http://gembundler.com/) for painless Ruby upgrades and
+bulletproof deployments.
 
-**Powerful in development.** Easily specify the Ruby version
-  dependency for your application with a single file and keep all your
-  teammates on the same page. Transparently run multiple applications
-  on different versions of Ruby from the command line or with app
-  servers like [Pow](http://pow.cx). Override the specified Ruby
-  version at any time just by setting an environment variable.
+**Powerful in development.** Specify your app's Ruby version once,
+  in a single file. Keep all your teammates on the same page. No
+  headaches running apps on different versions of Ruby. Just Works™
+  from the command line and with app servers like [Pow](http://pow.cx).
+  Override the Ruby version anytime: just set an environment variable.
 
 **Rock-solid in production.** Your application's executables are its
   interface with ops. With rbenv and [Bundler
   binstubs](http://yehudakatz.com/2011/05/30/gem-versioning-and-bundler-doing-it-right/)
   you'll never again need to `cd` in a cron job or Chef recipe to
   ensure you've selected the right runtime. The Ruby version
-  dependency information lives in one place—your app's directory—so
-  upgrades and rollbacks can be atomic.
+  dependency information lives in one place—your app—so upgrades and
+  rollbacks are atomic, even when you switch versions.
 
 **One thing well.** rbenv is concerned solely with switching Ruby
-  versions, but a rich plugin ecosystem lets you tailor it to suit
-  your needs. Compile your own Ruby versions, or use the
-  [ruby-build](https://github.com/sstephenson/ruby-build) plugin to
-  automate the process. Specify per-application environment variables
-  with [rbenv-vars](https://github.com/sstephenson/rbenv-vars). See
-  more [plugins on the
+  versions. It's simple and predictable. A rich plugin ecosystem lets
+  you tailor it to suit your needs. Compile your own Ruby versions, or
+  use the [ruby-build](https://github.com/sstephenson/ruby-build)
+  plugin to automate the process. Specify per-application environment
+  variables with [rbenv-vars](https://github.com/sstephenson/rbenv-vars).
+  See more [plugins on the
   wiki](https://github.com/sstephenson/rbenv/wiki/Plugins).
 
 ## Table of Contents
