@@ -1,40 +1,34 @@
 # Simple Ruby Version Management: rbenv
 
-rbenv lets you easily switch between multiple versions of Ruby. It's
-simple, unobtrusive, and follows the UNIX tradition of single-purpose
-tools that do one thing well.
+rbenv lets you lock your application to a specific version of Ruby,
+ensuring a consistent runtime environment during development and in
+production. Use it in conjunction with
+[Bundler](http://gembundler.com/) to facilitate painless Ruby upgrades
+and bulletproof deployments.
 
-<img src="http://i.sstephenson.us/rbenv2.png" width="894" height="464">
+**Powerful in development.** Easily specify the Ruby version
+  dependency for your application with a single file and keep all your
+  teammates on the same page. Transparently run multiple applications
+  on different versions of Ruby from the command line or with app
+  servers like [Pow](http://pow.cx). Override the specified Ruby
+  version at any time just by setting an environment variable.
 
-### rbenv _does…_
+**Rock-solid in production.** Your application's executables are its
+  interface with ops. With rbenv and [Bundler
+  binstubs](http://yehudakatz.com/2011/05/30/gem-versioning-and-bundler-doing-it-right/)
+  you'll never again need to `cd` in a cron job or Chef recipe to
+  ensure you've selected the right runtime. The Ruby version
+  dependency information lives in one place—your app's directory—so
+  upgrades and rollbacks can be atomic.
 
-* Let you **change the global Ruby version** on a per-user basis.
-* Provide support for **per-project Ruby versions**.
-* Allow you to **override the Ruby version** with an environment
-  variable.
-
-### In contrast with rvm, rbenv _does not…_
-
-* **Need to be loaded into your shell.** Instead, rbenv's shim
-    approach works by adding a directory to your `$PATH`.
-* **Override shell commands like `cd`.** That's dangerous and
-    error-prone.
-* **Have a configuration file.** There's nothing to configure except
-    which version of Ruby you want to use.
-* **Install Ruby.** You can build and install Ruby yourself, or use
-    [ruby-build][] to automate the process.
-* **Manage gemsets.** [Bundler](http://gembundler.com/) is a better
-    way to manage application dependencies. If you have projects that
-    are not yet using Bundler you can install the
-    [rbenv-gemset](https://github.com/jamis/rbenv-gemset) plugin.
-* **Require changes to Ruby libraries for compatibility.** The
-    simplicity of rbenv means as long as it's in your `$PATH`,
-    [nothing](https://rvm.io/integration/bundler/)
-    [else](https://rvm.io/integration/capistrano/)
-    needs to know about it.
-* **Prompt you with warnings when you switch to a project.** Instead
-    of executing arbitrary code, rbenv reads just the version name
-    from each project. There's nothing to "trust."
+**One thing well.** rbenv is concerned solely with switching Ruby
+  versions, but a rich plugin ecosystem lets you tailor it to suit
+  your needs. Compile your own Ruby versions, or use the
+  [ruby-build](https://github.com/sstephenson/ruby-build) plugin to
+  automate the process. Specify per-application environment variables
+  with [rbenv-vars](https://github.com/sstephenson/rbenv-vars). See
+  more [plugins on the
+  wiki](https://github.com/sstephenson/rbenv/wiki/Plugins).
 
 ## Table of Contents
 
@@ -105,10 +99,10 @@ easy to fork and contribute any changes back upstream.
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
 
-    **Ubuntu note**: Ubuntu uses `~/.profile` for enabling certain path 
-    changes. This file won't be read if you create a `~/.bash_profile`. 
-    Therefore, it's recommended that you add this line and the one in 
-    point 3 below to your `~/.profile`. This has the added advantage 
+    **Ubuntu note**: Ubuntu uses `~/.profile` for enabling certain path
+    changes. This file won't be read if you create a `~/.bash_profile`.
+    Therefore, it's recommended that you add this line and the one in
+    point 3 below to your `~/.profile`. This has the added advantage
     of working under both bash and zsh.
 
 3. Add `rbenv init` to your shell to enable shims and autocompletion.
@@ -118,18 +112,19 @@ easy to fork and contribute any changes back upstream.
     ~~~
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
-    
+
     **Ubuntu note**: Same as Ubuntu note for point 2 above.
 
-4. Restart your shell as a login shell so the path changes take effect. 
+4. Restart your shell as a login shell so the path changes take effect.
     You can now begin using rbenv.
 
     ~~~ sh
     $ exec $SHELL -l
     ~~~
 
-5. Install [ruby-build][], which provides an `rbenv install`
-   command that simplifies the process of installing new Ruby versions.
+5. Install [ruby-build](https://github.com/sstephenson/ruby-build),
+   which provides an `rbenv install` command that simplifies the
+   process of installing new Ruby versions.
 
     ~~~
     $ rbenv install 1.9.3-p327
@@ -171,7 +166,9 @@ $ git checkout v0.2.0
 
 ### Homebrew on Mac OS X ###
 
-You can also install rbenv using the [Homebrew][] on Mac OS X.
+You can also install rbenv using the
+[Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS
+X.
 
 ~~~
 $ brew update
@@ -416,7 +413,7 @@ tracker](https://github.com/sstephenson/rbenv/issues).
 
 (The MIT license)
 
-Copyright (c) 2011 Sam Stephenson
+Copyright (c) 2013 Sam Stephenson
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -436,7 +433,3 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-  [ruby-build]: https://github.com/sstephenson/ruby-build
-  [homebrew]: http://mxcl.github.com/homebrew/
