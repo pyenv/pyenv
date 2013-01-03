@@ -16,8 +16,8 @@ bulletproof deployments.
   binstubs](http://yehudakatz.com/2011/05/30/gem-versioning-and-bundler-doing-it-right/)
   you'll never again need to `cd` in a cron job or Chef recipe to
   ensure you've selected the right runtime. The Ruby version
-  dependency information lives in one place—your app—so upgrades and
-  rollbacks are atomic, even when you switch versions.
+  dependency lives in one place—your app—so upgrades and rollbacks are
+  atomic, even when you switch versions.
 
 **One thing well.** rbenv is concerned solely with switching Ruby
   versions. It's simple and predictable. A rich plugin ecosystem lets
