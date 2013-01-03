@@ -6,13 +6,17 @@
 #        rbenv local --unset
 #
 # Sets the local directory-specific Ruby version by writing the version
-# name to a file named `.rbenv-version'.
+# name to a file named `.ruby-version'.
 #
-# When you run a Ruby command, rbenv will look for an `.rbenv-version'
+# When you run a Ruby command, rbenv will look for a `.ruby-version'
 # file in the current directory and each parent directory. If no such
 # file is found in the tree, rbenv will use the global Ruby version
 # specified with `rbenv global', or the version specified in the
 # RBENV_VERSION environment variable.
+#
+# For backwards compatibility, rbenv will also read version
+# specifications from `.rbenv-version' files, but a `.ruby-version'
+# file in the same directory takes precedence.
 #
 # <version> should be a string matching a Ruby version known to rbenv.
 # The special version string `system' will use your default system Ruby.
@@ -29,14 +33,20 @@ if [ "$1" = "--complete" ]; then
 fi
 
 RBENV_VERSION="$1"
-RBENV_VERSION_FILE=".rbenv-version"
 
 if [ "$RBENV_VERSION" = "--unset" ]; then
-  rm -f "$RBENV_VERSION_FILE"
+  rm -f .ruby-version .rbenv-version
 elif [ -n "$RBENV_VERSION" ]; then
-  rbenv-version-file-write "$RBENV_VERSION_FILE" "$RBENV_VERSION"
+  if [ "$(RBENV_VERSION= rbenv-version-origin)" -ef .rbenv-version ]; then
+    rm -f .rbenv-version
+    { echo "rbenv: removed existing \`.rbenv-version' file and migrated"
+      echo "       local version specification to \`.ruby-version' file"
+    } >&2
+  fi
+  rbenv-version-file-write .ruby-version "$RBENV_VERSION"
 else
-  rbenv-version-file-read "$RBENV_VERSION_FILE" ||
+  rbenv-version-file-read .ruby-version ||
+  rbenv-version-file-read .rbenv-version ||
   { echo "rbenv: no local version configured for this directory"
     exit 1
   } >&2

@@ -13,10 +13,18 @@ if [ -z "$RBENV_VERSION" ] || [ "$RBENV_VERSION" = "system" ]; then
   exit
 fi
 
-RBENV_VERSION_PATH="${RBENV_ROOT}/versions/${RBENV_VERSION}"
+version_exists() {
+  local version="$1"
+  [ -d "${RBENV_ROOT}/versions/${version}" ]
+}
 
-if [ -d "$RBENV_VERSION_PATH" ]; then
+if version_exists "$RBENV_VERSION"; then
   echo "$RBENV_VERSION"
+elif version_exists "${RBENV_VERSION#ruby-}"; then
+  { echo "warning: ignoring extraneous \`ruby-' prefix in version \`${RBENV_VERSION}'"
+    echo "         (set by $(rbenv-version-origin))"
+  } >&2
+  echo "${RBENV_VERSION#ruby-}"
 else
   echo "rbenv: version \`$RBENV_VERSION' is not installed" >&2
   exit 1

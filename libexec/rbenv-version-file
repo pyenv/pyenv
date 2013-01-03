@@ -6,7 +6,10 @@ set -e
 find_local_version_file() {
   local root="$1"
   while [ -n "$root" ]; do
-    if [ -e "${root}/.rbenv-version" ]; then
+    if [ -e "${root}/.ruby-version" ]; then
+      echo "${root}/.ruby-version"
+      exit
+    elif [ -e "${root}/.rbenv-version" ]; then
       echo "${root}/.rbenv-version"
       exit
     fi

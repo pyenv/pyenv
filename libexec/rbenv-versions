@@ -21,7 +21,7 @@ fi
 
 print_version() {
   if [ "$1" == "$current_version" ]; then
-    echo "${hit_prefix}$(rbenv-version)"
+    echo "${hit_prefix}$(rbenv-version 2>/dev/null)"
   else
     echo "${miss_prefix}$1"
   fi
