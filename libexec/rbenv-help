@@ -143,7 +143,7 @@ if [ -z "$1" ] || [ "$1" == "rbenv" ]; then
   [ -z "$usage" ] || exit
   echo
   echo "Some useful rbenv commands are:"
-  print_summaries commands global local shell install uninstall rehash version versions which whence
+  print_summaries commands local global shell install uninstall rehash version versions which whence
   echo
   echo "See \`rbenv help <command>' for information on a specific command."
   echo "For full documentation, see: https://github.com/sstephenson/rbenv#readme"
