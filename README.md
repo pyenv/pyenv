@@ -412,7 +412,7 @@ tracker](https://github.com/sstephenson/rbenv/issues).
   managers](https://gist.github.com/1912050).
 * Deprecated `ruby-local-exec` and moved its functionality into the
   standard `ruby` shim. See the [ruby-local-exec wiki
-  page](https://github.com/sstephenson/wiki/ruby-local-exec) for
+  page](https://github.com/sstephenson/rbenv/wiki/ruby-local-exec) for
   upgrade instructions.
 * Modified shims to include the full path to rbenv so that they can be
   invoked without having rbenv's bin directory in the `$PATH`.
