@@ -28,6 +28,9 @@ bulletproof deployments.
   See more [plugins on the
   wiki](https://github.com/sstephenson/rbenv/wiki/Plugins).
 
+[**Why choose rbenv over
+RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
+
 ## Table of Contents
 
 * [How It Works](#how-it-works)
