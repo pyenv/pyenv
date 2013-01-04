@@ -13,4 +13,11 @@
 
 set -e
 export RBENV_DIR="${1%/*}"
+
+[ -n "$RBENV_SILENCE_WARNINGS" ] || {
+  echo "rbenv: \`ruby-local-exec' is deprecated and will be removed in the next release."
+  echo "       To upgrade: https://github.com/sstephenson/rbenv/wiki/ruby-local-exec"
+  echo
+} >&2
+
 exec ruby "$@"
