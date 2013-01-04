@@ -59,7 +59,7 @@ RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
 
 ## How It Works
 
-At at high level, rbenv intercepts Ruby commands using shim
+At a high level, rbenv intercepts Ruby commands using shim
 executables injected into your `PATH`, determines which Ruby version
 has been specified by your application, and passes your commands along
 to the correct Ruby installation.
