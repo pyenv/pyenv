@@ -13,7 +13,7 @@ bulletproof deployments.
 
 **Rock-solid in production.** Your application's executables are its
   interface with ops. With rbenv and [Bundler
-  binstubs](http://yehudakatz.com/2011/05/30/gem-versioning-and-bundler-doing-it-right/)
+  binstubs](https://github.com/sstephenson/rbenv/wiki/Understanding-binstubs)
   you'll never again need to `cd` in a cron job or Chef recipe to
   ensure you've selected the right runtime. The Ruby version
   dependency lives in one place—your app—so upgrades and rollbacks are
