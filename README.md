@@ -176,7 +176,7 @@ easy to fork and contribute any changes back upstream.
     $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
     ~~~
 
-    _Same as in previous step, use `~/.profile` on Ubuntu, `~/.zshrc` for zsh._
+    _Same as in previous step, use `~/.profile` on Ubuntu, `~/.zshrc` for Zsh._
 
 4. Restart your shell as a login shell so the path changes take effect.
     You can now begin using rbenv.
@@ -246,7 +246,7 @@ Skip this section unless you must know what every line in your shell
 profile is doing.
 
 `rbenv init` is the only command that crosses the line of loading
-extra commands into your shell. Coming from rvm, some of you might be
+extra commands into your shell. Coming from RVM, some of you might be
 opposed to this idea. Here's what `rbenv init` actually does:
 
 1. Sets up your shims path. This is the only requirement for rbenv to
@@ -259,7 +259,7 @@ opposed to this idea. Here's what `rbenv init` actually does:
    users.
 
 3. Rehashes shims. From time to time you'll need to rebuild your
-   shim files. Doing this on init makes sure everything is up to
+   shim files. Doing this automatically makes sure everything is up to
    date. You can always run `rbenv rehash` manually.
 
 4. Installs the sh dispatcher. This bit is also optional, but allows
@@ -279,7 +279,7 @@ As time goes on, Ruby versions you install will accumulate in your
 
 To remove old Ruby versions, simply `rm -rf` the directory of the
 version you want to remove. You can find the directory of a particular
-Ruby verison with the `rbenv prefix` command, e.g. `rbenv prefix
+Ruby version with the `rbenv prefix` command, e.g. `rbenv prefix
 1.8.7-p357`.
 
 The [ruby-build](https://github.com/sstephenson/ruby-build) plugin
@@ -416,7 +416,7 @@ tracker](https://github.com/sstephenson/rbenv/issues).
   upgrade instructions.
 * Modified shims to include the full path to rbenv so that they can be
   invoked without having rbenv's bin directory in the `$PATH`.
-* Sped up `rbenv init` by avoiding rbenv reinintialization and by
+* Sped up `rbenv init` by avoiding rbenv reinitialization and by
   using a simpler indexing approach. (Users of
   [chef-rbenv](https://github.com/fnichol/chef-rbenv) should upgrade
   to the latest version to fix a [compatibility
@@ -457,7 +457,7 @@ tracker](https://github.com/sstephenson/rbenv/issues).
 
 * Added an `rbenv root` command which prints the value of
   `$RBENV_ROOT`, or the default root directory if it's unset.
-* Clarified Zsh installation instructions in the readme.
+* Clarified Zsh installation instructions in the Readme.
 * Removed some redundant code in `rbenv rehash`.
 * Fixed an issue with calling `readlink` for paths with spaces.
 * Changed Zsh initialization code to install completion hooks only for
