@@ -163,13 +163,9 @@ easy to fork and contribute any changes back upstream.
     $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
     ~~~
 
-    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
+    **Ubuntu note**: Modify your `~/.profile` instead of `~/.bash_profile`.
 
-    **Ubuntu note**: Ubuntu uses `~/.profile` for enabling certain path
-    changes. This file won't be read if you create a `~/.bash_profile`.
-    Therefore, it's recommended that you add this line and the one in
-    point 3 below to your `~/.profile`. This has the added advantage
-    of working under both bash and zsh.
+    **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
 
 3. Add `rbenv init` to your shell to enable shims and autocompletion.
 
@@ -177,9 +173,7 @@ easy to fork and contribute any changes back upstream.
     $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
     ~~~
 
-    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
-
-    **Ubuntu note**: Same as Ubuntu note for point 2 above.
+    _Same as in previous step, use `~/.profile` on Ubuntu, `~/.zshrc` for zsh._
 
 4. Restart your shell as a login shell so the path changes take effect.
     You can now begin using rbenv.
