@@ -64,8 +64,8 @@ collect_documentation() {
     }
 
     function trim(str) {
-      gsub(/^\n*/, "", str)
-      gsub(/\n*$/, "", str)
+      sub(/^\n*/, "", str)
+      sub(/\n*$/, "", str)
       return str
     }
 
