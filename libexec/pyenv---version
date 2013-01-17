@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Summary: Display the version of pyenv
+#
+# Displays the version number of this pyenv release, including the
+# current revision from git, if available.
+#
+# The format of the git revision is:
+#   <version>-<num_commits>-<git_sha>
+# where `num_commits` is the number of commits since `version` was
+# tagged.
+
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+version="0.1.2"
+
+cd "$PYENV_ROOT"
+git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
+git_revision="${git_revision#v}"
+
+echo "pyenv ${git_revision:-$version}"
