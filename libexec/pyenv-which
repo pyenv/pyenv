@@ -77,5 +77,15 @@ if [ -x "$PYENV_COMMAND_PATH" ]; then
   echo "$PYENV_COMMAND_PATH"
 else
   echo "pyenv: $PYENV_COMMAND: command not found" >&2
+
+  versions="$(pyenv-whence "$PYENV_COMMAND" || true)"
+  if [ -n "$versions" ]; then
+    { echo
+      echo "The \`$1' command exists in these Ruby versions:"
+      echo "$versions" | sed 's/^/  /g'
+      echo
+    } >&2
+  fi
+
   exit 127
 fi

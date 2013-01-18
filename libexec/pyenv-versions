@@ -7,6 +7,20 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
+if [ "$1" = "--bare" ]; then
+  hit_prefix=""
+  miss_prefix=""
+  IFS=: current_versions=()
+  version_origin=""
+  include_system=""
+else
+  hit_prefix="* "
+  miss_prefix="  "
+  IFS=: current_versions=($(pyenv-version-name || true))
+  version_origin=" (set by $(pyenv-version-origin))"
+  include_system="1"
+fi
+
 array_exists() {
   local x car="$1"
   shift
@@ -16,26 +30,21 @@ array_exists() {
   return 1
 }
 
-IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name))
+print_version() {
+  if array_exists "$1" "${current_versions[@]}"; then
+    echo "${hit_prefix}${1}${version_origin}"
+  else
+    echo "${miss_prefix}${1}"
+  fi
+}
 
-if [ "$1" = "--bare" ]; then
-  hit_prefix=""
-  miss_prefix=""
-  version_origin=""
-else
-  hit_prefix="* "
-  miss_prefix="  "
-  version_origin=" (set by $(pyenv-version-origin))"
+# Include "system" in the non-bare output, if it exists
+if [ -n "$include_system" ] && PYENV_VERSION=system pyenv-which python >/dev/null 2>&1; then
+  print_version system
 fi
 
 for path in "${PYENV_ROOT}/versions/"*; do
   if [ -d "$path" ]; then
-    version="${path##*/}"
-
-    if array_exists "$version" "${PYENV_VERSION_NAMES[@]}"; then
-      echo "${hit_prefix}${version}${version_origin}"
-    else
-      echo "${miss_prefix}${version}"
-    fi
+    print_version "${path##*/}"
   fi
 done

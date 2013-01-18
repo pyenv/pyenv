@@ -13,4 +13,11 @@
 
 set -e
 export PYENV_DIR="${1%/*}"
+
+[ -n "$PYENV_SILENCE_WARNINGS" ] || {
+  echo "pyenv: \`python-local-exec' is deprecated and will be removed in the next release."
+  echo "       To upgrade: https://github.com/yyuu/pyenv/wiki/python-local-exec"
+  echo
+} >&2
+
 exec python "$@"

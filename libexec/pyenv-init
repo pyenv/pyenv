@@ -85,11 +85,12 @@ if [ -z "$no_rehash" ]; then
   echo 'pyenv rehash 2>/dev/null'
 fi
 
-commands=(`pyenv commands --sh`)
+commands=(`pyenv-commands --sh`)
 IFS="|"
 cat <<EOS
 pyenv() {
-  local command="\$1"
+  typeset command
+  command="\$1"
   if [ "\$#" -gt 0 ]; then
     shift
   fi

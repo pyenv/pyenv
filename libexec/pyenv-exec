@@ -21,6 +21,7 @@ if [ "$1" = "--complete" ]; then
   exec pyenv shims --short
 fi
 
+export PYENV_VERSION="$(pyenv-version-name)"
 PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then
@@ -36,5 +37,7 @@ for script in $(pyenv-hooks exec); do
 done
 
 shift 1
-export PATH="${PYENV_BIN_PATH}:${PATH}"
+if [ "$PYENV_VERSION" != "system" ]; then
+  export PATH="${PYENV_BIN_PATH}:${PATH}"
+fi
 exec -a "$PYENV_COMMAND" "$PYENV_COMMAND_PATH" "$@"

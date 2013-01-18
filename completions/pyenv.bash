@@ -5,8 +5,10 @@ _pyenv() {
   if [ "$COMP_CWORD" -eq 1 ]; then
     COMPREPLY=( $(compgen -W "$(pyenv commands)" -- "$word") )
   else
-    local command="${COMP_WORDS[1]}"
-    local completions="$(pyenv completions "$command")"
+    local words=("${COMP_WORDS[@]}")
+    unset words[0]
+    unset words[$COMP_CWORD]
+    local completions=$(pyenv completions "${words[@]}")
     COMPREPLY=( $(compgen -W "$completions" -- "$word") )
   fi
 }

@@ -32,17 +32,46 @@ remove_prototype_shim() {
 
 # The prototype shim file is a script that re-execs itself, passing
 # its filename and any arguments to `pyenv exec`. This file is
-# hard-linked for every binary and then removed. The linking technique
-# is fast, uses less disk space than unique files, and also serves as
-# a locking mechanism.
+# hard-linked for every executable and then removed. The linking
+# technique is fast, uses less disk space than unique files, and also
+# serves as a locking mechanism.
 create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
 set -e
+[ -n "\$PYENV_DEBUG" ] && set -x
+
+program="\${0##*/}"
+if [ "\$program" = "python" ]; then
+  for arg; do
+    case "\$arg" in
+    -c* | -- ) break ;;
+    */* )
+      if [ -f "\$arg" ]; then
+        export PYENV_DIR="\${arg%/*}"
+        break
+      fi
+      ;;
+    esac
+  done
+fi
+
 export PYENV_ROOT="$PYENV_ROOT"
-exec pyenv exec "\${0##*/}" "\$@"
+exec "$(command -v pyenv)" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
+}
+
+# If the contents of the prototype shim file differ from the contents
+# of the first shim in the shims directory, assume rbenv has been
+# upgraded and the existing shims need to be removed.
+remove_outdated_shims() {
+  for shim in *; do
+    if ! diff "$PROTOTYPE_SHIM_PATH" "$shim" >/dev/null 2>&1; then
+      for shim in *; do rm -f "$shim"; done
+    fi
+    break
+  done
 }
 
 # The basename of each argument passed to `make_shims` will be
@@ -57,58 +86,27 @@ make_shims() {
   done
 }
 
-# Create an empty array for the list of registered shims.
+# Create an empty array for the list of registered shims and an empty
+# string to use as a search index.
 registered_shims=()
+registered_shims_index=""
 
 # We will keep track of shims registered for installation with the
-# global `reigstered_shims` array and with a global variable for each
-# shim. The array will let us iterate over all registered shims. The
-# global variables will let us quickly check whether a shim with the
-# given name has been registered or not.
+# global `reigstered_shims` array and with a global search index
+# string. The array will let us iterate over all registered shims. The
+# index string will let us quickly check whether a shim with the given
+# name has been registered or not.
 register_shim() {
   local shim="$@"
-  local var="$(shim_variable_name "$shim")"
-
-  if [ -z "${!var}" ]; then
-    registered_shims[${#registered_shims[*]}]="$shim"
-    eval "${var}=1"
-  fi
-}
-
-# To compute the global variable name for a given shim we must first
-# escape any non-alphanumeric characters. If the shim name is
-# alphanumeric (including a hyphen or underscore) we can take a
-# shorter path. Otherwise, we must iterate over each character and
-# escape the non-alphanumeric ones using `printf`.
-shim_variable_name() {
-  local shim="$1"
-  local result="_shim_"
-
-  if [[ ! "$shim" =~ [^[:alnum:]_-] ]]; then
-    shim="${shim//_/_5f}"
-    shim="${shim//-/_2d}"
-    result="$result$shim"
-  else
-    local length="${#shim}"
-    local char i
-
-    for ((i=0; i<length; i++)); do
-      char="${shim:$i:1}"
-      if [[ "$char" =~ [[:alnum:]] ]]; then
-        result="$result$char"
-      else
-        result="$result$(printf "_%02x" \'"$char")"
-      fi
-    done
-  fi
-
-  echo "$result"
+  registered_shims["${#registered_shims[@]}"]="$shim"
+  registered_shims_index="$registered_shims_index/$shim/"
 }
 
 # To install all the registered shims, we iterate over the
 # `registered_shims` array and create a link if one does not already
 # exist.
 install_registered_shims() {
+  local shim
   for shim in "${registered_shims[@]}"; do
     [ -e "$shim" ] || ln -f "$PROTOTYPE_SHIM_PATH" "$shim"
   done
@@ -119,11 +117,10 @@ install_registered_shims() {
 # in the directory but has not been registered as a shim should be
 # removed.
 remove_stale_shims() {
-  local var
+  local shim
   for shim in *; do
-    var="$(shim_variable_name "$shim")"
-    if [ -z "${!var}" ]; then
-      rm -f "$shim" 
+    if [[ "$registered_shims_index" != *"/$shim/"* ]]; then
+      rm -f "$shim"
     fi
   done
 }
@@ -131,10 +128,12 @@ remove_stale_shims() {
 
 # Change to the shims directory.
 cd "$SHIM_PATH"
-
-# Create the prototype shim, then register shims for all known binaries.
-create_prototype_shim
 shopt -s nullglob
+
+# Create the prototype shim, then register shims for all known
+# executables.
+create_prototype_shim
+remove_outdated_shims
 make_shims ../versions/*/bin/*
 
 # Restore the previous working directory.
