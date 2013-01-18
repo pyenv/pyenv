@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+#
+# Summary: Display the full path to an executable
+#
+# Usage: pyenv which <command>
+#
+# Displays the full path to the executable that pyenv will invoke when
+# you run the given command.
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
@@ -45,7 +53,7 @@ IFS=: PYENV_VERSION="${versions[*]}"
 PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then
-  echo "usage: pyenv which COMMAND" >&2
+  pyenv-help --usage which >&2
   exit 1
 fi
 

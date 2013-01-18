@@ -1,4 +1,18 @@
 #!/usr/bin/env bash
+#
+# Summary: Run an executable with the selected Python version
+#
+# Usage: pyenv exec <command> [arg1 arg2...]
+#
+# Runs an executable by first preparing PATH so that the selected Python
+# version's `bin' directory is at the front.
+#
+# For example, if the currently selected Python version is 2.7.7:
+#   pyenv exec pip install -rrequirements.txt
+#
+# is equivalent to:
+#   PATH="$PYENV_ROOT/versions/2.7.7/bin:$PATH" pip install -rrequirements.txt
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
@@ -8,8 +22,9 @@ if [ "$1" = "--complete" ]; then
 fi
 
 PYENV_COMMAND="$1"
+
 if [ -z "$PYENV_COMMAND" ]; then
-  echo "usage: pyenv exec COMMAND [arg1 arg2...]" >&2
+  pyenv-help --usage exec >&2
   exit 1
 fi
 

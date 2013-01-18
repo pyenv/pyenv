@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
+# Usage: pyenv completions <command> [arg1 arg2...]
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 COMMAND="$1"
 if [ -z "$COMMAND" ]; then
-  echo "usage: pyenv completions COMMAND [arg1 arg2...]" >&2
+  pyenv-help --usage completions >&2
   exit 1
 fi
 

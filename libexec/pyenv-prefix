@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# Summary: Display prefix for a Python version
+# Usage: pyenv prefix [<version>]
+#
+# Displays the directory where a Python version is installed. If no
+# version is given, `pyenv prefix' displays the location of the
+# currently selected version.
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 

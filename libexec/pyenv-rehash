@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Summary: Rehash pyenv shims (run this after installing executables)
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 

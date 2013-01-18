@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Usage: pyenv version-file-write <file> <version>
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
@@ -7,7 +9,7 @@ shift
 versions=("$@")
 
 if [ -z "$versions" ] || [ -z "$PYENV_VERSION_FILE" ]; then
-  echo "usage: pyenv write-version-file FILENAME VERSIONS..." >&2
+  pyenv-help --usage version-file-write >&2
   exit 1
 fi
 

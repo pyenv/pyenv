@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+#
+# Summary: Set or show the global Python version
+#
+# Usage: pyenv global <version>
+#
+# Sets the global Python version. You can override the global version at
+# any time by setting a directory-specific version with `pyenv local'
+# or by setting the `PYENV_VERSION' environment variable.
+#
+# <version> should be a string matching a Python version known to pyenv.
+# The special version string `system' will use your default system Python.
+# Run `pyenv versions' for a list of available Python versions.
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 

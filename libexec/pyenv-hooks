@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Summary: List hook scripts for a given pyenv command
+# Usage: pyenv hooks <command>
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
@@ -12,7 +15,7 @@ fi
 
 PYENV_COMMAND="$1"
 if [ -z "$PYENV_COMMAND" ]; then
-  echo "usage: pyenv hooks COMMAND" >&2
+  pyenv-help --usage hooks >&2
   exit 1
 fi
 

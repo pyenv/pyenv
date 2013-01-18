@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Usage: pyenv push <version>
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 

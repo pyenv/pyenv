@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Summary: List existing pyenv shims
+# Usage: pyenv shims [--short]
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
