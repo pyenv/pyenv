@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 set -e
 
+if [ "$1" = "--debug" ]; then
+  export RBENV_DEBUG=1
+  shift
+fi
 
 if [ -n "$RBENV_DEBUG" ]; then
   export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
   set -x
 fi
+
 resolve_link() {
   $(type -p greadlink readlink | head -1) "$1"
 }
