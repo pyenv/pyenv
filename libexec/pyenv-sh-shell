@@ -41,7 +41,7 @@ if [ "$versions" = "--unset" ]; then
 fi
 
 # Make sure the specified version is installed.
-if pyenv-prefix "${versions[@]}" >/dev/null
+if pyenv-prefix "${versions[@]}" >/dev/null; then
   IFS=: PYENV_VERSION="${versions[*]}"
   echo "export PYENV_VERSION=\"${PYENV_VERSION}\""
 else
