@@ -1,4 +1,15 @@
 #!/usr/bin/env bash
+#
+# Summary: Uninstall a specific Python version
+#
+# Usage: pyenv uninstall [-f|--force] <version>
+#
+#    -f  Attempt to remove the specified version without prompting
+#        for confirmation. If the version does not exist, do not
+#        display an error message.
+#
+# See `pyenv versions` for a complete list of installed versions.
+#
 set -e
 
 # Provide pyenv completions
@@ -11,7 +22,7 @@ if [ -z "$PYENV_ROOT" ]; then
 fi
 
 unset FORCE
-if [ "$1" = "-f" ]; then
+if [ "$1" = "-f" ] || [ "$1" = "--force" ]; then
   FORCE=true
   shift
 fi
@@ -19,15 +30,9 @@ fi
 DEFINITION="$1"
 case "$DEFINITION" in
 "" | -* )
-  { echo "usage: pyenv uninstall [-f] VERSION"
-    echo
-    echo "   -f  Attempt to remove the specified version without prompting"
-    echo "       for confirmation. If the version does not exist, do not"
-    echo "       display an error message."
-    echo
-    echo "Installed versions:"
-    pyenv versions --bare | sed 's/^/  /'
-    echo
+  # We can remove the sed fallback once pyenv 0.4.0 is widely available.
+  { pyenv-help uninstall 2>/dev/null ||
+    sed -ne '/^#/!q;s/.\{1,2\}//;1,4d;p' < "$0"
   } >&2
   exit 1
   ;;

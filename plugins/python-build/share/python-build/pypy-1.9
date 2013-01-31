@@ -1,24 +1,24 @@
 case "$OSTYPE" in
 darwin*)
-  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2"
+  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2#aad9c4b7b827583e37fe8ae0f7cfe0ff"
   ;;
 linux*)
   case $(uname -m) in
   i386|i486|i586|i686)
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2"
+    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2#1a08c88642434fc2e0e4256d351f48db"
     ;;
   x86_64)
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2"
+    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2#201d2cce2557e40c784473b471ee1b6b"
     ;;
   esac
   ;;
 cygwin*|mingw*)
-  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip"
+  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip#e7655066baed3c7bbbca7df617817dd5"
   ;;
 esac
 
 if [ -n "$PYPY_URL" ]; then
   install_package "pypy-1.9" "$PYPY_URL" pypy
-  install_package "distribute-0.6.34" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.34.tar.gz" python
-  install_package "pip-1.2.1" "http://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz" python
+  install_package "distribute-0.6.34" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.34.tar.gz#4576ab843a6db5100fb22a72deadf56d" python
+  install_package "pip-1.2.1" "http://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz#db8a6d8a4564d3dc7f337ebed67b1a85" python
 fi

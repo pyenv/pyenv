@@ -1,23 +1,23 @@
 case "$OSTYPE" in
 darwin*)
-  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-osx64.tar.bz2"
+  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-osx64.tar.bz2#2802a06cd19ac86930b63afdd837c32f"
   ;;
 linux*)
   case $(uname -m) in
   armel)
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux-armel.tar.bz2"
+    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux-armel.tar.bz2#a1505520c063c591b218e5cd3436b111"
     ;;
   i386|i486|i586|i686)
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux.tar.bz2"
+    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux.tar.bz2#5aa2e4eee1c3dab86e5cec237776ced3"
     ;;
   x86_64)
     LDD_VERSION=$(ldd --version | head -1)
     case "${LDD_VERSION#ldd \(*\) }" in
     2.15)
-      PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.15.tar.bz2"
+      PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.15.tar.bz2#0fde559a7b1a3b98245d6a5ea7f8ebb2"
       ;;
     2.13)
-      PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.13.tar.bz2"
+      PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.13.tar.bz2#68d8668299cd5adf4f302eaf882c5b33"
       ;;
     *)
       echo "pypy-2.0-beta1 requires libc version 2.13 or 2.15." 1>&2
@@ -28,12 +28,12 @@ linux*)
   esac
   ;;
 cygwin*|mingw*)
-  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-win32.zip"
+  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-win32.zip#e46e1c20da6a2d15e34a6ef9afca311f"
   ;;
 esac
 
 if [ -n "$PYPY_URL" ]; then
   install_package "pypy-2.0-beta1" "$PYPY_URL" pypy
-  install_package "distribute-0.6.34" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.34.tar.gz" python
-  install_package "pip-1.2.1" "http://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz" python
+  install_package "distribute-0.6.34" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.34.tar.gz#4576ab843a6db5100fb22a72deadf56d" python
+  install_package "pip-1.2.1" "http://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz#db8a6d8a4564d3dc7f337ebed67b1a85" python
 fi

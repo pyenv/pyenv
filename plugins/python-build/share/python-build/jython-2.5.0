@@ -1,4 +1,4 @@
 require_java
-install_jar "Jython-2.5.0" "https://downloads.sourceforge.net/project/jython/jython/2.5.0/jython_installer-2.5.0.jar" jython
-install_package "distribute-0.6.34" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.34.tar.gz" python
-install_package "pip-1.2.1" "http://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz" python
+install_jar "Jython-2.5.0" "https://downloads.sourceforge.net/project/jython/jython/2.5.0/jython_installer-2.5.0.jar#f98b83fce9669feec69d0a17ee515a20" jython
+install_package "distribute-0.6.34" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.34.tar.gz#4576ab843a6db5100fb22a72deadf56d" python
+install_package "pip-1.2.1" "http://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz#db8a6d8a4564d3dc7f337ebed67b1a85" python

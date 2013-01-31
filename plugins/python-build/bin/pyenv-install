@@ -1,4 +1,21 @@
 #!/usr/bin/env bash
+#
+# Summary: Install a Python version using the python-build plugin
+#
+# Usage: pyenv install [-f|--force] [-k|--keep] [-v|--verbose] <version>
+#        pyenv install [-f|--force] [-k|--keep] [-v|--verbose] <definition-file>
+#        pyenv install -l|--list
+#
+#   -l/--list        List all available versions
+#   -f/--force       Install even if the version appears to be installed already
+#   -k/--keep        Keep source tree in $PYENV_BUILD_ROOT after installation
+#                    (defaults to $PYENV_ROOT/sources)
+#   -v/--verbose     Verbose mode: print compilation status to stdout
+#
+# For detailed information on installing Python versions with
+# python-build, including a list of environment variables for adjusting
+# compilation, see: https://github.com/yyuu/pyenv#readme
+#
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
@@ -15,20 +32,12 @@ fi
 eval "$(python-build --lib)"
 
 usage() {
-  { echo "usage: pyenv install [-k|--keep] [-v|--verbose] VERSION"
-    echo "       pyenv install [-k|--keep] [-v|--verbose] /path/to/definition"
-    echo "       pyenv install -l|--list"
-    echo
-    echo "  -l/--list        List all available versions"
-    echo "  -k/--keep        Keep source tree in \$PYENV_BUILD_ROOT after installation"
-    echo "                   (defaults to ${PYENV_ROOT}/sources)"
-    echo "  -v/--verbose     Verbose mode: print compilation status to stdout"
-    echo
-  } >&2
-
+  # We can remove the sed fallback once pyenv 0.4.0 is widely available.
+  pyenv-help install 2>/dev/null || sed -ne '/^#/!q;s/.//;s/.//;1,4d;p' < "$0"
   [ -z "$1" ] || exit "$1"
 }
 
+unset FORCE
 unset KEEP
 unset VERBOSE
 
@@ -42,6 +51,9 @@ for option in "${OPTIONS[@]}"; do
     echo "Available versions:"
     python-build --definitions | sed 's/^/  /'
     exit
+    ;;
+  "f" | "force" )
+    FORCE=true
     ;;
   "k" | "keep" )
     [ -n "${PYENV_BUILD_ROOT}" ] || PYENV_BUILD_ROOT="${PYENV_ROOT}/sources"
@@ -58,21 +70,82 @@ for option in "${OPTIONS[@]}"; do
   esac
 done
 
+unset VERSION_NAME
+
+# The first argument contains the definition to install. If the
+# argument is missing, try to install whatever local app-specific
+# version is specified by pyenv. Show usage instructions if a local
+# version is not specified.
 DEFINITION="${ARGUMENTS[0]}"
+[ -n "$DEFINITION" ] || DEFINITION="$(pyenv local 2>/dev/null || true)"
 [ -n "$DEFINITION" ] || usage 1
 
+
+
+# Define `before_install` and `after_install` functions that allow
+# plugin hooks to register a string of code for execution before or
+# after the installation process.
+declare -a before_hooks after_hooks
+
+before_install() {
+  local hook="$1"
+  before_hooks["${#before_hooks[@]}"]="$hook"
+}
+
+after_install() {
+  local hook="$1"
+  after_hooks["${#after_hooks[@]}"]="$hook"
+}
+
+# Load plugin hooks.
 for script in $(pyenv-hooks install); do
   source "$script"
 done
 
-VERSION_NAME="${DEFINITION##*/}"
+
+# Set VERSION_NAME from $DEFINITION, if it is not already set. Then
+# compute the installation prefix.
+[ -n "$VERSION_NAME" ] || VERSION_NAME="${DEFINITION##*/}"
 PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
 
-# If PYENV_BUILD_ROOT is set, then always pass keep options to python-build
+# If the installation prefix exists, prompt for confirmation unless
+# the --force option was specified.
+if [ -z "$FORCE" ] && [ -d "${PREFIX}/bin" ]; then
+  echo "pyenv: $PREFIX already exists" >&2
+  read -p "continue with installation? (y/N) "
+
+  case "$REPLY" in
+  y* | Y* ) ;;
+  * ) exit 1 ;;
+  esac
+fi
+
+# If PYENV_BUILD_ROOT is set, always pass keep options to python-build
 if [ -n "${PYENV_BUILD_ROOT}" ]; then
   export PYTHON_BUILD_BUILD_PATH="${PYENV_BUILD_ROOT}/${VERSION_NAME}"
   KEEP="-k"
 fi
 
-python-build $KEEP $VERBOSE "$DEFINITION" "$PREFIX"
-pyenv rehash
+# Set PYTHON_BUILD_CACHE_PATH to $PYENV_ROOT/cache, if the directory
+# exists and the variable is not already set.
+if [ -z "${PYTHON_BUILD_CACHE_PATH}" ] && [ -d "${PYENV_ROOT}/cache" ]; then
+  export PYTHON_BUILD_CACHE_PATH="${PYENV_ROOT}/cache"
+fi
+
+
+# Execute `before_install` hooks.
+for hook in "${before_hooks[@]}"; do eval "$hook"; done
+
+
+# Invoke `python-build` and record the exit status in $STATUS. Run
+# `pyenv rehash` after a successful installation.
+STATUS=0
+python-build $KEEP $VERBOSE "$DEFINITION" "$PREFIX" || STATUS="$?"
+
+# Execute `after_install` hooks.
+for hook in "${after_hooks[@]}"; do eval "$hook"; done
+
+# Run `pyenv-rehash` after a successful installation.
+[ "$STATUS" != "0" ] || pyenv rehash
+
+exit "$STATUS"

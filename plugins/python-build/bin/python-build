@@ -112,7 +112,9 @@ install_package_using() {
   make_package "$package_name" $*
   popd >&4
 
-  echo "Installed ${package_name} to ${PREFIX_PATH}" >&2
+  { echo "Installed ${package_name} to ${PREFIX_PATH}"
+    echo
+  } >&2
 }
 
 make_package() {
@@ -127,25 +129,137 @@ make_package() {
   popd >&4
 }
 
-fetch_url() {
+compute_md5() {
+  if type md5 >/dev/null; then
+    md5 -q
+  elif type openssl &>/dev/null; then
+    local output="$(openssl md5)"
+    echo "${output##* }"
+  elif type md5sum &>/dev/null; then
+    local output="$(md5sum -b)"
+    echo "${output% *}"
+  else
+    return 1
+  fi
+}
+
+verify_checksum() {
+  # If there's no MD5 support, return success
+  [ -n "$HAS_MD5_SUPPORT" ] || return 0
+
+  # If the specified filename doesn't exist, return success
+  local filename="$1"
+  [ -e "$filename" ] || return 0
+
+  # If there's no expected checksum, return success
+  local expected_checksum="$2"
+  [ -n "$expected_checksum" ] || return 0
+
+  # If the computed checksum is empty, return failure
+  local computed_checksum="$(compute_md5 < "$filename")"
+  [ -n "$computed_checksum" ] || return 1
+
+  if [ "$expected_checksum" != "$computed_checksum" ]; then
+    { echo
+      echo "checksum mismatch: ${filename} (file is corrupt)"
+      echo "expected $expected_checksum, got $computed_checksum"
+      echo
+    } >&4
+    return 1
+  fi
+}
+
+http() {
+  local method="$1"
+  local url="$2"
+  [ -n "$url" ] || return 1
+
   if type curl &>/dev/null; then
-    curl -L "$@"
+    "http_${method}_curl" "$url"
   elif type wget &>/dev/null; then
-    wget -O- "$@"
+    "http_${method}_wget" "$url"
   else
     echo "error: please install \`curl\` or \`wget\` and try again" >&2
     exit 1
   fi
 }
 
+http_head_curl() {
+  curl -sILf "$1" >&4 2>&1
+}
+
+http_get_curl() {
+  curl -sSLf "$1"
+}
+
+http_head_wget() {
+  wget -q --spider "$1" >&4 2>&1
+}
+
+http_get_wget() {
+  wget -nv -O- "$1"
+}
+
 fetch_tarball() {
   local package_name="$1"
   local package_url="$2"
+  local mirror_url
+  local checksum
 
-  echo "Downloading ${package_url}..." >&2
-  { fetch_url "$package_url" > "${package_name}.tar"
-    tar xvf "${package_name}.tar"
+  if [ "$package_url" != "${package_url/\#}" ]; then
+    checksum="${package_url#*#}"
+    package_url="${package_url%%#*}"
+
+    if [ -n "$PYTHON_BUILD_MIRROR_URL" ]; then
+      mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
+    fi
+  fi
+
+  local package_filename="${package_name}.tar" # later tar can read compression algorithm from file
+  symlink_tarball_from_cache "$package_filename" "$checksum" || {
+    echo "Downloading ${package_filename}..." >&2
+    { http head "$mirror_url" &&
+      download_tarball "$mirror_url" "$package_filename" "$checksum"
+    } ||
+    download_tarball "$package_url" "$package_filename" "$checksum"
+  }
+
+  { tar xvf "$package_filename"
+    rm -f "$package_filename"
   } >&4 2>&1
+}
+
+symlink_tarball_from_cache() {
+  [ -n "$PYTHON_BUILD_CACHE_PATH" ] || return 1
+
+  local package_filename="$1"
+  local cached_package_filename="${PYTHON_BUILD_CACHE_PATH}/$package_filename"
+  local checksum="$2"
+
+  [ -e "$cached_package_filename" ] || return 1
+  verify_checksum "$cached_package_filename" "$checksum" >&4 2>&1 || return 1
+  ln -s "$cached_package_filename" "$package_filename" >&4 2>&1 || return 1
+}
+
+download_tarball() {
+  local package_url="$1"
+  [ -n "$package_url" ] || return 1
+
+  local package_filename="$2"
+  local checksum="$3"
+
+  echo "-> $package_url" >&2
+
+  { http get "$package_url" > "$package_filename"
+    verify_checksum "$package_filename" "$checksum"
+  } >&4 2>&1 || return 1
+
+  if [ -n "$PYTHON_BUILD_CACHE_PATH" ]; then
+    local cached_package_filename="${PYTHON_BUILD_CACHE_PATH}/$package_filename"
+    { mv "$package_filename" "$cached_package_filename"
+      ln -s "$cached_package_filename" "$package_filename"
+    } >&4 2>&1 || return 1
+  fi
 }
 
 fetch_git() {
@@ -159,6 +273,21 @@ fetch_git() {
     git clone --depth 1 --branch "$git_ref" "$git_url" "${package_name}" >&4 2>&1
   else
     echo "error: please install \`git\` and try again" >&2
+    exit 1
+  fi
+}
+
+fetch_svn() {
+  local package_name="$1"
+  local svn_url="$2"
+  local svn_rev="$3"
+
+  echo "Checking out ${svn_url}..." >&2
+
+  if type svn &>/dev/null; then
+    svn co -r "$svn_rev" "$svn_url" "${package_name}" >&4 2>&1
+  else
+    echo "error: please install \`svn\` and try again" >&2
     exit 1
   fi
 }
@@ -186,7 +315,7 @@ build_package() {
   echo "Installing ${package_name}..." >&2
 
   for command in $commands; do
-    "build_package_${command}" "${package_name}"
+    "build_package_${command}"
   done
 
   if [ ! -f "$PYTHON_BIN" ]; then
@@ -252,10 +381,6 @@ build_package_copy() {
   cp -R . "$PREFIX_PATH"
 }
 
-bild_package_noop() {
-  echo "Nothing to do."
-}
-
 before_install_package() {
   local stub=1
 }
@@ -266,7 +391,7 @@ after_install_package() {
 
 fix_directory_permissions() {
   # Ensure installed directories are not world-writable to avoid Bundler warnings
-  find "$PREFIX_PATH" -type d -exec chmod go-w {} \;
+  find "$PREFIX_PATH" -type d \( -perm -020 -o -perm -002 \) -exec chmod go-w {} \;
 }
 
 require_gcc() {
@@ -480,6 +605,33 @@ else
   TMP="${TMPDIR%/}"
 fi
 
+if [ -z "$MAKE" ]; then
+  MAKE="make"
+fi
+
+if [ -n "$PYTHON_BUILD_CACHE_PATH" ] && [ -d "$PYTHON_BUILD_CACHE_PATH" ]; then
+  PYTHON_BUILD_CACHE_PATH="${PYTHON_BUILD_CACHE_PATH%/}"
+else
+  unset PYTHON_BUILD_CACHE_PATH
+fi
+
+if [ -z "$PYTHON_BUILD_MIRROR_URL" ]; then
+  PYTHON_BUILD_MIRROR_URL="" # FIXME: setup mirror site
+else
+  PYTHON_BUILD_MIRROR_URL="${PYTHON_BUILD_MIRROR_URL%/}"
+fi
+
+if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ]; then
+  unset PYTHON_BUILD_MIRROR_URL
+fi
+
+if echo test | compute_md5 >/dev/null; then
+  HAS_MD5_SUPPORT=1
+else
+  unset HAS_MD5_SUPPORT
+  unset PYTHON_BUILD_MIRROR_URL
+fi
+
 SEED="$(date "+%Y%m%d%H%M%S").$$"
 LOG_PATH="${TMP}/python-build.${SEED}.log"
 PYTHON_BIN="${PREFIX_PATH}/bin/python"
@@ -500,8 +652,8 @@ fi
 export LDFLAGS="-L'${PREFIX_PATH}/lib' ${LDFLAGS}"
 export CPPFLAGS="-I'${PREFIX_PATH}/include' ${CPPFLAGS}"
 
-unset PYTHONOPT
-unset PYTHONLIB
+unset PYTHONHOME
+unset PYTHONPATH
 
 trap build_failed ERR
 mkdir -p "$BUILD_PATH"
