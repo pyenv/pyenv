@@ -14,7 +14,7 @@ if [ -z "$versions" ] || [ -z "$PYENV_VERSION_FILE" ]; then
 fi
 
 # Make sure the specified version is installed.
-pyenv-prefix "${vesions[@]}" >/dev/null
+pyenv-prefix "${versions[@]}" >/dev/null
 
 # Write the version out to disk.
 rm -f "$PYENV_VERSION_FILE"
