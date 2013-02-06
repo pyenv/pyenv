@@ -63,7 +63,7 @@ SH
 }
 
 # If the contents of the prototype shim file differ from the contents
-# of the first shim in the shims directory, assume rbenv has been
+# of the first shim in the shims directory, assume pyenv has been
 # upgraded and the existing shims need to be removed.
 remove_outdated_shims() {
   for shim in *; do

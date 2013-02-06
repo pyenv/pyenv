@@ -19,7 +19,7 @@ fi
 
 version_exists() {
   local version="$1"
-  [ -d "${RBENV_ROOT}/versions/${version}" ]
+  [ -d "${PYENV_ROOT}/versions/${version}" ]
 }
 
 for version in "${versions[@]}"; do
