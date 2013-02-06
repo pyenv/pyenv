@@ -30,47 +30,114 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 
 ## Table of Contents
 
-   * [1 How It Works](#section_1)
-   * [2 Installation](#section_2)
-      * [2.1 Basic GitHub Checkout](#section_2.1)
-         * [2.1.1 Upgrading](#section_2.1.1)
-      * [2.2 Neckbeard Configuration](#section_2.3)
-   * [3 Usage](#section_3)
-      * [3.1 pyenv global](#section_3.1)
-      * [3.2 pyenv local](#section_3.2)
-      * [3.3 pyenv shell](#section_3.3)
-      * [3.4 pyenv versions](#section_3.4)
-      * [3.5 pyenv version](#section_3.5)
-      * [3.6 pyenv rehash](#section_3.6)
-      * [3.7 pyenv which](#section_3.7)
-      * [3.8 pyenv whence](#section_3.8)
-   * [4 Development](#section_4)
-      * [4.1 Version History](#section_4.1)
-      * [4.2 License](#section_4.2)
+* [How It Works](#how-it-works)
+  * [Understanding PATH](#understanding-path)
+  * [Understanding Shims](#understanding-shims)
+  * [Choosing the Python Version](#choosing-the-python-version)
+  * [Locating the Python Installation](#locating-the-python-installation)
+* [Installation](#installation)
+  * [Basic GitHub Checkout](#basic-github-checkout)
+    * [Upgrading](#upgrading)
+    * [Neckbeard Configuration](#neckbeard-configuration)
+    * [Uninstalling Python Versions](#uninstalling-python-versions)
+* [Command Reference](#command-reference)
+  * [pyenv local](#pyenv-local)
+  * [pyenv global](#pyenv-global)
+  * [pyenv shell](#pyenv-shell)
+  * [pyenv versions](#pyenv-versions)
+  * [pyenv version](#pyenv-version)
+  * [pyenv rehash](#pyenv-rehash)
+  * [pyenv which](#pyenv-which)
+  * [pyenv whence](#pyenv-whence)
+* [Development](#development)
+  * [Version History](#version-history)
+  * [License](#license)
 
-## <a name="section_1"></a> 1 How It Works
+## How It Works
 
-pyenv operates on the per-user directory `~/.pyenv`. Version names in
-pyenv correspond to subdirectories of `~/.pyenv/versions`. For
-example, you might have `~/.pyenv/versions/2.7.3` and
-`~/.pyenv/versions/2.7.3`.
+At a high level, pyenv intercepts Python commands using shim
+executables injected into your `PATH`, determines which Python version
+has been specified by your application, and passes your commands along
+to the correct Python installation.
 
-Each version is a working tree with its own binaries, like
-`~/.pyenv/versions/2.7.3/bin/python2.7` and
-`~/.pyenv/versions/3.2.3/bin/python3.2`. pyenv makes _shim binaries_
-for every such binary across all installed versions of Python.
+### Understanding PATH
 
-These shims are simple wrapper scripts that live in `~/.pyenv/shims`
-and detect which Python version you want to use. They insert the
-directory for the selected version at the beginning of your `$PATH`
-and then execute the corresponding binary.
+When you run a command like `python` or `pip`, your operating system
+searches through a list of directories to find an executable file with
+that name. This list of directories lives in an environment variable
+called `PATH`, with each directory in the list separated by a colon:
 
-Because of the simplicity of the shim approach, all you need to use
-pyenv is `~/.pyenv/shims` in your `$PATH`.
+    /usr/local/bin:/usr/bin:/bin
 
-## <a name="section_2"></a> 2 Installation
+Directories in `PATH` are searched from left to right, so a matching
+executable in a directory at the beginning of the list takes
+precedence over another one at the end. In this example, the
+`/usr/local/bin` directory will be searched first, then `/usr/bin`,
+then `/bin`.
 
-### <a name="section_2.1"></a> 2.1 Basic GitHub Checkout
+### Understanding Shims
+
+pyenv works by inserting a directory of _shims_ at the front of your
+`PATH`:
+
+    ~/.pyenv/shims:/usr/local/bin:/usr/bin:/bin
+
+Through a process called _rehashing_, pyenv maintains shims in that
+directory to match every Python command across every installed version
+of Python—`python`, `pip`, and so on.
+
+Shims are lightweight executables that simply pass your command along
+to pyenv. So with pyenv installed, when you run, say, `pip`, your
+operating system will do the following:
+
+* Search your `PATH` for an executable file named `pip`
+* Find the pyenv shim named `pip` at the beginning of your `PATH`
+* Run the shim named `pip`, which in turn passes the command along to
+  pyenv
+
+### Choosing the Python Version
+
+When you execute a shim, pyenv determines which Python version to use by
+reading it from the following sources, in this order:
+
+1. The `PYENV_VERSION` environment variable, if specified. You can use
+   the [`pyenv shell`](#pyenv-shell) command to set this environment
+   variable in your current shell session.
+
+2. The application-specific `.python-version` file in the current
+   directory, if present. You can modify the current directory's
+   `.python-version` file with the [`pyenv local`](#pyenv-local)
+   command.
+
+3. The first `.python-version` file found by searching each parent
+   directory until reaching the root of your filesystem, if any.
+
+4. The global `~/.pyenv/version` file. You can modify this file using
+   the [`pyenv global`](#pyenv-global) command. If the global version
+   file is not present, pyenv assumes you want to use the "system"
+   Python—i.e. whatever version would be run if pyenv weren't in your
+   path.
+
+### Locating the Python Installation
+
+Once pyenv has determined which version of Python your application has
+specified, it passes the command along to the corresponding Python
+installation.
+
+Each Python version is installed into its own directory under
+`~/.pyenv/versions`. For example, you might have these versions
+installed:
+
+* `~/.pyenv/versions/2.7.3/`
+* `~/.pyenv/versions/3.3.0/`
+* `~/.pyenv/versions/pypy-1.9/`
+
+Version names to pyenv are simply the names of the directories in
+`~/.pyenv/versions`.
+
+## Installation
+
+### Basic GitHub Checkout
 
 This will get you going with the latest version of pyenv and make it
 easy to fork and contribute any changes back upstream.
@@ -105,11 +172,11 @@ easy to fork and contribute any changes back upstream.
 
 6. Rebuild the shim binaries. You should do this any time you install
    a new Python binary (for example, when installing a new Python version,
-   or when installing a gem that provides a binary).
+   or when installing a package that provides a binary).
 
         $ pyenv rehash
 
-#### <a name="section_2.1.1"></a> 2.1.1 Upgrading
+#### Upgrading
 
 If you've installed pyenv using the instructions above, you can
 upgrade your installation at any time using git.
@@ -128,7 +195,7 @@ tag:
     v0.1.0
     $ git checkout v0.1.0
 
-### <a name="section_2.2"></a> 2.2 Neckbeard Configuration
+### Neckbeard Configuration
 
 Skip this section unless you must know what every line in your shell
 profile is doing.
@@ -160,60 +227,30 @@ opposed to this idea. Here's what `pyenv init` actually does:
 Run `pyenv init -` for yourself to see exactly what happens under the
 hood.
 
-## <a name="section_3"></a> 3 Usage
+### Uninstalling Python Versions
+
+As time goes on, Python versions you install will accumulate in your
+`~/.pyenv/versions` directory.
+
+To remove old Python versions, `pyenv uninstall` command to automate
+the removal process.
+
+Or, simply `rm -rf` the directory of the
+version you want to remove. You can find the directory of a particular
+Python version with the `pyenv prefix` command, e.g. `pyenv prefix
+2.6.8`.
+
+## Command Reference
 
 Like `git`, the `pyenv` command delegates to subcommands based on its
 first argument. The most common subcommands are:
 
-### <a name="section_3.1"></a> 3.1 pyenv global
+### pyenv local
 
-Sets the global version of Python to be used in all shells by writing
-the version name to the `~/.pyenv/version` file. This version can be
-overridden by a per-project `.pyenv-version` file, or by setting the
-`PYENV_VERSION` environment variable.
-
-    $ pyenv global 2.7.3
-
-The special version name `system` tells pyenv to use the system Python
-(detected by searching your `$PATH`).
-
-When run without a version number, `pyenv global` reports the
-currently configured global version.
-
-And also, you can specify multiple versions as global Python. Commands
-within these Python versions are searched by specified order.
-
-    $ pyenv global 2.7.3 3.2.3
-    $ pyenv global
-    2.7.3
-    3.2.3
-    $ pyenv which python2.7
-    /home/yyuu/.pyenv/versions/2.7.3/bin/python2.7
-    $ pyenv which python3.2
-    /home/yyuu/.pyenv/versions/3.2.3/bin/python3.2
-    $ pyenv which python
-    /home/yyuu/.pyenv/versions/2.7.3/bin/python
-
-You can manage your version stack by `pyenv push` and `pyenv pop`.
-
-    $ pyenv global
-    2.7.3
-    3.2.3
-    $ pyenv push 3.3.0
-    $ pyenv global
-    2.7.3
-    3.2.3
-    3.3.0
-    $ pyenv pop
-    2.7.3
-    3.2.3
-
-### <a name="section_3.2"></a> 3.2 pyenv local
-
-Sets a local per-project Python version by writing the version name to
-an `.pyenv-version` file in the current directory. This version
-overrides the global, and can be overridden itself by setting the
-`PYENV_VERSION` environment variable or with the `pyenv shell`
+Sets a local application-specific Python version by writing the version
+name to a `.python-version` file in the current directory. This version
+overrides the global version, and can be overridden itself by setting
+the `PYENV_VERSION` environment variable or with the `pyenv shell`
 command.
 
     $ pyenv local 2.7.3
@@ -223,7 +260,14 @@ configured local version. You can also unset the local version:
 
     $ pyenv local --unset
 
-And also, you can specify multiple versions as local Python. Commands
+Previous versions of pyenv stored local version specifications in a
+file named `.pyenv-version`. For backwards compatibility, pyenv will
+read a local version specified in an `.pyenv-version` file, but a
+`.python-version` file in the same directory will take precedence.
+
+**pyenv feature**
+
+You can specify multiple versions as local Python. Commands
 within these Python versions are searched by specified order.
 
     $ pyenv local 2.7.3 3.2.3
@@ -251,11 +295,56 @@ You can manage your version stack by `pyenv push` and `pyenv pop`.
     2.7.3
     3.2.3
 
-### <a name="section_3.3"></a> 3.3 pyenv shell
+### pyenv global
+
+Sets the global version of Python to be used in all shells by writing
+the version name to the `~/.pyenv/version` file. This version can be
+overridden by an application-specific `.python-version` file, or by
+setting the `PYENV_VERSION` environment variable.
+
+    $ pyenv global 2.7.3
+
+The special version name `system` tells pyenv to use the system Python
+(detected by searching your `$PATH`).
+
+When run without a version number, `pyenv global` reports the
+currently configured global version.
+
+**pyenv feature**
+
+You can specify multiple versions as global Python. Commands
+within these Python versions are searched by specified order.
+
+    $ pyenv global 2.7.3 3.2.3
+    $ pyenv global
+    2.7.3
+    3.2.3
+    $ pyenv which python2.7
+    /home/yyuu/.pyenv/versions/2.7.3/bin/python2.7
+    $ pyenv which python3.2
+    /home/yyuu/.pyenv/versions/3.2.3/bin/python3.2
+    $ pyenv which python
+    /home/yyuu/.pyenv/versions/2.7.3/bin/python
+
+You can manage your version stack by `pyenv push` and `pyenv pop`.
+
+    $ pyenv global
+    2.7.3
+    3.2.3
+    $ pyenv push 3.3.0
+    $ pyenv global
+    2.7.3
+    3.2.3
+    3.3.0
+    $ pyenv pop
+    2.7.3
+    3.2.3
+
+### pyenv shell
 
 Sets a shell-specific Python version by setting the `PYENV_VERSION`
-environment variable in your shell. This version overrides both
-project-specific versions and the global version.
+environment variable in your shell. This version overrides
+application-specific versions and the global version.
 
     $ pyenv shell pypy-1.9
 
@@ -271,7 +360,9 @@ prefer not to use shell integration, you may simply set the
 
     $ export PYENV_VERSION=pypy-1.9
 
-And also, you can specify multiple versions via `PYENV_VERSION`
+**pyenv feature**
+
+You can specify multiple versions via `PYENV_VERSION`
 environment variable in your shell.
 
     $ pyenv shell pypy-1.9 2.7.3
@@ -281,7 +372,7 @@ environment variable in your shell.
     pypy-1.9 (set by PYENV_VERSION environment variable)
     2.7.3 (set by PYENV_VERSION environment variable)
 
-### <a name="section_3.4"></a> 3.4 pyenv versions
+### pyenv versions
 
 Lists all Python versions known to pyenv, and shows an asterisk next to
 the currently active version.
@@ -294,7 +385,7 @@ the currently active version.
       jython-2.5.3
       pypy-1.9
 
-### <a name="section_3.5"></a> 3.5 pyenv version
+### pyenv version
 
 Displays the currently active Python version, along with information on
 how it was set.
@@ -302,23 +393,23 @@ how it was set.
     $ pyenv version
     2.7.3 (set by /home/yyuu/.pyenv/version)
 
-### <a name="section_3.6"></a> 3.6 pyenv rehash
+### pyenv rehash
 
 Installs shims for all Python binaries known to pyenv (i.e.,
 `~/.pyenv/versions/*/bin/*`). Run this command after you install a new
-version of Python, or install a gem that provides binaries.
+version of Python, or install a package that provides binaries.
 
     $ pyenv rehash
 
-### <a name="section_3.7"></a> 3.7 pyenv which
+### pyenv which
 
-Displays the full path to the binary that pyenv will execute when you
-run the given command.
+Displays the full path to the executable that pyenv will invoke when
+you run the given command.
 
     $ pyenv which python3.2
     /home/yyuu/.pyenv/versions/3.2.3/bin/python3.2
 
-### <a name="section_3.8"></a> 3.8 pyenv whence
+### pyenv whence
 
 Lists all Python versions with the given command installed.
 
@@ -327,7 +418,7 @@ Lists all Python versions with the given command installed.
     2.7.3
     3.2.3
 
-## <a name="section_4"></a> 4 Development
+## Development
 
 The pyenv source code is [hosted on
 GitHub](https://github.com/yyuu/pyenv). It's clean, modular,
@@ -336,7 +427,11 @@ and easy to understand, even if you're not a shell hacker.
 Please feel free to submit pull requests and file bugs on the [issue
 tracker](https://github.com/yyuu/pyenv/issues).
 
-### <a name="section_4.1"></a> 4.1 Version History
+### Version History
+
+**0.2.0** (February XX, 2013)
+
+* Import changes from rbenv 0.4.0.
 
 **0.1.2** (October 23, 2012)
 
@@ -352,7 +447,7 @@ tracker](https://github.com/yyuu/pyenv/issues).
 
 * Initial public release.
 
-### <a name="section_4.2"></a> 4.2 License
+### License
 
 (The MIT license)
 
