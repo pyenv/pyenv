@@ -81,7 +81,6 @@ DEFINITION="${ARGUMENTS[0]}"
 [ -n "$DEFINITION" ] || usage 1
 
 
-
 # Define `before_install` and `after_install` functions that allow
 # plugin hooks to register a string of code for execution before or
 # after the installation process.
@@ -120,7 +119,7 @@ if [ -z "$FORCE" ] && [ -d "${PREFIX}/bin" ]; then
   esac
 fi
 
-# If PYENV_BUILD_ROOT is set, always pass keep options to python-build
+# If PYENV_BUILD_ROOT is set, always pass keep options to python-build.
 if [ -n "${PYENV_BUILD_ROOT}" ]; then
   export PYTHON_BUILD_BUILD_PATH="${PYENV_BUILD_ROOT}/${VERSION_NAME}"
   KEEP="-k"
@@ -135,7 +134,6 @@ fi
 
 # Execute `before_install` hooks.
 for hook in "${before_hooks[@]}"; do eval "$hook"; done
-
 
 # Invoke `python-build` and record the exit status in $STATUS. Run
 # `pyenv rehash` after a successful installation.
