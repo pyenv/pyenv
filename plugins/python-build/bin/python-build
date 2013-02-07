@@ -299,11 +299,37 @@ fetch_svn() {
 fetch_jar() {
   local package_name="$1"
   local package_url="$2"
+  local mirror_url
+  local checksum
 
-  echo "Downloading ${package_url}..." >&2
-  { fetch_url "$package_url" > "${package_name}.jar"
-    $JAVA -jar ${package_name}.jar -s -d ${package_name}
+  if [ "$package_url" != "${package_url/\#}" ]; then
+    checksum="${package_url#*#}"
+    package_url="${package_url%%#*}"
+
+    if [ -n "$PYTHON_BUILD_MIRROR_URL" ]; then
+      mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
+    fi
+  fi
+
+  local package_filename="${package_name}.jar"
+  symlink_jar_from_cache "$package_filename" "checksum" || {
+    echo "Downloading ${package_filename}..." >&2
+    { http head "$mirror_url" &&
+      download_jar "$mirror_url" "$package_filename" "$checksum"
+    } ||
+    download_jar "$package_url" "$package_filename" "$checksum"
+  }
+  { $JAVA -jar ${package_name}.jar -s -d ${package_name}
+    rm -f "$package_filename"
   } >&4 2>&1
+}
+
+symlink_jar_from_cache() {
+  symlink_tarball_from_cache "$@"
+}
+
+download_jar() {
+  download_tarball "$@"
 }
 
 build_package() {
