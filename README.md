@@ -429,7 +429,7 @@ tracker](https://github.com/yyuu/pyenv/issues).
 
 ### Version History
 
-**0.2.0** (February XX, 2013)
+**0.2.0** (February 18, 2013)
 
 * Import changes from rbenv 0.4.0.
 
