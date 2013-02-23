@@ -11,7 +11,7 @@ _rbenv() {
   if [ "${#words}" -eq 2 ]; then
     completions="$(rbenv commands)"
   else
-    completions="$(rbenv completions ${words[2,-1]})"
+    completions="$(rbenv completions ${words[2,-2]})"
   fi
 
   reply=("${(ps:\n:)completions}")
