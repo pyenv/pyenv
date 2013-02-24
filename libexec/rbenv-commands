@@ -20,9 +20,11 @@ elif [ "$1" = "--no-sh" ]; then
   shift
 fi
 
+IFS=: paths=($PATH)
+
 shopt -s nullglob
 
-{ for path in ${PATH//:/$'\n'}; do
+{ for path in "${paths[@]}"; do
     for command in "${path}/rbenv-"*; do
       command="${command##*rbenv-}"
       if [ -n "$sh" ]; then

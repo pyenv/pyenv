@@ -37,9 +37,11 @@ realpath() {
   cd "$cwd"
 }
 
+IFS=: hook_paths=($RBENV_HOOK_PATH)
+
 shopt -s nullglob
-for path in ${RBENV_HOOK_PATH//:/$'\n'}; do
-  for script in $path/"$RBENV_COMMAND"/*.bash; do
+for path in "${hook_paths[@]}"; do
+  for script in "$path/$RBENV_COMMAND"/*.bash; do
     echo $(realpath $script)
   done
 done

@@ -19,6 +19,18 @@ load test_helper
   assert_line "shell"
 }
 
+@test "commands in path with spaces" {
+  path="${RBENV_TEST_DIR}/my commands"
+  cmd="${path}/rbenv-sh-hello"
+  mkdir -p "$path"
+  touch "$cmd"
+  chmod +x "$cmd"
+
+  PATH="${path}:$PATH" run rbenv-commands --sh
+  assert_success
+  assert_line "hello"
+}
+
 @test "commands --no-sh" {
   run rbenv-commands --no-sh
   assert_success
