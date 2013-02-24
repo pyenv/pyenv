@@ -73,7 +73,9 @@ fi
 
 mkdir -p "${RBENV_ROOT}/"{shims,versions}
 
-echo 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
+if [[ ":${PATH}:" != *:"${RBENV_ROOT}/shims":* ]]; then
+  echo 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
+fi
 
 case "$shell" in
 bash | zsh )
