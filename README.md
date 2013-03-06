@@ -25,7 +25,7 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 * **Need to be loaded into your shell.** Instead, pyenv's shim
     approach works by adding a directory to your `$PATH`.
 * **Manage virtualenv.** Of course, you can create [virtualenv](http://pypi.python.org/pypi/virtualenv)
-    yourself, or [python-virtualenv](https://github.com/yyuu/python-virtualenv)
+    yourself, or [pyenv-virtualenv](https://github.com/yyuu/pyenv-virtualenv)
     to automate the process.
 
 ## Table of Contents
