@@ -1,0 +1,2 @@
+install: git clone https://github.com/sstephenson/bats.git
+script: bats/bin/bats test
