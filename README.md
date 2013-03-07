@@ -398,6 +398,11 @@ The rbenv source code is [hosted on
 GitHub](https://github.com/sstephenson/rbenv). It's clean, modular,
 and easy to understand, even if you're not a shell hacker.
 
+Tests are executed using [Bats](https://github.com/sstephenson/bats):
+
+    $ bats test
+    $ bats test/<file>.bats
+
 Please feel free to submit pull requests and file bugs on the [issue
 tracker](https://github.com/sstephenson/rbenv/issues).
 

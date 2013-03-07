@@ -14,8 +14,9 @@ set -e
 
 version="0.4.0"
 
-cd "$RBENV_ROOT"
-git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
-git_revision="${git_revision#v}"
+if cd "$RBENV_ROOT" 2>/dev/null; then
+  git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
+  git_revision="${git_revision#v}"
+fi
 
 echo "rbenv ${git_revision:-$version}"
