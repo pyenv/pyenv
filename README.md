@@ -169,6 +169,9 @@ easy to fork and contribute any changes back upstream.
    install Python 2.7.3, download and unpack the source, then run:
 
         $ pyenv install 2.7.3
+        
+   **NOTE** If you need to pass configure option to build, please use 
+   ```CONFIGURE_OPTS``` environment variable. 
 
 6. Rebuild the shim binaries. You should do this any time you install
    a new Python binary (for example, when installing a new Python version,
