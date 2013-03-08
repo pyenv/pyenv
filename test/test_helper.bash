@@ -15,7 +15,10 @@ teardown() {
 }
 
 flunk() {
-  echo "$@" | sed "s:${RBENV_ROOT}:\$RBENV_ROOT:" >&2
+  { if [ "$#" -eq 0 ]; then cat -
+    else echo "$@"
+    fi
+  } | sed "s:${RBENV_TEST_DIR}:TEST_DIR:" >&2
   return 1
 }
 
@@ -35,18 +38,27 @@ assert_failure() {
   fi
 }
 
-assert_output() {
-  if [ "$output" != "$1" ]; then
-    flunk "expected: $1"      || true
-    flunk "got:      $output"
+assert_equal() {
+  if [ "$1" != "$2" ]; then
+    { echo "expected: $1"
+      echo "actual:   $2"
+    } | flunk
   fi
 }
 
+assert_output() {
+  assert_equal "$1" "$output"
+}
+
 assert_line() {
-  for line in "${lines[@]}"; do
-    if [ "$line" = "$1" ]; then return 0; fi
-  done
-  flunk "expected line \`$1'"
+  if [ "$1" -ge 0 ] 2>/dev/null; then
+    assert_equal "$2" "${lines[$1]}"
+  else
+    for line in "${lines[@]}"; do
+      if [ "$line" = "$1" ]; then return 0; fi
+    done
+    flunk "expected line \`$1'"
+  fi
 }
 
 refute_line() {
