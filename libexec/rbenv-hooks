@@ -25,7 +25,6 @@ resolve_link() {
 
 realpath() {
   local cwd="$(pwd)"
-  local base="$(basename $1)"
   local path="$1"
 
   while [ -n "$path" ]; do
@@ -34,7 +33,7 @@ realpath() {
     path="$(resolve_link "$name" || true)"
   done
 
-  echo "$(pwd)/$base"
+  echo "$(pwd)/$name"
   cd "$cwd"
 }
 

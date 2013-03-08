@@ -36,3 +36,14 @@ create_hook() {
   RBENV_HOOK_PATH="${HOME}/../rbenv.d" run rbenv-hooks exec
   assert_success "${RBENV_TEST_DIR}/rbenv.d/exec/hello.bash"
 }
+
+@test "resolves symlinks" {
+  path="${RBENV_TEST_DIR}/rbenv.d"
+  mkdir -p "${path}/exec"
+  mkdir -p "$HOME"
+  touch "${HOME}/hola.bash"
+  ln -s "../../home/hola.bash" "${path}/exec/hello.bash"
+
+  RBENV_HOOK_PATH="$path" run rbenv-hooks exec
+  assert_success "${HOME}/hola.bash"
+}
