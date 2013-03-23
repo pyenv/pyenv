@@ -11,7 +11,7 @@ for args in "$@"
 do
   if [ "$args" = "-" ]; then
     print=1
-		shift
+    shift
   fi
 
   if [ "$args" = "--no-rehash" ]; then
