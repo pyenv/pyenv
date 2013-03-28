@@ -2,12 +2,13 @@
 #
 # Summary: Install a Python version using the python-build plugin
 #
-# Usage: pyenv install [-f|--force] [-k|--keep] [-v|--verbose] <version>
-#        pyenv install [-f|--force] [-k|--keep] [-v|--verbose] <definition-file>
+# Usage: pyenv install [-f|--force] [-g|--debug] [-k|--keep] [-v|--verbose] <version>
+#        pyenv install [-f|--force] [-g|--debug] [-k|--keep] [-v|--verbose] <definition-file>
 #        pyenv install -l|--list
 #
 #   -l/--list        List all available versions
 #   -f/--force       Install even if the version appears to be installed already
+#   -g/--debug       Build a debug version
 #   -k/--keep        Keep source tree in $PYENV_BUILD_ROOT after installation
 #                    (defaults to $PYENV_ROOT/sources)
 #   -v/--verbose     Verbose mode: print compilation status to stdout
@@ -40,6 +41,7 @@ usage() {
 unset FORCE
 unset KEEP
 unset VERBOSE
+unset DEBUG
 
 parse_options "$@"
 for option in "${OPTIONS[@]}"; do
@@ -60,6 +62,9 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "v" | "verbose" )
     VERBOSE="-v"
+    ;;
+  "g" | "debug" )
+    DEBUG="-g"
     ;;
   "version" )
     exec python-build --version
@@ -105,6 +110,7 @@ done
 # Set VERSION_NAME from $DEFINITION, if it is not already set. Then
 # compute the installation prefix.
 [ -n "$VERSION_NAME" ] || VERSION_NAME="${DEFINITION##*/}"
+[ -n "$DEBUG" ] && VERSION_NAME="${VERSION_NAME}-debug"
 PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
 
 # If the installation prefix exists, prompt for confirmation unless
@@ -138,7 +144,7 @@ for hook in "${before_hooks[@]}"; do eval "$hook"; done
 # Invoke `python-build` and record the exit status in $STATUS. Run
 # `pyenv rehash` after a successful installation.
 STATUS=0
-python-build $KEEP $VERBOSE "$DEFINITION" "$PREFIX" || STATUS="$?"
+python-build $KEEP $VERBOSE $DEBUG "$DEFINITION" "$PREFIX" || STATUS="$?"
 
 # Execute `after_install` hooks.
 for hook in "${after_hooks[@]}"; do eval "$hook"; done

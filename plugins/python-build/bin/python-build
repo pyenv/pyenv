@@ -557,7 +557,7 @@ version() {
 
 usage() {
   { version
-    echo "usage: python-build [-k|--keep] [-v|--verbose] definition prefix"
+    echo "usage: python-build [-g|--debug] [-k|--keep] [-v|--verbose] definition prefix"
     echo "       python-build --definitions"
   } >&2
 
@@ -577,6 +577,7 @@ list_definitions() {
 
 unset VERBOSE
 unset KEEP_BUILD_PATH
+unset DEBUG
 PYTHON_BUILD_ROOT="$(abs_dirname "$0")/.."
 
 parse_options "$@"
@@ -602,6 +603,9 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "v" | "verbose" )
     VERBOSE=true
+    ;;
+  "g" | "debug" )
+    DEBUG=true
     ;;
   "version" )
     version
@@ -659,6 +663,10 @@ if echo test | compute_md5 >/dev/null; then
 else
   unset HAS_MD5_SUPPORT
   unset PYTHON_BUILD_MIRROR_URL
+fi
+
+if [ -n "$DEBUG" ]; then
+  CONFIGURE_OPTS="--with-pydebug"
 fi
 
 SEED="$(date "+%Y%m%d%H%M%S").$$"
