@@ -666,7 +666,7 @@ else
 fi
 
 if [ -n "$DEBUG" ]; then
-  CONFIGURE_OPTS="--with-pydebug"
+  CONFIGURE_OPTS+=" --with-pydebug"
 fi
 
 SEED="$(date "+%Y%m%d%H%M%S").$$"
