@@ -587,6 +587,7 @@ for option in "${OPTIONS[@]}"; do
   "h" | "help" )
     usage without_exiting
     { echo
+      echo "  -g/--debug       Build a debug version"
       echo "  -k/--keep        Do not remove source tree after installation"
       echo "  -v/--verbose     Verbose mode: print compilation status to stdout"
       echo "  --definitions    List all built-in definitions"
