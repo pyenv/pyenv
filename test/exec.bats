@@ -15,6 +15,19 @@ create_executable() {
   assert_failure "rbenv: version \`2.0' is not installed"
 }
 
+@test "completes with names of executables" {
+  export RBENV_VERSION="2.0"
+  create_executable "ruby"
+  create_executable "rake"
+
+  rbenv-rehash
+  run rbenv-completions exec
+  assert_success
+  assert_line 0 "rake"
+  assert_line 1 "ruby"
+  refute_line 2
+}
+
 @test "supports hook path with spaces" {
   hook_path="${RBENV_TEST_DIR}/custom stuff/rbenv hooks"
   mkdir -p "${hook_path}/exec"
