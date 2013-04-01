@@ -33,10 +33,7 @@ fi"
 # provide rbenv completions
 if [[ \$1 = --complete ]]; then
   shift 1
-  while [[ \$# -gt 0 ]]; do
-    echo \$1
-    shift 1
-  done
+  for arg; do echo \$arg; done
 else
   exit 1
 fi"

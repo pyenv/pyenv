@@ -42,10 +42,9 @@ create_executable() {
   export RBENV_VERSION="2.0"
   create_executable "ruby" "#!$BASH
     echo \$0
-    while [[ \$# -gt 0 ]]; do
+    for arg; do
       # hack to avoid bash builtin echo which can't output '-e'
-      printf \"%s\\n\" \"\$1\"
-      shift 1
+      printf \"%s\\n\" \"\$arg\"
     done"
 
   run rbenv-exec ruby -w -e "puts 'hello world'" -- extra args
