@@ -22,10 +22,10 @@ create_hook() {
   create_hook "$path2" exec "bueno.bash"
 
   RBENV_HOOK_PATH="$path1:$path2" run rbenv-hooks exec
-  assert_success
-  assert_line 0 "${RBENV_TEST_DIR}/rbenv.d/exec/ahoy.bash"
-  assert_line 1 "${RBENV_TEST_DIR}/rbenv.d/exec/hello.bash"
-  assert_line 2 "${RBENV_TEST_DIR}/etc/rbenv_hooks/exec/bueno.bash"
+  assert_success "\
+    ${RBENV_TEST_DIR}/rbenv.d/exec/ahoy.bash
+    ${RBENV_TEST_DIR}/rbenv.d/exec/hello.bash
+    ${RBENV_TEST_DIR}/etc/rbenv_hooks/exec/bueno.bash"
 }
 
 @test "supports hook paths with spaces" {
@@ -35,9 +35,9 @@ create_hook() {
   create_hook "$path2" exec "ahoy.bash"
 
   RBENV_HOOK_PATH="$path1:$path2" run rbenv-hooks exec
-  assert_success
-  assert_line 0 "${RBENV_TEST_DIR}/my hooks/rbenv.d/exec/hello.bash"
-  assert_line 1 "${RBENV_TEST_DIR}/etc/rbenv hooks/exec/ahoy.bash"
+  assert_success "\
+    ${RBENV_TEST_DIR}/my hooks/rbenv.d/exec/hello.bash
+    ${RBENV_TEST_DIR}/etc/rbenv hooks/exec/ahoy.bash"
 }
 
 @test "resolves relative paths" {

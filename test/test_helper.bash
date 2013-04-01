@@ -26,7 +26,7 @@ assert_success() {
   if [ "$status" -ne 0 ]; then
     flunk "command failed with exit status $status"
   elif [ "$#" -gt 0 ]; then
-    assert_output "$1"
+    assert_output_lines "$1"
   fi
 }
 
@@ -34,7 +34,7 @@ assert_failure() {
   if [ "$status" -eq 0 ]; then
     flunk "expected failed exit status"
   elif [ "$#" -gt 0 ]; then
-    assert_output "$1"
+    assert_output_lines "$1"
   fi
 }
 
@@ -50,10 +50,25 @@ assert_output() {
   assert_equal "$1" "$output"
 }
 
+# compares lines with leading whitespace trimmed
+assert_output_lines() {
+  local -a expected
+  IFS=$'\n' expected=($1)
+  for (( i=0; i < ${#expected[@]}; i++ )); do
+    local wants="${expected[$i]}"
+    local got="${lines[$i]}"
+    assert_equal \
+      "${wants#"${wants%%[![:space:]]*}"}" \
+      "${got#"${got%%[![:space:]]*}"}"
+  done
+  assert_equal "${expected[$i]}" "${lines[$i]}"
+}
+
 assert_line() {
   if [ "$1" -ge 0 ] 2>/dev/null; then
     assert_equal "$2" "${lines[$1]}"
   else
+    local line
     for line in "${lines[@]}"; do
       if [ "$line" = "$1" ]; then return 0; fi
     done
@@ -63,11 +78,12 @@ assert_line() {
 
 refute_line() {
   if [ "$1" -ge 0 ] 2>/dev/null; then
-    num_lines="${#lines[@]}"
+    local num_lines="${#lines[@]}"
     if [ "$1" -lt "$num_lines" ]; then
       flunk "output has $num_lines lines"
     fi
   else
+    local line
     for line in "${lines[@]}"; do
       if [ "$line" = "$1" ]; then
         flunk "expected to not find line \`$line'"

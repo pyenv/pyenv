@@ -22,10 +22,9 @@ create_executable() {
 
   rbenv-rehash
   run rbenv-completions exec
-  assert_success
-  assert_line 0 "rake"
-  assert_line 1 "ruby"
-  refute_line 2
+  assert_success "\
+    rake
+    ruby"
 }
 
 @test "supports hook path with spaces" {
@@ -45,20 +44,19 @@ create_executable() {
     echo \$0
     while [[ \$# -gt 0 ]]; do
       # hack to avoid bash builtin echo which can't output '-e'
-      cat <<<\"\$1\"
+      printf \"%s\\n\" \"\$1\"
       shift 1
-    done
-    "
+    done"
 
   run rbenv-exec ruby -w -e "puts 'hello world'" -- extra args
-  assert_line 0 "${RBENV_ROOT}/versions/2.0/bin/ruby"
-  assert_line 1 "-w"
-  assert_line 2 "-e"
-  assert_line 3 "puts 'hello world'"
-  assert_line 4 "--"
-  assert_line 5 "extra"
-  assert_line 6 "args"
-  refute_line 7
+  assert_success "\
+    ${RBENV_ROOT}/versions/2.0/bin/ruby
+    -w
+    -e
+    puts 'hello world'
+    --
+    extra
+    args"
 }
 
 @test "supports ruby -S <cmd>" {
