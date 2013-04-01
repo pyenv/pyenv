@@ -32,7 +32,7 @@ create_executable() {
     echo \$0
     while [[ \$# -gt 0 ]]; do
       # hack to avoid bash builtin echo which can't output '-e'
-      \$(which echo) \$1
+      cat <<<\"\$1\"
       shift 1
     done
     "
