@@ -62,9 +62,18 @@ assert_line() {
 }
 
 refute_line() {
-  for line in "${lines[@]}"; do
-    if [ "$line" = "$1" ]; then flunk "expected to not find line \`$line'"; fi
-  done
+  if [ "$1" -ge 0 ] 2>/dev/null; then
+    num_lines="${#lines[@]}"
+    if [ "$1" -lt "$num_lines" ]; then
+      flunk "output has $num_lines lines"
+    fi
+  else
+    for line in "${lines[@]}"; do
+      if [ "$line" = "$1" ]; then
+        flunk "expected to not find line \`$line'"
+      fi
+    done
+  fi
 }
 
 assert() {
