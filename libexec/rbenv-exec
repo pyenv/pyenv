@@ -21,7 +21,7 @@ if [ "$1" = "--complete" ]; then
   exec rbenv shims --short
 fi
 
-export RBENV_VERSION="$(rbenv-version-name)"
+RBENV_VERSION="$(rbenv-version-name)"
 RBENV_COMMAND="$1"
 
 if [ -z "$RBENV_COMMAND" ]; then
@@ -29,6 +29,7 @@ if [ -z "$RBENV_COMMAND" ]; then
   exit 1
 fi
 
+export RBENV_VERSION
 RBENV_COMMAND_PATH="$(rbenv-which "$RBENV_COMMAND")"
 RBENV_BIN_PATH="${RBENV_COMMAND_PATH%/*}"
 

@@ -9,6 +9,12 @@ create_executable() {
   chmod +x "${bin}/$1"
 }
 
+@test "fails with invalid version" {
+  export RBENV_VERSION="2.0"
+  run rbenv-exec ruby -v
+  assert_failure "rbenv: version \`2.0' is not installed"
+}
+
 @test "supports hook path with spaces" {
   hook_path="${RBENV_TEST_DIR}/custom stuff/rbenv hooks"
   mkdir -p "${hook_path}/exec"
