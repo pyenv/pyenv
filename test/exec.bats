@@ -67,16 +67,29 @@ SH
 
 @test "supports ruby -S <cmd>" {
   export RBENV_VERSION="2.0"
-  create_executable "ruby" "#!$BASH
-    if [[ \$1 = '-S' ]]; then
-      head -1 \$(which \$2) | grep ruby >/dev/null
-      exit \$?
-    else
-      echo 'ruby 2.0 (rbenv test)'
-    fi"
-  create_executable "rake" "#!/usr/bin/env ruby"
+
+  # emulate `ruby -S' behavior
+  create_executable "ruby" <<SH
+#!$BASH
+if [[ \$1 == "-S"* ]]; then
+  found="\$(PATH="\${RUBYPATH:-\$PATH}" which \$2)"
+  # assert that the found executable has ruby for shebang
+  if head -1 "\$found" | grep ruby >/dev/null; then
+    \$BASH "\$found"
+  else
+    echo "ruby: no Ruby script found in input (LoadError)" >&2
+    exit 1
+  fi
+else
+  echo 'ruby 2.0 (rbenv test)'
+fi
+SH
+
+  create_executable "rake" "\
+    #!/usr/bin/env ruby
+    echo hello rake"
 
   rbenv-rehash
   run ruby -S rake
-  assert_success
+  assert_success "hello rake"
 }
