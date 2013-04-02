@@ -3,10 +3,15 @@
 load test_helper
 
 create_executable() {
+  name="${1?}"
+  shift 1
   bin="${RBENV_ROOT}/versions/${RBENV_VERSION}/bin"
   mkdir -p "$bin"
-  echo "$2" > "${bin}/$1"
-  chmod +x "${bin}/$1"
+  { if [ $# -eq 0 ]; then cat -
+    else echo "$@"
+    fi
+  } | sed -Ee '1s/^ +//' > "${bin}/$name"
+  chmod +x "${bin}/$name"
 }
 
 @test "fails with invalid version" {
@@ -17,8 +22,8 @@ create_executable() {
 
 @test "completes with names of executables" {
   export RBENV_VERSION="2.0"
-  create_executable "ruby"
-  create_executable "rake"
+  create_executable "ruby" "#!/bin/sh"
+  create_executable "rake" "#!/bin/sh"
 
   rbenv-rehash
   run rbenv-completions exec
@@ -40,12 +45,14 @@ create_executable() {
 
 @test "forwards all arguments" {
   export RBENV_VERSION="2.0"
-  create_executable "ruby" "#!$BASH
-    echo \$0
-    for arg; do
-      # hack to avoid bash builtin echo which can't output '-e'
-      printf \"%s\\n\" \"\$arg\"
-    done"
+  create_executable "ruby" <<SH
+#!$BASH
+echo \$0
+for arg; do
+  # hack to avoid bash builtin echo which can't output '-e'
+  printf "%s\\n" "\$arg"
+done
+SH
 
   run rbenv-exec ruby -w -e "puts 'hello world'" -- extra args
   assert_success "\
