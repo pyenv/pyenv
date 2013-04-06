@@ -22,9 +22,11 @@ load test_helper
 
 @test "shell change invalid version" {
   run rbenv-sh-shell 1.2.3
-  assert_failure "\
-    rbenv: version \`1.2.3' not installed
-    return 1"
+  assert_failure
+  assert_output <<SH
+rbenv: version \`1.2.3' not installed
+return 1
+SH
 }
 
 @test "shell change version" {

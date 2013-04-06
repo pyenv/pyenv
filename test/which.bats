@@ -49,9 +49,12 @@ create_executable() {
   create_executable "2.0" "rspec"
 
   RBENV_VERSION=1.8 run rbenv-which rspec
-  assert_failure "\
-    rbenv: rspec: command not found
-    The \`rspec' command exists in these Ruby versions:
-      1.9
-      2.0"
+  assert_failure
+  assert_output <<OUT
+rbenv: rspec: command not found
+
+The \`rspec' command exists in these Ruby versions:
+  1.9
+  2.0
+OUT
 }

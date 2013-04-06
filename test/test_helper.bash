@@ -26,7 +26,7 @@ assert_success() {
   if [ "$status" -ne 0 ]; then
     flunk "command failed with exit status $status"
   elif [ "$#" -gt 0 ]; then
-    assert_output_lines "$1"
+    assert_output "$1"
   fi
 }
 
@@ -34,7 +34,7 @@ assert_failure() {
   if [ "$status" -eq 0 ]; then
     flunk "expected failed exit status"
   elif [ "$#" -gt 0 ]; then
-    assert_output_lines "$1"
+    assert_output "$1"
   fi
 }
 
@@ -47,21 +47,11 @@ assert_equal() {
 }
 
 assert_output() {
-  assert_equal "$1" "$output"
-}
-
-# compares lines with leading whitespace trimmed
-assert_output_lines() {
-  local -a expected
-  IFS=$'\n' expected=($1)
-  for (( i=0; i < ${#expected[@]}; i++ )); do
-    local wants="${expected[$i]}"
-    local got="${lines[$i]}"
-    assert_equal \
-      "${wants#"${wants%%[![:space:]]*}"}" \
-      "${got#"${got%%[![:space:]]*}"}"
-  done
-  assert_equal "${expected[$i]}" "${lines[$i]}"
+  local expected
+  if [ $# -eq 0 ]; then expected="$(cat -)"
+  else expected="$1"
+  fi
+  assert_equal "$expected" "$output"
 }
 
 assert_line() {

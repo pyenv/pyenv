@@ -16,9 +16,11 @@ create_executable() {
   create_executable "2.0" "rspec"
 
   run rbenv-whence ruby
-  assert_success "\
-    1.8
-    2.0"
+  assert_success
+  assert_output <<OUT
+1.8
+2.0
+OUT
 
   run rbenv-whence rake
   assert_success "1.8"

@@ -45,8 +45,10 @@ create_executable() {
   assert_success ""
 
   run ls "${RBENV_ROOT}/shims"
-  assert_success "\
-    rake
-    rspec
-    ruby"
+  assert_success
+  assert_output <<OUT
+rake
+rspec
+ruby
+OUT
 }
