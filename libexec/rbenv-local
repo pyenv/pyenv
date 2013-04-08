@@ -38,13 +38,14 @@ RBENV_VERSION="$1"
 if [ "$RBENV_VERSION" = "--unset" ]; then
   rm -f .ruby-version .rbenv-version
 elif [ -n "$RBENV_VERSION" ]; then
-  if [ "$(RBENV_VERSION= rbenv-version-origin)" -ef .rbenv-version ]; then
+  previous_file="$(RBENV_VERSION= rbenv-version-origin || true)"
+  rbenv-version-file-write .ruby-version "$RBENV_VERSION"
+  if [ "$previous_file" -ef .rbenv-version ]; then
     rm -f .rbenv-version
     { echo "rbenv: removed existing \`.rbenv-version' file and migrated"
       echo "       local version specification to \`.ruby-version' file"
     } >&2
   fi
-  rbenv-version-file-write .ruby-version "$RBENV_VERSION"
 else
   rbenv-version-file-read .ruby-version ||
   rbenv-version-file-read .rbenv-version ||

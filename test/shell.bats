@@ -23,13 +23,14 @@ load test_helper
 @test "shell change invalid version" {
   run rbenv-sh-shell 1.2.3
   assert_failure
-  assert_line "rbenv: version \`1.2.3' not installed"
-  assert_line "return 1"
+  assert_output <<SH
+rbenv: version \`1.2.3' not installed
+return 1
+SH
 }
 
 @test "shell change version" {
   mkdir -p "${RBENV_ROOT}/versions/1.2.3"
   run rbenv-sh-shell 1.2.3
   assert_success 'export RBENV_VERSION="1.2.3"'
-  refute_line "return 1"
 }
