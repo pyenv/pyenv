@@ -6,6 +6,11 @@ create_version() {
   mkdir -p "${RBENV_ROOT}/versions/$1"
 }
 
+setup() {
+  mkdir -p "$RBENV_TEST_DIR"
+  cd "$RBENV_TEST_DIR"
+}
+
 @test "no versions installed" {
   assert [ ! -d "${RBENV_ROOT}/versions" ]
   run rbenv-versions
@@ -87,8 +92,6 @@ OUT
 @test "per-project version" {
   create_version "1.9.3"
   create_version "2.0.0"
-  mkdir -p "$RBENV_TEST_DIR"
-  cd "$RBENV_TEST_DIR"
   cat > ".ruby-version" <<<"1.9.3"
   run rbenv-versions
   assert_success
