@@ -58,3 +58,17 @@ The \`rspec' command exists in these Ruby versions:
   2.0
 OUT
 }
+
+@test "carries original IFS within hooks" {
+  hook_path="${RBENV_TEST_DIR}/rbenv.d"
+  mkdir -p "${hook_path}/which"
+  cat > "${hook_path}/which/hello.bash" <<SH
+hellos=(\$(printf "hello\\tugly world\\nagain"))
+echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
+exit
+SH
+
+  RBENV_HOOK_PATH="$hook_path" IFS=$' \t\n' run rbenv-which anything
+  assert_success
+  assert_output "HELLO=:hello:ugly:world:again"
+}

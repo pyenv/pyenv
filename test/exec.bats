@@ -45,6 +45,20 @@ OUT
   assert_line "HELLO=from hook"
 }
 
+@test "carries original IFS within hooks" {
+  hook_path="${RBENV_TEST_DIR}/rbenv.d"
+  mkdir -p "${hook_path}/exec"
+  cat > "${hook_path}/exec/hello.bash" <<SH
+hellos=(\$(printf "hello\\tugly world\\nagain"))
+echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
+SH
+
+  export RBENV_VERSION=system
+  RBENV_HOOK_PATH="$hook_path" IFS=$' \t\n' run rbenv-exec env
+  assert_success
+  assert_line "HELLO=:hello:ugly:world:again"
+}
+
 @test "forwards all arguments" {
   export RBENV_VERSION="2.0"
   create_executable "ruby" <<SH
