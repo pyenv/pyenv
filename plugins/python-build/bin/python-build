@@ -57,6 +57,10 @@ abs_dirname() {
   cd "$cwd"
 }
 
+capitalize() {
+  printf "%s" "$1" | tr a-z A-Z
+}
+
 build_failed() {
   { echo
     echo "BUILD FAILED"
@@ -89,19 +93,19 @@ file_is_not_empty() {
 }
 
 install_package() {
-  install_package_using "tarball" 1 $*
+  install_package_using "tarball" 1 "$@"
 }
 
 install_git() {
-  install_package_using "git" 2 $*
+  install_package_using "git" 2 "$@"
 }
 
 install_svn() {
-  install_package_using "svn" 2 $*
+  install_package_using "svn" 2 "$@"
 }
 
 install_jar() {
-  install_package_using "jar" 1 $*
+  install_package_using "jar" 1 "$@"
 }
 
 install_package_using() {
@@ -110,10 +114,22 @@ install_package_using() {
   local package_name="$3"
   shift 3
 
+  local fetch_args=( "$package_name" "${@:1:$package_type_nargs}" )
+  local make_args=( "$package_name" )
+  local arg last_arg
+
+  for arg in "${@:$(( $package_type_nargs + 1 ))}"; do
+    if [ "$last_arg" = "--if" ]; then
+      "$arg" || return 0
+    elif [ "$arg" != "--if" ]; then
+      make_args["${#make_args[@]}"]="$arg"
+    fi
+    last_arg="$arg"
+  done
+
   pushd "$BUILD_PATH" >&4
-  "fetch_${package_type}" "$package_name" $*
-  shift $(($package_type_nargs))
-  make_package "$package_name" $*
+  "fetch_${package_type}" "${fetch_args[@]}"
+  make_package "${make_args[@]}"
   popd >&4
 
   { echo "Installed ${package_name} to ${PREFIX_PATH}"
@@ -176,12 +192,13 @@ verify_checksum() {
 http() {
   local method="$1"
   local url="$2"
+  local file="$3"
   [ -n "$url" ] || return 1
 
   if type curl &>/dev/null; then
-    "http_${method}_curl" "$url"
+    "http_${method}_curl" "$url" "$file"
   elif type wget &>/dev/null; then
-    "http_${method}_wget" "$url"
+    "http_${method}_wget" "$url" "$file"
   else
     echo "error: please install \`curl\` or \`wget\` and try again" >&2
     exit 1
@@ -189,11 +206,11 @@ http() {
 }
 
 http_head_curl() {
-  curl -sILf "$1" >&4 2>&1
+  curl -qsILf "$1" >&4 2>&1
 }
 
 http_get_curl() {
-  curl -sSLf "$1"
+  curl -C - -o "${2:--}" -qsSLf "$1"
 }
 
 http_head_wget() {
@@ -201,7 +218,7 @@ http_head_wget() {
 }
 
 http_get_wget() {
-  wget -nv -O- "$1"
+  wget -nv -c -O "${2:--}" "$1"
 }
 
 fetch_tarball() {
@@ -228,8 +245,13 @@ fetch_tarball() {
     download_tarball "$package_url" "$package_filename" "$checksum"
   }
 
-  { tar xvf "$package_filename"
-    rm -f "$package_filename"
+  { if tar xvf "$package_filename"; then
+      if [ -z "$KEEP_BUILD_PATH" ]; then
+        rm -f "$package_filename"
+      else
+        true
+      fi
+    fi
   } >&4 2>&1
 }
 
@@ -254,7 +276,7 @@ download_tarball() {
 
   echo "-> $package_url" >&2
 
-  { http get "$package_url" > "$package_filename"
+  { http get "$package_url" "$package_filename"
     verify_checksum "$package_filename" "$checksum"
   } >&4 2>&1 || return 1
 
@@ -345,7 +367,7 @@ build_package() {
   echo "Installing ${package_name}..." >&2
 
   for command in $commands; do
-    "build_package_${command}"
+    "build_package_${command}" "$package_name"
   done
 
   if [ ! -f "$PYTHON_BIN" ]; then
@@ -361,6 +383,16 @@ build_package() {
   fi
 }
 
+package_option() {
+  local package_name="$1"
+  local command_name="$2"
+  local variable="$(capitalize "${package_name}_${command_name}")_OPTS_ARRAY"
+  local array="$variable[@]"
+  shift 2
+  local value=( "${!array}" "$@" )
+  eval "$variable=( \"\${value[@]}\" )"
+}
+
 build_package_standard() {
   local package_name="$1"
 
@@ -370,8 +402,18 @@ build_package_standard() {
     MAKE_OPTS="-j 2"
   fi
 
-  { ./configure --prefix="$PREFIX_PATH" $CONFIGURE_OPTS
-    "$MAKE" $MAKE_OPTS
+  # Support PYTHON_CONFIGURE_OPTS, etc.
+  local package_var_name="$(capitalize "${package_name%%-*}")"
+  local PACKAGE_CONFIGURE="${package_var_name}_CONFIGURE"
+  local PACKAGE_PREFIX_PATH="${package_var_name}_PREFIX_PATH"
+  local PACKAGE_CONFIGURE_OPTS="${package_var_name}_CONFIGURE_OPTS"
+  local PACKAGE_CONFIGURE_OPTS_ARRAY="${package_var_name}_CONFIGURE_OPTS_ARRAY[@]"
+  local PACKAGE_MAKE_OPTS="${package_var_name}_MAKE_OPTS"
+  local PACKAGE_MAKE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
+  local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
+
+  { CFLAGS="$CFLAGS ${!PACKAGE_CFLAGS}" ${!PACKAGE_CONFIGURE:-./configure} --prefix="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}" $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}"
+    "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
     "$MAKE" install
   } >&4 2>&1
 }
@@ -490,6 +532,50 @@ verify_gcc() {
   echo "$gcc"
 }
 
+has_broken_mac_openssl() {
+  [ "$(uname -s)" = "Darwin" ] &&
+  [ "$(openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8r 8 Feb 2011" ] &&
+  [[ "$PYTHON_CONFIGURE_OPTS" != *--with-openssl-dir=* ]]
+}
+
+build_package_mac_openssl() {
+  # Install to a subdirectory since we don't want shims for bin/openssl.
+  OPENSSL_PREFIX_PATH="${PREFIX_PATH}/openssl"
+
+  # Put openssl.conf, certs, etc in ~/.pyenv/versions/*/openssl/ssl
+  OPENSSLDIR="${OPENSSLDIR:-$OPENSSL_PREFIX_PATH/ssl}"
+
+  # Tell Python to use this openssl for its extension.
+  package_option python configure --with-openssl-dir="$OPENSSL_PREFIX_PATH"
+
+  # Hint OpenSSL that we prefer a 64-bit build.
+  export KERNEL_BITS="64"
+  OPENSSL_CONFIGURE="${OPENSSL_CONFIGURE:-./config}"
+
+  # Compile a shared lib with zlib dynamically linked, no kerberos.
+  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-krb5 shared
+
+  # Default MAKE_OPTS are -j 2 which can confuse the build. Thankfully, make
+  # gives precedence to the last -j option, so we can override that.
+  package_option openssl make -j 1
+
+  build_package_standard "$@"
+
+  # Extract root certs from the system keychain in .pem format and rehash.
+  local pem_file="$OPENSSLDIR/cert.pem"
+  security find-certificate -a -p /Library/Keychains/System.keychain > "$pem_file"
+  security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> "$pem_file"
+}
+
+# Post-install check that the openssl extension was built.
+build_package_verify_openssl() {
+  "$PYTHON_BIN" -c 'try:
+    import ssl
+except ImportError:
+    raise(ImportError("The Python openssl extension was not compiled. Missing the OpenSSL lib?"))
+  ' >&4 2>&1
+}
+
 require_java() {
   local java="$(locate_java || true)"
 
@@ -577,8 +663,8 @@ list_definitions() {
 
 unset VERBOSE
 unset KEEP_BUILD_PATH
-unset DEBUG
 PYTHON_BUILD_ROOT="$(abs_dirname "$0")/.."
+unset DEBUG
 
 parse_options "$@"
 
@@ -587,8 +673,8 @@ for option in "${OPTIONS[@]}"; do
   "h" | "help" )
     usage without_exiting
     { echo
-      echo "  -g/--debug       Build a debug version"
       echo "  -k/--keep        Do not remove source tree after installation"
+      echo "  -g/--debug       Build a debug version"
       echo "  -v/--verbose     Verbose mode: print compilation status to stdout"
       echo "  --definitions    List all built-in definitions"
       echo
@@ -624,7 +710,7 @@ elif [ ! -e "$DEFINITION_PATH" ]; then
     DEFINITION_PATH="$BUILTIN_DEFINITION_PATH"
   else
     echo "python-build: definition not found: ${DEFINITION_PATH}" >&2
-    exit 1
+    exit 2
   fi
 fi
 
@@ -640,7 +726,7 @@ else
 fi
 
 if [ -z "$MAKE" ]; then
-  MAKE="make"
+  export MAKE="make"
 fi
 
 if [ -n "$PYTHON_BUILD_CACHE_PATH" ] && [ -d "$PYTHON_BUILD_CACHE_PATH" ]; then
@@ -678,13 +764,14 @@ CWD="$(pwd)"
 if [ -z $PYTHON_BUILD_BUILD_PATH ]; then
   BUILD_PATH="${TMP}/python-build.${SEED}"
 else
-  BUILD_PATH=$PYTHON_BUILD_BUILD_PATH
+  BUILD_PATH="$PYTHON_BUILD_BUILD_PATH"
 fi
 
 exec 4<> "$LOG_PATH" # open the log file at fd 4
 if [ -n "$VERBOSE" ]; then
   tail -f "$LOG_PATH" &
-  trap "kill 0" SIGINT SIGTERM EXIT
+  TAIL_PID=$!
+  trap "kill $TAIL_PID" SIGINT SIGTERM EXIT
 fi
 
 export LDFLAGS="-L'${PREFIX_PATH}/lib' ${LDFLAGS}"

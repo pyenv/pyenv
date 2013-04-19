@@ -8,9 +8,9 @@
 #
 #   -l/--list        List all available versions
 #   -f/--force       Install even if the version appears to be installed already
-#   -g/--debug       Build a debug version
 #   -k/--keep        Keep source tree in $PYENV_BUILD_ROOT after installation
 #                    (defaults to $PYENV_ROOT/sources)
+#   -g/--debug       Build a debug version
 #   -v/--verbose     Verbose mode: print compilation status to stdout
 #
 # For detailed information on installing Python versions with
@@ -38,6 +38,15 @@ usage() {
   [ -z "$1" ] || exit "$1"
 }
 
+definitions() {
+  local query="$1"
+  python-build --definitions | grep -F "$query" || true
+}
+
+indent() {
+  sed 's/^/  /'
+}
+
 unset FORCE
 unset KEEP
 unset VERBOSE
@@ -51,7 +60,7 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "l" | "list" )
     echo "Available versions:"
-    python-build --definitions | sed 's/^/  /'
+    definitions | indent
     exit
     ;;
   "f" | "force" )
@@ -113,6 +122,8 @@ done
 [ -n "$DEBUG" ] && VERSION_NAME="${VERSION_NAME}-debug"
 PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
 
+[ -d "${PREFIX}" ] && PREFIX_EXISTS=1
+
 # If the installation prefix exists, prompt for confirmation unless
 # the --force option was specified.
 if [ -z "$FORCE" ] && [ -d "${PREFIX}/bin" ]; then
@@ -141,15 +152,42 @@ fi
 # Execute `before_install` hooks.
 for hook in "${before_hooks[@]}"; do eval "$hook"; done
 
-# Invoke `python-build` and record the exit status in $STATUS. Run
-# `pyenv rehash` after a successful installation.
+# Plan cleanup on unsuccessful installation.
+cleanup() {
+  [ -z "${PREFIX_EXISTS}" ] && rm -rf "$PREFIX"
+}
+
+trap cleanup SIGINT
+
+# Invoke `python-build` and record the exit status in $STATUS.
 STATUS=0
 python-build $KEEP $VERBOSE $DEBUG "$DEFINITION" "$PREFIX" || STATUS="$?"
+
+# Display a more helpful message if the definition wasn't found.
+if [ "$STATUS" == "2" ]; then
+  { candidates="$(definitions "$DEFINITION")"
+    if [ -n "$candidates" ]; then
+      echo
+      echo "The following versions contain \`$DEFINITION' in the name:"
+      echo "$candidates" | indent
+    fi
+    echo
+    echo "You can list all available versions with \`pyenv install --list'."
+    echo
+    echo "If the version you're looking for is not present, first try upgrading"
+    echo "pyenv. If it's still missing, open a request on the pyenv"
+    echo "issue tracker: https://github.com/yyuu/pyenv/issues"
+  } >&2
+fi
 
 # Execute `after_install` hooks.
 for hook in "${after_hooks[@]}"; do eval "$hook"; done
 
 # Run `pyenv-rehash` after a successful installation.
-[ "$STATUS" != "0" ] || pyenv rehash
+if [ "$STATUS" == "0" ]; then
+  pyenv rehash
+else
+  cleanup
+fi
 
 exit "$STATUS"
