@@ -236,7 +236,7 @@ fetch_tarball() {
     fi
   fi
 
-  local package_filename="${package_name}.tar" # later tar can read compression algorithm from file
+  local package_filename="${package_name}.tar" # recent tar can read compression format from file
   symlink_tarball_from_cache "$package_filename" "$checksum" || {
     echo "Downloading ${package_filename}..." >&2
     { http head "$mirror_url" &&
@@ -334,7 +334,7 @@ fetch_jar() {
   fi
 
   local package_filename="${package_name}.jar"
-  symlink_jar_from_cache "$package_filename" "checksum" || {
+  symlink_jar_from_cache "$package_filename" "$checksum" || {
     echo "Downloading ${package_filename}..." >&2
     { http head "$mirror_url" &&
       download_jar "$mirror_url" "$package_filename" "$checksum"
