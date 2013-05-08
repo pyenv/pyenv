@@ -1,0 +1,75 @@
+diff -r -u ./Lib/ssl.py ../Python-3.0.1/Lib/ssl.py
+--- ./Lib/ssl.py	2009-01-04 08:47:58.000000000 +0900
++++ ../Python-3.0.1/Lib/ssl.py	2013-05-08 19:58:59.000000000 +0900
+@@ -60,8 +60,20 @@
+ 
+ from _ssl import SSLError
+ from _ssl import CERT_NONE, CERT_OPTIONAL, CERT_REQUIRED
+-from _ssl import (PROTOCOL_SSLv2, PROTOCOL_SSLv3, PROTOCOL_SSLv23,
++from _ssl import (PROTOCOL_SSLv3, PROTOCOL_SSLv23,
+                   PROTOCOL_TLSv1)
++_PROTOCOL_NAMES = {
++    PROTOCOL_TLSv1: "TLSv1",
++    PROTOCOL_SSLv23: "SSLv23",
++    PROTOCOL_SSLv3: "SSLv3",
++}
++try:
++    from _ssl import PROTOCOL_SSLv2
++    _SSLv2_IF_EXISTS = PROTOCOL_SSLv2
++except ImportError:
++    _SSLv2_IF_EXISTS = None
++else:
++    _PROTOCOL_NAMES[PROTOCOL_SSLv2] = "SSLv2"
+ from _ssl import RAND_status, RAND_egd, RAND_add
+ from _ssl import (
+     SSL_ERROR_ZERO_RETURN,
+@@ -434,13 +446,4 @@
+     return DER_cert_to_PEM_cert(dercert)
+ 
+ def get_protocol_name(protocol_code):
+-    if protocol_code == PROTOCOL_TLSv1:
+-        return "TLSv1"
+-    elif protocol_code == PROTOCOL_SSLv23:
+-        return "SSLv23"
+-    elif protocol_code == PROTOCOL_SSLv2:
+-        return "SSLv2"
+-    elif protocol_code == PROTOCOL_SSLv3:
+-        return "SSLv3"
+-    else:
+-        return "<unknown>"
++    return _PROTOCOL_NAMES.get(protocol_code, '<unknown>')
+diff -r -u ./Modules/_ssl.c ../Python-3.0.1/Modules/_ssl.c
+--- ./Modules/_ssl.c	2009-02-03 05:41:29.000000000 +0900
++++ ../Python-3.0.1/Modules/_ssl.c	2013-05-08 19:57:38.000000000 +0900
+@@ -62,7 +62,9 @@
+ };
+ 
+ enum py_ssl_version {
++#ifndef OPENSSL_NO_SSL2
+ 	PY_SSL_VERSION_SSL2,
++#endif
+ 	PY_SSL_VERSION_SSL3,
+ 	PY_SSL_VERSION_SSL23,
+ 	PY_SSL_VERSION_TLS1,
+@@ -299,8 +301,10 @@
+ 		self->ctx = SSL_CTX_new(TLSv1_method()); /* Set up context */
+ 	else if (proto_version == PY_SSL_VERSION_SSL3)
+ 		self->ctx = SSL_CTX_new(SSLv3_method()); /* Set up context */
++#ifndef OPENSSL_NO_SSL2
+ 	else if (proto_version == PY_SSL_VERSION_SSL2)
+ 		self->ctx = SSL_CTX_new(SSLv2_method()); /* Set up context */
++#endif
+ 	else if (proto_version == PY_SSL_VERSION_SSL23)
+ 		self->ctx = SSL_CTX_new(SSLv23_method()); /* Set up context */
+ 	PySSL_END_ALLOW_THREADS
+@@ -1691,8 +1695,10 @@
+ 				PY_SSL_CERT_REQUIRED);
+ 
+ 	/* protocol versions */
++#ifndef OPENSSL_NO_SSL2
+ 	PyModule_AddIntConstant(m, "PROTOCOL_SSLv2",
+ 				PY_SSL_VERSION_SSL2);
++#endif
+ 	PyModule_AddIntConstant(m, "PROTOCOL_SSLv3",
+ 				PY_SSL_VERSION_SSL3);
+ 	PyModule_AddIntConstant(m, "PROTOCOL_SSLv23",
