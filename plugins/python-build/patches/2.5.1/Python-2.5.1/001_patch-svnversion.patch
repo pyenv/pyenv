@@ -1,0 +1,47 @@
+diff -r -u ./Makefile.pre.in ../Python-2.5.1/Makefile.pre.in
+--- ./Makefile.pre.in	2006-12-09 05:46:13.000000000 +0900
++++ ../Python-2.5.1/Makefile.pre.in	2013-05-08 19:05:06.000000000 +0900
+@@ -455,7 +455,7 @@
+ 		$(SIGNAL_OBJS) \
+ 		$(MODOBJS) \
+ 		$(srcdir)/Modules/getbuildinfo.c
+-	$(CC) -c $(PY_CFLAGS) -DSVNVERSION=\"`LC_ALL=C $(SVNVERSION)`\" -o $@ $(srcdir)/Modules/getbuildinfo.c
++	$(CC) -c $(PY_CFLAGS) -DSVNVERSION="\"`LC_ALL=C $(SVNVERSION)`\"" -o $@ $(srcdir)/Modules/getbuildinfo.c
+ 
+ Modules/getpath.o: $(srcdir)/Modules/getpath.c Makefile
+ 	$(CC) -c $(PY_CFLAGS) -DPYTHONPATH='"$(PYTHONPATH)"' \
+diff -r -u ./Modules/getbuildinfo.c ../Python-2.5.1/Modules/getbuildinfo.c
+--- ./Modules/getbuildinfo.c	2006-01-18 18:13:51.000000000 +0900
++++ ../Python-2.5.1/Modules/getbuildinfo.c	2013-05-08 19:05:31.000000000 +0900
+@@ -43,6 +43,6 @@
+ #ifdef SVNVERSION
+ 	return SVNVERSION;
+ #else
+-	return "exported";
++	return "Unversioned directory";
+ #endif
+ }
+diff -r -u ./Python/sysmodule.c ../Python-2.5.1/Python/sysmodule.c
+--- ./Python/sysmodule.c	2007-04-16 15:12:02.000000000 +0900
++++ ../Python-2.5.1/Python/sysmodule.c	2013-05-08 19:05:49.000000000 +0900
+@@ -1011,7 +1011,7 @@
+ 
+ 
+ 	svnversion = _Py_svnversion();
+-	if (strcmp(svnversion, "exported") != 0)
++	if (strcmp(svnversion, "Unversioned directory") != 0)
+ 		svn_revision = svnversion;
+ 	else if (istag) {
+ 		len = strlen(_patchlevel_revision);
+diff -r -u ./configure.in ../Python-2.5.1/configure.in
+--- ./configure.in	2007-03-12 19:50:51.000000000 +0900
++++ ../Python-2.5.1/configure.in	2013-05-08 19:04:36.000000000 +0900
+@@ -691,7 +691,7 @@
+ then
+ 	SVNVERSION="svnversion \$(srcdir)"
+ else
+-	SVNVERSION="echo exported"
++	SVNVERSION="echo Unversioned directory"
+ fi
+ 
+ case $MACHDEP in

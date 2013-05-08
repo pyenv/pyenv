@@ -1,0 +1,42 @@
+--- configure.in
++++ configure.in
+@@ -767,7 +767,7 @@
+ then
+ 	SVNVERSION="svnversion \$(srcdir)"
+ else
+-	SVNVERSION="echo exported"
++	SVNVERSION="echo Unversioned directory"
+ fi
+ 
+ case $MACHDEP in
+--- Makefile.pre.in
++++ Makefile.pre.in
+@@ -501,7 +501,7 @@
+ 		$(SIGNAL_OBJS) \
+ 		$(MODOBJS) \
+ 		$(srcdir)/Modules/getbuildinfo.c
+-	$(CC) -c $(PY_CFLAGS) -DSVNVERSION=\"`LC_ALL=C $(SVNVERSION)`\" -o $@ $(srcdir)/Modules/getbuildinfo.c
++	$(CC) -c $(PY_CFLAGS) -DSVNVERSION="\"`LC_ALL=C $(SVNVERSION)`\"" -o $@ $(srcdir)/Modules/getbuildinfo.c
+ 
+ Modules/getpath.o: $(srcdir)/Modules/getpath.c Makefile
+ 	$(CC) -c $(PY_CFLAGS) -DPYTHONPATH='"$(PYTHONPATH)"' \
+--- Modules/getbuildinfo.c
++++ Modules/getbuildinfo.c
+@@ -48,5 +48,5 @@
+ 	static const char svnversion[] = SVNVERSION;
+ 	if (svnversion[0] != '$')
+ 		return svnversion; /* it was interpolated, or passed on command line */
+-	return "exported";
++	return "Unversioned directory";
+ }
+--- Python/sysmodule.c
++++ Python/sysmodule.c
+@@ -1161,7 +1161,7 @@
+ 
+ 
+ 	svnversion = _Py_svnversion();
+-	if (strcmp(svnversion, "exported") != 0)
++	if (strcmp(svnversion, "Unversioned directory") != 0 && strcmp(svnversion, "exported") != 0)
+ 		svn_revision = svnversion;
+ 	else if (istag) {
+ 		len = strlen(_patchlevel_revision);
