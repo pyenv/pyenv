@@ -17,7 +17,7 @@ for file in bin/*; do
 done
 
 for file in share/python-build/*; do
-  cp "${file}" "${SHARE_PATH}"
+  cp -Rp "${file}" "${SHARE_PATH}"
 done
 
 echo "Installed python-build at ${PREFIX}"
