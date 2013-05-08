@@ -102,7 +102,7 @@ process.
 * `MAKE_OPTS` (or `MAKEOPTS`) lets you pass additional options to
   `make`.
 * `PYTHON_CONFIGURE_OPTS` and `PYTHON_MAKE_OPTS` allow you to specify
-  configure and make options for buildling MRI. These variables will
+  configure and make options for buildling CPython. These variables will
   be passed to Python only, not any dependent packages (e.g. libyaml).
 
 ### Checksum verification
