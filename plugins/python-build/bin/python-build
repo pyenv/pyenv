@@ -137,12 +137,24 @@ install_package_using() {
   } >&2
 }
 
+apply_patches() {
+  local package_name="$1"
+  local patches_path="${PYTHON_BUILD_ROOT}/patches/${DEFINITION_PATH##*/}/${package_name}"
+  for patch in "${patches_path}"/*; do
+    if [ -f "$patch" ]; then
+      echo "Applying ${patch##*/} to ${package_name}..." >&2
+      patch -p0 < "$patch"
+    fi
+  done
+}
+
 make_package() {
   local package_name="$1"
   shift
 
   pushd "$package_name" >&4
   before_install_package "$package_name"
+  apply_patches "$package_name"
   build_package "$package_name" $*
   after_install_package "$package_name"
   fix_directory_permissions
@@ -371,7 +383,7 @@ build_package() {
   done
 
   if [ ! -f "$PYTHON_BIN" ]; then
-    for python in ${PREFIX_PATH}/bin/python*; do
+    for python in "${PREFIX_PATH}"/bin/python*; do
       if basename "$python" | grep '^python[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
         {
           cd ${PREFIX_PATH}/bin
