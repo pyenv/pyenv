@@ -248,7 +248,18 @@ fetch_tarball() {
     fi
   fi
 
-  local package_filename="${package_name}.tar" # recent tar can read compression format from file
+  local _package_filename="${package_url##*/}"
+  local _package_suffix="${_package_filename##*.}"
+  case "${_package_suffix}" in
+  "Z" | "bz2" | "gz" | "xz" )
+    local package_suffix="tar.${_package_suffix}"
+  ;;
+  * )
+    local package_suffix="${_package_suffix}"
+  ;;
+  esac
+
+  local package_filename="${package_name}.${package_suffix}"
   symlink_tarball_from_cache "$package_filename" "$checksum" || {
     echo "Downloading ${package_filename}..." >&2
     { http head "$mirror_url" &&
