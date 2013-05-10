@@ -10,7 +10,7 @@ case "$(uname -s)" in
   "armhf" )
     PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armhf.tar.bz2#2565ce68b4032eb306d998e722495694"
   ;;
-  "i386" | "i486" | "i586" | "i686")
+  "i386" | "i486" | "i586" | "i686" | "i786" )
     PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux.tar.bz2#267c46ed8c591da19b6091aa90fa9acf"
   ;;
   "x86_64" )
