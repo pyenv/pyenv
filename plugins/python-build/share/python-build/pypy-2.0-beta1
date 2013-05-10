@@ -1,33 +1,31 @@
-case "$OSTYPE" in
-darwin*)
+case "$(uname -s)" in
+"Darwin" )
   PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-osx64.tar.bz2#2802a06cd19ac86930b63afdd837c32f"
   ;;
-linux*)
-  case $(uname -m) in
-  armel)
+"Linux" )
+  case "$(uname -m)" in
+  "armel" )
     PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux-armel.tar.bz2#a1505520c063c591b218e5cd3436b111"
     ;;
-  i386|i486|i586|i686)
+  "i386" | "i486" | "i586" | "i686")
     PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux.tar.bz2#5aa2e4eee1c3dab86e5cec237776ced3"
     ;;
-  x86_64)
-    LDD_VERSION=$(ldd --version | head -1)
-    case "${LDD_VERSION#ldd \(*\) }" in
-    2.15)
-      PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.15.tar.bz2#0fde559a7b1a3b98245d6a5ea7f8ebb2"
-      ;;
-    2.13)
-      PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.13.tar.bz2#68d8668299cd5adf4f302eaf882c5b33"
-      ;;
-    *)
-      echo "pypy-2.0-beta1 requires libc version 2.13 or 2.15." 1>&2
-      exit 1
-      ;;
-    esac
-    ;;
+  "x86_64" )
+    ldd_copyright="$(ldd --version | head -1)"
+    glibc_version="${ldd_copyright#ldd \(*\) }"
+    glibc_major_version="${glibc_version%%.*}"
+    glibc_minor_version="${glibc_version##*.}"
+    if [ "${glibc_major_version}" -le 2 ]; then
+      if [ "${glibc_minor_version}" -ge 15 ]; then
+        PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.15.tar.bz2#0fde559a7b1a3b98245d6a5ea7f8ebb2"
+      elif [ "${glibc_minor_version}" -ge 13 ]; then
+        PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-linux64-libc2.13.tar.bz2#68d8668299cd5adf4f302eaf882c5b33"
+      fi
+    fi
+  ;;
   esac
   ;;
-cygwin*|mingw*)
+"CYGWIN"* | "MINGW"* )
   PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta1-win32.zip#e46e1c20da6a2d15e34a6ef9afca311f"
   ;;
 esac

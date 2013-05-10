@@ -1,18 +1,18 @@
-case "$OSTYPE" in
-darwin*)
+case "$(uname -s)" in
+"Darwin" )
   PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2#aad9c4b7b827583e37fe8ae0f7cfe0ff"
   ;;
-linux*)
-  case $(uname -m) in
-  i386|i486|i586|i686)
+"Linux" )
+  case "$(uname -m)" in
+  "i386" | "i486" | "i586" | "i686")
     PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2#1a08c88642434fc2e0e4256d351f48db"
     ;;
-  x86_64)
+  "x86_64" )
     PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2#201d2cce2557e40c784473b471ee1b6b"
     ;;
   esac
   ;;
-cygwin*|mingw*)
+"CYGWIN"* | "MINGW"* )
   PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip#e7655066baed3c7bbbca7df617817dd5"
   ;;
 esac

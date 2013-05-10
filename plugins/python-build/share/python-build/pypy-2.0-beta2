@@ -1,27 +1,25 @@
-case "$OSTYPE" in
-darwin*)
+case "$(uname -s)" in
+"Darwin" )
   PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta2-osx64.tar.bz2#f7ad21f79c8005b9c00c48e190ec662e"
   ;;
-linux*)
-  case $(uname -m) in
-  i386|i486|i586|i686)
+"Linux" )
+  case "$(uname -m)" in
+  "i386" | "i486" | "i586" | "i686")
     PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta2-linux.tar.bz2#61c2d5873ee62823bcf35b2e7086644f"
     ;;
-  x86_64)
-    LDD_VERSION=$(ldd --version | head -1)
-    case "${LDD_VERSION#ldd \(*\) }" in
-    2.15)
-      PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta2-linux64-libc2.15.tar.bz2#99f062eb516d8b6b5614f2350a65adab"
-      ;;
-    *)
-      echo "pypy-2.0-beta2 requires libc version 2.15." 1>&2
-      exit 1
-      ;;
-    esac
-    ;;
+  "x86_64" )
+    ldd_copyright="$(ldd --version | head -1)"
+    glibc_version="${ldd_copyright#ldd \(*\) }"
+    glibc_major_version="${glibc_version%%.*}"
+    glibc_minor_version="${glibc_version##*.}"
+    if [ "${glibc_major_version}" -le 2 ]; then
+      if [ "${glibc_minor_version}" -ge 15 ]; then
+        PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta2-linux64-libc2.15.tar.bz2#99f062eb516d8b6b5614f2350a65adab"
+      fi
+    fi
   esac
   ;;
-cygwin*|mingw*)
+"CYGWIN"* | "MINGW"* )
   PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-beta2-win32.zip#3b5250872a5e79034bb1a7c209f39391"
   ;;
 esac
