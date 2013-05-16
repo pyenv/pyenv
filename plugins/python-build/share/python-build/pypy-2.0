@@ -1,32 +1,31 @@
 case "$(uname -s)" in
 "Darwin" )
-  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-osx64.tar.bz2#39837722da4a03ca03eda187aafa13bb"
+  install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-osx64.tar.bz2#39837722da4a03ca03eda187aafa13bb" "pypy"
   ;;
 "Linux" )
   case "$(uname -m)" in
   "armel" )
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armel.tar.bz2#b9c36b99296c85a590c3e480b05d5a13"
+    install_package "pypy-2.0-alpha-arm" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armel.tar.bz2#b9c36b99296c85a590c3e480b05d5a13" "pypy"
   ;;
   "armhf" )
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armhf.tar.bz2#2565ce68b4032eb306d998e722495694"
+    install_package "pypy-2.0-alpha-arm" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armhf.tar.bz2#2565ce68b4032eb306d998e722495694" "pypy"
   ;;
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux.tar.bz2#267c46ed8c591da19b6091aa90fa9acf"
+    install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux.tar.bz2#267c46ed8c591da19b6091aa90fa9acf" "pypy"
   ;;
   "x86_64" )
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux64.tar.bz2#2fe3298ac9354fbdb57a38472936b823"
+    install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux64.tar.bz2#2fe3298ac9354fbdb57a38472936b823" "pypy"
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
-  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-win32.zip#f0d051c2b612b64dff496a6c0f3654fb"
+  # FIXME: never tested on Windows
+  install_zip "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-win32.zip#f0d051c2b612b64dff496a6c0f3654fb" "pypy"
+  ;;
+* )
+  echo "pypy-2.0 is not available." 1>&2
+  exit 1
   ;;
 esac
 
-if [ -z "$PYPY_URL" ]; then
-  echo "pypy is not available." 1>&2
-  exit 1
-else
-  install_package "pypy-2.0" "$PYPY_URL" pypy
-  install_package "distribute-0.6.40" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.40.tar.gz#7a2dd4033999af22fe9591fa84f3e599" python
-  install_package "pip-1.3.1" "http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz#cbb27a191cebc58997c4da8513863153" python
-fi
+install_package "distribute-0.6.40" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.40.tar.gz#7a2dd4033999af22fe9591fa84f3e599" python
+install_package "pip-1.3.1" "http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz#cbb27a191cebc58997c4da8513863153" python

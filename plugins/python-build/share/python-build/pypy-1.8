@@ -1,27 +1,26 @@
 case "$(uname -s)" in
 "Darwin" )
-  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-osx64.tar.bz2#1c293253e8e4df411c3dd59dff82a663"
+  install_package "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-osx64.tar.bz2#1c293253e8e4df411c3dd59dff82a663" pypy
   ;;
 "Linux" )
   case "$(uname -m)" in
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux.tar.bz2#c4a1d11e0283a390d9e9b801a4633b9f"
+    install_package "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux.tar.bz2#c4a1d11e0283a390d9e9b801a4633b9f" pypy
     ;;
   "x86_64" )
-    PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux64.tar.bz2#3b81363ccbc042dfdda2fabbf419e788"
+    install_package "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux64.tar.bz2#3b81363ccbc042dfdda2fabbf419e788" pypy
     ;;
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
-  PYPY_URL="https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-win32.zip#1af8ee722721e9f5fd06b61af530ecb3"
+  # FIXME: never tested on Windows
+  install_zip "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-win32.zip#1af8ee722721e9f5fd06b61af530ecb3" pypy
+  ;;
+* )
+  echo "pypy-1.8 is not available." 1>&2
+  exit 1
   ;;
 esac
 
-if [ -z "$PYPY_URL" ]; then
-  echo "pypy is not available." 1>&2
-  exit 1
-else
-  install_package "pypy-1.8" "$PYPY_URL" pypy
-  install_package "distribute-0.6.40" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.40.tar.gz#7a2dd4033999af22fe9591fa84f3e599" python
-  install_package "pip-1.3.1" "http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz#cbb27a191cebc58997c4da8513863153" python
-fi
+install_package "distribute-0.6.40" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.40.tar.gz#7a2dd4033999af22fe9591fa84f3e599" python
+install_package "pip-1.3.1" "http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz#cbb27a191cebc58997c4da8513863153" python
