@@ -140,10 +140,17 @@ install_package_using() {
 apply_patches() {
   local package_name="$1"
   local patches_path="${PYTHON_BUILD_ROOT}/share/python-build/patches/${DEFINITION_PATH##*/}"
+
+  # Support PYTHON_PATCH_STRIP, etc.
+  local package_var_name="$(capitalize "${package_name%%-*}")"
+  local PACKAGE_PATCH_STRIP="${package_var_name}_PATCH_STRIP"
+
   for patch in "${patches_path}/${package_name}/"*; do
     if [ -f "$patch" ]; then
-      echo "Applying ${patch##*/} to ${package_name}..." >&2
-      patch -p0 < "$patch"
+      {
+        echo "Applying ${patch##*/} to ${package_name}..."
+        patch "-p${!PACKAGE_PATCH_STRIP:-0}" < "$patch"
+      } >&4 2>&1
     fi
   done
 }
