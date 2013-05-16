@@ -23,8 +23,6 @@ version_exists() {
 }
 
 for version in "${versions[@]}"; do
-  PYENV_VERSION_PATH="${PYENV_ROOT}/versions/${version}"
-
   if [ "$version" != "system" ] && ! version_exists "$version"; then
     echo "pyenv: version \`$version' is not installed" >&2
     exit 1
