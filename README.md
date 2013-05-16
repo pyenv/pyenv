@@ -128,8 +128,8 @@ Each Python version is installed into its own directory under
 `~/.pyenv/versions`. For example, you might have these versions
 installed:
 
-* `~/.pyenv/versions/2.7.4/`
-* `~/.pyenv/versions/3.3.1/`
+* `~/.pyenv/versions/2.7.5/`
+* `~/.pyenv/versions/3.3.2/`
 * `~/.pyenv/versions/pypy-1.9/`
 
 Version names to pyenv are simply the names of the directories in
@@ -166,12 +166,12 @@ easy to fork and contribute any changes back upstream.
         $ exec $SHELL
 
 5. Install Python versions into `~/.pyenv/versions`. For example, to
-   install Python 2.7.4, download and unpack the source, then run:
+   install Python 2.7.5, download and unpack the source, then run:
 
-        $ pyenv install 2.7.4
-        
-   **NOTE** If you need to pass configure option to build, please use 
-   ```CONFIGURE_OPTS``` environment variable. 
+        $ pyenv install 2.7.5
+
+   **NOTE** If you need to pass configure option to build, please use
+   ```CONFIGURE_OPTS``` environment variable.
 
 6. Rebuild the shim binaries. You should do this any time you install
    a new Python binary (for example, when installing a new Python version,
@@ -256,7 +256,7 @@ overrides the global version, and can be overridden itself by setting
 the `PYENV_VERSION` environment variable or with the `pyenv shell`
 command.
 
-    $ pyenv local 2.7.4
+    $ pyenv local 2.7.5
 
 When run without a version number, `pyenv local` reports the currently
 configured local version. You can also unset the local version:
@@ -273,30 +273,30 @@ read a local version specified in an `.pyenv-version` file, but a
 You can specify multiple versions as local Python. Commands
 within these Python versions are searched by specified order.
 
-    $ pyenv local 2.7.4 3.2.4
+    $ pyenv local 2.7.5 3.2.5
     $ pyenv local
-    2.7.4
-    3.2.4
+    2.7.5
+    3.2.5
     $ pyenv which python2.7
-    /home/yyuu/.pyenv/versions/2.7.4/bin/python2.7
+    /home/yyuu/.pyenv/versions/2.7.5/bin/python2.7
     $ pyenv which python3.2
-    /home/yyuu/.pyenv/versions/3.2.4/bin/python3.2
+    /home/yyuu/.pyenv/versions/3.2.5/bin/python3.2
     $ pyenv which python
-    /home/yyuu/.pyenv/versions/2.7.4/bin/python
+    /home/yyuu/.pyenv/versions/2.7.5/bin/python
 
 You can manage your version stack by `pyenv push` and `pyenv pop`.
 
     $ pyenv local
-    2.7.4
-    3.2.4
-    $ pyenv push 3.3.1
+    2.7.5
+    3.2.5
+    $ pyenv push 3.3.2
     $ pyenv local
-    2.7.4
-    3.2.4
-    3.3.1
+    2.7.5
+    3.2.5
+    3.3.2
     $ pyenv pop
-    2.7.4
-    3.2.4
+    2.7.5
+    3.2.5
 
 ### pyenv global
 
@@ -305,7 +305,7 @@ the version name to the `~/.pyenv/version` file. This version can be
 overridden by an application-specific `.python-version` file, or by
 setting the `PYENV_VERSION` environment variable.
 
-    $ pyenv global 2.7.4
+    $ pyenv global 2.7.5
 
 The special version name `system` tells pyenv to use the system Python
 (detected by searching your `$PATH`).
@@ -318,30 +318,30 @@ currently configured global version.
 You can specify multiple versions as global Python. Commands
 within these Python versions are searched by specified order.
 
-    $ pyenv global 2.7.4 3.2.4
+    $ pyenv global 2.7.5 3.2.5
     $ pyenv global
-    2.7.4
-    3.2.4
+    2.7.5
+    3.2.5
     $ pyenv which python2.7
-    /home/yyuu/.pyenv/versions/2.7.4/bin/python2.7
+    /home/yyuu/.pyenv/versions/2.7.5/bin/python2.7
     $ pyenv which python3.2
-    /home/yyuu/.pyenv/versions/3.2.4/bin/python3.2
+    /home/yyuu/.pyenv/versions/3.2.5/bin/python3.2
     $ pyenv which python
-    /home/yyuu/.pyenv/versions/2.7.4/bin/python
+    /home/yyuu/.pyenv/versions/2.7.5/bin/python
 
 You can manage your version stack by `pyenv push` and `pyenv pop`.
 
     $ pyenv global
-    2.7.4
-    3.2.4
-    $ pyenv push 3.3.1
+    2.7.5
+    3.2.5
+    $ pyenv push 3.3.2
     $ pyenv global
-    2.7.4
-    3.2.4
-    3.3.1
+    2.7.5
+    3.2.5
+    3.3.2
     $ pyenv pop
-    2.7.4
-    3.2.4
+    2.7.5
+    3.2.5
 
 ### pyenv shell
 
@@ -368,12 +368,12 @@ prefer not to use shell integration, you may simply set the
 You can specify multiple versions via `PYENV_VERSION`
 environment variable in your shell.
 
-    $ pyenv shell pypy-1.9 2.7.4
+    $ pyenv shell pypy-1.9 2.7.5
     $ echo $PYENV_VERSION
-    pypy-1.9:2.7.4
+    pypy-1.9:2.7.5
     $ pyenv version
     pypy-1.9 (set by PYENV_VERSION environment variable)
-    2.7.4 (set by PYENV_VERSION environment variable)
+    2.7.5 (set by PYENV_VERSION environment variable)
 
 ### pyenv versions
 
@@ -383,8 +383,8 @@ the currently active version.
     $ pyenv versions
       2.5.6
       2.6.8
-    * 2.7.4 (set by /home/yyuu/.pyenv/version)
-      3.2.4
+    * 2.7.5 (set by /home/yyuu/.pyenv/version)
+      3.2.5
       jython-2.5.3
       pypy-1.9
 
@@ -394,7 +394,7 @@ Displays the currently active Python version, along with information on
 how it was set.
 
     $ pyenv version
-    2.7.4 (set by /home/yyuu/.pyenv/version)
+    2.7.5 (set by /home/yyuu/.pyenv/version)
 
 ### pyenv rehash
 
@@ -410,7 +410,7 @@ Displays the full path to the executable that pyenv will invoke when
 you run the given command.
 
     $ pyenv which python3.2
-    /home/yyuu/.pyenv/versions/3.2.4/bin/python3.2
+    /home/yyuu/.pyenv/versions/3.2.5/bin/python3.2
 
 ### pyenv whence
 
@@ -418,8 +418,8 @@ Lists all Python versions with the given command installed.
 
     $ pyenv whence 2to3
     2.6.8
-    2.7.4
-    3.2.4
+    2.7.5
+    3.2.5
 
 ## Development
 
