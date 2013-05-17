@@ -445,18 +445,6 @@ build_package() {
   for command in $commands; do
     "build_package_${command}" "$package_name"
   done
-
-  if [ ! -f "$PYTHON_BIN" ]; then
-    for python in "${PREFIX_PATH}"/bin/python*; do
-      if basename "$python" | grep '^python[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
-        {
-          cd ${PREFIX_PATH}/bin
-          ln -fs "$(basename $python)" python
-        }
-        break
-      fi
-    done
-  fi
 }
 
 package_option() {
@@ -492,6 +480,19 @@ build_package_standard() {
     "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
     "$MAKE" install
   } >&4 2>&1
+
+  # Create `python` executable if missing
+  if [[ "${package_name}" == "Python"* ]] || [[ "${package_name}" == "stackless"* ]]; then
+    if [ ! -f "$PYTHON_BIN" ]; then
+      local python
+      for python in "${PREFIX_PATH}/bin/python"*; do
+        if expr "$(basename "$python")" : '^python[0-9][0-9]*\.[0-9][0-9]*$' 2>&1 >/dev/null; then
+          ( cd "${PREFIX_PATH}/bin" && ln -fs "$(basename "$python")" python )
+          break
+        fi
+      done
+    fi
+  fi
 }
 
 build_package_autoconf() {
@@ -643,12 +644,79 @@ build_package_mac_openssl() {
   security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> "$pem_file"
 }
 
-# Post-install check that the openssl extension was built.
-build_package_verify_openssl() {
+build_package_verify_py25() {
+  build_package_verify_readline "$@"
+  build_package_verify_sqlite3 "$@"
+  build_package_verify_zlib "$@"
+  build_package_verify_bz2 "$@"
+}
+
+build_package_verify_py26() {
+  build_package_verify_readline "$@"
+  build_package_verify_ssl "$@"
+  build_package_verify_sqlite3 "$@"
+  build_package_verify_zlib "$@"
+  build_package_verify_bz2 "$@"
+}
+
+build_package_verify_py27() {
+  build_package_verify_readline "$@"
+  build_package_verify_ssl "$@"
+  build_package_verify_sqlite3 "$@"
+  build_package_verify_zlib "$@"
+  build_package_verify_bz2 "$@"
+}
+
+build_package_verify_py3() {
+  build_package_verify_readline "$@"
+  build_package_verify_ssl "$@"
+  build_package_verify_sqlite3 "$@"
+  build_package_verify_zlib "$@"
+  build_package_verify_bz2 "$@"
+}
+
+# Post-install check that the readline extension was built.
+build_package_verify_readline() {
+  "$PYTHON_BIN" -c 'try:
+    import readline
+except ImportError:
+    raise(ImportError("The Python readline extension was not compiled. Missing the GNU readline lib?"))
+  ' >&4 2>&1
+}
+
+# Post-install check that the ssl extension was built.
+build_package_verify_ssl() {
   "$PYTHON_BIN" -c 'try:
     import ssl
 except ImportError:
-    raise(ImportError("The Python openssl extension was not compiled. Missing the OpenSSL lib?"))
+    raise(ImportError("The Python ssl extension was not compiled. Missing the OpenSSL lib?"))
+  ' >&4 2>&1
+}
+
+# Post-install check that the sqlite3 extension was built.
+build_package_verify_sqlite3() {
+  "$PYTHON_BIN" -c 'try:
+    import sqlite3
+except ImportError:
+    raise(ImportError("The Python ssl extension was not compiled. Missing the SQLite3 lib?"))
+  ' >&4 2>&1
+}
+
+# Post-install check that the zlib extension was built.
+build_package_verify_zlib() {
+  "$PYTHON_BIN" -c 'try:
+    import zlib
+except ImportError:
+    raise(ImportError("The Python ssl extension was not compiled. Missing the zlib?"))
+  ' >&4 2>&1
+}
+
+# Post-install check that the bz2 extension was built.
+build_package_verify_bz2() {
+  "$PYTHON_BIN" -c 'try:
+    import bz2
+except ImportError:
+    raise(ImportError("The Python bz2 extension was not compiled. Missing the bzip2 lib?"))
   ' >&4 2>&1
 }
 
