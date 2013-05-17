@@ -698,7 +698,7 @@ build_package_verify_sqlite3() {
   "$PYTHON_BIN" -c 'try:
     import sqlite3
 except ImportError:
-    raise(ImportError("The Python ssl extension was not compiled. Missing the SQLite3 lib?"))
+    raise(ImportError("The Python sqlite3 extension was not compiled. Missing the SQLite3 lib?"))
   ' >&4 2>&1
 }
 
@@ -707,7 +707,7 @@ build_package_verify_zlib() {
   "$PYTHON_BIN" -c 'try:
     import zlib
 except ImportError:
-    raise(ImportError("The Python ssl extension was not compiled. Missing the zlib?"))
+    raise(ImportError("The Python zlib extension was not compiled. Missing the zlib?"))
   ' >&4 2>&1
 }
 
