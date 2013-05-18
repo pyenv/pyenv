@@ -133,6 +133,8 @@ download mirror and use official URLs instead. You can force
 python-build to bypass the mirror by setting the
 `PYTHON_BUILD_SKIP_MIRROR` environment variable.
 
+The official python-build download mirror is provided by [Git Hub Pages](http://yyuu.github.io/pythons/).
+
 ### Package download caching
 
 You can instruct python-build to keep a local cache of downloaded
