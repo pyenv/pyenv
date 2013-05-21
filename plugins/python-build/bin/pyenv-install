@@ -148,6 +148,9 @@ if [ -z "${PYTHON_BUILD_CACHE_PATH}" ] && [ -d "${PYENV_ROOT}/cache" ]; then
   export PYTHON_BUILD_CACHE_PATH="${PYENV_ROOT}/cache"
 fi
 
+# Default PYENV_VERSION to the globally-specified Python version.
+export PYENV_VERSION="$(pyenv global 2>/dev/null || true)"
+
 
 # Execute `before_install` hooks.
 for hook in "${before_hooks[@]}"; do eval "$hook"; done
