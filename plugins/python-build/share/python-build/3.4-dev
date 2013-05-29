@@ -1,3 +1,9 @@
+# Python 3.4 requires "python3.4" to be executable if it is in ${PATH}.
+if ! pyenv-which python3.4 1>/dev/null 2>&1; then
+  if pyenv-whence python3.4 1>/dev/null 2>&1; then
+    export PYENV_VERSION="$(pyenv-whence python3.4 2>/dev/null | tail -1)"
+  fi
+fi
 install_hg "Python-3.4-dev" "https://bitbucket.org/mirror/cpython" "default" standard verify_py34
 install_package "distribute-0.6.43" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.43.tar.gz#a216a46dc9bec5835fa3c6041f1c77c2" python
 install_package "pip-1.3.1" "http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz#cbb27a191cebc58997c4da8513863153" python
