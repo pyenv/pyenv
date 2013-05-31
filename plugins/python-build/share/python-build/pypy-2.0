@@ -29,5 +29,5 @@ case "$(uname -s)" in
   ;;
 esac
 
-install_package "distribute-0.6.43" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.43.tar.gz#a216a46dc9bec5835fa3c6041f1c77c2" python
+install_package "distribute-0.6.45" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.45.tar.gz#8953f2c07e6700dabf2ec150129b8c31" python
 install_package "pip-1.3.1" "http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz#cbb27a191cebc58997c4da8513863153" python
