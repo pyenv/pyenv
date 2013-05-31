@@ -1,0 +1,26 @@
+case "$(uname -s)" in
+"Darwin" )
+  install_package "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-osx64.tar.bz2#78bbf70f55e9fec20d7ac22531a997fc" pypy verify_py27
+  ;;
+"Linux" )
+  case "$(uname -m)" in
+  "i386" | "i486" | "i586" | "i686" | "i786" )
+    install_package "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-linux.tar.bz2#ee949986fc5ec5c4a11ecbd546b87fbb" pypy verify_py27
+    ;;
+  "x86_64" )
+    install_package "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-linux64.tar.bz2#a34e3113508449393e874f409dd888fc" pypy verify_py27
+    ;;
+  esac
+  ;;
+"CYGWIN"* | "MINGW"* )
+  # FIXME: never tested on Windows
+  install_zip "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-win32-c.zip#62b9eb914954aeab32905d632d3904f1" pypy verify_py27
+  ;;
+* )
+  echo "pypy-1.6 is not available." 1>&2
+  exit 1
+  ;;
+esac
+
+install_package "distribute-0.6.43" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.43.tar.gz#a216a46dc9bec5835fa3c6041f1c77c2" python
+install_package "pip-1.3.1" "http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz#cbb27a191cebc58997c4da8513863153" python

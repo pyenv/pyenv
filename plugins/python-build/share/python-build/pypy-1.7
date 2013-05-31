@@ -1,0 +1,26 @@
+case "$(uname -s)" in
+"Darwin" )
+  install_package "pypy-1.7" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.7-osx64.tar.bz2#ff979054fc8e17b4973ffebb9844b159" pypy verify_py27
+  ;;
+"Linux" )
+  case "$(uname -m)" in
+  "i386" | "i486" | "i586" | "i686" | "i786" )
+    install_package "pypy-1.7" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.7-linux.tar.bz2#8a6e2583902bc6f2661eb3c96b45f4e3" pypy verify_py27
+    ;;
+  "x86_64" )
+    install_package "pypy-1.7" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.7-linux64.tar.bz2#ceb8dfe7d9d1aeb558553b91b381a1a8" pypy verify_py27
+    ;;
+  esac
+  ;;
+"CYGWIN"* | "MINGW"* )
+  # FIXME: never tested on Windows
+  install_zip "pypy-1.7" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.7-win32.zip#08de1ed4a4382559b1c4c46650f4a8e8" pypy verify_py27
+  ;;
+* )
+  echo "pypy-1.7 is not available." 1>&2
+  exit 1
+  ;;
+esac
+
+install_package "distribute-0.6.43" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.43.tar.gz#a216a46dc9bec5835fa3c6041f1c77c2" python
+install_package "pip-1.3.1" "http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz#cbb27a191cebc58997c4da8513863153" python
