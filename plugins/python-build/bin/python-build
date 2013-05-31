@@ -574,6 +574,11 @@ build_package_jython() {
   } >&4 2>&1
 }
 
+build_package_jython_builder() {
+  ant >&4 2>&1
+  ( cd "dist" && build_package_jython )
+}
+
 build_package_pypy() {
   build_package_copy
   { if [ -x "${PREFIX_PATH}/bin/pypy" ] && [ ! -x "${PREFIX_PATH}/bin/python" ]; then
