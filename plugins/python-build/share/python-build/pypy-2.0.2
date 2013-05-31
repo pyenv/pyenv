@@ -1,19 +1,19 @@
 case "$(uname -s)" in
 "Darwin" )
-  install_package "pypy-2.0.2" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.2-osx64.tar.bz2#a7da45a3161c198de6f662e3c40629ff" "pypy"
+  install_package "pypy-2.0.2" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.2-osx64.tar.bz2#a7da45a3161c198de6f662e3c40629ff" "pypy" verify_py27
   ;;
 "Linux" )
   case "$(uname -m)" in
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    install_package "pypy-2.0.2" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.2-linux.tar.bz2#51ac0aa37a8255acbc71eca23ea29609" "pypy"
+    install_package "pypy-2.0.2" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.2-linux.tar.bz2#51ac0aa37a8255acbc71eca23ea29609" "pypy" verify_py27
   ;;
   "x86_64" )
-    install_package "pypy-2.0.2" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.2-linux64.tar.bz2#9d9f512ab2f114bfb4f165c71181a511" "pypy"
+    install_package "pypy-2.0.2" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.2-linux64.tar.bz2#9d9f512ab2f114bfb4f165c71181a511" "pypy" verify_py27
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.0.2" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.2-win32.zip#3e51dce7ecfc8fb069d65d95e8de6fb2" "pypy"
+  install_zip "pypy-2.0.2" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.2-win32.zip#3e51dce7ecfc8fb069d65d95e8de6fb2" "pypy" verify_py27
   ;;
 * )
   echo "pypy-2.0 is not available." 1>&2

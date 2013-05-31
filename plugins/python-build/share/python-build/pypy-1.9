@@ -1,20 +1,20 @@
 case "$(uname -s)" in
 "Darwin" )
-  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2#aad9c4b7b827583e37fe8ae0f7cfe0ff" pypy
+  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2#aad9c4b7b827583e37fe8ae0f7cfe0ff" pypy verify_py27
   ;;
 "Linux" )
   case "$(uname -m)" in
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2#1a08c88642434fc2e0e4256d351f48db" pypy
+    install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2#1a08c88642434fc2e0e4256d351f48db" pypy verify_py27
     ;;
   "x86_64" )
-    install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2#201d2cce2557e40c784473b471ee1b6b" pypy
+    install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2#201d2cce2557e40c784473b471ee1b6b" pypy verify_py27
     ;;
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip#e7655066baed3c7bbbca7df617817dd5" pypy
+  install_zip "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip#e7655066baed3c7bbbca7df617817dd5" pypy verify_py27
   ;;
 * )
   echo "pypy-1.9 is not available." 1>&2

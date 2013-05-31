@@ -1,25 +1,25 @@
 case "$(uname -s)" in
 "Darwin" )
-  install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-osx64.tar.bz2#39837722da4a03ca03eda187aafa13bb" "pypy"
+  install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-osx64.tar.bz2#39837722da4a03ca03eda187aafa13bb" "pypy" verify_py27
   ;;
 "Linux" )
   case "$(uname -m)" in
   "armel" )
-    install_package "pypy-2.0-alpha-arm" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armel.tar.bz2#b9c36b99296c85a590c3e480b05d5a13" "pypy"
+    install_package "pypy-2.0-alpha-arm" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armel.tar.bz2#b9c36b99296c85a590c3e480b05d5a13" "pypy" verify_py27
   ;;
   "armhf" )
-    install_package "pypy-2.0-alpha-arm" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armhf.tar.bz2#2565ce68b4032eb306d998e722495694" "pypy"
+    install_package "pypy-2.0-alpha-arm" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armhf.tar.bz2#2565ce68b4032eb306d998e722495694" "pypy" verify_py27
   ;;
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux.tar.bz2#267c46ed8c591da19b6091aa90fa9acf" "pypy"
+    install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux.tar.bz2#267c46ed8c591da19b6091aa90fa9acf" "pypy" verify_py27
   ;;
   "x86_64" )
-    install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux64.tar.bz2#2fe3298ac9354fbdb57a38472936b823" "pypy"
+    install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux64.tar.bz2#2fe3298ac9354fbdb57a38472936b823" "pypy" verify_py27
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-win32.zip#f0d051c2b612b64dff496a6c0f3654fb" "pypy"
+  install_zip "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-win32.zip#f0d051c2b612b64dff496a6c0f3654fb" "pypy" verify_py27
   ;;
 * )
   echo "pypy-2.0 is not available." 1>&2
