@@ -16,8 +16,10 @@ case "$(uname -s)" in
   install_zip "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-win32.zip#4c40b19ea1ec5c8c8c2a1f94f59bdf02" "pypy" verify_py27
   ;;
 * )
-  echo "pypy-2.0 is not available." 1>&2
-  exit 1
+  { echo "Precompiled binary of pypy-2.0.1 is not available for $(uname -s)-$(uname -m)."
+    echo "To build pypy-2.0.1 from soruce, use 'pypy-2.0.1-src'."
+  } 1>&4 2>&1
+  false
   ;;
 esac
 

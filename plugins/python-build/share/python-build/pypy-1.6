@@ -17,8 +17,9 @@ case "$(uname -s)" in
   install_zip "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-win32-c.zip#62b9eb914954aeab32905d632d3904f1" pypy verify_py27
   ;;
 * )
-  echo "pypy-1.6 is not available." 1>&2
-  exit 1
+  { echo "Precompiled binary of pypy-1.6 is not available for $(uname -s)-$(uname -m)."
+  } 1>&4 2>&1
+  false
   ;;
 esac
 

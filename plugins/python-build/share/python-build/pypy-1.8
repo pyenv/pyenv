@@ -17,8 +17,10 @@ case "$(uname -s)" in
   install_zip "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-win32.zip#1af8ee722721e9f5fd06b61af530ecb3" pypy verify_py27
   ;;
 * )
-  echo "pypy-1.8 is not available." 1>&2
-  exit 1
+  { echo "Precompiled binary of pypy-1.8 is not available for $(uname -s)-$(uname -m)."
+    echo "To build pypy-1.8 from soruce, use 'pypy-1.8-dev'."
+  } 1>&4 2>&1
+  false
   ;;
 esac
 
