@@ -284,20 +284,6 @@ within these Python versions are searched by specified order.
     $ pyenv which python
     /home/yyuu/.pyenv/versions/2.7.5/bin/python
 
-You can manage your version stack by `pyenv push` and `pyenv pop`.
-
-    $ pyenv local
-    2.7.5
-    3.2.5
-    $ pyenv push 3.3.2
-    $ pyenv local
-    2.7.5
-    3.2.5
-    3.3.2
-    $ pyenv pop
-    2.7.5
-    3.2.5
-
 ### pyenv global
 
 Sets the global version of Python to be used in all shells by writing
@@ -328,20 +314,6 @@ within these Python versions are searched by specified order.
     /home/yyuu/.pyenv/versions/3.2.5/bin/python3.2
     $ pyenv which python
     /home/yyuu/.pyenv/versions/2.7.5/bin/python
-
-You can manage your version stack by `pyenv push` and `pyenv pop`.
-
-    $ pyenv global
-    2.7.5
-    3.2.5
-    $ pyenv push 3.3.2
-    $ pyenv global
-    2.7.5
-    3.2.5
-    3.3.2
-    $ pyenv pop
-    2.7.5
-    3.2.5
 
 ### pyenv shell
 
