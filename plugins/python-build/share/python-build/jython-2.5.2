@@ -1,5 +1,7 @@
 require_java
 install_jar "Jython-2.5.2" "https://downloads.sourceforge.net/project/jython/jython/2.5.2/jython_installer-2.5.2.jar#7c7d9abd8985df480edeacd27ed9dcd5" jython
+# setuptools (>= 0.7) cannot install to Jython
+# * https://bitbucket.org/pypa/setuptools/issue/14/installation-failed-on-jython
 install_package "distribute-0.6.45" "http://pypi.python.org/packages/source/d/distribute/distribute-0.6.45.tar.gz#8953f2c07e6700dabf2ec150129b8c31" python
 # pip (>= 1.3) does not work properly since it uses HTTPS for downloads
 # * https://github.com/yyuu/pyenv/issues/15
