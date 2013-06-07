@@ -9,7 +9,7 @@ setup() {
 }
 
 git_commit() {
-  git commit --quiet --allow-empty -m "" --allow-empty-message
+  git commit --quiet --allow-empty -m "empty"
 }
 
 @test "default version" {
