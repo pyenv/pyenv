@@ -723,6 +723,19 @@ build_package_mac_openssl() {
   security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> "$pem_file"
 }
 
+has_broken_mac_readline() {
+  # MacOSX 10.4 has a broken readline.
+  # https://github.com/yyuu/pyenv/issues/23
+  local retval=1
+  local conftest="$BUILD_PATH/has_broken_mac_readline.h"
+  if [ "$(uname -s)" = "Darwin" ]; then
+    echo "#include <readline/rlconf.h>" > "$conftest"
+    cpp $CFLAGS $CPPFLAGS $LDFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
+    rm -f "$conftest"
+  fi
+  return "$retval"
+}
+
 # Post-install check for Python 2.5.x
 build_package_verify_py25() {
   build_package_verify_readline "$@"
