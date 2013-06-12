@@ -724,7 +724,7 @@ has_broken_mac_readline() {
   local conftest="$BUILD_PATH/has_broken_mac_readline.h"
   if [ "$(uname -s)" = "Darwin" ]; then
     echo "#include <readline/rlconf.h>" > "$conftest"
-    cpp $CFLAGS $CPPFLAGS $LDFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
+    "${CPP:-cpp}" $CFLAGS $CPPFLAGS $LDFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
     rm -f "$conftest"
   fi
   return "$retval"
