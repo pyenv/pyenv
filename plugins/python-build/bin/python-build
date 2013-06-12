@@ -690,8 +690,8 @@ verify_gcc() {
 
 has_broken_mac_openssl() {
   [ "$(uname -s)" = "Darwin" ] &&
-  [ "$(openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8r 8 Feb 2011" ] &&
-  [[ "$PYTHON_CONFIGURE_OPTS" != *--with-openssl-dir=* ]]
+  [ "$(openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8r 8 Feb 2011" ] #&&
+# [[ "$PYTHON_CONFIGURE_OPTS" != *--with-openssl-dir=* ]] # The "--with-*-dir=" style arguments are only effective for mkmf.rb
 }
 
 build_package_mac_openssl() {
