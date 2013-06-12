@@ -631,12 +631,6 @@ require_gcc() {
       echo "find a suitable \`gcc\` executable on your system. Please install GCC"
       echo "and try again."
       echo
-
-      if [ "$(uname -s)" = "Darwin" ]; then
-        echo "${esc}[1mDETAILS${esc}[0m: Apple no longer includes the official GCC compiler with Xcode"
-        echo "as of version 4.2. Instead, the \`gcc\` executable is a symlink to"
-        echo "\`llvm-gcc\`, a modified version of GCC which outputs LLVM bytecode."
-      fi
     } >&3
     return 1
   fi
