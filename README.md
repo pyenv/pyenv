@@ -38,6 +38,7 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 * [Installation](#installation)
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
+    * [Homebrew on Mac OS X](#homebrew-on-mac-os-x)
     * [Neckbeard Configuration](#neckbeard-configuration)
     * [Uninstalling Python Versions](#uninstalling-python-versions)
 * [Command Reference](#command-reference)
@@ -137,6 +138,9 @@ Version names to pyenv are simply the names of the directories in
 
 ## Installation
 
+If you're on Mac OS X, consider
+[installing with Homebrew](#homebrew-on-mac-os-x).
+
 ### Basic GitHub Checkout
 
 This will get you going with the latest version of pyenv and make it
@@ -197,6 +201,23 @@ tag:
     $ git tag
     v0.1.0
     $ git checkout v0.1.0
+
+### Homebrew on Mac OS X
+
+You can also install pyenv using the
+[Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS
+X.
+
+~~
+$ brew update
+$ brew install pyenv
+~~
+
+To later update these installs, use `upgrade` instead of `install`.
+
+Afterwards you'll still need to add `eval "$(pyenv init -)"` to your
+profile as stated in the caveats. You'll only ever have to do this
+once.
 
 ### Neckbeard Configuration
 
