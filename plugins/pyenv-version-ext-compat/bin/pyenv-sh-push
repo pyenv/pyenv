@@ -7,6 +7,8 @@ IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name))
 versions=("$@")
 PYENV_VERSION_NAMES=("${PYENV_VERSION_NAMES[@]}" "${versions[@]}")
 
+echo "WARNING: The \`push' command will be removed from pyenv. Please install https://github.com/yyuu/pyenv-version-ext." 1>&2
+
 if [ -n "$PYENV_VERSION" ]; then
   IFS=: PYENV_VERSION="${PYENV_VERSION_NAMES[*]}"
   echo "export PYENV_VERSION=\"${PYENV_VERSION}\""
