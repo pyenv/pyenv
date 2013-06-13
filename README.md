@@ -425,23 +425,8 @@ tracker](https://github.com/yyuu/pyenv/issues).
 
 ### Version History
 
-**0.2.0** (February 18, 2013)
+See CHANGELOG.md.
 
-* Import changes from rbenv 0.4.0.
-
-**0.1.2** (October 23, 2012)
-
-* Add push/pop for version stack management.
-* Support multiple versions via environment variable.
-* Now GCC is not a requirement to build CPython and Stackless.
-
-**0.1.1** (September 3, 2012)
-
-* Support multiple versions of Python at a time.
-
-**0.1.0** (August 31, 2012)
-
-* Initial public release.
 
 ### License
 
