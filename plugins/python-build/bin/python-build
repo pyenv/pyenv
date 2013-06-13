@@ -631,12 +631,6 @@ require_gcc() {
       echo "find a suitable \`gcc\` executable on your system. Please install GCC"
       echo "and try again."
       echo
-
-      if [ "$(uname -s)" = "Darwin" ]; then
-        echo "${esc}[1mDETAILS${esc}[0m: Apple no longer includes the official GCC compiler with Xcode"
-        echo "as of version 4.2. Instead, the \`gcc\` executable is a symlink to"
-        echo "\`llvm-gcc\`, a modified version of GCC which outputs LLVM bytecode."
-      fi
     } >&3
     return 1
   fi
@@ -690,8 +684,8 @@ verify_gcc() {
 
 has_broken_mac_openssl() {
   [ "$(uname -s)" = "Darwin" ] &&
-  [ "$(openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8r 8 Feb 2011" ] &&
-  [[ "$PYTHON_CONFIGURE_OPTS" != *--with-openssl-dir=* ]]
+  [ "$(openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8r 8 Feb 2011" ] #&&
+# [[ "$PYTHON_CONFIGURE_OPTS" != *--with-openssl-dir=* ]] # The "--with-*-dir=" style arguments are only effective for mkmf.rb
 }
 
 build_package_mac_openssl() {
@@ -721,6 +715,19 @@ build_package_mac_openssl() {
   local pem_file="$OPENSSLDIR/cert.pem"
   security find-certificate -a -p /Library/Keychains/System.keychain > "$pem_file"
   security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> "$pem_file"
+}
+
+has_broken_mac_readline() {
+  # MacOSX 10.4 has a broken readline.
+  # https://github.com/yyuu/pyenv/issues/23
+  local retval=1
+  local conftest="$BUILD_PATH/has_broken_mac_readline.h"
+  if [ "$(uname -s)" = "Darwin" ]; then
+    echo "#include <readline/rlconf.h>" > "$conftest"
+    "${CPP:-cpp}" $CFLAGS $CPPFLAGS $LDFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
+    rm -f "$conftest"
+  fi
+  return "$retval"
 }
 
 # Post-install check for Python 2.5.x
