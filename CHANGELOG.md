@@ -1,6 +1,6 @@
 ## Version History
 
-#### 0.4.0-201306XX
+#### 0.4.0-20130613
 
 * pyenv: Changed versioning schema. There are two parts; the former is the base rbenv version, and the latter is the date of release.
 * python-build: Add `--debug` option to build CPython with debug symbols. (#11)
