@@ -6,7 +6,7 @@ versions.
 
 (NOTICE:
 This project has been moved out as external plugin of pyenv.
-The pyenv-version-ext-compat has left for backward compatibility, but will be removed from future release of pyenv.
+The version-ext-compat has left for backward compatibility, but will be removed from future release of pyenv.
 See also [pyenv-version-ext](https://github.com/yyuu/pyenv-version-ext).)
 
 ## Installation
