@@ -5,6 +5,8 @@ set -e
 
 IFS=: versions=($(pyenv-version-name))
 
+echo "WARNING: The \`pop' command will be removed from pyenv. Please install https://github.com/yyuu/pyenv-version-ext." 1>&2
+
 length="${#versions[@]}"
 PYENV_VERSION_NAMES=()
 for ((i=0; i<length-1; i++)); do

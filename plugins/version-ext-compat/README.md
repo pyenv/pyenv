@@ -4,13 +4,24 @@ pyenv-version-ext is a [pyenv](https://github.com/yyuu/pyenv) plugin
 that provides a `pyenv push` and `pyenv pop` commands to manage Python
 versions.
 
+(NOTICE:
+This project has been moved out as external plugin of pyenv.
+The version-ext-compat has left for backward compatibility, but will be removed from future release of pyenv.
+See also [pyenv-version-ext](https://github.com/yyuu/pyenv-version-ext).)
+
 ## Installation
 
-### Installing as an pyenv plugin (recommended)
+### Installing as an pyenv plugin
 
-You need nothing to do since python-build is bundled with pyenv by
-default.
+Installing pyenv-version-ext as a pyenv plugin will give you access to the
+`pyenv push` and `pyenv pop` commands.
 
+    $ git clone git://github.com/yyuu/pyenv-version-ext.git ~/.pyenv/plugins/pyenv-version-ext
+
+This will install the latest development version of pyenv-version-ext into
+the `~/.pyenv/plugins/pyenv-version-ext` directory. From that directory, you
+can check out a specific release tag. To update pyenv-version-ext, run `git
+pull` to download the latest changes.
 
 ## Usage
 
