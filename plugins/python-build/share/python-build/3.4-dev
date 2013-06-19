@@ -1,7 +1,7 @@
 # Python 3.4 requires "python3.4" to be executable if it is in ${PATH}.
 if ! pyenv-which python3.4 1>/dev/null 2>&1; then
   if pyenv-whence python3.4 1>/dev/null 2>&1; then
-    export PYENV_VERSION="$(pyenv-whence python3.4 2>/dev/null | tail -1)"
+    export PYENV_VERSION="$(pyenv-version-name):$(pyenv-whence python3.4 2>/dev/null | tail -1)"
   fi
 fi
 
