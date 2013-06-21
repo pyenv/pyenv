@@ -10,13 +10,13 @@ set -e
 if [ "$1" = "--bare" ]; then
   hit_prefix=""
   miss_prefix=""
-  IFS=: current_versions=()
+  current_versions=()
   version_origin=""
   include_system=""
 else
   hit_prefix="* "
   miss_prefix="  "
-  IFS=: current_versions=($(pyenv-version-name || true))
+  current_versions=($(IFS=:; for version in $(pyenv-version-name); do echo "$version"; done || true))
   version_origin=" (set by $(pyenv-version-origin))"
   include_system="1"
 fi
