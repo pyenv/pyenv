@@ -622,30 +622,48 @@ fix_directory_permissions() {
 }
 
 require_gcc() {
-  local gcc="$(locate_gcc || true)"
+  require_cc "gcc"
+}
 
-  if [ -z "$gcc" ]; then
+require_cc() {
+  local cc ccname
+  for ccname in "$@"; do
+    cc="$(locate_cc "$ccname" || true)"
+    if [ -n "$cc" ]; then
+      break
+    fi
+  done
+
+  if [ -z "$cc" ]; then
     local esc=$'\033'
     { echo
-      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with GCC, but python-build couldn't"
-      echo "find a suitable \`gcc\` executable on your system. Please install GCC"
+      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with $@, but python-build couldn't"
+      echo "find a suitable \`cc\` executable on your system. Please install $@"
       echo "and try again."
       echo
     } >&3
     return 1
   fi
-
-  export CC="$gcc"
-}
+ 
+  export CC="$cc"
+} 
 
 locate_gcc() {
-  local gcc gccs
-  IFS=: gccs=($(gccs_in_path))
+  locate_cc "gcc" "$@"
+}
 
-  verify_gcc "$CC" ||
-  verify_gcc "$(command -v gcc || true)" || {
-    for gcc in "${gccs[@]}"; do
-      verify_gcc "$gcc" && break || true
+locate_cc() {
+  local ccname="$1"; shift
+  if [ -z "$ccname" ]; then
+    return 1
+  fi
+  local cc ccs
+  IFS=: ccs=($(ccs_in_path "${ccname}"))
+
+  verify_cc "${ccname}" "$CC" ||
+  verify_cc "${ccname}" "$(command -v "${ccname}" || true)" || {
+    for cc in "${ccs[@]}"; do
+      verify_cc "${ccname}" "$cc" && break || true
     done
   }
 
@@ -653,33 +671,49 @@ locate_gcc() {
 }
 
 gccs_in_path() {
-  local gcc path paths
-  local gccs=()
+  ccs_in_path "$gcc" "$@"
+}
+
+ccs_in_path() {
+  local ccname="$1"; shift
+  if [ -z "$ccname" ]; then
+    return 1
+  fi
+  local cc path paths
+  local ccs=()
   IFS=: paths=($PATH)
 
   shopt -s nullglob
   for path in "${paths[@]}"; do
-    for gcc in "$path"/gcc-*; do
-      gccs["${#gccs[@]}"]="$gcc"
+    for cc in "$path"/${ccname}-*; do
+      ccs["${#ccs[@]}"]="$cc"
     done
   done
   shopt -u nullglob
 
-  printf :%s "${gccs[@]}"
+  printf :%s "${ccs[@]}"
 }
 
 verify_gcc() {
-  local gcc="$1"
-  if [ -z "$gcc" ]; then
+  verify_cc "gcc" "$@"
+}
+
+verify_cc() {
+  local ccname="$1"; shift
+  if [ -z "$ccname" ]; then
+    return 1
+  fi
+  local cc="$1"
+  if [ -z "$cc" ]; then
     return 1
   fi
 
-  local version="$("$gcc" --version || true)"
+  local version="$("$cc" --version || true)"
   if [ -z "$version" ]; then
     return 1
   fi
 
-  echo "$gcc"
+  echo "$cc"
 }
 
 has_broken_mac_openssl() {
