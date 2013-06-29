@@ -626,19 +626,27 @@ require_gcc() {
 }
 
 require_cc() {
-  local cc ccname
-  for ccname in "$@"; do
-    cc="$(locate_cc "$ccname" || true)"
-    if [ -n "$cc" ]; then
+  while [ -n "$1" ]; do
+    if [ "$1" = "--if" ]; then
+      "$2" || return 0
+      shift 2
+    else
       break
     fi
   done
 
+  local cc
+  local ccname="${1:-cc}"
+  cc="$(locate_cc "$ccname" || true)"
+  if [ -n "$cc" ]; then
+    break
+  fi
+
   if [ -z "$cc" ]; then
     local esc=$'\033'
     { echo
-      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with $@, but python-build couldn't"
-      echo "find a suitable \`cc\` executable on your system. Please install $@"
+      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with $ccname, but python-build couldn't"
+      echo "find a suitable \`cc\` executable on your system. Please install $ccname"
       echo "and try again."
       echo
     } >&3
@@ -671,7 +679,7 @@ locate_cc() {
 }
 
 gccs_in_path() {
-  ccs_in_path "$gcc" "$@"
+  ccs_in_path "gcc" "$@"
 }
 
 ccs_in_path() {
@@ -762,6 +770,11 @@ has_broken_mac_readline() {
     rm -f "$conftest"
   fi
   return "$retval"
+}
+
+has_broken_mac_gcc_llvm() {
+  [ "$(uname -s)" = "Darwin" ] &&
+  [ "$(gcc --version 2>/dev/null || true)" = "llvm-gcc-4.2" ]
 }
 
 # Post-install check for Python 2.5.x
