@@ -638,9 +638,6 @@ require_cc() {
   local cc
   local ccname="${1:-cc}"
   cc="$(locate_cc "$ccname" || true)"
-  if [ -n "$cc" ]; then
-    break
-  fi
 
   if [ -z "$cc" ]; then
     local esc=$'\033'
