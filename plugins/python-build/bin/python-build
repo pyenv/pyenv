@@ -771,7 +771,7 @@ has_broken_mac_readline() {
 
 has_broken_mac_llvm_gcc() {
   [ "$(uname -s)" = "Darwin" ] &&
-  [ "$(gcc --version 2>/dev/null || true)" = "llvm-gcc-4.2" ]
+  [[ "$(gcc --version 2>/dev/null || true)" == *"llvm-gcc-4.2"* ]]
 }
 
 # Post-install check for Python 2.5.x
