@@ -1,0 +1,271 @@
+diff -r -u ./Include/pymactoolbox.h ../Python-2.5/Include/pymactoolbox.h
+--- ./Include/pymactoolbox.h	2004-11-05 16:02:59.000000000 +0900
++++ ../Python-2.5/Include/pymactoolbox.h	2013-07-17 23:38:51.000000000 +0900
+@@ -8,7 +8,10 @@
+ #endif
+ 
+ #include <Carbon/Carbon.h>
++
++#ifndef __LP64__
+ #include <QuickTime/QuickTime.h>
++#endif /* !__LP64__ */
+ 
+ /*
+ ** Helper routines for error codes and such.
+@@ -18,8 +21,11 @@
+ PyObject *PyMac_GetOSErrException(void);	/* Initialize & return it */
+ PyObject *PyErr_Mac(PyObject *, int);		/* Exception with a mac error */
+ PyObject *PyMac_Error(OSErr);			/* Uses PyMac_GetOSErrException */
++#ifndef __LP64__ 
+ extern OSErr PyMac_GetFullPathname(FSSpec *, char *, int); /* convert
+ 							      fsspec->path */
++#endif /* __LP64__ */
++
+ /*
+ ** These conversion routines are defined in mactoolboxglue.c itself.
+ */
+@@ -83,8 +89,10 @@
+ #endif /* USE_TOOLBOX_OBJECT_GLUE */
+ 
+ /* macfs exports */
++#ifndef __LP64__
+ int PyMac_GetFSSpec(PyObject *, FSSpec *);	/* argument parser for FSSpec */
+ PyObject *PyMac_BuildFSSpec(FSSpec *);		/* Convert FSSpec to PyObject */
++#endif /* !__LP64__ */
+ 
+ int PyMac_GetFSRef(PyObject *, FSRef *);	/* argument parser for FSRef */
+ PyObject *PyMac_BuildFSRef(FSRef *);		/* Convert FSRef to PyObject */
+@@ -101,39 +109,54 @@
+ extern int CmpInstObj_Convert(PyObject *, ComponentInstance *);
+ 
+ /* Ctl exports */
++#ifndef __LP64__
+ extern PyObject *CtlObj_New(ControlHandle);
+ extern int CtlObj_Convert(PyObject *, ControlHandle *);
++#endif /* !__LP64__ */
+ 
+ /* Dlg exports */
++#ifndef __LP64__
+ extern PyObject *DlgObj_New(DialogPtr);
+ extern int DlgObj_Convert(PyObject *, DialogPtr *);
+ extern PyObject *DlgObj_WhichDialog(DialogPtr);
++#endif /* !__LP64__ */
+ 
+ /* Drag exports */
++#ifndef __LP64__
+ extern PyObject *DragObj_New(DragReference);
+ extern int DragObj_Convert(PyObject *, DragReference *);
++#endif /* !__LP64__ */
+ 
+ /* List exports */
++#ifndef __LP64__
+ extern PyObject *ListObj_New(ListHandle);
+ extern int ListObj_Convert(PyObject *, ListHandle *);
++#endif /* !__LP64__ */
+ 
+ /* Menu exports */
++#ifndef __LP64__
+ extern PyObject *MenuObj_New(MenuHandle);
+ extern int MenuObj_Convert(PyObject *, MenuHandle *);
++#endif /* !__LP64__ */
+ 
+ /* Qd exports */
++#ifndef __LP64__
+ extern PyObject *GrafObj_New(GrafPtr);
+ extern int GrafObj_Convert(PyObject *, GrafPtr *);
+ extern PyObject *BMObj_New(BitMapPtr);
+ extern int BMObj_Convert(PyObject *, BitMapPtr *);
+ extern PyObject *QdRGB_New(RGBColor *);
+ extern int QdRGB_Convert(PyObject *, RGBColor *);
++#endif /* !__LP64__ */
+ 
+ /* Qdoffs exports */
++#ifndef __LP64__
+ extern PyObject *GWorldObj_New(GWorldPtr);
+ extern int GWorldObj_Convert(PyObject *, GWorldPtr *);
++#endif /* !__LP64__ */
+ 
+ /* Qt exports */
++#ifndef __LP64__
+ extern PyObject *TrackObj_New(Track);
+ extern int TrackObj_Convert(PyObject *, Track *);
+ extern PyObject *MovieObj_New(Movie);
+@@ -146,6 +169,7 @@
+ extern int UserDataObj_Convert(PyObject *, UserData *);
+ extern PyObject *MediaObj_New(Media);
+ extern int MediaObj_Convert(PyObject *, Media *);
++#endif /* !__LP64__ */
+ 
+ /* Res exports */
+ extern PyObject *ResObj_New(Handle);
+@@ -154,13 +178,17 @@
+ extern int OptResObj_Convert(PyObject *, Handle *);
+ 
+ /* TE exports */
++#ifndef __LP64__
+ extern PyObject *TEObj_New(TEHandle);
+ extern int TEObj_Convert(PyObject *, TEHandle *);
++#endif /* !__LP64__ */
+ 
+ /* Win exports */
++#ifndef __LP64__
+ extern PyObject *WinObj_New(WindowPtr);
+ extern int WinObj_Convert(PyObject *, WindowPtr *);
+ extern PyObject *WinObj_WhichWindow(WindowPtr);
++#endif /* !__LP64__ */
+ 
+ /* CF exports */
+ extern PyObject *CFObj_New(CFTypeRef);
+diff -r -u ./Mac/Modules/res/_Resmodule.c ../Python-2.5/Mac/Modules/res/_Resmodule.c
+--- ./Mac/Modules/res/_Resmodule.c	2005-07-04 05:59:44.000000000 +0900
++++ ../Python-2.5/Mac/Modules/res/_Resmodule.c	2013-07-17 23:38:51.000000000 +0900
+@@ -414,6 +414,7 @@
+ 	return _res;
+ }
+ 
++#ifndef __LP64__
+ static PyObject *ResObj_as_Control(ResourceObject *_self, PyObject *_args)
+ {
+ 	PyObject *_res = NULL;
+@@ -431,6 +432,7 @@
+ 	return _res;
+ 
+ }
++#endif /* !__LP64__ */
+ 
+ static PyObject *ResObj_LoadResource(ResourceObject *_self, PyObject *_args)
+ {
+@@ -1152,6 +1154,7 @@
+ 	return _res;
+ }
+ 
++#ifndef __LP64__
+ static PyObject *Res_OpenRFPerm(PyObject *_self, PyObject *_args)
+ {
+ 	PyObject *_res = NULL;
+@@ -1287,6 +1290,7 @@
+ 	_res = Py_None;
+ 	return _res;
+ }
++#endif /* !__LP64__ */
+ 
+ static PyObject *Res_InsertResourceFile(PyObject *_self, PyObject *_args)
+ {
+@@ -1327,6 +1331,7 @@
+ 	return _res;
+ }
+ 
++#ifndef __LP64__
+ static PyObject *Res_FSpResourceFileAlreadyOpen(PyObject *_self, PyObject *_args)
+ {
+ 	PyObject *_res = NULL;
+@@ -1413,6 +1418,7 @@
+ 	                     nextRefNum);
+ 	return _res;
+ }
++#endif /* !__LP64__ */
+ 
+ static PyObject *Res_FSOpenResFile(PyObject *_self, PyObject *_args)
+ {
+@@ -1438,6 +1444,7 @@
+ 	return _res;
+ }
+ 
++#ifndef __LP64__
+ static PyObject *Res_FSCreateResFile(PyObject *_self, PyObject *_args)
+ {
+ 	PyObject *_res = NULL;
+@@ -1534,6 +1541,7 @@
+ 	                     PyMac_BuildFSSpec, &newSpec);
+ 	return _res;
+ }
++#endif /* __LP64__ */
+ 
+ static PyObject *Res_FSOpenResourceFile(PyObject *_self, PyObject *_args)
+ {
+@@ -1637,6 +1645,7 @@
+ 	 PyDoc_STR("(short refNum) -> (short _rv)")},
+ 	{"SetResFileAttrs", (PyCFunction)Res_SetResFileAttrs, 1,
+ 	 PyDoc_STR("(short refNum, short attrs) -> None")},
++#ifndef __LP64__
+ 	{"OpenRFPerm", (PyCFunction)Res_OpenRFPerm, 1,
+ 	 PyDoc_STR("(Str255 fileName, short vRefNum, SignedByte permission) -> (short _rv)")},
+ 	{"HOpenResFile", (PyCFunction)Res_HOpenResFile, 1,
+@@ -1647,10 +1656,12 @@
+ 	 PyDoc_STR("(FSSpec spec, SignedByte permission) -> (short _rv)")},
+ 	{"FSpCreateResFile", (PyCFunction)Res_FSpCreateResFile, 1,
+ 	 PyDoc_STR("(FSSpec spec, OSType creator, OSType fileType, ScriptCode scriptTag) -> None")},
++#endif /* !__LP64__ */
+ 	{"InsertResourceFile", (PyCFunction)Res_InsertResourceFile, 1,
+ 	 PyDoc_STR("(SInt16 refNum, RsrcChainLocation where) -> None")},
+ 	{"DetachResourceFile", (PyCFunction)Res_DetachResourceFile, 1,
+ 	 PyDoc_STR("(SInt16 refNum) -> None")},
++#ifndef __LP64__
+ 	{"FSpResourceFileAlreadyOpen", (PyCFunction)Res_FSpResourceFileAlreadyOpen, 1,
+ 	 PyDoc_STR("(FSSpec resourceFile) -> (Boolean _rv, Boolean inChain, SInt16 refNum)")},
+ 	{"FSpOpenOrphanResFile", (PyCFunction)Res_FSpOpenOrphanResFile, 1,
+@@ -1659,14 +1670,17 @@
+ 	 PyDoc_STR("() -> (SInt16 refNum)")},
+ 	{"GetNextResourceFile", (PyCFunction)Res_GetNextResourceFile, 1,
+ 	 PyDoc_STR("(SInt16 curRefNum) -> (SInt16 nextRefNum)")},
++#endif /* __LP64__ */
+ 	{"FSOpenResFile", (PyCFunction)Res_FSOpenResFile, 1,
+ 	 PyDoc_STR("(FSRef ref, SignedByte permission) -> (short _rv)")},
++#ifndef __LP64__
+ 	{"FSCreateResFile", (PyCFunction)Res_FSCreateResFile, 1,
+ 	 PyDoc_STR("(FSRef parentRef, Buffer nameLength) -> (FSRef newRef, FSSpec newSpec)")},
+ 	{"FSResourceFileAlreadyOpen", (PyCFunction)Res_FSResourceFileAlreadyOpen, 1,
+ 	 PyDoc_STR("(FSRef resourceFileRef) -> (Boolean _rv, Boolean inChain, SInt16 refNum)")},
+ 	{"FSCreateResourceFile", (PyCFunction)Res_FSCreateResourceFile, 1,
+ 	 PyDoc_STR("(FSRef parentRef, Buffer nameLength, Buffer forkNameLength) -> (FSRef newRef, FSSpec newSpec)")},
++#endif /* __LP64__ */
+ 	{"FSOpenResourceFile", (PyCFunction)Res_FSOpenResourceFile, 1,
+ 	 PyDoc_STR("(FSRef ref, Buffer forkNameLength, SignedByte permissions) -> (SInt16 refNum)")},
+ 	{"Handle", (PyCFunction)Res_Handle, 1,
+diff -r -u ./Modules/_ctypes/libffi/src/darwin/ffitarget.h ../Python-2.5/Modules/_ctypes/libffi/src/darwin/ffitarget.h
+--- ./Modules/_ctypes/libffi/src/darwin/ffitarget.h	2006-05-26 06:58:05.000000000 +0900
++++ ../Python-2.5/Modules/_ctypes/libffi/src/darwin/ffitarget.h	2013-07-17 23:38:51.000000000 +0900
+@@ -4,7 +4,7 @@
+  * created by configure). This makes is possible to build a univeral binary
+  * of ctypes in one go.
+  */
+-#if defined(__i386__)
++#if defined(__i386__) || defined(__x86_64__)
+ 
+ #ifndef X86_DARWIN
+ #define X86_DARWIN
+diff -r -u ./Python/mactoolboxglue.c ../Python-2.5/Python/mactoolboxglue.c
+--- ./Python/mactoolboxglue.c	2006-07-12 01:44:25.000000000 +0900
++++ ../Python-2.5/Python/mactoolboxglue.c	2013-07-17 23:39:09.000000000 +0900
+@@ -106,6 +106,7 @@
+ }
+ 
+ 
++#ifndef __LP64__
+ OSErr
+ PyMac_GetFullPathname(FSSpec *fss, char *path, int len)
+ {
+@@ -153,6 +154,7 @@
+ 	Py_XDECREF(fs);
+ 	return err;
+ }
++#endif /* !__LP64__ */
+ 
+ /* Convert a 4-char string object argument to an OSType value */
+ int
+@@ -417,6 +419,7 @@
+ GLUE_NEW(GWorldPtr, GWorldObj_New, "Carbon.Qdoffs")
+ GLUE_CONVERT(GWorldPtr, GWorldObj_Convert, "Carbon.Qdoffs")
+ 
++#ifndef __LP64__
+ GLUE_NEW(Track, TrackObj_New, "Carbon.Qt")
+ GLUE_CONVERT(Track, TrackObj_Convert, "Carbon.Qt")
+ GLUE_NEW(Movie, MovieObj_New, "Carbon.Qt")
+@@ -429,6 +432,7 @@
+ GLUE_CONVERT(UserData, UserDataObj_Convert, "Carbon.Qt")
+ GLUE_NEW(Media, MediaObj_New, "Carbon.Qt")
+ GLUE_CONVERT(Media, MediaObj_Convert, "Carbon.Qt")
++#endif /* !__LP64__ */
+ 
+ GLUE_NEW(Handle, ResObj_New, "Carbon.Res")
+ GLUE_CONVERT(Handle, ResObj_Convert, "Carbon.Res")

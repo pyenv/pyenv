@@ -1,0 +1,166 @@
+diff -r -u ./configure ../Python-2.5/configure
+--- ./configure	2006-09-05 11:54:42.000000000 +0900
++++ ../Python-2.5/configure	2013-07-19 15:27:46.000000000 +0900
+@@ -1396,6 +1396,16 @@
+ _ACEOF
+ 
+ 
++# The later defininition of _XOPEN_SOURCE and _POSIX_C_SOURCE disables
++# certain features on Mac OS X, so we need _DARWIN_C_SOURCE to re-enable
++# them.
++
++cat >>confdefs.h <<\_ACEOF
++#define _DARWIN_C_SOURCE 1
++_ACEOF
++
++
++
+ define_xopen_source=yes
+ 
+ # Arguments passed to configure.
+@@ -3885,11 +3895,110 @@
+ 	    ;;
+ 	# is there any other compiler on Darwin besides gcc?
+ 	Darwin*)
+-	    BASECFLAGS="$BASECFLAGS -Wno-long-double -no-cpp-precomp -mno-fused-madd"
++	    # -Wno-long-double, -no-cpp-precomp, and -mno-fused-madd
++	    # used to be here, but non-Apple gcc doesn't accept them.
++            if test "${CC}" = gcc
++	    then
++		{ echo "$as_me:${as_lineno-$LINENO}: checking which compiler should be used" >&5
++echo -n "checking which compiler should be used... " >&6; }
++		case "${UNIVERSALSDK}" in
++		*/MacOSX10.4u.sdk)
++			# Build using 10.4 SDK, force usage of gcc when the
++			# compiler is gcc, otherwise the user will get very
++			# confusing error messages when building on OSX 10.6
++			CC=gcc-4.0
++			CPP=cpp-4.0
++			;;
++		esac
++		{ echo "$as_me:${as_lineno-$LINENO}: result: $CC" >&5
++echo "$CC" >&6; }
++	    fi
++
++
+ 	    if test "${enable_universalsdk}"; then
+-		BASECFLAGS="-arch ppc -arch i386 -isysroot ${UNIVERSALSDK} ${BASECFLAGS}"
++		UNIVERSAL_ARCH_FLAGS=""
++	        if test "$UNIVERSAL_ARCHS" = "32-bit" ; then
++		   UNIVERSAL_ARCH_FLAGS="-arch ppc -arch i386"
++		   ARCH_RUN_32BIT=""
++		   LIPO_32BIT_FLAGS=""
++	         elif test "$UNIVERSAL_ARCHS" = "64-bit" ; then
++		   UNIVERSAL_ARCH_FLAGS="-arch ppc64 -arch x86_64"
++		   LIPO_32BIT_FLAGS=""
++		   ARCH_RUN_32BIT="true"
++
++	         elif test "$UNIVERSAL_ARCHS" = "all" ; then
++		   UNIVERSAL_ARCH_FLAGS="-arch i386 -arch ppc -arch ppc64 -arch x86_64"
++		   LIPO_32BIT_FLAGS="-extract ppc7400 -extract i386"
++		   ARCH_RUN_32BIT="/usr/bin/arch -i386 -ppc"
++
++	         elif test "$UNIVERSAL_ARCHS" = "intel" ; then
++		   UNIVERSAL_ARCH_FLAGS="-arch i386 -arch x86_64"
++		   LIPO_32BIT_FLAGS="-extract i386"
++		   ARCH_RUN_32BIT="/usr/bin/arch -i386"
++
++	         elif test "$UNIVERSAL_ARCHS" = "3-way" ; then
++		   UNIVERSAL_ARCH_FLAGS="-arch i386 -arch ppc -arch x86_64"
++		   LIPO_32BIT_FLAGS="-extract ppc7400 -extract i386"
++		   ARCH_RUN_32BIT="/usr/bin/arch -i386 -ppc"
++
++		 else
++	           as_fn_error $? "proper usage is --with-universal-arch=32-bit|64-bit|all|intel|3-way" "$LINENO" 5
++
++		 fi
++
++
++		CFLAGS="${UNIVERSAL_ARCH_FLAGS} -isysroot ${UNIVERSALSDK} ${CFLAGS}"
++		if test "${UNIVERSALSDK}" != "/"
++		then
++			CFLAGS="-isysroot ${UNIVERSALSDK} ${CFLAGS}"
++			LDFLAGS="-isysroot ${UNIVERSALSDK} ${LDFLAGS}"
++			CPPFLAGS="-isysroot ${UNIVERSALSDK} ${CPPFLAGS}"
++		fi
+ 	    fi
+ 
++	    # Calculate the right deployment target for this build.
++	    #
++	    cur_target=`sw_vers -productVersion | sed 's/\(10\.[0-9]*\).*/\1/'`
++	    if test ${cur_target} '>' 10.2 && \
++	       test ${cur_target} '<' 10.6
++	    then
++		    cur_target=10.3
++		    if test ${enable_universalsdk}; then
++			    if test "${UNIVERSAL_ARCHS}" = "all"; then
++				    # Ensure that the default platform for a
++				    # 4-way universal build is OSX 10.5,
++				    # that's the first OS release where
++				    # 4-way builds make sense.
++				    cur_target='10.5'
++
++			    elif test "${UNIVERSAL_ARCHS}" = "3-way"; then
++				    cur_target='10.5'
++
++			    elif test "${UNIVERSAL_ARCHS}" = "intel"; then
++				    cur_target='10.5'
++
++			    elif test "${UNIVERSAL_ARCHS}" = "64-bit"; then
++				    cur_target='10.5'
++			    fi
++		    else
++			    if test `/usr/bin/arch` = "i386"; then
++				    # On Intel macs default to a deployment
++				    # target of 10.4, that's the first OSX
++				    # release with Intel support.
++				    cur_target="10.4"
++			    fi
++		    fi
++	    fi
++	    CONFIGURE_MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET-${cur_target}}
++
++	    # Make sure that MACOSX_DEPLOYMENT_TARGET is set in the
++	    # environment with a value that is the same as what we'll use
++	    # in the Makefile to ensure that we'll get the same compiler
++	    # environment during configure and build time.
++	    MACOSX_DEPLOYMENT_TARGET="$CONFIGURE_MACOSX_DEPLOYMENT_TARGET"
++	    export MACOSX_DEPLOYMENT_TARGET
++	    EXPORT_MACOSX_DEPLOYMENT_TARGET=''
++
+ 	    ;;
+ 	OSF*)
+ 	    BASECFLAGS="$BASECFLAGS -mieee"
+@@ -10851,7 +10960,7 @@
+     if test "${enable_universalsdk}"; then
+ 	    :
+     else
+-	LIBTOOL_CRUFT="${LIBTOOL_CRUFT} -arch_only `arch`"
++	LIBTOOL_CRUFT="${LIBTOOL_CRUFT}"
+     fi
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -install_name $(PYTHONFRAMEWORKINSTALLDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK)'
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -compatibility_version $(VERSION) -current_version $(VERSION)';;
+@@ -10863,7 +10972,7 @@
+         else
+             LIBTOOL_CRUFT=""
+     fi
+-    LIBTOOL_CRUFT=$LIBTOOL_CRUFT" -lSystem -lSystemStubs -arch_only `arch`"
++    LIBTOOL_CRUFT=$LIBTOOL_CRUFT" -lSystem -lSystemStubs"
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -install_name $(PYTHONFRAMEWORKINSTALLDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK)'
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -compatibility_version $(VERSION) -current_version $(VERSION)';;
+ esac
+diff -r -u ./pyconfig.h.in ../Python-2.5/pyconfig.h.in
+--- ./pyconfig.h.in	2006-07-30 23:09:47.000000000 +0900
++++ ../Python-2.5/pyconfig.h.in	2013-07-17 23:12:31.000000000 +0900
+@@ -912,6 +912,11 @@
+ /* Define on Irix to enable u_int */
+ #undef _BSD_TYPES
+ 
++/* Define on Darwin to activate all library features */
++#ifndef _DARWIN_C_SOURCE
++#define _DARWIN_C_SOURCE
++#endif
++
+ /* This must be set to 64 on some systems to enable large file support. */
+ #undef _FILE_OFFSET_BITS
+ 
