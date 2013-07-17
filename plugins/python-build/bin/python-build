@@ -769,7 +769,7 @@ has_broken_mac_readline() {
   return "$retval"
 }
 
-has_broken_mac_gcc_llvm() {
+has_broken_mac_llvm_gcc() {
   [ "$(uname -s)" = "Darwin" ] &&
   [ "$(gcc --version 2>/dev/null || true)" = "llvm-gcc-4.2" ]
 }
