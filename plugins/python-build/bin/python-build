@@ -774,12 +774,17 @@ has_broken_mac_llvm_gcc() {
   [[ "$(gcc --version 2>/dev/null || true)" == *"llvm-gcc-4.2"* ]]
 }
 
-# Post-install check for Python 2.5.x
-build_package_verify_py25() {
+# Post-install check for Python 2.4.x
+build_package_verify_py24() {
   build_package_verify_readline "$@"
-  build_package_verify_sqlite3 "$@"
   build_package_verify_zlib "$@"
   build_package_verify_bz2 "$@"
+}
+
+# Post-install check for Python 2.5.x
+build_package_verify_py25() {
+  build_package_verify_py24 "$@"
+  build_package_verify_sqlite3 "$@"
 }
 
 # Post-install check for Python 2.6.x
