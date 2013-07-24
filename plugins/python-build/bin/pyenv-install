@@ -149,12 +149,10 @@ if [ -z "${PYTHON_BUILD_CACHE_PATH}" ] && [ -d "${PYENV_ROOT}/cache" ]; then
 fi
 
 # Default PYENV_VERSION to the globally-specified Python version. (The
-# Python 3.4 installer requires an existing Python installation to run. An
+# CPython installer requires an existing Python installation to run. An
 # unsatisfied local .python-version file can cause the installer to
 # fail.)
-#if [ -z "${PYENV_VERSION}" ]; then
-#  export PYENV_VERSION="$(pyenv global 2>/dev/null || true)"
-#fi
+#export PYENV_VERSION="$(pyenv global 2>/dev/null || true)"
 
 
 # Execute `before_install` hooks.
