@@ -225,7 +225,7 @@ $ git checkout v0.3.0
 ### Homebrew on Mac OS X
 
 You can also install rbenv using the
-[Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS
+[Homebrew](http://brew.sh) package manager on Mac OS
 X.
 
 ~~~
