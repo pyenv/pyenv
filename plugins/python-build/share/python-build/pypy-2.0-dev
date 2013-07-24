@@ -1,4 +1,4 @@
 require_gcc
 install_hg "pypy-2.0-dev" "https://bitbucket.org/pypy/pypy" "release-2.0.x" "pypy_builder" verify_py27
 install_package "setuptools-0.9.5" "https://pypi.python.org/packages/source/s/setuptools/setuptools-0.9.5.tar.gz#2461dc5378277cfae68809baf8e0ef81" python
-install_package "pip-1.3.1" "https://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz#cbb27a191cebc58997c4da8513863153" python
+install_package "pip-1.4" "https://pypi.python.org/packages/source/p/pip/pip-1.4.tar.gz#ca790be30004937987767eac42cfa44a" python
