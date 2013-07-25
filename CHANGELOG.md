@@ -1,5 +1,17 @@
 ## Version History
 
+#### 0.4.0-2013MMDD
+
+* pyenv: Fix minor issue of variable scope in `pyenv versions` 
+* python-build: Update base version to ruby-build v20130628
+* python-build: Use brew managed OpenSSL and GNU Readline if they are available
+* python-build: Fix build of CPython 3.3+ on OS X (#29)
+* python-build: Fix build of native modules of CPython 2.5 on OS X (#33)
+* python-build: Fix build of CPython 2.6+ on openSUSE (#36)
+* python-build: Add ancient versions; 2.4.2 and 2.4.6. The build might be broken. (#37)
+* python-build: Update default pip version (1.3.1 -> 1.4)
+* python-build: Update default setuptools version (0.7.2 -> 0.9.7)
+
 #### 0.4.0-20130613
 
 * pyenv: Changed versioning schema. There are two parts; the former is the base rbenv version, and the latter is the date of release.

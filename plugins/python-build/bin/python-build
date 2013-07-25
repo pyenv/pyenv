@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20130518"
+PYTHON_BUILD_VERSION="20130628"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -203,11 +203,11 @@ verify_checksum() {
   [ -e "$filename" ] || return 0
 
   # If there's no expected checksum, return success
-  local expected_checksum="$2"
+  local expected_checksum=`echo "$2" | tr [A-Z] [a-z]`
   [ -n "$expected_checksum" ] || return 0
 
   # If the computed checksum is empty, return failure
-  local computed_checksum="$(compute_md5 < "$filename")"
+  local computed_checksum=`echo "$(compute_md5 < "$filename")" | tr [A-Z] [a-z]`
   [ -n "$computed_checksum" ] || return 1
 
   if [ "$expected_checksum" != "$computed_checksum" ]; then
@@ -520,7 +520,7 @@ build_package_standard() {
     MAKE_OPTS="-j 2"
   fi
 
-  # Support PYTHON_CONFIGURE_OPTS, etc.
+  # Support YAML_CONFIGURE_OPTS, PYTHON_CONFIGURE_OPTS, etc.
   local package_var_name="$(capitalize "${package_name%%-*}")"
   local PACKAGE_CONFIGURE="${package_var_name}_CONFIGURE"
   local PACKAGE_PREFIX_PATH="${package_var_name}_PREFIX_PATH"
@@ -645,7 +645,7 @@ require_cc() {
     local esc=$'\033'
     { echo
       echo "${esc}[1mERROR${esc}[0m: This package must be compiled with $ccname, but python-build couldn't"
-      echo "find a suitable \`cc\` executable on your system. Please install $ccname"
+      echo "find a suitable \`$ccname\` executable on your system. Please install $ccname"
       echo "and try again."
       echo
     } >&3
@@ -723,10 +723,81 @@ verify_cc() {
   echo "$cc"
 }
 
+require_java() {
+  local java="$(locate_java || true)"
+
+  if [ -z "$java" ]; then
+    local esc=$'\033'
+    { echo
+      echo "${esc}[1mERROR${esc}[0m: This package must be installed with java, but python-build couldn't"
+      echo "find a suitable \`java\` executable on your system. Please install Java"
+      echo "and try again."
+      echo
+    } >&3
+    return 1
+  fi
+
+  export JAVA="$java"
+}
+
+locate_java() {
+  local java javas
+  IFS=: javas=($(javas_in_path))
+
+  verify_java "$JAVA" ||
+  verify_java "$(command -v java || true)" || {
+    for java in "${javas[@]}"; do
+      verify_java "$java" && break || true
+    done
+  }
+
+  return 1
+}
+
+javas_in_path() {
+  local java path paths
+  local javas=()
+  IFS=: paths=($PATH)
+
+  shopt -s nullglob
+  for path in "${paths[@]}"; do
+    local java="$path"/java
+    if [ -x "$java" ]; then
+      javas["${#javas[@]}"]="$java"
+    fi
+  done
+  shopt -u nullglob
+
+  printf :%s "${javas[@]}"
+}
+
+verify_java() {
+  local java="$1"
+  if [ -z "$java" ]; then
+    return 1
+  fi
+
+  if [ ! -x "$java" ]; then
+    return 1
+  fi
+
+  echo "$java"
+}
+
 has_broken_mac_openssl() {
   [ "$(uname -s)" = "Darwin" ] &&
-  [ "$(openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8r 8 Feb 2011" ] #&&
-# [[ "$PYTHON_CONFIGURE_OPTS" != *--with-openssl-dir=* ]] # The "--with-*-dir=" style arguments are only effective for mkmf.rb
+  [[ "$(openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8"?* ]] &&
+  ! use_homebrew_openssl
+}
+
+use_homebrew_openssl() {
+  local ssldir="$(brew --prefix openssl 2>/dev/null || true)"
+  if [ -d "$ssldir" ]; then
+    CPPFLAGS="-I$ssldir/include $CPPFLAGS"
+    LDFLAGS="-L$ssldir/lib $LDFLAGS"
+  else
+    return 1
+  fi
 }
 
 build_package_mac_openssl() {
@@ -759,16 +830,32 @@ build_package_mac_openssl() {
 }
 
 has_broken_mac_readline() {
+  [ "$(uname -s)" = "Darwin" ] &&
+  _has_broken_mac_readline &&
+  ! use_homebrew_readline
+}
+
+_has_broken_mac_readline() {
   # MacOSX 10.4 has a broken readline.
   # https://github.com/yyuu/pyenv/issues/23
   local retval=1
   local conftest="$BUILD_PATH/has_broken_mac_readline.h"
   if [ "$(uname -s)" = "Darwin" ]; then
     echo "#include <readline/rlconf.h>" > "$conftest"
-    "${CPP:-cpp}" $CFLAGS $CPPFLAGS $LDFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
+    "${CPP:-cpp}" $CPPFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
     rm -f "$conftest"
   fi
   return "$retval"
+}
+
+use_homebrew_readline() {
+  local rldir="$(brew --prefix readline 2>/dev/null || true)"
+  if [ -d "$rldir" ]; then
+    CPPFLAGS="-I$rldir/include $CPPFLAGS"
+    LDFLAGS="-L$rldir/lib $LDFLAGS"
+  else
+    return 1
+  fi
 }
 
 has_broken_mac_llvm_gcc() {
@@ -874,67 +961,6 @@ except ImportError:
   ' >&4 2>&1
 }
 
-require_java() {
-  local java="$(locate_java || true)"
-
-  if [ -z "$java" ]; then
-    local esc=$'\033'
-    { echo
-      echo "${esc}[1mERROR${esc}[0m: This package must be installed with java, but python-build couldn't"
-      echo "find a suitable \`java\` executable on your system. Please install Java"
-      echo "and try again."
-      echo
-    } >&3
-    return 1
-  fi
-
-  export JAVA="$java"
-}
-
-locate_java() {
-  local java javas
-  IFS=: javas=($(javas_in_path))
-
-  verify_java "$JAVA" ||
-  verify_java "$(command -v java || true)" || {
-    for java in "${javas[@]}"; do
-      verify_java "$java" && break || true
-    done
-  }
-
-  return 1
-}
-
-javas_in_path() {
-  local java path paths
-  local javas=()
-  IFS=: paths=($PATH)
-
-  shopt -s nullglob
-  for path in "${paths[@]}"; do
-    local java="$path"/java
-    if [ -x "$java" ]; then
-      javas["${#javas[@]}"]="$java"
-    fi
-  done
-  shopt -u nullglob
-
-  printf :%s "${javas[@]}"
-}
-
-verify_java() {
-  local java="$1"
-  if [ -z "$java" ]; then
-    return 1
-  fi
-
-  if [ ! -x "$java" ]; then
-    return 1
-  fi
-
-  echo "$java"
-}
-
 version() {
   echo "python-build ${PYTHON_BUILD_VERSION}"
 }
@@ -1022,6 +1048,16 @@ if [ -z "$TMPDIR" ]; then
 else
   TMP="${TMPDIR%/}"
 fi
+
+# Work around warnings building Ruby 2.0 on Clang 2.x:
+# pass -Wno-error=shorten-64-to-32 if the compiler accepts it.
+#
+# When we set CFLAGS, Ruby won't apply its default flags, though. Since clang
+# builds 1.9.x and 2.x only, where -O3 is default, we can safely set that flag.
+# Ensure it's the first flag since later flags take precedence.
+#if "${CC:-cc}" -x c /dev/null -E -Wno-error=shorten-64-to-32 &>/dev/null; then
+#  PYTHON_CFLAGS="-O3 -Wno-error=shorten-64-to-32 $PYTHON_CFLAGS"
+#fi
 
 if [ -z "$MAKE" ]; then
   export MAKE="make"
