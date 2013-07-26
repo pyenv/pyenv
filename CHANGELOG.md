@@ -1,6 +1,6 @@
 ## Version History
 
-#### 0.4.0-2013MMDD
+#### 0.4.0-20130726
 
 * pyenv: Fix minor issue of variable scope in `pyenv versions` 
 * python-build: Update base version to ruby-build v20130628
