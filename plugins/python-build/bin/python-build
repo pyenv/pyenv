@@ -867,7 +867,6 @@ has_broken_mac_llvm_gcc() {
 build_package_verify_py24() {
   build_package_verify_readline "$@"
   build_package_verify_zlib "$@"
-  build_package_verify_bz2 "$@"
 }
 
 # Post-install check for Python 2.5.x
