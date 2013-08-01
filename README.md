@@ -208,10 +208,10 @@ You can also install pyenv using the
 [Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS
 X.
 
-~~
+~~~
 $ brew update
 $ brew install pyenv
-~~
+~~~
 
 To later update these installs, use `upgrade` instead of `install`.
 
