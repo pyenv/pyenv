@@ -1,0 +1,4 @@
+require_gcc
+install_package "pypy3-2.1-beta1-src" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-src.tar.bz2#bc2013d1927dc1c0c91228e566abd8da" "pypy_builder" verify_py32
+install_package "setuptools-0.9.7" "https://pypi.python.org/packages/source/s/setuptools/setuptools-0.9.7.tar.gz#ce3bb480e4f6d71fc2fb3388f6fe8123" python
+install_package "pip-1.4" "https://pypi.python.org/packages/source/p/pip/pip-1.4.tar.gz#ca790be30004937987767eac42cfa44a" python

@@ -1,0 +1,33 @@
+case "$(uname -s)" in
+"Darwin" )
+  install_package "pypy3-2.1-beta1-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-osx64.tar.bz2#36634bf17f0e9852fda7cc6745f2df28" "pypy" verify_py32
+  ;;
+"Linux" )
+  case "$(uname -m)" in
+  "armel" )
+    install_package "pypy3-2.1-beta1-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armel.tar.bz2#d57d0d0d3c49c7cce75440924d8f66b7" "pypy" verify_py32
+  ;;
+  "armhf" )
+    install_package "pypy3-2.1-beta1-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raring.tar.bz2#55b82b199ccf537c7ea5e2f31df78dfe" "pypy" verify_py32
+  ;;
+  "i386" | "i486" | "i586" | "i686" | "i786" )
+    install_package "pypy3-2.1-beta1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux.tar.bz2#9ae9d0b67279c557fb4b7f57c3072d0f" "pypy" verify_py32
+  ;;
+  "x86_64" )
+    install_package "pypy3-2.1-beta1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux64.tar.bz2#f6adca4d26f34bef9903cc5347c7d688" "pypy" verify_py32
+  esac
+  ;;
+"CYGWIN"* | "MINGW"* )
+  # FIXME: never tested on Windows
+  install_zip "pypy3-2.1-beta1-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-win32.zip#026c8be208bf2ef742ddfa3f8ca41a05" "pypy" verify_py32
+  ;;
+* )
+  { echo "Precompiled binary of pypy3-2.1-beta1 is not available for $(uname -s)-$(uname -m)."
+    echo "To build pypy3-2.1-beta1 from soruce, use 'pypy3-2.1-beta1-src'."
+  } 1>&4 2>&1
+  false
+  ;;
+esac
+
+install_package "setuptools-0.9.7" "https://pypi.python.org/packages/source/s/setuptools/setuptools-0.9.7.tar.gz#ce3bb480e4f6d71fc2fb3388f6fe8123" python
+install_package "pip-1.4" "https://pypi.python.org/packages/source/p/pip/pip-1.4.tar.gz#ca790be30004937987767eac42cfa44a" python
