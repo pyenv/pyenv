@@ -205,7 +205,7 @@ tag:
 ### Homebrew on Mac OS X
 
 You can also install pyenv using the
-[Homebrew](http://mxcl.github.com/homebrew/) package manager on Mac OS
+[Homebrew](http://brew.sh) package manager on Mac OS
 X.
 
 ~~~
