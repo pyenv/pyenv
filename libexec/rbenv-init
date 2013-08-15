@@ -62,6 +62,9 @@ if [ -z "$print" ]; then
   ksh )
     profile='~/.profile'
     ;;
+  fish )
+    profile='~/.config/fish/config.fish'
+    ;;
   * )
     profile='your profile'
     ;;
@@ -80,7 +83,14 @@ fi
 mkdir -p "${RBENV_ROOT}/"{shims,versions}
 
 if [[ ":${PATH}:" != *:"${RBENV_ROOT}/shims":* ]]; then
-  echo 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
+  case "$shell" in
+  fish )
+    echo 'setenv PATH "'${RBENV_ROOT}'/shims"' '$PATH' ';'
+  ;;
+  * )
+    echo 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
+  ;;
+  esac
 fi
 
 completion="${root}/completions/rbenv.${shell}"
@@ -91,8 +101,27 @@ if [ -z "$no_rehash" ]; then
 fi
 
 commands=(`rbenv-commands --sh`)
-IFS="|"
-cat <<EOS
+case "$shell" in
+fish )
+  cat <<EOS
+function rbenv
+  set command \$argv[1]
+  if [ (count \$argv) -gt 0 ]
+    set -e argv[1]
+  end
+
+  switch "\$command"
+  case ${commands[*]}
+    eval (rbenv "sh-\$command" \$argv)
+  case '*'
+    command rbenv "\$command" \$argv
+  end
+end
+EOS
+  ;;
+* )
+  IFS="|"
+  cat <<EOS
 rbenv() {
   typeset command
   command="\$1"
@@ -108,3 +137,5 @@ rbenv() {
   esac
 }
 EOS
+  ;;
+esac

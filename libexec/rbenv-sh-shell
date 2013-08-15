@@ -24,6 +24,7 @@ if [ "$1" = "--complete" ]; then
 fi
 
 version="$1"
+shell="$(basename "$SHELL")"
 
 if [ -z "$version" ]; then
   if [ -z "$RBENV_VERSION" ]; then
@@ -36,14 +37,28 @@ if [ -z "$version" ]; then
 fi
 
 if [ "$version" = "--unset" ]; then
-  echo "unset RBENV_VERSION"
+  case "$shell" in
+  fish )
+    echo "set -e RBENV_VERSION"
+    ;;
+  * )
+    echo "unset RBENV_VERSION"
+    ;;
+  esac
   exit
 fi
 
 # Make sure the specified version is installed.
 if rbenv-prefix "$version" >/dev/null; then
-  echo "export RBENV_VERSION=\"${version}\""
+  case "$shell" in
+  fish )
+    echo "setenv RBENV_VERSION \"${version}\""
+    ;;
+  * )
+    echo "export RBENV_VERSION=\"${version}\""
+    ;;
+  esac
 else
-  echo "return 1"
+  echo "false"
   exit 1
 fi
