@@ -27,12 +27,14 @@ PYENV_VERSION_FILE="${PYENV_ROOT}/version"
 if [ -n "$versions" ]; then
   pyenv-version-file-write "$PYENV_VERSION_FILE" "${versions[@]}"
 else
+  OLDIFS="$IFS"
   IFS=: versions=($(
     pyenv-version-file-read "$PYENV_VERSION_FILE" ||
     pyenv-version-file-read "${PYENV_ROOT}/global" ||
     pyenv-version-file-read "${PYENV_ROOT}/default" ||
     echo system
   ))
+  IFS="$OLDIFS"
   for version in "${versions[@]}"; do
     echo "$version"
   done

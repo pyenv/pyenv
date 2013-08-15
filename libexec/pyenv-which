@@ -36,7 +36,9 @@ remove_from_path() {
   fi
 
   local paths
+  OLDIFS="$IFS"
   IFS=: paths=($PATH)
+  IFS="$OLDIFS"
 
   for path in "${paths[@]}"; do
     path="$(expand_path "$path" || true)"
@@ -48,8 +50,10 @@ remove_from_path() {
   echo "${result%:}"
 }
 
+OLDIFS="$IFS"
 IFS=: versions=($(pyenv-version-name))
 IFS=: PYENV_VERSION="${versions[*]}"
+IFS="$OLDIFS"
 PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then

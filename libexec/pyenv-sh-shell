@@ -42,7 +42,9 @@ fi
 
 # Make sure the specified version is installed.
 if pyenv-prefix "${versions[@]}" >/dev/null; then
+  OLDIFS="$IFS"
   IFS=: PYENV_VERSION="${versions[*]}"
+  IFS="$OLDIFS"
   echo "export PYENV_VERSION=\"${PYENV_VERSION}\""
 else
   echo "return 1"

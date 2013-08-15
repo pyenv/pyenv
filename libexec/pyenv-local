@@ -46,6 +46,7 @@ elif [ -n "$versions" ]; then
   fi
   pyenv-version-file-write .python-version "${versions[@]}"
 else
+  OLDIFS="$IFS"
   IFS=: versions=($(
     pyenv-version-file-read .python-version ||
     pyenv-version-file-read .pyenv-version ||
@@ -53,6 +54,7 @@ else
       exit 1
     } >&2
   ))
+  IFS="$OLDIFS"
   for version in "${versions[@]}"; do
     echo "$version"
   done

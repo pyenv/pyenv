@@ -18,10 +18,11 @@ if [ -e "$VERSION_FILE" ]; then
   done < <( cat "$VERSION_FILE" && echo )
 
   if [ -n "$versions" ]; then
-    {
-      IFS=:
+    OLDIFS="$IFS"
+    { IFS=:
       echo "${versions[*]}"
     }
+    IFS="$OLDIFS"
     exit
   fi
 fi

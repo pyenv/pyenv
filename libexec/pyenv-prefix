@@ -17,10 +17,14 @@ fi
 
 if [ -n "$1" ]; then
   versions=($@)
+  OLDIFS="$IFS"
   IFS=: PYENV_VERSION="${versions[*]}"
+  IFS="$OLDIFS"
   export PYENV_VERSION
 else
+  OLDIFS="$IFS"
   IFS=: versions=($(pyenv-version-name))
+  IFS="$OLDIFS"
 fi
 
 PYENV_PREFIX_PATHS=()
@@ -39,4 +43,8 @@ for version in "${versions[@]}"; do
   fi
 done
 
-IFS=: echo "${PYENV_PREFIX_PATHS[*]}"
+OLDIFS="$IFS"
+{ IFS=:
+  echo "${PYENV_PREFIX_PATHS[*]}"
+}
+IFS="$OLDIFS"
