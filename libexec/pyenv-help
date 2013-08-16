@@ -17,7 +17,7 @@ set -e
 
 command_path() {
   local command="$1"
-  command -v pyenv-"$command" || command -v pyenv-sh-"$command" || true
+  command -v pyenv-"$command" || command -v pyenv-sh-"$command" || command -v pyenv-fish-"$command" || true
 }
 
 extract_initial_comment_block() {

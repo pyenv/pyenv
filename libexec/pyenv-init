@@ -56,6 +56,9 @@ if [ -z "$print" ]; then
   ksh )
     profile='~/.profile'
     ;;
+  fish )
+    profile='~/.config/fish/config.fish'
+    ;;
   * )
     profile='your profile'
     ;;
@@ -73,11 +76,21 @@ fi
 
 mkdir -p "${PYENV_ROOT}/"{shims,versions}
 
-echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+case "$shell" in
+fish )
+  echo 'setenv PATH "'${PYENV_ROOT}'/shims"' '$PATH' ';'
+  ;;
+* )
+  echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  ;;
+esac
 
 case "$shell" in
 bash | zsh )
   echo "source \"$root/completions/pyenv.${shell}\""
+  ;;
+fish )
+  echo ". \"$root/completions/pyenv.${shell}\";"
   ;;
 esac
 
@@ -85,9 +98,30 @@ if [ -z "$no_rehash" ]; then
   echo 'pyenv rehash 2>/dev/null'
 fi
 
-commands=(`pyenv-commands --sh`)
-IFS="|"
-cat <<EOS
+case "$shell" in
+fish )
+  commands=(`pyenv-commands --fish`)
+  cat <<EOS
+;function pyenv;
+  set -e command;
+  set command \$argv[1];
+  if [ (count \$argv) -gt 0 ];
+    set -e argv[1];
+  end;
+
+  switch "\$command";
+    case ${commands[*]};
+      eval (pyenv "fish-\$command" \$argv);
+    case '*';
+      command pyenv "\$command" \$argv;
+  end;
+end;
+EOS
+  ;;
+* )
+  commands=(`pyenv-commands --sh`)
+  IFS="|"
+  cat <<EOS
 pyenv() {
   typeset command
   command="\$1"
@@ -103,3 +137,5 @@ pyenv() {
   esac
 }
 EOS
+  ;;
+esac

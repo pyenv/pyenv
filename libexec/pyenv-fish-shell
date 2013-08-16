@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# Summary: Set or show the shell-specific Python version
+#
+# Usage: pyenv shell <version>
+#        pyenv shell --unset
+#
+# Sets a shell-specific Python version by setting the `PYENV_VERSION'
+# environment variable in your shell. This version overrides local
+# application-specific versions and the global version.
+#
+# <version> should be a string matching a Python version known to pyenv.
+# The special version string `system' will use your default system Python.
+# Run `pyenv versions' for a list of available Python versions.
+
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  echo --unset
+  echo system
+  exec pyenv-versions --bare
+fi
+
+versions=("$@")
+
+if [ -z "$versions" ]; then
+  if [ -z "$PYENV_VERSION" ]; then
+    echo "pyenv: no shell-specific version configured" >&2
+    exit 1
+  else
+    echo "echo \"\$PYENV_VERSION\""
+    exit
+  fi
+fi
+
+if [ "$versions" = "--unset" ]; then
+  echo "set -e PYENV_VERSION"
+  exit
+fi
+
+# Make sure the specified version is installed.
+if pyenv-prefix "${versions[@]}" >/dev/null; then
+  OLDIFS="$IFS"
+  IFS=: PYENV_VERSION="${versions[*]}"
+  IFS="OLDIFS"
+  echo "setenv PYENV_VERSION \"${PYENV_VERSION}\""
+else
+  echo "false"
+  exit 1
+fi
