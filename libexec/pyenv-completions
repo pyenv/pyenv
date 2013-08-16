@@ -10,7 +10,7 @@ if [ -z "$COMMAND" ]; then
   exit 1
 fi
 
-COMMAND_PATH="$(command -v "pyenv-$COMMAND" || command -v "pyenv-sh-$COMMAND")"
+COMMAND_PATH="$(command -v "pyenv-$COMMAND" || command -v "pyenv-sh-$COMMAND" || command -v "pyenv-fish-$COMMAND")"
 if grep -i "^# provide pyenv completions" "$COMMAND_PATH" >/dev/null; then
   shift
   exec "$COMMAND_PATH" --complete "$@"

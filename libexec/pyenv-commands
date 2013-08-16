@@ -8,14 +8,15 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   echo --sh
+  echo --fish
   echo --no-sh
   exit
 fi
 
-if [ "$1" = "--sh" ]; then
-  sh=1
+if [ "$1" = "--sh" ] || [ "$1" = "--fish" ]; then
+  sh="${1##--}-"
   shift
-elif [ "$1" = "--no-sh" ]; then
+elif [ "$1" = "--no-sh" ] || [ "$1" = "--no-fish" ]; then
   nosh=1
   shift
 fi
@@ -26,15 +27,21 @@ shopt -s nullglob
     for command in "${path}/pyenv-"*; do
       command="${command##*pyenv-}"
       if [ -n "$sh" ]; then
-        if [ ${command:0:3} = "sh-" ]; then
-          echo ${command##sh-}
+        if [[ "${command}" == "${sh}"* ]]; then
+          echo "${command##${sh}}"
         fi
       elif [ -n "$nosh" ]; then
-        if [ ${command:0:3} != "sh-" ]; then
-          echo ${command##sh-}
+        if [ "${command:0:3}" != "sh-" ] && [ "${command:0:5}" != "fish-" ]; then
+          echo "$command"
         fi
       else
-        echo ${command##sh-}
+        if [ "${command:0:3}" = "sh-" ]; then
+          echo "${command##sh-}"
+        elif [ "${command:0:5}" = "fish-" ]; then
+          echo "${command##fish-}"
+        else
+          echo "${command}"
+        fi
       fi
     done
   done
