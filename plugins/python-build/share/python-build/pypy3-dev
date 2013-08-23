@@ -1,4 +1,4 @@
 require_gcc
 install_hg "pypy3-dev" "https://bitbucket.org/pypy/pypy" "py3k" "pypy_builder" verify_py32
 install_package "setuptools-0.9.7" "https://pypi.python.org/packages/source/s/setuptools/setuptools-0.9.7.tar.gz#ce3bb480e4f6d71fc2fb3388f6fe8123" python
-install_package "pip-1.4" "https://pypi.python.org/packages/source/p/pip/pip-1.4.tar.gz#ca790be30004937987767eac42cfa44a" python
+install_package "pip-1.4.1" "https://pypi.python.org/packages/source/p/pip/pip-1.4.1.tar.gz#6afbb46aeb48abac658d4df742bff714" python
