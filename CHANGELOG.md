@@ -1,5 +1,12 @@
 ## Version History
 
+#### 0.4.?-YYYYMMDD
+
+* pyenv: Improved [fish shell](http://fishshell.com/) support
+* python-build: Add ancient versions; 2.4, 2.4.1, 2.4.3, 2.4.4 and 2.4.5
+* python-build: Update default pip version (1.4 -> 1.4.1)
+* python-build: Updat edefault setuptools version (0.9.7 -> 1.0)
+
 #### 0.4.0-20130726
 
 * pyenv: Fix minor issue of variable scope in `pyenv versions` 
