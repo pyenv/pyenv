@@ -146,15 +146,19 @@ If you're on Mac OS X, consider
 This will get you going with the latest version of pyenv and make it
 easy to fork and contribute any changes back upstream.
 
-1. Check out pyenv into `~/.pyenv`.
+1. Check out pyenv where you want it installed. A good place to choose is
+`$HOME/.pyenv` but you may install it somewhere else.
 
         $ cd
         $ git clone git://github.com/yyuu/pyenv.git .pyenv
 
-2. Add `~/.pyenv/bin` to your `$PATH` for access to the `pyenv`
-   command-line utility.
 
-        $ echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bash_profile
+2. Define environment variable `PYENV_ROOT` to point to the path where
+pyenv repo is cloned and add `$PYENV_ROOT/bin` to your `$PATH` for access 
+to the `pyenv` command-line utility.
+
+        $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
+        $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
 
@@ -169,7 +173,7 @@ easy to fork and contribute any changes back upstream.
 
         $ exec $SHELL
 
-5. Install Python versions into `~/.pyenv/versions`. For example, to
+5. Install Python versions into `$PYENV_ROOT/versions`. For example, to
    install Python 2.7.5, download and unpack the source, then run:
 
         $ pyenv install 2.7.5
