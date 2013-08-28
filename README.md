@@ -20,7 +20,7 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 
 ### In contrast with pythonbrew and pythonz, pyenv _does not..._
 
-* **Depending on Python itself.** pyenv was made from pure shell scripts.
+* **Depend on Python itself.** pyenv was made from pure shell scripts.
     There is no bootstrap problem of Python.
 * **Need to be loaded into your shell.** Instead, pyenv's shim
     approach works by adding a directory to your `$PATH`.
