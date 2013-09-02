@@ -541,19 +541,6 @@ build_package_standard() {
   { "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
     "$MAKE" install
   } >&4 2>&1
-
-  # Create `python` executable if missing
-  if [[ "${package_name}" == "Python"* ]] || [[ "${package_name}" == "stackless"* ]]; then
-    if [ ! -f "$PYTHON_BIN" ]; then
-      local python
-      for python in "${PREFIX_PATH}/bin/python"*; do
-        if expr "$(basename "$python")" : '^python[0-9][0-9]*\.[0-9][0-9]*$' 2>&1 >/dev/null; then
-          ( cd "${PREFIX_PATH}/bin" && ln -fs "$(basename "$python")" python )
-          break
-        fi
-      done
-    fi
-  fi
 }
 
 build_package_autoconf() {
@@ -863,8 +850,33 @@ has_broken_mac_llvm_gcc() {
   [[ "$(gcc --version 2>/dev/null || true)" == *"llvm-gcc-4.2"* ]]
 }
 
+build_package_verify_python() {
+  # Check the existence of ./bin since pyenv-which searches the executables from there
+  if [ ! -d "${PREFIX_PATH}/bin" ]; then
+    echo "pyenv: invalid Python installation" >&4 2>&1
+    return 1
+  fi
+
+  # Create `python` executable if missing. Especially for Py3k.
+  if [ ! -e "${PREFIX_PATH}/bin/python" ]; then
+    local python
+    for python in "${PREFIX_PATH}/bin/python"*; do
+      if expr "$(basename "$python")" : '^python[0-9][0-9]*\.[0-9][0-9]*$' 2>&1 >/dev/null; then
+        ( cd "${PREFIX_PATH}/bin" && ln -fs "$(basename "$python")" python )
+        break
+      fi
+    done
+  fi
+
+  if [ ! -x "${PYTHON_BIN}" ]; then
+    echo "pyenv: invalid Python executable: ${PYTHON_BIN}" >&4 2>&1
+    return 1
+  fi
+}
+
 # Post-install check for Python 2.4.x
 build_package_verify_py24() {
+  build_package_verify_python "$@"
   build_package_verify_readline "$@"
   build_package_verify_zlib "$@"
   build_package_verify_bz2 "$@"
@@ -889,6 +901,7 @@ build_package_verify_py27() {
 
 # Post-install check for Python 3.0.x
 build_package_verify_py30() {
+  build_package_verify_python "$@"
   build_package_verify_readline "$@"
   build_package_verify_ssl "$@"
   build_package_verify_sqlite3 "$@"
