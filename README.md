@@ -191,7 +191,7 @@ easy to fork and contribute any changes back upstream.
    process of installing new Ruby versions.
 
     ~~~
-    $ rbenv install 1.9.3-p327
+    $ rbenv install 2.0.0-p247
     ~~~
 
    As an alternative, you can download and compile Ruby yourself into
