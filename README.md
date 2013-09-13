@@ -161,12 +161,14 @@ to the `pyenv` command-line utility.
         $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
+    **Ubuntu note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
 3. Add pyenv init to your shell to enable shims and autocompletion.
 
         $ echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
+    **Ubuntu note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
 4. Restart your shell so the path changes take effect. You can now
    begin using pyenv.
