@@ -267,18 +267,27 @@ fetch_tarball() {
     fi
   fi
 
-  local _package_filename="${package_url##*/}"
-  local _package_suffix="${_package_filename##*.}"
-  case "${_package_suffix}" in
-  "Z" | "bz2" | "gz" | "xz" )
-    local package_suffix="tar.${_package_suffix}"
+  local package_suffix extract_option
+  case "${package_url}" in
+  *".tar.gz" )
+    package_suffix=".tar.gz"
+    extract_option="zxvf"
+  ;;
+  *".tgz" )
+    package_suffix=".tgz"
+    extract_option="zxvf"
+  ;;
+  *".tar.bz2" )
+    package_suffix=".tar.bz2"
+    extract_option="jxvf"
   ;;
   * )
-    local package_suffix="${_package_suffix}"
+    package_suffix=".${package_url##*.}"
+    extract_option="xvf"
   ;;
   esac
 
-  local package_filename="${package_name}.${package_suffix}"
+  local package_filename="${package_name}${package_suffix:-.tar.gz}"
   symlink_tarball_from_cache "$package_filename" "$checksum" || {
     echo "Downloading ${package_filename}..." >&2
     { http head "$mirror_url" &&
@@ -287,7 +296,7 @@ fetch_tarball() {
     download_tarball "$package_url" "$package_filename" "$checksum"
   }
 
-  { if tar xvf "$package_filename"; then
+  { if tar "${extract_options:-xvf}" "$package_filename"; then
       if [ -z "$KEEP_BUILD_PATH" ]; then
         rm -f "$package_filename"
       else
