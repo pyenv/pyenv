@@ -82,9 +82,9 @@ remove_outdated_shims() {
 # registered for installation as a shim. In this way, plugins may call
 # `make_shims` with a glob to register many shims at once.
 make_shims() {
-  local shims="$@"
+  local shims=("$@")
 
-  for file in $shims; do
+  for file in "${shims[@]}"; do
     local shim="${file##*/}"
     register_shim "$shim"
   done

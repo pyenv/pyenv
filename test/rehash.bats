@@ -53,6 +53,38 @@ ruby
 OUT
 }
 
+@test "removes stale shims" {
+  mkdir -p "${RBENV_ROOT}/shims"
+  touch "${RBENV_ROOT}/shims/oldshim1"
+  chmod +x "${RBENV_ROOT}/shims/oldshim1"
+
+  create_executable "2.0" "rake"
+  create_executable "2.0" "ruby"
+
+  run rbenv-rehash
+  assert_success ""
+
+  assert [ ! -e "${RBENV_ROOT}/shims/oldshim1" ]
+}
+
+@test "binary install locations containing spaces" {
+  create_executable "dirname1 p247" "ruby"
+  create_executable "dirname2 preview1" "rspec"
+
+  assert [ ! -e "${RBENV_ROOT}/shims/ruby" ]
+  assert [ ! -e "${RBENV_ROOT}/shims/rspec" ]
+
+  run rbenv-rehash
+  assert_success ""
+
+  run ls "${RBENV_ROOT}/shims"
+  assert_success
+  assert_output <<OUT
+rspec
+ruby
+OUT
+}
+
 @test "carries original IFS within hooks" {
   hook_path="${RBENV_TEST_DIR}/rbenv.d"
   mkdir -p "${hook_path}/rehash"
