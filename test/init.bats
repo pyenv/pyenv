@@ -19,14 +19,21 @@ load test_helper
 
 @test "setup shell completions" {
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
-  SHELL=/bin/bash run rbenv-init -
+  run rbenv-init - bash
   assert_success
   assert_line "source '${root}/libexec/../completions/rbenv.bash'"
 }
 
+@test "detect parent shell" {
+  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
+  SHELL=/bin/false run rbenv-init -
+  assert_success
+  assert_line "export RBENV_SHELL=bash"
+}
+
 @test "setup shell completions (fish)" {
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
-  SHELL=/usr/bin/fish run rbenv-init -
+  run rbenv-init - fish
   assert_success
   assert_line ". '${root}/libexec/../completions/rbenv.fish'"
 }
@@ -39,28 +46,28 @@ load test_helper
 
 @test "adds shims to PATH" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin"
-  SHELL=/bin/bash run rbenv-init -
+  run rbenv-init - bash
   assert_success
   assert_line 0 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
 }
 
 @test "adds shims to PATH (fish)" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin"
-  SHELL=/usr/bin/fish run rbenv-init -
+  run rbenv-init - fish
   assert_success
   assert_line 0 "setenv PATH '${RBENV_ROOT}/shims' \$PATH"
 }
 
 @test "doesn't add shims to PATH more than once" {
   export PATH="${RBENV_ROOT}/shims:$PATH"
-  SHELL=/bin/bash run rbenv-init -
+  run rbenv-init - bash
   assert_success
   refute_line 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
 }
 
 @test "doesn't add shims to PATH more than once (fish)" {
   export PATH="${RBENV_ROOT}/shims:$PATH"
-  SHELL=/usr/bin/fish run rbenv-init -
+  run rbenv-init - fish
   assert_success
   refute_line 'setenv PATH "'${RBENV_ROOT}'/shims" $PATH ;'
 }

@@ -24,7 +24,7 @@ if [ "$1" = "--complete" ]; then
 fi
 
 version="$1"
-shell="$(basename "$SHELL")"
+shell="$(basename "${RBENV_SHELL:-$SHELL}")"
 
 if [ -z "$version" ]; then
   if [ -z "$RBENV_VERSION" ]; then

@@ -7,7 +7,7 @@ if [ "$1" = "--complete" ]; then
   exec rbenv-rehash --complete
 fi
 
-shell="$(basename "$SHELL")"
+shell="$(basename "${RBENV_SHELL:-$SHELL}")"
 
 # When rbenv shell integration is enabled, delegate to rbenv-rehash,
 # then tell the shell to empty its command lookup cache.

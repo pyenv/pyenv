@@ -101,14 +101,14 @@ SH
 
 @test "sh-rehash in bash" {
   create_executable "2.0" "ruby"
-  SHELL=/bin/bash run rbenv-sh-rehash
+  RBENV_SHELL=bash run rbenv-sh-rehash
   assert_success "hash -r 2>/dev/null || true"
   assert [ -x "${RBENV_ROOT}/shims/ruby" ]
 }
 
 @test "sh-rehash in fish" {
   create_executable "2.0" "ruby"
-  SHELL=/usr/bin/fish run rbenv-sh-rehash
+  RBENV_SHELL=fish run rbenv-sh-rehash
   assert_success "hash -r 2>/dev/null ; or true"
   assert [ -x "${RBENV_ROOT}/shims/ruby" ]
 }

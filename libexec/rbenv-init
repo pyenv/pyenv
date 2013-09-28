@@ -22,7 +22,8 @@ done
 
 shell="$1"
 if [ -z "$shell" ]; then
-  shell="$(basename "$SHELL")"
+  shell="$(ps c -p $(ps -p $$ -o 'ppid=' 2>/dev/null) -o 'comm=' 2>/dev/null || true)"
+  shell="$(basename "${shell:-$SHELL}")"
 fi
 
 READLINK=$(type -p greadlink readlink | head -1)
@@ -99,6 +100,15 @@ if [[ ":${PATH}:" != *:"${RBENV_ROOT}/shims":* ]]; then
   ;;
   esac
 fi
+
+case "$shell" in
+fish )
+  echo "setenv RBENV_SHELL $shell"
+;;
+* )
+  echo "export RBENV_SHELL=$shell"
+;;
+esac
 
 completion="${root}/completions/rbenv.${shell}"
 if [ -r "$completion" ]; then
