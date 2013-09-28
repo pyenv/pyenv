@@ -62,6 +62,9 @@ if [ -z "$print" ]; then
   ksh )
     profile='~/.profile'
     ;;
+  fish )
+    profile='~/.config/fish/config.fish'
+    ;;
   * )
     profile='your profile'
     ;;
@@ -70,7 +73,14 @@ if [ -z "$print" ]; then
   { echo "# Load rbenv automatically by adding"
     echo "# the following to ${profile}:"
     echo
-    echo 'eval "$(rbenv init -)"'
+    case "$shell" in
+    fish )
+      echo '. (rbenv init -|psub)'
+      ;;
+    * )
+      echo 'eval "$(rbenv init -)"'
+      ;;
+    esac
     echo
   } >&2
 
@@ -80,21 +90,57 @@ fi
 mkdir -p "${RBENV_ROOT}/"{shims,versions}
 
 if [[ ":${PATH}:" != *:"${RBENV_ROOT}/shims":* ]]; then
-  echo 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
+  case "$shell" in
+  fish )
+    echo "setenv PATH '${RBENV_ROOT}/shims' \$PATH"
+  ;;
+  * )
+    echo 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
+  ;;
+  esac
 fi
 
 completion="${root}/completions/rbenv.${shell}"
-[ -r "$completion" ] && echo "source '$completion'"
+[ -r "$completion" ] && echo ". '$completion'"
 
 if [ -z "$no_rehash" ]; then
   echo 'rbenv rehash 2>/dev/null'
 fi
 
 commands=(`rbenv-commands --sh`)
+case "$shell" in
+fish )
+  cat <<EOS
+function rbenv
+  set command \$argv[1]
+  set -e argv[1]
+
+  switch "\$command"
+  case ${commands[*]}
+    eval (rbenv "sh-\$command" \$argv)
+  case '*'
+    command rbenv "\$command" \$argv
+  end
+end
+EOS
+  exit 0
+  ;;
+ksh )
+  cat <<EOS
+function rbenv {
+  typeset command
+EOS
+  ;;
+* )
+  cat <<EOS
+rbenv() {
+  local command
+EOS
+  ;;
+esac
+
 IFS="|"
 cat <<EOS
-rbenv() {
-  typeset command
   command="\$1"
   if [ "\$#" -gt 0 ]; then
     shift
