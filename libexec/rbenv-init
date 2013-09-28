@@ -123,12 +123,24 @@ function rbenv
   end
 end
 EOS
+  exit 0
+  ;;
+ksh )
+  cat <<EOS
+function rbenv {
+  typeset command
+EOS
   ;;
 * )
-  IFS="|"
   cat <<EOS
 rbenv() {
-  typeset command
+  local command
+EOS
+  ;;
+esac
+
+IFS="|"
+cat <<EOS
   command="\$1"
   if [ "\$#" -gt 0 ]; then
     shift
@@ -142,5 +154,3 @@ rbenv() {
   esac
 }
 EOS
-  ;;
-esac
