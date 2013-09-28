@@ -21,14 +21,14 @@ load test_helper
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   SHELL=/bin/bash run rbenv-init -
   assert_success
-  assert_line "source '${root}/libexec/../completions/rbenv.bash'"
+  assert_line ". '${root}/libexec/../completions/rbenv.bash'"
 }
 
 @test "setup shell completions (fish)" {
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   SHELL=/usr/bin/fish run rbenv-init -
   assert_success
-  assert_line '. "'${root}'/libexec/../completions/rbenv.fish";'
+  assert_line ". '${root}/libexec/../completions/rbenv.fish'"
 }
 
 @test "option to skip rehash" {
@@ -48,7 +48,7 @@ load test_helper
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin"
   SHELL=/usr/bin/fish run rbenv-init -
   assert_success
-  assert_line 0 'setenv PATH "'${RBENV_ROOT}'/shims" $PATH ;'
+  assert_line 0 "setenv PATH '${RBENV_ROOT}/shims' \$PATH"
 }
 
 @test "doesn't add shims to PATH more than once" {

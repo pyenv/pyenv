@@ -73,7 +73,14 @@ if [ -z "$print" ]; then
   { echo "# Load rbenv automatically by adding"
     echo "# the following to ${profile}:"
     echo
-    echo 'eval "$(rbenv init -)"'
+    case "$shell" in
+    fish )
+      echo '. (rbenv init -|psub)'
+      ;;
+    * )
+      echo 'eval "$(rbenv init -)"'
+      ;;
+    esac
     echo
   } >&2
 
@@ -85,7 +92,7 @@ mkdir -p "${RBENV_ROOT}/"{shims,versions}
 if [[ ":${PATH}:" != *:"${RBENV_ROOT}/shims":* ]]; then
   case "$shell" in
   fish )
-    echo 'setenv PATH "'${RBENV_ROOT}'/shims"' '$PATH' ';'
+    echo "setenv PATH '${RBENV_ROOT}/shims' \$PATH"
   ;;
   * )
     echo 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
@@ -94,7 +101,7 @@ if [[ ":${PATH}:" != *:"${RBENV_ROOT}/shims":* ]]; then
 fi
 
 completion="${root}/completions/rbenv.${shell}"
-[ -r "$completion" ] && echo "source '$completion'"
+[ -r "$completion" ] && echo ". '$completion'"
 
 if [ -z "$no_rehash" ]; then
   echo 'rbenv rehash 2>/dev/null'
@@ -106,9 +113,7 @@ fish )
   cat <<EOS
 function rbenv
   set command \$argv[1]
-  if [ (count \$argv) -gt 0 ]
-    set -e argv[1]
-  end
+  set -e argv[1]
 
   switch "\$command"
   case ${commands[*]}
