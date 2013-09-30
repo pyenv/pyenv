@@ -7,7 +7,19 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-rehash --complete
 fi
 
+shell="$(basename "$SHELL")"
+
 # When pyenv shell integration is enabled, delegate to pyenv-rehash,
 # then tell the shell to empty its command lookup cache.
 pyenv-rehash
-echo "hash -r"
+
+case "$shell" in
+fish )
+  or='; or'
+  ;;
+* )
+  or='||'
+  ;;
+esac
+
+echo "hash -r 2>/dev/null $or true"
