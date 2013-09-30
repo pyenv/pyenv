@@ -24,6 +24,7 @@ if [ "$1" = "--complete" ]; then
 fi
 
 versions=("$@")
+shell="$(basename "$SHELL")"
 
 if [ -z "$versions" ]; then
   if [ -z "$PYENV_VERSION" ]; then
@@ -36,7 +37,14 @@ if [ -z "$versions" ]; then
 fi
 
 if [ "$versions" = "--unset" ]; then
-  echo "unset PYENV_VERSION"
+  case "$shell" in
+  fish )
+    echo "set -e PYENV_VERSION"
+    ;;
+  * )
+    echo "unset PYENV_VERSION"
+    ;;
+  esac
   exit
 fi
 
@@ -45,8 +53,15 @@ if pyenv-prefix "${versions[@]}" >/dev/null; then
   OLDIFS="$IFS"
   IFS=: PYENV_VERSION="${versions[*]}"
   IFS="$OLDIFS"
-  echo "export PYENV_VERSION=\"${PYENV_VERSION}\""
+  case "$shell" in
+  fish )
+    echo "setenv PYENV_VERSION \"${PYENV_VERSION}\""
+    ;;
+  * )
+    echo "export PYENV_VERSION=\"${PYENV_VERSION}\""
+    ;;
+  esac
 else
-  echo "return 1"
+  echo "false"
   exit 1
 fi

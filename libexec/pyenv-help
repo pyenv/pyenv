@@ -17,7 +17,7 @@ set -e
 
 command_path() {
   local command="$1"
-  command -v pyenv-"$command" || command -v pyenv-sh-"$command" || command -v pyenv-fish-"$command" || true
+  command -v pyenv-"$command" || command -v pyenv-sh-"$command" || true
 }
 
 extract_initial_comment_block() {
@@ -64,8 +64,8 @@ collect_documentation() {
     }
 
     function trim(str) {
-      gsub(/^\n*/, "", str)
-      gsub(/\n*$/, "", str)
+      sub(/^\n*/, "", str)
+      sub(/\n*$/, "", str)
       return str
     }
 

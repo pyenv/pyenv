@@ -11,7 +11,7 @@ for args in "$@"
 do
   if [ "$args" = "-" ]; then
     print=1
-		shift
+    shift
   fi
 
   if [ "$args" = "--no-rehash" ]; then
@@ -25,8 +25,14 @@ if [ -z "$shell" ]; then
   shell="$(basename "$SHELL")"
 fi
 
+READLINK=$(type -p greadlink readlink | head -1)
+if [ -z "$READLINK" ]; then
+  echo "pyenv: cannot find readlink - are you missing GNU coreutils?" >&2
+  exit 1
+fi
+
 resolve_link() {
-  $(type -p greadlink readlink | head -1) $1
+  $READLINK "$1"
 }
 
 abs_dirname() {
@@ -67,7 +73,14 @@ if [ -z "$print" ]; then
   { echo "# Load pyenv automatically by adding"
     echo "# the following to ${profile}:"
     echo
-    echo 'eval "$(pyenv init -)"'
+    case "$shell" in
+    fish )
+      echo '. (pyenv init -|psub)'
+      ;;
+    * )
+      echo 'eval "$(pyenv init -)"'
+      ;;
+    esac
     echo
   } >&2
 
@@ -76,54 +89,58 @@ fi
 
 mkdir -p "${PYENV_ROOT}/"{shims,versions}
 
-case "$shell" in
-fish )
-  echo 'setenv PATH "'${PYENV_ROOT}'/shims"' '$PATH' ';'
+if [[ ":${PATH}:" != *:"${PYENV_ROOT}/shims":* ]]; then
+  case "$shell" in
+  fish )
+    echo "setenv PATH '${PYENV_ROOT}/shims' \$PATH"
   ;;
-* )
-  echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  * )
+    echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
   ;;
-esac
+  esac
+fi
 
-case "$shell" in
-bash | zsh )
-  echo "source \"$root/completions/pyenv.${shell}\""
-  ;;
-fish )
-  echo ". \"$root/completions/pyenv.${shell}\";"
-  ;;
-esac
+completion="${root}/completions/pyenv.${shell}"
+[ -r "$completion" ] && echo ". '$completion'"
 
 if [ -z "$no_rehash" ]; then
   echo 'pyenv rehash 2>/dev/null'
 fi
 
+commands=(`pyenv-commands --sh`)
 case "$shell" in
 fish )
-  commands=(`pyenv-commands --fish`)
   cat <<EOS
-;function pyenv;
-  set -e command;
-  set command \$argv[1];
-  if [ (count \$argv) -gt 0 ];
-    set -e argv[1];
-  end;
+function pyenv
+  set command \$argv[1]
+  set -e argv[1]
 
-  switch "\$command";
-    case ${commands[*]};
-      eval (pyenv "fish-\$command" \$argv);
-    case '*';
-      command pyenv "\$command" \$argv;
-  end;
-end;
+  switch "\$command"
+  case ${commands[*]}
+    eval (pyenv "sh-\$command" \$argv)
+  case '*'
+    command pyenv "\$command" \$argv
+  end
+end
+EOS
+  exit 0
+  ;;
+ksh )
+  cat <<EOS
+function pyenv {
+  typeset command
 EOS
   ;;
 * )
-  commands=(`pyenv-commands --sh`)
-  IFS="|"
   cat <<EOS
 pyenv() {
-  typeset command
+  local command
+EOS
+  ;;
+esac
+
+IFS="|"
+cat <<EOS
   command="\$1"
   if [ "\$#" -gt 0 ]; then
     shift
@@ -131,11 +148,9 @@ pyenv() {
 
   case "\$command" in
   ${commands[*]})
-    eval \`pyenv "sh-\$command" "\$@"\`;;
+    eval "\`pyenv "sh-\$command" "\$@"\`";;
   *)
     command pyenv "\$command" "\$@";;
   esac
 }
 EOS
-  ;;
-esac
