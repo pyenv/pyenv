@@ -191,12 +191,8 @@ easy to fork and contribute any changes back upstream.
    which provides an `rbenv install` command that simplifies the
    process of installing new Ruby versions.
 
-    ~~~
-    $ rbenv install 2.0.0-p247
-    ~~~
-
-   As an alternative, you can download and compile Ruby yourself into
-   `~/.rbenv/versions/`.
+   If you don't want to do this, you can download and compile Ruby
+   manually as subdirectories of `~/.rbenv/versions/`.
 
 6. Rebuild the shim executables. You should do this any time you
    install a new Ruby executable (for example, when installing a new
