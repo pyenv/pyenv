@@ -22,10 +22,14 @@ elif [ -z "$RBENV_VERSION" ]; then
 fi
 
 if [ "$RBENV_VERSION" = "system" ]; then
-  RUBY_PATH="$(rbenv-which ruby)"
-  RUBY_PATH="${RUBY_PATH%/*}"
-  echo "${RUBY_PATH%/bin}"
-  exit
+  if RUBY_PATH="$(rbenv-which ruby 2>/dev/null)"; then
+    RUBY_PATH="${RUBY_PATH%/*}"
+    echo "${RUBY_PATH%/bin}"
+    exit
+  else
+    echo "rbenv: system version not found in PATH" >&2
+    exit 1
+  fi
 fi
 
 RBENV_PREFIX_PATH="${RBENV_ROOT}/versions/${RBENV_VERSION}"
