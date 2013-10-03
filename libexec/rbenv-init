@@ -101,7 +101,12 @@ if [[ ":${PATH}:" != *:"${RBENV_ROOT}/shims":* ]]; then
 fi
 
 completion="${root}/completions/rbenv.${shell}"
-[ -r "$completion" ] && echo ". '$completion'"
+if [ -r "$completion" ]; then
+  case "$shell" in
+  fish ) echo ". '$completion'" ;;
+  *    ) echo "source '$completion'" ;;
+  esac
+fi
 
 if [ -z "$no_rehash" ]; then
   echo 'rbenv rehash 2>/dev/null'
