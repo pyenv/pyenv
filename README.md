@@ -22,7 +22,7 @@ bulletproof deployments.
 **One thing well.** rbenv is concerned solely with switching Ruby
   versions. It's simple and predictable. A rich plugin ecosystem lets
   you tailor it to suit your needs. Compile your own Ruby versions, or
-  use the [ruby-build](https://github.com/sstephenson/ruby-build)
+  use the [ruby-build][]
   plugin to automate the process. Specify per-application environment
   variables with [rbenv-vars](https://github.com/sstephenson/rbenv-vars).
   See more [plugins on the
@@ -43,6 +43,7 @@ RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
     * [Upgrading](#upgrading)
   * [Homebrew on Mac OS X](#homebrew-on-mac-os-x)
   * [Neckbeard Configuration](#neckbeard-configuration)
+  * [Installing Ruby Versions](#installing-ruby-versions)
   * [Uninstalling Ruby Versions](#uninstalling-ruby-versions)
 * [Command Reference](#command-reference)
   * [rbenv local](#rbenv-local)
@@ -187,20 +188,9 @@ easy to fork and contribute any changes back upstream.
     #=> "rbenv is a function"
     ~~~
 
-5. Install [ruby-build](https://github.com/sstephenson/ruby-build),
-   which provides an `rbenv install` command that simplifies the
-   process of installing new Ruby versions.
-
-   If you don't want to do this, you can download and compile Ruby
-   manually as subdirectories of `~/.rbenv/versions/`.
-
-6. Rebuild the shim executables. You should do this any time you
-   install a new Ruby executable (for example, when installing a new
-   Ruby version, or when installing a gem that provides a command).
-
-    ~~~
-    $ rbenv rehash
-    ~~~
+5. _(Optional)_ Install [ruby-build][], which provides the
+   `rbenv install` command that simplifies the process of
+   [installing new Ruby versions](#installing-ruby-versions).
 
 #### Upgrading
 
@@ -220,19 +210,24 @@ $ git fetch
 $ git checkout v0.3.0
 ~~~
 
+If you've [installed via Homebrew](#homebrew-on-mac-os-x), then upgrade
+via its `brew` command:
+
+~~~ sh
+$ brew update
+$ brew upgrade rbenv ruby-build
+~~~
+
 ### Homebrew on Mac OS X
 
-You can also install rbenv using the
-[Homebrew](http://brew.sh) package manager on Mac OS
-X.
+As an alternative to installation via GitHub checkout, you can install
+rbenv and [ruby-build][] using the [Homebrew](http://brew.sh) package
+manager on Mac OS X:
 
 ~~~
 $ brew update
-$ brew install rbenv
-$ brew install ruby-build
+$ brew install rbenv ruby-build
 ~~~
-
-To later update these installs, use `upgrade` instead of `install`.
 
 Afterwards you'll still need to add `eval "$(rbenv init -)"` to your
 profile as stated in the caveats. You'll only ever have to do this
@@ -270,6 +265,27 @@ opposed to this idea. Here's what `rbenv init` actually does:
 Run `rbenv init -` for yourself to see exactly what happens under the
 hood.
 
+### Installing Ruby Versions
+
+The `rbenv install` command doesn't ship with rbenv out of the box, but
+is provided by the [ruby-build][] project. If you installed it either
+as part of GitHub checkout process outlined above or via Homebrew, you
+should be able to:
+
+~~~ sh
+# list all available versions:
+$ rbenv install -l
+
+# install a Ruby version:
+$ rbenv install v2.0.0-p247
+~~~
+
+Alternatively to the `install` command, you can download and compile
+Ruby manually as a subdirectory of `~/.rbenv/versions/`. An entry in
+that directory can also be a symlink to a Ruby version installed
+elsewhere on the filesystem. rbenv doesn't care; it will simply treat
+any entry in the `versions/` directory as a separate Ruby version.
+
 ### Uninstalling Ruby Versions
 
 As time goes on, Ruby versions you install will accumulate in your
@@ -280,9 +296,8 @@ version you want to remove. You can find the directory of a particular
 Ruby version with the `rbenv prefix` command, e.g. `rbenv prefix
 1.8.7-p357`.
 
-The [ruby-build](https://github.com/sstephenson/ruby-build) plugin
-provides an `rbenv uninstall` command to automate the removal
-process.
+The [ruby-build][] plugin provides an `rbenv uninstall` command to
+automate the removal process.
 
 ## Command Reference
 
@@ -554,3 +569,6 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+  [ruby-build]: https://github.com/sstephenson/ruby-build#readme
