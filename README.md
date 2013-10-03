@@ -277,7 +277,7 @@ should be able to:
 $ rbenv install -l
 
 # install a Ruby version:
-$ rbenv install v2.0.0-p247
+$ rbenv install 2.0.0-p247
 ~~~
 
 Alternatively to the `install` command, you can download and compile
