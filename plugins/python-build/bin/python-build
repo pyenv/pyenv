@@ -938,49 +938,44 @@ build_package_verify_py34() {
   build_package_verify_py33 "$@"
 }
 
+build_package_verify_import() {
+  local module="${1}"
+  local module_name="${2:-${module}}"
+  { if ! "$PYTHON_BIN" -c "import ${module}"; then
+      echo
+      echo "The Python ${module} extension was not compiled. Missing the ${module_name}?"
+      echo
+      echo "Please consult to the Wiki page to fix the problem."
+      echo "https://github.com/yyuu/pyenv/wiki/Common-build-problems"
+      echo
+      return 1
+    fi
+  } >&4 2>&1
+} 
+
 # Post-install check that the readline extension was built.
 build_package_verify_readline() {
-  "$PYTHON_BIN" -c 'try:
-    import readline
-except ImportError:
-    raise(ImportError("The Python readline extension was not compiled. Missing the GNU readline lib?"))
-  ' >&4 2>&1
+  build_package_verify_import "readline" "GNU readline lib"
 }
 
 # Post-install check that the ssl extension was built.
 build_package_verify_ssl() {
-  "$PYTHON_BIN" -c 'try:
-    import ssl
-except ImportError:
-    raise(ImportError("The Python ssl extension was not compiled. Missing the OpenSSL lib?"))
-  ' >&4 2>&1
+  build_package_verify_import "ssl" "OpenSSL lib"
 }
 
 # Post-install check that the sqlite3 extension was built.
 build_package_verify_sqlite3() {
-  "$PYTHON_BIN" -c 'try:
-    import sqlite3
-except ImportError:
-    raise(ImportError("The Python sqlite3 extension was not compiled. Missing the SQLite3 lib?"))
-  ' >&4 2>&1
+  build_package_verify_import "sqlite3" "SQLite3 lib"
 }
 
 # Post-install check that the zlib extension was built.
 build_package_verify_zlib() {
-  "$PYTHON_BIN" -c 'try:
-    import zlib
-except ImportError:
-    raise(ImportError("The Python zlib extension was not compiled. Missing the zlib?"))
-  ' >&4 2>&1
+  build_package_verify_import "zlib" "zlib"
 }
 
 # Post-install check that the bz2 extension was built.
 build_package_verify_bz2() {
-  "$PYTHON_BIN" -c 'try:
-    import bz2
-except ImportError:
-    raise(ImportError("The Python bz2 extension was not compiled. Missing the bzip2 lib?"))
-  ' >&4 2>&1
+  build_package_verify_import "bz2" "bzip2 lib"
 }
 
 version() {
