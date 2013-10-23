@@ -1,11 +1,13 @@
 ## Version History
 
-#### 0.4.?-YYYYMMDD
+#### 0.4.0-20131023
 
 * pyenv: Improved [fish shell](http://fishshell.com/) support
+* python-build: Add new PyPy releases; pypy-2.1, pypy-2.1-src, pypy3-2.1-beta1, pypy3-2.1-beta1-src
 * python-build: Add ancient versions; 2.4, 2.4.1, 2.4.3, 2.4.4 and 2.4.5
+* python-build: Add alpha releases; 3.4.0a2, 3.4.0a3, 3.4.0a4
 * python-build: Update default pip version (1.4 -> 1.4.1)
-* python-build: Updat edefault setuptools version (0.9.7 -> 1.1.6)
+* python-build: Update default setuptools version (0.9.7 -> 1.1.6)
 
 #### 0.4.0-20130726
 
