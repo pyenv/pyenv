@@ -17,8 +17,20 @@ setup() {
   assert_failure ""
 }
 
+@test "fails for blank file" {
+  echo > my-version
+  run rbenv-version-file-read my-version
+  assert_failure ""
+}
+
 @test "reads simple version file" {
   cat > my-version <<<"1.9.3"
+  run rbenv-version-file-read my-version
+  assert_success "1.9.3"
+}
+
+@test "ignores leading spaces" {
+  cat > my-version <<<"  1.9.3"
   run rbenv-version-file-read my-version
   assert_success "1.9.3"
 }
@@ -34,6 +46,21 @@ setup() {
 1.8.7 one
 1.9.3 two
 IN
+  run rbenv-version-file-read my-version
+  assert_success "1.8.7"
+}
+
+@test "ignores leading blank lines" {
+  cat > my-version <<IN
+
+1.9.3
+IN
+  run rbenv-version-file-read my-version
+  assert_success "1.9.3"
+}
+
+@test "handles the file with no trailing newline" {
+  echo -n "1.8.7" > my-version
   run rbenv-version-file-read my-version
   assert_success "1.8.7"
 }

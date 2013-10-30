@@ -8,13 +8,8 @@ VERSION_FILE="$1"
 if [ -e "$VERSION_FILE" ]; then
   # Read the first non-whitespace word from the specified version file.
   # Be careful not to load it whole in case there's something crazy in it.
-  version=""
-  while read -a words; do
-    word="${words[0]}"
-    if [ -z "$version" ] && [ -n "$word" ]; then
-      version="$word"
-    fi
-  done < <( cat "$VERSION_FILE" && echo )
+  words=( $(head -c 1024 "$VERSION_FILE") )
+  version="${words[0]}"
 
   if [ -n "$version" ]; then
     echo "$version"
