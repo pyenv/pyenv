@@ -15,11 +15,9 @@ rbenv-rehash
 
 case "$shell" in
 fish )
-  or='; or'
+  # no rehash support
   ;;
 * )
-  or='||'
+  echo "hash -r 2>/dev/null || true"
   ;;
 esac
-
-echo "hash -r 2>/dev/null $or true"

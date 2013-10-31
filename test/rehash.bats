@@ -109,6 +109,6 @@ SH
 @test "sh-rehash in fish" {
   create_executable "2.0" "ruby"
   RBENV_SHELL=fish run rbenv-sh-rehash
-  assert_success "hash -r 2>/dev/null ; or true"
+  assert_success ""
   assert [ -x "${RBENV_ROOT}/shims/ruby" ]
 }
