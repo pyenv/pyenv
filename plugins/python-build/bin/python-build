@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20130628"
+PYTHON_BUILD_VERSION="20131030"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -94,6 +94,17 @@ file_is_not_empty() {
   else
     return 1
   fi
+}
+
+num_cpu_cores() {
+  local num=""
+  if [ "Darwin" = "$(uname -s)" ]; then
+    num="$(sysctl -n hw.ncpu 2>/dev/null || true)"
+  elif [ -r /proc/cpuinfo ]; then
+    num="$(grep -c ^processor /proc/cpuinfo)"
+    [ "$num" -gt 0 ] || num=""
+  fi
+  echo "${num:-2}"
 }
 
 install_package() {
@@ -267,36 +278,28 @@ fetch_tarball() {
     fi
   fi
 
+  local tar_args="xzvf"
+  local package_filename="${package_name}.tar.gz"
+
   local package_suffix extract_option
   case "${package_url}" in
-  *".tar.gz" )
-    package_suffix=".tar.gz"
-    extract_option="zxvf"
-  ;;
   *".tgz" )
-    package_suffix=".tgz"
-    extract_option="zxvf"
+    package_filename="${package_name}.tgz"
   ;;
   *".tar.bz2" )
-    package_suffix=".tar.bz2"
-    extract_option="jxvf"
-  ;;
-  * )
-    package_suffix=".${package_url##*.}"
-    extract_option="xvf"
+    package_filename="${package_name}.tar.bz2"
+    tar_args="${tar_args/z/j}"
   ;;
   esac
 
-  local package_filename="${package_name}${package_suffix:-.tar.gz}"
-  symlink_tarball_from_cache "$package_filename" "$checksum" || {
+  if ! symlink_tarball_from_cache "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
-    { http head "$mirror_url" &&
-      download_tarball "$mirror_url" "$package_filename" "$checksum"
-    } ||
+    http head "$mirror_url" &&
+    download_tarball "$mirror_url" "$package_filename" "$checksum" ||
     download_tarball "$package_url" "$package_filename" "$checksum"
-  }
+  fi
 
-  { if tar "${extract_options:-xvf}" "$package_filename"; then
+  { if tar $tar_args "$package_filename"; then
       if [ -z "$KEEP_BUILD_PATH" ]; then
         rm -f "$package_filename"
       else
@@ -327,9 +330,12 @@ download_tarball() {
 
   echo "-> $package_url" >&2
 
-  { http get "$package_url" "$package_filename"
-    verify_checksum "$package_filename" "$checksum"
-  } >&4 2>&1 || return 1
+  if http get "$package_url" "$package_filename" >&4 2>&1; then
+    verify_checksum "$package_filename" "$checksum" >&4 2>&1 || return 1
+  else
+    echo "error: failed to download $package_filename" >&2
+    return 1
+  fi
 
   if [ -n "$PYTHON_BUILD_CACHE_PATH" ]; then
     local cached_package_filename="${PYTHON_BUILD_CACHE_PATH}/$package_filename"
@@ -431,24 +437,22 @@ fetch_jar() {
   fi
 
   local package_filename="${package_name}.jar"
-  symlink_jar_from_cache "$package_filename" "$checksum" || {
+
+  if ! symlink_tarball_from_cache "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
-    { http head "$mirror_url" &&
-      download_jar "$mirror_url" "$package_filename" "$checksum"
-    } ||
-    download_jar "$package_url" "$package_filename" "$checksum"
-  }
-  { $JAVA -jar ${package_name}.jar -s -d ${package_name}
-    rm -f "$package_filename"
+    http head "$mirror_url" &&
+    download_tarball "$mirror_url" "$package_filename" "$checksum" ||
+    download_tarball "$package_url" "$package_filename" "$checksum"
+  fi
+
+  { if $JAVA -jar ${package_name}.jar -s -d ${package_name}; then
+      if [ -z "$KEEP_BUILD_PATH" ]; then
+        rm -f "$package_filename"
+      else
+        true
+      fi
+    fi
   } >&4 2>&1
-}
-
-symlink_jar_from_cache() {
-  symlink_tarball_from_cache "$@"
-}
-
-download_jar() {
-  download_tarball "$@"
 }
 
 fetch_zip() {
@@ -467,13 +471,13 @@ fetch_zip() {
   fi
 
   local package_filename="${package_name}.zip"
-  symlink_zip_from_cache "$package_filename" "$checksum" || {
+
+  if ! symlink_tarball_from_cache "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
-    { http head "$mirror_url" &&
-      download_zip "$mirror_url" "$package_filename" "$checksum"
-    } ||
-    download_zip "$package_url" "$package_filename" "$checksum"
-  }
+    http head "$mirror_url" &&
+    download_tarball "$mirror_url" "$package_filename" "$checksum" ||
+    download_tarball "$package_url" "$package_filename" "$checksum"
+  fi
 
   { if unzip "$package_filename"; then
       if [ -z "$KEEP_BUILD_PATH" ]; then
@@ -483,14 +487,6 @@ fetch_zip() {
       fi
     fi
   } >&4 2>&1
-}
-
-symlink_zip_from_cache() {
-  symlink_tarball_from_cache "$@"
-}
-
-download_zip() {
-  download_tarball "$@"
 }
 
 build_package() {
@@ -526,7 +522,7 @@ build_package_standard() {
   if [ "${MAKEOPTS+defined}" ]; then
     MAKE_OPTS="$MAKEOPTS"
   elif [ -z "${MAKE_OPTS+defined}" ]; then
-    MAKE_OPTS="-j 2"
+    MAKE_OPTS="-j $(num_cpu_cores)"
   fi
 
   # Support YAML_CONFIGURE_OPTS, PYTHON_CONFIGURE_OPTS, etc.
@@ -603,7 +599,7 @@ build_package_pypy_builder() {
 
 build_package_copy() {
   mkdir -p "$PREFIX_PATH"
-  cp -R . "$PREFIX_PATH"
+  cp -fR . "$PREFIX_PATH"
 }
 
 before_install_package() {
@@ -823,6 +819,16 @@ build_package_mac_openssl() {
   local pem_file="$OPENSSLDIR/cert.pem"
   security find-certificate -a -p /Library/Keychains/System.keychain > "$pem_file"
   security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> "$pem_file"
+}
+
+# Ensure that directories listed in LDFLAGS exist
+build_package_ldflags_dirs() {
+  local arg
+  for arg in $LDFLAGS; do
+    case "$arg" in
+    -L* ) mkdir -p "${arg#-L}" ;;
+    esac
+  done
 }
 
 has_broken_mac_readline() {
@@ -1058,12 +1064,19 @@ fi
 PREFIX_PATH="${ARGUMENTS[1]}"
 if [ -z "$PREFIX_PATH" ]; then
   usage
+elif [ "${PREFIX_PATH#/}" = "$PREFIX_PATH" ]; then
+  PREFIX_PATH="${PWD}/${PREFIX_PATH}"
 fi
 
 if [ -z "$TMPDIR" ]; then
   TMP="/tmp"
 else
   TMP="${TMPDIR%/}"
+fi
+
+if [ ! -w "$TMP" ] || [ ! -x "$TMP" ]; then
+  echo "python-build: TMPDIR=$TMP is set to a non-accessible location" >&2
+  exit 1
 fi
 
 # Work around warnings building Ruby 2.0 on Clang 2.x:
@@ -1077,7 +1090,11 @@ fi
 #fi
 
 if [ -z "$MAKE" ]; then
-  export MAKE="make"
+  if [[ "FreeBSD" = "$(uname -s)" ]]; then
+    export MAKE="gmake"
+  else
+    export MAKE="make"
+  fi
 fi
 
 if [ -n "$PYTHON_BUILD_CACHE_PATH" ] && [ -d "$PYTHON_BUILD_CACHE_PATH" ]; then
