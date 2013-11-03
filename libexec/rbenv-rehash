@@ -45,12 +45,10 @@ create_prototype_shim() {
 set -e
 [ -n "\$RBENV_DEBUG" ] && set -x
 
-opt=""
 program="\${0##*/}"
 if [ "\$program" = "ruby" ]; then
   for arg; do
     case "\$arg" in
-    -S* ) opt=--rubypath ;;
     -e* | -- ) break ;;
     */* )
       if [ -f "\$arg" ]; then
@@ -63,7 +61,7 @@ if [ "\$program" = "ruby" ]; then
 fi
 
 export RBENV_ROOT="$RBENV_ROOT"
-exec "$(command -v rbenv)" exec \$opt "\$program" "\$@"
+exec "$(command -v rbenv)" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
 }

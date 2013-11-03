@@ -2,59 +2,24 @@
 #
 # Summary: Run an executable with the selected Ruby version
 #
-# Usage: rbenv exec <command> [args...]
+# Usage: rbenv exec <command> [arg1 arg2...]
 #
-# Runs an executable contained by the currently selected Ruby's bin
-# directory. Rough equivalent of:
+# Runs an executable by first preparing PATH so that the selected Ruby
+# version's `bin' directory is at the front.
 #
-#   exec "$(rbenv prefix)/bin/$command" args...
+# For example, if the currently selected Ruby version is 1.9.3-p327:
+#   rbenv exec bundle install
+#
+# is equivalent to:
+#   PATH="$RBENV_ROOT/versions/1.9.3-p327/bin:$PATH" bundle install
 
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
-rubypath=""
 # Provide rbenv completions
-while true; do
-  case "$1" in
-  "--complete" )
-    exec rbenv shims --short
-    ;;
-  "--rubypath" )
-    rubypath=1
-    shift 1
-    ;;
-  * )
-    break
-    ;;
-  esac
-done
-
-# Replace any "RBENV_ROOT/shims" or "RBENV_ROOT/versions/*/bin" paths in the
-# list with the given path. If no replacements were made, prepend the path onto
-# the list.
-replace_shims_path() {
-  local path="$1"
-  local dir="$2"
-  # fake directory that serves as a placeholder for shims location in RUBYPATH:
-  local placeholder="/rbenv_shims_were_here"
-  local found=""
-  local result=""
-  local -a paths
-  IFS=: paths=($path)
-
-  for path in "${paths[@]}"; do
-    if [[ $path = "${RBENV_ROOT}/shims" || $path == "${RBENV_ROOT}/versions/"*/bin || $path = $placeholder ]]; then
-      found=1
-      result="${result}${dir:-$placeholder}:"
-    else
-      result="${result}${path}:"
-    fi
-  done
-
-  # if no rbenv paths were replaced, simply prepend the path
-  [ -n "$found" -o -z "$dir" ] || result="${dir}:${path}"
-  echo "${result%:}"
-}
+if [ "$1" = "--complete" ]; then
+  exec rbenv shims --short
+fi
 
 RBENV_VERSION="$(rbenv-version-name)"
 RBENV_COMMAND="$1"
@@ -66,6 +31,7 @@ fi
 
 export RBENV_VERSION
 RBENV_COMMAND_PATH="$(rbenv-which "$RBENV_COMMAND")"
+RBENV_BIN_PATH="${RBENV_COMMAND_PATH%/*}"
 
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`rbenv-hooks exec`)
@@ -75,9 +41,7 @@ for script in "${scripts[@]}"; do
 done
 
 shift 1
-if [ -n "$rubypath" ]; then
-  bindir=""
-  [ "$RBENV_VERSION" != "system" ] && bindir="${RBENV_COMMAND_PATH%/*}"
-  export RUBYPATH="$(replace_shims_path "${RUBYPATH:-$PATH}" "$bindir")"
+if [ "$RBENV_VERSION" != "system" ]; then
+  export PATH="${RBENV_BIN_PATH}:${PATH}"
 fi
 exec -a "$RBENV_COMMAND" "$RBENV_COMMAND_PATH" "$@"
