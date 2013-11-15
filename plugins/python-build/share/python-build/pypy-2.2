@@ -1,0 +1,33 @@
+case "$(uname -s)" in
+"Darwin" )
+  install_package "pypy-2.2-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-osx64.tar.bz2#690783f07340888a0fa180789de789da" "pypy" verify_py27
+  ;;
+"Linux" )
+  case "$(uname -m)" in
+  "armel" )
+    install_package "pypy-2.2-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux-armel.tar.bz2#c50373a6c2517b43c65fd84ac2cd3a6f" "pypy" verify_py27
+  ;;
+  "armhf" )
+    install_package "pypy-2.2-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux-armhf-raring.tar.bz2#830fdcfafae461d8e72daa94a1ab4499" "pypy" verify_py27
+  ;;
+  "i386" | "i486" | "i586" | "i686" | "i786" )
+    install_package "pypy-2.2-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux.tar.bz2#28b38b2417c3cad4c32db120f718bcd9" "pypy" verify_py27
+  ;;
+  "x86_64" )
+    install_package "pypy-2.2-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux64.tar.bz2#2ce3be921d063eff8286be2e82649638" "pypy" verify_py27
+  esac
+  ;;
+"CYGWIN"* | "MINGW"* )
+  # FIXME: never tested on Windows
+  install_zip "pypy-2.2-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-win32.zip#b44e65f0a7951c0f7eb4338f89120120" "pypy" verify_py27
+  ;;
+* )
+  { echo "Precompiled binary of pypy-2.2 is not available for $(uname -s)-$(uname -m)."
+    echo "To build pypy-2.2 from soruce, use 'pypy-2.2-src'."
+  } 1>&4 2>&1
+  false
+  ;;
+esac
+
+install_package "setuptools-1.3.2" "https://pypi.python.org/packages/source/s/setuptools/setuptools-1.3.2.tar.gz#441f2e58c0599d31597622a7b9eb605f" python
+install_package "pip-1.4.1" "https://pypi.python.org/packages/source/p/pip/pip-1.4.1.tar.gz#6afbb46aeb48abac658d4df742bff714" python
