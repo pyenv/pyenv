@@ -1,5 +1,13 @@
 ## Version History
 
+#### 0.4.0-20131116
+
+* python-build: Add new CPython releases; 2.6.9, 2.7.6 (#76)
+* python-build: Add new CPython release candidates; 3.3.3-rc1, 3.3.3-rc2
+* python-build: Add new PyPy releases; pypy-2.2, pypy-2.2-src (#77)
+* python-build: Update default setuptools version (1.1.6 -> 1.3.2)
+* python-build: Imported recent changes from ruby-build v20131030
+
 #### 0.4.0-20131023
 
 * pyenv: Improved [fish shell](http://fishshell.com/) support
