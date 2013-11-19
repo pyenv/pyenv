@@ -156,11 +156,13 @@ if [ -z "${PYTHON_BUILD_CACHE_PATH}" ] && [ -d "${PYENV_ROOT}/cache" ]; then
   export PYTHON_BUILD_CACHE_PATH="${PYENV_ROOT}/cache"
 fi
 
-# Default PYENV_VERSION to the globally-specified Python version. (The
+# Default PYENV_VERSION to the friendly Python version. (The
 # CPython installer requires an existing Python installation to run. An
-# unsatisfied local .python-version file can cause the installer to
+# unsatisfied local python version can cause the installer to
 # fail.)
-#export PYENV_VERSION="$(pyenv global 2>/dev/null || true)"
+if [[ "${VERSION_NAME}" == [23]"."* ]]; then
+  export PYENV_VERSION="$(pyenv-whence "python${VERSION_NAME%%.${VERSION_NAME##*.}}" 2>/dev/null | tail -1 || true)"
+fi
 
 
 # Execute `before_install` hooks.
