@@ -182,6 +182,8 @@ to the `pyenv` command-line utility.
 
    **NOTE** If you need to pass configure option to build, please use
    ```CONFIGURE_OPTS``` environment variable.
+   
+   **NOTE** If you are having trouble installing a python version please visit the wiki page about [Common Build Problems](https://github.com/yyuu/pyenv/wiki/Common-build-problems)
 
 6. Rebuild the shim binaries. You should do this any time you install
    a new Python binary (for example, when installing a new Python version,
