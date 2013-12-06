@@ -77,7 +77,7 @@ if [ -z "$print" ]; then
     echo
     case "$shell" in
     fish )
-      echo '. (rbenv init -|psub)'
+      echo 'status --is-interactive; and . (rbenv init -|psub)'
       ;;
     * )
       echo 'eval "$(rbenv init -)"'

@@ -38,6 +38,12 @@ load test_helper
   assert_line ". '${root}/libexec/../completions/rbenv.fish'"
 }
 
+@test "fish instructions" {
+  run rbenv-init fish
+  assert [ "$status" -eq 1 ]
+  assert_line 'status --is-interactive; and . (rbenv init -|psub)'
+}
+
 @test "option to skip rehash" {
   run rbenv-init - --no-rehash
   assert_success
