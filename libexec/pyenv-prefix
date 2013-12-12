@@ -31,7 +31,7 @@ PYENV_PREFIX_PATHS=()
 for version in "${versions[@]}"; do
   if [ "$version" = "system" ]; then
     PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python || true)"
-    PYENV_PREFIX_PATH="${PYTHON_PATH%/*}"
+    PYENV_PREFIX_PATH="${PYTHON_PATH%/bin/*}"
   else
     PYENV_PREFIX_PATH="${PYENV_ROOT}/versions/${version}"
   fi
