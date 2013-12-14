@@ -42,7 +42,7 @@ RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
   * [Homebrew on Mac OS X](#homebrew-on-mac-os-x)
-  * [Neckbeard Configuration](#neckbeard-configuration)
+  * [How rbenv hooks into your shell](#how-rbenv-hooks-into-your-shell)
   * [Installing Ruby Versions](#installing-ruby-versions)
   * [Uninstalling Ruby Versions](#uninstalling-ruby-versions)
 * [Command Reference](#command-reference)
@@ -233,7 +233,7 @@ Afterwards you'll still need to add `eval "$(rbenv init -)"` to your
 profile as stated in the caveats. You'll only ever have to do this
 once.
 
-### Neckbeard Configuration
+### How rbenv hooks into your shell
 
 Skip this section unless you must know what every line in your shell
 profile is doing.
