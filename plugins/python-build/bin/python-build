@@ -920,19 +920,17 @@ use_homebrew_yaml() {
 }
 
 has_broken_mac_readline() {
-  if [ "$(uname -s)" = "Darwin" ]; then
-    use_homebrew_readline || {
-      # MacOSX 10.4 has a broken readline.
-      # https://github.com/yyuu/pyenv/issues/23
-      local retval=1
-      local conftest="$BUILD_PATH/has_broken_mac_readline.h"
-      if [ "$(uname -s)" = "Darwin" ]; then
-        echo "#include <readline/rlconf.h>" > "$conftest"
-        "${CPP:-cpp}" $CPPFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
-        rm -f "$conftest"
-      fi
-      return "$retval"
-    }
+  if [ "$(uname -s)" = "Darwin" ] && ! use_homebrew_readline; then
+    # MacOSX 10.4 has a broken readline.
+    # https://github.com/yyuu/pyenv/issues/23
+    local retval=1
+    local conftest="$BUILD_PATH/has_broken_mac_readline.h"
+    if [ "$(uname -s)" = "Darwin" ]; then
+      echo "#include <readline/rlconf.h>" > "$conftest"
+      "${CPP:-cpp}" $CPPFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
+      rm -f "$conftest"
+    fi
+    return "$retval"
   else
     return 1
   fi
