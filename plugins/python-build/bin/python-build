@@ -1054,6 +1054,11 @@ isolated_gem_install() {
   gem install "$@"
 }
 
+has_broken_mac_llvm_gcc() {
+  [ "$(uname -s)" = "Darwin" ] &&
+  [[ "$(gcc --version 2>/dev/null || true)" == *"llvm-gcc-4.2"* ]]
+}
+
 build_package_verify_python() {
   # Check the existence of ./bin since pyenv-which searches the executables from there
   if [ ! -d "${PREFIX_PATH}/bin" ]; then
