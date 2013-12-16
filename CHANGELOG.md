@@ -1,6 +1,6 @@
 ## Version History
 
-#### 0.4.0-201312DD
+#### 0.4.0-20131216
 
 * python-build: Add new CPython releases; 3.3.3 (#80)
 * python-build: Add new CPython releases candidates; 3.4.0b1
