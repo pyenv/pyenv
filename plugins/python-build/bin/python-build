@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20131030"
+PYTHON_BUILD_VERSION="20131211"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -101,7 +101,7 @@ num_cpu_cores() {
   if [ "Darwin" = "$(uname -s)" ]; then
     num="$(sysctl -n hw.ncpu 2>/dev/null || true)"
   elif [ -r /proc/cpuinfo ]; then
-    num="$(grep -c ^processor /proc/cpuinfo)"
+    num="$(grep ^processor /proc/cpuinfo | wc -l)"
     [ "$num" -gt 0 ] || num=""
   fi
   echo "${num:-2}"
@@ -535,6 +535,8 @@ build_package_standard() {
   local PACKAGE_MAKE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
+  [ "$package_var_name" = "PYTHON" ] && use_homebrew_readline || true
+
   ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
       export CFLAGS="$CFLAGS ${!PACKAGE_CFLAGS}"
     fi
@@ -553,11 +555,113 @@ build_package_autoconf() {
   } >&4 2>&1
 }
 
+build_package_ruby() {
+  local package_name="$1"
+
+  { "$RUBY_BIN" setup.rb
+  } >&4 2>&1
+}
+
 build_package_python() {
   local package_name="$1"
 
   { "$PYTHON_BIN" setup.py install
   } >&4 2>&1
+}
+
+build_package_ree_installer() {
+  build_package_auto_tcltk
+
+  local options=""
+  if [[ "Darwin" = "$(uname)" ]]; then
+    options="--no-tcmalloc"
+  fi
+
+  local option
+  for option in $RUBY_CONFIGURE_OPTS ${RUBY_CONFIGURE_OPTS_ARRAY[@]}; do
+    options="$options -c $option"
+  done
+
+  # Work around install_useful_libraries crash with --dont-install-useful-gems
+  mkdir -p "$PREFIX_PATH/lib/ruby/gems/1.8/gems"
+
+  { ./installer --auto "$PREFIX_PATH" --dont-install-useful-gems $options $CONFIGURE_OPTS
+  } >&4 2>&1
+}
+
+build_package_rbx() {
+  local package_name="$1"
+
+  { bundle --path=vendor/bundle
+    RUBYOPT="-rubygems $RUBYOPT" ./configure --prefix="$PREFIX_PATH" $RUBY_CONFIGURE_OPTS
+    rake install
+    fix_rbx_gem_binstubs "$PREFIX_PATH"
+    fix_rbx_irb "$PREFIX_PATH"
+  } >&4 2>&1
+}
+
+build_package_mruby() {
+  local package_name="$1"
+
+  { rake
+    mkdir -p "$PREFIX_PATH"
+    cp -fR build/host/* "$PREFIX_PATH"
+    cd "$PREFIX_PATH/bin"
+    ln -fs mruby ruby
+    ln -fs mirb irb
+  } >&4 2>&1
+}
+
+build_package_maglev() {
+  build_package_copy
+
+  { cd "${PREFIX_PATH}"
+    ./install.sh
+    cd "${PREFIX_PATH}/bin"
+    echo "Creating symlink for ruby*"
+    ln -fs maglev-ruby ruby
+    echo "Creating symlink for irb*"
+    ln -fs maglev-irb irb
+  } >&4 2>&1
+  echo
+  echo "Run 'maglev start' to start up the stone before using 'ruby' or 'irb'"
+}
+
+build_package_topaz() {
+  build_package_copy
+  { cd "${PREFIX_PATH}/bin"
+    echo "Creating symlink for ruby*"
+    ln -fs topaz ruby
+  } >&4 2>&1
+}
+
+topaz_architecture() {
+  case "$(uname -s)" in
+  "Darwin") echo "osx64";;
+  "Linux") [[ "$(uname -m)" = "x86_64" ]] && echo "linux64" || echo "linux32";;
+  *)
+    echo "no nightly builds available" >&2
+    exit 1;;
+  esac
+}
+
+build_package_jruby() {
+  build_package_copy
+  cd "${PREFIX_PATH}/bin"
+  ln -fs jruby ruby
+  install_jruby_launcher
+  remove_windows_files
+}
+
+install_jruby_launcher() {
+  cd "${PREFIX_PATH}/bin"
+  { ./ruby gem install jruby-launcher
+  } >&4 2>&1
+}
+
+remove_windows_files() {
+  cd "$PREFIX_PATH"
+  rm -f bin/*.exe bin/*.dll bin/*.bat bin/jruby.sh
 }
 
 build_package_jython() {
@@ -613,6 +717,31 @@ after_install_package() {
 fix_directory_permissions() {
   # Ensure installed directories are not world-writable to avoid Bundler warnings
   find "$PREFIX_PATH" -type d \( -perm -020 -o -perm -002 \) -exec chmod go-w {} \;
+}
+
+fix_rbx_gem_binstubs() {
+  local prefix="$1"
+  local gemdir="${prefix}/gems/bin"
+  local bindir="${prefix}/bin"
+  local file binstub
+  # Symlink Rubinius' `gems/bin/` into `bin/`
+  if [ -d "$gemdir" ]; then
+    for file in "$gemdir"/*; do
+      binstub="${bindir}/${file##*/}"
+      rm -f "$binstub"
+      sed -E "s:^#\!.+:#\!${bindir}/ruby:" < "$file" > "$binstub"
+      chmod +x "$binstub"
+    done
+    rm -rf "$gemdir"
+    ln -s ../bin "$gemdir"
+  fi
+}
+
+fix_rbx_irb() {
+  local prefix="$1"
+  "${prefix}/bin/irb" --version &>/dev/null ||
+    "${prefix}/bin/gem" install rubysl-tracer -v '~> 2.0' --no-rdoc --no-ri &>/dev/null ||
+    true
 }
 
 require_gcc() {
@@ -776,6 +905,49 @@ verify_java() {
   echo "$java"
 }
 
+needs_yaml() {
+  [[ "$RUBY_CONFIGURE_OPTS" != *--with-libyaml-dir=* ]] &&
+  ! use_homebrew_yaml
+}
+
+use_homebrew_yaml() {
+  local libdir="$(brew --prefix libyaml 2>/dev/null || true)"
+  if [ -d "$libdir" ]; then
+    package_option ruby configure --with-libyaml-dir="$libdir"
+  else
+    return 1
+  fi
+}
+
+has_broken_mac_readline() {
+  if [ "$(uname -s)" = "Darwin" ]; then
+    use_homebrew_readline || {
+      # MacOSX 10.4 has a broken readline.
+      # https://github.com/yyuu/pyenv/issues/23
+      local retval=1
+      local conftest="$BUILD_PATH/has_broken_mac_readline.h"
+      if [ "$(uname -s)" = "Darwin" ]; then
+        echo "#include <readline/rlconf.h>" > "$conftest"
+        "${CPP:-cpp}" $CPPFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
+        rm -f "$conftest"
+      fi
+      return "$retval"
+    }
+  else
+    return 1
+  fi
+}
+
+use_homebrew_readline() {
+  local libdir="$(brew --prefix readline 2>/dev/null || true)"
+  if [ -d "$libdir" ]; then
+    CPPFLAGS="-I$libdir/include $CPPFLAGS"
+    LDFLAGS="-L$libdir/lib $LDFLAGS"
+  else
+    return 1
+  fi
+}
+
 has_broken_mac_openssl() {
   [ "$(uname -s)" = "Darwin" ] &&
   [[ "$(openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8"?* ]] &&
@@ -821,6 +993,15 @@ build_package_mac_openssl() {
   security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> "$pem_file"
 }
 
+# Post-install check that the openssl extension was built.
+build_package_verify_openssl() {
+  "$RUBY_BIN" -e 'begin
+    require "openssl"
+  rescue LoadError
+    abort "The Ruby openssl extension was not compiled. Missing the OpenSSL lib?"
+  end' >&4 2>&1
+}
+
 # Ensure that directories listed in LDFLAGS exist
 build_package_ldflags_dirs() {
   local arg
@@ -831,38 +1012,46 @@ build_package_ldflags_dirs() {
   done
 }
 
-has_broken_mac_readline() {
-  [ "$(uname -s)" = "Darwin" ] &&
-  _has_broken_mac_readline &&
-  ! use_homebrew_readline
-}
-
-_has_broken_mac_readline() {
-  # MacOSX 10.4 has a broken readline.
-  # https://github.com/yyuu/pyenv/issues/23
-  local retval=1
-  local conftest="$BUILD_PATH/has_broken_mac_readline.h"
-  if [ "$(uname -s)" = "Darwin" ]; then
-    echo "#include <readline/rlconf.h>" > "$conftest"
-    "${CPP:-cpp}" $CPPFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
-    rm -f "$conftest"
+build_package_auto_tcltk() {
+  if [ "Darwin" = "$(uname -s)" ] && [ ! -d /usr/include/X11 ]; then
+    if [ -d /opt/X11/include ]; then
+      if [[ "$CPPFLAGS" != *-I/opt/X11/include* ]]; then
+        export CPPFLAGS="-I/opt/X11/include $CPPFLAGS"
+      fi
+    else
+      package_option ruby configure --without-tk
+    fi
   fi
-  return "$retval"
 }
 
-use_homebrew_readline() {
-  local rldir="$(brew --prefix readline 2>/dev/null || true)"
-  if [ -d "$rldir" ]; then
-    CPPFLAGS="-I$rldir/include $CPPFLAGS"
-    LDFLAGS="-L$rldir/lib $LDFLAGS"
+rake() {
+  if [ -e "./Gemfile" ]; then
+    bundle exec rake "$@"
   else
-    return 1
+    isolated_gem_dependency "rake --version" rake -v '~> 10.1.0'
+    command rake "$@"
   fi
 }
 
-has_broken_mac_llvm_gcc() {
-  [ "$(uname -s)" = "Darwin" ] &&
-  [[ "$(gcc --version 2>/dev/null || true)" == *"llvm-gcc-4.2"* ]]
+bundle() {
+  isolated_gem_dependency "bundle --version" bundler -v '~> 1.3.5'
+  command bundle "$@"
+}
+
+isolated_gem_dependency() {
+  set +E
+  ( command $1 &>/dev/null ) || {
+    set -E
+    shift 1
+    isolated_gem_install "$@"
+  }
+  set -E
+}
+
+isolated_gem_install() {
+  export GEM_HOME="${PWD}/.gem"
+  export PATH="${GEM_HOME}/bin:${PATH}"
+  gem install "$@"
 }
 
 build_package_verify_python() {
@@ -1142,8 +1331,8 @@ if [ -n "$VERBOSE" ]; then
   trap "kill $TAIL_PID" SIGINT SIGTERM EXIT
 fi
 
-export LDFLAGS="-L'${PREFIX_PATH}/lib' ${LDFLAGS}"
-export CPPFLAGS="-I'${PREFIX_PATH}/include' ${CPPFLAGS}"
+export LDFLAGS="-L${PREFIX_PATH}/lib ${LDFLAGS}"
+export CPPFLAGS="-I${PREFIX_PATH}/include ${CPPFLAGS}"
 
 unset PYTHONHOME
 unset PYTHONPATH
