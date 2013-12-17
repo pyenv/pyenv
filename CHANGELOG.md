@@ -1,5 +1,10 @@
 ## Version History
 
+#### 0.4.0-20131217
+
+* python-build: Fix broken build of CPython 3.3+ on Darwin
+* python-build: Not build GNU Readline uselessly on Darwin
+
 #### 0.4.0-20131216
 
 * python-build: Add new CPython releases; 3.3.3 (#80)
