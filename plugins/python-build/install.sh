@@ -17,4 +17,4 @@ SHARE_PATH="${PREFIX}/share/python-build"
 mkdir -p "$BIN_PATH" "$SHARE_PATH"
 
 install -p bin/* "$BIN_PATH"
-install -p share/python-build/* "$SHARE_PATH"
+cp -RPp share/python-build/* "$SHARE_PATH"
