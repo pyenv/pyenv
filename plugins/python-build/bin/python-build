@@ -1316,8 +1316,11 @@ if [ -n "$DEBUG" ]; then
   PYTHON_CONFIGURE_OPTS="--with-pydebug $PYTHON_CONFIGURE_OPTS"
 fi
 
-if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]] && [[ "$LDFLAGS" != *"-Wl,-rpath="* ]]; then
-  LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
+if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]] && [[ "$LDFLAGS" != *"-rpath="* ]]; then
+  # The ld on Darwin embeds the full paths to each dylib by default
+  if [[ "Darwin" != "$(uname -s)" ]]; then
+    export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
+  fi
 fi
 
 SEED="$(date "+%Y%m%d%H%M%S").$$"
