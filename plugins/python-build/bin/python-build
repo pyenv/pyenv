@@ -1316,6 +1316,10 @@ if [ -n "$DEBUG" ]; then
   PYTHON_CONFIGURE_OPTS="--with-pydebug $PYTHON_CONFIGURE_OPTS"
 fi
 
+if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]] && [[ "$LDFLAGS" != *"-Wl,-rpath="* ]]; then
+  LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
+fi
+
 SEED="$(date "+%Y%m%d%H%M%S").$$"
 LOG_PATH="${TMP}/python-build.${SEED}.log"
 PYTHON_BIN="${PREFIX_PATH}/bin/python"
