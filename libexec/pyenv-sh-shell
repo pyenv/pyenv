@@ -24,7 +24,7 @@ if [ "$1" = "--complete" ]; then
 fi
 
 versions=("$@")
-shell="$(basename "$SHELL")"
+shell="$(basename "${PYENV_SHELL:-$SHELL}")"
 
 if [ -z "$versions" ]; then
   if [ -z "$PYENV_VERSION" ]; then
