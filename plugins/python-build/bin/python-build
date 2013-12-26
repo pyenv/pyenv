@@ -1264,9 +1264,10 @@ elif [ ! -e "$DEFINITION_PATH" ]; then
 fi
 
 if [ -z "$PYTHON_BUILD_PATCH_PATH" ]; then
-  PYTHON_BUILD_PATCH_PATH="${DEFINITION_PATH%/*}/patches/${DEFINITION_PATH##*/}"
+  # Find patches from "./patches" relatively from the definition path
+  PYTHON_BUILD_PATCH_PATH="$(abs_dirname "${DEFINITION_PATH}" 2>/dev/null)/patches/${DEFINITION_PATH##*/}"
 else
-  PYTHON_BUILD_PATCH_PATH="${PYTHON_BUILD_PATCH_PATH%/}"
+  PYTHON_BUILD_PATCH_PATH="$(abs_dirname "${PYTHON_BUILD_PATCH_PATH}/.." 2>/dev/null)"
 fi
 
 PREFIX_PATH="${ARGUMENTS[1]}"
