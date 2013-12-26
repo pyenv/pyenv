@@ -169,7 +169,7 @@ apply_patches() {
   local PACKAGE_PATCH_PATH="${package_var_name}_PATCH_PATH"
   local PACKAGE_PATCH_OPTS="${package_var_name}_PATCH_OPTS"
 
-  if [ -z "${PATCH_OPTS+defined}" ] && [ "${!PACKAGE_PATCH_OPTS+defined}" ]; then
+  if [ -z "${PATCH_OPTS+defined}" ] && [ -z "${!PACKAGE_PATCH_OPTS+defined}" ]; then
     local PATCH_OPTS="-p0"
   fi
 
