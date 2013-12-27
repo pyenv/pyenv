@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20131211"
+PYTHON_BUILD_VERSION="20131225.1"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -307,16 +307,14 @@ fetch_tarball() {
   local tar_args="xzvf"
   local package_filename="${package_name}.tar.gz"
 
-  local package_suffix extract_option
-  case "${package_url}" in
-  *".tgz" )
-    package_filename="${package_name}.tgz"
-  ;;
-  *".tar.bz2" )
-    package_filename="${package_name}.tar.bz2"
+  if [ "$package_url" != "${package_url%tgz}" ]; then
+    package_filename="${package_filename%tar.gz}tgz"
+  fi
+
+  if [ "$package_url" != "${package_url%bz2}" ]; then
+    package_filename="${package_filename%.gz}.bz2"
     tar_args="${tar_args/z/j}"
-  ;;
-  esac
+  fi
 
   if ! symlink_tarball_from_cache "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
@@ -527,6 +525,8 @@ build_package() {
 
   echo "Installing ${package_name}..." >&2
 
+  [ -n "$HAS_PATCH" ] && apply_python_patch "$package_name"
+
   for command in $commands; do
     "build_package_${command}" "$package_name"
   done
@@ -677,12 +677,22 @@ build_package_jruby() {
   ln -fs jruby ruby
   install_jruby_launcher
   remove_windows_files
+  fix_jruby_shebangs
 }
 
 install_jruby_launcher() {
   cd "${PREFIX_PATH}/bin"
   { ./ruby gem install jruby-launcher
   } >&4 2>&1
+}
+
+fix_jruby_shebangs() {
+  for file in "${PREFIX_PATH}/bin"/*; do
+    if [ "$(head -c 20 "$file")" = "#!/usr/bin/env jruby" ]; then
+      sed -i.bak -E "1s:.+:#\!${PREFIX_PATH}/bin/jruby:" "$file"
+      rm "$file".bak
+    fi
+  done
 }
 
 remove_windows_files() {
@@ -1078,6 +1088,14 @@ isolated_gem_install() {
   gem install "$@"
 }
 
+apply_python_patch() {
+  case "$1" in
+  Python-* | jython-* | pypy-* )
+    patch -p0 -i "${2:--}"
+    ;;
+  esac
+}
+
 has_broken_mac_llvm_gcc() {
   [ "$(uname -s)" = "Darwin" ] &&
   [[ "$(gcc --version 2>/dev/null || true)" == *"llvm-gcc-4.2"* ]]
@@ -1208,7 +1226,7 @@ version() {
 
 usage() {
   { version
-    echo "usage: python-build [-g|--debug] [-k|--keep] [-v|--verbose] definition prefix"
+    echo "usage: python-build [-k|--keep] [-v|--verbose] [-p|--patch] [-g|--debug] definition prefix"
     echo "       python-build --definitions"
   } >&2
 
@@ -1228,8 +1246,9 @@ list_definitions() {
 
 unset VERBOSE
 unset KEEP_BUILD_PATH
-PYTHON_BUILD_ROOT="$(abs_dirname "$0")/.."
+unset HAS_PATCH
 unset DEBUG
+PYTHON_BUILD_ROOT="$(abs_dirname "$0")/.."
 
 parse_options "$@"
 
@@ -1239,8 +1258,9 @@ for option in "${OPTIONS[@]}"; do
     usage without_exiting
     { echo
       echo "  -k/--keep        Do not remove source tree after installation"
-      echo "  -g/--debug       Build a debug version"
       echo "  -v/--verbose     Verbose mode: print compilation status to stdout"
+      echo "  -p/--patch       Apply a patch from stdin before building"
+      echo "  -g/--debug       Build a debug version"
       echo "  --definitions    List all built-in definitions"
       echo
     } >&2
@@ -1255,6 +1275,9 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "v" | "verbose" )
     VERBOSE=true
+    ;;
+  "p" | "patch" )
+    HAS_PATCH=true
     ;;
   "g" | "debug" )
     DEBUG=true
