@@ -104,10 +104,6 @@ process.
 * `PYTHON_CONFIGURE_OPTS` and `PYTHON_MAKE_OPTS` allow you to specify
   configure and make options for buildling CPython. These variables will
   be passed to Python only, not any dependent packages (e.g. libyaml).
-* `PYTHON_PATCH_PATH` allows you to specify a directory that contains
-  the patches for building CPython. All patches should be created
-  as same strip number (default `-p0`). `PYTHON_PATCH_OPTS` allows
-  you to override the options for `patch`.
 
 ### Checksum verification
 
