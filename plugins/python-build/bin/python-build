@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20131211"
+PYTHON_BUILD_VERSION="20131225.1"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -160,57 +160,12 @@ install_package_using() {
   } >&2
 }
 
-apply_patches() {
-  local package_name="$1"
-
-  # Support PYTHON_PATCH, PYTHON_PATCH_OPTS, etc.
-  local package_var_name="$(capitalize "${package_name%%-*}")"
-  local PACKAGE_PATCH="${package_var_name}_PATCH"
-  local PACKAGE_PATCH_OPTS="${package_var_name}_PATCH_OPTS"
-
-  if [ -z "${PATCH_OPTS+defined}" ] && [ -z "${!PACKAGE_PATCH_OPTS+defined}" ]; then
-    local PATCH_OPTS="-p0"
-  fi
-
-  local patch
-  for patch in $(list_patches "${package_name}"); do
-    echo "Applying ${patch##*/} to ${package_name}..." >&2
-    { ${!PACKAGE_PATCH:-patch} $PATCH_OPTS ${!PACKAGE_PATCH_OPTS} < "$patch"
-    } >&4 2>&1
-  done
-}
-
-list_patches() {
-  local package_name="$1"
-
-  # Support PYTHON_PATCH_PATH, etc.
-  local package_var_name="$(capitalize "${package_name%%-*}")"
-  local PACKAGE_PATCH_PATH="${package_var_name}_PATCH_PATH"
-
-  if [ "${!PACKAGE_PATCH_PATH+defined}" ]; then
-    # patch path may be given in relative from working directory
-    if [[ "${!PACKAGE_PATCH_PATH}" != /* ]]; then
-      local patch_path="${CWD}/${!PACKAGE_PATCH_PATH}"
-    else
-      local patch_path="${!PACKAGE_PATCH_PATH}"
-    fi
-  else
-    local patch_path="${PYTHON_BUILD_PATCH_PATH}/${package_name}"
-  fi
-
-  { for patch in "${patch_path}"/*; do
-      [ -f "${patch}" ] && echo "${patch}"
-    done
-  } | sort
-}
-
 make_package() {
   local package_name="$1"
   shift
 
   pushd "$package_name" >&4
   before_install_package "$package_name"
-  apply_patches "$package_name"
   build_package "$package_name" $*
   after_install_package "$package_name"
   fix_directory_permissions
@@ -307,16 +262,14 @@ fetch_tarball() {
   local tar_args="xzvf"
   local package_filename="${package_name}.tar.gz"
 
-  local package_suffix extract_option
-  case "${package_url}" in
-  *".tgz" )
-    package_filename="${package_name}.tgz"
-  ;;
-  *".tar.bz2" )
-    package_filename="${package_name}.tar.bz2"
+  if [ "$package_url" != "${package_url%tgz}" ]; then
+    package_filename="${package_filename%tar.gz}tgz"
+  fi
+
+  if [ "$package_url" != "${package_url%bz2}" ]; then
+    package_filename="${package_filename%.gz}.bz2"
     tar_args="${tar_args/z/j}"
-  ;;
-  esac
+  fi
 
   if ! symlink_tarball_from_cache "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
@@ -527,6 +480,8 @@ build_package() {
 
   echo "Installing ${package_name}..." >&2
 
+  [ -n "$HAS_PATCH" ] && apply_python_patch "$package_name"
+
   for command in $commands; do
     "build_package_${command}" "$package_name"
   done
@@ -677,12 +632,22 @@ build_package_jruby() {
   ln -fs jruby ruby
   install_jruby_launcher
   remove_windows_files
+  fix_jruby_shebangs
 }
 
 install_jruby_launcher() {
   cd "${PREFIX_PATH}/bin"
   { ./ruby gem install jruby-launcher
   } >&4 2>&1
+}
+
+fix_jruby_shebangs() {
+  for file in "${PREFIX_PATH}/bin"/*; do
+    if [ "$(head -c 20 "$file")" = "#!/usr/bin/env jruby" ]; then
+      sed -i.bak -E "1s:.+:#\!${PREFIX_PATH}/bin/jruby:" "$file"
+      rm "$file".bak
+    fi
+  done
 }
 
 remove_windows_files() {
@@ -734,10 +699,28 @@ build_package_copy() {
 
 before_install_package() {
   local stub=1
+  before_install_package_patch "$@"
+}
+
+before_install_package_patch() {
+# Apply built-in patches if patch was not given from stdin
+  if [ -z "$HAS_PATCH" ]; then
+    ( cat "${PYTHON_BUILD_ROOT}/share/python-build/patches/${DEFINITION_PATH##*/}/$1"/* || true ) 2>/dev/null 1>"$1.patch"
+    exec <&-
+    exec <"$1.patch"
+  fi
+  ORIG_HAS_PATCH="$HAS_PATCH"
+  HAS_PATCH=true
 }
 
 after_install_package() {
   local stub=1
+  after_install_package_patch "$@"
+}
+
+after_install_package_patch() {
+  rm -f "$1.patch"
+  HAS_PATCH="$ORIG_HAS_PATCH"
 }
 
 fix_directory_permissions() {
@@ -963,13 +946,13 @@ has_broken_mac_readline() {
 }
 
 use_homebrew_readline() {
-  local libdir="$(brew --prefix readline 2>/dev/null || true)"
-  if [ -d "$libdir" ]; then
-    CPPFLAGS="-I$libdir/include $CPPFLAGS"
-    LDFLAGS="-L$libdir/lib $LDFLAGS"
-  else
-    return 1
-  fi
+    local libdir="$(brew --prefix readline 2>/dev/null || true)"
+    if [ -d "$libdir" ]; then
+      CPPFLAGS="-I$libdir/include $CPPFLAGS"
+      LDFLAGS="-L$libdir/lib $LDFLAGS"
+    else
+      return 1
+    fi
 }
 
 has_broken_mac_openssl() {
@@ -1076,6 +1059,14 @@ isolated_gem_install() {
   export GEM_HOME="${PWD}/.gem"
   export PATH="${GEM_HOME}/bin:${PATH}"
   gem install "$@"
+}
+
+apply_python_patch() {
+  case "$1" in
+  Python-* | jython-* | pypy-* )
+    patch -p0 -i "${2:--}"
+    ;;
+  esac
 }
 
 has_broken_mac_llvm_gcc() {
@@ -1208,7 +1199,7 @@ version() {
 
 usage() {
   { version
-    echo "usage: python-build [-g|--debug] [-k|--keep] [-v|--verbose] definition prefix"
+    echo "usage: python-build [-k|--keep] [-v|--verbose] [-p|--patch] [-g|--debug] definition prefix"
     echo "       python-build --definitions"
   } >&2
 
@@ -1228,8 +1219,9 @@ list_definitions() {
 
 unset VERBOSE
 unset KEEP_BUILD_PATH
-PYTHON_BUILD_ROOT="$(abs_dirname "$0")/.."
+unset HAS_PATCH
 unset DEBUG
+PYTHON_BUILD_ROOT="$(abs_dirname "$0")/.."
 
 parse_options "$@"
 
@@ -1239,8 +1231,9 @@ for option in "${OPTIONS[@]}"; do
     usage without_exiting
     { echo
       echo "  -k/--keep        Do not remove source tree after installation"
-      echo "  -g/--debug       Build a debug version"
       echo "  -v/--verbose     Verbose mode: print compilation status to stdout"
+      echo "  -p/--patch       Apply a patch from stdin before building"
+      echo "  -g/--debug       Build a debug version"
       echo "  --definitions    List all built-in definitions"
       echo
     } >&2
@@ -1255,6 +1248,9 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "v" | "verbose" )
     VERBOSE=true
+    ;;
+  "p" | "patch" )
+    HAS_PATCH=true
     ;;
   "g" | "debug" )
     DEBUG=true
@@ -1277,13 +1273,6 @@ elif [ ! -e "$DEFINITION_PATH" ]; then
     echo "python-build: definition not found: ${DEFINITION_PATH}" >&2
     exit 2
   fi
-fi
-
-if [ -z "$PYTHON_BUILD_PATCH_PATH" ]; then
-  # Find patches from "./patches" relatively from the definition path
-  PYTHON_BUILD_PATCH_PATH="$(abs_dirname "${DEFINITION_PATH}" 2>/dev/null)/patches/${DEFINITION_PATH##*/}"
-else
-  PYTHON_BUILD_PATCH_PATH="$(abs_dirname "${PYTHON_BUILD_PATCH_PATH}/.." 2>/dev/null)"
 fi
 
 PREFIX_PATH="${ARGUMENTS[1]}"
