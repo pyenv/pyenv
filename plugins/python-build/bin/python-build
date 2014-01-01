@@ -1062,19 +1062,9 @@ isolated_gem_install() {
 }
 
 apply_python_patch() {
-  local package_name="$1"
-
-  # Support PYTHON_PATCH_OPTS, etc.
-  local package_var_name="$(capitalize "${package_name%%-*}")"
-  local PACKAGE_PATCH_OPTS="${package_var_name}_PATCH_OPTS"
-
-  if [ -z "${PATCH_OPTS+defined}" ] && [ -z "${!PACKAGE_PATCH_OPTS+defined}" ]; then
-    local PATCH_OPTS="-p0"
-  fi
-
   case "$1" in
   Python-* | jython-* | pypy-* )
-    ${PATCH:-patch} $PATCH_OPTS ${!PACKAGE_PATCH_OPTS} -i "${2:--}"
+    patch -p0 -i "${2:--}"
     ;;
   esac
 }
