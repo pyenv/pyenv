@@ -47,9 +47,9 @@ create_executable() {
   run ls "${PYENV_ROOT}/shims"
   assert_success
   assert_output <<OUT
+python
 rake
 rspec
-python
 OUT
 }
 
@@ -80,8 +80,8 @@ OUT
   run ls "${PYENV_ROOT}/shims"
   assert_success
   assert_output <<OUT
-rspec
 python
+rspec
 OUT
 }
 

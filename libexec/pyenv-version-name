@@ -5,18 +5,10 @@ set -e
 
 if [ -z "$PYENV_VERSION" ]; then
   PYENV_VERSION_FILE="$(pyenv-version-file)"
-  OLDIFS="$IFS"
-  IFS=: versions=($(pyenv-version-file-read "$PYENV_VERSION_FILE" || true))
-  IFS=: PYENV_VERSION="${versions[*]}"
-  IFS="$OLDIFS"
-  export PYENV_VERSION
-else
-  OLDIFS="$IFS"
-  IFS=: versions=($(echo "${PYENV_VERSION}"))
-  IFS="$OLDIFS"
+  PYENV_VERSION="$(pyenv-version-file-read "$PYENV_VERSION_FILE" || true)"
 fi
 
-if [ -z "$versions" ] || [ "$versions" = "system" ]; then
+if [ -z "$PYENV_VERSION" ] || [ "$PYENV_VERSION" = "system" ]; then
   echo "system"
   exit
 fi
@@ -26,11 +18,27 @@ version_exists() {
   [ -d "${PYENV_ROOT}/versions/${version}" ]
 }
 
-for version in "${versions[@]}"; do
-  if [ "$version" != "system" ] && ! version_exists "$version"; then
-    echo "pyenv: version \`$version' is not installed" >&2
-    exit 1
-  fi
-done
+versions=()
+OLDIFS="$IFS"
+{ IFS=:
+  for version in ${PYENV_VERSION}; do
+    if version_exists "$version" || [ "$version" = "system" ]; then
+      versions=("${versions[@]}" "${version}")
+    elif version_exists "${version#python-}"; then
+      { echo "warning: ignoring extraneous \`python-' prefix in version \`${version}'"
+        echo "         (set by $(pyenv-version-origin))"
+      } >&2
+      versions=("${versions[@]}" "${version#python-}")
+    else
+      echo "pyenv: version \`$version' is not installed" >&2
+      exit 1
+    fi
+  done
+}
+IFS="$OLDIFS"
 
-echo "${PYENV_VERSION}"
+OLDIFS="$IFS"
+{ IFS=:
+  echo "${versions[*]}"
+}
+IFS="$OLDIFS"

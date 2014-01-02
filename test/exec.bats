@@ -29,8 +29,8 @@ create_executable() {
   run pyenv-completions exec
   assert_success
   assert_output <<OUT
-rake
 python
+rake
 OUT
 }
 

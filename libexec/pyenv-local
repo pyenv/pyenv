@@ -38,13 +38,14 @@ versions=($@)
 if [ "$versions" = "--unset" ]; then
   rm -f .python-version .pyenv-version
 elif [ -n "$versions" ]; then
-  if [ "$(PYENV_VERSION= pyenv-version-origin)" -ef .pyenv-version ]; then
+  previous_file="$(PYENV_VERSION= pyenv-version-origin || true)"
+  pyenv-version-file-write .python-version "${versions[@]}"
+  if [ "$previous_file" -ef .pyenv-version ]; then
     rm -f .pyenv-version
     { echo "pyenv: removed existing \`.pyenv-version' file and migrated"
       echo "       local version specification to \`.python-version' file"
     } >&2
   fi
-  pyenv-version-file-write .python-version "${versions[@]}"
 else
   OLDIFS="$IFS"
   IFS=: versions=($(
