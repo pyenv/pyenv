@@ -17,7 +17,11 @@ mkdir -p "$SHIM_PATH"
 set -o noclobber
 { echo > "$PROTOTYPE_SHIM_PATH"
 } 2>/dev/null ||
-{ echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
+{ if [ -w "$SHIM_PATH" ]; then
+    echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
+  else
+    echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
+  fi
   exit 1
 } >&2
 set +o noclobber
@@ -78,9 +82,9 @@ remove_outdated_shims() {
 # registered for installation as a shim. In this way, plugins may call
 # `make_shims` with a glob to register many shims at once.
 make_shims() {
-  local shims="$@"
+  local shims=("$@")
 
-  for file in $shims; do
+  for file in "${shims[@]}"; do
     local shim="${file##*/}"
     register_shim "$shim"
   done
@@ -92,7 +96,7 @@ registered_shims=()
 registered_shims_index=""
 
 # We will keep track of shims registered for installation with the
-# global `reigstered_shims` array and with a global search index
+# global `registered_shims` array and with a global search index
 # string. The array will let us iterate over all registered shims. The
 # index string will let us quickly check whether a shim with the given
 # name has been registered or not.
@@ -140,7 +144,11 @@ make_shims ../versions/*/bin/*
 cd "$OLDPWD"
 
 # Allow plugins to register shims.
-for script in $(pyenv-hooks rehash); do
+OLDIFS="$IFS"
+IFS=$'\n' scripts=(`pyenv-hooks rehash`)
+IFS="$OLDIFS"
+
+for script in "${scripts[@]}"; do
   source "$script"
 done
 

@@ -34,9 +34,9 @@ array_exists() {
 
 print_version() {
   if array_exists "$1" "${current_versions[@]}"; then
-    echo "${hit_prefix}${1}${version_origin}"
+    echo "${hit_prefix}$1${version_origin}"
   else
-    echo "${miss_prefix}${1}"
+    echo "${miss_prefix}$1"
   fi
 }
 

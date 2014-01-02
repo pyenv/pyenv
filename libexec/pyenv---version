@@ -14,8 +14,9 @@ set -e
 
 version="0.4.0-20131217"
 
-cd "$PYENV_ROOT"
-git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
-git_revision="${git_revision#v}"
+if cd "$PYENV_ROOT" 2>/dev/null; then
+  git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
+  git_revision="${git_revision#v}"
+fi
 
 echo "pyenv ${git_revision:-$version}"

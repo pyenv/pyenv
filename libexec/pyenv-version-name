@@ -3,20 +3,20 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-if [ -n "$PYENV_VERSION" ]; then
-  OLDIFS="$IFS"
-  IFS=: versions=($(echo "${PYENV_VERSION}"))
-  IFS="$IFS"
-else
+if [ -z "$PYENV_VERSION" ]; then
   PYENV_VERSION_FILE="$(pyenv-version-file)"
   OLDIFS="$IFS"
   IFS=: versions=($(pyenv-version-file-read "$PYENV_VERSION_FILE" || true))
   IFS=: PYENV_VERSION="${versions[*]}"
   IFS="$OLDIFS"
   export PYENV_VERSION
+else
+  OLDIFS="$IFS"
+  IFS=: versions=($(echo "${PYENV_VERSION}"))
+  IFS="$IFS"
 fi
 
-if [ -z "$versions" ]; then
+if [ -z "$versions" ] || [ "$versions" = "system" ]; then
   echo "system"
   exit
 fi

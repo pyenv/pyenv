@@ -11,6 +11,8 @@ if [ "$1" = "--complete" ]; then
   exit
 fi
 
+shopt -s nullglob
+
 for command in "${PYENV_ROOT}/shims/"*; do
   if [ "$1" = "--short" ]; then
     echo "${command##*/}"

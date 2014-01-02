@@ -36,9 +36,7 @@ remove_from_path() {
   fi
 
   local paths
-  OLDIFS="$IFS"
   IFS=: paths=($PATH)
-  IFS="$OLDIFS"
 
   for path in "${paths[@]}"; do
     path="$(expand_path "$path" || true)"
@@ -73,7 +71,10 @@ for version in "${versions[@]}"; do
   fi
 done
 
-for script in $(pyenv-hooks which); do
+OLDIFS="$IFS"
+IFS=$'\n' scripts=(`pyenv-hooks which`)
+IFS="$OLDIFS"
+for script in "${scripts[@]}"; do
   source "$script"
 done
 
