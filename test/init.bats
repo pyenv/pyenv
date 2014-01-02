@@ -51,14 +51,14 @@ load test_helper
 }
 
 @test "adds shims to PATH" {
-  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin"
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run rbenv-init - bash
   assert_success
   assert_line 0 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
 }
 
 @test "adds shims to PATH (fish)" {
-  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin"
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run rbenv-init - fish
   assert_success
   assert_line 0 "setenv PATH '${RBENV_ROOT}/shims' \$PATH"
