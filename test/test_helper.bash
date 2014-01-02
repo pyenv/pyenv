@@ -93,3 +93,25 @@ assert() {
     flunk "failed: $@"
   fi
 }
+
+# Output a modified PATH that ensures that the given executable is not present,
+# but in which system utils necessary for rbenv operation are still available.
+path_without() {
+  local exe="$1"
+  local path="${PATH}:"
+  local found alt util
+  for found in $(which -a "$exe"); do
+    found="${found%/*}"
+    if [ "$found" != "${RBENV_ROOT}/shims" ]; then
+      alt="${RBENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
+      mkdir -p "$alt"
+      for util in bash head cut readlink greadlink; do
+        if [ -x "${found}/$util" ]; then
+          ln -s "${found}/$util" "${alt}/$util"
+        fi
+      done
+      path="${path/${found}:/${alt}:}"
+    fi
+  done
+  echo "${path%:}"
+}
