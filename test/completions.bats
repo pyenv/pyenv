@@ -18,7 +18,7 @@ create_command() {
 
 @test "command with completion support" {
   create_command "rbenv-hello" "#!$BASH
-# provide rbenv completions
+# Provide rbenv completions
 if [[ \$1 = --complete ]]; then
   echo hello
 else
