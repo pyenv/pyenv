@@ -13,7 +13,7 @@ if [ -z "$PYENV_VERSION" ]; then
 else
   OLDIFS="$IFS"
   IFS=: versions=($(echo "${PYENV_VERSION}"))
-  IFS="$IFS"
+  IFS="$OLDIFS"
 fi
 
 if [ -z "$versions" ] || [ "$versions" = "system" ]; then
