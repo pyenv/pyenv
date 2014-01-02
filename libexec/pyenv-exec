@@ -34,7 +34,7 @@ PYENV_COMMAND_PATH="$(pyenv-which "$PYENV_COMMAND")"
 PYENV_BIN_PATH="${PYENV_COMMAND_PATH%/*}"
 
 OLDIFS="$IFS"
-IFS=$'\n' scripts=(`rbenv-hooks exec`)
+IFS=$'\n' scripts=(`pyenv-hooks exec`)
 IFS="$OLDIFS"
 for script in "${scripts[@]}"; do
   source "$script"
