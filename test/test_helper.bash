@@ -8,7 +8,7 @@ if [ "$PYENV_ROOT" != "${PYENV_TEST_DIR}/root" ]; then
   export PYENV_ROOT="${PYENV_TEST_DIR}/root"
   export HOME="${PYENV_TEST_DIR}/home"
 
-  PATH=/usr/bin:/bin:/usr/sbin:/sbin
+  PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
   PATH="${PYENV_TEST_DIR}/bin:$PATH"
   PATH="${BATS_TEST_DIRNAME}/../libexec:$PATH"
   PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
@@ -92,4 +92,26 @@ assert() {
   if ! "$@"; then
     flunk "failed: $@"
   fi
+}
+
+# Output a modified PATH that ensures that the given executable is not present,
+# but in which system utils necessary for pyenv operation are still available.
+path_without() {
+  local exe="$1"
+  local path="${PATH}:"
+  local found alt util
+  for found in $(which -a "$exe"); do
+    found="${found%/*}"
+    if [ "$found" != "${PYENV_ROOT}/shims" ]; then
+      alt="${PYENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
+      mkdir -p "$alt"
+      for util in bash head cut readlink greadlink; do
+        if [ -x "${found}/$util" ]; then
+          ln -s "${found}/$util" "${alt}/$util"
+        fi
+      done
+      path="${path/${found}:/${alt}:}"
+    fi
+  done
+  echo "${path%:}"
 }

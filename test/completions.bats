@@ -18,7 +18,7 @@ create_command() {
 
 @test "command with completion support" {
   create_command "pyenv-hello" "#!$BASH
-# provide pyenv completions
+# Provide pyenv completions
 if [[ \$1 = --complete ]]; then
   echo hello
 else

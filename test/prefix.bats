@@ -25,15 +25,6 @@ load test_helper
 }
 
 @test "prefix for invalid system" {
-  USRBIN_ALT="${PYENV_TEST_DIR}/usr-bin-alt"
-  mkdir -p "$USRBIN_ALT"
-  for util in head readlink greadlink; do
-    if [ -x "/usr/bin/$util" ]; then
-      ln -s "/usr/bin/$util" "${USRBIN_ALT}/$util"
-    fi
-  done
-  PATH_WITHOUT_PYTHON="${PATH/\/usr\/bin:/$USRBIN_ALT:}"
-
-  PATH="$PATH_WITHOUT_PYTHON" run pyenv-prefix system
+  PATH="$(path_without python)" run pyenv-prefix system
   assert_failure "pyenv: system version not found in PATH"
 }

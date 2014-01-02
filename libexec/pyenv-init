@@ -22,8 +22,9 @@ done
 
 shell="$1"
 if [ -z "$shell" ]; then
-  shell="$(ps c -p $(ps -p $$ -o 'ppid=' 2>/dev/null) -o 'comm=' 2>/dev/null || true)"
+  shell="$(ps c -p "$PPID" -o 'ucomm=' 2>/dev/null || true)"
   shell="${shell##-}"
+  shell="${shell%% *}"
   shell="$(basename "${shell:-$SHELL}")"
 fi
 
