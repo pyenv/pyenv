@@ -4,8 +4,8 @@ set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 find_local_version_file() {
-  local root="$1"
-  while [ -n "$root" ]; do
+  local prev root="$1"
+  while [ -n "$root" ] && [ "$root" != "$prev" ]; do
     if [ -e "${root}/.python-version" ]; then
       echo "${root}/.python-version"
       exit
@@ -13,6 +13,7 @@ find_local_version_file() {
       echo "${root}/.pyenv-version"
       exit
     fi
+    prev="${root}"
     root="${root%/*}"
   done
 }

@@ -44,13 +44,13 @@ fi
 export PYENV_ROOT
 
 if [ -z "${PYENV_DIR}" ]; then
-  PYENV_DIR="$(abs_dirname "$(pwd)/..")"
+  PYENV_DIR="$(pwd)"
 else
   cd "$PYENV_DIR" 2>/dev/null || {
     echo "pyenv: cannot change working directory to \`$PYENV_DIR'"
     exit 1
   } >&2
-  PYENV_DIR="$(abs_dirname "$(pwd)/..")"
+  PYENV_DIR="$(pwd)"
   cd "$OLDPWD"
 fi
 export PYENV_DIR
