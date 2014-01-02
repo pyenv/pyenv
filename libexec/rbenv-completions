@@ -11,7 +11,7 @@ if [ -z "$COMMAND" ]; then
 fi
 
 COMMAND_PATH="$(command -v "rbenv-$COMMAND" || command -v "rbenv-sh-$COMMAND")"
-if grep -i "^\([#%]\|--\|//\) provide rbenv completions" "$COMMAND_PATH" >/dev/null; then
+if grep -iE "^([#%]|--|//) provide rbenv completions" "$COMMAND_PATH" >/dev/null; then
   shift
   exec "$COMMAND_PATH" --complete "$@"
 fi
