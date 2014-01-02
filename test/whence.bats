@@ -10,21 +10,21 @@ create_executable() {
 }
 
 @test "finds versions where present" {
-  create_executable "1.8" "python"
-  create_executable "1.8" "rake"
-  create_executable "2.0" "python"
-  create_executable "2.0" "rspec"
+  create_executable "2.7" "python"
+  create_executable "2.7" "fab"
+  create_executable "3.4" "python"
+  create_executable "3.4" "py.test"
 
   run pyenv-whence python
   assert_success
   assert_output <<OUT
-1.8
-2.0
+2.7
+3.4
 OUT
 
-  run pyenv-whence rake
-  assert_success "1.8"
+  run pyenv-whence fab
+  assert_success "2.7"
 
-  run pyenv-whence rspec
-  assert_success "2.0"
+  run pyenv-whence py.test
+  assert_success "3.4"
 }

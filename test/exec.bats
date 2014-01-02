@@ -15,22 +15,22 @@ create_executable() {
 }
 
 @test "fails with invalid version" {
-  export PYENV_VERSION="2.0"
+  export PYENV_VERSION="3.4"
   run pyenv-exec python -v
-  assert_failure "pyenv: version \`2.0' is not installed"
+  assert_failure "pyenv: version \`3.4' is not installed"
 }
 
 @test "completes with names of executables" {
-  export PYENV_VERSION="2.0"
+  export PYENV_VERSION="3.4"
+  create_executable "fab" "#!/bin/sh"
   create_executable "python" "#!/bin/sh"
-  create_executable "rake" "#!/bin/sh"
 
   pyenv-rehash
   run pyenv-completions exec
   assert_success
   assert_output <<OUT
+fab
 python
-rake
 OUT
 }
 
@@ -60,7 +60,7 @@ SH
 }
 
 @test "forwards all arguments" {
-  export PYENV_VERSION="2.0"
+  export PYENV_VERSION="3.4"
   create_executable "python" <<SH
 #!$BASH
 echo \$0
@@ -73,7 +73,7 @@ SH
   run pyenv-exec python -w "/path to/python script.rb" -- extra args
   assert_success
   assert_output <<OUT
-${PYENV_ROOT}/versions/2.0/bin/python
+${PYENV_ROOT}/versions/3.4/bin/python
   -w
   /path to/python script.rb
   --
@@ -83,7 +83,7 @@ OUT
 }
 
 @test "supports python -S <cmd>" {
-  export PYENV_VERSION="2.0"
+  export PYENV_VERSION="3.4"
 
   # emulate `python -S' behavior
   create_executable "python" <<SH
@@ -98,16 +98,16 @@ if [[ \$1 == "-S"* ]]; then
     exit 1
   fi
 else
-  echo 'python 2.0 (pyenv test)'
+  echo 'python 3.4 (pyenv test)'
 fi
 SH
 
-  create_executable "rake" <<SH
+  create_executable "fab" <<SH
 #!/usr/bin/env python
-echo hello rake
+echo hello fab
 SH
 
   pyenv-rehash
-  run python -S rake
-  assert_success "hello rake"
+  run python -S fab
+  assert_success "hello fab"
 }

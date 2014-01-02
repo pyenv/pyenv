@@ -13,14 +13,14 @@ create_executable() {
 }
 
 @test "outputs path to executable" {
-  create_executable "1.8" "python"
-  create_executable "2.0" "rspec"
+  create_executable "2.7" "python"
+  create_executable "3.4" "py.test"
 
-  PYENV_VERSION=1.8 run pyenv-which python
-  assert_success "${PYENV_ROOT}/versions/1.8/bin/python"
+  PYENV_VERSION=2.7 run pyenv-which python
+  assert_success "${PYENV_ROOT}/versions/2.7/bin/python"
 
-  PYENV_VERSION=2.0 run pyenv-which rspec
-  assert_success "${PYENV_ROOT}/versions/2.0/bin/rspec"
+  PYENV_VERSION=3.4 run pyenv-which py.test
+  assert_success "${PYENV_ROOT}/versions/3.4/bin/py.test"
 }
 
 @test "searches PATH for system version" {
@@ -32,30 +32,30 @@ create_executable() {
 }
 
 @test "version not installed" {
-  create_executable "2.0" "rspec"
-  PYENV_VERSION=1.9 run pyenv-which rspec
-  assert_failure "pyenv: version \`1.9' is not installed"
+  create_executable "3.4" "py.test"
+  PYENV_VERSION=3.3 run pyenv-which py.test
+  assert_failure "pyenv: version \`3.3' is not installed"
 }
 
 @test "no executable found" {
-  create_executable "1.8" "rspec"
-  PYENV_VERSION=1.8 run pyenv-which rake
-  assert_failure "pyenv: rake: command not found"
+  create_executable "2.7" "py.test"
+  PYENV_VERSION=2.7 run pyenv-which fab
+  assert_failure "pyenv: fab: command not found"
 }
 
 @test "executable found in other versions" {
-  create_executable "1.8" "python"
-  create_executable "1.9" "rspec"
-  create_executable "2.0" "rspec"
+  create_executable "2.7" "python"
+  create_executable "3.3" "py.test"
+  create_executable "3.4" "py.test"
 
-  PYENV_VERSION=1.8 run pyenv-which rspec
+  PYENV_VERSION=2.7 run pyenv-which py.test
   assert_failure
   assert_output <<OUT
-pyenv: rspec: command not found
+pyenv: py.test: command not found
 
-The \`rspec' command exists in these Python versions:
-  1.9
-  2.0
+The \`py.test' command exists in these Python versions:
+  3.3
+  3.4
 OUT
 }
 

@@ -23,28 +23,28 @@ setup() {
 }
 
 @test "PYENV_VERSION has precedence over local" {
-  create_version "1.8.7"
-  create_version "1.9.3"
+  create_version "2.7.6"
+  create_version "3.3.3"
 
-  cat > ".python-version" <<<"1.8.7"
+  cat > ".python-version" <<<"2.7.6"
   run pyenv-version-name
-  assert_success "1.8.7"
+  assert_success "2.7.6"
 
-  PYENV_VERSION=1.9.3 run pyenv-version-name
-  assert_success "1.9.3"
+  PYENV_VERSION=3.3.3 run pyenv-version-name
+  assert_success "3.3.3"
 }
 
 @test "local file has precedence over global" {
-  create_version "1.8.7"
-  create_version "1.9.3"
+  create_version "2.7.6"
+  create_version "3.3.3"
 
-  cat > "${PYENV_ROOT}/version" <<<"1.8.7"
+  cat > "${PYENV_ROOT}/version" <<<"2.7.6"
   run pyenv-version-name
-  assert_success "1.8.7"
+  assert_success "2.7.6"
 
-  cat > ".python-version" <<<"1.9.3"
+  cat > ".python-version" <<<"3.3.3"
   run pyenv-version-name
-  assert_success "1.9.3"
+  assert_success "3.3.3"
 }
 
 @test "missing version" {
@@ -53,13 +53,13 @@ setup() {
 }
 
 @test "version with prefix in name" {
-  create_version "1.8.7"
-  cat > ".python-version" <<<"python-1.8.7"
+  create_version "2.7.6"
+  cat > ".python-version" <<<"python-2.7.6"
   run pyenv-version-name
   assert_success
   assert_output <<OUT
-warning: ignoring extraneous \`python-' prefix in version \`python-1.8.7'
+warning: ignoring extraneous \`python-' prefix in version \`python-2.7.6'
          (set by ${PWD}/.python-version)
-1.8.7
+2.7.6
 OUT
 }

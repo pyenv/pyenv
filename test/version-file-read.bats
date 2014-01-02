@@ -24,43 +24,43 @@ setup() {
 }
 
 @test "reads simple version file" {
-  cat > my-version <<<"1.9.3"
+  cat > my-version <<<"3.3.3"
   run pyenv-version-file-read my-version
-  assert_success "1.9.3"
+  assert_success "3.3.3"
 }
 
 @test "ignores leading spaces" {
-  cat > my-version <<<"  1.9.3"
+  cat > my-version <<<"  3.3.3"
   run pyenv-version-file-read my-version
-  assert_success "1.9.3"
+  assert_success "3.3.3"
 }
 
 @test "reads only the first word from file" {
-  cat > my-version <<<"1.9.3-p194@tag 1.8.7 hi"
+  cat > my-version <<<"3.3.3-p194@tag 2.7.6 hi"
   run pyenv-version-file-read my-version
-  assert_success "1.9.3-p194@tag:1.8.7:hi"
+  assert_success "3.3.3-p194@tag:2.7.6:hi"
 }
 
 @test "loads only the first line in file" {
   cat > my-version <<IN
-1.8.7 one
-1.9.3 two
+2.7.6 one
+3.3.3 two
 IN
   run pyenv-version-file-read my-version
-  assert_success "1.8.7:one:1.9.3:two"
+  assert_success "2.7.6:one:3.3.3:two"
 }
 
 @test "ignores leading blank lines" {
   cat > my-version <<IN
 
-1.9.3
+3.3.3
 IN
   run pyenv-version-file-read my-version
-  assert_success "1.9.3"
+  assert_success "3.3.3"
 }
 
 @test "handles the file with no trailing newline" {
-  echo -n "1.8.7" > my-version
+  echo -n "2.7.6" > my-version
   run pyenv-version-file-read my-version
-  assert_success "1.8.7"
+  assert_success "2.7.6"
 }

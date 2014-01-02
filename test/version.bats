@@ -18,21 +18,21 @@ setup() {
 }
 
 @test "set by PYENV_VERSION" {
-  create_version "1.9.3"
-  PYENV_VERSION=1.9.3 run pyenv-version
-  assert_success "1.9.3 (set by PYENV_VERSION environment variable)"
+  create_version "3.3.3"
+  PYENV_VERSION=3.3.3 run pyenv-version
+  assert_success "3.3.3 (set by PYENV_VERSION environment variable)"
 }
 
 @test "set by local file" {
-  create_version "1.9.3"
-  cat > ".python-version" <<<"1.9.3"
+  create_version "3.3.3"
+  cat > ".python-version" <<<"3.3.3"
   run pyenv-version
-  assert_success "1.9.3 (set by ${PWD}/.python-version)"
+  assert_success "3.3.3 (set by ${PWD}/.python-version)"
 }
 
 @test "set by global file" {
-  create_version "1.9.3"
-  cat > "${PYENV_ROOT}/version" <<<"1.9.3"
+  create_version "3.3.3"
+  cat > "${PYENV_ROOT}/version" <<<"3.3.3"
   run pyenv-version
-  assert_success "1.9.3 (set by ${PYENV_ROOT}/version)"
+  assert_success "3.3.3 (set by ${PYENV_ROOT}/version)"
 }

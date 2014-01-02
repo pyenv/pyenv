@@ -32,84 +32,84 @@ stub_system_python() {
 
 @test "single version installed" {
   stub_system_python
-  create_version "1.9"
+  create_version "3.3"
   run pyenv-versions
   assert_success
   assert_output <<OUT
 * system (set by ${PYENV_ROOT}/version)
-  1.9
+  3.3
 OUT
 }
 
 @test "single version bare" {
-  create_version "1.9"
+  create_version "3.3"
   run pyenv-versions --bare
-  assert_success "1.9"
+  assert_success "3.3"
 }
 
 @test "multiple versions" {
   stub_system_python
-  create_version "1.8.7"
-  create_version "1.9.3"
-  create_version "2.0.0"
+  create_version "2.7.6"
+  create_version "3.3.3"
+  create_version "3.4.0"
   run pyenv-versions
   assert_success
   assert_output <<OUT
 * system (set by ${PYENV_ROOT}/version)
-  1.8.7
-  1.9.3
-  2.0.0
+  2.7.6
+  3.3.3
+  3.4.0
 OUT
 }
 
 @test "indicates current version" {
   stub_system_python
-  create_version "1.9.3"
-  create_version "2.0.0"
-  PYENV_VERSION=1.9.3 run pyenv-versions
+  create_version "3.3.3"
+  create_version "3.4.0"
+  PYENV_VERSION=3.3.3 run pyenv-versions
   assert_success
   assert_output <<OUT
   system
-* 1.9.3 (set by PYENV_VERSION environment variable)
-  2.0.0
+* 3.3.3 (set by PYENV_VERSION environment variable)
+  3.4.0
 OUT
 }
 
 @test "bare doesn't indicate current version" {
-  create_version "1.9.3"
-  create_version "2.0.0"
-  PYENV_VERSION=1.9.3 run pyenv-versions --bare
+  create_version "3.3.3"
+  create_version "3.4.0"
+  PYENV_VERSION=3.3.3 run pyenv-versions --bare
   assert_success
   assert_output <<OUT
-1.9.3
-2.0.0
+3.3.3
+3.4.0
 OUT
 }
 
 @test "globally selected version" {
   stub_system_python
-  create_version "1.9.3"
-  create_version "2.0.0"
-  cat > "${PYENV_ROOT}/version" <<<"1.9.3"
+  create_version "3.3.3"
+  create_version "3.4.0"
+  cat > "${PYENV_ROOT}/version" <<<"3.3.3"
   run pyenv-versions
   assert_success
   assert_output <<OUT
   system
-* 1.9.3 (set by ${PYENV_ROOT}/version)
-  2.0.0
+* 3.3.3 (set by ${PYENV_ROOT}/version)
+  3.4.0
 OUT
 }
 
 @test "per-project version" {
   stub_system_python
-  create_version "1.9.3"
-  create_version "2.0.0"
-  cat > ".python-version" <<<"1.9.3"
+  create_version "3.3.3"
+  create_version "3.4.0"
+  cat > ".python-version" <<<"3.3.3"
   run pyenv-versions
   assert_success
   assert_output <<OUT
   system
-* 1.9.3 (set by ${PYENV_TEST_DIR}/.python-version)
-  2.0.0
+* 3.3.3 (set by ${PYENV_TEST_DIR}/.python-version)
+  3.4.0
 OUT
 }

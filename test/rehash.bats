@@ -32,14 +32,14 @@ create_executable() {
 }
 
 @test "creates shims" {
-  create_executable "1.8" "python"
-  create_executable "1.8" "rake"
-  create_executable "2.0" "python"
-  create_executable "2.0" "rspec"
+  create_executable "2.7" "python"
+  create_executable "2.7" "fab"
+  create_executable "3.4" "python"
+  create_executable "3.4" "py.test"
 
+  assert [ ! -e "${PYENV_ROOT}/shims/fab" ]
   assert [ ! -e "${PYENV_ROOT}/shims/python" ]
-  assert [ ! -e "${PYENV_ROOT}/shims/rake" ]
-  assert [ ! -e "${PYENV_ROOT}/shims/rspec" ]
+  assert [ ! -e "${PYENV_ROOT}/shims/py.test" ]
 
   run pyenv-rehash
   assert_success ""
@@ -47,9 +47,9 @@ create_executable() {
   run ls "${PYENV_ROOT}/shims"
   assert_success
   assert_output <<OUT
+fab
+py.test
 python
-rake
-rspec
 OUT
 }
 
@@ -58,8 +58,8 @@ OUT
   touch "${PYENV_ROOT}/shims/oldshim1"
   chmod +x "${PYENV_ROOT}/shims/oldshim1"
 
-  create_executable "2.0" "rake"
-  create_executable "2.0" "python"
+  create_executable "3.4" "fab"
+  create_executable "3.4" "python"
 
   run pyenv-rehash
   assert_success ""
@@ -69,10 +69,10 @@ OUT
 
 @test "binary install locations containing spaces" {
   create_executable "dirname1 p247" "python"
-  create_executable "dirname2 preview1" "rspec"
+  create_executable "dirname2 preview1" "py.test"
 
   assert [ ! -e "${PYENV_ROOT}/shims/python" ]
-  assert [ ! -e "${PYENV_ROOT}/shims/rspec" ]
+  assert [ ! -e "${PYENV_ROOT}/shims/py.test" ]
 
   run pyenv-rehash
   assert_success ""
@@ -80,8 +80,8 @@ OUT
   run ls "${PYENV_ROOT}/shims"
   assert_success
   assert_output <<OUT
+py.test
 python
-rspec
 OUT
 }
 
@@ -100,14 +100,14 @@ SH
 }
 
 @test "sh-rehash in bash" {
-  create_executable "2.0" "python"
+  create_executable "3.4" "python"
   PYENV_SHELL=bash run pyenv-sh-rehash
   assert_success "hash -r 2>/dev/null || true"
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
 
 @test "sh-rehash in fish" {
-  create_executable "2.0" "python"
+  create_executable "3.4" "python"
   PYENV_SHELL=fish run pyenv-sh-rehash
   assert_success ""
   assert [ -x "${PYENV_ROOT}/shims/python" ]

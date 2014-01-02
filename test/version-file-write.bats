@@ -16,15 +16,15 @@ setup() {
 
 @test "setting nonexistent version fails" {
   assert [ ! -e ".python-version" ]
-  run pyenv-version-file-write ".python-version" "1.8.7"
-  assert_failure "pyenv: version \`1.8.7' not installed"
+  run pyenv-version-file-write ".python-version" "2.7.6"
+  assert_failure "pyenv: version \`2.7.6' not installed"
   assert [ ! -e ".python-version" ]
 }
 
 @test "writes value to arbitrary file" {
-  mkdir -p "${PYENV_ROOT}/versions/1.8.7"
+  mkdir -p "${PYENV_ROOT}/versions/2.7.6"
   assert [ ! -e "my-version" ]
-  run pyenv-version-file-write "${PWD}/my-version" "1.8.7"
+  run pyenv-version-file-write "${PWD}/my-version" "2.7.6"
   assert_success ""
-  assert [ "$(cat my-version)" = "1.8.7" ]
+  assert [ "$(cat my-version)" = "2.7.6" ]
 }
