@@ -5,7 +5,7 @@ set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 PYENV_VERSION_FILE="$1"
-shift
+shift || true
 versions=("$@")
 
 if [ -z "$versions" ] || [ -z "$PYENV_VERSION_FILE" ]; then

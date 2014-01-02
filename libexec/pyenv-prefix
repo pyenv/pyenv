@@ -16,32 +16,38 @@ if [ "$1" = "--complete" ]; then
 fi
 
 if [ -n "$1" ]; then
-  versions=($@)
   OLDIFS="$IFS"
-  IFS=: PYENV_VERSION="${versions[*]}"
+  { IFS=:
+    export PYENV_VERSION="$*"
+  }
   IFS="$OLDIFS"
-  export PYENV_VERSION
-else
-  OLDIFS="$IFS"
-  IFS=: versions=($(pyenv-version-name))
-  IFS="$OLDIFS"
+elif [ -z "$PYENV_VERSION" ]; then
+  PYENV_VERSION="$(pyenv-version-name)"
 fi
 
 PYENV_PREFIX_PATHS=()
-for version in "${versions[@]}"; do
-  if [ "$version" = "system" ]; then
-    PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python || true)"
-    PYENV_PREFIX_PATH="${PYTHON_PATH%/bin/*}"
-  else
-    PYENV_PREFIX_PATH="${PYENV_ROOT}/versions/${version}"
-  fi
-  if [ -d "$PYENV_PREFIX_PATH" ]; then
-    PYENV_PREFIX_PATHS=("${PYENV_PREFIX_PATHS[@]}" "$PYENV_PREFIX_PATH")
-  else
-    echo "pyenv: version \`${version}' not installed" >&2
-    exit 1
-  fi
-done
+OLDIFS="$IFS"
+{ IFS=:
+  for version in ${PYENV_VERSION}; do
+    if [ "$version" = "system" ]; then
+      if PYTHON_PATH="$(pyenv-which python 2>/dev/null)"; then
+        PYENV_PREFIX_PATH="${PYTHON_PATH%/bin/*}"
+      else
+        echo "pyenv: system version not found in PATH" >&2
+        exit 1
+      fi
+    else
+      PYENV_PREFIX_PATH="${PYENV_ROOT}/versions/${version}"
+    fi
+    if [ -d "$PYENV_PREFIX_PATH" ]; then
+      PYENV_PREFIX_PATHS=("${PYENV_PREFIX_PATHS[@]}" "$PYENV_PREFIX_PATH")
+    else
+      echo "pyenv: version \`${version}' not installed" >&2
+      exit 1
+    fi
+  done
+}
+IFS="$OLDIFS"
 
 OLDIFS="$IFS"
 { IFS=:
