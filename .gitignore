@@ -4,3 +4,5 @@
 /versions
 /sources
 /cache
+/libexec/*.dylib
+/src/*.o
