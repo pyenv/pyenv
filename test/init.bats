@@ -21,7 +21,7 @@ load test_helper
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run rbenv-init - bash
   assert_success
-  assert_line "source '${root}/libexec/../completions/rbenv.bash'"
+  assert_line "source '${root}/test/../libexec/../completions/rbenv.bash'"
 }
 
 @test "detect parent shell" {
@@ -35,7 +35,7 @@ load test_helper
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run rbenv-init - fish
   assert_success
-  assert_line ". '${root}/libexec/../completions/rbenv.fish'"
+  assert_line ". '${root}/test/../libexec/../completions/rbenv.fish'"
 }
 
 @test "fish instructions" {
