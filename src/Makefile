@@ -1,4 +1,4 @@
-SHOBJ_LDFLAGS = -dynamiclib -current_version 1.0
+SHOBJ_LDFLAGS = -dynamiclib
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
