@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+
+if [ -n "$RBENV_NATIVE_EXT" ]; then
+  make -C src
+fi
+
+exec bats ${CI:+--tap} test
