@@ -3,10 +3,17 @@ set -e
 
 src_dir="${0%/*}"
 
-CC="${CC:-gcc}"
+if [ -z "$CC" ]; then
+  if type -p gcc >/dev/null; then
+    CC=gcc
+  else
+    echo "warning: gcc not found; using CC=cc" >&2
+    CC=cc
+  fi
+fi
 
-if ! which "$CC" &>/dev/null; then
-  echo "no compiler found: $CC" >&2
+if ! type -p "$CC" >/dev/null; then
+  echo "aborted: compiler not found: $CC" >&2
   exit 1
 fi
 
