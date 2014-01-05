@@ -142,6 +142,17 @@ freebsd[3-9]*|freebsdelf[3-9]*|freebsdaout[3-9]*|dragonfly*)
 	;;
 
 # Darwin/MacOS X
+darwin1*)
+	SHOBJ_STATUS=supported
+	SHLIB_STATUS=supported
+	
+	SHOBJ_CFLAGS=''
+	SHLIB_LIBSUFF='dylib'
+
+	SHOBJ_LD='${CC}'
+	SHOBJ_LDFLAGS='-dynamiclib'
+	;;
+
 darwin8*)
 	SHOBJ_STATUS=supported
 	SHLIB_STATUS=supported
