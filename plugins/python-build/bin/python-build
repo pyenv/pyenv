@@ -703,14 +703,17 @@ before_install_package() {
 }
 
 before_install_package_patch() {
-# Apply built-in patches if patch was not given from stdin
-  if [ -z "$HAS_PATCH" ]; then
-    ( cat "${PYTHON_BUILD_ROOT}/share/python-build/patches/${DEFINITION_PATH##*/}/$1"/* || true ) 2>/dev/null 1>"$1.patch"
-    exec <&-
-    exec <"$1.patch"
-  fi
+  local package_name="$1"
+  local package_patch_path="${PYTHON_BUILD_ROOT}/share/python-build/patches/${DEFINITION_PATH##*/}/${package_name}"
+
   ORIG_HAS_PATCH="$HAS_PATCH"
-  HAS_PATCH=true
+# Apply built-in patches if patch was not given from stdin
+  if [ -z "$HAS_PATCH" ] && [ -d "${package_patch_path}" ]; then
+    ( cat "${package_patch_path}"/* || true ) 2>/dev/null 1>"${package_name}.patch"
+    exec <&-
+    exec <"${package_name}.patch"
+    HAS_PATCH=true
+  fi
 }
 
 after_install_package() {
@@ -719,7 +722,8 @@ after_install_package() {
 }
 
 after_install_package_patch() {
-  rm -f "$1.patch"
+  local package_name="$1"
+  rm -f "${package_name}.patch"
   HAS_PATCH="$ORIG_HAS_PATCH"
 }
 
