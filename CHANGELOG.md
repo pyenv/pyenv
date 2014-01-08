@@ -1,5 +1,20 @@
 ## Version History
 
+#### 0.4.0-20140110
+
+* pyenv: Reliably detect parent shell in `pyenv init` (#93)
+* pyenv: Import recent changes from rbenv 0.4.0
+* pyenv: Import `bats` tests from rbenv 0.4.0
+* python-build: Add new CPython releases candidates; 3.4.0b2
+* python-build: Add ruby-build style patching feature (#91)
+* python-build: Set `RPATH` if `--enable-shared` was given (#65, #66, 82)
+* python-build: Update default setuptools version (2.0 -> 2.1)
+* python-build: Update default pip version (1.4.1 -> 1.5)
+* python-build: Activate friendly CPython during build if the one is not activated (8fa6b4a1847851919ad7857c6c42ed809a4d277b)
+* python-build: Fix broken install.sh
+* python-build: Import recent changes from ruby-build v20131225.1
+* version-ext-compat: Removed from default plugin. Please use [pyenv-version-ext](https://github.com/yyuu/pyenv-version-ext) instead.
+
 #### 0.4.0-20131217
 
 * python-build: Fix broken build of CPython 3.3+ on Darwin
