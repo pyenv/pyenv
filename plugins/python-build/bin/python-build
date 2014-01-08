@@ -938,11 +938,9 @@ has_broken_mac_readline() {
     # https://github.com/yyuu/pyenv/issues/23
     local retval=1
     local conftest="$BUILD_PATH/has_broken_mac_readline.h"
-    if [ "$(uname -s)" = "Darwin" ]; then
-      echo "#include <readline/rlconf.h>" > "$conftest"
-      "${CPP:-cpp}" $CPPFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
-      rm -f "$conftest"
-    fi
+    echo "#include <readline/rlconf.h>" > "$conftest"
+    "${CPP:-cpp}" $CPPFLAGS "$conftest" 1>/dev/null 2>&1 || retval=0
+    rm -f "$conftest"
     return "$retval"
   else
     return 1
