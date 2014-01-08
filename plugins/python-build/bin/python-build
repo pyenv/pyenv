@@ -926,7 +926,7 @@ needs_yaml() {
 use_homebrew_yaml() {
   local libdir="$(brew --prefix libyaml 2>/dev/null || true)"
   if [ -d "$libdir" ]; then
-    package_option ruby configure --with-libyaml-dir="$libdir"
+    package_option python configure CPPFLAGS="-I$libdir/include" LDFLAGS="-L$libdir/lib"
   else
     return 1
   fi
@@ -950,8 +950,7 @@ has_broken_mac_readline() {
 use_homebrew_readline() {
     local libdir="$(brew --prefix readline 2>/dev/null || true)"
     if [ -d "$libdir" ]; then
-      CPPFLAGS="-I$libdir/include $CPPFLAGS"
-      LDFLAGS="-L$libdir/lib $LDFLAGS"
+      package_option python configure CPPFLAGS="-I$libdir/include" LDFLAGS="-L$libdir/lib"
     else
       return 1
     fi
@@ -966,8 +965,7 @@ has_broken_mac_openssl() {
 use_homebrew_openssl() {
   local ssldir="$(brew --prefix openssl 2>/dev/null || true)"
   if [ -d "$ssldir" ]; then
-    CPPFLAGS="-I$ssldir/include $CPPFLAGS"
-    LDFLAGS="-L$ssldir/lib $LDFLAGS"
+    package_option python configure CPPFLAGS="-I$ssldir/include" LDFLAGS="-L$ssldir/lib"
   else
     return 1
   fi
@@ -981,7 +979,7 @@ build_package_mac_openssl() {
   OPENSSLDIR="${OPENSSLDIR:-$OPENSSL_PREFIX_PATH/ssl}"
 
   # Tell Python to use this openssl for its extension.
-  package_option python configure --with-openssl-dir="$OPENSSL_PREFIX_PATH"
+  package_option python configure CPPFLAGS="-I${OPENSSL_PREFIX_PATH}/include" LDFLAGS="-L${OPENSSL_PREFIX_PATH}/lib"
 
   # Hint OpenSSL that we prefer a 64-bit build.
   export KERNEL_BITS="64"
@@ -1028,7 +1026,7 @@ build_package_auto_tcltk() {
         export CPPFLAGS="-I/opt/X11/include $CPPFLAGS"
       fi
     else
-      package_option ruby configure --without-tk
+      package_option python configure --without-tk
     fi
   fi
 }
@@ -1337,7 +1335,7 @@ else
 fi
 
 if [ -n "$DEBUG" ]; then
-  PYTHON_CONFIGURE_OPTS="--with-pydebug $PYTHON_CONFIGURE_OPTS"
+  package_option python configure --with-pydebug
 fi
 
 if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]] && [[ "$LDFLAGS" != *"-rpath="* ]]; then
