@@ -758,28 +758,104 @@ fix_rbx_irb() {
 }
 
 require_gcc() {
-  require_cc "gcc"
+  local gcc="$(locate_gcc || true)"
+
+  if [ -z "$gcc" ]; then
+    local esc=$'\033'
+    { echo
+      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with GCC, but python-build couldn't"
+      echo "find a suitable \`gcc\` executable on your system. Please install GCC"
+      echo "and try again."
+      echo
+
+      if [ "$(uname -s)" = "Darwin" ]; then
+        echo "${esc}[1mDETAILS${esc}[0m: Apple no longer includes the official GCC compiler with Xcode"
+        echo "as of version 4.2. Instead, the \`gcc\` executable is a symlink to"
+        echo "\`llvm-gcc\`, a modified version of GCC which outputs LLVM bytecode."
+        echo
+        echo "For most programs the \`llvm-gcc\` compiler works fine. However,"
+        echo "versions of CPython newer than 3.3.0 are incompatible with"
+        echo "\`llvm-gcc\`. To build newer versions of CPython you must have the official"
+        echo "GCC compiler installed on your system."
+        echo
+
+        if type brew &>/dev/null; then
+          echo "${esc}[1mTO FIX THE PROBLEM${esc}[0m: Install Homebrew's apple-gcc42 package with this"
+          echo "command: ${esc}[4mbrew tap homebrew/dupes ; brew install apple-gcc42${esc}[0m"
+        else
+          echo "${esc}[1mTO FIX THE PROBLEM${esc}[0m: Install the official GCC compiler using these"
+          echo "packages: ${esc}[4mhttps://github.com/kennethreitz/osx-gcc-installer/downloads${esc}[0m"
+        fi
+
+        echo
+        echo "You will need to install the official GCC compiler to build newer"
+        echo "versions of CPython even if you have installed Apple's Command Line Tools"
+        echo "for Xcode package. The Command Line Tools for Xcode package only"
+        echo "includes \`llvm-gcc\`."
+      fi
+    } >&3
+    return 1
+  fi
+
+  export CC="$gcc"
 }
 
-require_cc() {
-  while [ -n "$1" ]; do
-    if [ "$1" = "--if" ]; then
-      "$2" || return 0
-      shift 2
-    else
-      break
-    fi
-  done
+locate_gcc() {
+  local gcc gccs
+  IFS=: gccs=($(gccs_in_path))
 
-  local cc
-  local ccname="${1:-cc}"
-  cc="$(locate_cc "$ccname" || true)"
+  verify_gcc "$CC" ||
+  verify_gcc "$(command -v gcc || true)" || {
+    for gcc in "${gccs[@]}"; do
+      verify_gcc "$gcc" && break || true
+    done
+  }
+
+  return 1
+}
+
+gccs_in_path() {
+  local gcc path paths
+  local gccs=()
+  IFS=: paths=($PATH)
+
+  shopt -s nullglob
+  for path in "${paths[@]}"; do
+    for gcc in "$path"/gcc-*; do
+      gccs["${#gccs[@]}"]="$gcc"
+    done
+  done
+  shopt -u nullglob
+
+  printf :%s "${gccs[@]}"
+}
+
+verify_gcc() {
+  local gcc="$1"
+  if [ -z "$gcc" ]; then
+    return 1
+  fi
+
+  local version="$("$gcc" --version || true)"
+  if [ -z "$version" ]; then
+    return 1
+  fi
+
+  if echo "$version" | grep LLVM >/dev/null; then
+    return 1
+  fi
+
+  echo "$gcc"
+}
+
+require_clang() {
+  local cc="$(command -v "$CC" || command -v "clang" || command -v "cc" || true)"
 
   if [ -z "$cc" ]; then
     local esc=$'\033'
     { echo
-      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with $ccname, but python-build couldn't"
-      echo "find a suitable \`$ccname\` executable on your system. Please install $ccname"
+      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with cc, but python-build couldn't"
+      echo "find a suitable \`cc\` executable on your system. Please install cc"
       echo "and try again."
       echo
     } >&3
@@ -789,76 +865,8 @@ require_cc() {
   export CC="$cc"
 } 
 
-locate_gcc() {
-  locate_cc "gcc" "$@"
-}
-
-locate_cc() {
-  local ccname="$1"; shift
-  if [ -z "$ccname" ]; then
-    return 1
-  fi
-  local cc ccs
-  IFS=: ccs=($(ccs_in_path "${ccname}"))
-
-  verify_cc "${ccname}" "$CC" ||
-  verify_cc "${ccname}" "$(command -v "${ccname}" || true)" || {
-    for cc in "${ccs[@]}"; do
-      verify_cc "${ccname}" "$cc" && break || true
-    done
-  }
-
-  return 1
-}
-
-gccs_in_path() {
-  ccs_in_path "gcc" "$@"
-}
-
-ccs_in_path() {
-  local ccname="$1"; shift
-  if [ -z "$ccname" ]; then
-    return 1
-  fi
-  local cc path paths
-  local ccs=()
-  IFS=: paths=($PATH)
-
-  shopt -s nullglob
-  for path in "${paths[@]}"; do
-    for cc in "$path"/${ccname}-*; do
-      ccs["${#ccs[@]}"]="$cc"
-    done
-  done
-  shopt -u nullglob
-
-  printf :%s "${ccs[@]}"
-}
-
-verify_gcc() {
-  verify_cc "gcc" "$@"
-}
-
-verify_cc() {
-  local ccname="$1"; shift
-  if [ -z "$ccname" ]; then
-    return 1
-  fi
-  local cc="$1"
-  if [ -z "$cc" ]; then
-    return 1
-  fi
-
-  local version="$("$cc" --version || true)"
-  if [ -z "$version" ]; then
-    return 1
-  fi
-
-  echo "$cc"
-}
-
 require_java() {
-  local java="$(locate_java || true)"
+  local java="$(command -v java || true)"
 
   if [ -z "$java" ]; then
     local esc=$'\033'
@@ -874,52 +882,8 @@ require_java() {
   export JAVA="$java"
 }
 
-locate_java() {
-  local java javas
-  IFS=: javas=($(javas_in_path))
-
-  verify_java "$JAVA" ||
-  verify_java "$(command -v java || true)" || {
-    for java in "${javas[@]}"; do
-      verify_java "$java" && break || true
-    done
-  }
-
-  return 1
-}
-
-javas_in_path() {
-  local java path paths
-  local javas=()
-  IFS=: paths=($PATH)
-
-  shopt -s nullglob
-  for path in "${paths[@]}"; do
-    local java="$path"/java
-    if [ -x "$java" ]; then
-      javas["${#javas[@]}"]="$java"
-    fi
-  done
-  shopt -u nullglob
-
-  printf :%s "${javas[@]}"
-}
-
-verify_java() {
-  local java="$1"
-  if [ -z "$java" ]; then
-    return 1
-  fi
-
-  if [ ! -x "$java" ]; then
-    return 1
-  fi
-
-  echo "$java"
-}
-
 needs_yaml() {
-  [[ "$RUBY_CONFIGURE_OPTS" != *--with-libyaml-dir=* ]] &&
+  [[ "$PYTHON_CONFIGURE_OPTS" != *--with-libyaml-dir=* ]] &&
   ! use_homebrew_yaml
 }
 
@@ -1067,11 +1031,6 @@ apply_python_patch() {
     patch -p0 -i "${2:--}"
     ;;
   esac
-}
-
-has_broken_mac_llvm_gcc() {
-  [ "$(uname -s)" = "Darwin" ] &&
-  [[ "$(gcc --version 2>/dev/null || true)" == *"llvm-gcc-4.2"* ]]
 }
 
 build_package_verify_python() {
