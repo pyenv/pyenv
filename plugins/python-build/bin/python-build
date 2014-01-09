@@ -849,20 +849,20 @@ verify_gcc() {
 }
 
 require_clang() {
-  local cc="$(command -v "$CC" || command -v "clang" || command -v "cc" || true)"
+  local clang="$(command -v "$CC" || command -v "clang" || true)"
 
-  if [ -z "$cc" ]; then
+  if [ -z "$clang" ]; then
     local esc=$'\033'
     { echo
-      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with cc, but python-build couldn't"
-      echo "find a suitable \`cc\` executable on your system. Please install cc"
+      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with clang, but python-build couldn't"
+      echo "find a suitable \`clang\` executable on your system. Please install clang"
       echo "and try again."
       echo
     } >&3
     return 1
   fi
  
-  export CC="$cc"
+  export CC="$clang"
 } 
 
 require_java() {
