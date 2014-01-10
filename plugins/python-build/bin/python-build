@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20131225.1"
+PYTHON_BUILD_VERSION="20140110.1"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -897,7 +897,6 @@ require_java() {
 }
 
 needs_yaml() {
-  [[ "$PYTHON_CONFIGURE_OPTS" != *--with-libyaml-dir=* ]] &&
   ! use_homebrew_yaml
 }
 
@@ -1048,14 +1047,8 @@ apply_python_patch() {
 }
 
 build_package_verify_python() {
-  # Check the existence of ./bin since pyenv-which searches the executables from there
-  if [ ! -d "${PREFIX_PATH}/bin" ]; then
-    echo "pyenv: invalid Python installation" >&4 2>&1
-    return 1
-  fi
-
   # Create `python` executable if missing. Especially for Py3k.
-  if [ ! -e "${PREFIX_PATH}/bin/python" ]; then
+  [ -e "${PYTHON_BIN}" ] || {
     local python
     for python in "${PREFIX_PATH}/bin/python"*; do
       if expr "$(basename "$python")" : '^python[0-9][0-9]*\.[0-9][0-9]*$' 2>&1 >/dev/null; then
@@ -1063,8 +1056,7 @@ build_package_verify_python() {
         break
       fi
     done
-  fi
-
+  }
   if [ ! -x "${PYTHON_BIN}" ]; then
     echo "pyenv: invalid Python executable: ${PYTHON_BIN}" >&4 2>&1
     return 1
@@ -1193,8 +1185,8 @@ list_definitions() {
 unset VERBOSE
 unset KEEP_BUILD_PATH
 unset HAS_PATCH
-unset DEBUG
 PYTHON_BUILD_ROOT="$(abs_dirname "$0")/.."
+unset DEBUG
 
 parse_options "$@"
 
@@ -1311,9 +1303,9 @@ if [ -n "$DEBUG" ]; then
   package_option python configure --with-pydebug
 fi
 
-if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]] && [[ "$LDFLAGS" != *"-rpath="* ]]; then
+if [[ "$CONFIGURE_OPTS" == *"--enable-shared"* ]] || [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]]; then
   # The ld on Darwin embeds the full paths to each dylib by default
-  if [[ "Darwin" != "$(uname -s)" ]]; then
+  if [[ "$LDFLAGS" != *"-rpath="* ]] && [[ "Darwin" != "$(uname -s)" ]]; then
     export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
   fi
 fi
@@ -1323,7 +1315,7 @@ LOG_PATH="${TMP}/python-build.${SEED}.log"
 PYTHON_BIN="${PREFIX_PATH}/bin/python"
 CWD="$(pwd)"
 
-if [ -z $PYTHON_BUILD_BUILD_PATH ]; then
+if [ -z "$PYTHON_BUILD_BUILD_PATH" ]; then
   BUILD_PATH="${TMP}/python-build.${SEED}"
 else
   BUILD_PATH="$PYTHON_BUILD_BUILD_PATH"
