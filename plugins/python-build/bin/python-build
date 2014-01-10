@@ -848,6 +848,20 @@ verify_gcc() {
   echo "$gcc"
 }
 
+require_cc() {
+  local cc=("$@")
+  while [ -n "${cc}" ]; do
+    { if [ "${#cc[@]}" -le 1 ]; then
+        "require_${cc}" # display last error
+      else
+        "require_${cc}" 3>/dev/null
+      fi
+    } && return 0
+    cc=("${cc[@]:1}")
+  done
+  return 1
+}
+
 require_clang() {
   local clang="$(command -v "$CC" || command -v "clang" || true)"
 
