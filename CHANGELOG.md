@@ -1,5 +1,9 @@
 ## Version History
 
+#### 0.4.0-20140110.1
+
+* python-build: Fix build error of CPython 2.x on the platform where the `gcc` is llvm-gcc.
+
 #### 0.4.0-20140110
 
 * pyenv: Reliably detect parent shell in `pyenv init` (#93)
