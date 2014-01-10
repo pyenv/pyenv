@@ -41,7 +41,7 @@ for script in "${scripts[@]}"; do
 done
 
 shift 1
-if [ "$PYENV_VERSION" != "system" ]; then
-  export PATH="${PYENV_BIN_PATH}:${PATH}"
-fi
+# CPython's `sys.executable` requires the `PYENV_BIN_PATH` to be at the top of the `PATH`.
+# https://github.com/yyuu/pyenv/issues/98
+export PATH="${PYENV_BIN_PATH}:${PATH}"
 exec -a "$PYENV_COMMAND" "$PYENV_COMMAND_PATH" "$@"
