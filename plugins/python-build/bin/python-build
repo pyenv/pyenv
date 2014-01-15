@@ -165,9 +165,11 @@ make_package() {
   shift
 
   pushd "$package_name" >&4
+  setup_builtin_patches "$package_name"
   before_install_package "$package_name"
   build_package "$package_name" $*
   after_install_package "$package_name"
+  cleanup_builtin_patches "$package_name"
   fix_directory_permissions
   popd >&4
 }
@@ -699,10 +701,13 @@ build_package_copy() {
 
 before_install_package() {
   local stub=1
-  before_install_package_patch "$@"
 }
 
-before_install_package_patch() {
+after_install_package() {
+  local stub=1
+}
+
+setup_builtin_patches() {
   local package_name="$1"
   local package_patch_path="${PYTHON_BUILD_ROOT}/share/python-build/patches/${DEFINITION_PATH##*/}/${package_name}"
 
@@ -713,19 +718,14 @@ before_install_package_patch() {
     { for patch in "${package_patch_path}"/*; do
         [ -f "${patch}" ] && echo "${patch}"
       done
-    } | sort | xargs cat -- 1>"${package_name}.patch"
+    } 2>/dev/null | sort | xargs cat 1>"${package_name}.patch"
     exec <&-
     exec <"${package_name}.patch"
     HAS_PATCH=true
   fi
 }
 
-after_install_package() {
-  local stub=1
-  after_install_package_patch "$@"
-}
-
-after_install_package_patch() {
+cleanup_builtin_patches() {
   local package_name="$1"
   rm -f "${package_name}.patch"
   HAS_PATCH="$ORIG_HAS_PATCH"
