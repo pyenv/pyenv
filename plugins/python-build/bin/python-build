@@ -709,7 +709,11 @@ before_install_package_patch() {
   ORIG_HAS_PATCH="$HAS_PATCH"
 # Apply built-in patches if patch was not given from stdin
   if [ -z "$HAS_PATCH" ] && [ -d "${package_patch_path}" ]; then
-    ( cat "${package_patch_path}"/* || true ) 2>/dev/null 1>"${package_name}.patch"
+    local patch
+    { for patch in "${package_patch_path}"/*; do
+        [ -f "${patch}" ] && echo "${patch}"
+      done
+    } | sort | xargs cat -- 1>"${package_name}.patch"
     exec <&-
     exec <"${package_name}.patch"
     HAS_PATCH=true
