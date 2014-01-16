@@ -1051,16 +1051,11 @@ apply_python_patch() {
 }
 
 build_package_verify_python() {
-  # Create `python` executable if missing. Especially for Py3k.
-  [ -e "${PYTHON_BIN}" ] || {
-    local python
-    for python in "${PREFIX_PATH}/bin/python"*; do
-      if expr "$(basename "$python")" : '^python[0-9][0-9]*\.[0-9][0-9]*$' 2>&1 >/dev/null; then
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "$(basename "$python")" python )
-        break
-      fi
-    done
-  }
+  local package_name="$1"
+  local python="$2"
+  if [ ! -e "${PREFIX_PATH}/bin/python" ] && [ -e "${PREFIX_PATH}/bin/${python}" ]; then
+    ( cd "${PREFIX_PATH}/bin" && ln -fs "${python}" "python" )
+  fi
   if [ ! -x "${PYTHON_BIN}" ]; then
     echo "pyenv: invalid Python executable: ${PYTHON_BIN}" >&4 2>&1
     return 1
@@ -1069,57 +1064,69 @@ build_package_verify_python() {
 
 # Post-install check for Python 2.4.x
 build_package_verify_py24() {
-  build_package_verify_python "$@"
-  build_package_verify_readline "$@"
-  build_package_verify_zlib "$@"
-  build_package_verify_bz2 "$@"
+  build_package_verify_python "$1" "${2:-python2.4}"
+  build_package_verify_readline "$1" "${2:-python2.4}"
+  build_package_verify_zlib "$1" "${2:-python2.4}"
+  build_package_verify_bz2 "$1" "${2:-python2.4}"
 }
 
 # Post-install check for Python 2.5.x
 build_package_verify_py25() {
-  build_package_verify_py24 "$@"
-  build_package_verify_sqlite3 "$@"
+  build_package_verify_py24 "$1" "${2:-python2.5}"
+  build_package_verify_sqlite3 "$1" "${2:-python2.5}"
 }
 
 # Post-install check for Python 2.6.x
 build_package_verify_py26() {
-  build_package_verify_py25 "$@"
-  build_package_verify_ssl "$@"
+  build_package_verify_py25 "$1" "${2:-python2.6}"
+  build_package_verify_ssl "$1" "${2:-python2.6}"
 }
 
 # Post-install check for Python 2.7.x
 build_package_verify_py27() {
-  build_package_verify_py26 "$@"
+  build_package_verify_py26 "$1" "${2:-python2.7}"
 }
 
 # Post-install check for Python 3.0.x
 build_package_verify_py30() {
-  build_package_verify_python "$@"
-  build_package_verify_readline "$@"
-  build_package_verify_ssl "$@"
-  build_package_verify_sqlite3 "$@"
-  build_package_verify_zlib "$@"
-  build_package_verify_bz2 "$@"
+  build_package_verify_python "$1" "${2:-python3.0}"
+  build_package_verify_readline "$1" "${2:-python3.0}"
+  build_package_verify_ssl "$1" "${2:-python3.0}"
+  build_package_verify_sqlite3 "$1" "${2:-python3.0}"
+  build_package_verify_zlib "$1" "${2:-python3.0}"
+  build_package_verify_bz2 "$1" "${2:-python3.0}"
 }
 
 # Post-install check for Python 3.1.x
 build_package_verify_py31() {
-  build_package_verify_py30 "$@"
+  build_package_verify_py30 "$1" "${2:-python3.1}"
 }
 
 # Post-install check for Python 3.2.x
 build_package_verify_py32() {
-  build_package_verify_py31 "$@"
+  build_package_verify_py31 "$1" "${2:-python3.2}"
 }
 
 # Post-install check for Python 3.3.x
 build_package_verify_py33() {
-  build_package_verify_py32 "$@"
+  build_package_verify_py32 "$1" "${2:-python3.3}"
 }
 
 # Post-install check for Python 3.4.x
 build_package_verify_py34() {
-  build_package_verify_py33 "$@"
+  build_package_verify_py33 "$1" "${2:-python3.4}"
+}
+
+build_package_ensurepip() {
+  { "$PYTHON_BIN" -m ensurepip
+  } >&4 2>&1
+
+  if [ ! -e "${PREFIX_PATH}/bin/pip" ]; then
+    local pip="$("$PYTHON_BIN" -c 'import sys;v=sys.version_info;sys.stdout.write("pip%d.%d"%(v[0],v[1]))')"
+    if [ -e "${PREFIX_PATH}/bin/${pip}" ]; then
+      ( cd "${PREFIX_PATH}/bin" && ln -fs "${pip}" "pip" )
+    fi
+  fi
 }
 
 build_package_verify_import() {
