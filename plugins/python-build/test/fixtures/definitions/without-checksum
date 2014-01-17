@@ -1,0 +1,1 @@
+install_package "package-1.0.0" "http://example.com/packages/package-1.0.0.tar.gz" copy

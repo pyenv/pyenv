@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -e
+
+status=0
+program="${0##*/}"
+PROGRAM="$(echo "$program" | tr a-z- A-Z_)"
+[ -n "$TMPDIR" ] || TMPDIR="/tmp"
+
+_STUB_PLAN="${PROGRAM}_STUB_PLAN"
+_STUB_RUN="${PROGRAM}_STUB_RUN"
+_STUB_INDEX="${PROGRAM}_STUB_INDEX"
+_STUB_RESULT="${PROGRAM}_STUB_RESULT"
+_STUB_END="${PROGRAM}_STUB_END"
+_STUB_DEBUG="${PROGRAM}_STUB_DEBUG"
+
+if [ -n "${!_STUB_DEBUG}" ]; then
+  echo "$program" "$@" >&${!_STUB_DEBUG}
+fi
+
+[ -e "${!_STUB_PLAN}" ] || exit 1
+[ -n "${!_STUB_RUN}" ] || eval "${_STUB_RUN}"="${TMPDIR}/${program}-stub-run"
+
+
+# Initialize or load the stub run information.
+eval "${_STUB_INDEX}"=1
+eval "${_STUB_RESULT}"=0
+[ ! -e "${!_STUB_RUN}" ] || source "${!_STUB_RUN}"
+
+
+# Loop over each line in the plan.
+index=0
+while IFS= read -r line; do
+  index=$(($index + 1))
+
+  if [ -z "${!_STUB_END}" ] && [ $index -eq "${!_STUB_INDEX}" ]; then
+    # We found the plan line we're interested in.
+    # Start off by assuming success.
+    result=0
+
+    # Split the line into an array of arguments to
+    # match and a command to run to produce output.
+    command=" $line"
+    if [ "$command" != "${command/ : }" ]; then
+      patterns="${command%% : *}"
+      command="${command#* : }"
+    fi
+
+    # Naively split patterns by whitespace for now.
+    # In the future, use a sed script to split while
+    # respecting quoting.
+    set -f
+    patterns=($patterns)
+    set +f
+    arguments=("$@")
+
+    # Match the expected argument patterns to actual
+    # arguments.
+    for (( i=0; i<${#patterns[@]}; i++ )); do
+      pattern="${patterns[$i]}"
+      argument="${arguments[$i]}"
+
+      case "$argument" in
+        $pattern ) ;;
+        * ) result=1 ;;
+      esac
+    done
+
+    # If the arguments matched, evaluate the command
+    # in a subshell. Otherwise, log the failure.
+    if [ $result -eq 0 ] ; then
+      set +e
+      ( eval "$command" )
+      status="$?"
+      set -e
+    else
+      eval "${_STUB_RESULT}"=1
+    fi
+  fi
+done < "${!_STUB_PLAN}"
+
+
+if [ -n "${!_STUB_END}" ]; then
+  # Clean up the run file.
+  rm -f "${!_STUB_RUN}"
+
+  # If the number of lines in the plan is larger than
+  # the requested index, we failed.
+  if [ $index -ge "${!_STUB_INDEX}" ]; then
+    eval "${_STUB_RESULT}"=1
+  fi
+
+  # Return the result.
+  exit "${!_STUB_RESULT}"
+
+else
+  # If the requested index is larger than the number
+  # of lines in the plan file, we failed.
+  if [ "${!_STUB_INDEX}" -gt $index ]; then
+    eval "${_STUB_RESULT}"=1
+  fi
+
+  # Write out the run information.
+  { echo "${_STUB_INDEX}=$((${!_STUB_INDEX} + 1))"
+    echo "${_STUB_RESULT}=${!_STUB_RESULT}"
+  } > "${!_STUB_RUN}"
+
+  exit "$status"
+
+fi
