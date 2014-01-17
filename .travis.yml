@@ -1,4 +1,8 @@
 install: git clone https://github.com/sstephenson/bats.git
 script: bats/bin/bats --tap test
-# skips unnecessary Python-specific setup
+after_script:
+  - bats/bin/bats --tap plugins/python-build/test
 language: c
+notifications:
+  email:
+    on_success: never
