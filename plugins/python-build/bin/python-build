@@ -1062,6 +1062,19 @@ apply_python_patch() {
 build_package_verify_python() {
   local package_name="$1"
   local python="$2"
+  if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+    local path file
+    for path in bin include lib share; do
+      mkdir -p "${PREFIX_PATH}/${path}"
+      mv -f "${PREFIX_PATH}/${path}" "${PREFIX_PATH}/.${path}"
+      ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/${path}" "${PREFIX_PATH}/${path}"
+      find "${PREFIX_PATH}/.${path}" -type l -delete
+      for file in "${PREFIX_PATH}/.${path}/"*; do
+        [ -e "${file}" ] && cp -fR "${file}" "${PREFIX_PATH}/${path}"
+      done
+      rm -fr "${PREFIX_PATH}/.${path}"
+    done
+  fi
   if [ ! -e "${PREFIX_PATH}/bin/python" ] && [ -e "${PREFIX_PATH}/bin/${python}" ]; then
     ( cd "${PREFIX_PATH}/bin" && ln -fs "${python}" "python" )
   fi
@@ -1328,6 +1341,10 @@ if [[ "$CONFIGURE_OPTS" == *"--enable-shared"* ]] || [[ "$PYTHON_CONFIGURE_OPTS"
   if [[ "$LDFLAGS" != *"-rpath="* ]] && [[ "Darwin" != "$(uname -s)" ]]; then
     export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
   fi
+fi
+
+if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+  package_option python configure --enable-framework="${PREFIX_PATH}"
 fi
 
 SEED="$(date "+%Y%m%d%H%M%S").$$"
