@@ -1062,6 +1062,11 @@ apply_python_patch() {
 build_package_verify_python() {
   local package_name="$1"
   local python="$2"
+  if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+    # Only symlinks are installed in ${PREFIX_PATH}/bin
+    rm -fr "${PREFIX_PATH}/bin"
+    ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
+  fi
   if [ ! -e "${PREFIX_PATH}/bin/python" ] && [ -e "${PREFIX_PATH}/bin/${python}" ]; then
     ( cd "${PREFIX_PATH}/bin" && ln -fs "${python}" "python" )
   fi
@@ -1328,6 +1333,21 @@ if [[ "$CONFIGURE_OPTS" == *"--enable-shared"* ]] || [[ "$PYTHON_CONFIGURE_OPTS"
   if [[ "$LDFLAGS" != *"-rpath="* ]] && [[ "Darwin" != "$(uname -s)" ]]; then
     export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
   fi
+fi
+
+if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+  create_framework_dirs() {
+    local version="$(echo "$1" | sed -E 's/^[^0-9]*([0-9]+\.[0-9]+).*$/\1/')"
+    mkdir -p "${PREFIX_PATH}/Python.framework/Versions/${version}"
+    ( cd "${PREFIX_PATH}/Python.framework/Versions" && ln -fs "${version}" "Current")
+    local path
+    for path in include lib share; do
+      mkdir -p "${PREFIX_PATH}/Python.framework/Versions/Current/${path}"
+      ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/${path}" "${PREFIX_PATH}/${path}"
+    done
+  }
+  create_framework_dirs "${DEFINITION_PATH##*/}"
+  package_option python configure --enable-framework="${PREFIX_PATH}"
 fi
 
 SEED="$(date "+%Y%m%d%H%M%S").$$"
