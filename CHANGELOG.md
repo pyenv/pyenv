@@ -1,5 +1,14 @@
 ## Version History
 
+#### 0.4.0-20140123
+
+* pyenv: Always append the directory at the top of the `$PATH` to return proper value for `sys.executable` (#98)
+* pyenv: Unset `GREP_OPTIONS` to avoid issues of conflicting options (#101)
+* python-build: Install `pip` with using `ensurepip` if available
+* python-build: Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
+* python-build: Import recent changes from ruby-build v20140110.1
+* python-build: Import `bats` tests from ruby-build v20140110.1
+
 #### 0.4.0-20140110.1
 
 * python-build: Fix build error of CPython 2.x on the platform where the `gcc` is llvm-gcc.
