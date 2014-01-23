@@ -18,6 +18,8 @@ if [ -z "$READLINK" ]; then
   exit 1
 fi
 
+unset GREP_OPTIONS
+
 resolve_link() {
   $READLINK "$1"
 }
