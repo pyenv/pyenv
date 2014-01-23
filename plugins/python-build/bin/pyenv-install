@@ -44,7 +44,7 @@ usage() {
 
 definitions() {
   local query="$1"
-  python-build --definitions | grep -F "$query" || true
+  python-build --definitions | GREP_OPTIONS= grep -F "$query" || true
 }
 
 indent() {
