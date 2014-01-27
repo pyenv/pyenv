@@ -161,7 +161,13 @@ fi
 # unsatisfied local python version can cause the installer to
 # fail.)
 if [[ "${VERSION_NAME}" == [23]"."* ]]; then
-  export PYENV_VERSION="$(pyenv-whence "python${VERSION_NAME%%.${VERSION_NAME##*.}}" 2>/dev/null | tail -1 || true)"
+  for version in "${VERSION_NAME%-dev}" "${VERSION_NAME%.*}" "${VERSION_NAME%%.*}"; do
+    PYENV_VERSION="$(pyenv-whence "python${version}" 2>/dev/null | tail -n 1 || true)"
+    if [ -n "${PYENV_VERSION}" ]; then
+      export PYENV_VERSION
+      break
+    fi
+  done
 fi
 
 
