@@ -131,9 +131,9 @@ Each Python version is installed into its own directory under
 `~/.pyenv/versions`. For example, you might have these versions
 installed:
 
-* `~/.pyenv/versions/2.7.5/`
-* `~/.pyenv/versions/3.3.2/`
-* `~/.pyenv/versions/pypy-1.9/`
+* `~/.pyenv/versions/2.7.6/`
+* `~/.pyenv/versions/3.3.3/`
+* `~/.pyenv/versions/pypy-2.2.1/`
 
 Version names to pyenv are simply the names of the directories in
 `~/.pyenv/versions`.
@@ -178,9 +178,9 @@ to the `pyenv` command-line utility.
         $ exec $SHELL
 
 5. Install Python versions into `$PYENV_ROOT/versions`. For example, to
-   install Python 2.7.5, download and unpack the source, then run:
+   install Python 2.7.6, download and unpack the source, then run:
 
-        $ pyenv install 2.7.5
+        $ pyenv install 2.7.6
 
    **NOTE** If you need to pass configure option to build, please use
    ```CONFIGURE_OPTS``` environment variable.
@@ -287,7 +287,7 @@ overrides the global version, and can be overridden itself by setting
 the `PYENV_VERSION` environment variable or with the `pyenv shell`
 command.
 
-    $ pyenv local 2.7.5
+    $ pyenv local 2.7.6
 
 When run without a version number, `pyenv local` reports the currently
 configured local version. You can also unset the local version:
@@ -299,21 +299,38 @@ file named `.pyenv-version`. For backwards compatibility, pyenv will
 read a local version specified in an `.pyenv-version` file, but a
 `.python-version` file in the same directory will take precedence.
 
-**pyenv feature**
+#### pyenv local (advanced)
 
-You can specify multiple versions as local Python. Commands
-within these Python versions are searched by specified order.
+You can specify multiple versions as local Python at once.
 
-    $ pyenv local 2.7.5 3.2.5
-    $ pyenv local
-    2.7.5
-    3.2.5
-    $ pyenv which python2.7
-    /home/yyuu/.pyenv/versions/2.7.5/bin/python2.7
-    $ pyenv which python3.2
-    /home/yyuu/.pyenv/versions/3.2.5/bin/python3.2
-    $ pyenv which python
-    /home/yyuu/.pyenv/versions/2.7.5/bin/python
+Let's say if you have two versions of 2.7.6 and 3.3.3. If you prefer 2.7.6 over 3.3.3,
+
+    $ pyenv local 2.7.6 3.3.3
+    $ pyenv versions
+      system
+    * 2.7.6 (set by /Users/yyuu/path/to/project/.python-version)
+    * 3.3.3 (set by /Users/yyuu/path/to/project/.python-version)
+    $ python --version
+    Python 2.7.6
+    $ python2.7 --version
+    Python 2.7.6
+    $ python3.3 --version
+    Python 3.3.3
+
+or, if you prefer 3.3.3 over 2.7.6,
+
+    $ pyenv local 3.3.3 2.7.6
+    $ pyenv versions
+      system
+    * 2.7.6 (set by /Users/yyuu/path/to/project/.python-version)
+    * 3.3.3 (set by /Users/yyuu/path/to/project/.python-version)
+      venv27
+    $ python --version
+    Python 3.3.3
+    $ python2.7 --version
+    Python 2.7.6
+    $ python3.3 --version
+    Python 3.3.3
 
 ### pyenv global
 
@@ -322,7 +339,7 @@ the version name to the `~/.pyenv/version` file. This version can be
 overridden by an application-specific `.python-version` file, or by
 setting the `PYENV_VERSION` environment variable.
 
-    $ pyenv global 2.7.5
+    $ pyenv global 2.7.6
 
 The special version name `system` tells pyenv to use the system Python
 (detected by searching your `$PATH`).
@@ -330,21 +347,38 @@ The special version name `system` tells pyenv to use the system Python
 When run without a version number, `pyenv global` reports the
 currently configured global version.
 
-**pyenv feature**
+#### pyenv global (advanced)
 
-You can specify multiple versions as global Python. Commands
-within these Python versions are searched by specified order.
+You can specify multiple versions as global Python at once.
 
-    $ pyenv global 2.7.5 3.2.5
-    $ pyenv global
-    2.7.5
-    3.2.5
-    $ pyenv which python2.7
-    /home/yyuu/.pyenv/versions/2.7.5/bin/python2.7
-    $ pyenv which python3.2
-    /home/yyuu/.pyenv/versions/3.2.5/bin/python3.2
-    $ pyenv which python
-    /home/yyuu/.pyenv/versions/2.7.5/bin/python
+Let's say if you have two versions of 2.7.6 and 3.3.3. If you prefer 2.7.6 over 3.3.3,
+
+    $ pyenv global 2.7.6 3.3.3
+    $ pyenv versions
+      system
+    * 2.7.6 (set by /Users/yyuu/.pyenv/version)
+    * 3.3.3 (set by /Users/yyuu/.pyenv/version)
+    $ python --version
+    Python 2.7.6
+    $ python2.7 --version
+    Python 2.7.6
+    $ python3.3 --version
+    Python 3.3.3
+
+or, if you prefer 3.3.3 over 2.7.6,
+
+    $ pyenv global 3.3.3 2.7.6
+    $ pyenv versions
+      system
+    * 2.7.6 (set by /Users/yyuu/.pyenv/version)
+    * 3.3.3 (set by /Users/yyuu/.pyenv/version)
+      venv27
+    $ python --version
+    Python 3.3.3
+    $ python2.7 --version
+    Python 2.7.6
+    $ python3.3 --version
+    Python 3.3.3
 
 ### pyenv shell
 
@@ -352,7 +386,7 @@ Sets a shell-specific Python version by setting the `PYENV_VERSION`
 environment variable in your shell. This version overrides
 application-specific versions and the global version.
 
-    $ pyenv shell pypy-1.9
+    $ pyenv shell pypy-2.2.1
 
 When run without a version number, `pyenv shell` reports the current
 value of `PYENV_VERSION`. You can also unset the shell version:
@@ -364,19 +398,40 @@ the installation instructions) in order to use this command. If you
 prefer not to use shell integration, you may simply set the
 `PYENV_VERSION` variable yourself:
 
-    $ export PYENV_VERSION=pypy-1.9
+    $ export PYENV_VERSION=pypy-2.2.1
 
-**pyenv feature**
+#### pyenv shell (advanced)
 
-You can specify multiple versions via `PYENV_VERSION`
-environment variable in your shell.
+You can specify multiple versions via `PYENV_VERSION` at once.
 
-    $ pyenv shell pypy-1.9 2.7.5
-    $ echo $PYENV_VERSION
-    pypy-1.9:2.7.5
-    $ pyenv version
-    pypy-1.9 (set by PYENV_VERSION environment variable)
-    2.7.5 (set by PYENV_VERSION environment variable)
+Let's say if you have two versions of 2.7.6 and 3.3.3. If you prefer 2.7.6 over 3.3.3,
+
+    $ pyenv shell 2.7.6 3.3.3
+    $ pyenv versions
+      system
+    * 2.7.6 (set by PYENV_VERSION environment variable)
+    * 3.3.3 (set by PYENV_VERSION environment variable)
+    $ python --version
+    Python 2.7.6
+    $ python2.7 --version
+    Python 2.7.6
+    $ python3.3 --version
+    Python 3.3.3
+
+or, if you prefer 3.3.3 over 2.7.6,
+
+    $ pyenv shell 3.3.3 2.7.6
+    $ pyenv versions
+      system
+    * 2.7.6 (set by PYENV_VERSION environment variable)
+    * 3.3.3 (set by PYENV_VERSION environment variable)
+      venv27
+    $ python --version
+    Python 3.3.3
+    $ python2.7 --version
+    Python 2.7.6
+    $ python3.3 --version
+    Python 3.3.3
 
 ### pyenv versions
 
@@ -386,10 +441,10 @@ the currently active version.
     $ pyenv versions
       2.5.6
       2.6.8
-    * 2.7.5 (set by /home/yyuu/.pyenv/version)
-      3.2.5
+    * 2.7.6 (set by /home/yyuu/.pyenv/version)
+      3.3.3
       jython-2.5.3
-      pypy-1.9
+      pypy-2.2.1
 
 ### pyenv version
 
@@ -397,7 +452,7 @@ Displays the currently active Python version, along with information on
 how it was set.
 
     $ pyenv version
-    2.7.5 (set by /home/yyuu/.pyenv/version)
+    2.7.6 (set by /home/yyuu/.pyenv/version)
 
 ### pyenv rehash
 
@@ -412,8 +467,8 @@ version of Python, or install a package that provides binaries.
 Displays the full path to the executable that pyenv will invoke when
 you run the given command.
 
-    $ pyenv which python3.2
-    /home/yyuu/.pyenv/versions/3.2.5/bin/python3.2
+    $ pyenv which python3.3
+    /home/yyuu/.pyenv/versions/3.3.3/bin/python3.3
 
 ### pyenv whence
 
@@ -421,8 +476,8 @@ Lists all Python versions with the given command installed.
 
     $ pyenv whence 2to3
     2.6.8
-    2.7.5
-    3.2.5
+    2.7.6
+    3.3.3
 
 ## Development
 
