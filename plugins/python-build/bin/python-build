@@ -732,6 +732,11 @@ build_package_anaconda() {
   } >&4 2>&1
 }
 
+build_package_miniconda() {
+  build_package_anaconda "$@"
+  "${PREFIX_PATH}/bin/conda" install --yes "pip"
+}
+
 build_package_copy() {
   mkdir -p "$PREFIX_PATH"
   cp -fR . "$PREFIX_PATH"

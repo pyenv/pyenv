@@ -1,0 +1,19 @@
+case "$(uname -s)" in
+"Darwin" )
+  install_script "Miniconda-3.0.0-MacOSX-x86_64" "http://repo.continuum.io/miniconda/Miniconda-3.0.0-MacOSX-x86_64.sh#4dc63992aca6ddb3d10aba902ed00a56" "miniconda" verify_py27
+  ;;
+"Linux" )
+  case "$(uname -m)" in
+  "i386" | "i486" | "i586" | "i686" | "i786" )
+    install_script "Miniconda-3.0.0-Linux-x86" "http://repo.continuum.io/miniconda/Miniconda-3.0.0-Linux-x86.sh#9d1473a904a39f44d6f8e0860424d16b" "miniconda" verify_py27
+  ;;
+  "x86_64" )
+    install_script "Miniconda-3.0.0-Linux-x86_64" "http://repo.continuum.io/miniconda/Miniconda-3.0.0-Linux-x86_64.sh#acf150992cf8d5c332064b31ff885858" "miniconda" verify_py27
+  esac
+  ;;
+* )
+  { echo "Precompiled binary of miniconda-3.0.0 is not available for $(uname -s)-$(uname -m)."
+  } 1>&4 2>&1
+  false
+  ;;
+esac
