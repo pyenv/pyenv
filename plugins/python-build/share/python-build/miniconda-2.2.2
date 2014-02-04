@@ -1,0 +1,26 @@
+case "$(uname -s)" in
+"Darwin" )
+  package_name="Miniconda-2.2.2-MacOSX-x86_64"
+  package_url="http://repo.continuum.io/miniconda/Miniconda-2.2.2-MacOSX-x86_64.sh#cd0c8059fd7040a25d015c67f85bbc44"
+  ;;
+"Linux" )
+  case "$(uname -m)" in
+  "i386" | "i486" | "i586" | "i686" | "i786" )
+    package_name="Miniconda-2.2.2-Linux-x86"
+    package_url="http://repo.continuum.io/miniconda/Miniconda-2.2.2-Linux-x86.sh#26a4bdf7183aefa360f2aba8e9386a7f"
+    ;;
+  "x86_64" )
+    package_name="Miniconda-2.2.2-Linux-x86_64"
+    package_url="http://repo.continuum.io/miniconda/Miniconda-2.2.2-Linux-x86_64.sh#a24a8baa264dee7cfd9286ae3d4add60"
+    ;;
+  esac
+  ;;
+esac
+
+if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
+  install_script "${package_name}" "${package_url}" "miniconda" verify_py27
+else
+  { echo "Precompiled binary of miniconda-2.2.2 is not available for $(uname -s)-$(uname -m)."
+  } 1>&4 2>&1
+  exit 1
+fi
