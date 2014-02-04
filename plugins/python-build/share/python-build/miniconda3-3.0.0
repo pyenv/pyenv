@@ -1,0 +1,26 @@
+case "$(uname -s)" in
+"Darwin" )
+  package_name="Miniconda3-3.0.0-MacOSX-x86_64"
+  package_url="http://repo.continuum.io/miniconda/Miniconda3-3.0.0-MacOSX-x86_64.sh#2b356f05895a0694fc59f7cd809038f2"
+  ;;
+"Linux" )
+  case "$(uname -m)" in
+  "i386" | "i486" | "i586" | "i686" | "i786" )
+    package_name="Miniconda3-3.0.0-Linux-x86"
+    package_url="http://repo.continuum.io/miniconda/Miniconda3-3.0.0-Linux-x86.sh#4abe8655f5c361338fb317b018ce7c98"
+    ;;
+  "x86_64" )
+    package_name="Miniconda3-3.0.0-Linux-x86_64"
+    package_url="http://repo.continuum.io/miniconda/Miniconda3-3.0.0-Linux-x86_64.sh#f74f8e9223492ef292a9b2d87e265de9"
+    ;;
+  esac
+  ;;
+esac
+
+if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
+  install_script "${package_name}" "${package_url}" "miniconda" verify_py33
+else
+  { echo "Precompiled binary of miniconda3-3.0.0 is not available for $(uname -s)-$(uname -m)."
+  } 1>&4 2>&1
+  exit 1
+fi

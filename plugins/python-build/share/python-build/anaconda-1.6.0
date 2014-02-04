@@ -1,0 +1,26 @@
+case "$(uname -s)" in
+"Darwin" )
+  package_name="Anaconda-1.6.0-MacOSX-x86_64"
+  package_url="http://repo.continuum.io/archive/Anaconda-1.6.0-MacOSX-x86_64.sh#cccdd0353bfd46d3a93143fc6e47d728"
+  ;;
+"Linux" )
+  case "$(uname -m)" in
+  "i386" | "i486" | "i586" | "i686" | "i786" )
+    package_name="Anaconda-1.6.0-Linux-x86"
+    package_url="http://repo.continuum.io/archive/Anaconda-1.6.0-Linux-x86.sh#7a7f1f53684d38a7aa36935e34af30a3"
+    ;;
+  "x86_64" )
+    package_name="Anaconda-1.6.0-Linux-x86_64"
+    package_url="http://repo.continuum.io/archive/Anaconda-1.6.0-Linux-x86_64.sh#207a0b4ebde49bcde67925ac8c72fe37"
+    ;;
+  esac
+  ;;
+esac
+
+if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
+  install_script "${package_name}" "${package_url}" "anaconda" verify_py27
+else
+  { echo "Precompiled binary of anaconda-1.6.0 is not available for $(uname -s)-$(uname -m)."
+  } 1>&4 2>&1
+  exit 1
+fi
