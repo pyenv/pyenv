@@ -1,0 +1,19 @@
+case "$(uname -s)" in
+"Darwin" )
+  install_script "Anaconda-1.8.0-MacOSX-x86_64" "http://repo.continuum.io/archive/Anaconda-1.8.0-MacOSX-x86_64.sh#9fd7dd485c5f04fb65699a290e69671c" "anaconda" verify_py27
+  ;;
+"Linux" )
+  case "$(uname -m)" in
+  "i386" | "i486" | "i586" | "i686" | "i786" )
+    install_script "Anaconda-1.8.0-Linux-x86" "http://repo.continuum.io/archive/Anaconda-1.8.0-Linux-x86.sh#5028bf0aa7ff8a071d5532b8f8ec924c" "anaconda" verify_py27
+  ;;
+  "x86_64" )
+    install_script "Anaconda-1.8.0-Linux-x86_64" "http://repo.continuum.io/archive/Anaconda-1.8.0-Linux-x86_64.sh#398d4b7ddc5c0a16c556c415b2444266" "anaconda" verify_py27
+  esac
+  ;;
+* )
+  { echo "Precompiled binary of anaconda-1.8.0 is not available for $(uname -s)-$(uname -m)."
+  } 1>&4 2>&1
+  false
+  ;;
+esac
