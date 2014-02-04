@@ -1,27 +1,38 @@
 case "$(uname -s)" in
 "Darwin" )
-  install_package "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-osx64.tar.bz2#78bbf70f55e9fec20d7ac22531a997fc" pypy verify_py27
+  package_name="pypy-1.6"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-osx64.tar.bz2#78bbf70f55e9fec20d7ac22531a997fc"
   ;;
 "Linux" )
   case "$(uname -m)" in
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    install_package "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-linux.tar.bz2#ee949986fc5ec5c4a11ecbd546b87fbb" pypy verify_py27
+    package_name="pypy-1.6"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-linux.tar.bz2#ee949986fc5ec5c4a11ecbd546b87fbb"
     ;;
   "x86_64" )
-    install_package "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-linux64.tar.bz2#a34e3113508449393e874f409dd888fc" pypy verify_py27
+    package_name="pypy-1.6"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-linux64.tar.bz2#a34e3113508449393e874f409dd888fc"
     ;;
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-win32-c.zip#62b9eb914954aeab32905d632d3904f1" pypy verify_py27
-  ;;
-* )
-  { echo "Precompiled binary of pypy-1.6 is not available for $(uname -s)-$(uname -m)."
-  } 1>&4 2>&1
-  false
+  package_name="pypy-1.6"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-win32-c.zip#62b9eb914954aeab32905d632d3904f1"
   ;;
 esac
+
+if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
+  if [ "${package_url}" != "${package_url%%.zip*}" ]; then
+    install_zip "${package_name}" "${package_url}" "pypy" verify_py27
+  else
+    install_package "${package_name}" "${package_url}" "pypy" verify_py27
+  fi
+else
+  { echo "Precompiled binary of pypy-1.6 is not available for $(uname -s)-$(uname -m)."
+  } 1>&4 2>&1
+  exit 1
+fi
 
 install_package "setuptools-2.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-2.1.tar.gz#2044725530450d0517393882dc4b7508" python
 install_package "pip-1.5.2" "https://pypi.python.org/packages/source/p/pip/pip-1.5.2.tar.gz#5da30919f732d68b1c666e484e7676f5" python

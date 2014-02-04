@@ -1,27 +1,39 @@
 case "$(uname -s)" in
 "Darwin" )
-  install_package "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux.tar.bz2#e666450bcfbd936b016a2dd7312f9853" "pypy" verify_py27
+  package_name="pypy-2.0.1"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux.tar.bz2#e666450bcfbd936b016a2dd7312f9853"
   ;;
 "Linux" )
   case "$(uname -m)" in
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    install_package "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux.tar.bz2#8d11952e0356ea751321e7d2a1d4f17a" "pypy" verify_py27
-  ;;
+    package_name="pypy-2.0.1"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux.tar.bz2#8d11952e0356ea751321e7d2a1d4f17a"
+    ;;
   "x86_64" )
-    install_package "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux64.tar.bz2#5c11d727579443d0834caadb4dfe53e3" "pypy" verify_py27
+    package_name="pypy-2.0.1"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux64.tar.bz2#5c11d727579443d0834caadb4dfe53e3"
+    ;;
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-win32.zip#4c40b19ea1ec5c8c8c2a1f94f59bdf02" "pypy" verify_py27
+  package_name="pypy-2.0.1"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-win32.zip#4c40b19ea1ec5c8c8c2a1f94f59bdf02"
   ;;
-* )
+esac
+
+if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
+  if [ "${package_url}" != "${package_url%%.zip*}" ]; then
+    install_zip "${package_name}" "${package_url}" "pypy" verify_py27
+  else
+    install_package "${package_name}" "${package_url}" "pypy" verify_py27
+  fi
+else
   { echo "Precompiled binary of pypy-2.0.1 is not available for $(uname -s)-$(uname -m)."
     echo "To build pypy-2.0.1 from soruce, use 'pypy-2.0.1-src'."
   } 1>&4 2>&1
-  false
-  ;;
-esac
+  exit 1
+fi
 
 install_package "setuptools-2.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-2.1.tar.gz#2044725530450d0517393882dc4b7508" python
 install_package "pip-1.5.2" "https://pypi.python.org/packages/source/p/pip/pip-1.5.2.tar.gz#5da30919f732d68b1c666e484e7676f5" python

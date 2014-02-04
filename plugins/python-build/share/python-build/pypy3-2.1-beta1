@@ -1,33 +1,47 @@
 case "$(uname -s)" in
 "Darwin" )
-  install_package "pypy3-2.1-beta1-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-osx64.tar.bz2#36634bf17f0e9852fda7cc6745f2df28" "pypy" verify_py32
+  package_name="pypy3-2.1-beta1-osx64"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-osx64.tar.bz2#36634bf17f0e9852fda7cc6745f2df28"
   ;;
 "Linux" )
   case "$(uname -m)" in
   "armel" )
-    install_package "pypy3-2.1-beta1-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armel.tar.bz2#d57d0d0d3c49c7cce75440924d8f66b7" "pypy" verify_py32
-  ;;
+    package_name="pypy3-2.1-beta1-linux-armel"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armel.tar.bz2#d57d0d0d3c49c7cce75440924d8f66b7"
+    ;;
   "armhf" )
-    install_package "pypy3-2.1-beta1-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raring.tar.bz2#55b82b199ccf537c7ea5e2f31df78dfe" "pypy" verify_py32
-  ;;
+    package_name="pypy3-2.1-beta1-linux-armhf-raring"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raring.tar.bz2#55b82b199ccf537c7ea5e2f31df78dfe"
+    ;;
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    install_package "pypy3-2.1-beta1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux.tar.bz2#9ae9d0b67279c557fb4b7f57c3072d0f" "pypy" verify_py32
-  ;;
+    package_name="pypy3-2.1-beta1-linux"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux.tar.bz2#9ae9d0b67279c557fb4b7f57c3072d0f"
+    ;;
   "x86_64" )
-    install_package "pypy3-2.1-beta1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux64.tar.bz2#f6adca4d26f34bef9903cc5347c7d688" "pypy" verify_py32
+    package_name="pypy3-2.1-beta1-linux64"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux64.tar.bz2#f6adca4d26f34bef9903cc5347c7d688"
+    ;;
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
   # FIXME: never tested on Windows
-  install_zip "pypy3-2.1-beta1-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-win32.zip#026c8be208bf2ef742ddfa3f8ca41a05" "pypy" verify_py32
+  package_name="pypy3-2.1-beta1-win32"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-win32.zip#026c8be208bf2ef742ddfa3f8ca41a05"
   ;;
-* )
+esac
+
+if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
+  if [ "${package_url}" != "${package_url%%.zip*}" ]; then
+    install_zip "${package_name}" "${package_url}" "pypy" verify_py32
+  else
+    install_package "${package_name}" "${package_url}" "pypy" verify_py32
+  fi
+else
   { echo "Precompiled binary of pypy3-2.1-beta1 is not available for $(uname -s)-$(uname -m)."
     echo "To build pypy3-2.1-beta1 from soruce, use 'pypy3-2.1-beta1-src'."
   } 1>&4 2>&1
-  false
-  ;;
-esac
+  exit 1
+fi
 
 install_package "setuptools-2.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-2.1.tar.gz#2044725530450d0517393882dc4b7508" python
 install_package "pip-1.5.2" "https://pypi.python.org/packages/source/p/pip/pip-1.5.2.tar.gz#5da30919f732d68b1c666e484e7676f5" python

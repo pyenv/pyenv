@@ -1,28 +1,39 @@
 case "$(uname -s)" in
 "Darwin" )
-  install_package "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-osx64.tar.bz2#1c293253e8e4df411c3dd59dff82a663" pypy verify_py27
+  package_name="pypy-1.8"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-osx64.tar.bz2#1c293253e8e4df411c3dd59dff82a663"
   ;;
 "Linux" )
   case "$(uname -m)" in
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    install_package "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux.tar.bz2#c4a1d11e0283a390d9e9b801a4633b9f" pypy verify_py27
+    package_name="pypy-1.8"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux.tar.bz2#c4a1d11e0283a390d9e9b801a4633b9f"
     ;;
   "x86_64" )
-    install_package "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux64.tar.bz2#3b81363ccbc042dfdda2fabbf419e788" pypy verify_py27
+    package_name="pypy-1.8"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux64.tar.bz2#3b81363ccbc042dfdda2fabbf419e788"
     ;;
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-win32.zip#1af8ee722721e9f5fd06b61af530ecb3" pypy verify_py27
+  package_name="pypy-1.8"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-win32.zip#1af8ee722721e9f5fd06b61af530ecb3"
   ;;
-* )
+esac
+
+if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
+  if [ "${package_url}" != "${package_url%%.zip*}" ]; then
+    install_zip "${package_name}" "${package_url}" "pypy" verify_py27
+  else
+    install_package "${package_name}" "${package_url}" "pypy" verify_py27
+  fi
+else
   { echo "Precompiled binary of pypy-1.8 is not available for $(uname -s)-$(uname -m)."
     echo "To build pypy-1.8 from soruce, use 'pypy-1.8-dev'."
   } 1>&4 2>&1
-  false
-  ;;
-esac
+  exit 1
+fi
 
 install_package "setuptools-2.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-2.1.tar.gz#2044725530450d0517393882dc4b7508" python
 install_package "pip-1.5.2" "https://pypi.python.org/packages/source/p/pip/pip-1.5.2.tar.gz#5da30919f732d68b1c666e484e7676f5" python

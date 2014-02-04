@@ -1,33 +1,47 @@
 case "$(uname -s)" in
 "Darwin" )
-  install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-osx64.tar.bz2#2a9b66d1511335183108428436fe4184" "pypy" verify_py27
+  package_name="pypy-2.1"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-osx64.tar.bz2#2a9b66d1511335183108428436fe4184"
   ;;
 "Linux" )
   case "$(uname -m)" in
   "armel" )
-    install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armel.tar.bz2#48cdb54c54153d219670a8a56364e9cb" "pypy" verify_py27
-  ;;
+    package_name="pypy-2.1"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armel.tar.bz2#48cdb54c54153d219670a8a56364e9cb"
+    ;;
   "armhf" )
-    install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armhf-raring.tar.bz2#563a97875c342459c277cdd567c83af8" "pypy" verify_py27
-  ;;
+    package_name="pypy-2.1"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armhf-raring.tar.bz2#563a97875c342459c277cdd567c83af8"
+    ;;
   "i386" | "i486" | "i586" | "i686" | "i786" )
-    install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux.tar.bz2#dd6b4f4f52ab1bebe30b32dc4085757a" "pypy" verify_py27
-  ;;
+    package_name="pypy-2.1"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux.tar.bz2#dd6b4f4f52ab1bebe30b32dc4085757a"
+    ;;
   "x86_64" )
-    install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux64.tar.bz2#80ef61f3b1b15fd0bd94fa5cdf8a005f" "pypy" verify_py27
+    package_name="pypy-2.1"
+    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux64.tar.bz2#80ef61f3b1b15fd0bd94fa5cdf8a005f"
+    ;;
   esac
   ;;
 "CYGWIN"* | "MINGW"* )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-win32.zip#9943c7a008535c99fed6bbe1c5a22797" "pypy" verify_py27
+  package_name="pypy-2.1"
+  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-win32.zip#9943c7a008535c99fed6bbe1c5a22797"
   ;;
-* )
+esac
+
+if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
+  if [ "${package_url}" != "${package_url%%.zip*}" ]; then
+    install_zip "${package_name}" "${package_url}" "pypy" verify_py27
+  else
+    install_package "${package_name}" "${package_url}" "pypy" verify_py27
+  fi
+else
   { echo "Precompiled binary of pypy-2.1 is not available for $(uname -s)-$(uname -m)."
     echo "To build pypy-2.1 from soruce, use 'pypy-2.1-src'."
   } 1>&4 2>&1
-  false
-  ;;
-esac
+  exit 1
+fi
 
 install_package "setuptools-2.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-2.1.tar.gz#2044725530450d0517393882dc4b7508" python
 install_package "pip-1.5.2" "https://pypi.python.org/packages/source/p/pip/pip-1.5.2.tar.gz#5da30919f732d68b1c666e484e7676f5" python
