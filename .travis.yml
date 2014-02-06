@@ -1,7 +1,5 @@
 install: git clone https://github.com/sstephenson/bats.git
-script: bats/bin/bats --tap test
-after_script:
-  - bats/bin/bats --tap plugins/python-build/test
+script: bats/bin/bats --tap test plugins/python-build/test
 language: c
 notifications:
   email:
