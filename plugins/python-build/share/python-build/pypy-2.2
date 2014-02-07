@@ -9,9 +9,17 @@ case "$(uname -s)" in
     package_name="pypy-2.2-linux-armel"
     package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux-armel.tar.bz2#c50373a6c2517b43c65fd84ac2cd3a6f"
     ;;
-  "armhf" )
-    package_name="pypy-2.2-linux-armhf-raring"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux-armhf-raring.tar.bz2#830fdcfafae461d8e72daa94a1ab4499"
+  "armhf" | "armv6l" | "armv7l" )
+    case "$(cat /etc/issue 2>/dev/null || true)" in
+    "Raspbian"* )
+      package_name="pypy-2.2-linux-armhf-raspbian"
+      package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux-armhf-raspbian.tar.bz2#e9c9f28cba22d07445e9195c1d2fede6"
+      ;;
+    "Ubuntu"* )
+      package_name="pypy-2.2-linux-armhf-raring"
+      package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux-armhf-raring.tar.bz2#830fdcfafae461d8e72daa94a1ab4499"
+      ;;
+    esac
     ;;
   "i386" | "i486" | "i586" | "i686" | "i786" )
     package_name="pypy-2.2-linux"

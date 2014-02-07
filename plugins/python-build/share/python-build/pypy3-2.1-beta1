@@ -9,9 +9,17 @@ case "$(uname -s)" in
     package_name="pypy3-2.1-beta1-linux-armel"
     package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armel.tar.bz2#d57d0d0d3c49c7cce75440924d8f66b7"
     ;;
-  "armhf" )
-    package_name="pypy3-2.1-beta1-linux-armhf-raring"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raring.tar.bz2#55b82b199ccf537c7ea5e2f31df78dfe"
+  "armhf" | "armv6l" | "armv7l" )
+    case "$(cat /etc/issue 2>/dev/null || true)" in
+    "Raspbian"* )
+      package_name="pypy3-2.1-beta1-linux-armhf-raspbian"
+      package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raspbian.tar.bz2#a43e64557fe27b979a8546a89c05652f"
+      ;;
+    "Ubuntu"* )
+      package_name="pypy3-2.1-beta1-linux-armhf-raring"
+      package_url="https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raring.tar.bz2#55b82b199ccf537c7ea5e2f31df78dfe"
+      ;;
+    esac
     ;;
   "i386" | "i486" | "i586" | "i686" | "i786" )
     package_name="pypy3-2.1-beta1-linux"
