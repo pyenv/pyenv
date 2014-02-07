@@ -9,7 +9,7 @@ case "$(uname -s)" in
     package_name="pypy-2.2.1-linux-armel"
     package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.2.1-linux-armel.tar.bz2#0127094c36f985f6c2b4ed82be3fb6c8"
     ;;
-  "armhf" )
+  "armhf" | "armv6l" | "armv7l" )
     case "$(cat /etc/issue 2>/dev/null || true)" in
     "Raspbian"* )
       package_name="pypy-2.2.1-linux-armhf-raspbian"
