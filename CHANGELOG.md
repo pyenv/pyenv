@@ -7,6 +7,7 @@
 * python-build: Display error if the wget does not support Server Name Indication (SNI) to avoid SSL verification error when downloading from https://pypi.python.org. (#60)
 * python-build: Update default setuptools version (2.1 -> 2.2)
 * python-build: Update default pip version (1.5.1 -> 1.5.2)
+* python-build: Import recent changes from ruby-build v20140204
 
 #### 0.4.0-20140123
 
