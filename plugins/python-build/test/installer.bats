@@ -17,6 +17,18 @@ load test_helper
   assert [ -e share/python-build/pypy-2.0 ]
 }
 
+@test "build definitions don't have the executable bit" {
+  cd "$TMP"
+  PREFIX="${PWD}/usr" run "${BATS_TEST_DIRNAME}/../install.sh"
+  assert_success ""
+
+  run $BASH -c 'ls -l usr/share/python-build | tail -2 | cut -d" " -f1'
+  assert_output <<OUT
+-rw-r--r--
+-rw-r--r--
+OUT
+}
+
 @test "overwrites old installation" {
   cd "$TMP"
   mkdir -p bin share/python-build

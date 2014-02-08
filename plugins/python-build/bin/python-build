@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20140110.1"
+PYTHON_BUILD_VERSION="20140204"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -548,6 +548,8 @@ build_package_standard() {
   local PACKAGE_CONFIGURE_OPTS_ARRAY="${package_var_name}_CONFIGURE_OPTS_ARRAY[@]"
   local PACKAGE_MAKE_OPTS="${package_var_name}_MAKE_OPTS"
   local PACKAGE_MAKE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
+  local PACKAGE_MAKE_INSTALL_OPTS="${package_var_name}_MAKE_INSTALL_OPTS"
+  local PACKAGE_MAKE_INSTALL_OPTS_ARRAY="${package_var_name}_MAKE_INSTALL_OPTS_ARRAY[@]"
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
   [ "$package_var_name" = "PYTHON" ] && use_homebrew_readline || true
@@ -561,7 +563,7 @@ build_package_standard() {
   ) >&4 2>&1
 
   { "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
-    "$MAKE" install
+    "$MAKE" install $MAKE_INSTALL_OPTS ${!PACKAGE_MAKE_INSTALL_OPTS} "${!PACKAGE_MAKE_INSTALL_OPTS_ARRAY}"
   } >&4 2>&1
 }
 
@@ -678,7 +680,7 @@ install_jruby_launcher() {
 fix_jruby_shebangs() {
   for file in "${PREFIX_PATH}/bin"/*; do
     if [ "$(head -c 20 "$file")" = "#!/usr/bin/env jruby" ]; then
-      sed -i.bak -E "1s:.+:#\!${PREFIX_PATH}/bin/jruby:" "$file"
+      sed -i.bak "1 s:.*:#\!${PREFIX_PATH}\/bin\/jruby:" "$file"
       rm "$file".bak
     fi
   done

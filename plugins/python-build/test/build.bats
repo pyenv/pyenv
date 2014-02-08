@@ -47,7 +47,7 @@ OUT
 stub_make_install() {
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \
-    "install : cat build.log >> '$INSTALL_ROOT/build.log'"
+    "install : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
 }
 
 assert_build_log() {
@@ -56,7 +56,7 @@ assert_build_log() {
 }
 
 @test "yaml is installed for python" {
-  cached_tarball "yaml-0.1.4"
+  cached_tarball "yaml-0.1.5"
   cached_tarball "Python-3.2.1"
 
   stub brew false
@@ -69,15 +69,17 @@ assert_build_log() {
   unstub make
 
   assert_build_log <<OUT
-yaml-0.1.4: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+yaml-0.1.5: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
+make install
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
+make install
 OUT
 }
 
 @test "apply python patch before building" {
-  cached_tarball "yaml-0.1.4"
+  cached_tarball "yaml-0.1.5"
   cached_tarball "Python-3.2.1"
 
   stub brew false
@@ -92,11 +94,13 @@ OUT
   unstub patch
 
   assert_build_log <<OUT
-yaml-0.1.4: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+yaml-0.1.5: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
+make install
 patch -p0 -i -
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
+make install
 OUT
 }
 
@@ -118,6 +122,7 @@ OUT
   assert_build_log <<OUT
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib CPPFLAGS=-I$brew_libdir/include LDFLAGS=-L$brew_libdir/lib
 make -j 2
+make install
 OUT
 }
 
@@ -141,6 +146,7 @@ DEF
   assert_build_log <<OUT
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib
 make -j 2
+make install
 OUT
 }
 
@@ -166,6 +172,7 @@ DEF
   assert_build_log <<OUT
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib
 make -j 2
+make install
 OUT
 }
 
@@ -188,6 +195,7 @@ DEF
   assert_build_log <<OUT
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
+make install
 OUT
 }
 
@@ -211,6 +219,47 @@ DEF
   assert_build_log <<OUT
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 4
+make install
+OUT
+}
+
+@test "setting PYTHON_MAKE_INSTALL_OPTS to a multi-word string" {
+  cached_tarball "Python-3.2.1"
+
+  stub_make_install
+
+  export PYTHON_MAKE_INSTALL_OPTS="DOGE=\"such wow\""
+  run_inline_definition <<DEF
+install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+DEF
+  assert_success
+
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install DOGE="such wow"
+OUT
+}
+
+@test "setting MAKE_INSTALL_OPTS to a multi-word string" {
+  cached_tarball "Python-3.2.1"
+
+  stub_make_install
+
+  export MAKE_INSTALL_OPTS="DOGE=\"such wow\""
+  run_inline_definition <<DEF
+install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+DEF
+  assert_success
+
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install DOGE="such wow"
 OUT
 }
 
@@ -261,6 +310,7 @@ DEF
 apply -p1 -i /my/patch.diff
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
+make install
 OUT
 }
 
