@@ -17,4 +17,10 @@ SHARE_PATH="${PREFIX}/share/python-build"
 mkdir -p "$BIN_PATH" "$SHARE_PATH"
 
 install -p bin/* "$BIN_PATH"
-cp -RPp share/python-build/* "$SHARE_PATH"
+for share in share/python-build/*; do
+  if [ -d "$share" ]; then
+    cp -RPp "$share" "$SHARE_PATH"
+  else
+    install -p -m 0644 "$share" "$SHARE_PATH"
+  fi
+done
