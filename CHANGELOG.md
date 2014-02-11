@@ -2,7 +2,7 @@
 
 #### 0.4.0-201402XX
 
-* python-build: Add new CPython release candidates; 3.3.4rc1, 3.4.0b3
+* python-build: Add new CPython release candidates; 3.3.4, 3.4.0b3
 * python-build: Add [Anaconda](https://store.continuum.io/cshop/anaconda/) and [Miniconda](http://repo.continuum.io/miniconda/) binary distributions
 * python-build: Display error if the wget does not support Server Name Indication (SNI) to avoid SSL verification error when downloading from https://pypi.python.org. (#60)
 * python-build: Update default setuptools version (2.1 -> 2.2)
