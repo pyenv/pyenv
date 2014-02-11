@@ -1,6 +1,6 @@
 ## Version History
 
-#### 0.4.0-201402XX
+#### 0.4.0-20140211
 
 * python-build: Add new CPython release candidates; 3.3.4, 3.4.0b3
 * python-build: Add [Anaconda](https://store.continuum.io/cshop/anaconda/) and [Miniconda](http://repo.continuum.io/miniconda/) binary distributions
