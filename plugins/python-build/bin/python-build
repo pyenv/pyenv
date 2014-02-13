@@ -1104,9 +1104,8 @@ apply_python_patch() {
   esac
 }
 
-build_package_verify_python() {
-  local package_name="$1"
-  local python="$2"
+verify_python() {
+  local python="$1"
   if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
     # Only symlinks are installed in ${PREFIX_PATH}/bin
     rm -fr "${PREFIX_PATH}/bin"
@@ -1123,7 +1122,7 @@ build_package_verify_python() {
 
 # Post-install check for Python 2.4.x
 build_package_verify_py24() {
-  build_package_verify_python "$1" "${2:-python2.4}"
+  verify_python "${2:-python2.4}"
   build_package_verify_readline "$1" "${2:-python2.4}"
   build_package_verify_zlib "$1" "${2:-python2.4}"
   build_package_verify_bz2 "$1" "${2:-python2.4}"
@@ -1148,7 +1147,7 @@ build_package_verify_py27() {
 
 # Post-install check for Python 3.0.x
 build_package_verify_py30() {
-  build_package_verify_python "$1" "${2:-python3.0}"
+  verify_python "${2:-python3.0}"
   build_package_verify_readline "$1" "${2:-python3.0}"
   build_package_verify_ssl "$1" "${2:-python3.0}"
   build_package_verify_sqlite3 "$1" "${2:-python3.0}"
@@ -1188,7 +1187,7 @@ build_package_ensurepip() {
   fi
 }
 
-build_package_verify_import() {
+verify_python_module() {
   local module="${1}"
   local module_name="${2:-${module}}"
   { if ! "$PYTHON_BIN" -c "import ${module}"; then
@@ -1205,27 +1204,27 @@ build_package_verify_import() {
 
 # Post-install check that the readline extension was built.
 build_package_verify_readline() {
-  build_package_verify_import "readline" "GNU readline lib"
+  verify_python_module "readline" "GNU readline lib"
 }
 
 # Post-install check that the ssl extension was built.
 build_package_verify_ssl() {
-  build_package_verify_import "ssl" "OpenSSL lib"
+  verify_python_module "ssl" "OpenSSL lib"
 }
 
 # Post-install check that the sqlite3 extension was built.
 build_package_verify_sqlite3() {
-  build_package_verify_import "sqlite3" "SQLite3 lib"
+  verify_python_module "sqlite3" "SQLite3 lib"
 }
 
 # Post-install check that the zlib extension was built.
 build_package_verify_zlib() {
-  build_package_verify_import "zlib" "zlib"
+  verify_python_module "zlib" "zlib"
 }
 
 # Post-install check that the bz2 extension was built.
 build_package_verify_bz2() {
-  build_package_verify_import "bz2" "bzip2 lib"
+  verify_python_module "bz2" "bzip2 lib"
 }
 
 version() {
