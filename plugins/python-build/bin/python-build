@@ -1404,6 +1404,12 @@ if ! command -v curl 1>/dev/null 2>&1 && [[ "$(wget --version 2>/dev/null || tru
   exit 1
 fi
 
+# pydistutils.cfg may corrupt install location of Python libraries (#35, #111)
+if [ -e "$HOME/.pydistutils.cfg" ]; then
+  echo "python-build: Please make sure you remove any previous custom paths from your $HOME/.pydistutils.cfg file." >&2
+  exit 1
+fi
+
 SEED="$(date "+%Y%m%d%H%M%S").$$"
 LOG_PATH="${TMP}/python-build.${SEED}.log"
 PYTHON_BIN="${PREFIX_PATH}/bin/python"
