@@ -143,6 +143,11 @@ Version names to pyenv are simply the names of the directories in
 If you're on Mac OS X, consider
 [installing with Homebrew](#homebrew-on-mac-os-x).
 
+### The automatic installer
+
+Visit my other project:
+https://github.com/yyuu/pyenv-installer
+
 ### Basic GitHub Checkout
 
 This will get you going with the latest version of pyenv and make it
