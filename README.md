@@ -483,6 +483,24 @@ Lists all Python versions with the given command installed.
     2.6.8
     2.7.6
     3.3.3
+    
+### pyenv install
+
+Part of [Python-build](https://github.com/yyuu/pyenv/tree/master/plugins/python-build), this installs versions of python
+
+    $ pyenv install 2.7.6
+    $ pyenv install 2.6.8
+    $ pyenv versions
+      system
+      2.6.8
+    * 2.7.6 (set by /home/yyuu/.pyenv/version)
+    
+### pyenv install --list
+
+List available remote versions of Python, including Anaconda, Jython, pypy, and stackless
+
+    $ pyenv install --list
+
 
 ## Development
 
