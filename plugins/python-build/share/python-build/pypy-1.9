@@ -1,39 +1,27 @@
-case "$(uname -s)" in
-"Darwin" )
-  package_name="pypy-1.9"
-  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2#aad9c4b7b827583e37fe8ae0f7cfe0ff"
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2#1a08c88642434fc2e0e4256d351f48db" "pypy" verify_py27
   ;;
-"Linux" )
-  case "$(uname -m)" in
-  "i386" | "i486" | "i586" | "i686" | "i786" )
-    package_name="pypy-1.9"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2#1a08c88642434fc2e0e4256d351f48db"
-    ;;
-  "x86_64" )
-    package_name="pypy-1.9"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2#201d2cce2557e40c784473b471ee1b6b"
-    ;;
-  esac
+"linux64" )
+  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2#201d2cce2557e40c784473b471ee1b6b" "pypy" verify_py27
   ;;
-"CYGWIN"* | "MINGW"* )
+"osx64" )
+  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2#aad9c4b7b827583e37fe8ae0f7cfe0ff" "pypy" verify_py27
+  ;;
+"win32" )
   # FIXME: never tested on Windows
-  package_name="pypy-1.9"
-  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip#e7655066baed3c7bbbca7df617817dd5"
+  install_zip "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip#e7655066baed3c7bbbca7df617817dd5" "pypy" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(uname -s)-$(uname -m)."
+    echo "try 'pypy-1.9-dev' to build from soruce."
+    echo
+  } >&2
+  exit 1
   ;;
 esac
-
-if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
-  if [ "${package_url}" != "${package_url%%.zip*}" ]; then
-    install_zip "${package_name}" "${package_url}" "pypy" verify_py27
-  else
-    install_package "${package_name}" "${package_url}" "pypy" verify_py27
-  fi
-else
-  { echo "Precompiled binary of pypy-1.9 is not available for $(uname -s)-$(uname -m)."
-    echo "To build pypy-1.9 from soruce, use 'pypy-1.9-dev'."
-  } 1>&4 2>&1
-  exit 1
-fi
 
 install_package "setuptools-2.2" "https://pypi.python.org/packages/source/s/setuptools/setuptools-2.2.tar.gz#04a7664538957b832710653fd7d5b4e6" python
 install_package "pip-1.5.4" "https://pypi.python.org/packages/source/p/pip/pip-1.5.4.tar.gz#834b2904f92d46aaa333267fb1c922bb" python

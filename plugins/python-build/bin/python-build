@@ -730,6 +730,23 @@ build_package_jython_builder() {
   ( cd "dist" && build_package_jython )
 }
 
+pypy_architecture() {
+  case "$(uname -s)" in
+  "Darwin" ) echo "osx64" ;;
+  "Linux" )
+    case "$(uname -m)" in
+    "armel" ) echo "linux-armel" ;;
+    "armhf" | "armv6l" | "armv7l" ) echo "linux-armhf" ;;
+    "i386" | "i486" | "i586" | "i686" | "i786" ) echo "linux" ;;
+    "x86_64" ) echo "linux64" ;;
+    * ) return 1 ;;
+    esac
+    ;;
+  "CYGWIN"* | "MINGW"* ) echo "win32" ;;
+  * ) return 1 ;;
+  esac
+}
+
 build_package_pypy() {
   build_package_copy
   { if [ -x "${PREFIX_PATH}/bin/pypy" ] && [ ! -x "${PREFIX_PATH}/bin/python" ]; then

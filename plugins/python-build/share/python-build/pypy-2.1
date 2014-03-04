@@ -1,55 +1,53 @@
-case "$(uname -s)" in
-"Darwin" )
-  package_name="pypy-2.1"
-  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-osx64.tar.bz2#2a9b66d1511335183108428436fe4184"
+require_distro() {
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" != "$1"* ]]; then
+    { echo
+      colorize 1 "WARNING"
+      echo ": The binary distribution of PyPy is built for $1."
+      echo "installed binary may not run expectedly on other platforms."
+      echo
+    } >&2
+    return 1
+  fi
+}
+
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  require_distro "Ubuntu 10.04" || true
+  install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux.tar.bz2#dd6b4f4f52ab1bebe30b32dc4085757a" "pypy" verify_py27
   ;;
-"Linux" )
-  case "$(uname -m)" in
-  "armel" )
-    package_name="pypy-2.1"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armel.tar.bz2#48cdb54c54153d219670a8a56364e9cb"
-    ;;
-  "armhf" | "armv6l" | "armv7l" )
-    case "$(cat /etc/issue 2>/dev/null || true)" in
-    "Raspbian"* )
-      package_name="pypy-2.1"
-      package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armhf-raspbian.tar.bz2#56de3739f73072dfd53c7249dd04603a"
-      ;;
-    "Ubuntu"* )
-      package_name="pypy-2.1"
-      package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armhf-raring.tar.bz2#563a97875c342459c277cdd567c83af8"
-      ;;
-    esac
-    ;;
-  "i386" | "i486" | "i586" | "i686" | "i786" )
-    package_name="pypy-2.1"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux.tar.bz2#dd6b4f4f52ab1bebe30b32dc4085757a"
-    ;;
-  "x86_64" )
-    package_name="pypy-2.1"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux64.tar.bz2#80ef61f3b1b15fd0bd94fa5cdf8a005f"
-    ;;
-  esac
+"linux-armel" )
+  require_distro "Ubuntu 12.04" || true
+  install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armel.tar.bz2#48cdb54c54153d219670a8a56364e9cb" "pypy" verify_py27
   ;;
-"CYGWIN"* | "MINGW"* )
+"linux-armhf" )
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
+    install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armhf-raspbian.tar.bz2#56de3739f73072dfd53c7249dd04603a" "pypy" verify_py27
+  else
+    require_distro "Ubuntu 13.04" || true
+    install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux-armhf-raring.tar.bz2#563a97875c342459c277cdd567c83af8" "pypy" verify_py27
+  fi
+  ;;
+"linux64" )
+  require_distro "Ubuntu 12.04" || true
+  install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-linux64.tar.bz2#80ef61f3b1b15fd0bd94fa5cdf8a005f" "pypy" verify_py27
+  ;;
+"osx64" )
+  install_package "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-osx64.tar.bz2#2a9b66d1511335183108428436fe4184" "pypy" verify_py27
+  ;;
+"win32" )
   # FIXME: never tested on Windows
-  package_name="pypy-2.1"
-  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-win32.zip#9943c7a008535c99fed6bbe1c5a22797"
+  install_zip "pypy-2.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.1-win32.zip#9943c7a008535c99fed6bbe1c5a22797" "pypy" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(uname -s)-$(uname -m)."
+    echo "try 'pypy-2.1-src' to build from soruce."
+    echo
+  } >&2
+  exit 1
   ;;
 esac
-
-if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
-  if [ "${package_url}" != "${package_url%%.zip*}" ]; then
-    install_zip "${package_name}" "${package_url}" "pypy" verify_py27
-  else
-    install_package "${package_name}" "${package_url}" "pypy" verify_py27
-  fi
-else
-  { echo "Precompiled binary of pypy-2.1 is not available for $(uname -s)-$(uname -m)."
-    echo "To build pypy-2.1 from soruce, use 'pypy-2.1-src'."
-  } 1>&4 2>&1
-  exit 1
-fi
 
 install_package "setuptools-2.2" "https://pypi.python.org/packages/source/s/setuptools/setuptools-2.2.tar.gz#04a7664538957b832710653fd7d5b4e6" python
 install_package "pip-1.5.4" "https://pypi.python.org/packages/source/p/pip/pip-1.5.4.tar.gz#834b2904f92d46aaa333267fb1c922bb" python
