@@ -1,39 +1,41 @@
-case "$(uname -s)" in
-"Darwin" )
-  package_name="pypy-2.0.1"
-  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux.tar.bz2#e666450bcfbd936b016a2dd7312f9853"
+require_distro() {
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" != "$1"* ]]; then
+    { echo
+      colorize 1 "WARNING"
+      echo ": The binary distribution of PyPy is built for $1."
+      echo "installed binary may not run expectedly on other platforms."
+      echo
+    } >&2
+    return 1
+  fi
+}
+
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  require_distro "Ubuntu 10.04" || true
+  install_package "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux.tar.bz2#8d11952e0356ea751321e7d2a1d4f17a" "pypy" verify_py27
   ;;
-"Linux" )
-  case "$(uname -m)" in
-  "i386" | "i486" | "i586" | "i686" | "i786" )
-    package_name="pypy-2.0.1"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux.tar.bz2#8d11952e0356ea751321e7d2a1d4f17a"
-    ;;
-  "x86_64" )
-    package_name="pypy-2.0.1"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux64.tar.bz2#5c11d727579443d0834caadb4dfe53e3"
-    ;;
-  esac
+"linux64" )
+  require_distro "Ubuntu 12.04" || true
+  install_package "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux64.tar.bz2#5c11d727579443d0834caadb4dfe53e3" "pypy" verify_py27
   ;;
-"CYGWIN"* | "MINGW"* )
+"osx64" )
+  install_package "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux.tar.bz2#e666450bcfbd936b016a2dd7312f9853" "pypy" verify_py27
+  ;;
+"win32" )
   # FIXME: never tested on Windows
-  package_name="pypy-2.0.1"
-  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-win32.zip#4c40b19ea1ec5c8c8c2a1f94f59bdf02"
+  install_zip "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-win32.zip#4c40b19ea1ec5c8c8c2a1f94f59bdf02" "pypy" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(uname -s)-$(uname -m)."
+    echo "try 'pypy-2.0.1-src' to build from soruce."
+    echo
+  } >&2
+  exit 1
   ;;
 esac
-
-if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
-  if [ "${package_url}" != "${package_url%%.zip*}" ]; then
-    install_zip "${package_name}" "${package_url}" "pypy" verify_py27
-  else
-    install_package "${package_name}" "${package_url}" "pypy" verify_py27
-  fi
-else
-  { echo "Precompiled binary of pypy-2.0.1 is not available for $(uname -s)-$(uname -m)."
-    echo "To build pypy-2.0.1 from soruce, use 'pypy-2.0.1-src'."
-  } 1>&4 2>&1
-  exit 1
-fi
 
 install_package "setuptools-2.2" "https://pypi.python.org/packages/source/s/setuptools/setuptools-2.2.tar.gz#04a7664538957b832710653fd7d5b4e6" python
 install_package "pip-1.5.4" "https://pypi.python.org/packages/source/p/pip/pip-1.5.4.tar.gz#834b2904f92d46aaa333267fb1c922bb" python

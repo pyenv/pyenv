@@ -1,39 +1,27 @@
-case "$(uname -s)" in
-"Darwin" )
-  package_name="pypy-c-jit-43780-b590cf6de419-osx64"
-  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-osx64.tar.bz2#b1417916bc01ebb9f95c666f5e397fb5"
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  install_package "pypy-c-jit-43780-b590cf6de419-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux.tar.bz2#08a2c95163c95f91772abb8bf5f8b9cb" "pypy" verify_py27
   ;;
-"Linux" )
-  case "$(uname -m)" in
-  "i386" | "i486" | "i586" | "i686" | "i786" )
-    package_name="pypy-c-jit-43780-b590cf6de419-linux"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux.tar.bz2#08a2c95163c95f91772abb8bf5f8b9cb"
-    ;;
-  "x86_64" )
-    package_name="pypy-c-jit-43780-b590cf6de419-linux64"
-    package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux64.tar.bz2#32392b7986eb34cd657d5b6c5d242cc7"
-    ;;
-  esac
+"linux64" )
+  install_package "pypy-c-jit-43780-b590cf6de419-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux64.tar.bz2#32392b7986eb34cd657d5b6c5d242cc7" "pypy" verify_py27
   ;;
-"CYGWIN"* | "MINGW"* )
+"osx64" )
+  install_package "pypy-c-jit-43780-b590cf6de419-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-osx64.tar.bz2#b1417916bc01ebb9f95c666f5e397fb5" "pypy" verify_py27
+  ;;
+"win32" )
   # FIXME: never tested on Windows
-  package_name="pypy-1.5.0a0-win32"
-  package_url="https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-win32.zip#b6cc12bed5e7243ed44aa3430eb14885"
+  install_zip "pypy-1.5.0a0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-win32.zip#b6cc12bed5e7243ed44aa3430eb14885" "pypy" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(uname -s)-$(uname -m)."
+    echo "try 'pypy-1.5-src' to build from source."
+    echo
+  } >&2
+  exit 1
   ;;
 esac
-
-if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
-  if [ "${package_url}" != "${package_url%%.zip*}" ]; then
-    install_zip "${package_name}" "${package_url}" "pypy" verify_py27
-  else
-    install_package "${package_name}" "${package_url}" "pypy" verify_py27
-  fi
-else
-  { echo "Precompiled binary of pypy-1.5 is not available for $(uname -s)-$(uname -m)."
-    echo "To build pypy-1.5 from soruce, use 'pypy-1.5-src'."
-  } 1>&4 2>&1
-  exit 1
-fi
 
 install_package "setuptools-2.2" "https://pypi.python.org/packages/source/s/setuptools/setuptools-2.2.tar.gz#04a7664538957b832710653fd7d5b4e6" python
 install_package "pip-1.5.4" "https://pypi.python.org/packages/source/p/pip/pip-1.5.4.tar.gz#834b2904f92d46aaa333267fb1c922bb" python
