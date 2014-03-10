@@ -1,14 +1,13 @@
-case "$(uname -s)" in
-"Darwin" )
-  package_name="Anaconda-1.5.1-MacOSX-x86_64"
-  package_url="http://repo.continuum.io/archive/Anaconda-1.5.1-MacOSX-x86_64.sh#03942512daf1b39eb3ff9016fc7efa0c"
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"MacOSX-x86_64" )
+  install_script "Anaconda-1.5.1-MacOSX-x86_64" "http://repo.continuum.io/archive/Anaconda-1.5.1-MacOSX-x86_64.sh#03942512daf1b39eb3ff9016fc7efa0c" "anaconda" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo "Precompiled binary of anaconda-1.5.1 is not available for $(uname -s)-$(uname -m)."
+    echo
+  } >&2
+  exit 1
   ;;
 esac
-
-if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
-  install_script "${package_name}" "${package_url}" "anaconda" verify_py27
-else
-  { echo "Precompiled binary of anaconda-1.5.1 is not available for $(uname -s)-$(uname -m)."
-  } 1>&4 2>&1
-  exit 1
-fi

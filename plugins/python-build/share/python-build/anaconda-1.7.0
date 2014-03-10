@@ -1,26 +1,19 @@
-case "$(uname -s)" in
-"Darwin" )
-  package_name="Anaconda-1.7.0-MacOSX-x86_64"
-  package_url="http://repo.continuum.io/archive/Anaconda-1.7.0-MacOSX-x86_64.sh#16194eb9be2301eeb135f9f01695a566"
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-x86" )
+  install_script "Anaconda-1.7.0-Linux-x86" "http://repo.continuum.io/archive/Anaconda-1.7.0-Linux-x86.sh#bbde22bd0346ad9c8932b4d98c0f4000" "anaconda" verify_py27
   ;;
-"Linux" )
-  case "$(uname -m)" in
-  "i386" | "i486" | "i586" | "i686" | "i786" )
-    package_name="Anaconda-1.7.0-Linux-x86"
-    package_url="http://repo.continuum.io/archive/Anaconda-1.7.0-Linux-x86.sh#bbde22bd0346ad9c8932b4d98c0f4000"
-    ;;
-  "x86_64" )
-    package_name="Anaconda-1.7.0-Linux-x86_64"
-    package_url="http://repo.continuum.io/archive/Anaconda-1.7.0-Linux-x86_64.sh#01dc7d6df2ed592e5401ab4fbe3aed4a"
-    ;;
-  esac
+"Linux-x86_64" )
+  install_script "Anaconda-1.7.0-Linux-x86_64" "http://repo.continuum.io/archive/Anaconda-1.7.0-Linux-x86_64.sh#01dc7d6df2ed592e5401ab4fbe3aed4a" "anaconda" verify_py27
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda-1.7.0-MacOSX-x86_64" "http://repo.continuum.io/archive/Anaconda-1.7.0-MacOSX-x86_64.sh#16194eb9be2301eeb135f9f01695a566" "anaconda" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo "Precompiled binary of anaconda-1.7.0 is not available for $(uname -s)-$(uname -m)."
+    echo
+  } >&2
+  exit 1
   ;;
 esac
-
-if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
-  install_script "${package_name}" "${package_url}" "anaconda" verify_py27
-else
-  { echo "Precompiled binary of anaconda-1.7.0 is not available for $(uname -s)-$(uname -m)."
-  } 1>&4 2>&1
-  exit 1
-fi

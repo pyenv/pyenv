@@ -1,26 +1,19 @@
-case "$(uname -s)" in
-"Darwin" )
-  package_name="Miniconda3-2.2.2-MacOSX-x86_64"
-  package_url="http://repo.continuum.io/miniconda/Miniconda3-2.2.2-MacOSX-x86_64.sh#cc227b40bee9ea5f117114726f3b8a35"
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-x86" )
+  install_script "Miniconda3-2.2.2-Linux-x86" "http://repo.continuum.io/miniconda/Miniconda3-2.2.2-Linux-x86.sh#2dac0e1abf6b0599b6c59ccf3a8cbcf2" "miniconda" verify_py33
   ;;
-"Linux" )
-  case "$(uname -m)" in
-  "i386" | "i486" | "i586" | "i686" | "i786" )
-    package_name="Miniconda3-2.2.2-Linux-x86"
-    package_url="http://repo.continuum.io/miniconda/Miniconda3-2.2.2-Linux-x86.sh#2dac0e1abf6b0599b6c59ccf3a8cbcf2"
-    ;;
-  "x86_64" )
-    package_name="Miniconda3-2.2.2-Linux-x86_64"
-    package_url="http://repo.continuum.io/miniconda/Miniconda3-2.2.2-Linux-x86_64.sh#486bd0f9fa6a6f51e4194ce2a91a4b8e"
-    ;;
-  esac
+"Linux-x86_64" )
+  install_script "Miniconda3-2.2.2-Linux-x86_64" "http://repo.continuum.io/miniconda/Miniconda3-2.2.2-Linux-x86_64.sh#486bd0f9fa6a6f51e4194ce2a91a4b8e" "miniconda" verify_py33
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniconda3-2.2.2-MacOSX-x86_64" "http://repo.continuum.io/miniconda/Miniconda3-2.2.2-MacOSX-x86_64.sh#cc227b40bee9ea5f117114726f3b8a35" "miniconda" verify_py33
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo "Precompiled binary of miniconda3-2.2.2 is not available for $(uname -s)-$(uname -m)."
+    echo
+  } >&2
+  exit 1
   ;;
 esac
-
-if [ -n "${package_name}" ] && [ -n "${package_url}" ]; then
-  install_script "${package_name}" "${package_url}" "miniconda" verify_py33
-else
-  { echo "Precompiled binary of miniconda3-2.2.2 is not available for $(uname -s)-$(uname -m)."
-  } 1>&4 2>&1
-  exit 1
-fi
