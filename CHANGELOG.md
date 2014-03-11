@@ -1,5 +1,13 @@
 ## Version History
 
+#### 0.4.0-20140311
+
+* python-build: Add new CPython releases; 3.3.5 (#127)
+* python-build: Add new CPython release candidates; 3.4.0rc1, 3.4.0rc2, 3.4.0rc3
+* python-build: Update default setuptools version (2.2 -> 3.1)
+* python-build: Update default pip version (1.5.2 -> 1.5.4)
+* python-build: Import recent changes from ruby-build v20140225
+
 #### 0.4.0-20140211
 
 * python-build: Add new CPython release candidates; 3.3.4, 3.4.0b3
