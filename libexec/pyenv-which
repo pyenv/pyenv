@@ -15,39 +15,6 @@ if [ "$1" = "--complete" ]; then
   exec pyenv shims --short
 fi
 
-expand_path() {
-  if [ ! -d "$1" ]; then
-    return 1
-  fi
-
-  local cwd="$(pwd)"
-  cd "$1"
-  pwd
-  cd "$cwd"
-}
-
-remove_from_path() {
-  local path_to_remove="$(expand_path "$1")"
-  local result=""
-
-  if [ -z "$path_to_remove" ]; then
-    echo "${PATH}"
-    return
-  fi
-
-  local paths
-  IFS=: paths=($PATH)
-
-  for path in "${paths[@]}"; do
-    path="$(expand_path "$path" || true)"
-    if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
-      result="${result}${path}:"
-    fi
-  done
-
-  echo "${result%:}"
-}
-
 OLDIFS="$IFS"
 IFS=: versions=($(pyenv-version-name))
 IFS=: PYENV_VERSION="${versions[*]}"
@@ -61,8 +28,11 @@ fi
 
 for version in "${versions[@]}"; do
   if [ "$version" = "system" ]; then
-    PATH="$(remove_from_path "${PYENV_ROOT}/shims")"
-    PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
+    # Remove shims from PATH:
+    _path=":$PATH:"
+    _remove="${PYENV_ROOT}/shims"
+    _path="${_path//:$_remove:/:}"
+    PYENV_COMMAND_PATH="$(PATH=$_path command -v "$PYENV_COMMAND" || true)"
   else
     PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${version}/bin/${PYENV_COMMAND}"
   fi
