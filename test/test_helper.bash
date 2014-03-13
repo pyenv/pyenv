@@ -1,7 +1,7 @@
 unset RBENV_VERSION
 unset RBENV_DIR
 
-RBENV_TEST_DIR="${BATS_TMPDIR}/rbenv"
+RBENV_TEST_DIR="$(mktemp -d --tmpdir=$BATS_TMPDIR rbenv.bats.XXX)"
 
 # guard against executing this block twice due to bats internals
 if [ "$RBENV_ROOT" != "${RBENV_TEST_DIR}/root" ]; then
