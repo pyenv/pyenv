@@ -15,38 +15,6 @@ if [ "$1" = "--complete" ]; then
   exec rbenv shims --short
 fi
 
-expand_path() {
-  if [ ! -d "$1" ]; then
-    return 1
-  fi
-
-  local cwd="$(pwd)"
-  cd "$1"
-  pwd
-  cd "$cwd"
-}
-
-remove_from_path() {
-  local path_to_remove="$(expand_path "$1")"
-  local result=""
-
-  if [ -z "$path_to_remove" ]; then
-    echo "${PATH}"
-    return
-  fi
-
-  local paths
-  IFS=: paths=($PATH)
-
-  for path in "${paths[@]}"; do
-    path="$(expand_path "$path" || true)"
-    if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
-      result="${result}${path}:"
-    fi
-  done
-
-  echo "${result%:}"
-}
 
 RBENV_COMMAND="$1"
 
@@ -58,8 +26,18 @@ fi
 RBENV_VERSION="${RBENV_VERSION:-$(rbenv-version-name)}"
 
 if [ "$RBENV_VERSION" = "system" ]; then
-  PATH="$(remove_from_path "${RBENV_ROOT}/shims")"
-  RBENV_COMMAND_PATH="$(command -v "$RBENV_COMMAND" || true)"
+  # Remove shims from PATH. Use a loop, because Bash won't remove all ":foo:"
+  # in ":foo:foo:" in one go.
+  path=":$PATH:"
+  remove="${RBENV_ROOT}/shims"
+  while true; do
+    path_before="$path"
+    path="${path//:$remove:/:}"
+    if [[ "$path_before" = "$path" ]]; then
+      break
+    fi
+  done
+  RBENV_COMMAND_PATH="$(PATH=$path command -v "$RBENV_COMMAND" || true)"
 else
   RBENV_COMMAND_PATH="${RBENV_ROOT}/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
 fi
