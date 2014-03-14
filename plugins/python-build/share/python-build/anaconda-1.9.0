@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-x86" )
+  install_script "Anaconda-1.9.0-Linux-x86" "http://repo.continuum.io/archive/Anaconda-1.9.0-Linux-x86.sh#11af2251aece5fc4333822dc25f78938" "anaconda" verify_py27
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda-1.9.0-Linux-x86_64" "http://repo.continuum.io/archive/Anaconda-1.9.0-Linux-x86_64.sh#52ed5f32f7e36b75b5f951ab58a4bc08" "anaconda" verify_py27
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda-1.9.0-MacOSX-x86_64" "http://repo.continuum.io/archive/Anaconda-1.9.0-MacOSX-x86_64.sh#ddd474c01696cc02dcaea91da1d72389" "anaconda" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo "Precompiled binary of anaconda-1.9.0 is not available for $(uname -s)-$(uname -m)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
