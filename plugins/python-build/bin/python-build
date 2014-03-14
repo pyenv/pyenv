@@ -1286,31 +1286,6 @@ build_package_ensurepip() {
   fi
 }
 
-# Post-install check that the readline extension was built.
-build_package_verify_readline() {
-  verify_python_module "readline" "GNU readline lib"
-}
-
-# Post-install check that the ssl extension was built.
-build_package_verify_ssl() {
-  verify_python_module "ssl" "OpenSSL lib"
-}
-
-# Post-install check that the sqlite3 extension was built.
-build_package_verify_sqlite3() {
-  verify_python_module "sqlite3" "SQLite3 lib"
-}
-
-# Post-install check that the zlib extension was built.
-build_package_verify_zlib() {
-  verify_python_module "zlib" "zlib"
-}
-
-# Post-install check that the bz2 extension was built.
-build_package_verify_bz2() {
-  verify_python_module "bz2" "bzip2 lib"
-}
-
 version() {
   echo "python-build ${PYTHON_BUILD_VERSION}"
 }
