@@ -1186,29 +1186,57 @@ verify_python() {
     ( cd "${PREFIX_PATH}/bin" && ln -fs "${python}" "python" )
   fi
   if [ ! -x "${PYTHON_BIN}" ]; then
-    echo "pyenv: invalid Python executable: ${PYTHON_BIN}" >&4 2>&1
-    return 1
+    { colorize 1 "ERROR"
+      echo ": invalid Python executable: ${PYTHON_BIN}"
+      echo
+      echo "The python-build could not find proper executable of Python after successful build."
+      echo "Please open an issue for future improvements."
+      echo "https://github.com/yyuu/pyenv/issues"
+      return 1
+    } >&3
+  fi
+}
+
+try_python_module() {
+  if ! "$PYTHON_BIN" -c "import $1" 1>/dev/null 2>&1; then
+    { colorize 1 "WARNING"
+      echo ": The Python $1 extension was not compiled. Missing the ${2:-$1}?"
+      return 0
+    } >&3
+  fi
+}
+
+verify_python_module() {
+  if ! "$PYTHON_BIN" -c "import $1" 1>/dev/null 2>&1; then
+    { colorize 1 "ERROR"
+      echo ": The Python $1 extension was not compiled. Missing the ${2:-$1}?"
+      echo
+      echo "Please consult to the Wiki page to fix the problem."
+      echo "https://github.com/yyuu/pyenv/wiki/Common-build-problems"
+      echo
+      return 1
+    } >&3
   fi
 }
 
 # Post-install check for Python 2.4.x
 build_package_verify_py24() {
   verify_python "${2:-python2.4}"
-  build_package_verify_readline "$1" "${2:-python2.4}"
-  build_package_verify_zlib "$1" "${2:-python2.4}"
-  build_package_verify_bz2 "$1" "${2:-python2.4}"
+  try_python_module "readline" "GNU readline lib"
+  verify_python_module "zlib" "zlib"
+  try_python_module "bz2" "bzip2 lib"
 }
 
 # Post-install check for Python 2.5.x
 build_package_verify_py25() {
   build_package_verify_py24 "$1" "${2:-python2.5}"
-  build_package_verify_sqlite3 "$1" "${2:-python2.5}"
+  try_python_module "sqlite3" "SQLite3 lib"
 }
 
 # Post-install check for Python 2.6.x
 build_package_verify_py26() {
   build_package_verify_py25 "$1" "${2:-python2.6}"
-  build_package_verify_ssl "$1" "${2:-python2.6}"
+  verify_python_module "ssl" "OpenSSL lib"
 }
 
 # Post-install check for Python 2.7.x
@@ -1219,11 +1247,11 @@ build_package_verify_py27() {
 # Post-install check for Python 3.0.x
 build_package_verify_py30() {
   verify_python "${2:-python3.0}"
-  build_package_verify_readline "$1" "${2:-python3.0}"
-  build_package_verify_ssl "$1" "${2:-python3.0}"
-  build_package_verify_sqlite3 "$1" "${2:-python3.0}"
-  build_package_verify_zlib "$1" "${2:-python3.0}"
-  build_package_verify_bz2 "$1" "${2:-python3.0}"
+  try_python_module "bz2" "bzip2 lib"
+  try_python_module "readline" "GNU readline lib"
+  verify_python_module "ssl" "OpenSSL lib"
+  try_python_module "sqlite3" "SQLite3 lib"
+  verify_python_module "zlib" "zlib"
 }
 
 # Post-install check for Python 3.1.x
@@ -1257,21 +1285,6 @@ build_package_ensurepip() {
     fi
   fi
 }
-
-verify_python_module() {
-  local module="${1}"
-  local module_name="${2:-${module}}"
-  { if ! "$PYTHON_BIN" -c "import ${module}"; then
-      echo
-      echo "The Python ${module} extension was not compiled. Missing the ${module_name}?"
-      echo
-      echo "Please consult to the Wiki page to fix the problem."
-      echo "https://github.com/yyuu/pyenv/wiki/Common-build-problems"
-      echo
-      return 1
-    fi
-  } >&4 2>&1
-} 
 
 # Post-install check that the readline extension was built.
 build_package_verify_readline() {
