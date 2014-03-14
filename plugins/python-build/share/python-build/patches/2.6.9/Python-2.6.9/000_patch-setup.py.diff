@@ -6,6 +6,7 @@
 # Parent  2e4cdaffe493e879fb5367a4aa454491de451137
 Backport for Python 2.7 of issue 11715 support for building Python on
 multiarch Debian/Ubuntu.
+Updates tkinter library versions.
 
 diff --git a/setup.py b/setup.py
 --- setup.py.orig
@@ -41,7 +42,15 @@ diff --git a/setup.py b/setup.py
          add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
          add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
 +        self.add_multiarch_paths()
- 
+
          # Add paths specified in the environment variables LDFLAGS and
          # CPPFLAGS for header and library files.
-
+@@ -1675,7 +1698,7 @@
+         # The versions with dots are used on Unix, and the versions without
+         # dots on Windows, for detection by cygwin.
+         tcllib = tklib = tcl_includes = tk_includes = None
+-        for version in ['8.5', '85', '8.4', '84', '8.3', '83', '8.2',
++        for version in ['8.6', '86', '8.5', '85', '8.4', '84', '8.3', '83', '8.2',
+                         '82', '8.1', '81', '8.0', '80']:
+             tklib = self.compiler.find_library_file(lib_dirs, 'tk' + version)
+             tcllib = self.compiler.find_library_file(lib_dirs, 'tcl' + version)
