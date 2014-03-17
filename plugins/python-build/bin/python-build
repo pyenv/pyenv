@@ -773,7 +773,7 @@ build_package_pypy_builder() {
 
 anaconda_architecture() {
   case "$(uname -s)" in
-  "Darwin" ) echo "MaxOSX-x86_64" ;;
+  "Darwin" ) echo "MacOSX-x86_64" ;;
   "Linux" )
     case "$(uname -m)" in
     "i386" | "i486" | "i586" | "i686" | "i786" ) echo "Linux-x86" ;;
