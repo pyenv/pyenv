@@ -1,5 +1,12 @@
 ## Version History
 
+#### 0.4.0-20140317
+
+* python-build: Add new CPython releases; 3.4.0 (#133)
+* python-build: Add new Anaconda releases; anaconda-1.9.0, anaconda-1.9.1
+* python-build: Add new Miniconda releases; miniconda-3.0.4, miniconda-3.0.5, miniconda3-3.0.4, miniconda3-3.0.5
+* python-build: Update default setuptools version (3.1 -> 3.3)
+
 #### 0.4.0-20140311
 
 * python-build: Add new CPython releases; 3.3.5 (#127)
