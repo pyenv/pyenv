@@ -9,7 +9,7 @@ if [ -e "$VERSION_FILE" ]; then
   # Read the first non-whitespace word from the specified version file.
   # Be careful not to load it whole in case there's something crazy in it.
   words=( $(cut -b 1-1024 "$VERSION_FILE") )
-  version="${words[0]//[$'\r']}"
+  version="${words[0]//$'\r'}"
 
   if [ -n "$version" ]; then
     echo "$version"
