@@ -6,20 +6,20 @@
 #        pyenv install [-f] [-kvp] <definition-file>
 #        pyenv install -l|--list
 #
-#   -l/--list        List all available versions
-#   -f/--force       Install even if the version appears to be installed already
+#   -l, --list       List all available versions
+#   -f, --force      Install even if the version appears to be installed already
 #
 #   python-build options:
 #
-#   -k/--keep        Keep source tree in $PYENV_BUILD_ROOT after installation
-#                    (defaults to $PYENV_ROOT/sources)
-#   -v/--verbose     Verbose mode: print compilation status to stdout
-#   -p/--patch       Apply a patch from stdin before building
-#   -g/--debug       Build a debug version
+#   -k, --keep       Keep source tree in $PYENV_BUILD_ROOT after installation
+#                    (default: $PYENV_ROOT/sources)
+#   -v, --verbose    Verbose mode: print compilation status to stdout
+#   -p, --patch      Apply a patch from stdin before building
+#   -g, --debug      Build a debug version
 #
-# For detailed information on installing Python versions with
-# python-build, including a list of environment variables for adjusting
-# compilation, see: https://github.com/yyuu/pyenv#readme
+# For detailed information on installing Python versions with python-build
+# (including a list of environment variables used in compilation) see: 
+# https://github.com/yyuu/pyenv#readme
 #
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x

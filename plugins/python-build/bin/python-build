@@ -1304,7 +1304,7 @@ version() {
 
 usage() {
   { version
-    echo "usage: python-build [-k|--keep] [-v|--verbose] [-p|--patch] [-g|--debug] definition prefix"
+    echo "usage: python-build [-k|--keep] [-v|--verbose] [-p|--patch] [-g|--debug] <definition> <prefix>"
     echo "       python-build --definitions"
   } >&2
 
@@ -1335,10 +1335,10 @@ for option in "${OPTIONS[@]}"; do
   "h" | "help" )
     usage without_exiting
     { echo
-      echo "  -k/--keep        Do not remove source tree after installation"
-      echo "  -v/--verbose     Verbose mode: print compilation status to stdout"
-      echo "  -p/--patch       Apply a patch from stdin before building"
-      echo "  -g/--debug       Build a debug version"
+      echo "  -k, --keep       Do not remove source tree after installation"
+      echo "  -v, --verbose    Verbose mode: print compilation status to STDOUT"
+      echo "  -p, --patch      Apply a patch from STDIN before building"
+      echo "  -g, --debug      Build a debug version"
       echo "  --definitions    List all built-in definitions"
       echo
     } >&2
