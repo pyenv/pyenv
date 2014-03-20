@@ -5,18 +5,18 @@ first argument.
 
 The most common subcommands are:
 
-* [pyenv local](#pyenv-local)
-* [pyenv global](#pyenv-global)
-* [pyenv shell](#pyenv-shell)
-* [pyenv versions](#pyenv-versions)
-* [pyenv version](#pyenv-version)
-* [pyenv rehash](#pyenv-rehash)
-* [pyenv which](#pyenv-which)
-* [pyenv whence](#pyenv-whence)
-  
+* [`pyenv local`](#pyenv-local)
+* [`pyenv global`](#pyenv-global)
+* [`pyenv shell`](#pyenv-shell)
+* [`pyenv versions`](#pyenv-versions)
+* [`pyenv version`](#pyenv-version)
+* [`pyenv rehash`](#pyenv-rehash)
+* [`pyenv which`](#pyenv-which)
+* [`pyenv whence`](#pyenv-whence)
 
 
-## pyenv local
+
+## `pyenv local`
 
 Sets a local application-specific Python version by writing the version
 name to a `.python-version` file in the current directory. This version
@@ -37,7 +37,7 @@ read a local version specified in an `.pyenv-version` file, but a
 `.python-version` file in the same directory will take precedence.
 
 
-### pyenv local (advanced)
+### `pyenv local` (advanced)
 
 You can specify multiple versions as local Python at once.
 
@@ -71,7 +71,7 @@ or, if you prefer 3.3.3 over 2.7.6,
     Python 3.3.3
 
 
-## pyenv global
+## `pyenv global`
 
 Sets the global version of Python to be used in all shells by writing
 the version name to the `~/.pyenv/version` file. This version can be
@@ -87,7 +87,7 @@ When run without a version number, `pyenv global` reports the
 currently configured global version.
 
 
-### pyenv global (advanced)
+### `pyenv global` (advanced)
 
 You can specify multiple versions as global Python at once.
 
@@ -121,7 +121,7 @@ or, if you prefer 3.3.3 over 2.7.6,
     Python 3.3.3
 
 
-## pyenv shell
+## `pyenv shell`
 
 Sets a shell-specific Python version by setting the `PYENV_VERSION`
 environment variable in your shell. This version overrides
@@ -142,7 +142,7 @@ prefer not to use shell integration, you may simply set the
     $ export PYENV_VERSION=pypy-2.2.1
 
 
-### pyenv shell (advanced)
+### `pyenv shell` (advanced)
 
 You can specify multiple versions via `PYENV_VERSION` at once.
 
@@ -176,7 +176,7 @@ or, if you prefer 3.3.3 over 2.7.6,
     Python 3.3.3
 
 
-## pyenv versions
+## `pyenv versions`
 
 Lists all Python versions known to pyenv, and shows an asterisk next to
 the currently active version.
@@ -190,7 +190,7 @@ the currently active version.
       pypy-2.2.1
 
 
-## pyenv version
+## `pyenv version`
 
 Displays the currently active Python version, along with information on
 how it was set.
@@ -199,7 +199,7 @@ how it was set.
     2.7.6 (set by /home/yyuu/.pyenv/version)
 
 
-## pyenv rehash
+## `pyenv rehash`
 
 Installs shims for all Python binaries known to pyenv (i.e.,
 `~/.pyenv/versions/*/bin/*`). Run this command after you install a new
@@ -208,7 +208,7 @@ version of Python, or install a package that provides binaries.
     $ pyenv rehash
 
 
-## pyenv which
+## `pyenv which`
 
 Displays the full path to the executable that pyenv will invoke when
 you run the given command.
@@ -217,7 +217,7 @@ you run the given command.
     /home/yyuu/.pyenv/versions/3.3.3/bin/python3.3
 
 
-## pyenv whence
+## `pyenv whence`
 
 Lists all Python versions with the given command installed.
 
@@ -227,7 +227,7 @@ Lists all Python versions with the given command installed.
     3.3.3
 
 
-## pyenv install
+## `pyenv install`
 
 Part of [Python-build](https://github.com/yyuu/pyenv/tree/master/plugins/python-build), this installs versions of python
 
@@ -239,7 +239,7 @@ Part of [Python-build](https://github.com/yyuu/pyenv/tree/master/plugins/python-
     * 2.7.6 (set by /home/yyuu/.pyenv/version)
 
 
-## pyenv install --list
+## `pyenv install --list`
 
 List available remote versions of Python, including Anaconda, Jython, pypy, and stackless
 
