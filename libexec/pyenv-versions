@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+#
 # Summary: List all Python versions available to pyenv
+#
 # Usage: pyenv versions [--bare]
 #
 # Lists all Python versions found in `$PYENV_ROOT/versions/*'.
