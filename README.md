@@ -35,19 +35,19 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 
 ## Table of Contents
 
-* [How It Works](#how-it-works)
+* **[How It Works](#how-it-works)**
   * [Understanding PATH](#understanding-path)
   * [Understanding Shims](#understanding-shims)
   * [Choosing the Python Version](#choosing-the-python-version)
   * [Locating the Python Installation](#locating-the-python-installation)
-* [Installation](#installation)
+* **[Installation](#installation)**
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
     * [Homebrew on Mac OS X](#homebrew-on-mac-os-x)
     * [Neckbeard Configuration](#neckbeard-configuration)
     * [Uninstalling Python Versions](#uninstalling-python-versions)
-* [Command Reference](#command-reference)
-* [Development](#development)
+* **[Command Reference](#command-reference)**
+* **[Development](#development)**
   * [Version History](#version-history)
   * [License](#license)
 
@@ -142,8 +142,7 @@ As far as pyenv is concerned, version names are simply the directories in
 
 ## Installation
 
-If you're on Mac OS X, consider
-[installing with Homebrew](#homebrew-on-mac-os-x).
+If you're on Mac OS X, consider [installing with Homebrew](#homebrew-on-mac-os-x).
 
 
 ### The automatic installer
@@ -157,16 +156,16 @@ https://github.com/yyuu/pyenv-installer
 This will get you going with the latest version of pyenv and make it
 easy to fork and contribute any changes back upstream.
 
-1. **Check out pyenv where you want it installed.** A good place to choose is
-`$HOME/.pyenv` but you may install it somewhere else.
+1. **Check out pyenv where you want it installed.** 
+   A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else).
 
         $ cd
         $ git clone git://github.com/yyuu/pyenv.git .pyenv
 
 
 2. **Define environment variable `PYENV_ROOT`** to point to the path where
-pyenv repo is cloned and add `$PYENV_ROOT/bin` to your `$PATH` for access 
-to the `pyenv` command-line utility.
+   pyenv repo is cloned and add `$PYENV_ROOT/bin` to your `$PATH` for access 
+   to the `pyenv` command-line utility.
 
         $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
         $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
@@ -181,24 +180,26 @@ to the `pyenv` command-line utility.
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
     **Ubuntu note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
-4. **Restart your shell so the path changes take effect.** You can now
-   begin using pyenv.
+4. **Restart your shell so the path changes take effect.** 
+   You can now begin using pyenv.
 
         $ exec $SHELL
 
-5. **Install Python versions into `$PYENV_ROOT/versions`.** For example, to
-   install Python 2.7.6, download and unpack the source, then run:
+5. **Install Python versions into `$PYENV_ROOT/versions`.** 
+   For example, to install Python 2.7.6, download and unpack the source, then run:
 
         $ pyenv install 2.7.6
 
-   **NOTE** If you need to pass configure option to build, please use
+   **NOTE:** If you need to pass configure option to build, please use
    ```CONFIGURE_OPTS``` environment variable.
    
-   **NOTE** If you are having trouble installing a python version please visit the wiki page about [Common Build Problems](https://github.com/yyuu/pyenv/wiki/Common-build-problems)
+   **NOTE:** If you are having trouble installing a python version, 
+   please visit the wiki page about 
+   [Common Build Problems](https://github.com/yyuu/pyenv/wiki/Common-build-problems)
 
-6. **Rebuild the shim binaries.** You should do this any time you install
-   a new Python binary. (Examples: installing a new Python version,
-   or installing a package that provides a binary.)
+6. **Rebuild the shim binaries.** 
+   You should do this any time you install a new Python binary. 
+   (Examples: installing a new Python version, or installing a package that provides a binary.)
 
         $ pyenv rehash
 
@@ -213,8 +214,7 @@ To upgrade to the latest development version of pyenv, use `git pull`:
     $ cd ~/.pyenv
     $ git pull
 
-To upgrade to a specific release of pyenv, check out the corresponding
-tag:
+To upgrade to a specific release of pyenv, check out the corresponding tag:
 
     $ cd ~/.pyenv
     $ git fetch
@@ -225,13 +225,12 @@ tag:
 
 ### Homebrew on Mac OS X
 
-You can also install pyenv using the
-[Homebrew](http://brew.sh) package manager on Mac OS X.
+You can also install pyenv using the [Homebrew](http://brew.sh) 
+package manager for Mac OS X.
 
-~~~
-$ brew update
-$ brew install pyenv
-~~~
+    $ brew update
+    $ brew install pyenv
+
 
 To upgrade pyenv in the future, just use `upgrade` instead of `install`.
 
@@ -292,12 +291,11 @@ See [COMMANDS.md](COMMANDS.md).
 
 ## Development
 
-The pyenv source code is [hosted on
-GitHub](https://github.com/yyuu/pyenv). It's clean, modular,
-and easy to understand, even if you're not a shell hacker.
+The pyenv source code is [hosted on GitHub](https://github.com/yyuu/pyenv). 
+It's clean, modular, and easy to understand--even if you're not a shell hacker.
 
-Please feel free to submit pull requests and file bugs on the [issue
-tracker](https://github.com/yyuu/pyenv/issues).
+Please feel free to submit Pull Requests and report bugs on the 
+[issue tracker](https://github.com/yyuu/pyenv/issues).
 
 
 ### Version History
