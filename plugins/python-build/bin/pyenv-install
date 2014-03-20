@@ -198,7 +198,8 @@ if [ "$STATUS" == "2" ]; then
     echo
     echo "If the version you're looking for is not present, first try upgrading"
     echo "pyenv. If it's still missing, open a request on the pyenv"
-    echo "issue tracker: https://github.com/yyuu/pyenv/issues"
+    echo "issue tracker: "
+    echo "https://github.com/yyuu/pyenv/issues"
   } >&2
 fi
 
