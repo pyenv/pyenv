@@ -1,4 +1,5 @@
 #!/bin/sh
+#
 # Usage: PREFIX=/usr/local ./install.sh
 #
 # Installs python-build under $PREFIX.

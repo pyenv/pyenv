@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+#
 # Summary: Detect the file that sets the current pyenv version
+#
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 

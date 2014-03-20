@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+#
 # Summary: List all Python versions that contain the given executable
+#
 # Usage: pyenv whence [--path] <command>
 
 set -e

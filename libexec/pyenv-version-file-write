@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
+#
 # Usage: pyenv version-file-write <file> <version>
+#
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
