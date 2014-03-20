@@ -30,6 +30,13 @@ setup() {
   assert_success "1.9.3 (set by ${PWD}/.ruby-version)"
 }
 
+@test "set by local file containing CR" {
+  create_version "1.9.3"
+  cat > ".ruby-version" <<< $'1.9.3\r'
+  run rbenv-version
+  assert_success "1.9.3 (set by ${PWD}/.ruby-version)"
+}
+
 @test "set by global file" {
   create_version "1.9.3"
   cat > "${RBENV_ROOT}/version" <<<"1.9.3"
