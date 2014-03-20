@@ -11,9 +11,9 @@ The most common subcommands are:
 * [`pyenv shell`](#pyenv-shell)
 * [`pyenv install`](#pyenv-install)
 * [`pyenv uninstall`](#pyenv-uninstall)
-* [`pyenv versions`](#pyenv-versions)
-* [`pyenv version`](#pyenv-version)
 * [`pyenv rehash`](#pyenv-rehash)
+* [`pyenv version`](#pyenv-version)
+* [`pyenv versions`](#pyenv-versions)
 * [`pyenv which`](#pyenv-which)
 * [`pyenv whence`](#pyenv-whence)
 
@@ -187,10 +187,49 @@ or, if you prefer 3.3.3 over 2.7.6,
 
 Install a Python version (using `python-build`).
 
+    Usage: pyenv install [-f] [-kvp] <version>
+           pyenv install [-f] [-kvp] <definition-file>
+           pyenv install -l|--list
+
+      -l/--list        List all available versions
+      -f/--force       Install even if the version appears to be installed already
+
+      python-build options:
+
+      -k/--keep        Keep source tree in $PYENV_BUILD_ROOT after installation
+                       (defaults to $PYENV_ROOT/sources)
+      -v/--verbose     Verbose mode: print compilation status to stdout
+      -p/--patch       Apply a patch from stdin before building
+      -g/--debug       Build a debug version
+
 
 ## `pyenv uninstall`
 
-Uninstall a specific Python version
+Uninstall a specific Python version.
+
+    Usage: pyenv uninstall [-f|--force] <version>
+
+       -f  Attempt to remove the specified version without prompting
+           for confirmation. If the version does not exist, do not
+           display an error message.
+
+
+## `pyenv rehash`
+
+Installs shims for all Python binaries known to pyenv (i.e.,
+`~/.pyenv/versions/*/bin/*`). Run this command after you install a new
+version of Python, or install a package that provides binaries.
+
+    $ pyenv rehash
+
+
+## `pyenv version`
+
+Displays the currently active Python version, along with information on
+how it was set.
+
+    $ pyenv version
+    2.7.6 (set by /home/yyuu/.pyenv/version)
 
 
 ## `pyenv versions`
@@ -205,24 +244,6 @@ the currently active version.
       3.3.3
       jython-2.5.3
       pypy-2.2.1
-
-
-## `pyenv version`
-
-Displays the currently active Python version, along with information on
-how it was set.
-
-    $ pyenv version
-    2.7.6 (set by /home/yyuu/.pyenv/version)
-
-
-## `pyenv rehash`
-
-Installs shims for all Python binaries known to pyenv (i.e.,
-`~/.pyenv/versions/*/bin/*`). Run this command after you install a new
-version of Python, or install a package that provides binaries.
-
-    $ pyenv rehash
 
 
 ## `pyenv which`
