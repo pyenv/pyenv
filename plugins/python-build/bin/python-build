@@ -241,7 +241,7 @@ http() {
   elif type wget &>/dev/null; then
     "http_${method}_wget" "$url" "$file"
   else
-    echo "error: please install \`curl\` or \`wget\` and try again" >&2
+    echo "ERROR: please install \`curl\` or \`wget\` and try again" >&2
     exit 1
   fi
 }
@@ -330,7 +330,7 @@ download_tarball() {
   if http get "$package_url" "$package_filename" >&4 2>&1; then
     verify_checksum "$package_filename" "$checksum" >&4 2>&1 || return 1
   else
-    echo "error: failed to download $package_filename" >&2
+    echo "ERROR: failed to download $package_filename" >&2
     return 1
   fi
 
@@ -366,7 +366,7 @@ fetch_git() {
 
     git clone --depth 1 --branch "$git_ref" "$git_url" "${package_name}" >&4 2>&1
   else
-    echo "error: please install \`git\` and try again" >&2
+    echo "ERROR: please install \`git\` and try again" >&2
     exit 1
   fi
 }
@@ -398,7 +398,7 @@ fetch_hg() {
 
     hg clone --branch "$hg_ref" "$hg_url" "${package_name}" >&4 2>&1
   else
-    echo "error: please install \`hg\` and try again" >&2
+    echo "ERROR: please install \`hg\` and try again" >&2
     exit 1
   fi
 }
@@ -413,7 +413,7 @@ fetch_svn() {
   if type svn &>/dev/null; then
     svn co -r "$svn_rev" "$svn_url" "${package_name}" >&4 2>&1
   else
-    echo "error: please install \`svn\` and try again" >&2
+    echo "ERROR: please install \`svn\` and try again" >&2
     exit 1
   fi
 }
@@ -741,10 +741,10 @@ pypy_architecture() {
   "Darwin" ) echo "osx64" ;;
   "Linux" )
     case "$(uname -m)" in
-    "armel" ) echo "linux-armel" ;;
-    "armhf" | "armv6l" | "armv7l" ) echo "linux-armhf" ;;
+    "armel" )                                    echo "linux-armel" ;;
+    "armhf" | "armv6l" | "armv7l" )              echo "linux-armhf" ;;
     "i386" | "i486" | "i586" | "i686" | "i786" ) echo "linux" ;;
-    "x86_64" ) echo "linux64" ;;
+    "x86_64" )                                   echo "linux64" ;;
     * ) return 1 ;;
     esac
     ;;
@@ -783,7 +783,7 @@ anaconda_architecture() {
   "Linux" )
     case "$(uname -m)" in
     "i386" | "i486" | "i586" | "i686" | "i786" ) echo "Linux-x86" ;;
-    "x86_64" ) echo "Linux-x86_64" ;;
+    "x86_64" )                                   echo "Linux-x86_64" ;;
     * ) return 1 ;;
     esac
     ;;
@@ -820,7 +820,7 @@ setup_builtin_patches() {
   local package_patch_path="${PYTHON_BUILD_ROOT}/share/python-build/patches/${DEFINITION_PATH##*/}/${package_name}"
 
   ORIG_HAS_PATCH="$HAS_PATCH"
-# Apply built-in patches if patch was not given from stdin
+# Apply built-in patches if patch was not given from STDIN
   if [ -z "$HAS_PATCH" ] && [ -d "${package_patch_path}" ]; then
     local patch
     { for patch in "${package_patch_path}"/*; do
@@ -885,8 +885,8 @@ require_gcc() {
     { echo
       colorize 1 "ERROR"
       echo ": This package must be compiled with GCC, but python-build couldn't"
-      echo "find a suitable \`gcc\` executable on your system. Please install GCC"
-      echo "and try again."
+      echo "find a suitable \`gcc\` executable on your system. "
+      echo "Please install GCC and try again."
       echo
 
       if [ "$(uname -s)" = "Darwin" ]; then
@@ -914,9 +914,9 @@ require_gcc() {
 
         echo
         echo
-        echo "You will need to install the official GCC compiler to build newer"
-        echo "versions of CPython even if you have installed Apple's Command Line Tools"
-        echo "for Xcode package. The Command Line Tools for Xcode package only"
+        echo "You will need to install the official GCC compiler to build newer "
+        echo "versions of CPython, even if Apple's Command Line Tools for Xcode "
+        echo "package is installed. The Command Line Tools for Xcode package only "
         echo "includes \`llvm-gcc\`."
       fi
     } >&3
@@ -994,9 +994,9 @@ require_clang() {
   if [ -z "$clang" ]; then
     local esc=$'\033'
     { echo
-      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with clang, but python-build couldn't"
-      echo "find a suitable \`clang\` executable on your system. Please install clang"
-      echo "and try again."
+      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with clang, but "
+      echo "python-build couldn't find a suitable \`clang\` executable on your system. "
+      echo "Please install clang and try again."
       echo
     } >&3
     return 1
@@ -1011,9 +1011,9 @@ require_java() {
   if [ -z "$java" ]; then
     local esc=$'\033'
     { echo
-      echo "${esc}[1mERROR${esc}[0m: This package must be installed with java, but python-build couldn't"
-      echo "find a suitable \`java\` executable on your system. Please install Java"
-      echo "and try again."
+      echo "${esc}[1mERROR${esc}[0m: This package must be installed with java, but "
+      echo "python-build couldn't find a suitable \`java\` executable on your system. "
+      echo "Please install Java and try again."
       echo
     } >&3
     return 1
@@ -1117,7 +1117,7 @@ build_package_verify_openssl() {
   "$RUBY_BIN" -e 'begin
     require "openssl"
   rescue LoadError
-    abort "The Ruby openssl extension was not compiled. Missing the OpenSSL lib?"
+    abort "The Ruby openssl extension was not compiled. Are you missing the OpenSSL lib?"
   end' >&4 2>&1
 }
 
@@ -1269,7 +1269,7 @@ verify_python_module() {
   local module_name="${2:-${module}}"
   { if ! "$PYTHON_BIN" -c "import ${module}"; then
       echo
-      echo "The Python ${module} extension was not compiled. Missing the ${module_name}?"
+      echo "The Python ${module} extension was not compiled. Are you missing the ${module_name}?"
       echo
       echo "To fix the problem, please consult the Wiki page:"
       echo "https://github.com/yyuu/pyenv/wiki/Common-build-problems"
