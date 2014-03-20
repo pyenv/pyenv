@@ -5,15 +5,22 @@ first argument.
 
 The most common subcommands are:
 
+* [`pyenv commands`](#pyenv-commands)
 * [`pyenv local`](#pyenv-local)
 * [`pyenv global`](#pyenv-global)
 * [`pyenv shell`](#pyenv-shell)
+* [`pyenv install`](#pyenv-install)
+* [`pyenv uninstall`](#pyenv-uninstall)
 * [`pyenv versions`](#pyenv-versions)
 * [`pyenv version`](#pyenv-version)
 * [`pyenv rehash`](#pyenv-rehash)
 * [`pyenv which`](#pyenv-which)
 * [`pyenv whence`](#pyenv-whence)
 
+
+## `pyenv commands`
+
+Lists all available pyenv commands.
 
 
 ## `pyenv local`
@@ -174,6 +181,16 @@ or, if you prefer 3.3.3 over 2.7.6,
     Python 2.7.6
     $ python3.3 --version
     Python 3.3.3
+
+
+## `pyenv install`
+
+Install a Python version (using `python-build`).
+
+
+## `pyenv uninstall`
+
+Uninstall a specific Python version
 
 
 ## `pyenv versions`
