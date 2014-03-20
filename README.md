@@ -33,6 +33,9 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
     to automate the process.
 
 
+----
+
+
 ## Table of Contents
 
 * **[How It Works](#how-it-works)**
@@ -50,6 +53,9 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 * **[Development](#development)**
   * [Version History](#version-history)
   * [License](#license)
+
+
+----
 
 
 ## How It Works
@@ -138,6 +144,9 @@ For example, you might have these versions installed:
 
 As far as pyenv is concerned, version names are simply the directories in
 `~/.pyenv/versions`.
+
+
+----
 
 
 ## Installation
@@ -284,9 +293,15 @@ to remove. You can find the directory of a particular Python version
 with the `pyenv prefix` command, e.g. `pyenv prefix 2.6.8`.
 
 
+----
+
+
 ## Command Reference
 
 See [COMMANDS.md](COMMANDS.md).
+
+
+----
 
 
 ## Development
