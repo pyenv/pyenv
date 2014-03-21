@@ -64,3 +64,9 @@ IN
   run rbenv-version-file-read my-version
   assert_success "1.8.7"
 }
+
+@test "ignores carriage returns" {
+  cat > my-version <<< $'1.9.3\r'
+  run rbenv-version-file-read my-version
+  assert_success "1.9.3"
+}
