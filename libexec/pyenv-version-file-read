@@ -9,14 +9,12 @@ if [ -e "$VERSION_FILE" ]; then
   # Read the first non-whitespace word from the specified version file.
   # Be careful not to load it whole in case there's something crazy in it.
   IFS="${IFS}"$'\r'
-  words=( $(cut -b 1-1024 "$VERSION_FILE") )
+  words=( $(cut -b 1-1024 "$VERSION_FILE" | awk '{ print($1) }') )
   versions=("${words[@]}")
 
   if [ -n "$versions" ]; then
-    OLDIFS="$IFS"
-    IFS=:
+    IFS=":"
     echo "${versions[*]}"
-    IFS="$OLDIFS"
     exit
   fi
 fi

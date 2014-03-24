@@ -38,16 +38,16 @@ setup() {
 @test "reads only the first word from file" {
   cat > my-version <<<"3.3.5 2.7.6 hi"
   run pyenv-version-file-read my-version
-  assert_success "3.3.5:2.7.6:hi"
+  assert_success "3.3.5"
 }
 
-@test "loads only the first line in file" {
+@test "loads *not* only the first line in file" {
   cat > my-version <<IN
 2.7.6 one
 3.3.5 two
 IN
   run pyenv-version-file-read my-version
-  assert_success "2.7.6:one:3.3.5:two"
+  assert_success "2.7.6:3.3.5"
 }
 
 @test "ignores leading blank lines" {
