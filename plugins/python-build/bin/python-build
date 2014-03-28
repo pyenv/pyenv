@@ -986,9 +986,9 @@ require_clang() {
   local clang="$(command -v "$CC" || command -v "clang" || true)"
 
   if [ -z "$clang" ]; then
-    local esc=$'\033'
     { echo
-      echo "${esc}[1mERROR${esc}[0m: This package must be compiled with clang, but python-build couldn't"
+      colorize 1 "ERROR"
+      echo ": This package must be compiled with clang, but python-build couldn't"
       echo "find a suitable \`clang\` executable on your system. Please install clang"
       echo "and try again."
       echo
@@ -1003,9 +1003,9 @@ require_java() {
   local java="$(command -v java || true)"
 
   if [ -z "$java" ]; then
-    local esc=$'\033'
     { echo
-      echo "${esc}[1mERROR${esc}[0m: This package must be installed with java, but python-build couldn't"
+      colorize 1 "ERROR"
+      echo ": This package must be installed with java, but python-build couldn't"
       echo "find a suitable \`java\` executable on your system. Please install Java"
       echo "and try again."
       echo
