@@ -1467,8 +1467,9 @@ fi
 
 # pydistutils.cfg may corrupt install location of Python libraries (#35, #111)
 if [ -e "$HOME/.pydistutils.cfg" ]; then
-  echo "python-build: Please make sure you remove any previous custom paths from your $HOME/.pydistutils.cfg file." >&2
-  exit 1
+  { colorize 1 "WARNING"
+    echo ": Please make sure you remove any previous custom paths from your $HOME/.pydistutils.cfg file."
+  } >&2
 fi
 
 SEED="$(date "+%Y%m%d%H%M%S").$$"
