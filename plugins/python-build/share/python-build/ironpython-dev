@@ -1,0 +1,3 @@
+install_git "ironpython-dev" "https://github.com/IronLanguages/main.git" master ironpython_builder
+install_package "setuptools-3.4.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-3.4.1.tar.gz#252a38c6b25f1ac446ba6983095dbf3f" python
+install_package "pip-1.5.4" "https://pypi.python.org/packages/source/p/pip/pip-1.5.4.tar.gz#834b2904f92d46aaa333267fb1c922bb" python
