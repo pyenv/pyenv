@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-x86" )
+  install_script "Miniconda-3.3.0-Linux-x86" "http://repo.continuum.io/miniconda/Miniconda-3.3.0-Linux-x86.sh#734f0f18f5c8705e0b849c97573559e9" "miniconda" verify_py27
+  ;;
+"Linux-x86_64" )
+  install_script "Miniconda-3.3.0-Linux-x86_64" "http://repo.continuum.io/miniconda/Miniconda-3.3.0-Linux-x86_64.sh#d68136816b4483391651fb4efd34725f" "miniconda" verify_py27
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniconda-3.3.0-MacOSX-x86_64" "http://repo.continuum.io/miniconda/Miniconda-3.3.0-MacOSX-x86_64.sh#7624c9643f4e8bcc6bbd5924b3ad15fd" "miniconda" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo "Precompiled binary of miniconda-3.3.0 is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
