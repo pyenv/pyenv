@@ -730,6 +730,18 @@ build_package_jython_builder() {
   ( cd "dist" && build_package_jython )
 }
 
+build_package_ironpython() {
+  mkdir -p "${PREFIX_PATH}/bin"
+  cp -fR . "${PREFIX_PATH}/bin"
+  chmod +x "${PREFIX_PATH}/bin/"*.exe
+  ( cd "${PREFIX_PATH}/bin" && ln -fs ipy.exe python )
+}
+
+build_package_ironpython_builder() {
+  xbuild Build.proj /t:Stage "/p:Mono=true;BaseConfiguration=Release" >&4 2>&1
+  ( cd "Stage/Release/IronPython-"* && build_package_ironpython )
+}
+
 pypy_architecture() {
   case "$(uname -s)" in
   "Darwin" ) echo "osx64" ;;
