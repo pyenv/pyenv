@@ -1,4 +1,4 @@
 require_gcc
 install_package "pypy-2.2.1-src" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2.1-src.tar.bz2#7ec9f48702323f9e93654ba73dd46720" "pypy_builder" verify_py27
-install_package "setuptools-3.4.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-3.4.1.tar.gz#252a38c6b25f1ac446ba6983095dbf3f" python
+install_package "setuptools-3.4.3" "https://pypi.python.org/packages/source/s/setuptools/setuptools-3.4.3.tar.gz#284bf84819c0f6735c853619d1a54955" python
 install_package "pip-1.5.4" "https://pypi.python.org/packages/source/p/pip/pip-1.5.4.tar.gz#834b2904f92d46aaa333267fb1c922bb" python
