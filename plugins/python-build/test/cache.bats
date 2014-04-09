@@ -11,7 +11,7 @@ setup() {
 
 @test "packages are saved to download cache" {
   stub md5 true
-  stub curl "-C - -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${6##*/} \$4"
+  stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   install_fixture definitions/without-checksum
   [ "$status" -eq 0 ]
@@ -59,7 +59,7 @@ setup() {
 
   stub md5 true "echo invalid" "echo $checksum"
   stub curl "-*I* : true" \
-    "-C - -o * -*S* http://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$4"
+    "-q -o * -*S* http://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
 
   touch "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz"
 
@@ -76,7 +76,7 @@ setup() {
 
 @test "nonexistent cache directory is ignored" {
   stub md5 true
-  stub curl "-C - -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${6##*/} \$4"
+  stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   export PYTHON_BUILD_CACHE_PATH="${TMP}/nonexistent"
 

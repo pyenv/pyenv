@@ -56,7 +56,7 @@ assert_build_log() {
 }
 
 @test "yaml is installed for python" {
-  cached_tarball "yaml-0.1.5"
+  cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.2.1"
 
   stub brew false
@@ -69,7 +69,7 @@ assert_build_log() {
   unstub make
 
   assert_build_log <<OUT
-yaml-0.1.5: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+yaml-0.1.6: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
@@ -79,7 +79,7 @@ OUT
 }
 
 @test "apply python patch before building" {
-  cached_tarball "yaml-0.1.5"
+  cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.2.1"
 
   stub brew false
@@ -94,7 +94,7 @@ OUT
   unstub patch
 
   assert_build_log <<OUT
-yaml-0.1.5: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+yaml-0.1.6: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 patch -p0 -i -
@@ -153,6 +153,7 @@ OUT
 @test "readline is not linked from Homebrew when explicitly defined" {
   cached_tarball "Python-3.2.1"
 
+  # python-build
   readline_libdir="$TMP/custom"
   mkdir -p "$readline_libdir/include/readline"
   touch "$readline_libdir/include/readline/rlconf.h"

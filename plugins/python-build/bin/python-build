@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20140225"
+PYTHON_BUILD_VERSION="20140408"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -245,7 +245,7 @@ http_head_curl() {
 }
 
 http_get_curl() {
-  curl -C - -o "${2:--}" -qsSLf "$1"
+  curl -q -o "${2:--}" -sSLf "$1"
 }
 
 http_head_wget() {
@@ -253,7 +253,7 @@ http_head_wget() {
 }
 
 http_get_wget() {
-  wget -nv -c -O "${2:--}" "$1"
+  wget -nv -O "${2:--}" "$1"
 }
 
 fetch_tarball() {
@@ -283,7 +283,7 @@ fetch_tarball() {
     tar_args="${tar_args/z/j}"
   fi
 
-  if ! symlink_tarball_from_cache "$package_filename" "$checksum"; then
+  if ! reuse_existing_tarball "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
     http head "$mirror_url" &&
     download_tarball "$mirror_url" "$package_filename" "$checksum" ||
@@ -300,12 +300,18 @@ fetch_tarball() {
   } >&4 2>&1
 }
 
-symlink_tarball_from_cache() {
-  [ -n "$PYTHON_BUILD_CACHE_PATH" ] || return 1
-
+reuse_existing_tarball() {
   local package_filename="$1"
-  local cached_package_filename="${PYTHON_BUILD_CACHE_PATH}/$package_filename"
   local checksum="$2"
+
+  # Reuse existing file in build location
+  if [ -e "$package_filename" ] && verify_checksum "$package_filename" "$checksum"; then
+    return 0
+  fi
+
+  # Reuse previously downloaded file in cache location
+  [ -n "$PYTHON_BUILD_CACHE_PATH" ] || return 1
+  local cached_package_filename="${PYTHON_BUILD_CACHE_PATH}/$package_filename"
 
   [ -e "$cached_package_filename" ] || return 1
   verify_checksum "$cached_package_filename" "$checksum" >&4 2>&1 || return 1
@@ -429,7 +435,7 @@ fetch_jar() {
 
   local package_filename="${package_name}.jar"
 
-  if ! symlink_tarball_from_cache "$package_filename" "$checksum"; then
+  if ! reuse_existing_tarball "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
     http head "$mirror_url" &&
     download_tarball "$mirror_url" "$package_filename" "$checksum" ||
@@ -463,7 +469,7 @@ fetch_zip() {
 
   local package_filename="${package_name}.zip"
 
-  if ! symlink_tarball_from_cache "$package_filename" "$checksum"; then
+  if ! reuse_existing_tarball "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
     http head "$mirror_url" &&
     download_tarball "$mirror_url" "$package_filename" "$checksum" ||
@@ -497,7 +503,7 @@ fetch_script() {
 
   local package_filename="${package_name}.sh" # TODO: extract suffix from ${package_url}
 
-  if ! symlink_tarball_from_cache "$package_filename" "$checksum"; then
+  if ! reuse_existing_tarball "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
     http head "$mirror_url" &&
     download_tarball "$mirror_url" "$package_filename" "$checksum" ||
@@ -860,7 +866,9 @@ fix_rbx_gem_binstubs() {
     for file in "$gemdir"/*; do
       binstub="${bindir}/${file##*/}"
       rm -f "$binstub"
-      sed -E "s:^#\!.+:#\!${bindir}/ruby:" < "$file" > "$binstub"
+      { echo "#!${bindir}/ruby"
+        cat "$file"
+      } > "$binstub"
       chmod +x "$binstub"
     done
     rm -rf "$gemdir"

@@ -6,16 +6,17 @@
 #        pyenv install [-f] [-kvp] <definition-file>
 #        pyenv install -l|--list
 #
-#   -l/--list        List all available versions
-#   -f/--force       Install even if the version appears to be installed already
+#   -l/--list          List all available versions
+#   -f/--force         Install even if the version appears to be installed already
+#   -s/--skip-existing Skip if the version appears to be installed already
 #
 #   python-build options:
 #
-#   -k/--keep        Keep source tree in $PYENV_BUILD_ROOT after installation
-#                    (defaults to $PYENV_ROOT/sources)
-#   -v/--verbose     Verbose mode: print compilation status to stdout
-#   -p/--patch       Apply a patch from stdin before building
-#   -g/--debug       Build a debug version
+#   -k/--keep          Keep source tree in $PYENV_BUILD_ROOT after installation
+#                      (defaults to $PYENV_ROOT/sources)
+#   -v/--verbose       Verbose mode: print compilation status to stdout
+#   -p/--patch         Apply a patch from stdin before building
+#   -g/--debug         Build a debug version
 #
 # For detailed information on installing Python versions with
 # python-build, including a list of environment variables for adjusting
@@ -52,6 +53,7 @@ indent() {
 }
 
 unset FORCE
+unset SKIP_EXISTING
 unset KEEP
 unset VERBOSE
 unset HAS_PATCH
@@ -70,6 +72,9 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "f" | "force" )
     FORCE=true
+    ;;
+  "s" | "skip-existing" )
+    SKIP_EXISTING=true
     ;;
   "k" | "keep" )
     [ -n "${PYENV_BUILD_ROOT}" ] || PYENV_BUILD_ROOT="${PYENV_ROOT}/sources"
@@ -134,14 +139,21 @@ PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
 
 # If the installation prefix exists, prompt for confirmation unless
 # the --force option was specified.
-if [ -z "$FORCE" ] && [ -d "${PREFIX}/bin" ]; then
-  echo "pyenv: $PREFIX already exists" >&2
-  read -p "continue with installation? (y/N) "
+if [ -d "${PREFIX}/bin" ]; then
+  if [ -z "$FORCE" ] && [ -z "$SKIP_EXISTING" ]; then
+    echo "pyenv: $PREFIX already exists" >&2
+    read -p "continue with installation? (y/N) "
 
-  case "$REPLY" in
-  y* | Y* ) ;;
-  * ) exit 1 ;;
-  esac
+    case "$REPLY" in
+    y* | Y* ) ;;
+    * ) exit 1 ;;
+    esac
+  elif [ -n "$SKIP_EXISTING" ]; then
+    # Since we know the python version is already installed, and are opting to
+    # not force installation of existing versions, we just `exit 0` here to
+    # leave things happy
+    exit 0
+  fi
 fi
 
 # If PYENV_BUILD_ROOT is set, always pass keep options to python-build.
@@ -158,7 +170,7 @@ fi
 
 # Default PYENV_VERSION to the friendly Python version. (The
 # CPython installer requires an existing Python installation to run. An
-# unsatisfied local python version can cause the installer to
+# unsatisfied local .python-version file can cause the installer to
 # fail.)
 if [[ "${VERSION_NAME}" == [23]"."* ]]; then
   for version in "${VERSION_NAME%-dev}" "${VERSION_NAME%.*}" "${VERSION_NAME%%.*}"; do
