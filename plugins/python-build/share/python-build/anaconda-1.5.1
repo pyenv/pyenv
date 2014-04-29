@@ -5,7 +5,7 @@ case "$(anaconda_architecture 2>/dev/null || true)" in
 * )
   { echo
     colorize 1 "ERROR"
-    echo "Precompiled binary of anaconda-1.5.1 is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo ": The binary distribution of Anaconda is not available for $(anaconda_architecture 2>/dev/null || true)."
     echo
   } >&2
   exit 1
