@@ -1,0 +1,4 @@
+require_gcc
+install_package "pypy-pypy-394146e9bb67" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-src.tar.bz2#c93a8e47f3b3109af2f66d2bd766eb97" "pypy_builder" verify_py27
+install_package "setuptools-3.5.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-3.5.1.tar.gz#d0447ca5adeeac93ef43931c395788c3" python
+install_package "pip-1.5.5" "https://pypi.python.org/packages/source/p/pip/pip-1.5.5.tar.gz#7520581ba0687dec1ce85bd15496537b" python
