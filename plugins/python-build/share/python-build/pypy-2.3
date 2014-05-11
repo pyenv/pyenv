@@ -13,36 +13,36 @@ require_distro() {
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   require_distro "Ubuntu 10.04" || true
-  install_package "pypy-2.2-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux.tar.bz2#28b38b2417c3cad4c32db120f718bcd9" "pypy" verify_py27
+  install_package "pypy-2.3-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux.tar.bz2#e84a1179a63632c62e311363a409df56" "pypy" verify_py27
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.2-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux-armel.tar.bz2#c50373a6c2517b43c65fd84ac2cd3a6f" "pypy" verify_py27
+  install_package "pypy-2.3-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux-armel.tar.bz2#391bda03d0642ebb3fa6d59ec90a1388" "pypy" verify_py27
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy-2.2-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux-armhf-raspbian.tar.bz2#e9c9f28cba22d07445e9195c1d2fede6" "pypy" verify_py27
+    install_package "pypy-2.3-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux-armhf-raspbian.tar.bz2#0ab5df88c02b41f8f062b2893ccd5066" "pypy" verify_py27
   else
     require_distro "Ubuntu 13.04" || true
-    install_package "pypy-2.2-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux-armhf-raring.tar.bz2#830fdcfafae461d8e72daa94a1ab4499" "pypy" verify_py27
+    install_package "pypy-2.3-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux-armhf-raring.tar.bz2#cdb738317e958031d0752dff5a1742f1" "pypy" verify_py27
   fi
   ;;
 "linux64" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.2-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-linux64.tar.bz2#2ce3be921d063eff8286be2e82649638" "pypy" verify_py27
+  install_package "pypy-2.3-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux64.tar.bz2#2ae65fa6b0ea9ddffd50a02a40f27186" "pypy" verify_py27
   ;;
 "osx64" )
-  install_package "pypy-2.2-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-osx64.tar.bz2#690783f07340888a0fa180789de789da" "pypy" verify_py27
+  install_package "pypy-2.3-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-osx64.tar.bz2#76b5d7798d3a9b8919f792df5a402bb2" "pypy" verify_py27
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.2-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2-win32.zip#b44e65f0a7951c0f7eb4338f89120120" "pypy" verify_py27
+  install_zip "pypy-2.3-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-win32.zip#55e0598ca9add0e7c78ffa49db6476c2" "pypy" verify_py27
   ;;
 * )
   { echo
     colorize 1 "ERROR"
     echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
-    echo "try 'pypy-2.2-src' to build from soruce."
+    echo "try 'pypy-2.3-src' to build from soruce."
     echo
   } >&2
   exit 1

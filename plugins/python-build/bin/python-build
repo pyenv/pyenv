@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20140408"
+PYTHON_BUILD_VERSION="20140420"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -284,7 +284,8 @@ fetch_tarball() {
   fi
 
   if ! reuse_existing_tarball "$package_filename" "$checksum"; then
-    echo "Downloading ${package_filename}..." >&2
+    local tarball_filename=$(basename $package_url)
+    echo "Downloading ${tarball_filename}..." >&2
     http head "$mirror_url" &&
     download_tarball "$mirror_url" "$package_filename" "$checksum" ||
     download_tarball "$package_url" "$package_filename" "$checksum"
