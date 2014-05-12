@@ -1,6 +1,6 @@
 require_java
 install_hg "jython-dev" "http://hg.python.org/jython" "default" jython_builder
-install_package "setuptools-3.5.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-3.5.1.tar.gz#d0447ca5adeeac93ef43931c395788c3" python
+install_package "setuptools-3.6" "https://pypi.python.org/packages/source/s/setuptools/setuptools-3.6.tar.gz#8f3a1dcdc14313c8334eb6af4f66ea0a" python
 # pip (>= 1.3) does not work properly since it uses HTTPS for downloads
 # * https://github.com/yyuu/pyenv/issues/15
 install_package "pip-1.2.1" "https://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz#db8a6d8a4564d3dc7f337ebed67b1a85" python

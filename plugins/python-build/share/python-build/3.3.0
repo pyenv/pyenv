@@ -1,5 +1,5 @@
 require_cc
 install_package "readline-6.3" "http://ftpmirror.gnu.org/readline/readline-6.3.tar.gz#33c8fb279e981274f485fd91da77e94a" standard --if has_broken_mac_readline
 install_package "Python-3.3.0" "http://python.org/ftp/python/3.3.0/Python-3.3.0.tgz#198a64f7a04d1d5e95ce2782d5fd8254" ldflags_dirs standard verify_py33
-install_package "setuptools-3.5.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-3.5.1.tar.gz#d0447ca5adeeac93ef43931c395788c3" python
+install_package "setuptools-3.6" "https://pypi.python.org/packages/source/s/setuptools/setuptools-3.6.tar.gz#8f3a1dcdc14313c8334eb6af4f66ea0a" python
 install_package "pip-1.5.5" "https://pypi.python.org/packages/source/p/pip/pip-1.5.5.tar.gz#7520581ba0687dec1ce85bd15496537b" python
