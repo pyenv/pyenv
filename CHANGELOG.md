@@ -1,5 +1,19 @@
 ## Version History
 
+#### 0.4.0-20140516
+
+* pyenv: Prefer gawk over awk if both are available.
+* python-build: Add new PyPy release; pypy-2.3, pypy-2.3-src (#162)
+* python-build: Add new Anaconda release; anaconda-1.9.2 (#155)
+* python-build: Add new Miniconda releases; miniconda-3.3.0, minoconda-3.4.2, miniconda3-3.3.0, miniconda3-3.4.2
+* python-build: Add new Stackless releases; stackless-2.7.3, stackless-2.7.4, stackless-2.7.5, stackless-2.7.6, stackless-3.2.5, stackless-3.3.5 (#164)
+* python-build: Add IronPython versions (setuptools and pip will work); ironpython-2.7.4, ironpython-dev
+* python-build: Add new Jython beta release; jython-2.7-beta2
+* python-build: Update default setuptools version (3.4.1 -> 3.6)
+* python-build: Update default pip version (1.5.4 -> 1.5.5)
+* python-build: Update GNU Readline (6.2 -> 6.3)
+* python-build: Import recent changes from ruby-build v20140420
+
 #### 0.4.0-20140404
 
 * pyenv: Reads only the first word from version file. This is as same behavior as rbenv.
