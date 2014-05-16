@@ -1047,7 +1047,7 @@ needs_yaml() {
 use_homebrew_yaml() {
   local libdir="$(brew --prefix libyaml 2>/dev/null || true)"
   if [ -d "$libdir" ]; then
-    package_option python configure CPPFLAGS="-I$libdir/include" LDFLAGS="-L$libdir/lib"
+    package_option python configure CPPFLAGS="-I$libdir/include $CPPFLAGS" LDFLAGS="-L$libdir/lib $LDFLAGS"
   else
     return 1
   fi
@@ -1079,7 +1079,7 @@ use_homebrew_readline() {
   if ! configured_with_readline_dir; then
     local libdir="$(brew --prefix readline 2>/dev/null || true)"
     if [ -d "$libdir" ]; then
-      package_option python configure CPPFLAGS="-I$libdir/include" LDFLAGS="-L$libdir/lib"
+      package_option python configure CPPFLAGS="-I$libdir/include $CPPFLAGS" LDFLAGS="-L$libdir/lib $LDFLAGS"
     else
       return 1
     fi
@@ -1095,7 +1095,7 @@ has_broken_mac_openssl() {
 use_homebrew_openssl() {
   local ssldir="$(brew --prefix openssl 2>/dev/null || true)"
   if [ -d "$ssldir" ]; then
-    package_option python configure CPPFLAGS="-I$ssldir/include" LDFLAGS="-L$ssldir/lib"
+    package_option python configure CPPFLAGS="-I$ssldir/include $CPPFLAGS" LDFLAGS="-L$ssldir/lib $LDFLAGS"
   else
     return 1
   fi
@@ -1109,7 +1109,7 @@ build_package_mac_openssl() {
   OPENSSLDIR="${OPENSSLDIR:-$OPENSSL_PREFIX_PATH/ssl}"
 
   # Tell Python to use this openssl for its extension.
-  package_option python configure CPPFLAGS="-I${OPENSSL_PREFIX_PATH}/include" LDFLAGS="-L${OPENSSL_PREFIX_PATH}/lib"
+  package_option python configure CPPFLAGS="-I${OPENSSL_PREFIX_PATH}/include $CPPFLAGS" LDFLAGS="-L${OPENSSL_PREFIX_PATH}/lib $LDFLAGS"
 
   # Hint OpenSSL that we prefer a 64-bit build.
   export KERNEL_BITS="64"
