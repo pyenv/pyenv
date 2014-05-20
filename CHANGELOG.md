@@ -1,5 +1,10 @@
 ## Version History
 
+#### 0.4.0-20140520
+
+* python-build: Add new CPython release; 3.4.1 (#170, #171)
+* python-build: Update default pip version (1.5.5 -> 1.5.6) (#169)
+
 #### 0.4.0-20140516
 
 * pyenv: Prefer gawk over awk if both are available.
