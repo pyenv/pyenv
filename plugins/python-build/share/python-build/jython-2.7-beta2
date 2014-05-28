@@ -1,5 +1,5 @@
 require_java
-install_jar "jython-2.7-beta2" "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7-b1/jython-installer-2.7-b1.jar" jython
+install_jar "jython-2.7-beta2" "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7-b2/jython-installer-2.7-b2.jar" jython
 install_package "setuptools-3.6" "https://pypi.python.org/packages/source/s/setuptools/setuptools-3.6.tar.gz#8f3a1dcdc14313c8334eb6af4f66ea0a" python
 # pip (>= 1.3) does not work properly since it uses HTTPS for downloads
 # * https://github.com/yyuu/pyenv/issues/15
