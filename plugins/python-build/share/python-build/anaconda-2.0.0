@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-x86" )
+  install_script "Anaconda-2.0.0-Linux-x86" "http://repo.continuum.io/archive/Anaconda-2.0.0-Linux-x86.sh#48b6773dacf45e4df0da91cfc149bb23" "anaconda" verify_py27
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda-2.0.0-Linux-x86_64" "http://repo.continuum.io/archive/Anaconda-2.0.0-Linux-x86_64.sh#480ba8864579a457db91cd774bd373c1" "anaconda" verify_py27
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda-2.0.0-MacOSX-x86_64" "http://repo.continuum.io/archive/Anaconda-2.0.0-MacOSX-x86_64.sh#ec288bc9901facac5a1e098ded8c9936" "anaconda" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Anaconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
