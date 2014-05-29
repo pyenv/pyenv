@@ -283,6 +283,11 @@ fetch_tarball() {
     tar_args="${tar_args/z/j}"
   fi
 
+   if [ "$package_url" != "${package_url%xz}" ]; then
+     package_filename="${package_filename%.gz}.xz"
+     tar_args="${tar_args/z/J}"
+   fi
+
   if ! reuse_existing_tarball "$package_filename" "$checksum"; then
     local tarball_filename=$(basename $package_url)
     echo "Downloading ${tarball_filename}..." >&2
