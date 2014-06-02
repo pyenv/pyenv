@@ -140,7 +140,6 @@ function rbenv
   end
 end
 EOS
-  exit 0
   ;;
 ksh )
   cat <<EOS
@@ -156,6 +155,7 @@ EOS
   ;;
 esac
 
+if [ "$shell" != "fish" ]; then
 IFS="|"
 cat <<EOS
   command="\$1"
@@ -171,3 +171,4 @@ cat <<EOS
   esac
 }
 EOS
+fi

@@ -77,3 +77,20 @@ load test_helper
   assert_success
   refute_line 'setenv PATH "'${RBENV_ROOT}'/shims" $PATH ;'
 }
+
+@test "outputs sh-compatible syntax" {
+  run rbenv-init - bash
+  assert_success
+  assert_line '  case "$command" in'
+
+  run rbenv-init - zsh
+  assert_success
+  assert_line '  case "$command" in'
+}
+
+@test "outputs fish-specific syntax (fish)" {
+  run rbenv-init - fish
+  assert_success
+  assert_line '  switch "$command"'
+  refute_line '  case "$command" in'
+}
