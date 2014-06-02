@@ -1,5 +1,13 @@
 ## Version History
 
+#### 0.4.0-20140602
+
+* python-build: Add new Anaconda/Anaconda3 releases; anaconda-2.0.0, anaconda3-2.0.0 (#179)
+* python-build: Add new CPython release; 2.7.7 (#180)
+* python-build: Update default setuptools version (3.6 -> 4.0) (#181)
+* python-build: Respect environment variables of `CPPFLAGS` and `LDFLAGS` (#168)
+* python-build: Support for xz-compressed Python tarballs (#177)
+
 #### 0.4.0-20140520
 
 * python-build: Add new CPython release; 3.4.1 (#170, #171)
