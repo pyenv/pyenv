@@ -88,9 +88,9 @@ OUT
   stub brew false
   stub_make_install
   stub_make_install
-  stub patch ' : echo patch "$@" >> build.log'
+  stub patch ' : echo patch "$@" | sed -E "s/\.[[:alnum:]]+$/.XXX/" >> build.log'
 
-  install_fixture --patch definitions/needs-yaml
+  TMPDIR="$TMP" install_fixture --patch definitions/needs-yaml <<<""
   assert_success
 
   unstub make
@@ -101,7 +101,35 @@ yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
 yaml-0.1.6: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
-patch -p0 -i -
+patch -p0 --force -i $TMP/python-patch.XXX
+Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "apply python patch from git diff before building" {
+  cached_tarball "yaml-0.1.6"
+  cached_tarball "Python-3.2.1"
+
+  stub brew false
+  stub_make_install
+  stub_make_install
+  stub patch ' : echo patch "$@" | sed -E "s/\.[[:alnum:]]+$/.XXX/" >> build.log'
+
+  TMPDIR="$TMP" install_fixture --patch definitions/needs-yaml <<<"diff --git a/script.py"
+  assert_success
+
+  unstub make
+  unstub patch
+
+  assert_build_log <<OUT
+yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+yaml-0.1.6: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+patch -p1 --force -i $TMP/python-patch.XXX
 Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2

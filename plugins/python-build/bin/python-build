@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20140420"
+PYTHON_BUILD_VERSION="20140524"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -184,14 +184,31 @@ make_package() {
   popd >&4
 }
 
+compute_sha2() {
+  local output
+  if type shasum &>/dev/null; then
+    output="$(shasum -a 256 -b)" || return 1
+    echo "${output% *}"
+  elif type openssl &>/dev/null; then
+    output="$(openssl dgst -sha256)" || return 1
+    echo "${output##* }"
+  elif type sha256sum &>/dev/null; then
+    output="$(sha256sum --quiet)" || return 1
+    echo "${output% *}"
+  else
+    return 1
+  fi
+}
+
 compute_md5() {
+  local output
   if type md5 &>/dev/null; then
     md5 -q
   elif type openssl &>/dev/null; then
-    local output="$(openssl md5)"
+    output="$(openssl md5)" || return 1
     echo "${output##* }"
   elif type md5sum &>/dev/null; then
-    local output="$(md5sum -b)"
+    output="$(md5sum -b)" || return 1
     echo "${output% *}"
   else
     return 1
@@ -199,8 +216,9 @@ compute_md5() {
 }
 
 verify_checksum() {
-  # If there's no MD5 support, return success
-  [ -n "$HAS_MD5_SUPPORT" ] || return 0
+  # If there's no SHA2 support, return success
+  [ -n "$HAS_SHA2_SUPPORT" ] || return 0
+  local checksum_command="compute_sha2"
 
   # If the specified filename doesn't exist, return success
   local filename="$1"
@@ -210,8 +228,14 @@ verify_checksum() {
   local expected_checksum=`echo "$2" | tr [A-Z] [a-z]`
   [ -n "$expected_checksum" ] || return 0
 
+  # If the checksum length is 32 chars, assume MD5, otherwise SHA2
+  if [ "${#expected_checksum}" -eq 32 ]; then
+    [ -n "$HAS_MD5_SUPPORT" ] || return 0
+    checksum_command="compute_md5"
+  fi
+
   # If the computed checksum is empty, return failure
-  local computed_checksum=`echo "$(compute_md5 < "$filename")" | tr [A-Z] [a-z]`
+  local computed_checksum=`echo "$($checksum_command < "$filename")" | tr [A-Z] [a-z]`
   [ -n "$computed_checksum" ] || return 1
 
   if [ "$expected_checksum" != "$computed_checksum" ]; then
@@ -1201,9 +1225,15 @@ isolated_gem_install() {
 }
 
 apply_python_patch() {
+  local patchfile
   case "$1" in
   Python-* | jython-* | pypy-* )
-    patch -p0 -i "${2:--}"
+    patchfile="$(mktemp "${TMP}/python-patch.XXXXXX")"
+    cat "${2:--}" >"$patchfile"
+
+    local striplevel=0
+    grep -q '^diff --git a/' "$patchfile" && striplevel=1
+    patch -p$striplevel --force -i "$patchfile"
     ;;
   esac
 }
@@ -1450,6 +1480,13 @@ else
 fi
 
 if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ]; then
+  unset PYTHON_BUILD_MIRROR_URL
+fi
+
+if echo test | compute_sha2 >/dev/null; then
+  HAS_SHA2_SUPPORT=1
+else
+  unset HAS_SHA2_SUPPORT
   unset PYTHON_BUILD_MIRROR_URL
 fi
 

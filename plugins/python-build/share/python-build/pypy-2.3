@@ -13,30 +13,30 @@ require_distro() {
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   require_distro "Ubuntu 10.04" || true
-  install_package "pypy-2.3-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux.tar.bz2#e84a1179a63632c62e311363a409df56" "pypy" verify_py27
+  install_package "pypy-2.3-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux.tar.bz2#9071072d42344fb37cc588429864b00fff447bd5d33d51008641fe6822823f1b" "pypy" verify_py27
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.3-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux-armel.tar.bz2#391bda03d0642ebb3fa6d59ec90a1388" "pypy" verify_py27
+  install_package "pypy-2.3-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux-armel.tar.bz2#18394acc9ce356d109cbd92224a9d724a7eb53a0505ce0ec5de36ee20b288a07" "pypy" verify_py27
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy-2.3-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux-armhf-raspbian.tar.bz2#0ab5df88c02b41f8f062b2893ccd5066" "pypy" verify_py27
+    install_package "pypy-2.3-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux-armhf-raspbian.tar.bz2#92584cfccde188b6a3a850ecf226daa9924788a1da8574c57c10a7551fb127d4" "pypy" verify_py27
   else
     require_distro "Ubuntu 13.04" || true
-    install_package "pypy-2.3-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux-armhf-raring.tar.bz2#cdb738317e958031d0752dff5a1742f1" "pypy" verify_py27
+    install_package "pypy-2.3-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux-armhf-raring.tar.bz2#c8c4a4da406db8ea6dfec074951e1ac150619b0709317ceaafb6bdd837acf96e" "pypy" verify_py27
   fi
   ;;
 "linux64" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.3-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux64.tar.bz2#2ae65fa6b0ea9ddffd50a02a40f27186" "pypy" verify_py27
+  install_package "pypy-2.3-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-linux64.tar.bz2#777dbdd9c67ad1b8906288b01ae76bc9f7b80c95e967836f9a700a1679b80008" "pypy" verify_py27
   ;;
 "osx64" )
-  install_package "pypy-2.3-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-osx64.tar.bz2#76b5d7798d3a9b8919f792df5a402bb2" "pypy" verify_py27
+  install_package "pypy-2.3-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-osx64.tar.bz2#df7ca23ba6c8a63149d910b482be04f069b26dd1f7d0ca15e6342cac94e759d7" "pypy" verify_py27
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.3-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-win32.zip#55e0598ca9add0e7c78ffa49db6476c2" "pypy" verify_py27
+  install_zip "pypy-2.3-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3-win32.zip#72f46afe69281147ad9abc88a7b39d1840e112e626a8be251a5f9f7308c559c7" "pypy" verify_py27
   ;;
 * )
   { echo
@@ -49,5 +49,5 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 esac
 
-install_package "setuptools-4.0.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-4.0.1.tar.gz#190b1d4470de9bae0b4414353e14700d" python
-install_package "pip-1.5.6" "https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz#01026f87978932060cc86c1dc527903e" python
+install_package "setuptools-4.0.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-4.0.1.tar.gz#bdb18342c53a2320a9dfdb0897fc3b688f01108eb21108c557d01ede9611dba7" python
+install_package "pip-1.5.6" "https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz#b1a4ae66baf21b7eb05a5e4f37c50c2706fa28ea1f8780ce8efe14dcd9f1726c" python

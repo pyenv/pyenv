@@ -1,16 +1,16 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  install_package "pypy-c-jit-43780-b590cf6de419-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux.tar.bz2#08a2c95163c95f91772abb8bf5f8b9cb" "pypy" verify_py27
+  install_package "pypy-c-jit-43780-b590cf6de419-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux.tar.bz2#a5a28457134a050bae59ee8d83cc65807bab10f0c7c3be547c6d9284f9a77989" "pypy" verify_py27
   ;;
 "linux64" )
-  install_package "pypy-c-jit-43780-b590cf6de419-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux64.tar.bz2#32392b7986eb34cd657d5b6c5d242cc7" "pypy" verify_py27
+  install_package "pypy-c-jit-43780-b590cf6de419-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux64.tar.bz2#880b7f9288a6046aff62ded61a4f432ccb45038daee526356afa311d14c010a9" "pypy" verify_py27
   ;;
 "osx64" )
-  install_package "pypy-c-jit-43780-b590cf6de419-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-osx64.tar.bz2#b1417916bc01ebb9f95c666f5e397fb5" "pypy" verify_py27
+  install_package "pypy-c-jit-43780-b590cf6de419-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-osx64.tar.bz2#87294182aeacf2597c2bde358ffd6810295214db8cf81b07340598bb03ac44f0" "pypy" verify_py27
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.5.0a0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-win32.zip#b6cc12bed5e7243ed44aa3430eb14885" "pypy" verify_py27
+  install_zip "pypy-1.5.0a0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-win32.zip#8ee727a9cfdc1957ced24a136a263279361efda73cc1354cc4877383565a4fe6" "pypy" verify_py27
   ;;
 * )
   { echo
@@ -23,5 +23,5 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 esac
 
-install_package "setuptools-4.0.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-4.0.1.tar.gz#190b1d4470de9bae0b4414353e14700d" python
-install_package "pip-1.5.6" "https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz#01026f87978932060cc86c1dc527903e" python
+install_package "setuptools-4.0.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-4.0.1.tar.gz#bdb18342c53a2320a9dfdb0897fc3b688f01108eb21108c557d01ede9611dba7" python
+install_package "pip-1.5.6" "https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz#b1a4ae66baf21b7eb05a5e4f37c50c2706fa28ea1f8780ce8efe14dcd9f1726c" python
