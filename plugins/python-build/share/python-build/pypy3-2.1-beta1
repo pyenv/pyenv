@@ -13,30 +13,30 @@ require_distro() {
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   require_distro "Ubuntu 10.04" || true
-  install_package "pypy3-2.1-beta1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux.tar.bz2#9ae9d0b67279c557fb4b7f57c3072d0f" "pypy" verify_py32
+  install_package "pypy3-2.1-beta1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux.tar.bz2#9017dad4cbfca2c2463bd6032c5133d829ada1bf996bcf5e9e12a1f50c3b4ade" "pypy" verify_py32
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy3-2.1-beta1-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armel.tar.bz2#d57d0d0d3c49c7cce75440924d8f66b7" "pypy" verify_py32
+  install_package "pypy3-2.1-beta1-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armel.tar.bz2#157dffde53f97c2cbcffa071ce5621bd3a10749c6a4073c890d7b8b8acb1d681" "pypy" verify_py32
   ;;
 "linux-armhf")
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy3-2.1-beta1-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raspbian.tar.bz2#a43e64557fe27b979a8546a89c05652f" "pypy" verify_py32
+    install_package "pypy3-2.1-beta1-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raspbian.tar.bz2#6ecceda260b6c98c127bfae4d5b702731aa286569df8ae7b6074b0e8dbb65d5c" "pypy" verify_py32
   else
     require_distro "Ubuntu 13.04" || true
-    install_package "pypy3-2.1-beta1-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raring.tar.bz2#55b82b199ccf537c7ea5e2f31df78dfe" "pypy" verify_py32
+    install_package "pypy3-2.1-beta1-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux-armhf-raring.tar.bz2#e9717c5a0afd189695bf2d207eaa4ce1d6eae471cb8c795709c0b28a858d1dde" "pypy" verify_py32
   fi
   ;;
 "linux64" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy3-2.1-beta1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux64.tar.bz2#f6adca4d26f34bef9903cc5347c7d688" "pypy" verify_py32
+  install_package "pypy3-2.1-beta1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-linux64.tar.bz2#6b3e2f66fc012db57cc2596af0a413b9e1b3ade8894f4f6a71c993107d419070" "pypy" verify_py32
   ;;
 "osx64" )
-  install_package "pypy3-2.1-beta1-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-osx64.tar.bz2#36634bf17f0e9852fda7cc6745f2df28" "pypy" verify_py32
+  install_package "pypy3-2.1-beta1-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-osx64.tar.bz2#bd3d4202141488d4d094d4a66d048b3e537a45be2177f5b55a1e4c68b73a0667" "pypy" verify_py32
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy3-2.1-beta1-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-win32.zip#026c8be208bf2ef742ddfa3f8ca41a05" "pypy" verify_py32
+  install_zip "pypy3-2.1-beta1-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-win32.zip#b91f026886e074183c4c09443977666311f832b8286e1735500260b73d26d747" "pypy" verify_py32
   ;;
 * )
   { echo
@@ -49,5 +49,5 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 esac
 
-install_package "setuptools-4.0.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-4.0.1.tar.gz#190b1d4470de9bae0b4414353e14700d" python
-install_package "pip-1.5.6" "https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz#01026f87978932060cc86c1dc527903e" python
+install_package "setuptools-4.0.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-4.0.1.tar.gz#bdb18342c53a2320a9dfdb0897fc3b688f01108eb21108c557d01ede9611dba7" python
+install_package "pip-1.5.6" "https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz#b1a4ae66baf21b7eb05a5e4f37c50c2706fa28ea1f8780ce8efe14dcd9f1726c" python

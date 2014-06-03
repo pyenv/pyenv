@@ -1,16 +1,16 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2#1a08c88642434fc2e0e4256d351f48db" "pypy" verify_py27
+  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2#1e3f9c3d06f8bbfa0dcb1301b40c298096249a7d7c2b4594b3fb1c3e7b9888f2" "pypy" verify_py27
   ;;
 "linux64" )
-  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2#201d2cce2557e40c784473b471ee1b6b" "pypy" verify_py27
+  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2#4298252515e78c96f4ecd9f25be957411c060ece02d9213eef8d781cf528d18f" "pypy" verify_py27
   ;;
 "osx64" )
-  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2#aad9c4b7b827583e37fe8ae0f7cfe0ff" "pypy" verify_py27
+  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2#4858f200e32c1070c77c1234ea0e9473eeda98bcd3832c4231f3e46e4e3b74b1" "pypy" verify_py27
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip#e7655066baed3c7bbbca7df617817dd5" "pypy" verify_py27
+  install_zip "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip#54fafe8c69df390d2a460bab022145aaacd2c62c4a569873b22fdc7475f31581" "pypy" verify_py27
   ;;
 * )
   { echo
@@ -23,5 +23,5 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 esac
 
-install_package "setuptools-4.0.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-4.0.1.tar.gz#190b1d4470de9bae0b4414353e14700d" python
-install_package "pip-1.5.6" "https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz#01026f87978932060cc86c1dc527903e" python
+install_package "setuptools-4.0.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-4.0.1.tar.gz#bdb18342c53a2320a9dfdb0897fc3b688f01108eb21108c557d01ede9611dba7" python
+install_package "pip-1.5.6" "https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz#b1a4ae66baf21b7eb05a5e4f37c50c2706fa28ea1f8780ce8efe14dcd9f1726c" python
