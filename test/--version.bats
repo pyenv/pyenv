@@ -16,7 +16,7 @@ git_commit() {
   assert [ ! -e "$PYENV_ROOT" ]
   run pyenv---version
   assert_success
-  [[ $output == "pyenv 0."* ]]
+  [[ $output == "pyenv 20"* ]]
 }
 
 @test "reads version from git repo" {
@@ -24,14 +24,14 @@ git_commit() {
   cd "$PYENV_ROOT"
   git init
   git_commit
-  git tag v0.4.1
+  git tag v20380119
   git_commit
   git_commit
 
   cd "$PYENV_TEST_DIR"
   run pyenv---version
   assert_success
-  [[ $output == "pyenv 0.4.1-2-g"* ]]
+  [[ $output == "pyenv 20380119-2-g"* ]]
 }
 
 @test "prints default version if no tags in git repo" {
@@ -42,5 +42,5 @@ git_commit() {
 
   cd "$PYENV_TEST_DIR"
   run pyenv---version
-  [[ $output == "pyenv 0."* ]]
+  [[ $output == "pyenv 20"* ]]
 }
