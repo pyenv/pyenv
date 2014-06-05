@@ -107,8 +107,8 @@ process.
 
 ### Checksum verification
 
-If you have the `md5`, `openssl`, or `md5sum` tool installed,
-python-build will automatically verify the MD5 checksum of each
+If you have the `shasum`, `openssl`, or `sha256sum` tool installed,
+python-build will automatically verify the SHA2 checksum of each
 downloaded package before installing it.
 
 Checksums are optional and specified as anchors on the package URL in
@@ -125,10 +125,10 @@ defintion file.
 You can point python-build to another mirror by specifying the
 `PYTHON_BUILD_MIRROR_URL` environment variable--useful if you'd like to
 run your own local mirror, for example. Package mirror URLs are
-constructed by joining this variable with the MD5 checksum of the
+constructed by joining this variable with the SHA2 checksum of the
 package file.
 
-If you don't have an MD5 program installed, python-build will skip the
+If you don't have an SHA2 program installed, python-build will skip the
 download mirror and use official URLs instead. You can force
 python-build to bypass the mirror by setting the
 `PYTHON_BUILD_SKIP_MIRROR` environment variable.
