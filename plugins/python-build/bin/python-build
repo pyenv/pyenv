@@ -394,7 +394,14 @@ fetch_git() {
       popd >&4
     fi
 
-    git clone --depth 1 --branch "$git_ref" "$git_url" "${package_name}" >&4 2>&1
+    if [ -e "${package_name}" ]; then
+      ( cd "${package_name}"
+        git fetch --depth 1 origin "+${git_ref}"
+        git checkout -q -B "$git_ref" "origin/${git_ref}"
+      ) >&4 2>&1
+    else
+      git clone --depth 1 --branch "$git_ref" "$git_url" "${package_name}" >&4 2>&1
+    fi
   else
     echo "error: please install \`git\` and try again" >&2
     exit 1
