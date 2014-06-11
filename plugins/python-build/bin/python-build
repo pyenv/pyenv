@@ -1246,15 +1246,29 @@ apply_python_patch() {
 }
 
 verify_python() {
-  local python="$1"
+  local python="${1##python}"
   if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
     # Only symlinks are installed in ${PREFIX_PATH}/bin
     rm -fr "${PREFIX_PATH}/bin"
     ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
   fi
-  if [ ! -e "${PREFIX_PATH}/bin/python" ] && [ -e "${PREFIX_PATH}/bin/${python}" ]; then
-    ( cd "${PREFIX_PATH}/bin" && ln -fs "${python}" "python" )
-  fi
+
+  # Create symlinks
+  local suffix="${1##python}"
+  local file link
+  for file in "${PREFIX_PATH}/bin"/*; do
+    if [[ "${file##*/}" == *"${suffix}" ]]; then
+      if [[ "${file}" == *"-${suffix}" ]]; then
+        link="${file%%-${suffix}}"
+      else
+        link="${file%%${suffix}}"
+      fi
+      if [ ! -e "${link}" ]; then
+        ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
+      fi
+    fi
+  done
+
   if [ ! -x "${PYTHON_BIN}" ]; then
     { colorize 1 "ERROR"
       echo ": invalid Python executable: ${PYTHON_BIN}"
