@@ -1,4 +1,4 @@
-diff --git ./Modules/_ctypes/libffi_osx/LICENSE ./Modules/_ctypes/libffi_osx/LICENSE
+diff -r -u ./Modules/_ctypes/libffi_osx/LICENSE ./Modules/_ctypes/libffi_osx/LICENSE
 new file mode 100644
 index 0000000..f591795
 --- /dev/null
@@ -24,7 +24,7 @@ index 0000000..f591795
 +OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 +ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 +OTHER DEALINGS IN THE SOFTWARE.
-diff --git ./Modules/_ctypes/libffi_osx/README ./Modules/_ctypes/libffi_osx/README
+diff -r -u ./Modules/_ctypes/libffi_osx/README ./Modules/_ctypes/libffi_osx/README
 new file mode 100644
 index 0000000..1fc2747
 --- /dev/null
@@ -530,7 +530,7 @@ index 0000000..1fc2747
 +
 +If you have a problem, or have found a bug, please send a note to
 +green@cygnus.com.
-diff --git ./Modules/_ctypes/libffi_osx/README.pyobjc ./Modules/_ctypes/libffi_osx/README.pyobjc
+diff -r -u ./Modules/_ctypes/libffi_osx/README.pyobjc ./Modules/_ctypes/libffi_osx/README.pyobjc
 new file mode 100644
 index 0000000..405d85f
 --- /dev/null
@@ -541,7 +541,7 @@ index 0000000..405d85f
 +
 +The only modifications are those that are necessary to compile libffi using 
 +the Apple provided compiler and outside of the GCC source tree.
-diff --git ./Modules/_ctypes/libffi_osx/ffi.c ./Modules/_ctypes/libffi_osx/ffi.c
+diff -r -u ./Modules/_ctypes/libffi_osx/ffi.c ./Modules/_ctypes/libffi_osx/ffi.c
 new file mode 100644
 index 0000000..bf42093
 --- /dev/null
@@ -773,7 +773,7 @@ index 0000000..bf42093
 +	return ffi_prep_cif_machdep(cif);
 +}
 +#endif /* not __CRIS__ */
-diff --git ./Modules/_ctypes/libffi_osx/include/ffi.h ./Modules/_ctypes/libffi_osx/include/ffi.h
+diff -r -u ./Modules/_ctypes/libffi_osx/include/ffi.h ./Modules/_ctypes/libffi_osx/include/ffi.h
 new file mode 100644
 index 0000000..c104a5c
 --- /dev/null
@@ -1134,7 +1134,7 @@ index 0000000..c104a5c
 +#endif
 +
 +#endif	// #ifndef LIBFFI_H
-diff --git ./Modules/_ctypes/libffi_osx/include/ffi_common.h ./Modules/_ctypes/libffi_osx/include/ffi_common.h
+diff -r -u ./Modules/_ctypes/libffi_osx/include/ffi_common.h ./Modules/_ctypes/libffi_osx/include/ffi_common.h
 new file mode 100644
 index 0000000..685a358
 --- /dev/null
@@ -1243,7 +1243,7 @@ index 0000000..685a358
 +
 +#endif	// #ifndef FFI_COMMON_H
 \ No newline at end of file
-diff --git ./Modules/_ctypes/libffi_osx/include/fficonfig.h ./Modules/_ctypes/libffi_osx/include/fficonfig.h
+diff -r -u ./Modules/_ctypes/libffi_osx/include/fficonfig.h ./Modules/_ctypes/libffi_osx/include/fficonfig.h
 new file mode 100644
 index 0000000..2172490
 --- /dev/null
@@ -1400,7 +1400,7 @@ index 0000000..2172490
 +#	endif
 +#endif
 \ No newline at end of file
-diff --git ./Modules/_ctypes/libffi_osx/include/ffitarget.h ./Modules/_ctypes/libffi_osx/include/ffitarget.h
+diff -r -u ./Modules/_ctypes/libffi_osx/include/ffitarget.h ./Modules/_ctypes/libffi_osx/include/ffitarget.h
 new file mode 100644
 index 0000000..faaa30d
 --- /dev/null
@@ -1420,7 +1420,7 @@ index 0000000..faaa30d
 +#error "Unsupported CPU type"
 +#endif
 \ No newline at end of file
-diff --git ./Modules/_ctypes/libffi_osx/include/ppc-ffitarget.h ./Modules/_ctypes/libffi_osx/include/ppc-ffitarget.h
+diff -r -u ./Modules/_ctypes/libffi_osx/include/ppc-ffitarget.h ./Modules/_ctypes/libffi_osx/include/ppc-ffitarget.h
 new file mode 100644
 index 0000000..2318421
 --- /dev/null
@@ -1531,7 +1531,7 @@ index 0000000..2318421
 +
 +#endif	// #ifndef LIBFFI_TARGET_H
 \ No newline at end of file
-diff --git ./Modules/_ctypes/libffi_osx/include/x86-ffitarget.h ./Modules/_ctypes/libffi_osx/include/x86-ffitarget.h
+diff -r -u ./Modules/_ctypes/libffi_osx/include/x86-ffitarget.h ./Modules/_ctypes/libffi_osx/include/x86-ffitarget.h
 new file mode 100644
 index 0000000..55c2b6c
 --- /dev/null
@@ -1626,7 +1626,7 @@ index 0000000..55c2b6c
 +
 +#endif	// #ifndef LIBFFI_TARGET_H
 \ No newline at end of file
-diff --git ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin.S ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin.S
+diff -r -u ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin.S ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin.S
 new file mode 100644
 index 0000000..f143dbd
 --- /dev/null
@@ -1997,7 +1997,7 @@ index 0000000..f143dbd
 +
 +#endif // __ppc64__
 +#endif // __ppc__ || __ppc64__
-diff --git ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin.h ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin.h
+diff -r -u ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin.h ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin.h
 new file mode 100644
 index 0000000..cf4bd50
 --- /dev/null
@@ -2089,7 +2089,7 @@ index 0000000..cf4bd50
 +
 +#endif	// !defined(LIBFFI_ASM)
 \ No newline at end of file
-diff --git ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin_closure.S ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin_closure.S
+diff -r -u ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin_closure.S ./Modules/_ctypes/libffi_osx/powerpc/ppc-darwin_closure.S
 new file mode 100644
 index 0000000..c3d30c2
 --- /dev/null
@@ -2403,7 +2403,7 @@ index 0000000..c3d30c2
 +
 +
 +#endif // __ppc__
-diff --git ./Modules/_ctypes/libffi_osx/powerpc/ppc-ffi_darwin.c ./Modules/_ctypes/libffi_osx/powerpc/ppc-ffi_darwin.c
+diff -r -u ./Modules/_ctypes/libffi_osx/powerpc/ppc-ffi_darwin.c ./Modules/_ctypes/libffi_osx/powerpc/ppc-ffi_darwin.c
 new file mode 100644
 index 0000000..8953d5f
 --- /dev/null
@@ -4185,7 +4185,7 @@ index 0000000..8953d5f
 +
 +#endif	/*	defined(__ppc64__)	*/
 +#endif	/* __ppc__ || __ppc64__ */
-diff --git ./Modules/_ctypes/libffi_osx/powerpc/ppc64-darwin_closure.S ./Modules/_ctypes/libffi_osx/powerpc/ppc64-darwin_closure.S
+diff -r -u ./Modules/_ctypes/libffi_osx/powerpc/ppc64-darwin_closure.S ./Modules/_ctypes/libffi_osx/powerpc/ppc64-darwin_closure.S
 new file mode 100644
 index 0000000..7162fa1
 --- /dev/null
@@ -4609,7 +4609,7 @@ index 0000000..7162fa1
 +	.g_long dyld_stub_binding_helper
 +
 +#endif // __ppc64__
-diff --git ./Modules/_ctypes/libffi_osx/types.c ./Modules/_ctypes/libffi_osx/types.c
+diff -r -u ./Modules/_ctypes/libffi_osx/types.c ./Modules/_ctypes/libffi_osx/types.c
 new file mode 100644
 index 0000000..44806ae
 --- /dev/null
@@ -4731,7 +4731,7 @@ index 0000000..44806ae
 +FFI_INTEGRAL_TYPEDEF(longdouble, 8, 8, FFI_TYPE_LONGDOUBLE);
 +#endif
 \ No newline at end of file
-diff --git ./Modules/_ctypes/libffi_osx/x86/darwin64.S ./Modules/_ctypes/libffi_osx/x86/darwin64.S
+diff -r -u ./Modules/_ctypes/libffi_osx/x86/darwin64.S ./Modules/_ctypes/libffi_osx/x86/darwin64.S
 new file mode 100644
 index 0000000..165d469
 --- /dev/null
@@ -5154,7 +5154,7 @@ index 0000000..165d469
 + .subsections_via_symbols
 +
 +#endif /* __x86_64__ */
-diff --git ./Modules/_ctypes/libffi_osx/x86/x86-darwin.S ./Modules/_ctypes/libffi_osx/x86/x86-darwin.S
+diff -r -u ./Modules/_ctypes/libffi_osx/x86/x86-darwin.S ./Modules/_ctypes/libffi_osx/x86/x86-darwin.S
 new file mode 100644
 index 0000000..925a841
 --- /dev/null
@@ -5582,7 +5582,7 @@ index 0000000..925a841
 +#endif /* ifndef __x86_64__ */
 +
 +#endif /* defined __i386__ */
-diff --git ./Modules/_ctypes/libffi_osx/x86/x86-ffi64.c ./Modules/_ctypes/libffi_osx/x86/x86-ffi64.c
+diff -r -u ./Modules/_ctypes/libffi_osx/x86/x86-ffi64.c ./Modules/_ctypes/libffi_osx/x86/x86-ffi64.c
 new file mode 100644
 index 0000000..06feaf2
 --- /dev/null
@@ -6322,7 +6322,7 @@ index 0000000..06feaf2
 +}
 +
 +#endif /* __x86_64__ */
-diff --git ./Modules/_ctypes/libffi_osx/x86/x86-ffi_darwin.c ./Modules/_ctypes/libffi_osx/x86/x86-ffi_darwin.c
+diff -r -u ./Modules/_ctypes/libffi_osx/x86/x86-ffi_darwin.c ./Modules/_ctypes/libffi_osx/x86/x86-ffi_darwin.c
 new file mode 100644
 index 0000000..706ea0f
 --- /dev/null
@@ -6766,7 +6766,7 @@ index 0000000..706ea0f
 +
 +#endif
 +#endif	// __i386__
-diff --git ./setup.py ./setup.py
+diff -r -u ./setup.py ./setup.py
 index 46b92fe..2bf6b4b 100644
 --- ./setup.py
 +++ ./setup.py

@@ -1,4 +1,4 @@
-diff --git ./Mac/Modules/cg/_CGmodule.c ./Mac/Modules/cg/_CGmodule.c
+diff -r -u ./Mac/Modules/cg/_CGmodule.c ./Mac/Modules/cg/_CGmodule.c
 index 8115614..e36fce9 100755
 --- ./Mac/Modules/cg/_CGmodule.c
 +++ ./Mac/Modules/cg/_CGmodule.c
@@ -53,7 +53,7 @@ index 8115614..e36fce9 100755
  	{NULL, NULL, 0}
  };
  
-diff --git ./Modules/_curses_panel.c ./Modules/_curses_panel.c
+diff -r -u ./Modules/_curses_panel.c ./Modules/_curses_panel.c
 index 0acf3fd..1728b59 100644
 --- ./Modules/_curses_panel.c
 +++ ./Modules/_curses_panel.c

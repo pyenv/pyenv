@@ -7,7 +7,7 @@
 Backport for Python 2.7 of issue 11715 support for building Python on
 multiarch Debian/Ubuntu.
 
-diff --git a/setup.py b/setup.py
+diff -r -u setup.py setup.py
 --- setup.py.orig
 +++ setup.py
 @@ -345,10 +345,33 @@ class PyBuildExt(build_ext):
