@@ -1256,6 +1256,7 @@ verify_python() {
   # Create symlinks
   local suffix="${1##python}"
   local file link
+  shopt -s nullglob
   for file in "${PREFIX_PATH}/bin"/*; do
     if [[ "${file##*/}" == *"${suffix}" ]]; then
       if [[ "${file}" == *"-${suffix}" ]]; then
@@ -1268,6 +1269,7 @@ verify_python() {
       fi
     fi
   done
+  shopt -u nullglob
 
   if [ ! -x "${PYTHON_BIN}" ]; then
     { colorize 1 "ERROR"
