@@ -1,5 +1,9 @@
 ## Version History
 
+#### 20140615
+
+* python-build: Update default setuptools version (4.0.1 -> 5.0) (#190)
+
 #### 20140614
 
 * pyenv: Change versioning schema (`v0.4.0-YYYYMMDD` -> `vYYYYMMDD`)
