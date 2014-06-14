@@ -1,5 +1,14 @@
 ## Version History
 
+#### 20140614
+
+* pyenv: Change versioning schema (`v0.4.0-YYYYMMDD` -> `vYYYYMMDD`)
+* python-build: Add new PyPy release; pypy-2.3.1, pypy-2.3.1-src
+* python-build: Create symlinks for executables with version suffix (#182)
+* python-build: Use SHA2 as default digest algorithm to verify downloaded archives
+* python-build: Update default setuptools version (4.0 -> 4.0.1) (#183)
+* python-build: Import recent changes from ruby-build v20140524 (#184)
+
 #### 0.4.0-20140602
 
 * python-build: Add new Anaconda/Anaconda3 releases; anaconda-2.0.0, anaconda3-2.0.0 (#179)
