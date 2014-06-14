@@ -1,6 +1,6 @@
 require_java
 install_jar "jython-2.7-beta2" "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7-b2/jython-installer-2.7-b2.jar" jython
-install_package "setuptools-4.0.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-4.0.1.tar.gz#bdb18342c53a2320a9dfdb0897fc3b688f01108eb21108c557d01ede9611dba7" python
+install_package "setuptools-5.0" "https://pypi.python.org/packages/source/s/setuptools/setuptools-5.0.tar.gz#684c6d96f498775e171202fe0c59150de34f1651142b132a48e65ef645a36cff" python
 # pip (>= 1.3) does not work properly since it uses HTTPS for downloads
 # * https://github.com/yyuu/pyenv/issues/15
 install_package "pip-1.2.1" "https://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz#12a9302acfca62cdc7bc5d83386cac3e0581db61ac39acdb3a4e766a16b88eb1" python
