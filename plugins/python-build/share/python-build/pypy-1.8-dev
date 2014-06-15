@@ -1,4 +1,2 @@
 require_gcc
-install_hg "pypy-1.8-dev" "https://bitbucket.org/pypy/pypy" "release-1.8.x" "pypy_builder" verify_py27
-install_package "setuptools-5.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-5.1.tar.gz#5855a13607cae9123df0981d814d32b5b413b7a20422f642bf3f4c355383485b" python
-install_package "pip-1.5.6" "https://pypi.python.org/packages/source/p/pip/pip-1.5.6.tar.gz#b1a4ae66baf21b7eb05a5e4f37c50c2706fa28ea1f8780ce8efe14dcd9f1726c" python
+install_hg "pypy-1.8-dev" "https://bitbucket.org/pypy/pypy" "release-1.8.x" "pypy_builder" verify_py27 ensurepip
