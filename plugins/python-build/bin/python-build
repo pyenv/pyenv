@@ -1364,6 +1364,8 @@ build_package_verify_py34() {
 }
 
 build_package_ez_setup() {
+  local ez_setup="${BUILD_PATH}/ez_setup.py"
+  rm -f "${ez_setup}"
   { if [ "${EZ_SETUP+defined}" ] && [ -f "${EZ_SETUP}" ]; then
       echo "Installing setuptools from ${EZ_SETUP}..." 1>&2
       cat "${EZ_SETUP}"
@@ -1372,10 +1374,16 @@ build_package_ez_setup() {
       echo "Installing setuptools from ${EZ_SETUP_URL}..." 1>&2
       http get "${EZ_SETUP_URL}"
     fi
-  } | "${PYTHON_BIN}" 1>&4 2>&1
+  } 1> "${ez_setup}"
+  "${PYTHON_BIN}" "${ez_setup}" 1>&4 2>&1 || {
+    echo "error: failed to install setuptools via ez_setup.py" >&2
+    return 1
+  }
 }
 
 build_package_getpip() {
+  local getpip="${BUILD_PATH}/get-pip.py"
+  rm -f "${getpip}"
   { if [ "${GET_PIP+defined}" ] && [ -f "${GET_PIP}" ]; then
       echo "Installing pip from ${GET_PIP}..." 1>&2
       cat "${GET_PIP}"
@@ -1384,14 +1392,17 @@ build_package_getpip() {
       echo "Installing pip from ${GET_PIP_URL}..." 1>&2
       http get "${GET_PIP_URL}"
     fi
-  } | "${PYTHON_BIN}" 1>&4 2>&1
+  } 1> "${getpip}"
+  "${PYTHON_BIN}" "${getpip}" 1>&4 2>&1 || {
+    echo "error: failed to install pip via get-pip.py" >&2
+    return 1
+  }
 }
 
 build_package_ensurepip() {
   "$PYTHON_BIN" -m ensurepip 1>/dev/null 2>&1 || {
-    build_package_ez_setup "$@"
-    build_package_getpip "$@"
-  }
+    build_package_ez_setup "$@" && build_package_getpip "$@"
+  } || return 1
 
   create_symlinks "$("$PYTHON_BIN" -c 'import sys;v=sys.version_info;sys.stdout.write("python%d.%d"%(v[0],v[1]))')"
 }
