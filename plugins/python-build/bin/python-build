@@ -1245,16 +1245,9 @@ apply_python_patch() {
   esac
 }
 
-verify_python() {
-  local python="${1##python}"
-  if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
-    # Only symlinks are installed in ${PREFIX_PATH}/bin
-    rm -fr "${PREFIX_PATH}/bin"
-    ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
-  fi
+create_symlinks() {
+  local suffix="$1"
 
-  # Create symlinks
-  local suffix="${1##python}"
   local file link
   shopt -s nullglob
   for file in "${PREFIX_PATH}/bin"/*; do
@@ -1270,6 +1263,16 @@ verify_python() {
     fi
   done
   shopt -u nullglob
+}
+
+verify_python() {
+  if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+    # Only symlinks are installed in ${PREFIX_PATH}/bin
+    rm -fr "${PREFIX_PATH}/bin"
+    ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
+  fi
+
+  create_symlinks "$1"
 
   if [ ! -x "${PYTHON_BIN}" ]; then
     { colorize 1 "ERROR"
@@ -1307,7 +1310,7 @@ verify_python_module() {
 
 # Post-install check for Python 2.4.x
 build_package_verify_py24() {
-  verify_python "${2:-python2.4}"
+  verify_python "${2:-2.4}"
   try_python_module "readline" "GNU readline lib"
   verify_python_module "zlib" "zlib"
   try_python_module "bz2" "bzip2 lib"
@@ -1315,24 +1318,24 @@ build_package_verify_py24() {
 
 # Post-install check for Python 2.5.x
 build_package_verify_py25() {
-  build_package_verify_py24 "$1" "${2:-python2.5}"
+  build_package_verify_py24 "$1" "${2:-2.5}"
   try_python_module "sqlite3" "SQLite3 lib"
 }
 
 # Post-install check for Python 2.6.x
 build_package_verify_py26() {
-  build_package_verify_py25 "$1" "${2:-python2.6}"
+  build_package_verify_py25 "$1" "${2:-2.6}"
   verify_python_module "ssl" "OpenSSL lib"
 }
 
 # Post-install check for Python 2.7.x
 build_package_verify_py27() {
-  build_package_verify_py26 "$1" "${2:-python2.7}"
+  build_package_verify_py26 "$1" "${2:-2.7}"
 }
 
 # Post-install check for Python 3.0.x
 build_package_verify_py30() {
-  verify_python "${2:-python3.0}"
+  verify_python "${2:-3.0}"
   try_python_module "bz2" "bzip2 lib"
   try_python_module "readline" "GNU readline lib"
   verify_python_module "ssl" "OpenSSL lib"
@@ -1342,34 +1345,66 @@ build_package_verify_py30() {
 
 # Post-install check for Python 3.1.x
 build_package_verify_py31() {
-  build_package_verify_py30 "$1" "${2:-python3.1}"
+  build_package_verify_py30 "$1" "${2:-3.1}"
 }
 
 # Post-install check for Python 3.2.x
 build_package_verify_py32() {
-  build_package_verify_py31 "$1" "${2:-python3.2}"
+  build_package_verify_py31 "$1" "${2:-3.2}"
 }
 
 # Post-install check for Python 3.3.x
 build_package_verify_py33() {
-  build_package_verify_py32 "$1" "${2:-python3.3}"
+  build_package_verify_py32 "$1" "${2:-3.3}"
 }
 
 # Post-install check for Python 3.4.x
 build_package_verify_py34() {
-  build_package_verify_py33 "$1" "${2:-python3.4}"
+  build_package_verify_py33 "$1" "${2:-3.4}"
+}
+
+build_package_ez_setup() {
+  local ez_setup="${BUILD_PATH}/ez_setup.py"
+  rm -f "${ez_setup}"
+  { if [ "${EZ_SETUP+defined}" ] && [ -f "${EZ_SETUP}" ]; then
+      echo "Installing setuptools from ${EZ_SETUP}..." 1>&2
+      cat "${EZ_SETUP}"
+    else
+      [ -n "${EZ_SETUP_URL}" ] || EZ_SETUP_URL="https://bootstrap.pypa.io/ez_setup.py"
+      echo "Installing setuptools from ${EZ_SETUP_URL}..." 1>&2
+      http get "${EZ_SETUP_URL}"
+    fi
+  } 1> "${ez_setup}"
+  "${PYTHON_BIN}" "${ez_setup}" 1>&4 2>&1 || {
+    echo "error: failed to install setuptools via ez_setup.py" >&2
+    return 1
+  }
+}
+
+build_package_get_pip() {
+  local get_pip="${BUILD_PATH}/get-pip.py"
+  rm -f "${get_pip}"
+  { if [ "${GET_PIP+defined}" ] && [ -f "${GET_PIP}" ]; then
+      echo "Installing pip from ${GET_PIP}..." 1>&2
+      cat "${GET_PIP}"
+    else
+      [ -n "${GET_PIP_URL}" ] || GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
+      echo "Installing pip from ${GET_PIP_URL}..." 1>&2
+      http get "${GET_PIP_URL}"
+    fi
+  } 1> "${get_pip}"
+  "${PYTHON_BIN}" "${get_pip}" 1>&4 2>&1 || {
+    echo "error: failed to install pip via get-pip.py" >&2
+    return 1
+  }
 }
 
 build_package_ensurepip() {
-  { "$PYTHON_BIN" -m ensurepip
-  } >&4 2>&1
+  "$PYTHON_BIN" -m ensurepip 1>/dev/null 2>&1 || {
+    build_package_ez_setup "$@" && build_package_get_pip "$@"
+  } || return 1
 
-  if [ ! -e "${PREFIX_PATH}/bin/pip" ]; then
-    local pip="$("$PYTHON_BIN" -c 'import sys;v=sys.version_info;sys.stdout.write("pip%d.%d"%(v[0],v[1]))')"
-    if [ -e "${PREFIX_PATH}/bin/${pip}" ]; then
-      ( cd "${PREFIX_PATH}/bin" && ln -fs "${pip}" "pip" )
-    fi
-  fi
+  create_symlinks "$("$PYTHON_BIN" -c 'import sys;v=sys.version_info;sys.stdout.write("python%d.%d"%(v[0],v[1]))')"
 }
 
 version() {
