@@ -1,2 +1,0 @@
-require_gcc
-install_package "pypy3-2.1-beta1-src" "https://bitbucket.org/pypy/pypy/downloads/pypy3-2.1-beta1-src.tar.bz2#85fbcf5412c01e2ce843f92ba2067ccb6b2f2ef3fe22dce766f5743407ee7167" "pypy_builder" verify_py32 ensurepip
