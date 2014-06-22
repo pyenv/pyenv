@@ -1,0 +1,58 @@
+--- setup.py.orig	2014-06-22 01:56:56.614802000 -0700
++++ setup.py	2014-06-22 01:55:54.555149273 -0700
+@@ -12,10 +12,18 @@
+ from distutils.errors import *
+ from distutils.core import Extension, setup
+ from distutils.command.build_ext import build_ext
++from distutils.spawn import find_executable
+ 
+ # This global variable is used to hold the list of modules to be disabled.
+ disabled_module_list = []
+ 
++def add_dir_to_list(dirlist, dir):
++    """Add the directory 'dir' to the list 'dirlist' (at the front) if
++    1) 'dir' is not already in 'dirlist'
++    2) 'dir' actually exists, and is a directory."""
++    if dir is not None and os.path.isdir(dir) and dir not in dirlist:
++        dirlist.insert(0, dir)
++
+ def find_file(filename, std_dirs, paths):
+     """Searches for the directory where a given file is located,
+     and returns a possibly-empty list of additional directories, or None
+@@ -144,12 +152,36 @@
+ 
+         return platform
+ 
++    def add_multiarch_paths(self):
++        # Debian/Ubuntu multiarch support.
++        # https://wiki.ubuntu.com/MultiarchSpec
++        if not find_executable('dpkg-architecture'):
++            return
++        tmpfile = os.path.join(self.build_temp, 'multiarch')
++        if not os.path.exists(self.build_temp):
++            os.makedirs(self.build_temp)
++        ret = os.system(
++            'dpkg-architecture -qDEB_HOST_MULTIARCH > %s 2> /dev/null' %
++            tmpfile)
++        try:
++            if ret >> 8 == 0:
++                fp = open(tmpfile)
++                multiarch_path_component = fp.readline().strip()
++                fp.close()
++                add_dir_to_list(self.compiler.library_dirs,
++                                '/usr/lib/' + multiarch_path_component)
++                add_dir_to_list(self.compiler.include_dirs,
++                                '/usr/include/' + multiarch_path_component)
++        finally:
++            os.unlink(tmpfile)
++
+     def detect_modules(self):
+         # Ensure that /usr/local is always used
+         if '/usr/local/lib' not in self.compiler.library_dirs:
+             self.compiler.library_dirs.insert(0, '/usr/local/lib')
+         if '/usr/local/include' not in self.compiler.include_dirs:
+             self.compiler.include_dirs.insert(0, '/usr/local/include' )
++        self.add_multiarch_paths()
+ 
+         # lib_dirs and inc_dirs are used to search for files;
+         # if a file is found in one of those directories, it can

@@ -1308,6 +1308,39 @@ verify_python_module() {
   fi
 }
 
+# Post-install check for Python 2.1.x
+build_package_verify_py21() {
+  verify_python "${2:-python2.1}"
+  try_python_module "readline" "GNU readline lib"
+  verify_python_module "binascii" "binascii"
+  # fixme: zlib doesn't link correctly on 64-bit Linux, due to being in
+  # /usr/x86_64-linux-gnu instead of /usr/lib
+  try_python_module "zlib" "zlib"
+  try_python_module "bz2" "bzip2 lib"
+}
+
+# Post-install check for Python 2.2.x
+build_package_verify_py22() {
+  verify_python "${2:-python2.2}"
+  try_python_module "readline" "GNU readline lib"
+  verify_python_module "binascii" "binascii"
+  # fixme: zlib doesn't link correctly on 64-bit Linux, due to being in
+  # /usr/x86_64-linux-gnu instead of /usr/lib
+  try_python_module "zlib" "zlib"
+  try_python_module "bz2" "bzip2 lib"
+}
+
+# Post-install check for Python 2.3.x
+build_package_verify_py23() {
+  verify_python "${2:-python2.3}"
+  try_python_module "readline" "GNU readline lib"
+  verify_python_module "binascii" "binascii"
+  # fixme: zlib doesn't link correctly on 64-bit Linux, due to being in
+  # /usr/x86_64-linux-gnu instead of /usr/lib
+  try_python_module "zlib" "zlib"
+  try_python_module "bz2" "bzip2 lib"
+}
+
 # Post-install check for Python 2.4.x
 build_package_verify_py24() {
   verify_python "${2:-2.4}"
