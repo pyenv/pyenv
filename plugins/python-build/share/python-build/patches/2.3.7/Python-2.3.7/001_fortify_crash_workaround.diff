@@ -1,0 +1,51 @@
+Author: Dwayne Litzenberger <dlitz@dlitz.net>
+Date:   Sun Jun 22 01:15:05 2014 -0700
+
+    Patch configure to handle Ubuntu Bug#286334
+    
+    Fixes this crash:
+    
+        *** buffer overflow detected ***: ./python terminated
+        ======= Backtrace: =========
+        /lib/x86_64-linux-gnu/libc.so.6(__fortify_fail+0x37)[0x2b08765c9007]
+
+diff --git configure configure
+index 4838393..654de3f 100755
+--- configure
++++ configure
+@@ -20798,6 +20798,15 @@ done
+ echo "$as_me:$LINENO: result: done" >&5
+ echo "${ECHO_T}done" >&6
+ 
++case $ac_sys_system in
++Linux*)
++# Workaround for bug in Ubuntu 10.10 amd64 gcc-4.4
++# See http://orip.org/2008/10/building-python-235-on-ubuntu-intrepid.html
++# and Ubuntu Bug #286334
++BASECFLAGS="$BASECFLAGS -U_FORTIFY_SOURCE"
++;;
++esac
++
+ # generate output files
+                     ac_config_files="$ac_config_files Makefile.pre Modules/Setup.config"
+ 
+diff --git configure.in configure.in
+index ba7a011..060a73f 100644
+--- configure.in
++++ configure.in
+@@ -3072,6 +3072,15 @@ for dir in $SRCDIRS; do
+ done
+ AC_MSG_RESULT(done)
+ 
++case $ac_sys_system in
++Linux*)
++# Workaround for bug in Ubuntu 10.10 amd64 gcc-4.4
++# See http://orip.org/2008/10/building-python-235-on-ubuntu-intrepid.html
++# and Ubuntu Bug #286334
++BASECFLAGS="$BASECFLAGS -U_FORTIFY_SOURCE"
++;;
++esac
++
+ # generate output files
+ AC_CONFIG_FILES(Makefile.pre Modules/Setup.config)
+ AC_OUTPUT
