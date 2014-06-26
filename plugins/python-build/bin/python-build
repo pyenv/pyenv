@@ -1408,7 +1408,7 @@ build_package_ez_setup() {
       http get "${EZ_SETUP_URL}"
     fi
   } 1> "${ez_setup}"
-  "${PYTHON_BIN}" "${ez_setup}" 1>&4 2>&1 || {
+  "${PYTHON_BIN}" "${ez_setup}" ${EZ_SETUP_OPTS} 1>&4 2>&1 || {
     echo "error: failed to install setuptools via ez_setup.py" >&2
     return 1
   }
@@ -1426,7 +1426,7 @@ build_package_get_pip() {
       http get "${GET_PIP_URL}"
     fi
   } 1> "${get_pip}"
-  "${PYTHON_BIN}" "${get_pip}" 1>&4 2>&1 || {
+  "${PYTHON_BIN}" "${get_pip}" ${GET_PIP_OPTS} 1>&4 2>&1 || {
     echo "error: failed to install pip via get-pip.py" >&2
     return 1
   }
