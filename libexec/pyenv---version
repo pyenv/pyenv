@@ -12,7 +12,7 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-version="20140615"
+version="20140628"
 
 if cd "$PYENV_ROOT" 2>/dev/null; then
   git_revision="$(git describe --tags HEAD 2>/dev/null || true)"

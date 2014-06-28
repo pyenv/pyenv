@@ -1,5 +1,13 @@
 ## Version History
 
+#### 20140628
+
+* python-build: Add new Anaconda releases; anaconda-2.0.1, anaconda3-2.0.1 (#195)
+* python-build: Add new PyPy3 release; pypy3-2.3.1 (#198)
+* python-build: Add ancient CPython releases; 2.1.3, 2.2.3, 2.3.7 (#199)
+* python-build: Use `ez_setup.py` and `get-pip.py` instead of installing them from tarballs (#194)
+* python-build: Add support for command-line options to `ez_setup.py` and `get-pip.py` (#200)
+
 #### 20140615
 
 * python-build: Update default setuptools version (4.0.1 -> 5.0) (#190)
