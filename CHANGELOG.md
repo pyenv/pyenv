@@ -1,5 +1,10 @@
 ## Version History
 
+#### 20140705
+
+* python-build: Add new CPython release; 2.7.8 (#201)
+* python-build: Support `SETUPTOOLS_VERSION` and `PIP_VERSION` to allow installing specific version of setuptools/pip (#202)
+
 #### 20140628
 
 * python-build: Add new Anaconda releases; anaconda-2.0.1, anaconda3-2.0.1 (#195)
