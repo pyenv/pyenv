@@ -435,7 +435,7 @@ fetch_hg() {
 
     hg clone --branch "$hg_ref" "$hg_url" "${package_name}" >&4 2>&1
   else
-    echo "error: please install \`hg\` and try again" >&2
+    echo "error: please install \`mercurial\` and try again" >&2
     exit 1
   fi
 }
