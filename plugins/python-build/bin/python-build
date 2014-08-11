@@ -1623,6 +1623,10 @@ if ! command -v curl 1>/dev/null 2>&1 && [[ "$(wget --version 2>/dev/null || tru
   exit 1
 fi
 
+# Unset `PIP_REQUIRE_VENV` during build (#216)
+unset PIP_REQUIRE_VENV
+unset PIP_REQUIRE_VIRTUALENV
+
 # pydistutils.cfg may corrupt install location of Python libraries (#35, #111)
 if [ -e "$HOME/.pydistutils.cfg" ]; then
   { colorize 1 "WARNING"
