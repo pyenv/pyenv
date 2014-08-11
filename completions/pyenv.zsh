@@ -11,7 +11,7 @@ _pyenv() {
   if [ "${#words}" -eq 2 ]; then
     completions="$(pyenv commands)"
   else
-    completions="$(pyenv completions "${words[2,-2]}")"
+    completions="$(pyenv completions ${words[2,-2]})"
   fi
 
   reply=("${(ps:\n:)completions}")
