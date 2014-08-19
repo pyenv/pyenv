@@ -4,7 +4,7 @@
 
 pyenv lets you easily switch between multiple versions of Python. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
-tools that do one thing well.
+tools that do one thing well.c
 
 This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 [ruby-build](https://github.com/sstephenson/ruby-build), and modified for Python.
@@ -169,7 +169,7 @@ easy to fork and contribute any changes back upstream.
    A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else).
 
         $ cd
-        $ git clone git://github.com/yyuu/pyenv.git .pyenv
+        $ git clone git@github.com:yyuu/pyenv.git .pyenv
 
 
 2. **Define environment variable `PYENV_ROOT`** to point to the path where
