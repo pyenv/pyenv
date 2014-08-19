@@ -4,7 +4,7 @@
 
 pyenv lets you easily switch between multiple versions of Python. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
-tools that do one thing well.c
+tools that do one thing well.
 
 This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 [ruby-build](https://github.com/sstephenson/ruby-build), and modified for Python.
