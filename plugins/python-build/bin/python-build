@@ -1642,6 +1642,19 @@ if [ -n "${PIP_VERSION}" ]; then
   GET_PIP_URL="https://raw.githubusercontent.com/pypa/pip/${PIP_VERSION}/contrib/get-pip.py"
 fi
 
+# Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
+if [[ "Darwin" == "$(uname -s)" ]]; then
+  MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null || true)"
+  MACOS_VERSION_ARRAY=(${MACOS_VERSION//\./ })
+  if [ "${#MACOS_VERSION_ARRAY[@]}" -ge 2 ]; then
+    export MACOSX_DEPLOYMENT_TARGET="${MACOS_VERSION_ARRAY[0]}.${MACOS_VERSION_ARRAY[1]}"
+  else
+    { colorize 1 "WARNING"
+      echo ": Could not detect the product version of OS X for MACOSX_DEPLOYMENT_TARGET. Use default setting."
+    } >&2
+  fi
+fi
+
 SEED="$(date "+%Y%m%d%H%M%S").$$"
 LOG_PATH="${TMP}/python-build.${SEED}.log"
 PYTHON_BIN="${PREFIX_PATH}/bin/python"
