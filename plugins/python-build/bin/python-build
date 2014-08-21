@@ -1603,6 +1603,10 @@ fi
 
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
 if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+  if [[ "Darwin" != "$(uname -s)" ]]; then
+    echo "python-build: framework installation is not supported." >&2
+    exit 1
+  fi
   create_framework_dirs() {
     local version="$(echo "$1" | sed -E 's/^[^0-9]*([0-9]+\.[0-9]+).*$/\1/')"
     mkdir -p "${PREFIX_PATH}/Python.framework/Versions/${version}"
@@ -1615,6 +1619,15 @@ if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   }
   create_framework_dirs "${DEFINITION_PATH##*/}"
   package_option python configure --enable-framework="${PREFIX_PATH}"
+fi
+
+# Build against universal SDK (#219, #220)
+if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
+  if [[ "Darwin" != "$(uname -s)" ]]; then
+    echo "python-build: universal installation is not supported." >&2
+    exit 1
+  fi
+  package_option python configure --enable-universalsdk=/ --with-universal-archs=intel
 fi
 
 # SSL Certificate error with older wget that does not support Server Name Indication (#60)
