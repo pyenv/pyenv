@@ -217,6 +217,7 @@ OUT
   cached_tarball "Python-3.2.1"
 
   stub uname '-s : echo Darwin'
+  stub uname '-s : echo Darwin'
   stub sysctl false
   stub_make_install
 
@@ -240,6 +241,7 @@ OUT
 @test "number of CPU cores is detected on Mac" {
   cached_tarball "Python-3.2.1"
 
+  stub uname '-s : echo Darwin'
   stub uname '-s : echo Darwin'
   stub sysctl '-n hw.ncpu : echo 4'
   stub_make_install
@@ -316,6 +318,7 @@ OUT
 @test "make on FreeBSD defaults to gmake" {
   cached_tarball "Python-3.2.1"
 
+  stub uname "-s : echo FreeBSD"
   stub uname "-s : echo FreeBSD"
   MAKE=gmake stub_make_install
 
