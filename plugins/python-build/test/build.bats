@@ -392,3 +392,37 @@ OUT
   run python-build "${TMP}/build-definition" "$INSTALL_ROOT"
   assert_failure "python-build: TMPDIR=$TMPDIR is set to a non-accessible location"
 }
+
+@test "setting MACOSX_DEPLOYMENT_TARGET from the product version of OS X" {
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.9.4'
+
+  run_inline_definition <<DEF
+echo "MACOSX_DEPLOYMENT_TARGET=\${MACOSX_DEPLOYMENT_TARGET}" > "$INSTALL_ROOT/build.log"
+DEF
+  assert_success
+
+  assert_build_log <<OUT
+MACOSX_DEPLOYMENT_TARGET=10.9
+OUT
+
+  unstub uname
+  unstub sw_vers
+}
+
+@test "not setting MACOSX_DEPLOYMENT_TARGET if the product version of OS X is not available" {
+  stub uname '-s : echo Darwin'
+  stub sw_vers false
+
+  run_inline_definition <<DEF
+echo "MACOSX_DEPLOYMENT_TARGET=\${MACOSX_DEPLOYMENT_TARGET}" > "$INSTALL_ROOT/build.log"
+DEF
+  assert_success
+
+  assert_build_log <<OUT
+MACOSX_DEPLOYMENT_TARGET=
+OUT
+
+  unstub uname
+  unstub sw_vers
+}
