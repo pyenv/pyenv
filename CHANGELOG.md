@@ -1,5 +1,13 @@
 ## Version History
 
+#### 20140825
+
+* pyenv: Fix zsh completion with multiple words (#215)
+* python-build: Display the package name of `hg` as `mercurial` in message (#212)
+* python-build: Unset `PIP_REQUIRE_VENV` during build (#216)
+* python-build: Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
+* python-build: Add new Jython release; jython2.7-beta3 (#223)
+
 #### 20140705
 
 * python-build: Add new CPython release; 2.7.8 (#201)
