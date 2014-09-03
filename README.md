@@ -126,6 +126,9 @@ reading it from the following sources, in this order:
    Python. (In other words, whatever version would run if pyenv weren't in your
    `PATH`.)
 
+**NOTE:** You can activate multiple versions at the same time, e.g. `pyenv
+global 3.4.1 2.7.8`.  This allows for parallel usage of python2 and python3,
+and is required with tools like `tox`.
 
 ### Locating the Python Installation
 
