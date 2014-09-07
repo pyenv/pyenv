@@ -17,7 +17,8 @@ fi
 pyenv-prefix "${versions[@]}" >/dev/null
 
 # Write the version out to disk.
-rm -f "$PYENV_VERSION_FILE"
+# Create an empty file. Using "rm" might cause a permission error.
+> "$PYENV_VERSION_FILE"
 for version in "${versions[@]}"; do
   echo "$version" >> "$PYENV_VERSION_FILE"
 done
