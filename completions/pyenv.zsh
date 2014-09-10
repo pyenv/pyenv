@@ -14,5 +14,5 @@ _pyenv() {
     completions="$(pyenv completions ${words[2,-2]})"
   fi
 
-  reply=("${(ps:\n:)completions}")
+  reply=(${(ps:\n:)completions})
 }
