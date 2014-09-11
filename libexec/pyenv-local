@@ -33,7 +33,7 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-versions --bare
 fi
 
-versions=($@)
+versions=("$@")
 
 if [ "$versions" = "--unset" ]; then
   rm -f .python-version .pyenv-version

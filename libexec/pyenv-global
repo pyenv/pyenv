@@ -21,7 +21,7 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-versions --bare
 fi
 
-versions=($@)
+versions=("$@")
 PYENV_VERSION_FILE="${PYENV_ROOT}/version"
 
 if [ -n "$versions" ]; then
