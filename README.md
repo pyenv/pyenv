@@ -141,8 +141,8 @@ Each Python version is installed into its own directory under
 
 For example, you might have these versions installed:
 
-* `~/.pyenv/versions/2.7.6/`
-* `~/.pyenv/versions/3.3.3/`
+* `~/.pyenv/versions/2.7.8/`
+* `~/.pyenv/versions/3.4.1/`
 * `~/.pyenv/versions/pypy-2.2.1/`
 
 As far as pyenv is concerned, version names are simply the directories in
@@ -198,9 +198,9 @@ easy to fork and contribute any changes back upstream.
         $ exec $SHELL
 
 5. **Install Python versions into `$PYENV_ROOT/versions`.**
-   For example, to install Python 2.7.6, download and unpack the source, then run:
+   For example, to install Python 2.7.8, download and unpack the source, then run:
 
-        $ pyenv install 2.7.6
+        $ pyenv install 2.7.8
 
    **NOTE:** If you need to pass configure option to build, please use
    ```CONFIGURE_OPTS``` environment variable.
