@@ -1,0 +1,2 @@
+require_gcc
+install_package "pypy-pypy-c6ad44ecf5d8" "https://bitbucket.org/pypy/pypy/get/release-2.4.0.tar.bz2#7e0dec2c40106f20f002121bdabb71939915254fb91bd55b01434e4b994113d2" "pypy_builder" verify_py27 ensurepip
