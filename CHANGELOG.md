@@ -1,5 +1,12 @@
 ## Version History
 
+#### 20140924
+
+* pyenv: Fix an unintended behavior when user does not have write permission on $PYENV_ROOT (#230)
+* pyenv: Fix a zsh completion issue (#232)
+* python-build: Add new PyPy release; pypy-2.4.0, pypy-2.4.0-src (#241)
+
+
 #### 20140825
 
 * pyenv: Fix zsh completion with multiple words (#215)
