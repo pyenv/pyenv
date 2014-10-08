@@ -1,11 +1,15 @@
 ## Version History
 
+#### 20141008
+
+* python-build: Add new CPython release; 3.4.2 (#251)
+* python-build: Add new CPython release candidates; 3.2.6rc1, 3.3.6rc1 (#248)
+
 #### 20140924
 
 * pyenv: Fix an unintended behavior when user does not have write permission on $PYENV_ROOT (#230)
 * pyenv: Fix a zsh completion issue (#232)
 * python-build: Add new PyPy release; pypy-2.4.0, pypy-2.4.0-src (#241)
-
 
 #### 20140825
 
