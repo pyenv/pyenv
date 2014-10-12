@@ -1,5 +1,9 @@
 ## Version History
 
+#### 20141012
+
+* python-build: Add new CPython releases; 3.2.6, 3.3.6 (#253)
+
 #### 20141011
 
 * python-build: Fix build error of Stackless 3.3.5 on OS X (#250)
