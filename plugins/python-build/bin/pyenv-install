@@ -182,6 +182,26 @@ if [[ "${VERSION_NAME}" == [23]"."* ]]; then
   done
 fi
 
+# PyPy requires existing Python 2.x to build
+if [[ "${VERSION_NAME}" == "pypy-"*"-src" ]]; then
+  PYENV_VERSION="$(pyenv-whence "python2.7" 2>/dev/null | tail -n 1 || true)"
+  if [ -n "${PYENV_VERSION}" ]; then
+    export PYENV_VERSION
+  else
+    PYENV_VERSION="$(pyenv-whence "python2.6" 2>/dev/null | tail -n 1 || true)"
+    if [ -n "${PYENV_VERSION}" ]; then
+      export PYENV_VERSION
+    else
+      PYENV_VERSION="$(pyenv-whence "python2.5" 2>/dev/null | tail -n 1 || true)"
+      if [ -n "${PYENV_VERSION}" ]; then
+        export PYENV_VERSION
+      else
+        echo "pyenv-install: $VERSION_NAME requires CPython 2.[567] to build" >^2
+        exit 1
+      fi
+    fi
+  fi
+fi
 
 # Execute `before_install` hooks.
 for hook in "${before_hooks[@]}"; do eval "$hook"; done
