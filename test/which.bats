@@ -72,3 +72,12 @@ SH
   assert_success
   assert_output "HELLO=:hello:ugly:world:again"
 }
+
+@test "discovers version from rbenv-version-name" {
+  mkdir -p "$RBENV_ROOT"
+  cat > "${RBENV_ROOT}/version" <<<"1.8"
+  create_executable "1.8" "ruby"
+
+  RBENV_VERSION= run rbenv-which ruby
+  assert_success "${RBENV_ROOT}/versions/1.8/bin/ruby"
+}
