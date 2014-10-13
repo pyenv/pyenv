@@ -24,6 +24,12 @@ stub_system_ruby() {
   assert_success "* system (set by ${RBENV_ROOT}/version)"
 }
 
+@test "not even system ruby available" {
+  PATH="$(path_without ruby)" run rbenv-versions
+  assert_failure
+  assert_output "Warning: no Ruby detected on the system"
+}
+
 @test "bare output no versions installed" {
   assert [ ! -d "${RBENV_ROOT}/versions" ]
   run rbenv-versions --bare
@@ -111,5 +117,25 @@ OUT
   system
 * 1.9.3 (set by ${RBENV_TEST_DIR}/.ruby-version)
   2.0.0
+OUT
+}
+
+@test "ignores non-directories under versions" {
+  create_version "1.9"
+  touch "${RBENV_ROOT}/versions/hello"
+
+  run rbenv-versions --bare
+  assert_success "1.9"
+}
+
+@test "lists symlinks under versions" {
+  create_version "1.8.7"
+  ln -s "1.8.7" "${RBENV_ROOT}/versions/1.8"
+
+  run rbenv-versions --bare
+  assert_success
+  assert_output <<OUT
+1.8
+1.8.7
 OUT
 }

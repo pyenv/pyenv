@@ -19,12 +19,15 @@ else
   include_system="1"
 fi
 
+num_versions=0
+
 print_version() {
   if [ "$1" == "$current_version" ]; then
     echo "${hit_prefix}$(rbenv-version 2>/dev/null)"
   else
     echo "${miss_prefix}$1"
   fi
+  num_versions=$((num_versions + 1))
 }
 
 # Include "system" in the non-bare output, if it exists
@@ -32,8 +35,15 @@ if [ -n "$include_system" ] && RBENV_VERSION=system rbenv-which ruby >/dev/null 
   print_version system
 fi
 
+shopt -s nullglob
 for path in "${RBENV_ROOT}/versions/"*; do
   if [ -d "$path" ]; then
     print_version "${path##*/}"
   fi
 done
+shopt -u nullglob
+
+if [ "$num_versions" -eq 0 ] && [ -n "$include_system" ]; then
+  echo "Warning: no Ruby detected on the system" >&2
+  exit 1
+fi
