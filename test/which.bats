@@ -31,6 +31,31 @@ create_executable() {
   assert_success "${PYENV_TEST_DIR}/bin/kill-all-humans"
 }
 
+@test "searches PATH for system version (shims prepended)" {
+  create_executable "${PYENV_TEST_DIR}/bin" "kill-all-humans"
+  create_executable "${PYENV_ROOT}/shims" "kill-all-humans"
+
+  PATH="${PYENV_ROOT}/shims:$PATH" PYENV_VERSION=system run pyenv-which kill-all-humans
+  assert_success "${PYENV_TEST_DIR}/bin/kill-all-humans"
+}
+
+@test "searches PATH for system version (shims appended)" {
+  create_executable "${PYENV_TEST_DIR}/bin" "kill-all-humans"
+  create_executable "${PYENV_ROOT}/shims" "kill-all-humans"
+
+  PATH="$PATH:${PYENV_ROOT}/shims" PYENV_VERSION=system run pyenv-which kill-all-humans
+  assert_success "${PYENV_TEST_DIR}/bin/kill-all-humans"
+}
+
+@test "searches PATH for system version (shims spread)" {
+  create_executable "${PYENV_TEST_DIR}/bin" "kill-all-humans"
+  create_executable "${PYENV_ROOT}/shims" "kill-all-humans"
+
+  PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/shims:/tmp/non-existent:$PATH:${PYENV_ROOT}/shims" \
+    PYENV_VERSION=system run pyenv-which kill-all-humans
+  assert_success "${PYENV_TEST_DIR}/bin/kill-all-humans"
+}
+
 @test "version not installed" {
   create_executable "3.4" "py.test"
   PYENV_VERSION=3.3 run pyenv-which py.test
@@ -71,4 +96,16 @@ SH
   PYENV_HOOK_PATH="$hook_path" IFS=$' \t\n' run pyenv-which anything
   assert_success
   assert_output "HELLO=:hello:ugly:world:again"
+}
+
+@test "discovers version from pyenv-version-name" {
+  mkdir -p "$PYENV_ROOT"
+  cat > "${PYENV_ROOT}/version" <<<"3.4"
+  create_executable "3.4" "python"
+
+  mkdir -p "$PYENV_TEST_DIR"
+  cd "$PYENV_TEST_DIR"
+
+  PYENV_VERSION= run pyenv-which python
+  assert_success "${PYENV_ROOT}/versions/3.4/bin/python"
 }
