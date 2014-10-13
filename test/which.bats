@@ -96,7 +96,7 @@ echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
 exit
 SH
 
-  PYENV_HOOK_PATH="$hook_path" IFS=$' \t\n' run pyenv-which anything
+  PYENV_HOOK_PATH="$hook_path" IFS=$' \t\n' PYENV_VERSION=system run pyenv-which anything
   assert_success
   assert_output "HELLO=:hello:ugly:world:again"
 }
