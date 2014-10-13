@@ -24,6 +24,12 @@ stub_system_ruby() {
   assert_success "* system (set by ${RBENV_ROOT}/version)"
 }
 
+@test "not even system ruby available" {
+  PATH="$(path_without ruby)" run rbenv-versions
+  assert_failure
+  assert_output "Warning: no Ruby detected on the system"
+}
+
 @test "bare output no versions installed" {
   assert [ ! -d "${RBENV_ROOT}/versions" ]
   run rbenv-versions --bare
