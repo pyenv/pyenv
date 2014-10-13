@@ -119,3 +119,23 @@ OUT
   2.0.0
 OUT
 }
+
+@test "ignores non-directories under versions" {
+  create_version "1.9"
+  touch "${RBENV_ROOT}/versions/hello"
+
+  run rbenv-versions --bare
+  assert_success "1.9"
+}
+
+@test "lists symlinks under versions" {
+  create_version "1.8.7"
+  ln -s "1.8.7" "${RBENV_ROOT}/versions/1.8"
+
+  run rbenv-versions --bare
+  assert_success
+  assert_output <<OUT
+1.8
+1.8.7
+OUT
+}
