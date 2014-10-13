@@ -93,7 +93,7 @@ echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
 exit
 SH
 
-  RBENV_HOOK_PATH="$hook_path" IFS=$' \t\n' run rbenv-which anything
+  RBENV_HOOK_PATH="$hook_path" IFS=$' \t\n' RBENV_VERSION=system run rbenv-which anything
   assert_success
   assert_output "HELLO=:hello:ugly:world:again"
 }
@@ -102,6 +102,9 @@ SH
   mkdir -p "$RBENV_ROOT"
   cat > "${RBENV_ROOT}/version" <<<"1.8"
   create_executable "1.8" "ruby"
+
+  mkdir -p "$RBENV_TEST_DIR"
+  cd "$RBENV_TEST_DIR"
 
   RBENV_VERSION= run rbenv-which ruby
   assert_success "${RBENV_ROOT}/versions/1.8/bin/ruby"
