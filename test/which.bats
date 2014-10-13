@@ -21,6 +21,9 @@ create_executable() {
 
   PYENV_VERSION=3.4 run pyenv-which py.test
   assert_success "${PYENV_ROOT}/versions/3.4/bin/py.test"
+
+  PYENV_VERSION=3.4:2.7 run pyenv-which py.test
+  assert_success "${PYENV_ROOT}/versions/3.4/bin/py.test"
 }
 
 @test "searches PATH for system version" {
