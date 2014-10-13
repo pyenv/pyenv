@@ -15,46 +15,25 @@ if [ "$1" = "--complete" ]; then
   exec rbenv shims --short
 fi
 
-expand_path() {
-  if [ ! -d "$1" ]; then
-    return 1
-  fi
-
-  local cwd="$(pwd)"
-  cd "$1"
-  pwd
-  cd "$cwd"
-}
-
 remove_from_path() {
-  local path_to_remove="$(expand_path "$1")"
-  local result=""
-
-  if [ -z "$path_to_remove" ]; then
-    echo "${PATH}"
-    return
-  fi
-
-  local paths
-  IFS=: paths=($PATH)
-
-  for path in "${paths[@]}"; do
-    path="$(expand_path "$path" || true)"
-    if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
-      result="${result}${path}:"
-    fi
+  local path_to_remove="$1"
+  local path_before
+  local result=":$PATH:"
+  while [ "$path_before" != "$result" ]; do
+    path_before="$result"
+    result="${result//:$path_to_remove:/:}"
   done
-
   echo "${result%:}"
 }
 
-RBENV_VERSION="$(rbenv-version-name)"
 RBENV_COMMAND="$1"
 
 if [ -z "$RBENV_COMMAND" ]; then
   rbenv-help --usage which >&2
   exit 1
 fi
+
+RBENV_VERSION="${RBENV_VERSION:-$(rbenv-version-name)}"
 
 if [ "$RBENV_VERSION" = "system" ]; then
   PATH="$(remove_from_path "${RBENV_ROOT}/shims")"
@@ -72,6 +51,9 @@ done
 
 if [ -x "$RBENV_COMMAND_PATH" ]; then
   echo "$RBENV_COMMAND_PATH"
+elif ! [ -d "${RBENV_ROOT}/versions/${RBENV_VERSION}" ]; then
+  echo "rbenv: version \`$RBENV_VERSION' is not installed" >&2
+  exit 1
 else
   echo "rbenv: $RBENV_COMMAND: command not found" >&2
 

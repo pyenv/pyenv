@@ -31,6 +31,31 @@ create_executable() {
   assert_success "${RBENV_TEST_DIR}/bin/kill-all-humans"
 }
 
+@test "searches PATH for system version (shims prepended)" {
+  create_executable "${RBENV_TEST_DIR}/bin" "kill-all-humans"
+  create_executable "${RBENV_ROOT}/shims" "kill-all-humans"
+
+  PATH="${RBENV_ROOT}/shims:$PATH" RBENV_VERSION=system run rbenv-which kill-all-humans
+  assert_success "${RBENV_TEST_DIR}/bin/kill-all-humans"
+}
+
+@test "searches PATH for system version (shims appended)" {
+  create_executable "${RBENV_TEST_DIR}/bin" "kill-all-humans"
+  create_executable "${RBENV_ROOT}/shims" "kill-all-humans"
+
+  PATH="$PATH:${RBENV_ROOT}/shims" RBENV_VERSION=system run rbenv-which kill-all-humans
+  assert_success "${RBENV_TEST_DIR}/bin/kill-all-humans"
+}
+
+@test "searches PATH for system version (shims spread)" {
+  create_executable "${RBENV_TEST_DIR}/bin" "kill-all-humans"
+  create_executable "${RBENV_ROOT}/shims" "kill-all-humans"
+
+  PATH="${RBENV_ROOT}/shims:${RBENV_ROOT}/shims:/tmp/non-existent:$PATH:${RBENV_ROOT}/shims" \
+    RBENV_VERSION=system run rbenv-which kill-all-humans
+  assert_success "${RBENV_TEST_DIR}/bin/kill-all-humans"
+}
+
 @test "version not installed" {
   create_executable "2.0" "rspec"
   RBENV_VERSION=1.9 run rbenv-which rspec
@@ -71,4 +96,13 @@ SH
   RBENV_HOOK_PATH="$hook_path" IFS=$' \t\n' run rbenv-which anything
   assert_success
   assert_output "HELLO=:hello:ugly:world:again"
+}
+
+@test "discovers version from rbenv-version-name" {
+  mkdir -p "$RBENV_ROOT"
+  cat > "${RBENV_ROOT}/version" <<<"1.8"
+  create_executable "1.8" "ruby"
+
+  RBENV_VERSION= run rbenv-which ruby
+  assert_success "${RBENV_ROOT}/versions/1.8/bin/ruby"
 }
