@@ -18,7 +18,7 @@ set -e
 
 # Provide rbenv completions
 if [ "$1" = "--complete" ]; then
-  exec rbenv shims --short
+  exec rbenv-shims --short
 fi
 
 RBENV_VERSION="$(rbenv-version-name)"

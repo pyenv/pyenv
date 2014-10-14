@@ -12,7 +12,7 @@ set -e
 
 # Provide rbenv completions
 if [ "$1" = "--complete" ]; then
-  exec rbenv shims --short
+  exec rbenv-shims --short
 fi
 
 remove_from_path() {

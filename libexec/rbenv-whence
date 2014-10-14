@@ -8,7 +8,7 @@ set -e
 # Provide rbenv completions
 if [ "$1" = "--complete" ]; then
   echo --path
-  exec rbenv shims --short
+  exec rbenv-shims --short
 fi
 
 if [ "$1" = "--path" ]; then
