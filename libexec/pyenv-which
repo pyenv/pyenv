@@ -15,49 +15,27 @@ if [ "$1" = "--complete" ]; then
   exec pyenv shims --short
 fi
 
-expand_path() {
-  if [ ! -d "$1" ]; then
-    return 1
-  fi
-
-  local cwd="$(pwd)"
-  cd "$1"
-  pwd
-  cd "$cwd"
-}
-
 remove_from_path() {
-  local path_to_remove="$(expand_path "$1")"
-  local result=""
-
-  if [ -z "$path_to_remove" ]; then
-    echo "${PATH}"
-    return
-  fi
-
-  local paths
-  IFS=: paths=($PATH)
-
-  for path in "${paths[@]}"; do
-    path="$(expand_path "$path" || true)"
-    if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
-      result="${result}${path}:"
-    fi
+  local path_to_remove="$1"
+  local path_before
+  local result=":$PATH:"
+  while [ "$path_before" != "$result" ]; do
+    path_before="$result"
+    result="${result//:$path_to_remove:/:}"
   done
-
   echo "${result%:}"
 }
 
-OLDIFS="$IFS"
-IFS=: versions=($(pyenv-version-name))
-IFS=: PYENV_VERSION="${versions[*]}"
-IFS="$OLDIFS"
 PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then
   pyenv-help --usage which >&2
   exit 1
 fi
+
+OLDIFS="$IFS"
+IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name)})
+IFS="$OLDIFS"
 
 for version in "${versions[@]}"; do
   if [ "$version" = "system" ]; then
@@ -67,6 +45,7 @@ for version in "${versions[@]}"; do
     PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${version}/bin/${PYENV_COMMAND}"
   fi
   if [ -x "$PYENV_COMMAND_PATH" ]; then
+    PYENV_VERSION="$version"
     break
   fi
 done
@@ -80,6 +59,9 @@ done
 
 if [ -x "$PYENV_COMMAND_PATH" ]; then
   echo "$PYENV_COMMAND_PATH"
+elif ! [ -d "${PYENV_ROOT}/versions/${PYENV_VERSION}" ]; then
+  echo "pyenv: version \`$PYENV_VERSION' is not installed" >&2
+  exit 1
 else
   echo "pyenv: $PYENV_COMMAND: command not found" >&2
 
