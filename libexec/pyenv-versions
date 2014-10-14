@@ -11,7 +11,6 @@ if [ "$1" = "--bare" ]; then
   hit_prefix=""
   miss_prefix=""
   current_versions=()
-  version_origin=""
   include_system=""
 else
   hit_prefix="* "
@@ -19,25 +18,30 @@ else
   OLDIFS="$IFS"
   IFS=: current_versions=($(pyenv-version-name || true))
   IFS="$OLDIFS"
-  version_origin=" (set by $(pyenv-version-origin))"
   include_system="1"
 fi
 
-array_exists() {
-  local x car="$1"
+num_versions=0
+
+exists() {
+  local car="$1"
+  local cdar
   shift
-  for x in "$@"; do
-    [ "${x}" = "${car}" ] && return 0
+  for cdar in "$@"; do
+    if [ "${car}" == "${cdar}" ]; then
+      return 0
+    fi
   done
   return 1
 }
 
 print_version() {
-  if array_exists "$1" "${current_versions[@]}"; then
-    echo "${hit_prefix}$1${version_origin}"
+  if exists "$1" "${current_versions[@]}"; then
+    echo "${hit_prefix}$1 (set by $(pyenv-version-origin))"
   else
     echo "${miss_prefix}$1"
   fi
+  num_versions=$((num_versions + 1))
 }
 
 # Include "system" in the non-bare output, if it exists
@@ -45,8 +49,15 @@ if [ -n "$include_system" ] && PYENV_VERSION=system pyenv-which python >/dev/nul
   print_version system
 fi
 
+shopt -s nullglob
 for path in "${PYENV_ROOT}/versions/"*; do
   if [ -d "$path" ]; then
     print_version "${path##*/}"
   fi
 done
+shopt -u nullglob
+
+if [ "$num_versions" -eq 0 ] && [ -n "$include_system" ]; then
+  echo "Warning: no Python detected on the system" >&2
+  exit 1
+fi

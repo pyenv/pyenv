@@ -24,6 +24,12 @@ stub_system_python() {
   assert_success "* system (set by ${PYENV_ROOT}/version)"
 }
 
+@test "not even system python available" {
+  PATH="$(path_without python)" run pyenv-versions
+  assert_failure
+  assert_output "Warning: no Python detected on the system"
+}
+
 @test "bare output no versions installed" {
   assert [ ! -d "${PYENV_ROOT}/versions" ]
   run pyenv-versions --bare
@@ -111,5 +117,25 @@ OUT
   system
 * 3.3.3 (set by ${PYENV_TEST_DIR}/.python-version)
   3.4.0
+OUT
+}
+
+@test "ignores non-directories under versions" {
+  create_version "3.3"
+  touch "${PYENV_ROOT}/versions/hello"
+
+  run pyenv-versions --bare
+  assert_success "3.3"
+}
+
+@test "lists symlinks under versions" {
+  create_version "2.7.8"
+  ln -s "2.7.8" "${PYENV_ROOT}/versions/2.7"
+
+  run pyenv-versions --bare
+  assert_success
+  assert_output <<OUT
+2.7
+2.7.8
 OUT
 }
