@@ -79,6 +79,14 @@ remove_outdated_shims() {
   done
 }
 
+# List basenames of executables for every Ruby version
+list_executable_names() {
+  local file
+  for file in "$RBENV_ROOT"/versions/*/bin/*; do
+    echo "${file##*/}"
+  done
+}
+
 # The basename of each argument passed to `make_shims` will be
 # registered for installation as a shim. In this way, plugins may call
 # `make_shims` with a glob to register many shims at once.
@@ -136,7 +144,7 @@ shopt -s nullglob
 # executables.
 create_prototype_shim
 remove_outdated_shims
-make_shims ../versions/*/bin/*
+make_shims $(list_executable_names | sort -u)
 
 
 # Allow plugins to register shims.
