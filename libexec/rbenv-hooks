@@ -19,6 +19,11 @@ if [ -z "$RBENV_COMMAND" ]; then
   exit 1
 fi
 
+if ! enable -f "${BASH_SOURCE%/*}"/rbenv-realpath.dylib realpath 2>/dev/null; then
+  if [ -n "$RBENV_NATIVE_EXT" ]; then
+    echo "rbenv: failed to load \`realpath' builtin" >&2
+    exit 1
+  fi
 READLINK=$(type -p greadlink readlink | head -1)
 if [ -z "$READLINK" ]; then
   echo "rbenv: cannot find readlink - are you missing GNU coreutils?" >&2
@@ -42,13 +47,14 @@ realpath() {
   echo "$(pwd)/$name"
   cd "$cwd"
 }
+fi
 
 IFS=: hook_paths=($RBENV_HOOK_PATH)
 
 shopt -s nullglob
 for path in "${hook_paths[@]}"; do
   for script in "$path/$RBENV_COMMAND"/*.bash; do
-    echo $(realpath $script)
+    realpath "$script"
   done
 done
 shopt -u nullglob
