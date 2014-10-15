@@ -70,9 +70,10 @@ SH
 # of the first shim in the shims directory, assume rbenv has been
 # upgraded and the existing shims need to be removed.
 remove_outdated_shims() {
-  for shim in *; do
+  local shim
+  for shim in "$SHIM_PATH"/*; do
     if ! diff "$PROTOTYPE_SHIM_PATH" "$shim" >/dev/null 2>&1; then
-      for shim in *; do rm -f "$shim"; done
+      rm -f "$SHIM_PATH"/*
     fi
     break
   done
@@ -82,10 +83,9 @@ remove_outdated_shims() {
 # registered for installation as a shim. In this way, plugins may call
 # `make_shims` with a glob to register many shims at once.
 make_shims() {
-  local shims=("$@")
-
-  for file in "${shims[@]}"; do
-    local shim="${file##*/}"
+  local file shim
+  for file; do
+    shim="${file##*/}"
     register_shim "$shim"
   done
 }
@@ -110,9 +110,10 @@ register_shim() {
 # `registered_shims` array and create a link if one does not already
 # exist.
 install_registered_shims() {
-  local shim
+  local shim file
   for shim in "${registered_shims[@]}"; do
-    [ -e "$shim" ] || ln -f "$PROTOTYPE_SHIM_PATH" "$shim"
+    file="${SHIM_PATH}/${shim}"
+    [ -e "$file" ] || ln -f "$PROTOTYPE_SHIM_PATH" "$file"
   done
 }
 
@@ -122,16 +123,13 @@ install_registered_shims() {
 # removed.
 remove_stale_shims() {
   local shim
-  for shim in *; do
-    if [[ "$registered_shims_index" != *"/$shim/"* ]]; then
+  for shim in "$SHIM_PATH"/*; do
+    if [[ "$registered_shims_index" != *"/${shim##*/}/"* ]]; then
       rm -f "$shim"
     fi
   done
 }
 
-
-# Change to the shims directory.
-cd "$SHIM_PATH"
 shopt -s nullglob
 
 # Create the prototype shim, then register shims for all known
@@ -140,8 +138,6 @@ create_prototype_shim
 remove_outdated_shims
 make_shims ../versions/*/bin/*
 
-# Restore the previous working directory.
-cd "$OLDPWD"
 
 # Allow plugins to register shims.
 OLDIFS="$IFS"
@@ -152,8 +148,5 @@ for script in "${scripts[@]}"; do
   source "$script"
 done
 
-# Change back to the shims directory to install the registered shims
-# and remove stale shims.
-cd "$SHIM_PATH"
 install_registered_shims
 remove_stale_shims
