@@ -45,7 +45,6 @@ for version in "${versions[@]}"; do
     PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${version}/bin/${PYENV_COMMAND}"
   fi
   if [ -x "$PYENV_COMMAND_PATH" ]; then
-    PYENV_VERSION="$version"
     break
   fi
 done
@@ -59,10 +58,18 @@ done
 
 if [ -x "$PYENV_COMMAND_PATH" ]; then
   echo "$PYENV_COMMAND_PATH"
-elif ! [ -d "${PYENV_ROOT}/versions/${PYENV_VERSION}" ]; then
-  echo "pyenv: version \`$PYENV_VERSION' is not installed" >&2
-  exit 1
 else
+  for version in "${versions[@]}"; do
+    any_not_installed=0
+    if ! [ -d "${PYENV_ROOT}/versions/${version}" ]; then
+      echo "pyenv: version \`$version' is not installed" >&2
+      any_not_installed=1
+    fi
+  done
+  if [ "$any_not_installed" = 1 ]; then
+    exit 1
+  fi
+
   echo "pyenv: $PYENV_COMMAND: command not found" >&2
 
   versions="$(pyenv-whence "$PYENV_COMMAND" || true)"

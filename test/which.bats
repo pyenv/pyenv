@@ -65,6 +65,15 @@ create_executable() {
   assert_failure "pyenv: version \`3.3' is not installed"
 }
 
+@test "versions not installed" {
+  create_executable "3.4" "py.test"
+  PYENV_VERSION=2.7:3.3 run pyenv-which py.test
+  assert_failure <<OUT
+pyenv: version \`2.7' is not installed
+pyenv: version \`3.3' is not installed
+OUT
+}
+
 @test "no executable found" {
   create_executable "2.7" "py.test"
   PYENV_VERSION=2.7 run pyenv-which fab
