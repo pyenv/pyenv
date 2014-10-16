@@ -70,11 +70,20 @@ SH
 # of the first shim in the shims directory, assume rbenv has been
 # upgraded and the existing shims need to be removed.
 remove_outdated_shims() {
-  for shim in *; do
+  local shim
+  for shim in "$SHIM_PATH"/*; do
     if ! diff "$PROTOTYPE_SHIM_PATH" "$shim" >/dev/null 2>&1; then
-      for shim in *; do rm -f "$shim"; done
+      rm -f "$SHIM_PATH"/*
     fi
     break
+  done
+}
+
+# List basenames of executables for every Ruby version
+list_executable_names() {
+  local file
+  for file in "$RBENV_ROOT"/versions/*/bin/*; do
+    echo "${file##*/}"
   done
 }
 
@@ -82,37 +91,26 @@ remove_outdated_shims() {
 # registered for installation as a shim. In this way, plugins may call
 # `make_shims` with a glob to register many shims at once.
 make_shims() {
-  local shims=("$@")
-
-  for file in "${shims[@]}"; do
-    local shim="${file##*/}"
+  local file shim
+  for file; do
+    shim="${file##*/}"
     register_shim "$shim"
   done
 }
 
-# Create an empty array for the list of registered shims and an empty
-# string to use as a search index.
-registered_shims=()
-registered_shims_index=""
+registered_shims=" "
 
-# We will keep track of shims registered for installation with the
-# global `registered_shims` array and with a global search index
-# string. The array will let us iterate over all registered shims. The
-# index string will let us quickly check whether a shim with the given
-# name has been registered or not.
+# Registers the name of a shim to be generated.
 register_shim() {
-  local shim="$@"
-  registered_shims["${#registered_shims[@]}"]="$shim"
-  registered_shims_index="$registered_shims_index/$shim/"
+  registered_shims="${registered_shims}${1} "
 }
 
-# To install all the registered shims, we iterate over the
-# `registered_shims` array and create a link if one does not already
-# exist.
+# Install all the shims registered via `make_shims` or `register_shim` directly.
 install_registered_shims() {
-  local shim
-  for shim in "${registered_shims[@]}"; do
-    [ -e "$shim" ] || ln -f "$PROTOTYPE_SHIM_PATH" "$shim"
+  local shim file
+  for shim in $registered_shims; do
+    file="${SHIM_PATH}/${shim}"
+    [ -e "$file" ] || ln -f "$PROTOTYPE_SHIM_PATH" "$file"
   done
 }
 
@@ -122,26 +120,21 @@ install_registered_shims() {
 # removed.
 remove_stale_shims() {
   local shim
-  for shim in *; do
-    if [[ "$registered_shims_index" != *"/$shim/"* ]]; then
+  for shim in "$SHIM_PATH"/*; do
+    if [[ "$registered_shims" != *" ${shim##*/} "* ]]; then
       rm -f "$shim"
     fi
   done
 }
 
-
-# Change to the shims directory.
-cd "$SHIM_PATH"
 shopt -s nullglob
 
 # Create the prototype shim, then register shims for all known
 # executables.
 create_prototype_shim
 remove_outdated_shims
-make_shims ../versions/*/bin/*
+make_shims $(list_executable_names | sort -u)
 
-# Restore the previous working directory.
-cd "$OLDPWD"
 
 # Allow plugins to register shims.
 OLDIFS="$IFS"
@@ -152,8 +145,5 @@ for script in "${scripts[@]}"; do
   source "$script"
 done
 
-# Change back to the shims directory to install the registered shims
-# and remove stale shims.
-cd "$SHIM_PATH"
 install_registered_shims
 remove_stale_shims
