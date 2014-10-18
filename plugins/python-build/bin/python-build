@@ -1443,7 +1443,11 @@ build_package_get_pip() {
 }
 
 build_package_ensurepip() {
-  "$PYTHON_BIN" -m ensurepip 1>/dev/null 2>&1 || {
+  local ensurepip_opts
+  if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
+    ensurepip_opts="--altinstall"
+  fi
+  "$PYTHON_BIN" -m ensurepip $ensurepip_opts 1>/dev/null 2>&1 || {
     build_package_ez_setup "$@" && build_package_get_pip "$@"
   } || return 1
 
