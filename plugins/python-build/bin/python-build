@@ -1687,9 +1687,25 @@ if [[ "Darwin" == "$(uname -s)" ]]; then
   fi
 fi
 
+python_bin_suffix() {
+  local version_name version_info
+  case "$1" in
+  2.* | 3.* )
+    version_name="$1"
+    version_info=(${version_name//./ })
+    echo "${version_info[0]}.${version_info[1]}"
+    ;;
+  stackless-2.* | stackless-3.* )
+    version_name="${1#stackless-}"
+    version_info=(${version_name//./ })
+    echo "${version_info[0]}.${version_info[1]}"
+    ;;
+  esac
+}
+
 SEED="$(date "+%Y%m%d%H%M%S").$$"
 LOG_PATH="${TMP}/python-build.${SEED}.log"
-PYTHON_BIN="${PREFIX_PATH}/bin/python"
+PYTHON_BIN="${PREFIX_PATH}/bin/python$(python_bin_suffix "${DEFINITION_PATH##*/}")"
 CWD="$(pwd)"
 
 if [ -z "$PYTHON_BUILD_BUILD_PATH" ]; then
