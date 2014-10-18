@@ -1282,7 +1282,9 @@ verify_python() {
     ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
   fi
 
-  create_symlinks "$1"
+  if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
+    create_symlinks "$1"
+  fi
 
   if [ ! -x "${PYTHON_BIN}" ]; then
     { colorize 1 "ERROR"
