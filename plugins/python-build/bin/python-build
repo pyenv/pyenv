@@ -599,6 +599,7 @@ build_package_standard() {
   local PACKAGE_MAKE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
   local PACKAGE_MAKE_INSTALL_OPTS="${package_var_name}_MAKE_INSTALL_OPTS"
   local PACKAGE_MAKE_INSTALL_OPTS_ARRAY="${package_var_name}_MAKE_INSTALL_OPTS_ARRAY[@]"
+  local PACKAGE_MAKE_INSTALL_TARGET="${package_var_name}_MAKE_INSTALL_TARGET"
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
   [ "$package_var_name" = "PYTHON" ] && use_homebrew_readline || true
@@ -612,7 +613,7 @@ build_package_standard() {
   ) >&4 2>&1
 
   { "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
-    "$MAKE" install $MAKE_INSTALL_OPTS ${!PACKAGE_MAKE_INSTALL_OPTS} "${!PACKAGE_MAKE_INSTALL_OPTS_ARRAY}"
+    "$MAKE" "${!PACKAGE_MAKE_INSTALL_TARGET:-install}" $MAKE_INSTALL_OPTS ${!PACKAGE_MAKE_INSTALL_OPTS} "${!PACKAGE_MAKE_INSTALL_OPTS_ARRAY}"
   } >&4 2>&1
 }
 
@@ -1254,26 +1255,6 @@ apply_python_patch() {
   esac
 }
 
-create_symlinks() {
-  local suffix="$1"
-
-  local file link
-  shopt -s nullglob
-  for file in "${PREFIX_PATH}/bin"/*; do
-    if [[ "${file##*/}" == *"${suffix}" ]]; then
-      if [[ "${file}" == *"-${suffix}" ]]; then
-        link="${file%%-${suffix}}"
-      else
-        link="${file%%${suffix}}"
-      fi
-      if [ ! -e "${link}" ]; then
-        ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
-      fi
-    fi
-  done
-  shopt -u nullglob
-}
-
 verify_python() {
   if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
     # Only symlinks are installed in ${PREFIX_PATH}/bin
@@ -1281,7 +1262,23 @@ verify_python() {
     ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
   fi
 
-  create_symlinks "$1"
+  # Not create symlinks on `altinstall` (#255)
+  if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
+    local suffix="${1#python}"
+    local file
+    shopt -s nullglob
+    for file in "${PREFIX_PATH}/bin"/*; do
+      local link
+      case "${file}" in
+      *"-${suffix}" ) link="${file%%-${suffix}}" ;;
+      *"${suffix}" )  link="${file%%${suffix}}"  ;;
+      esac
+      if [ -n "$link" ] && [ ! -e "$link" ]; then
+        ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
+      fi
+    done
+    shopt -u nullglob
+  fi
 
   if [ ! -x "${PYTHON_BIN}" ]; then
     { colorize 1 "ERROR"
@@ -1442,11 +1439,13 @@ build_package_get_pip() {
 }
 
 build_package_ensurepip() {
-  "$PYTHON_BIN" -m ensurepip 1>/dev/null 2>&1 || {
+  local ensurepip_opts
+  if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
+    ensurepip_opts="--altinstall"
+  fi
+  "$PYTHON_BIN" -m ensurepip $ensurepip_opts 1>/dev/null 2>&1 || {
     build_package_ez_setup "$@" && build_package_get_pip "$@"
   } || return 1
-
-  create_symlinks "$("$PYTHON_BIN" -c 'import sys;v=sys.version_info;sys.stdout.write("python%d.%d"%(v[0],v[1]))')"
 }
 
 version() {
@@ -1682,9 +1681,25 @@ if [[ "Darwin" == "$(uname -s)" ]]; then
   fi
 fi
 
+python_bin_suffix() {
+  local version_name version_info
+  case "$1" in
+  2.* | 3.* )
+    version_name="$1"
+    version_info=(${version_name//./ })
+    echo "${version_info[0]}.${version_info[1]}"
+    ;;
+  stackless-2.* | stackless-3.* )
+    version_name="${1#stackless-}"
+    version_info=(${version_name//./ })
+    echo "${version_info[0]}.${version_info[1]}"
+    ;;
+  esac
+}
+
 SEED="$(date "+%Y%m%d%H%M%S").$$"
 LOG_PATH="${TMP}/python-build.${SEED}.log"
-PYTHON_BIN="${PREFIX_PATH}/bin/python"
+PYTHON_BIN="${PREFIX_PATH}/bin/python$(python_bin_suffix "${DEFINITION_PATH##*/}")"
 CWD="$(pwd)"
 
 if [ -z "$PYTHON_BUILD_BUILD_PATH" ]; then
