@@ -1255,26 +1255,6 @@ apply_python_patch() {
   esac
 }
 
-create_symlinks() {
-  local suffix="$1"
-
-  local file link
-  shopt -s nullglob
-  for file in "${PREFIX_PATH}/bin"/*; do
-    if [[ "${file##*/}" == *"${suffix}" ]]; then
-      if [[ "${file}" == *"-${suffix}" ]]; then
-        link="${file%%-${suffix}}"
-      else
-        link="${file%%${suffix}}"
-      fi
-      if [ ! -e "${link}" ]; then
-        ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
-      fi
-    fi
-  done
-  shopt -u nullglob
-}
-
 verify_python() {
   if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
     # Only symlinks are installed in ${PREFIX_PATH}/bin
@@ -1282,8 +1262,22 @@ verify_python() {
     ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
   fi
 
+  # Not create symlinks on `altinstall` (#255)
   if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
-    create_symlinks "$1"
+    local suffix="${1#python}"
+    local file
+    shopt -s nullglob
+    for file in "${PREFIX_PATH}/bin"/*; do
+      local link
+      case "${file}" in
+      *"-${suffix}" ) link="${file%%-${suffix}}" ;;
+      *"${suffix}" )  link="${file%%${suffix}}"  ;;
+      esac
+      if [ -n "$link" ] && [ ! -e "$link" ]; then
+        ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
+      fi
+    done
+    shopt -u nullglob
   fi
 
   if [ ! -x "${PYTHON_BIN}" ]; then
@@ -1452,8 +1446,6 @@ build_package_ensurepip() {
   "$PYTHON_BIN" -m ensurepip $ensurepip_opts 1>/dev/null 2>&1 || {
     build_package_ez_setup "$@" && build_package_get_pip "$@"
   } || return 1
-
-  create_symlinks "$("$PYTHON_BIN" -c 'import sys;v=sys.version_info;sys.stdout.write("python%d.%d"%(v[0],v[1]))')"
 }
 
 version() {
