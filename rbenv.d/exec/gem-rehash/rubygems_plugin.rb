@@ -3,7 +3,7 @@ hook = lambda do |installer|
     # Ignore gems that aren't installed in locations that rbenv searches for binstubs
     if installer.spec.executables.any? &&
         [Gem.default_bindir, Gem.bindir(Gem.user_dir)].include?(installer.bin_dir)
-      system "rbenv", "rehash"
+      `rbenv rehash`
     end
   rescue
     warn "rbenv: error in gem-rehash (#{$!})"
