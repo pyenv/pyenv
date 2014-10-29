@@ -264,6 +264,31 @@ make install
 OUT
 }
 
+@test "number of CPU cores is detected on FreeBSD" {
+  cached_tarball "Python-3.2.1"
+
+  stub uname '-s : echo FreeBSD'
+  stub sysctl '-n hw.ncpu : echo 1'
+  stub_make_install
+
+  export -n MAKE_OPTS
+  run_inline_definition <<DEF
+install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sysctl
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+make -j 1
+make install
+OUT
+}
+
 @test "setting PYTHON_MAKE_INSTALL_OPTS to a multi-word string" {
   cached_tarball "Python-3.2.1"
 
@@ -315,17 +340,28 @@ OUT
   assert [ -x ./here/bin/package ]
 }
 
-@test "make on FreeBSD defaults to gmake" {
+@test "make on FreeBSD 9 defaults to gmake" {
   cached_tarball "Python-3.2.1"
 
-  stub uname "-s : echo FreeBSD"
-  stub uname "-s : echo FreeBSD"
+  stub uname "-s : echo FreeBSD" "-r : echo 9.1"
   MAKE=gmake stub_make_install
 
   MAKE= install_fixture definitions/vanilla-python
   assert_success
 
   unstub gmake
+  unstub uname
+}
+
+@test "make on FreeBSD 10" {
+  cached_tarball "Python-3.2.1"
+
+  stub uname "-s : echo FreeBSD" "-r : echo 10.0-RELEASE"
+  stub_make_install
+
+  MAKE= install_fixture definitions/vanilla-python
+  assert_success
+
   unstub uname
 }
 

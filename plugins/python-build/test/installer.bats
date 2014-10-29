@@ -22,7 +22,7 @@ load test_helper
   PREFIX="${PWD}/usr" run "${BATS_TEST_DIRNAME}/../install.sh"
   assert_success ""
 
-  run $BASH -c 'ls -l usr/share/python-build | tail -2 | cut -d" " -f1'
+  run $BASH -c 'ls -l usr/share/python-build | tail -2 | cut -c1-10'
   assert_output <<OUT
 -rw-r--r--
 -rw-r--r--
