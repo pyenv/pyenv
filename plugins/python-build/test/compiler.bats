@@ -8,7 +8,7 @@ export -n CC
 
 @test "require_gcc on OS X 10.9" {
   stub uname '-s : echo Darwin'
-  stub sw_vers '-productVersion : echo 10.9'
+  stub sw_vers '-productVersion : echo 10.9.5'
   stub gcc '--version : echo 4.2.1'
 
   run_inline_definition <<DEF
@@ -19,7 +19,7 @@ DEF
   assert_success
   assert_output <<OUT
 CC=${TMP}/bin/gcc
-MACOSX_DEPLOYMENT_TARGET=no
+MACOSX_DEPLOYMENT_TARGET=10.9
 OUT
 }
 
@@ -36,7 +36,7 @@ DEF
   assert_success
   assert_output <<OUT
 CC=${TMP}/bin/gcc
-MACOSX_DEPLOYMENT_TARGET=10.9
+MACOSX_DEPLOYMENT_TARGET=10.10
 OUT
 }
 
@@ -53,6 +53,10 @@ DEF
 @test "CC=clang by default on OS X 10.10" {
   mkdir -p "$INSTALL_ROOT"
   cd "$INSTALL_ROOT"
+
+  # yyuu/pyenv#222
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
@@ -76,7 +80,7 @@ build_package_standard python
 DEF
   assert_success
   assert_output <<OUT
-./configure --prefix=$INSTALL_ROOT
+./configure --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib
 CC=clang
 CFLAGS=no
 make -j 2

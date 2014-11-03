@@ -89,10 +89,9 @@ os_information() {
 # 10.9  -> 1009
 # 10.10 -> 1010
 osx_version() {
-  local ver="$(sw_vers -productVersion)"
-  local major="${ver%.*}"
-  local minor="${ver#*.}"
-  echo $(( major*100 + minor ))
+  local -a ver
+  IFS=. ver=( `sw_vers -productVersion` )
+  echo $(( ${ver[0]}*100 + ${ver[1]} ))
 }
 
 build_failed() {
@@ -1083,40 +1082,6 @@ require_llvm() {
   fi
 }
 
-require_cc() {
-  local cc="$(command -v "$CC" || command -v "cc" || true)"
-
-  if [ -z "$cc" ]; then
-    { echo
-      colorize 1 "ERROR"
-      echo ": This package must be compiled with cc, but python-build couldn't"
-      echo "find a suitable \`cc\` executable on your system. Please install cc"
-      echo "and try again."
-      echo
-    } >&3
-    return 1
-  fi
-
-  export CC
-}
-
-require_clang() {
-  local clang="$(command -v "$CC" || command -v "clang" || true)"
-
-  if [ -z "$clang" ]; then
-    { echo
-      colorize 1 "ERROR"
-      echo ": This package must be compiled with clang, but python-build couldn't"
-      echo "find a suitable \`clang\` executable on your system. Please install clang"
-      echo "and try again."
-      echo
-    } >&3
-    return 1
-  fi
- 
-  export CC="$clang"
-}
-
 require_java() {
   local java="$(command -v java || true)"
 
@@ -1505,7 +1470,7 @@ build_package_ensurepip() {
 version() {
   local git_revision
   # Read the revision from git if the remote points to "python-build" repository
-  if GIT_DIR="$PYTHON_BUILD_INSTALL_PREFIX/../../.git" git remote -v 2>/dev/null | grep -q /python-build; then
+  if GIT_DIR="$PYTHON_BUILD_INSTALL_PREFIX/../../.git" git remote -v 2>/dev/null | grep -q /pyenv; then
     git_revision="$(GIT_DIR="$PYTHON_BUILD_INSTALL_PREFIX/../../.git" git describe --tags HEAD 2>/dev/null || true)"
     git_revision="${git_revision#v}"
   fi
@@ -1525,7 +1490,7 @@ usage() {
 
 list_definitions() {
   { for DEFINITION_DIR in "${PYTHON_BUILD_DEFINITIONS[@]}"; do
-      [ -d "$DEFINITION_DIR" ] && ls "$DEFINITION_DIR"
+      [ -d "$DEFINITION_DIR" ] && find "$DEFINITION_DIR" -maxdepth 1 -type f -print0 | xargs -0 -n 1 basename 2>/dev/null
     done
   } | sort_versions | uniq
 }
@@ -1755,18 +1720,14 @@ if [ -n "${PIP_VERSION}" ]; then
   GET_PIP_URL="https://raw.githubusercontent.com/pypa/pip/${PIP_VERSION}/contrib/get-pip.py"
 fi
 
-## Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
-#if [[ "Darwin" == "$(uname -s)" ]]; then
-#  MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null || true)"
-#  MACOS_VERSION_ARRAY=(${MACOS_VERSION//\./ })
-#  if [ "${#MACOS_VERSION_ARRAY[@]}" -ge 2 ]; then
-#    export MACOSX_DEPLOYMENT_TARGET="${MACOS_VERSION_ARRAY[0]}.${MACOS_VERSION_ARRAY[1]}"
-#  else
-#    { colorize 1 "WARNING"
-#      echo ": Could not detect the product version of OS X for MACOSX_DEPLOYMENT_TARGET. Use default setting."
-#    } >&2
-#  fi
-#fi
+# Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
+if [[ "Darwin" == "$(uname -s)" ]]; then
+  MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null || true)"
+  MACOS_VERSION_ARRAY=(${MACOS_VERSION//\./ })
+  if [ "${#MACOS_VERSION_ARRAY[@]}" -ge 2 ]; then
+    export MACOSX_DEPLOYMENT_TARGET="${MACOS_VERSION_ARRAY[0]}.${MACOS_VERSION_ARRAY[1]}"
+  fi
+fi
 
 python_bin_suffix() {
   local version_name version_info

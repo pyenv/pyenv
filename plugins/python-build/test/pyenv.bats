@@ -67,9 +67,9 @@ The following versions contain \`2.7.9' in the name:
 
 See all available versions with \`pyenv install --list'.
 
-If the version you need is missing, try upgrading python-build:
+If the version you need is missing, try upgrading pyenv:
 
-  cd ${BATS_TEST_DIRNAME}/.. && git pull
+  cd ${BATS_TEST_DIRNAME}/../../.. && git pull
 OUT
 
   unstub python-build
@@ -87,7 +87,7 @@ ERROR
 
 See all available versions with \`pyenv install --list'.
 
-If the version you need is missing, try upgrading python-build:
+If the version you need is missing, try upgrading pyenv:
 
   brew update && brew upgrade pyenv
 OUT

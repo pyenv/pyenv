@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 load test_helper
-NUM_DEFINITIONS="$(ls "$BATS_TEST_DIRNAME"/../share/python-build | wc -l)"
+NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -type f | wc -l)"
 
 @test "list built-in definitions" {
   run python-build --definitions
@@ -69,26 +69,24 @@ NUM_DEFINITIONS="$(ls "$BATS_TEST_DIRNAME"/../share/python-build | wc -l)"
   export PYTHON_BUILD_ROOT="$TMP"
   mkdir -p "${PYTHON_BUILD_ROOT}/share/python-build"
   expected="2.7-dev
-2.7.8-preview1
-2.7.8-rc1
-2.7.8-p0
-2.7.8-p125
+2.7
+2.7.1
+2.7.2
+2.7.3
 3.4.0
-3.4.0-rc1
+3.4-dev
 3.4.1
 3.4.2
-3.4-dev
-2.2.0-dev
+jython-dev
 jython-2.5.0
+jython-2.5-dev
 jython-2.5.1
 jython-2.5.2
 jython-2.5.3
 jython-2.5.4-rc1
-jython-2.5-dev
 jython-2.7-beta1
 jython-2.7-beta2
-jython-2.7-beta3
-jython-dev"
+jython-2.7-beta3"
   for ver in "$expected"; do
     touch "${PYTHON_BUILD_ROOT}/share/python-build/$ver"
   done
