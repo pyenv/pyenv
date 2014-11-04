@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -e
+
+[ -d ./bats/bin ] && export PATH="$(pwd)"/bats/bin:"$PATH"
+
+STATUS=0
+bats -t test && ( cd plugins/python-build && bats -t test ) || STATUS="$?"
+
+#if [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ -z "$TRAVIS_COMMIT_RANGE" ]; then
+#  first_sha="$(curl -fsSL https://github.com/${TRAVIS_REPO_SLUG}/pull/${TRAVIS_PULL_REQUEST}.patch | head -1 | awk '{print $2}')"
+#  export TRAVIS_COMMIT_RANGE="${first_sha}^..${TRAVIS_COMMIT}"
+#fi
+
+#if [ "$TRAVIS_SECURE_ENV_VARS" = "true" ]; then
+#  ./script/mirror update "$TRAVIS_COMMIT_RANGE"
+#elif [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+#  ./script/mirror verify "$TRAVIS_COMMIT_RANGE"
+#fi
+
+exit "$STATUS"
