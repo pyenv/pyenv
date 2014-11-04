@@ -191,6 +191,12 @@ easy to fork and contribute any changes back upstream.
 
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
     **Ubuntu note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
+    
+    **General warning**: There are some systems, where the `BASH_ENV` variable is configured
+    to point to `.bashrc`. On such systems you should almost certainly put the abovementioned line
+    `eval "$(pyenv init -)` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
+    may observe strange behaviour, such as `pyenv` getting into an infinite loop.
+    See [#264](https://github.com/yyuu/pyenv/issues/264) for details.
 
 4. **Restart your shell so the path changes take effect.**
    You can now begin using pyenv.
