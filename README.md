@@ -127,7 +127,7 @@ reading it from the following sources, in this order:
    `PATH`.)
 
 **NOTE:** You can activate multiple versions at the same time, e.g. `pyenv
-global 3.4.1 2.7.8`.  This allows for parallel usage of python2 and python3,
+global 3.4.2 2.7.8`.  This allows for parallel usage of python2 and python3,
 and is required with tools like `tox`.
 
 ### Locating the Python Installation
@@ -142,8 +142,8 @@ Each Python version is installed into its own directory under
 For example, you might have these versions installed:
 
 * `~/.pyenv/versions/2.7.8/`
-* `~/.pyenv/versions/3.4.1/`
-* `~/.pyenv/versions/pypy-2.2.1/`
+* `~/.pyenv/versions/3.4.2/`
+* `~/.pyenv/versions/pypy-2.4.0/`
 
 As far as pyenv is concerned, version names are simply the directories in
 `~/.pyenv/versions`.
