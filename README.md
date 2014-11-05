@@ -221,6 +221,10 @@ easy to fork and contribute any changes back upstream.
 
         $ pyenv rehash
 
+   This can be automated for pip using
+   [pyenv-pip-rehash](https://github.com/yyuu/pyenv-pip-rehash), which invokes
+   `pyenv rehash` after (un)installing packages using pip.
+
 
 #### Upgrading
 
