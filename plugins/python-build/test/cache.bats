@@ -59,7 +59,7 @@ setup() {
 
   stub shasum true "echo invalid" "echo $checksum"
   stub curl "-*I* : true" \
-    "-q -o * -*S* http://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
+    "-q -o * -*S* https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
 
   touch "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz"
 
