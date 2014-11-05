@@ -25,13 +25,22 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
+if [ -z "$PYENV_ROOT" ]; then
+  PYENV_ROOT="${HOME}/.pyenv"
+fi
+
+# Add `share/python-build/` directory from each pyenv plugin to the list of
+# paths where build definitions are looked up.
+shopt -s nullglob
+for plugin_path in "$PYENV_ROOT"/plugins/*/share/python-build; do
+  PYTHON_BUILD_DEFINITIONS="${PYTHON_BUILD_DEFINITIONS}:${plugin_path}"
+done
+export PYTHON_BUILD_DEFINITIONS
+shopt -u nullglob
+
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   exec python-build --definitions
-fi
-
-if [ -z "$PYENV_ROOT" ]; then
-  PYENV_ROOT="${HOME}/.pyenv"
 fi
 
 # Load shared library functions
@@ -221,17 +230,25 @@ python-build $KEEP $VERBOSE $HAS_PATCH $DEBUG "$DEFINITION" "$PREFIX" || STATUS=
 # Display a more helpful message if the definition wasn't found.
 if [ "$STATUS" == "2" ]; then
   { candidates="$(definitions "$DEFINITION")"
+    here="$(dirname "${0%/*}")/../.."
     if [ -n "$candidates" ]; then
       echo
       echo "The following versions contain \`$DEFINITION' in the name:"
       echo "$candidates" | indent
     fi
     echo
-    echo "You can list all available versions with \`pyenv install --list'."
+    echo "See all available versions with \`pyenv install --list'."
     echo
-    echo "If the version you're looking for is not present, first try upgrading"
-    echo "pyenv. If it's still missing, open a request on the pyenv"
-    echo "issue tracker: https://github.com/yyuu/pyenv/issues"
+    echo -n "If the version you need is missing, try upgrading pyenv"
+    if [ "$here" != "${here#$(brew --prefix 2>/dev/null)}" ]; then
+      printf ":\n\n"
+      echo "  brew update && brew upgrade pyenv"
+    elif [ -d "${here}/.git" ]; then
+      printf ":\n\n"
+      echo "  cd ${here} && git pull"
+    else
+      printf ".\n"
+    fi
   } >&2
 fi
 

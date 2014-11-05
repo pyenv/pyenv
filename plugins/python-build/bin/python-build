@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-PYTHON_BUILD_VERSION="20140524"
+PYTHON_BUILD_VERSION="20141028"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -71,17 +71,41 @@ colorize() {
   fi
 }
 
+os_information() {
+  if type -p lsb_release >/dev/null; then
+    lsb_release -sir | xargs echo
+  elif type -p sw_vers >/dev/null; then
+    echo "OS X $(sw_vers -productVersion)"
+  elif [ -r /etc/os-release ]; then
+    source /etc/os-release
+    echo "$NAME" $VERSION_ID
+  else
+    local os="$(cat /etc/{centos,redhat,fedora,system}-release /etc/debian_version 2>/dev/null | head -1)"
+    echo "${os:-$(uname -sr)}"
+  fi
+}
+
+#  9.1  -> 901
+# 10.9  -> 1009
+# 10.10 -> 1010
+osx_version() {
+  local -a ver
+  IFS=. ver=( `sw_vers -productVersion` )
+  echo $(( ${ver[0]}*100 + ${ver[1]} ))
+}
+
 build_failed() {
   { echo
-    echo "BUILD FAILED"
+    colorize 1 "BUILD FAILED"
+    echo " ($(os_information) using $(version))"
     echo
 
     if ! rmdir "${BUILD_PATH}" 2>/dev/null; then
       echo "Inspect or clean up the working tree at ${BUILD_PATH}"
 
       if file_is_not_empty "$LOG_PATH"; then
-        echo "Results logged to ${LOG_PATH}"
-        echo
+        colorize 33 "Results logged to ${LOG_PATH}"
+        printf "\n\n"
         echo "Last 10 log lines:"
         tail -n 10 "$LOG_PATH"
       fi
@@ -103,13 +127,16 @@ file_is_not_empty() {
 }
 
 num_cpu_cores() {
-  local num=""
-  if [ "Darwin" = "$(uname -s)" ]; then
+  local num
+  case "$(uname -s)" in
+  Darwin | *BSD )
     num="$(sysctl -n hw.ncpu 2>/dev/null || true)"
-  elif [ -r /proc/cpuinfo ]; then
-    num="$(grep ^processor /proc/cpuinfo | wc -l)"
-    [ "$num" -gt 0 ] || num=""
-  fi
+    ;;
+  * )
+    num="$(grep ^processor /proc/cpuinfo 2>/dev/null | wc -l | xargs)"
+    num="${num#0}"
+    ;;
+  esac
   echo "${num:-2}"
 }
 
@@ -190,7 +217,8 @@ compute_sha2() {
     output="$(shasum -a 256 -b)" || return 1
     echo "${output% *}"
   elif type openssl &>/dev/null; then
-    output="$(openssl dgst -sha256)" || return 1
+    local openssl="$(command -v "$(brew --prefix openssl 2>/dev/null)"/bin/openssl openssl | head -1)"
+    output="$("$openssl" dgst -sha256 2>/dev/null)" || return 1
     echo "${output##* }"
   elif type sha256sum &>/dev/null; then
     output="$(sha256sum --quiet)" || return 1
@@ -295,7 +323,7 @@ fetch_tarball() {
     fi
   fi
 
-  local tar_args="xzvf"
+  local tar_args="xzf"
   local package_filename="${package_name}.tar.gz"
 
   if [ "$package_url" != "${package_url%tgz}" ]; then
@@ -607,6 +635,9 @@ build_package_standard() {
   ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
       export CFLAGS="$CFLAGS ${!PACKAGE_CFLAGS}"
     fi
+    if [ -z "$CC" ] && [ "$(uname -s)" = "Darwin" ] && [ "$(osx_version)" -ge 1010 ]; then
+      export CC=clang
+    fi
     ${!PACKAGE_CONFIGURE:-./configure} --prefix="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}" \
                                        --libdir="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}/lib" \
                                        $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}"
@@ -659,8 +690,12 @@ build_package_ree_installer() {
 build_package_rbx() {
   local package_name="$1"
 
-  { bundle --path=vendor/bundle
-    RUBYOPT="-rubygems $RUBYOPT" ./configure --prefix="$PREFIX_PATH" $RUBY_CONFIGURE_OPTS
+  { [ ! -e "Gemfile" ] || bundle --path=vendor/bundle
+    if [ -n "$RUBY_BUILD_CACHE_PATH" ]; then
+      mkdir -p vendor
+      ln -s "$RUBY_BUILD_CACHE_PATH" vendor/prebuilt
+    fi
+    RUBYOPT="-rubygems $RUBYOPT" ./configure --prefix="$PREFIX_PATH" $RUBY_CONFIGURE_OPTS "${RUBY_CONFIGURE_OPTS_ARRAY[@]}"
     rake install
     fix_rbx_gem_binstubs "$PREFIX_PATH"
     fix_rbx_irb "$PREFIX_PATH"
@@ -909,7 +944,7 @@ fix_rbx_gem_binstubs() {
   local bindir="${prefix}/bin"
   local file binstub
   # Symlink Rubinius' `gems/bin/` into `bin/`
-  if [ -d "$gemdir" ]; then
+  if [ -d "$gemdir" ] && [ ! -L "$gemdir" ]; then
     for file in "$gemdir"/*; do
       binstub="${bindir}/${file##*/}"
       rm -f "$binstub"
@@ -985,6 +1020,9 @@ require_gcc() {
   fi
 
   export CC="$gcc"
+  if [ "$(uname -s)" = "Darwin" ] && [ "$(osx_version)" -ge 1010 ]; then
+    export MACOSX_DEPLOYMENT_TARGET=10.9
+  fi
 }
 
 locate_gcc() {
@@ -1023,7 +1061,7 @@ verify_gcc() {
     return 1
   fi
 
-  local version="$("$gcc" --version || true)"
+  local version="$("$gcc" --version 2>/dev/null || true)"
   if [ -z "$version" ]; then
     return 1
   fi
@@ -1035,38 +1073,13 @@ verify_gcc() {
   echo "$gcc"
 }
 
-require_cc() {
-  local cc="$(command -v "$CC" || command -v "cc" || true)"
-
-  if [ -z "$cc" ]; then
-    { echo
-      colorize 1 "ERROR"
-      echo ": This package must be compiled with cc, but python-build couldn't"
-      echo "find a suitable \`cc\` executable on your system. Please install cc"
-      echo "and try again."
-      echo
-    } >&3
-    return 1
+require_llvm() {
+  local llvm_version="$1"
+  if [ "$(uname -s)" = "Darwin" ] && [ "$(osx_version)" -ge 1010 ]; then
+    if [[ "$PYTHON_CONFIGURE_OPTS" != *--llvm-* ]]; then
+      package_option python configure --prebuilt-name="llvm-3.2-x86_64-apple-darwin13.tar.bz2"
+    fi
   fi
-
-  export CC
-}
-
-require_clang() {
-  local clang="$(command -v "$CC" || command -v "clang" || true)"
-
-  if [ -z "$clang" ]; then
-    { echo
-      colorize 1 "ERROR"
-      echo ": This package must be compiled with clang, but python-build couldn't"
-      echo "find a suitable \`clang\` executable on your system. Please install clang"
-      echo "and try again."
-      echo
-    } >&3
-    return 1
-  fi
- 
-  export CC="$clang"
 }
 
 require_java() {
@@ -1087,6 +1100,7 @@ require_java() {
 }
 
 needs_yaml() {
+  [[ "$RUBY_CONFIGURE_OPTS" != *--with-libyaml-dir=* ]] &&
   ! use_homebrew_yaml
 }
 
@@ -1136,7 +1150,8 @@ use_homebrew_readline() {
 
 has_broken_mac_openssl() {
   [ "$(uname -s)" = "Darwin" ] &&
-  [[ "$(openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8"?* ]] &&
+  [[ "$(/usr/bin/openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8"?* ]] &&
+  [[ "$RUBY_CONFIGURE_OPTS" != *--with-openssl-dir=* ]] &&
   ! use_homebrew_openssl
 }
 
@@ -1166,7 +1181,7 @@ build_package_mac_openssl() {
   OPENSSL_CONFIGURE="${OPENSSL_CONFIGURE:-./config}"
 
   # Compile a shared lib with zlib dynamically linked, no kerberos.
-  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-krb5 shared
+  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl2 no-ssl3 no-krb5 shared
 
   # Default MAKE_OPTS are -j 2 which can confuse the build. Thankfully, make
   # gives precedence to the last -j option, so we can override that.
@@ -1185,7 +1200,11 @@ build_package_verify_openssl() {
   "$RUBY_BIN" -e 'begin
     require "openssl"
   rescue LoadError
-    abort "The Ruby openssl extension was not compiled. Missing the OpenSSL lib?"
+    $stderr.puts "The Ruby openssl extension was not compiled. Missing the OpenSSL lib?"
+    $stderr.puts "Configure options used:"
+    require "rbconfig"; require "shellwords"
+    RbConfig::CONFIG.fetch("configure_args").shellsplit.each { |arg| $stderr.puts "  #{arg}" }
+    exit 1
   end' >&4 2>&1
 }
 
@@ -1449,7 +1468,13 @@ build_package_ensurepip() {
 }
 
 version() {
-  echo "python-build ${PYTHON_BUILD_VERSION}"
+  local git_revision
+  # Read the revision from git if the remote points to "python-build" repository
+  if GIT_DIR="$PYTHON_BUILD_INSTALL_PREFIX/../../.git" git remote -v 2>/dev/null | grep -q /pyenv; then
+    git_revision="$(GIT_DIR="$PYTHON_BUILD_INSTALL_PREFIX/../../.git" git describe --tags HEAD 2>/dev/null || true)"
+    git_revision="${git_revision#v}"
+  fi
+  echo "python-build ${git_revision:-$PYTHON_BUILD_VERSION}"
 }
 
 usage() {
@@ -1464,19 +1489,28 @@ usage() {
 }
 
 list_definitions() {
-  { for definition in "${PYTHON_BUILD_ROOT}/share/python-build/"*; do
-      [ -f "${definition}" ] && echo "${definition##*/}"
+  { for DEFINITION_DIR in "${PYTHON_BUILD_DEFINITIONS[@]}"; do
+      [ -d "$DEFINITION_DIR" ] && find "$DEFINITION_DIR" -maxdepth 1 -type f -print0 | xargs -0 -n 1 basename 2>/dev/null
     done
-  } | sort
+  } | sort_versions | uniq
 }
 
+sort_versions() {
+  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z\1/; s/$/.z/; G; s/\n/ /' | \
+    LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
+}
 
 
 unset VERBOSE
 unset KEEP_BUILD_PATH
 unset HAS_PATCH
-PYTHON_BUILD_ROOT="$(abs_dirname "$0")/.."
 unset DEBUG
+
+PYTHON_BUILD_INSTALL_PREFIX="$(abs_dirname "$0")/.."
+
+OLDIFS="$IFS"
+IFS=: PYTHON_BUILD_DEFINITIONS=($PYTHON_BUILD_DEFINITIONS ${PYTHON_BUILD_ROOT:-$PYTHON_BUILD_INSTALL_PREFIX}/share/python-build)
+IFS="$OLDIFS"
 
 parse_options "$@"
 
@@ -1521,10 +1555,14 @@ DEFINITION_PATH="${ARGUMENTS[0]}"
 if [ -z "$DEFINITION_PATH" ]; then
   usage
 elif [ ! -f "$DEFINITION_PATH" ]; then
-  BUILTIN_DEFINITION_PATH="${PYTHON_BUILD_ROOT}/share/python-build/${DEFINITION_PATH}"
-  if [ -e "$BUILTIN_DEFINITION_PATH" ]; then
-    DEFINITION_PATH="$BUILTIN_DEFINITION_PATH"
-  else
+  for DEFINITION_DIR in "${PYTHON_BUILD_DEFINITIONS[@]}"; do
+    if [ -f "${DEFINITION_DIR}/${DEFINITION_PATH}" ]; then
+      DEFINITION_PATH="${DEFINITION_DIR}/${DEFINITION_PATH}"
+      break
+    fi
+  done
+
+  if [ ! -f "$DEFINITION_PATH" ]; then
     echo "python-build: definition not found: ${DEFINITION_PATH}" >&2
     exit 2
   fi
@@ -1543,8 +1581,23 @@ else
   TMP="${TMPDIR%/}"
 fi
 
-if [ ! -w "$TMP" ] || [ ! -x "$TMP" ]; then
+# Check if TMPDIR is accessible and can hold executables.
+tmp_executable="${TMP}/python-build-test.$$"
+noexec=""
+if mkdir -p "$TMP" && touch "$tmp_executable" 2>/dev/null; then
+  cat > "$tmp_executable" <<-EOF
+	#!${BASH}
+	exit 0
+	EOF
+  chmod +x "$tmp_executable"
+else
   echo "python-build: TMPDIR=$TMP is set to a non-accessible location" >&2
+  exit 1
+fi
+"$tmp_executable" 2>/dev/null || noexec=1
+rm -f "$tmp_executable"
+if [ -n "$noexec" ]; then
+  echo "python-build: TMPDIR=$TMP cannot hold executables (partition possibly mounted with \`noexec\`)" >&2
   exit 1
 fi
 
@@ -1559,7 +1612,7 @@ fi
 #fi
 
 if [ -z "$MAKE" ]; then
-  if [[ "FreeBSD" = "$(uname -s)" ]]; then
+  if [ "FreeBSD" = "$(uname -s)" ] && [ "$(uname -r | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
     export MAKE="gmake"
   else
     export MAKE="make"
@@ -1593,7 +1646,6 @@ if echo test | compute_md5 >/dev/null; then
   HAS_MD5_SUPPORT=1
 else
   unset HAS_MD5_SUPPORT
-  unset PYTHON_BUILD_MIRROR_URL
 fi
 
 # Add an option to build a debug version of Python (#11)
@@ -1674,10 +1726,6 @@ if [[ "Darwin" == "$(uname -s)" ]]; then
   MACOS_VERSION_ARRAY=(${MACOS_VERSION//\./ })
   if [ "${#MACOS_VERSION_ARRAY[@]}" -ge 2 ]; then
     export MACOSX_DEPLOYMENT_TARGET="${MACOS_VERSION_ARRAY[0]}.${MACOS_VERSION_ARRAY[1]}"
-  else
-    { colorize 1 "WARNING"
-      echo ": Could not detect the product version of OS X for MACOSX_DEPLOYMENT_TARGET. Use default setting."
-    } >&2
   fi
 fi
 

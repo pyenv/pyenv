@@ -4,6 +4,7 @@ load test_helper
 export PYTHON_BUILD_CACHE_PATH="$TMP/cache"
 export MAKE=make
 export MAKE_OPTS="-j 2"
+export CC=cc
 
 setup() {
   mkdir -p "$INSTALL_ROOT"
@@ -216,7 +217,10 @@ OUT
 @test "number of CPU cores defaults to 2" {
   cached_tarball "Python-3.2.1"
 
+  # yyuu/pyenv#222
   stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
+
   stub uname '-s : echo Darwin'
   stub sysctl false
   stub_make_install
@@ -241,7 +245,10 @@ OUT
 @test "number of CPU cores is detected on Mac" {
   cached_tarball "Python-3.2.1"
 
+  # yyuu/pyenv#222
   stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
+
   stub uname '-s : echo Darwin'
   stub sysctl '-n hw.ncpu : echo 4'
   stub_make_install
@@ -260,6 +267,34 @@ DEF
 Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
 Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 4
+make install
+OUT
+}
+
+@test "number of CPU cores is detected on FreeBSD" {
+  cached_tarball "Python-3.2.1"
+
+  stub uname '-s : echo FreeBSD'
+  stub sysctl '-n hw.ncpu : echo 1'
+  stub_make_install
+
+  # yyuu/pyenv#222
+  stub uname '-s : echo FreeBSD'
+
+  export -n MAKE_OPTS
+  run_inline_definition <<DEF
+install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sysctl
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+make -j 1
 make install
 OUT
 }
@@ -315,17 +350,34 @@ OUT
   assert [ -x ./here/bin/package ]
 }
 
-@test "make on FreeBSD defaults to gmake" {
+@test "make on FreeBSD 9 defaults to gmake" {
   cached_tarball "Python-3.2.1"
 
-  stub uname "-s : echo FreeBSD"
-  stub uname "-s : echo FreeBSD"
+  stub uname "-s : echo FreeBSD" "-r : echo 9.1"
   MAKE=gmake stub_make_install
+
+  # yyuu/pyenv#222
+  stub uname '-s : echo FreeBSD'
 
   MAKE= install_fixture definitions/vanilla-python
   assert_success
 
   unstub gmake
+  unstub uname
+}
+
+@test "make on FreeBSD 10" {
+  cached_tarball "Python-3.2.1"
+
+  stub uname "-s : echo FreeBSD" "-r : echo 10.0-RELEASE"
+  stub_make_install
+
+  # yyuu/pyenv#222
+  stub uname '-s : echo FreeBSD'
+
+  MAKE= install_fixture definitions/vanilla-python
+  assert_success
+
   unstub uname
 }
 
@@ -373,6 +425,30 @@ OUT
   assert_success "hello world"
 }
 
+@test "mruby strategy overwrites non-writable files" {
+  # nop
+}
+
+@test "mruby strategy fetches rake if missing" {
+  # nop
+}
+
+@test "rbx uses bundle then rake" {
+  # nop
+}
+
+@test "fixes rbx binstubs" {
+  # nop
+}
+
+@test "JRuby build" {
+  # nop
+}
+
+@test "JRuby+Graal does not install launchers" {
+  # nop
+}
+
 @test "non-writable TMPDIR aborts build" {
   export TMPDIR="${TMP}/build"
   mkdir -p "$TMPDIR"
@@ -391,38 +467,4 @@ OUT
   touch "${TMP}/build-definition"
   run python-build "${TMP}/build-definition" "$INSTALL_ROOT"
   assert_failure "python-build: TMPDIR=$TMPDIR is set to a non-accessible location"
-}
-
-@test "setting MACOSX_DEPLOYMENT_TARGET from the product version of OS X" {
-  stub uname '-s : echo Darwin'
-  stub sw_vers '-productVersion : echo 10.9.4'
-
-  run_inline_definition <<DEF
-echo "MACOSX_DEPLOYMENT_TARGET=\${MACOSX_DEPLOYMENT_TARGET}" > "$INSTALL_ROOT/build.log"
-DEF
-  assert_success
-
-  assert_build_log <<OUT
-MACOSX_DEPLOYMENT_TARGET=10.9
-OUT
-
-  unstub uname
-  unstub sw_vers
-}
-
-@test "not setting MACOSX_DEPLOYMENT_TARGET if the product version of OS X is not available" {
-  stub uname '-s : echo Darwin'
-  stub sw_vers false
-
-  run_inline_definition <<DEF
-echo "MACOSX_DEPLOYMENT_TARGET=\${MACOSX_DEPLOYMENT_TARGET}" > "$INSTALL_ROOT/build.log"
-DEF
-  assert_success
-
-  assert_build_log <<OUT
-MACOSX_DEPLOYMENT_TARGET=
-OUT
-
-  unstub uname
-  unstub sw_vers
 }
