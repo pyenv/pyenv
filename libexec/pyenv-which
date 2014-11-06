@@ -59,8 +59,11 @@ done
 if [ -x "$PYENV_COMMAND_PATH" ]; then
   echo "$PYENV_COMMAND_PATH"
 else
+  any_not_installed=0
   for version in "${versions[@]}"; do
-    any_not_installed=0
+    if [ "$version" = "system" ]; then
+      continue
+    fi
     if ! [ -d "${PYENV_ROOT}/versions/${version}" ]; then
       echo "pyenv: version \`$version' is not installed" >&2
       any_not_installed=1
