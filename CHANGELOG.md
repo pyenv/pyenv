@@ -1,5 +1,14 @@
 ## Version History
 
+#### 20141106
+
+* pyenv: Optimize pyenv-which. Thanks to @blueyed (#129)
+* python-build: Add Miniconda/Miniconda3 3.7.0 and Anaconda/Anaconda3 2.1.0 (#260)
+* python-build: Use HTTPS for mirror download URLs (#262)
+* python-build: Set `rpath` for `--shared` build of PyPy (#244)
+* python-build: Support `make altinstall` when building CPython/Stackless (#255)
+* python-build: Import recent changes from ruby-build v20141028 (#265)
+
 #### 20141012
 
 * python-build: Add new CPython releases; 3.2.6, 3.3.6 (#253)
@@ -16,7 +25,7 @@
 
 #### 20140924
 
-* pyenv: Fix an unintended behavior when user does not have write permission on $PYENV_ROOT (#230)
+* pyenv: Fix an unintended behavior when user does not have write permission on `$PYENV_ROOT` (#230)
 * pyenv: Fix a zsh completion issue (#232)
 * python-build: Add new PyPy release; pypy-2.4.0, pypy-2.4.0-src (#241)
 
@@ -25,7 +34,7 @@
 * pyenv: Fix zsh completion with multiple words (#215)
 * python-build: Display the package name of `hg` as `mercurial` in message (#212)
 * python-build: Unset `PIP_REQUIRE_VENV` during build (#216)
-* python-build: Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
+* python-build: Set `MACOSX_DEPLOYMENT_TARGET` from the product version of OS X (#219, #220)
 * python-build: Add new Jython release; jython2.7-beta3 (#223)
 
 #### 20140705
