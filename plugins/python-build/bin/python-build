@@ -911,15 +911,12 @@ after_install_package() {
 
 setup_builtin_patches() {
   local package_name="$1"
-  local package_patch_path="${PYTHON_BUILD_ROOT}/share/python-build/patches/${DEFINITION_PATH##*/}/${package_name}"
+  local package_patch_path="${DEFINITION_PATH%/*}/patches/${DEFINITION_PATH##*/}/${package_name}"
 
   ORIG_HAS_PATCH="$HAS_PATCH"
 # Apply built-in patches if patch was not given from stdin
   if [ -z "$HAS_PATCH" ] && [ -d "${package_patch_path}" ]; then
-    local patch
-    { for patch in "${package_patch_path}"/*; do
-        [ -f "${patch}" ] && echo "${patch}"
-      done
+    { find "${package_patch_path}" -maxdepth 1 -type f
     } 2>/dev/null | sort | xargs cat 1>"${package_name}.patch"
     exec <&-
     exec <"${package_name}.patch"
