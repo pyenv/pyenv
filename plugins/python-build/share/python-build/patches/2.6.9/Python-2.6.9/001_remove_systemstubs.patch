@@ -1,0 +1,12 @@
+diff -ru ../Python-2.6.9/configure ./configure
+--- ../Python-2.6.9/configure	2013-10-29 17:04:39.000000000 +0200
++++ ./configure	2014-11-14 11:33:00.000000000 +0200
+@@ -7227,7 +7227,7 @@
+ 	#ARCH_RUN_32BIT="true"
+     fi
+ 
+-    LIBTOOL_CRUFT=$LIBTOOL_CRUFT" -lSystem -lSystemStubs -arch_only ${MACOSX_DEFAULT_ARCH}"
++    LIBTOOL_CRUFT=$LIBTOOL_CRUFT" -lSystem -arch_only ${MACOSX_DEFAULT_ARCH}"
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -install_name $(PYTHONFRAMEWORKINSTALLDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK)'
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -compatibility_version $(VERSION) -current_version $(VERSION)';;
+ esac
