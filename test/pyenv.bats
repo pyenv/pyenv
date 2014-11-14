@@ -45,11 +45,3 @@ load test_helper
   assert_failure
   assert_output "pyenv: cannot change working directory to \`$dir'"
 }
-
-@test "conflicting GREP_OPTIONS" {
-  file="${BATS_TMPDIR}/hello"
-  echo "hello" > "$file"
-  GREP_OPTIONS="-F" run pyenv grep "hell." "$file"
-  assert_success
-  assert_output "hello"
-}
