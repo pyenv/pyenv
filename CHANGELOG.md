@@ -1,5 +1,10 @@
 ## Version History
 
+#### 20141118
+
+* python-build: Fix broken `setup_builtin_patches` (#270)
+* python-build: Add a patch to allow building 2.6.9 on OS X 10.9 with `--enable-framework` (#269, #271)
+
 #### 20141106
 
 * pyenv: Optimize pyenv-which. Thanks to @blueyed (#129)
