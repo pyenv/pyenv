@@ -1,5 +1,9 @@
 ## Version History
 
+#### 20141127
+
+* python-build: Add new CPython release candidates; 2.7.9rc1 (#276)
+
 #### 20141118
 
 * python-build: Fix broken `setup_builtin_patches` (#270)
