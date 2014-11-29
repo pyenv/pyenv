@@ -841,8 +841,18 @@ pypy_architecture() {
 build_package_pypy() {
   build_package_copy
   { if [ ! -x "${PREFIX_PATH}/bin/python" ]; then
+      local pypy
       if [ -x "${PREFIX_PATH}/bin/pypy" ]; then
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "pypy" "python" )
+        pypy="${PREFIX_PATH}/bin/pypy"
+      elif [ -x "${PREFIX_PATH}/bin/pypy3" ]; then
+        pypy="${PREFIX_PATH}/bin/pypy3"
+      fi
+      if [ -e "${pypy}" ]; then
+        if [ -L "${pypy}" ]; then
+          ( cd "${PREFIX_PATH}/bin" && ln -fs "$(resolve_link "${pypy}")" "python" )
+        else
+          ( cd "${PREFIX_PATH}/bin" && ln -fs "${pypy}" "python" )
+        fi
       else
         echo "not a pypy binary distribution" 1>&3
         return 1
