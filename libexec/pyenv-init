@@ -121,7 +121,7 @@ if [ -r "$completion" ]; then
 fi
 
 if [ -z "$no_rehash" ]; then
-  echo 'pyenv rehash 2>/dev/null'
+  echo 'command pyenv rehash 2>/dev/null'
 fi
 
 commands=(`pyenv-commands --sh`)
