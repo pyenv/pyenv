@@ -12,6 +12,16 @@ if [ -n "$PYENV_DEBUG" ]; then
   set -x
 fi
 
+if enable -f "${0%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
+  abs_dirname() {
+    local path="$(realpath "$1")"
+    echo "${path%/*}"
+  }
+else
+  if [ -n "$PYENV_NATIVE_EXT" ]; then
+    echo "pyenv: failed to load \`realpath' builtin" >&2
+    exit 1
+  fi
 READLINK=$(type -p greadlink readlink | head -1)
 if [ -z "$READLINK" ]; then
   echo "pyenv: cannot find readlink - are you missing GNU coreutils?" >&2
@@ -37,6 +47,7 @@ abs_dirname() {
   pwd
   cd "$cwd"
 }
+fi
 
 if [ -z "${PYENV_ROOT}" ]; then
   PYENV_ROOT="${HOME}/.pyenv"
@@ -62,15 +73,20 @@ shopt -s nullglob
 
 bin_path="$(abs_dirname "$0")"
 for plugin_bin in "${PYENV_ROOT}/plugins/"*/bin; do
-  bin_path="${bin_path}:${plugin_bin}"
+  PATH="${plugin_bin}:${PATH}"
 done
 export PATH="${bin_path}:${PATH}"
 
-hook_path="${PYENV_HOOK_PATH}:${PYENV_ROOT}/pyenv.d:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib/pyenv/hooks"
+PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${PYENV_ROOT}/pyenv.d"
+if [ "${bin_path%/*}" != "$PYENV_ROOT" ]; then
+  # Add pyenv's own `pyenv.d` unless pyenv was cloned to PYENV_ROOT
+  PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${bin_path%/*}/pyenv.d"
+fi
+PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib/pyenv/hooks"
 for plugin_hook in "${PYENV_ROOT}/plugins/"*/etc/pyenv.d; do
-  hook_path="${hook_path}:${plugin_hook}"
+  PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${plugin_hook}"
 done
-export PYENV_HOOK_PATH="$hook_path"
+export PYENV_HOOK_PATH
 
 shopt -u nullglob
 

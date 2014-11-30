@@ -8,7 +8,7 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   echo --path
-  exec pyenv shims --short
+  exec pyenv-shims --short
 fi
 
 if [ "$1" = "--path" ]; then

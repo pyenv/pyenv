@@ -12,7 +12,7 @@ set -e
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
-  exec pyenv shims --short
+  exec pyenv-shims --short
 fi
 
 remove_from_path() {

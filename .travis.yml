@@ -1,6 +1,6 @@
-install: git clone --depth 1 https://github.com/sstephenson/bats.git
-script: script/test
+install: git clone https://github.com/sstephenson/bats.git
+script: PATH="./bats/bin:$PATH" test/run && ( cd plugins/python-build bats ${CI:+--tap} test )
 language: c
-notifications:
-  email:
-    on_success: never
+env:
+  - PYENV_NATIVE_EXT=
+  - PYENV_NATIVE_EXT=1
