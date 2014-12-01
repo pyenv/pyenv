@@ -28,31 +28,7 @@ if [ -z "$shell" ]; then
   shell="$(basename "${shell:-$SHELL}")"
 fi
 
-READLINK=$(type -p greadlink readlink | head -1)
-if [ -z "$READLINK" ]; then
-  echo "pyenv: cannot find readlink - are you missing GNU coreutils?" >&2
-  exit 1
-fi
-
-resolve_link() {
-  $READLINK "$1"
-}
-
-abs_dirname() {
-  local cwd="$(pwd)"
-  local path="$1"
-
-  while [ -n "$path" ]; do
-    cd "${path%/*}"
-    local name="${path##*/}"
-    path="$(resolve_link "$name" || true)"
-  done
-
-  pwd
-  cd "$cwd"
-}
-
-root="$(abs_dirname "$0")/.."
+root="${0%/*}/.."
 
 if [ -z "$print" ]; then
   case "$shell" in
@@ -92,22 +68,13 @@ fi
 
 mkdir -p "${PYENV_ROOT}/"{shims,versions}
 
-if [[ ":${PATH}:" != *:"${PYENV_ROOT}/shims":* ]]; then
-  case "$shell" in
-  fish )
-    echo "setenv PATH '${PYENV_ROOT}/shims' \$PATH"
-  ;;
-  * )
-    echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
-  ;;
-  esac
-fi
-
 case "$shell" in
 fish )
+  echo "setenv PATH '${PYENV_ROOT}/shims' \$PATH"
   echo "setenv PYENV_SHELL $shell"
 ;;
 * )
+  echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
   echo "export PYENV_SHELL=$shell"
 ;;
 esac

@@ -18,7 +18,7 @@ set -e
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
-  exec pyenv shims --short
+  exec pyenv-shims --short
 fi
 
 PYENV_VERSION="$(pyenv-version-name)"
