@@ -1775,11 +1775,17 @@ python_bin_suffix() {
   case "$1" in
   2.* | 3.* )
     version_name="$1"
+    version_name="${version_name%-dev}"
+    version_name="${version_name%-rc*}"
+    version_name="${version_name%rc*}"
     version_info=(${version_name//./ })
     echo "${version_info[0]}.${version_info[1]}"
     ;;
   stackless-2.* | stackless-3.* )
     version_name="${1#stackless-}"
+    version_name="${version_name%-dev}"
+    version_name="${version_name%-rc*}"
+    version_name="${version_name%rc*}"
     version_info=(${version_name//./ })
     echo "${version_info[0]}.${version_info[1]}"
     ;;
