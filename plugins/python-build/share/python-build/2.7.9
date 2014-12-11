@@ -1,0 +1,3 @@
+#require_gcc
+install_package "readline-6.3" "http://ftpmirror.gnu.org/readline/readline-6.3.tar.gz#56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43" standard --if has_broken_mac_readline
+install_package "Python-2.7.9" "https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz#c8bba33e66ac3201dabdc556f0ea7cfe6ac11946ec32d357c4c6f9b018c12c5b" ldflags_dirs standard verify_py27 ensurepip
