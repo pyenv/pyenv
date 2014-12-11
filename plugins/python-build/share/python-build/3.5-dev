@@ -1,0 +1,3 @@
+#require_gcc
+install_package "readline-6.3" "http://ftpmirror.gnu.org/readline/readline-6.3.tar.gz#56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43" standard --if has_broken_mac_readline
+install_hg "Python-3.5-dev" "https://bitbucket.org/mirror/cpython" "default" standard verify_py35 ensurepip
