@@ -1,0 +1,13 @@
+Only in .: 003_system_library_path_in_sys_path.patch
+diff -ur ../Python-2.7.3/Lib/site.py ./Lib/site.py
+--- ../Python-2.7.3/Lib/site.py	2012-04-10 02:07:31.000000000 +0300
++++ ./Lib/site.py	2014-12-12 11:35:33.000000000 +0200
+@@ -312,7 +312,7 @@
+             # locations.
+             from sysconfig import get_config_var
+             framework = get_config_var("PYTHONFRAMEWORK")
+-            if framework:
++            if False and framework:
+                 sitepackages.append(
+                         os.path.join("/Library", framework,
+                             sys.version[:3], "site-packages"))
