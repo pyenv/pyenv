@@ -1,0 +1,35 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  install_nightly_package "pypy-c-jit-latest-linux" "http://buildbot.pypy.org/nightly/trunk/pypy-c-jit-latest-linux.tar.bz2" "pypy-c-jit-*-linux" "pypy" verify_py27 ensurepip
+  ;;
+"linux-armel" )
+  install_nightly_package "pypy-c-jit-latest-linux-armel" "http://buildbot.pypy.org/nightly/trunk/pypy-c-jit-latest-linux-armel.tar.bz2" "pypy-c-jit-*-linux-armel" "pypy" verify_py27 ensurepip
+  ;;
+"linux-armhf" )
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
+    install_nightly_package "pypy-c-jit-latest-linux-armhf-raspbian" "http://buildbot.pypy.org/nightly/trunk/pypy-c-jit-latest-linux-armhf-raspbian.tar.bz2" "pypy-c-jit-*-linux-armhf-raspbian" "pypy" verify_py27 ensurepip
+  else
+    install_nightly_package "pypy-c-jit-latest-linux-armhf-raring" "http://buildbot.pypy.org/nightly/trunk/pypy-c-jit-latest-linux-armhf-raring.tar.bz2" "pypy-c-jit-*-linux-armhf-raring" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"linux64" )
+  install_nightly_package "pypy-c-jit-latest-linux64" "http://buildbot.pypy.org/nightly/trunk/pypy-c-jit-latest-linux64.tar.bz2" "pypy-c-jit-*-linux64" "pypy" verify_py27 ensurepip
+  ;;
+"osx64" )
+  install_nightly_package "pypy-c-jit-latest-osx64" "http://buildbot.pypy.org/nightly/trunk/pypy-c-jit-latest-osx64.tar.bz2" "pypy-c-jit-*-osx64" "pypy" verify_py27 ensurepip
+  ;;
+"freebsd64" )
+  install_nightly_package "pypy-c-jit-latest-freebsd64" "http://buildbot.pypy.org/nightly/trunk/pypy-c-jit-latest-freebsd64.tar.bz2" "pypy-c-jit-*-freebsd64" "pypy" verify_py27 ensurepip
+  ;;
+#"win32" )
+#  install_zip "pypy-c-jit-latest-win32" "http://buildbot.pypy.org/nightly/trunk/pypy-c-jit-latest-win32.zip" "pypy" verify_py27 ensurepip
+#  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

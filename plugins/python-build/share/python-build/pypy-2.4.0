@@ -1,10 +1,10 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  require_distro "Ubuntu 10.04" || true
+  require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" || true
   install_package "pypy-2.4.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux.tar.bz2#a24adb366f87ac0eba829d7188a156a7d897e71893689fab06502c3f4152ac0e" "pypy" verify_py27 ensurepip
   ;;
 "linux-armel" )
-  require_distro "Ubuntu 12.04" || true
+  require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" || true
   install_package "pypy-2.4.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux-armel.tar.bz2#8362d634bf86fbfb3b99b578b13c0a9fd673b2b7580d6d65b4a181934c659ccd" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )

@@ -21,7 +21,7 @@ load test_helper
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - bash
   assert_success
-  assert_line "source '${root}/libexec/../completions/pyenv.bash'"
+  assert_line "source '${root}/test/../libexec/../completions/pyenv.bash'"
 }
 
 @test "detect parent shell" {
@@ -35,7 +35,7 @@ load test_helper
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - fish
   assert_success
-  assert_line ". '${root}/libexec/../completions/pyenv.fish'"
+  assert_line ". '${root}/test/../libexec/../completions/pyenv.fish'"
 }
 
 @test "fish instructions" {
@@ -68,7 +68,7 @@ load test_helper
   export PATH="${PYENV_ROOT}/shims:$PATH"
   run pyenv-init - bash
   assert_success
-  refute_line 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  assert_line 0 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
 }
 
 @test "doesn't add shims to PATH more than once (fish)" {
@@ -76,4 +76,21 @@ load test_helper
   run pyenv-init - fish
   assert_success
   refute_line 'setenv PATH "'${PYENV_ROOT}'/shims" $PATH ;'
+}
+
+@test "outputs sh-compatible syntax" {
+  run pyenv-init - bash
+  assert_success
+  assert_line '  case "$command" in'
+
+  run pyenv-init - zsh
+  assert_success
+  assert_line '  case "$command" in'
+}
+
+@test "outputs fish-specific syntax (fish)" {
+  run pyenv-init - fish
+  assert_success
+  assert_line '  switch "$command"'
+  refute_line '  case "$command" in'
 }
