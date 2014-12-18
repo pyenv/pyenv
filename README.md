@@ -171,8 +171,7 @@ easy to fork and contribute any changes back upstream.
 1. **Check out pyenv where you want it installed.**
    A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else).
 
-        $ cd
-        $ git clone git://github.com/yyuu/pyenv.git .pyenv
+        $ git clone git://github.com/yyuu/pyenv.git ~/.pyenv
 
 
 2. **Define environment variable `PYENV_ROOT`** to point to the path where
