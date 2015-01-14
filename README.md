@@ -1,6 +1,6 @@
 # Simple Python Version Management: pyenv
 
-[![Build Status](https://travis-ci.org/yyuu/pyenv.png)](https://travis-ci.org/yyuu/pyenv)
+[![Build Status](https://travis-ci.org/yyuu/pyenv.svg)](https://travis-ci.org/yyuu/pyenv)
 
 pyenv lets you easily switch between multiple versions of Python. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
