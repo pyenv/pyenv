@@ -17,8 +17,18 @@ if [ "$1" = "--complete" ]; then
   exec pyenv versions --bare
 fi
 
+usage() {
+  # We can remove the sed fallback once pyenv 0.4.0 is widely available
+  pyenv-help uninstall 2>/dev/null || sed -ne '/^#/!q;s/.//;s/.//;1,4d;p' < "$0"
+  [ -z "$1" ] || exit "$1"
+}
+
 if [ -z "$PYENV_ROOT" ]; then
   PYENV_ROOT="${HOME}/.pyenv"
+fi
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  usage 0
 fi
 
 unset FORCE
@@ -27,14 +37,12 @@ if [ "$1" = "-f" ] || [ "$1" = "--force" ]; then
   shift
 fi
 
+[ "$#" -eq 1 ] || usage 1 >&2
+
 DEFINITION="$1"
 case "$DEFINITION" in
 "" | -* )
-  # We can remove the sed fallback once pyenv 0.4.0 is widely available.
-  { pyenv-help uninstall 2>/dev/null ||
-    sed -ne '/^#/!q;s/.\{1,2\}//;1,4d;p' < "$0"
-  } >&2
-  exit 1
+  usage 1 >&2
   ;;
 esac
 

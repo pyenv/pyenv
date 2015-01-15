@@ -146,3 +146,42 @@ ${PYENV_ROOT}/plugins/bar/share/python-build
 ${PYENV_ROOT}/plugins/foo/share/python-build
 OUT
 }
+
+@test "not enough arguments for pyenv-install" {
+  stub_python_build
+  run pyenv-install
+  assert_failure
+  assert_output_contains 'Usage: pyenv install'
+}
+
+@test "too many arguments for pyenv-install" {
+  stub_python_build
+  run pyenv-install 3.4.1 3.4.2
+  assert_failure
+  assert_output_contains 'Usage: pyenv install'
+}
+
+@test "show help for pyenv-install" {
+  stub_python_build
+  run pyenv-install -h
+  assert_success
+  assert_output_contains 'Usage: pyenv install'
+}
+
+@test "not enough arguments pyenv-uninstall" {
+  run pyenv-uninstall
+  assert_failure
+  assert_output_contains 'Usage: pyenv uninstall'
+}
+
+@test "too many arguments for pyenv-uninstall" {
+  run pyenv-uninstall 3.4.1 3.4.2
+  assert_failure
+  assert_output_contains 'Usage: pyenv uninstall'
+}
+
+@test "show help for pyenv-uninstall" {
+  run pyenv-uninstall -h
+  assert_success
+  assert_output_contains 'Usage: pyenv uninstall'
+}
