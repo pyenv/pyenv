@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+#
+# Usage: python-build [-kvp] <definition> <prefix>
+#        python-build --definitions
+#
+#   -k/--keep        Do not remove source tree after installation
+#   -v/--verbose     Verbose mode: print compilation status to stdout
+#   -p/--patch       Apply a patch from stdin before building
+#   --definitions    List all built-in definitions
+#   -g/--debug       Build a debug version
+#
 
 PYTHON_BUILD_VERSION="20141028"
 
@@ -495,7 +505,7 @@ fetch_svn() {
   if type svn &>/dev/null; then
     svn co -r "$svn_rev" "$svn_url" "${package_name}" >&4 2>&1
   else
-    echo "error: please install \`svn\` and try again" >&2
+    echo "error: please install Subversion and try again" >&2
     exit 1
   fi
 }
@@ -644,7 +654,6 @@ build_package_standard() {
   local PACKAGE_MAKE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
   local PACKAGE_MAKE_INSTALL_OPTS="${package_var_name}_MAKE_INSTALL_OPTS"
   local PACKAGE_MAKE_INSTALL_OPTS_ARRAY="${package_var_name}_MAKE_INSTALL_OPTS_ARRAY[@]"
-  local PACKAGE_MAKE_INSTALL_TARGET="${package_var_name}_MAKE_INSTALL_TARGET"
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
   [ "$package_var_name" = "PYTHON" ] && use_homebrew_readline || true
@@ -661,7 +670,7 @@ build_package_standard() {
   ) >&4 2>&1
 
   { "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
-    "$MAKE" "${!PACKAGE_MAKE_INSTALL_TARGET:-install}" $MAKE_INSTALL_OPTS ${!PACKAGE_MAKE_INSTALL_OPTS} "${!PACKAGE_MAKE_INSTALL_OPTS_ARRAY}"
+    "$MAKE" install $MAKE_INSTALL_OPTS ${!PACKAGE_MAKE_INSTALL_OPTS} "${!PACKAGE_MAKE_INSTALL_OPTS_ARRAY}"
   } >&4 2>&1
 }
 
@@ -1098,7 +1107,15 @@ require_llvm() {
   local llvm_version="$1"
   if [ "$(uname -s)" = "Darwin" ] && [ "$(osx_version)" -ge 1010 ]; then
     if [[ "$PYTHON_CONFIGURE_OPTS" != *--llvm-* ]]; then
-      package_option python configure --prebuilt-name="llvm-3.2-x86_64-apple-darwin13.tar.bz2"
+      if [ "$llvm_version" = "3.2" ]; then
+        package_option python configure --prebuilt-name="llvm-3.2-x86_64-apple-darwin13.tar.bz2"
+      else
+        local llvm_prefix="$(brew --prefix llvm 2>/dev/null || true)"
+        local llvm_config="${llvm_prefix}/bin/llvm-config"
+        if [ -x "$llvm_config" ]; then
+          package_option python configure --llvm-config="$llvm_config"
+        fi
+      fi
     fi
   fi
 }
@@ -1519,14 +1536,8 @@ version() {
 }
 
 usage() {
-  { version
-    echo "usage: python-build [-k|--keep] [-v|--verbose] [-p|--patch] [-g|--debug] definition prefix"
-    echo "       python-build --definitions"
-  } >&2
-
-  if [ -z "$1" ]; then
-    exit 1
-  fi
+  sed -ne '/^#/!q;s/.\{1,2\}//;1,2d;p' < "$0"
+  [ -z "$1" ] || exit "$1"
 }
 
 list_definitions() {
@@ -1558,16 +1569,9 @@ parse_options "$@"
 for option in "${OPTIONS[@]}"; do
   case "$option" in
   "h" | "help" )
-    usage without_exiting
-    { echo
-      echo "  -k/--keep        Do not remove source tree after installation"
-      echo "  -v/--verbose     Verbose mode: print compilation status to stdout"
-      echo "  -p/--patch       Apply a patch from stdin before building"
-      echo "  -g/--debug       Build a debug version"
-      echo "  --definitions    List all built-in definitions"
-      echo
-    } >&2
-    exit 0
+    version
+    echo
+    usage 0
     ;;
   "definitions" )
     list_definitions
@@ -1592,9 +1596,11 @@ for option in "${OPTIONS[@]}"; do
   esac
 done
 
+[ "${#ARGUMENTS[@]}" -eq 2 ] || usage 1 >&2
+
 DEFINITION_PATH="${ARGUMENTS[0]}"
 if [ -z "$DEFINITION_PATH" ]; then
-  usage
+  usage 1 >&2
 elif [ ! -f "$DEFINITION_PATH" ]; then
   for DEFINITION_DIR in "${PYTHON_BUILD_DEFINITIONS[@]}"; do
     if [ -f "${DEFINITION_DIR}/${DEFINITION_PATH}" ]; then
@@ -1611,7 +1617,7 @@ fi
 
 PREFIX_PATH="${ARGUMENTS[1]}"
 if [ -z "$PREFIX_PATH" ]; then
-  usage
+  usage 1 >&2
 elif [ "${PREFIX_PATH#/}" = "$PREFIX_PATH" ]; then
   PREFIX_PATH="${PWD}/${PREFIX_PATH}"
 fi

@@ -106,6 +106,8 @@ for option in "${OPTIONS[@]}"; do
   esac
 done
 
+[ "${#ARGUMENTS[@]}" -le 1 ] || usage 1 >&2
+
 unset VERSION_NAME
 
 # The first argument contains the definition to install. If the
@@ -114,8 +116,7 @@ unset VERSION_NAME
 # version is not specified.
 DEFINITION="${ARGUMENTS[0]}"
 [ -n "$DEFINITION" ] || DEFINITION="$(pyenv-local 2>/dev/null || true)"
-[ -n "$DEFINITION" ] || usage 1
-
+[ -n "$DEFINITION" ] || usage 1 >&2
 
 # Define `before_install` and `after_install` functions that allow
 # plugin hooks to register a string of code for execution before or
