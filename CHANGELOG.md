@@ -1,5 +1,12 @@
 ## Version History
 
+#### 20141211
+
+* pyenv: Add bulit-in `pip-rehash` feature. You don't need to install [pyenv-pip-rehash](https://github.com/yyuu/pyenv-pip-rehash) anymore.
+* python-build: Add new CPython release; 2.7.9 (#284)
+* python-build: Add new PyPy releases; pypy3-2.4.0, pypy3-2.4.0-src (#277)
+* python-build: Add build definitions of PyPy nightly build
+
 #### 20141127
 
 * python-build: Add new CPython release candidates; 2.7.9rc1 (#276)
