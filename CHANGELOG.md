@@ -1,5 +1,11 @@
 ## Version History
 
+#### 20150124
+
+* python-build: Import recent changes from ruby-build v20150112
+* python-build: Prevent adding `/Library/Python/X.X/site-packages` to `sys.path` whtn `--enable-framework` is enabled on OS X. Thanks @s1341 (#292)
+* python-build: Add new IronPython release; 2.7.5
+
 #### 20141211
 
 * pyenv: Add bulit-in `pip-rehash` feature. You don't need to install [pyenv-pip-rehash](https://github.com/yyuu/pyenv-pip-rehash) anymore.
