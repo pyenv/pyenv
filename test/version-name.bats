@@ -57,9 +57,5 @@ setup() {
   cat > ".ruby-version" <<<"ruby-1.8.7"
   run rbenv-version-name
   assert_success
-  assert_output <<OUT
-warning: ignoring extraneous \`ruby-' prefix in version \`ruby-1.8.7'
-         (set by ${PWD}/.ruby-version)
-1.8.7
-OUT
+  assert_output "1.8.7"
 }

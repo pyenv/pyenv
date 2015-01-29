@@ -21,9 +21,6 @@ version_exists() {
 if version_exists "$RBENV_VERSION"; then
   echo "$RBENV_VERSION"
 elif version_exists "${RBENV_VERSION#ruby-}"; then
-  { echo "warning: ignoring extraneous \`ruby-' prefix in version \`${RBENV_VERSION}'"
-    echo "         (set by $(rbenv-version-origin))"
-  } >&2
   echo "${RBENV_VERSION#ruby-}"
 else
   echo "rbenv: version \`$RBENV_VERSION' is not installed" >&2
