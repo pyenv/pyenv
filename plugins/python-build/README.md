@@ -105,7 +105,7 @@ process.
   configure and make options for buildling CPython. These variables will
   be passed to Python only, not any dependent packages (e.g. libyaml).
 
-### Building with shared library
+### Building as `--enable-shared`
 
 You can build CPython with `--enable-shared` to install a version with
 shared object.
