@@ -1338,13 +1338,21 @@ verify_python() {
   # Not create symlinks on `altinstall` (#255)
   if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
     local suffix="${1#python}"
-    local file
+    local file link
     shopt -s nullglob
     for file in "${PREFIX_PATH}/bin"/*; do
-      local link
+      unset link
       case "${file}" in
-      *"-${suffix}" ) link="${file%%-${suffix}}" ;;
-      *"${suffix}" )  link="${file%%${suffix}}"  ;;
+      */"python${suffix}-config" )
+        # Symlink `pythonX.Y-config` to `python-config` if `python-config` is missing (#296)
+        link="${file%/*}/python-config"
+      ;;
+      */*"-${suffix}" )
+        link="${file%%-${suffix}}"
+      ;;
+      */*"${suffix}" )
+        link="${file%%${suffix}}"
+      ;;
       esac
       if [ -n "$link" ] && [ ! -e "$link" ]; then
         ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
