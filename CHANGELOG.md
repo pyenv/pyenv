@@ -1,5 +1,13 @@
 ## Version History
 
+#### 20150204
+
+* python-build: Add PyPy 2.5.0 release (#311)
+* python-build: Add note about `--enable-shared` and RPATH (#217)
+* python-build: Fix regression of `PYTHON_MAKE_INSTALL_TARGET` and add test (#255)
+* python-build: Symlink `pythonX.Y-config` to `python-config` if `python-config` is missing (#296)
+* python-build: Latest `pip` can't be installed into `3.0.1` (#309)
+
 #### 20150124
 
 * python-build: Import recent changes from ruby-build v20150112
