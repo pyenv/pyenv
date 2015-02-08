@@ -50,15 +50,13 @@ if [ -z "$print" ]; then
   esac
 
   { echo "# Load pyenv automatically by adding"
+    echo "# the following to the end of ${profile}:"
+    echo
     case "$shell" in
     fish )
-      echo "# the following to the end of ${profile}:"
-      echo
       echo 'status --is-interactive; and . (pyenv init -|psub)'
       ;;
     * )
-      echo "# the following to ${profile}:"
-      echo
       echo 'eval "$(pyenv init -)"'
       ;;
     esac
