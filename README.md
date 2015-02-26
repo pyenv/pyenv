@@ -55,8 +55,6 @@ RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
   * [rbenv which](#rbenv-which)
   * [rbenv whence](#rbenv-whence)
 * [Development](#development)
-  * [Version History](#version-history)
-  * [License](#license)
 
 ## How It Works
 
