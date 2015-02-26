@@ -1,5 +1,11 @@
 ## Version History
 
+#### 20150226
+
+* python-build: Add CPython release; 3.4.3 (#323)
+* python-build: Add CPython alpha release; 3.5.0a1 (#324)
+* python-build: Add Miniconda/Miniconda3 3.8.3 (#318)
+
 #### 20150204
 
 * python-build: Add PyPy 2.5.0 release (#311)
