@@ -1,7 +1,10 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" || true
-  install_package "pypy-2.5.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.0-linux.tar.bz2#3dfd56a986d25929b4ed9f40a5484f72f1d513cd816cf8aaa683106c3391247c" "pypy" verify_py27 ensurepip
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy-2.5.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.0-linux.tar.bz2#3dfd56a986d25929b4ed9f40a5484f72f1d513cd816cf8aaa683106c3391247c" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-2.5-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.5-linux_i686-portable.tar.bz2#6cbe3e1a48900f22c8e4412f82906fba92dd4a165bac5fe6866a2a26383fe3b8" "pypy" verify_py27 ensurepip
+  fi
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" || true
@@ -16,8 +19,11 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "linux64" )
-  require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.5.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.0-linux64.tar.bz2#7764fb6b662407f8709eaa334c542aac9cb6bfe3291ac198dad0980ca129f3c2" "pypy" verify_py27 ensurepip
+  if require_distro "Ubuntu 12.04" 1>/dev/null 2>&1; then
+    install_package "pypy-2.5.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.0-linux64.tar.bz2#7764fb6b662407f8709eaa334c542aac9cb6bfe3291ac198dad0980ca129f3c2" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-2.5-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.5-linux_x86_64-portable.tar.bz2#26c5a0964b32b09be0282766c27937c843a12b6820ff2d440c6d47a6092837e0" "pypy" verify_py27 ensurepip
+  fi
   ;;
 "osx64" )
   install_package "pypy-2.5.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.0-osx64.tar.bz2#30b392b969b54cde281b07f5c10865a7f2e11a229c46b8af384ca1d3fe8d4e6e" "pypy" verify_py27 ensurepip
