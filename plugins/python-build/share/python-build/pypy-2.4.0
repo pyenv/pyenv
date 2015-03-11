@@ -1,7 +1,10 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" || true
-  install_package "pypy-2.4.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux.tar.bz2#a24adb366f87ac0eba829d7188a156a7d897e71893689fab06502c3f4152ac0e" "pypy" verify_py27 ensurepip
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy-2.4.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux.tar.bz2#a24adb366f87ac0eba829d7188a156a7d897e71893689fab06502c3f4152ac0e" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-2.4-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.4-linux_i686-portable.tar.bz2" "pypy" verify_py27 ensurepip
+  fi
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" || true
@@ -16,8 +19,11 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "linux64" )
-  require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.4.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux64.tar.bz2#27cdc0d6e8bce2637678f6d076fc780877dffe1bf9aec9e253f95219af9ed099" "pypy" verify_py27 ensurepip
+  if require_distro "Ubuntu 12.04" 1>/dev/null 2>&1; then
+    install_package "pypy-2.4.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux64.tar.bz2#27cdc0d6e8bce2637678f6d076fc780877dffe1bf9aec9e253f95219af9ed099" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-2.4-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.4-linux_x86_64-portable.tar.bz2" "pypy" verify_py27 ensurepip
+  fi
   ;;
 "osx64" )
   install_package "pypy-2.4.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-osx64.tar.bz2#3eb8afdfa42bc9b08b4d3058e21d4ce978a52722fdcfdc67d6c3ee5013a51aaa" "pypy" verify_py27 ensurepip
