@@ -54,6 +54,7 @@ RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
   * [rbenv rehash](#rbenv-rehash)
   * [rbenv which](#rbenv-which)
   * [rbenv whence](#rbenv-whence)
+* [Environment variables](#environment-variables)
 * [Development](#development)
 
 ## How It Works
@@ -403,6 +404,18 @@ Lists all Ruby versions with the given command installed.
     jruby-1.7.1
     ree-1.8.7-2011.03
 
+## Environment variables
+
+You can affect how rbenv operates with the following settings:
+
+name | default | description
+-----|---------|------------
+`RBENV_VERSION` | | Specifies the Ruby version to be used.<br>Also see [`rbenv shell`](#rbenv-shell)
+`RBENV_ROOT` | `~/.rbenv` | Defines the directory under which Ruby versions and shims reside.<br>Also see `rbenv root`
+`RBENV_DEBUG` | | Outputs debug information.<br>Also as: `rbenv --debug <subcommand>`
+`RBENV_HOOK_PATH` | [_see wiki_][hooks] | Colon-separated list of paths searched for rbenv hooks.
+`RBENV_DIR` | `$PWD` | Directory to start searching for `.ruby-version` files.
+
 ## Development
 
 The rbenv source code is [hosted on
@@ -419,3 +432,4 @@ tracker](https://github.com/sstephenson/rbenv/issues).
 
 
   [ruby-build]: https://github.com/sstephenson/ruby-build#readme
+  [hooks]: https://github.com/sstephenson/rbenv/wiki/Authoring-plugins#rbenv-hooks
