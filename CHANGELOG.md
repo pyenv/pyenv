@@ -1,5 +1,12 @@
 ## Version History
 
+#### 20150326
+
+* python-build: Add Portable PyPy binaries from https://github.com/squeaky-pl/portable-pypy (#329)
+* python-build: Add CPython alpha release; 3.5.0a2 (#328)
+* python-build: Add pypy-2.5.1 (fixes #338)
+* pyenv: Import recent changes from rbenv 4d72eefffc548081f6eee2e54d3b9116b9f9ee8e
+
 #### 20150226
 
 * python-build: Add CPython release; 3.4.3 (#323)
