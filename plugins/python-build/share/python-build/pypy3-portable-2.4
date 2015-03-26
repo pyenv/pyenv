@@ -1,0 +1,16 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  install_package "pypy3-2.4-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3-2.4-linux_i686-portable.tar.bz2#7ce050b4928dc58f7e9dd01e3e48c443c85616ca83f4bcc9147f1078d0fd126c" "pypy" verify_py32 ensurepip
+  ;;
+"linux64" )
+  install_package "pypy3-2.4-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3-2.4-linux_x86_64-portable.tar.bz2#7b3e0f0bc924bd0d68d85c0b566979e74a2b366595db3d81502267367370a5fb" "pypy" verify_py32 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": Portable PyPy3 is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

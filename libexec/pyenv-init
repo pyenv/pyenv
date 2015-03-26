@@ -50,7 +50,7 @@ if [ -z "$print" ]; then
   esac
 
   { echo "# Load pyenv automatically by adding"
-    echo "# the following to ${profile}:"
+    echo "# the following to the end of ${profile}:"
     echo
     case "$shell" in
     fish )

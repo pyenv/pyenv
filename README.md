@@ -1,6 +1,6 @@
 # Simple Python Version Management: pyenv
 
-[![Build Status](https://travis-ci.org/yyuu/pyenv.png)](https://travis-ci.org/yyuu/pyenv)
+[![Build Status](https://travis-ci.org/yyuu/pyenv.svg)](https://travis-ci.org/yyuu/pyenv)
 
 pyenv lets you easily switch between multiple versions of Python. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
@@ -171,8 +171,7 @@ easy to fork and contribute any changes back upstream.
 1. **Check out pyenv where you want it installed.**
    A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else).
 
-        $ cd
-        $ git clone git://github.com/yyuu/pyenv.git .pyenv
+        $ git clone https://github.com/yyuu/pyenv.git ~/.pyenv
 
 
 2. **Define environment variable `PYENV_ROOT`** to point to the path where

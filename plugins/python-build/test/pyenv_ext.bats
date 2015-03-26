@@ -138,3 +138,24 @@ OUT
   unstub make
   unstub patch
 }
+
+@test "allow custom make install target" {
+  cached_tarball "Python-3.2.1"
+
+  stub brew false
+  stub "$MAKE" \
+    " : echo \"$MAKE \$@\" >> build.log" \
+    " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
+
+  PYTHON_MAKE_INSTALL_TARGET="altinstall" TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
+  assert_success
+
+  assert_build_log <<OUT
+Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+make -j 2
+make altinstall
+OUT
+
+  unstub make
+}

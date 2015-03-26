@@ -25,9 +25,6 @@ OLDIFS="$IFS"
     if version_exists "$version" || [ "$version" = "system" ]; then
       versions=("${versions[@]}" "${version}")
     elif version_exists "${version#python-}"; then
-      { echo "warning: ignoring extraneous \`python-' prefix in version \`${version}'"
-        echo "         (set by $(pyenv-version-origin))"
-      } >&2
       versions=("${versions[@]}" "${version#python-}")
     else
       echo "pyenv: version \`$version' is not installed" >&2

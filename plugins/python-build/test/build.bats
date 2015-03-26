@@ -5,6 +5,7 @@ export PYTHON_BUILD_CACHE_PATH="$TMP/cache"
 export MAKE=make
 export MAKE_OPTS="-j 2"
 export CC=cc
+export -n PYTHON_CONFIGURE_OPTS
 
 setup() {
   mkdir -p "$INSTALL_ROOT"
@@ -446,6 +447,18 @@ OUT
 }
 
 @test "JRuby+Graal does not install launchers" {
+  # nop
+}
+
+@test "JRuby Java 7 missing" {
+  # nop
+}
+
+@test "JRuby Java is outdated" {
+  # nop
+}
+
+@test "JRuby Java 7 up-to-date" {
   # nop
 }
 

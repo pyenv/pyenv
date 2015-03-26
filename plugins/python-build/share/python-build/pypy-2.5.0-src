@@ -1,0 +1,2 @@
+require_gcc
+install_package "pypy-pypy-10f1b29a2bd2" "https://bitbucket.org/pypy/pypy/get/release-2.5.0.tar.bz2#8d644a55a3150cf3d18536c784e3410bb3f3438c1505000c4f761863bacedf88" "pypy_builder" verify_py27 ensurepip

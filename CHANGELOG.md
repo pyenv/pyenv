@@ -1,5 +1,39 @@
 ## Version History
 
+#### 20150326
+
+* python-build: Add Portable PyPy binaries from https://github.com/squeaky-pl/portable-pypy (#329)
+* python-build: Add CPython alpha release; 3.5.0a2 (#328)
+* python-build: Add pypy-2.5.1 (fixes #338)
+* pyenv: Import recent changes from rbenv 4d72eefffc548081f6eee2e54d3b9116b9f9ee8e
+
+#### 20150226
+
+* python-build: Add CPython release; 3.4.3 (#323)
+* python-build: Add CPython alpha release; 3.5.0a1 (#324)
+* python-build: Add Miniconda/Miniconda3 3.8.3 (#318)
+
+#### 20150204
+
+* python-build: Add PyPy 2.5.0 release (#311)
+* python-build: Add note about `--enable-shared` and RPATH (#217)
+* python-build: Fix regression of `PYTHON_MAKE_INSTALL_TARGET` and add test (#255)
+* python-build: Symlink `pythonX.Y-config` to `python-config` if `python-config` is missing (#296)
+* python-build: Latest `pip` can't be installed into `3.0.1` (#309)
+
+#### 20150124
+
+* python-build: Import recent changes from ruby-build v20150112
+* python-build: Prevent adding `/Library/Python/X.X/site-packages` to `sys.path` whtn `--enable-framework` is enabled on OS X. Thanks @s1341 (#292)
+* python-build: Add new IronPython release; 2.7.5
+
+#### 20141211
+
+* pyenv: Add bulit-in `pip-rehash` feature. You don't need to install [pyenv-pip-rehash](https://github.com/yyuu/pyenv-pip-rehash) anymore.
+* python-build: Add new CPython release; 2.7.9 (#284)
+* python-build: Add new PyPy releases; pypy3-2.4.0, pypy3-2.4.0-src (#277)
+* python-build: Add build definitions of PyPy nightly build
+
 #### 20141127
 
 * python-build: Add new CPython release candidates; 2.7.9rc1 (#276)
