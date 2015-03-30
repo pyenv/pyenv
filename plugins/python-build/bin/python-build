@@ -1140,13 +1140,13 @@ require_java() {
 
 require_distro() {
   for arg; do
-    if [[ "$(cat /etc/issue 2>/dev/null || true)" == "$1"* ]]; then
+    if [[ "$(cat /etc/issue 2>/dev/null || true)" == "$arg"* ]]; then
       return 0
     fi
   done
   { echo
     colorize 1 "WARNING"
-    echo ": This binary distribution is built for $1."
+    echo ": This binary distribution is built for the following distro(s): $@."
     echo "installed binary may not run expectedly on other platforms."
     echo
   } >&2
