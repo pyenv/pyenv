@@ -3,12 +3,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy-2.5.1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.1-linux.tar.bz2#c0035a2650cafcb384050a8c476ddc41c9fd40b0c3677fab68026f57c715907a" "pypy" verify_py27 ensurepip
   else
-    # FIXME: portable distribution not yet available
-    echo
-    colorize 1 "ERROR"
-    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
-    echo "try 'pypy-2.5.1-src' to build from soruce."
-    echo
+    install_package "pypy-2.5.1-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.5.1-linux_i686-portable.tar.bz2#ed532ddde3332d10faa59af49854cacbca458c597889352e619a87ab22363063" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
@@ -27,12 +22,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy-2.5.1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.1-linux64.tar.bz2#68e0955dbc80a0d51dfa9a8a76d8623f34920ece1bcbc6d910c2be019a653ba8" "pypy" verify_py27 ensurepip
   else
-    # FIXME: portable distribution not yet available
-    echo
-    colorize 1 "ERROR"
-    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
-    echo "try 'pypy-2.5.1-src' to build from soruce."
-    echo
+    install_package "pypy-2.5.1-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.5.1-linux_x86_64-portable.tar.bz2#157bee6349878cf0ef575b0d7bfd6cbb837c00e83b2872c924580ef7bc32c0d7" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
