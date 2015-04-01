@@ -39,8 +39,8 @@ sed "
   s,@SHOBJ_CC@,${SHOBJ_CC},
   s,@SHOBJ_CFLAGS@,${SHOBJ_CFLAGS},
   s,@SHOBJ_LD@,${SHOBJ_LD},
-  s,@SHOBJ_LDFLAGS@,${SHOBJ_LDFLAGS//,/\,},
-  s,@SHOBJ_XLDFLAGS@,${SHOBJ_XLDFLAGS//,/\,},
+  s,@SHOBJ_LDFLAGS@,${SHOBJ_LDFLAGS//,/\\,},
+  s,@SHOBJ_XLDFLAGS@,${SHOBJ_XLDFLAGS//,/\\,},
   s,@SHOBJ_LIBS@,${SHOBJ_LIBS},
   s,@SHOBJ_STATUS@,${SHOBJ_STATUS},
 " "$src_dir"/Makefile.in > "$src_dir"/Makefile
