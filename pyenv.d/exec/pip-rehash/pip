@@ -19,8 +19,9 @@ export PATH="${PYENV_BIN_PATH}:${PATH}"
 STATUS=0
 "$PYENV_COMMAND_PATH" "$@" || STATUS="$?"
 
-# Run `pyenv-rehash` after a successful installation.
-if [ "$STATUS" == "0" ]; then
+# Run `pyenv-rehash` after a successful installation,
+# unless rehash is explicitly disabled.
+if [ "$STATUS" == "0" -a -z "$PYENV_NOREHASH" ]; then
   case "$1" in
   "install" | "uninstall" ) pyenv-rehash;;
   esac
