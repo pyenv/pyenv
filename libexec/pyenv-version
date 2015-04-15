@@ -12,6 +12,7 @@ OLDIFS="$IFS"
 IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name))
 IFS="$OLDIFS"
 
+origin=$(pyenv-version-origin)
 for PYENV_VERSION_NAME in "${PYENV_VERSION_NAMES[@]}"; do
-  echo "$PYENV_VERSION_NAME (set by $(pyenv-version-origin))"
+  echo "$PYENV_VERSION_NAME (set by $origin)"
 done
