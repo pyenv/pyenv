@@ -8,7 +8,7 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   echo --short
-  exit
+  [ "$0" != "$BASH_SOURCE" ] && return || exit 0
 fi
 
 shopt -s nullglob

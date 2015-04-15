@@ -63,7 +63,7 @@ if [ -z "$print" ]; then
     echo
   } >&2
 
-  exit 1
+  [ "$0" != "$BASH_SOURCE" ] && return 1 || exit 1
 fi
 
 mkdir -p "${PYENV_ROOT}/"{shims,versions}

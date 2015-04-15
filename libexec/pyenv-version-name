@@ -4,13 +4,13 @@ set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 if [ -z "$PYENV_VERSION" ]; then
-  PYENV_VERSION_FILE="$(pyenv-version-file)"
-  PYENV_VERSION="$(pyenv-version-file-read "$PYENV_VERSION_FILE" || true)"
+  PYENV_VERSION_FILE="$(source "$(command -v pyenv-version-file)")"
+  PYENV_VERSION="$(source "$(command -v pyenv-version-file-read)" "$PYENV_VERSION_FILE" || true)"
 fi
 
 if [ -z "$PYENV_VERSION" ] || [ "$PYENV_VERSION" = "system" ]; then
   echo "system"
-  exit
+  [ "$0" != "$BASH_SOURCE" ] && return || exit 0
 fi
 
 version_exists() {
@@ -28,7 +28,7 @@ OLDIFS="$IFS"
       versions=("${versions[@]}" "${version#python-}")
     else
       echo "pyenv: version \`$version' is not installed" >&2
-      exit 1
+      [ "$0" != "$BASH_SOURCE" ] && return 1 || exit 1
     fi
   done
 }

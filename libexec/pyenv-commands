@@ -9,7 +9,7 @@ set -e
 if [ "$1" = "--complete" ]; then
   echo --sh
   echo --no-sh
-  exit
+  [ "$0" != "$BASH_SOURCE" ] && return || exit 0
 fi
 
 if [ "$1" = "--sh" ]; then

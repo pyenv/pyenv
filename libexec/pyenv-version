@@ -9,7 +9,7 @@ set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 OLDIFS="$IFS"
-IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name))
+IFS=: PYENV_VERSION_NAMES=($(source $(command -v pyenv-version-name)))
 IFS="$OLDIFS"
 
 origin=$(pyenv-version-origin)

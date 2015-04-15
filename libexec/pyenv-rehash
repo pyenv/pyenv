@@ -22,7 +22,7 @@ set -o noclobber
   else
     echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
   fi
-  exit 1
+  [ "$0" != "$BASH_SOURCE" ] && return 1 || exit 1
 } >&2
 set +o noclobber
 
@@ -61,7 +61,7 @@ if [ "\$program" = "python" ]; then
 fi
 
 export PYENV_ROOT="$PYENV_ROOT"
-exec "$(command -v pyenv)" exec "\$program" "\$@"
+source "$(command -v pyenv)" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
 }
@@ -138,9 +138,8 @@ make_shims $(list_executable_names | sort -u)
 
 # Allow plugins to register shims.
 OLDIFS="$IFS"
-IFS=$'\n' scripts=(`pyenv-hooks rehash`)
+IFS=$'\n' scripts=($(source "$(command -v pyenv-hooks)" rehash))
 IFS="$OLDIFS"
-
 for script in "${scripts[@]}"; do
   source "$script"
 done
