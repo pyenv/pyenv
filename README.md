@@ -126,9 +126,16 @@ reading it from the following sources, in this order:
    Python. (In other words, whatever version would run if pyenv weren't in your
    `PATH`.)
 
-**NOTE:** You can activate multiple versions at the same time, e.g. `pyenv
-global 3.4.2 2.7.8`.  This allows for parallel usage of python2 and python3,
-and is required with tools like `tox`.
+**NOTE:** You can activate multiple versions at the same time, including mulitple
+versions of Python2 or Python3 simultaneously. This allows for parallel usage of
+Python2 and Python3, and is required with tools like `tox`. For example, to set
+your path to first use your `system` Python and Python3 (set to 2.7.9 and 3.4.2
+in this example), but also have Python 3.3.6, 3.2, and 2.5 available on your
+`PATH`, one would first `pyenv install` the missing versions, then set `pyenv
+global system 3.3.6 3.2 2.5`. At this point, one should be able to find the full
+executable path to each of these using `pyenv which`, e.g. `pyenv which python2.5`
+(should display `$PYENV_ROOT/versions/2.5/bin/python2.5`), or `pyenv which
+python3.4` (should display path to system Python3).
 
 ### Locating the Python Installation
 
