@@ -64,7 +64,7 @@ load test_helper
   assert_line 0 "setenv PATH '${PYENV_ROOT}/shims' \$PATH"
 }
 
-@test "doesn't add shims to PATH more than once" {
+@test "can add shims to PATH more than once" {
   export PATH="${PYENV_ROOT}/shims:$PATH"
   run pyenv-init - bash
   assert_success
