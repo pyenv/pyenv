@@ -71,11 +71,11 @@ load test_helper
   assert_line 0 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
 }
 
-@test "doesn't add shims to PATH more than once (fish)" {
+@test "can add shims to PATH more than once (fish)" {
   export PATH="${RBENV_ROOT}/shims:$PATH"
   run rbenv-init - fish
   assert_success
-  refute_line 'setenv PATH "'${RBENV_ROOT}'/shims" $PATH ;'
+  assert_line 0 "setenv PATH '${RBENV_ROOT}/shims' \$PATH"
 }
 
 @test "outputs sh-compatible syntax" {
