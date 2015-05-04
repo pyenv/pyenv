@@ -1,5 +1,12 @@
 ## Version History
 
+#### 20150504
+
+* python-build: Add Jython 2.7.0
+* python-build: Add CPython alpha release; 3.5.0a4
+* python-build: Add CPython 3.1, 3.1.1, and 3.1.2
+* python-build: Fix pip version to 1.5.6 for CPython 3.1.x (#351)
+
 #### 20150326
 
 * python-build: Add Portable PyPy binaries from https://github.com/squeaky-pl/portable-pypy (#329)
@@ -230,7 +237,7 @@
 
 #### 0.4.0-20130726
 
-* pyenv: Fix minor issue of variable scope in `pyenv versions` 
+* pyenv: Fix minor issue of variable scope in `pyenv versions`
 * python-build: Update base version to ruby-build v20130628
 * python-build: Use brew managed OpenSSL and GNU Readline if they are available
 * python-build: Fix build of CPython 3.3+ on OS X (#29)
