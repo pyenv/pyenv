@@ -1,5 +1,0 @@
-require_java
-install_jar "jython-2.7-beta1" "http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7-b1/jython-installer-2.7-b1.jar" jython ez_setup
-# pip (>= 1.3) does not work properly since it uses HTTPS for downloads
-# * https://github.com/yyuu/pyenv/issues/15
-install_package "pip-1.2.1" "https://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz#12a9302acfca62cdc7bc5d83386cac3e0581db61ac39acdb3a4e766a16b88eb1" python
