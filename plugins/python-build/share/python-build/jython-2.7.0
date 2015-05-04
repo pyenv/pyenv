@@ -1,15 +1,6 @@
 require_java
 install_jar "jython-2.7.0" "https://repo1.maven.org/maven2/org/python/jython-installer/2.7.0/jython-installer-2.7.0.jar#b44352ece72382268a60e2848741c96609a91d796bb9a9c6ebeff62f0c12c9cf" jython
 
-# Jython is supposed to install pip using ensurepip by default, but this does
-# not appear to be working so we do it manually.
-#
-# pyenv's `ensurepip` downloads `get-pip.py` which isnt currently compatible
-# with jython: http://bugs.jython.org/issue2302
-#
-# Use the ensurepip module in jython to install the bundled pip instead:
-"$PYTHON_BIN" -m ensurepip
-
 case "$(pypy_architecture 2>/dev/null || true)" in
 "osx64"|"win32" )
   # Jython does not seem to work properly on OSX/windows unless JAVA_HOME is set

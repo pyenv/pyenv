@@ -534,7 +534,9 @@ fetch_jar() {
     download_tarball "$package_url" "$package_filename" "$checksum"
   fi
 
-  { if $JAVA -jar ${package_name}.jar -s -d ${package_name}; then
+  # Must use full path to jar and destination directory:
+  #   http://bugs.jython.org/issue2350
+  { if $JAVA -jar $PWD/${package_name}.jar -s -d $PWD/${package_name}; then
       if [ -z "$KEEP_BUILD_PATH" ]; then
         rm -f "$package_filename"
       else
