@@ -1,3 +1,22 @@
 require_java
-install_jar "jython-2.7.0" "https://repo1.maven.org/maven2/org/python/jython-installer/2.7.0/jython-installer-2.7.0.jar#b44352ece72382268a60e2848741c96609a91d796bb9a9c6ebeff62f0c12c9cf" jython ez_setup
-install_package "pip-6.1.1" "https://pypi.python.org/packages/source/p/pip/pip-6.1.1.tar.gz#89f3b626d225e08e7f20d85044afa40f612eb3284484169813dc2d0631f2a556" python
+install_jar "jython-2.7.0" "https://repo1.maven.org/maven2/org/python/jython-installer/2.7.0/jython-installer-2.7.0.jar#b44352ece72382268a60e2848741c96609a91d796bb9a9c6ebeff62f0c12c9cf" jython
+
+# Jython is supposed to install pip using ensurepip by default, but this does
+# not appear to be working so we do it manually.
+#
+# pyenv's `ensurepip` downloads `get-pip.py` which isnt currently compatible
+# with jython: http://bugs.jython.org/issue2302
+#
+# Use the ensurepip module in jython to install the bundled pip instead:
+"$PYTHON_BIN" -m ensurepip
+
+case "$(pypy_architecture 2>/dev/null || true)" in
+"osx64"|"win32" )
+  # Jython does not seem to work properly on OSX/windows unless JAVA_HOME is set
+  if [ -z "${JAVA_HOME+defined}" ]; then
+    colorize 1 "WARNING: "
+    echo "Please ensure that your JAVA_HOME environment variable is set correctly!"
+    echo "See http://bugs.jython.org/issue2346 for details."
+  fi
+  ;;
+esac
