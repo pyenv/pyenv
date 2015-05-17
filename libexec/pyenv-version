@@ -8,10 +8,13 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
+exitcode=0
 OLDIFS="$IFS"
-IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name))
+IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name)) || exitcode=$?
 IFS="$OLDIFS"
 
 for PYENV_VERSION_NAME in "${PYENV_VERSION_NAMES[@]}"; do
   echo "$PYENV_VERSION_NAME (set by $(pyenv-version-origin))"
 done
+
+exit $exitcode
