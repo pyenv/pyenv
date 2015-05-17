@@ -11,7 +11,7 @@ shell="$(basename "${PYENV_SHELL:-$SHELL}")"
 
 # When pyenv shell integration is enabled, delegate to pyenv-rehash,
 # then tell the shell to empty its command lookup cache.
-pyenv-rehash
+source "$(command -v pyenv-rehash)"
 
 case "$shell" in
 fish )

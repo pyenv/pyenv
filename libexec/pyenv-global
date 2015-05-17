@@ -25,13 +25,13 @@ versions=("$@")
 PYENV_VERSION_FILE="${PYENV_ROOT}/version"
 
 if [ -n "$versions" ]; then
-  pyenv-version-file-write "$PYENV_VERSION_FILE" "${versions[@]}"
+  source "$(command -v pyenv-version-file-write)" "$PYENV_VERSION_FILE" "${versions[@]}"
 else
   OLDIFS="$IFS"
   IFS=: versions=($(
-    pyenv-version-file-read "$PYENV_VERSION_FILE" ||
-    pyenv-version-file-read "${PYENV_ROOT}/global" ||
-    pyenv-version-file-read "${PYENV_ROOT}/default" ||
+    source "$(command -v pyenv-version-file-read)" "$PYENV_VERSION_FILE" ||
+    source "$(command -v pyenv-version-file-read)" "${PYENV_ROOT}/global" ||
+    source "$(command -v pyenv-version-file-read)" "${PYENV_ROOT}/default" ||
     echo system
   ))
   IFS="$OLDIFS"

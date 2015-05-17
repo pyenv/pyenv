@@ -12,7 +12,7 @@ if [ -n "$PYENV_DEBUG" ]; then
   set -x
 fi
 
-if enable -f "${0%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
+if enable -f "${BASH_SOURCE[0]%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
   abs_dirname() {
     local path="$(realpath "$1")"
     echo "${path%/*}"
@@ -69,7 +69,7 @@ export PYENV_DIR
 
 shopt -s nullglob
 
-bin_path="$(abs_dirname "$0")"
+bin_path="$(abs_dirname "${BASH_SOURCE[0]}")"
 for plugin_bin in "${PYENV_ROOT}/plugins/"*/bin; do
   PATH="${plugin_bin}:${PATH}"
 done
@@ -105,6 +105,6 @@ case "$command" in
   fi
 
   shift 1
-  exec "$command_path" "$@"
+  source "$command_path" "$@"
   ;;
 esac

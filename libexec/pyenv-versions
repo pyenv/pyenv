@@ -16,7 +16,7 @@ else
   hit_prefix="* "
   miss_prefix="  "
   OLDIFS="$IFS"
-  IFS=: current_versions=($(pyenv-version-name || true))
+  IFS=: current_versions=($(source "$(command -v pyenv-version-name)" || true))
   IFS="$OLDIFS"
   include_system="1"
 fi
@@ -45,7 +45,8 @@ print_version() {
 }
 
 # Include "system" in the non-bare output, if it exists
-if [ -n "$include_system" ] && PYENV_VERSION=system pyenv-which python >/dev/null 2>&1; then
+if [ -n "$include_system" ] \
+  && PYENV_VERSION=system source "$(command -v pyenv-which)" python >/dev/null 2>&1; then
   print_version system
 fi
 
@@ -59,5 +60,5 @@ shopt -u nullglob
 
 if [ "$num_versions" -eq 0 ] && [ -n "$include_system" ]; then
   echo "Warning: no Python detected on the system" >&2
-  exit 1
+  [ "$0" != "$BASH_SOURCE" ] && return 1 || exit 1
 fi

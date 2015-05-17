@@ -30,11 +30,11 @@ PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then
   pyenv-help --usage which >&2
-  exit 1
+  [ "$0" != "$BASH_SOURCE" ] && return 1 || exit 1
 fi
 
 OLDIFS="$IFS"
-IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name)})
+IFS=: versions=(${PYENV_VERSION:-$(source "$(command -v pyenv-version-name)")})
 IFS="$OLDIFS"
 
 for version in "${versions[@]}"; do
@@ -50,7 +50,7 @@ for version in "${versions[@]}"; do
 done
 
 OLDIFS="$IFS"
-IFS=$'\n' scripts=(`pyenv-hooks which`)
+IFS=$'\n' scripts=($(source "$(command -v pyenv-hooks)" which))
 IFS="$OLDIFS"
 for script in "${scripts[@]}"; do
   source "$script"
@@ -70,7 +70,7 @@ else
     fi
   done
   if [ "$any_not_installed" = 1 ]; then
-    exit 1
+    [ "$0" != "$BASH_SOURCE" ] && return 1 || exit 1
   fi
 
   echo "pyenv: $PYENV_COMMAND: command not found" >&2
@@ -84,5 +84,5 @@ else
     } >&2
   fi
 
-  exit 127
+  [ "$0" != "$BASH_SOURCE" ] && return 127 || exit 127
 fi

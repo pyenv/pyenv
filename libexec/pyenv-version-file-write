@@ -10,11 +10,11 @@ versions=("$@")
 
 if [ -z "$versions" ] || [ -z "$PYENV_VERSION_FILE" ]; then
   pyenv-help --usage version-file-write >&2
-  exit 1
+  [ "$0" != "$BASH_SOURCE" ] && return 1 || exit 1
 fi
 
 # Make sure the specified version is installed.
-pyenv-prefix "${versions[@]}" >/dev/null
+source "$(command -v pyenv-prefix)" "${versions[@]}" >/dev/null
 
 # Write the version out to disk.
 # Create an empty file. Using "rm" might cause a permission error.

@@ -39,7 +39,7 @@ if [ "$versions" = "--unset" ]; then
   rm -f .python-version .pyenv-version
 elif [ -n "$versions" ]; then
   previous_file="$(PYENV_VERSION= pyenv-version-origin || true)"
-  pyenv-version-file-write .python-version "${versions[@]}"
+  source "$(command -v pyenv-version-file-write)" .python-version "${versions[@]}"
   if [ "$previous_file" -ef .pyenv-version ]; then
     rm -f .pyenv-version
     { echo "pyenv: removed existing \`.pyenv-version' file and migrated"
@@ -49,10 +49,10 @@ elif [ -n "$versions" ]; then
 else
   OLDIFS="$IFS"
   IFS=: versions=($(
-    pyenv-version-file-read .python-version ||
-    pyenv-version-file-read .pyenv-version ||
+    source "$(command -v pyenv-version-file-read)" .python-version ||
+    source "$(command -v pyenv-version-file-read)" .pyenv-version ||
     { echo "pyenv: no local version configured for this directory"
-      exit 1
+      [ "$0" != "$BASH_SOURCE" ] && return 1 || exit 1
     } >&2
   ))
   IFS="$OLDIFS"
