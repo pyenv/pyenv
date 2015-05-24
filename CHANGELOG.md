@@ -1,5 +1,12 @@
 ## Version History
 
+#### 20150524
+
+* pyenv: Improve `pyenv version`, if there is one missing (#290)
+* pyenv: Improve pip-rehash to handle versions in command, like `pip2` and `pip3.4` (#368)
+* python-build: Add CPython release; 2.7.10 (#380)
+* python-build: Add Miniconda/Miniconda3 3.9.1 and Anaconda/Anaconda3 2.2.0 (#375, #376)
+
 #### 20150504
 
 * python-build: Add Jython 2.7.0
