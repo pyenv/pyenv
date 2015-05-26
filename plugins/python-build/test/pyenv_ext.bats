@@ -159,3 +159,39 @@ OUT
 
   unstub make
 }
+
+@test "ensurepip without altinstall" {
+  mkdir -p "${INSTALL_ROOT}/bin"
+  cat <<OUT > "${INSTALL_ROOT}/bin/python"
+#!$BASH
+echo "python \$@" >> "${INSTALL_ROOT}/build.log"
+OUT
+  chmod +x "${INSTALL_ROOT}/bin/python"
+
+  PYTHON_MAKE_INSTALL_TARGET="" TMPDIR="$TMP" run_inline_definition <<OUT
+build_package_ensurepip
+OUT
+  assert_success
+
+  assert_build_log <<OUT
+python -m ensurepip
+OUT
+}
+
+@test "ensurepip with altinstall" {
+  mkdir -p "${INSTALL_ROOT}/bin"
+  cat <<OUT > "${INSTALL_ROOT}/bin/python"
+#!$BASH
+echo "python \$@" >> "${INSTALL_ROOT}/build.log"
+OUT
+  chmod +x "${INSTALL_ROOT}/bin/python"
+
+  PYTHON_MAKE_INSTALL_TARGET="altinstall" TMPDIR="$TMP" run_inline_definition <<OUT
+build_package_ensurepip
+OUT
+  assert_success
+
+  assert_build_log <<OUT
+python -m ensurepip --altinstall
+OUT
+}

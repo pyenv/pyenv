@@ -1528,10 +1528,12 @@ build_package_get_pip() {
 
 build_package_ensurepip() {
   local ensurepip_opts
-  if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
+  # Install as `--altinstall` if the Python is installed as `altinstall` (#255)
+  if [[ "$PYTHON_MAKE_INSTALL_TARGET" == *"altinstall"* ]]; then
     ensurepip_opts="--altinstall"
   fi
-  "$PYTHON_BIN" -m ensurepip $ensurepip_opts 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
+  # FIXME: `--altinstall` with `get-pip.py`
+  "$PYTHON_BIN" -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
 }
 
 version() {
