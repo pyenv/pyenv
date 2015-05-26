@@ -1531,9 +1531,7 @@ build_package_ensurepip() {
   if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
     ensurepip_opts="--altinstall"
   fi
-  "$PYTHON_BIN" -m ensurepip $ensurepip_opts 1>/dev/null 2>&1 || {
-    build_package_ez_setup "$@" && build_package_get_pip "$@"
-  } || return 1
+  "$PYTHON_BIN" -m ensurepip $ensurepip_opts 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
 }
 
 version() {
