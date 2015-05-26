@@ -69,7 +69,7 @@ See all available versions with \`pyenv install --list'.
 
 If the version you need is missing, try upgrading pyenv:
 
-  cd ${BATS_TEST_DIRNAME}/../../.. && git pull
+  cd ${BATS_TEST_DIRNAME}/../../.. && git pull && cd -
 OUT
 
   unstub python-build

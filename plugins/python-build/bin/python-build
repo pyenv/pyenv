@@ -6,11 +6,13 @@
 #   -k/--keep        Do not remove source tree after installation
 #   -v/--verbose     Verbose mode: print compilation status to stdout
 #   -p/--patch       Apply a patch from stdin before building
+#   -4/--ipv4        Resolve names to IPv4 addresses only
+#   -6/--ipv6        Resolve names to IPv6 addresses only
 #   --definitions    List all built-in definitions
 #   -g/--debug       Build a debug version
 #
 
-PYTHON_BUILD_VERSION="20141028"
+PYTHON_BUILD_VERSION="20150519"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -231,7 +233,7 @@ compute_sha2() {
     output="$(shasum -a 256 -b)" || return 1
     echo "${output% *}"
   elif type openssl &>/dev/null; then
-    local openssl="$(command -v "$(brew --prefix openssl 2>/dev/null)"/bin/openssl openssl | head -1)"
+    local openssl="$(command -v "$(brew --prefix openssl 2>/dev/null || true)"/bin/openssl openssl | head -1)"
     output="$("$openssl" dgst -sha256 2>/dev/null)" || return 1
     echo "${output##* }"
   elif type sha256sum &>/dev/null; then
@@ -307,19 +309,31 @@ http() {
 }
 
 http_head_curl() {
-  curl -qsILf "$1" >&4 2>&1
+  options=""
+  [ -n "${IPV4}" ] && options="--ipv4"
+  [ -n "${IPV6}" ] && options="--ipv6"
+  curl -qsILf ${options} "$1" >&4 2>&1
 }
 
 http_get_curl() {
-  curl -q -o "${2:--}" -sSLf "$1"
+  options=""
+  [ -n "${IPV4}" ] && options="--ipv4"
+  [ -n "${IPV6}" ] && options="--ipv6"
+  curl -q -o "${2:--}" -sSLf ${options} "$1"
 }
 
 http_head_wget() {
-  wget -q --spider "$1" >&4 2>&1
+  options=""
+  [ -n "${IPV4}" ] && options="--inet4-only"
+  [ -n "${IPV6}" ] && options="--inet6-only"
+  wget -q --spider ${options} "$1" >&4 2>&1
 }
 
 http_get_wget() {
-  wget -nv -O "${2:--}" "$1"
+  options=""
+  [ -n "${IPV4}" ] && options="--inet4-only"
+  [ -n "${IPV6}" ] && options="--inet6-only"
+  wget -nv ${options} -O "${2:--}" "$1"
 }
 
 fetch_tarball() {
@@ -982,7 +996,7 @@ fix_rbx_gem_binstubs() {
       binstub="${bindir}/${file##*/}"
       rm -f "$binstub"
       { echo "#!${bindir}/ruby"
-        cat "$file"
+        grep -v '^#!' "$file"
       } > "$binstub"
       chmod +x "$binstub"
     done
@@ -999,7 +1013,7 @@ fix_rbx_irb() {
 }
 
 require_java7() {
-  local version="$(java -version 2>&1 | head -1)"
+  local version="$(java -version 2>&1 | grep '\(java\|openjdk\) version' | head -1)"
   if [[ $version != *1.[789]* ]]; then
     colorize 1 "ERROR" >&3
     echo ": Java 7 required. Please install a 1.7-compatible JRE." >&3
@@ -1117,6 +1131,19 @@ require_llvm() {
         local llvm_config="${llvm_prefix}/bin/llvm-config"
         if [ -x "$llvm_config" ]; then
           package_option python configure --llvm-config="$llvm_config"
+        else
+          { echo
+            colorize 1 "ERROR"
+            echo ": Rubinius will not be able to compile using Apple's LLVM-based "
+            echo "build tools on OS X. You will need to install LLVM 3.5 first."
+            echo
+            colorize 1 "TO FIX THE PROBLEM"
+            echo ": Install Homebrew's llvm package with this"
+            echo -n "command: "
+            colorize 4 "brew install llvm"
+            echo
+          } >&3
+          return 1
         fi
       fi
     fi
@@ -1568,6 +1595,8 @@ unset VERBOSE
 unset KEEP_BUILD_PATH
 unset HAS_PATCH
 unset DEBUG
+unset IPV4
+unset IPV6
 
 PYTHON_BUILD_INSTALL_PREFIX="$(abs_dirname "$0")/.."
 
@@ -1599,6 +1628,12 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "g" | "debug" )
     DEBUG=true
+    ;;
+  "4" | "ipv4")
+    IPV4=true
+    ;;
+  "6" | "ipv6")
+    IPV6=true
     ;;
   "version" )
     version

@@ -101,7 +101,7 @@ for option in "${OPTIONS[@]}"; do
     exec python-build --version
     ;;
   * )
-    usage 1
+    usage 1 >&2
     ;;
   esac
 done
@@ -246,7 +246,7 @@ if [ "$STATUS" == "2" ]; then
       echo "  brew update && brew upgrade pyenv"
     elif [ -d "${here}/.git" ]; then
       printf ":\n\n"
-      echo "  cd ${here} && git pull"
+      echo "  cd ${here} && git pull && cd -"
     else
       printf ".\n"
     fi

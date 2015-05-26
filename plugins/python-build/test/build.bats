@@ -462,6 +462,14 @@ OUT
   # nop
 }
 
+@test "Java version string not on first line" {
+  # nop
+}
+
+@test "Java version string on OpenJDK" {
+  # nop
+}
+
 @test "non-writable TMPDIR aborts build" {
   export TMPDIR="${TMP}/build"
   mkdir -p "$TMPDIR"
