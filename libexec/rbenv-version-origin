@@ -3,7 +3,16 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
-if [ -n "$RBENV_VERSION" ]; then
+OLDIFS="$IFS"
+IFS=$'\n' scripts=(`rbenv-hooks version-origin`)
+IFS="$OLDIFS"
+for script in "${scripts[@]}"; do
+  source "$script"
+done
+
+if [ -n "$RBENV_VERSION_ORIGIN" ]; then
+  echo "$RBENV_VERSION_ORIGIN"
+elif [ -n "$RBENV_VERSION" ]; then
   echo "RBENV_VERSION environment variable"
 else
   rbenv-version-file
