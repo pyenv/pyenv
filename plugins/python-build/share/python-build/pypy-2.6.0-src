@@ -1,0 +1,2 @@
+require_gcc
+install_package "pypy-2.6.0-src" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.6.0-src.tar.bz2#9bf353f22d25e97a85a6d3766619966055edea1ea1b2218445d683a8ad0399d9" "pypy_builder" verify_py27 ensurepip
