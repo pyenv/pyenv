@@ -1,5 +1,15 @@
 ## Version History
 
+#### 20150601
+
+* python-build: Add PyPy 2.6.0
+* python-build: Add PyPy 2.5.1 portable
+* python-build: Add CPython 3.5.0 beta releases; 3.5.0b1 and 3.5.0b2
+* python-build: Removed CPython 3.5.0 alpha releases
+* python-build: Fix inverted condition for `--altinstall` of ensurepip (#255)
+* python-build: Skip installing `setuptools` by `ez_setup.py` explicitly (fixes #381)
+* python-build: Import changes from ruby-build v20150519
+
 #### 20150524
 
 * pyenv: Improve `pyenv version`, if there is one missing (#290)
