@@ -45,6 +45,7 @@ RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
   * [How rbenv hooks into your shell](#how-rbenv-hooks-into-your-shell)
   * [Installing Ruby Versions](#installing-ruby-versions)
   * [Uninstalling Ruby Versions](#uninstalling-ruby-versions)
+  * [Uninstalling rbenv](#uninstalling-rbenv)
 * [Command Reference](#command-reference)
   * [rbenv local](#rbenv-local)
   * [rbenv global](#rbenv-global)
@@ -297,6 +298,30 @@ Ruby version with the `rbenv prefix` command, e.g. `rbenv prefix
 
 The [ruby-build][] plugin provides an `rbenv uninstall` command to
 automate the removal process.
+
+### Uninstalling rbenv
+
+The simplicity of rbenv makes it easy to temporarily disable it, or
+uninstall from the system.
+
+1. To **disable** rbenv managing your Ruby versions, simply remove the
+  `rbenv init` line from your shell startup configuration. This will
+  remove rbenv shims directory from PATH, and future invocations like
+  `ruby` will execute the system Ruby version, as before rbenv.
+
+  `rbenv` will still be accessible on the command line, but your Ruby
+  apps won't be affected by version switching.
+
+2. To completely **uninstall** rbenv, perform step (1) and then remove
+   its root directory. This will **delete all Ruby versions** that were
+   installed under `` `rbenv root`/versions/ `` directory:
+
+        rm -rf `rbenv root`
+
+   If you've installed rbenv using a package manager, as a final step
+   perform the rbenv package removal. For instance, for Homebrew:
+
+        brew uninstall rbenv
 
 ## Command Reference
 
