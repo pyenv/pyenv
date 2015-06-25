@@ -404,7 +404,9 @@ reuse_existing_tarball() {
   local checksum="$2"
 
   # Reuse existing file in build location
-  if [ -e "$package_filename" ] && verify_checksum "$package_filename" "$checksum"; then
+  if [ -f "$PYTHON_BUILD_CACHE_PATH/$package_filename" ] && verify_checksum "$package_filename" "$checksum"; then
+    echo "Found a cached copy of $package_filename in $PYTHON_BUILD_CACHE_PATH"
+    echo "Copying and un-tarring"
     return 0
   fi
 
@@ -433,7 +435,7 @@ download_tarball() {
     return 1
   fi
 
-  if [ -n "$PYTHON_BUILD_CACHE_PATH" ]; then
+  if [[ -n "$PYTHON_BUILD_CACHE_PATH" && ! -f ${PYTHON_BUILD_CACHE_PATH}/$package_filename ]]; then
     local cached_package_filename="${PYTHON_BUILD_CACHE_PATH}/$package_filename"
     { mv "$package_filename" "$cached_package_filename"
       ln -s "$cached_package_filename" "$package_filename"
