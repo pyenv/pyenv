@@ -87,6 +87,10 @@ install_tmp_fixture() {
   run python-build $args "$TMP_FIXTURES/$name" "$destination"
 }
 
+resolve_link() {
+  $(type -p greadlink readlink | head -1) "$1"
+}
+
 @test "apply built-in python patch before building" {
   cached_tarball "Python-3.2.1"
 
@@ -194,4 +198,64 @@ OUT
   assert_build_log <<OUT
 python -m ensurepip --altinstall
 OUT
+}
+
+@test "python3-config" {
+  mkdir -p "${INSTALL_ROOT}/bin"
+  touch "${INSTALL_ROOT}/bin/python3"
+  chmod +x "${INSTALL_ROOT}/bin/python3"
+  touch "${INSTALL_ROOT}/bin/python3.4"
+  chmod +x "${INSTALL_ROOT}/bin/python3.4"
+  touch "${INSTALL_ROOT}/bin/python3-config"
+  chmod +x "${INSTALL_ROOT}/bin/python3-config"
+  touch "${INSTALL_ROOT}/bin/python3.4-config"
+  chmod +x "${INSTALL_ROOT}/bin/python3.4-config"
+
+  TMPDIR="$TMP" run_inline_definition <<OUT
+verify_python python3.4
+OUT
+  assert_success
+
+  [ -L "${INSTALL_ROOT}/bin/python" ]
+  [ -L "${INSTALL_ROOT}/bin/python-config" ]
+  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python")" == "python3.4" ]]
+  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python-config")" == "python3.4-config" ]]
+}
+
+@test "--enable-framework" {
+  mkdir -p "${INSTALL_ROOT}/Python.framework/Versions/Current/bin"
+  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3"
+  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3"
+  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4"
+  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4"
+  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3-config"
+  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3-config"
+  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4-config"
+  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4-config"
+
+  stub uname '-s : echo Darwin'
+
+  PYTHON_CONFIGURE_OPTS="--enable-framework" TMPDIR="$TMP" run_inline_definition <<OUT
+echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
+verify_python python3.4
+OUT
+  assert_success
+  assert_output <<EOS
+PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-framework=${TMP}/install)
+EOS
+
+  [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python" ]
+  [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python-config" ]
+}
+
+@test "--enable-universalsdk" {
+  stub uname '-s : echo Darwin'
+
+  PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
+echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
+OUT
+  assert_success
+  assert_output <<EOS
+PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-universalsdk=/ --with-universal-archs=intel)
+EOS
 }
