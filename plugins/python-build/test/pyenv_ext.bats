@@ -259,3 +259,24 @@ OUT
 PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-universalsdk=/ --with-universal-archs=intel)
 EOS
 }
+
+@test "default MACOSX_DEPLOYMENT_TARGET" {
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
+
+  TMPDIR="$TMP" run_inline_definition <<OUT
+echo "\${MACOSX_DEPLOYMENT_TARGET}"
+OUT
+  assert_success
+  assert_output "10.10"
+}
+
+@test "use custom MACOSX_DEPLOYMENT_TARGET if defined" {
+  stub uname '-s : echo Darwin'
+
+  MACOSX_DEPLOYMENT_TARGET="10.4" TMPDIR="$TMP" run_inline_definition <<OUT
+echo "\${MACOSX_DEPLOYMENT_TARGET}"
+OUT
+  assert_success
+  assert_output "10.4"
+}
