@@ -32,6 +32,7 @@ fi
 export PYENV_VERSION
 PYENV_COMMAND_PATH="$(pyenv-which "$PYENV_COMMAND")"
 PYENV_BIN_PATH="${PYENV_COMMAND_PATH%/*}"
+PYENV_LIB_PATH="${PYENV_BIN_PATH%/*}/lib"
 
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks exec`)
@@ -44,4 +45,5 @@ shift 1
 # CPython's `sys.executable` requires the `PYENV_BIN_PATH` to be at the top of the `PATH`.
 # https://github.com/yyuu/pyenv/issues/98
 export PATH="${PYENV_BIN_PATH}:${PATH}"
+export LD_LIBRARY_PATH="${PYENV_LIB_PATH}:${LD_LIBRARY_PATH}"
 exec -a "$PYENV_COMMAND" "$PYENV_COMMAND_PATH" "$@"
