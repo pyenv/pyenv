@@ -52,7 +52,7 @@ if [[ "\$program" = "python"* ]]; then
     -c* | -- ) break ;;
     */* )
       if [ -f "\$arg" ]; then
-        export PYENV_DIR="\${arg%/*}"
+        export PYENV_FILE_ARG="\$arg"
         break
       fi
       ;;
