@@ -56,7 +56,7 @@ resolve_link() {
 }
 
 abs_dirname() {
-  local cwd="$(pwd)"
+  local cwd="$PWD"
   local path="$1"
 
   while [ -n "$path" ]; do
@@ -65,7 +65,7 @@ abs_dirname() {
     path="$(resolve_link "$name" || true)"
   done
 
-  pwd
+  echo "$PWD"
   cd "$cwd"
 }
 
@@ -1849,7 +1849,7 @@ python_bin_suffix() {
 SEED="$(date "+%Y%m%d%H%M%S").$$"
 LOG_PATH="${TMP}/python-build.${SEED}.log"
 PYTHON_BIN="${PREFIX_PATH}/bin/python$(python_bin_suffix "${DEFINITION_PATH##*/}")"
-CWD="$(pwd)"
+CWD="$PWD"
 
 if [ -z "$PYTHON_BUILD_BUILD_PATH" ]; then
   BUILD_PATH="${TMP}/python-build.${SEED}"
