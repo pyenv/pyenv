@@ -42,7 +42,7 @@ setup() {
   PYENV_VERSION=3.3.3:1.2 run pyenv-version
   assert_failure
   assert_output <<OUT
-pyenv: version \`1.2' is not installed
+pyenv: version \`1.2' is not installed (set by PYENV_VERSION environment variable)
 3.3.3 (set by PYENV_VERSION environment variable)
 OUT
 }
@@ -52,8 +52,8 @@ OUT
   PYENV_VERSION=3.4.2:3.3.3:1.2 run pyenv-version
   assert_failure
   assert_output <<OUT
-pyenv: version \`3.4.2' is not installed
-pyenv: version \`1.2' is not installed
+pyenv: version \`3.4.2' is not installed (set by PYENV_VERSION environment variable)
+pyenv: version \`1.2' is not installed (set by PYENV_VERSION environment variable)
 3.3.3 (set by PYENV_VERSION environment variable)
 OUT
 }
