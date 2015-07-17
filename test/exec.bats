@@ -17,7 +17,7 @@ create_executable() {
 @test "fails with invalid version" {
   export RBENV_VERSION="2.0"
   run rbenv-exec ruby -v
-  assert_failure "rbenv: version \`2.0' is not installed"
+  assert_failure "rbenv: version \`2.0' is not installed (set by RBENV_VERSION environment variable)"
 }
 
 @test "completes with names of executables" {
