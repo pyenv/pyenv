@@ -59,7 +59,7 @@ create_executable() {
 @test "version not installed" {
   create_executable "2.0" "rspec"
   RBENV_VERSION=1.9 run rbenv-which rspec
-  assert_failure "rbenv: version \`1.9' is not installed"
+  assert_failure "rbenv: version \`1.9' is not installed (set by RBENV_VERSION environment variable)"
 }
 
 @test "no executable found" {

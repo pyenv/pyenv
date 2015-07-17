@@ -23,6 +23,6 @@ if version_exists "$RBENV_VERSION"; then
 elif version_exists "${RBENV_VERSION#ruby-}"; then
   echo "${RBENV_VERSION#ruby-}"
 else
-  echo "rbenv: version \`$RBENV_VERSION' is not installed" >&2
+  echo "rbenv: version \`$RBENV_VERSION' is not installed (set by $(rbenv-version-origin))" >&2
   exit 1
 fi

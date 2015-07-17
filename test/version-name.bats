@@ -49,7 +49,7 @@ setup() {
 
 @test "missing version" {
   RBENV_VERSION=1.2 run rbenv-version-name
-  assert_failure "rbenv: version \`1.2' is not installed"
+  assert_failure "rbenv: version \`1.2' is not installed (set by RBENV_VERSION environment variable)"
 }
 
 @test "version with prefix in name" {

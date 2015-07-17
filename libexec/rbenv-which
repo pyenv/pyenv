@@ -52,7 +52,7 @@ done
 if [ -x "$RBENV_COMMAND_PATH" ]; then
   echo "$RBENV_COMMAND_PATH"
 elif ! [ -d "${RBENV_ROOT}/versions/${RBENV_VERSION}" ]; then
-  echo "rbenv: version \`$RBENV_VERSION' is not installed" >&2
+  echo "rbenv: version \`$RBENV_VERSION' is not installed (set by $(rbenv-version-origin))" >&2
   exit 1
 else
   echo "rbenv: $RBENV_COMMAND: command not found" >&2
