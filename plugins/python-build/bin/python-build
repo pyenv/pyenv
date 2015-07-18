@@ -1517,6 +1517,11 @@ build_package_verify_py35() {
   build_package_verify_py34 "$1" "${2:-3.5}"
 }
 
+# Post-install check for Python 3.6.x
+build_package_verify_py36() {
+  build_package_verify_py35 "$1" "${2:-3.6}"
+}
+
 build_package_ez_setup() {
   local ez_setup="${BUILD_PATH}/ez_setup.py"
   rm -f "${ez_setup}"
