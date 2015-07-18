@@ -1552,7 +1552,7 @@ build_package_get_pip() {
       http get "${GET_PIP_URL}"
     fi
   } 1> "${get_pip}"
-  "${PYTHON_BIN}" "${get_pip}" ${GET_PIP_OPTS} 1>&4 2>&1 || {
+  "${PYTHON_BIN}" -s "${get_pip}" ${GET_PIP_OPTS} 1>&4 2>&1 || {
     echo "error: failed to install pip via get-pip.py" >&2
     return 1
   }
@@ -1565,7 +1565,7 @@ build_package_ensurepip() {
     ensurepip_opts="--altinstall"
   fi
   # FIXME: `--altinstall` with `get-pip.py`
-  "$PYTHON_BIN" -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
+  "$PYTHON_BIN" -s -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
 }
 
 version() {
