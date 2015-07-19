@@ -1,5 +1,14 @@
 ## Version History
 
+#### 20150719
+
+* python-build: Add CPython `3.6-dev` (#413)
+* python-build: Add Anaconda/Anaconda3 2.3.0
+* python-build: Fix download URL of portable PyPy 2.6 (fixes #389)
+* python-build: Use custom `MACOSX_DEPLOYMENT_TARGET` if defined (#312)
+* python-build: Use original CPython repository instead of mirror at bitbucket.org as the source of `*-dev` versions (#409)
+* python-build: Pin pip version to 1.5.6 for python 3.1.5 (#351)
+
 #### 20150601
 
 * python-build: Add PyPy 2.6.0
