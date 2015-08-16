@@ -1,3 +1,5 @@
+# disable `_FORTITY_SOURCE` to fix build of CPython (>= 2.4, <= 2.4.3) (#422)
+package_option python configure BASECFLAGS="-U_FORTIFY_SOURCE"
 #require_gcc
 install_package "readline-6.3" "http://ftpmirror.gnu.org/readline/readline-6.3.tar.gz#56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43" standard --if has_broken_mac_readline
 install_package "Python-2.4.3" "http://python.org/ftp/python/2.4.3/Python-2.4.3.tgz#985a413932f5e31e6280b37da6b285a3a0b2748c6786643989ed9b23de97e2d5" ldflags_dirs standard verify_py24
