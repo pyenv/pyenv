@@ -1,0 +1,14 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux64" )
+  require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" || true
+  install_package "pypy-stm-2.5.1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-stm-2.5.1-linux64.tar.bz2#f280788002f2acf8690b8f9c479bb5b6f0e699ebb42f8bf203da3f70f1a38134" "pypy" verify_py27 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy-STM is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

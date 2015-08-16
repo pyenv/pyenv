@@ -890,10 +890,18 @@ pypy_architecture() {
 build_package_pypy() {
   build_package_copy
   mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
-  local pypy libpypy
+  local pypy libpypy python
   shopt -s nullglob
   for pypy in "bin/pypy"*; do
-    ( cd "${PREFIX_PATH}/bin" && ln -fs "$(basename "${pypy}")" "$(basename "${pypy}" | sed -e 's/pypy/python/')" )
+    case "${pypy##*/}" in
+    "pypy-stm" )
+      python="bin/python"
+      ;;
+    * )
+      python="$(basename "${pypy}" | sed -e 's/pypy/python/')"
+      ;;
+    esac
+    ( cd "${PREFIX_PATH}/bin" && ln -fs "${pypy##*/}" "${python##*/}" )
   done
   for libpypy in "bin/libpypy-c."*; do
     ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/$(basename "${libpypy}")" "$(basename "${libpypy}")" )
