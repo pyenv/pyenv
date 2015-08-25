@@ -1,3 +1,0 @@
-#require_gcc
-install_package "readline-6.3" "http://ftpmirror.gnu.org/readline/readline-6.3.tar.gz#56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43" standard --if has_broken_mac_readline
-install_package "Python-3.5.0b1" "https://www.python.org/ftp/python/3.5.0/Python-3.5.0b1.tgz#1a4f57ad2ec0dd9b17703e13b46b96256b55b28d9e6529005e72f3d660e3f8a1" ldflags_dirs standard verify_py35 ensurepip
