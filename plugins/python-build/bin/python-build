@@ -12,7 +12,7 @@
 #   -g/--debug       Build a debug version
 #
 
-PYTHON_BUILD_VERSION="20150519"
+PYTHON_BUILD_VERSION="20150818"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -1132,12 +1132,13 @@ require_llvm() {
   local llvm_version="$1"
   if [ "$(uname -s)" = "Darwin" ] && [ "$(osx_version)" -ge 1010 ]; then
     if [[ "$PYTHON_CONFIGURE_OPTS" != *--llvm-* ]]; then
-      if [ "$llvm_version" = "3.2" ]; then
+      case "$llvm_version" in
+      3.2 )
         package_option python configure --prebuilt-name="llvm-3.2-x86_64-apple-darwin13.tar.bz2"
-      else
-        local llvm_prefix="$(brew --prefix llvm 2>/dev/null || true)"
-        local llvm_config="${llvm_prefix}/bin/llvm-config"
-        if [ -x "$llvm_config" ]; then
+        ;;
+      3.5 )
+        local llvm_config="$(locate_llvm "$llvm_version")"
+        if [ -n "$llvm_config" ]; then
           package_option python configure --llvm-config="$llvm_config"
         else
           { echo
@@ -1148,14 +1149,29 @@ require_llvm() {
             colorize 1 "TO FIX THE PROBLEM"
             echo ": Install Homebrew's llvm package with this"
             echo -n "command: "
-            colorize 4 "brew install llvm"
+            colorize 4 "brew tap homebrew/versions ; brew install llvm35"
             echo
           } >&3
           return 1
         fi
-      fi
+        ;;
+      esac
     fi
   fi
+}
+
+locate_llvm() {
+  local llvm_version="$1"
+  local package llvm_config
+  shopt -s nullglob
+  for package in `brew list 2>/dev/null | grep "^llvm"`; do
+    llvm_config="$(echo "$(brew --prefix "$package")/bin/llvm-config"*)"
+    if [ -n "$llvm_config" ] && [[ "$("$llvm_config" --version)" = "$llvm_version"* ]]; then
+      echo "$llvm_config"
+      break
+    fi
+  done
+  shopt -u nullglob
 }
 
 require_java() {

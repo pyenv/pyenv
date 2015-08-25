@@ -149,39 +149,61 @@ OUT
 
 @test "not enough arguments for pyenv-install" {
   stub_python_build
+  stub pyenv-help 'install : true'
+
   run pyenv-install
   assert_failure
-  assert_output_contains 'Usage: pyenv install'
+  unstub pyenv-help
 }
 
 @test "too many arguments for pyenv-install" {
   stub_python_build
+  stub pyenv-help 'install : true'
+
   run pyenv-install 3.4.1 3.4.2
   assert_failure
-  assert_output_contains 'Usage: pyenv install'
+  unstub pyenv-help
 }
 
 @test "show help for pyenv-install" {
   stub_python_build
+  stub pyenv-help 'install : true'
+
   run pyenv-install -h
   assert_success
+  unstub pyenv-help
+}
+
+@test "pyenv-install has usage help preface" {
+  run head "$(which pyenv-install)"
   assert_output_contains 'Usage: pyenv install'
 }
 
 @test "not enough arguments pyenv-uninstall" {
+  stub pyenv-help 'uninstall : true'
+
   run pyenv-uninstall
   assert_failure
-  assert_output_contains 'Usage: pyenv uninstall'
+  unstub pyenv-help
 }
 
 @test "too many arguments for pyenv-uninstall" {
+  stub pyenv-help 'uninstall : true'
+
   run pyenv-uninstall 3.4.1 3.4.2
   assert_failure
-  assert_output_contains 'Usage: pyenv uninstall'
+  unstub pyenv-help
 }
 
 @test "show help for pyenv-uninstall" {
+  stub pyenv-help 'uninstall : true'
+
   run pyenv-uninstall -h
   assert_success
+  unstub pyenv-help
+}
+
+@test "pyenv-uninstall has usage help preface" {
+  run head "$(which pyenv-uninstall)"
   assert_output_contains 'Usage: pyenv uninstall'
 }

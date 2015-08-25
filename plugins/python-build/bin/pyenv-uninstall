@@ -18,8 +18,7 @@ if [ "$1" = "--complete" ]; then
 fi
 
 usage() {
-  # We can remove the sed fallback once pyenv 0.4.0 is widely available
-  pyenv-help uninstall 2>/dev/null || sed -ne '/^#/!q;s/.//;s/.//;1,4d;p' < "$0"
+  pyenv-help uninstall 2>/dev/null
   [ -z "$1" ] || exit "$1"
 }
 
