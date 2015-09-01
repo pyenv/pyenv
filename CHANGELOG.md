@@ -1,5 +1,16 @@
 ## Version History
 
+### 20150901
+
+* python-build: Add CPython 3.5.0 release candidates; 3.5.0rc1 and 3.5.0rc2
+* python-build: Disabled `_FORTITY_SOURCE` to fix CPython >= 2.4, <= 2.4.3 builds (#422)
+* python-build: Removed CPython 3.5.0 betas
+* python-build: Add miniconda-3.10.1 and miniconda3-3.10.1 (#414)
+* python-build: Add PyPy 2.6.1 (#433)
+* python-build: Add PyPy-STM 2.3 and 2.5.1 (#428)
+* python-build: Ignore user's site-packages on ensurepip/get-pip (#411)
+* pyenv: Import recent changes from ruby-build v20150818
+
 #### 20150719
 
 * python-build: Add CPython `3.6-dev` (#413)
