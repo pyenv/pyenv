@@ -1,0 +1,16 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  install_package "pypy-2.6.1-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.6.1-linux_i686-portable.tar.bz2#af8f05790fe21bffdb0619d39f2890e2ecabe47bbd3b21c2c97b9778e4cdb378" "pypy" verify_py27 ensurepip
+  ;;
+"linux64" )
+  install_package "pypy-2.6.1-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.6.1-linux_x86_64-portable.tar.bz2#ed6a35dee4c982123af716e62975039e18920b599afc4f6a2f3c7c89d0403389" "pypy" verify_py27 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": Portable PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
