@@ -49,7 +49,7 @@ if [ -z "$print" ]; then
     ;;
   esac
 
-  { echo "# Load rbenv automatically by adding"
+  { echo "# Load rbenv automatically by appending"
     echo "# the following to ${profile}:"
     echo
     case "$shell" in
