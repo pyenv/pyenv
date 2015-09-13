@@ -1,5 +1,12 @@
 ## Version History
 
+### 20150913
+
+* python-build: Add CPython 3.5.0
+* python-build: Remove CPython 3.5.0 release candidates
+* python-build: Fixed anaconda3 repo's paths (#439)
+* python-build: Add miniconda-3.16.0 and miniconda3-3.16.0 (#435)
+
 ### 20150901
 
 * python-build: Add CPython 3.5.0 release candidates; 3.5.0rc1 and 3.5.0rc2
