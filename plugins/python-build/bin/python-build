@@ -1258,7 +1258,6 @@ use_homebrew_readline() {
 has_broken_mac_openssl() {
   [ "$(uname -s)" = "Darwin" ] &&
   [[ "$(/usr/bin/openssl version 2>/dev/null || true)" = "OpenSSL 0.9.8"?* ]] &&
-  [[ "$RUBY_CONFIGURE_OPTS" != *--with-openssl-dir=* ]] &&
   ! use_homebrew_openssl
 }
 
