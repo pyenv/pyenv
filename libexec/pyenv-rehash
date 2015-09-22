@@ -46,13 +46,13 @@ set -e
 [ -n "\$PYENV_DEBUG" ] && set -x
 
 program="\${0##*/}"
-if [ "\$program" = "python" ]; then
+if [[ "\$program" = "python"* ]]; then
   for arg; do
     case "\$arg" in
     -c* | -- ) break ;;
     */* )
       if [ -f "\$arg" ]; then
-        export PYENV_DIR="\${arg%/*}"
+        export PYENV_FILE_ARG="\$arg"
         break
       fi
       ;;
