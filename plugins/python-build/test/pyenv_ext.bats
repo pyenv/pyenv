@@ -241,7 +241,7 @@ verify_python python3.4
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-framework=${TMP}/install)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-framework=${TMP}/install)
 EOS
 
   [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python" ]
@@ -256,7 +256,7 @@ echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-universalsdk=/ --with-universal-archs=intel)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/ --with-universal-archs=intel)
 EOS
 }
 
