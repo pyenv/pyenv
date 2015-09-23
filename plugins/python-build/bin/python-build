@@ -682,8 +682,7 @@ build_package_standard() {
       export CC=clang
     fi
     ${!PACKAGE_CONFIGURE:-./configure} --prefix="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}" \
-                                       --libdir="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}/lib" \
-                                       $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}"
+      $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}"
   ) >&4 2>&1
 
   { "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
@@ -1773,6 +1772,9 @@ fi
 if [ -n "$DEBUG" ]; then
   package_option python configure --with-pydebug
 fi
+
+# python-build: Specify `--libdir` on configure to fix build on openSUSE (#36)
+package_option python configure --libdir="${PREFIX_PATH}/lib"
 
 # python-build: Set `RPATH` if `--enable-shared` was given (#65, #66, #82)
 if [[ "$CONFIGURE_OPTS" == *"--enable-shared"* ]] || [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]]; then
