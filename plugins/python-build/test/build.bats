@@ -73,7 +73,7 @@ assert_build_log() {
 
   assert_build_log <<OUT
 yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-yaml-0.1.6: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
 Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
@@ -100,7 +100,7 @@ OUT
 
   assert_build_log <<OUT
 yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-yaml-0.1.6: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
 patch -p0 --force -i $TMP/python-patch.XXX
@@ -128,7 +128,7 @@ OUT
 
   assert_build_log <<OUT
 yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-yaml-0.1.6: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
 patch -p1 --force -i $TMP/python-patch.XXX
@@ -209,7 +209,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib
+Python-3.2.1: --prefix=$INSTALL_ROOT CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
