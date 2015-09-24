@@ -220,6 +220,9 @@ easy to fork and contribute any changes back upstream.
 
    **NOTE:** If you need to pass configure option to build, please use
    ```CONFIGURE_OPTS``` environment variable.
+   
+   **NOTE:** If you want to use proxy to download, please use `http_proxy` and `https_proxy`
+   environment variable.
 
    **NOTE:** If you are having trouble installing a python version,
    please visit the wiki page about
