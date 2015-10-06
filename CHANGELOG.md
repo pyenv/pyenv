@@ -1,5 +1,12 @@
 ## Version History
 
+### 20151006
+
+* pyenv: Different behaviour when invoking .py script through symlink (#379, #404)
+* pyenv: Enabled Gitter on the project (#436, #444)
+* python-build: Add Jython 2.7.1b1
+* python-build: Install OpenSSL on OS X if no proper versionn is available (#429)
+
 ### 20150913
 
 * python-build: Add CPython 3.5.0
