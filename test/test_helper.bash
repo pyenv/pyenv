@@ -1,18 +1,20 @@
 unset RBENV_VERSION
 unset RBENV_DIR
 
-if enable -f "${BATS_TEST_DIRNAME}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
-  RBENV_TEST_DIR="$(realpath "$BATS_TMPDIR")/rbenv"
-else
-  if [ -n "$RBENV_NATIVE_EXT" ]; then
-    echo "rbenv: failed to load \`realpath' builtin" >&2
-    exit 1
-  fi
-  RBENV_TEST_DIR="$(mktemp -d --tmpdir=$BATS_TMPDIR rbenv.bats.XXX)"
-fi
-
 # guard against executing this block twice due to bats internals
-if [ "$RBENV_ROOT" != "${RBENV_TEST_DIR}/root" ]; then
+if [ -z "$RBENV_TEST_DIR" ]; then
+  RBENV_TEST_DIR="${BATS_TMPDIR}/rbenv"
+  export RBENV_TEST_DIR="$(mktemp -d "${RBENV_TEST_DIR}.XXX" 2>/dev/null || echo "$RBENV_TEST_DIR")"
+
+  if enable -f "${BATS_TEST_DIRNAME}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
+    export RBENV_TEST_DIR="$(realpath "$RBENV_TEST_DIR")"
+  else
+    if [ -n "$RBENV_NATIVE_EXT" ]; then
+      echo "rbenv: failed to load \`realpath' builtin" >&2
+      exit 1
+    fi
+  fi
+
   export RBENV_ROOT="${RBENV_TEST_DIR}/root"
   export HOME="${RBENV_TEST_DIR}/home"
 
