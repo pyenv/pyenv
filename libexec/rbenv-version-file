@@ -6,6 +6,7 @@ set -e
 find_local_version_file() {
   local root="$1"
   while true; do
+    [[ "$root" =~ ^//[^/]*$ ]] && break
     if [ -e "${root}/.ruby-version" ]; then
       echo "${root}/.ruby-version"
       exit
