@@ -8,7 +8,7 @@ else
     echo "rbenv: failed to load \`realpath' builtin" >&2
     exit 1
   fi
-  RBENV_TEST_DIR="${BATS_TMPDIR}/rbenv"
+  RBENV_TEST_DIR="$(mktemp -d --tmpdir=$BATS_TMPDIR rbenv.bats.XXX)"
 fi
 
 # guard against executing this block twice due to bats internals
