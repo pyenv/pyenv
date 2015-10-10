@@ -25,7 +25,8 @@ if [ -z "$shell" ]; then
   shell="$(ps c -p "$PPID" -o 'ucomm=' 2>/dev/null || true)"
   shell="${shell##-}"
   shell="${shell%% *}"
-  shell="$(basename "${shell:-$SHELL}")"
+  shell="${shell:-$SHELL}"
+  shell="${shell##*/}"
 fi
 
 root="${0%/*}/.."
