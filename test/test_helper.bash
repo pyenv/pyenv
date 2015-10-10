@@ -22,6 +22,9 @@ if [ "$RBENV_ROOT" != "${RBENV_TEST_DIR}/root" ]; then
   PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
   PATH="${RBENV_ROOT}/shims:$PATH"
   export PATH
+
+  for xdg_var in `env 2>/dev/null | grep ^XDG_ | cut -d= -f1`; do unset "$xdg_var"; done
+  unset xdg_var
 fi
 
 teardown() {
