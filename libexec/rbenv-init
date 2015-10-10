@@ -102,7 +102,7 @@ function rbenv
 
   switch "\$command"
   case ${commands[*]}
-    eval (rbenv "sh-\$command" \$argv)
+    . (rbenv "sh-\$command" \$argv|psub)
   case '*'
     command rbenv "\$command" \$argv
   end
