@@ -133,7 +133,7 @@ cat <<EOS
 
   case "\$command" in
   ${commands[*]})
-    eval "\`rbenv "sh-\$command" "\$@"\`";;
+    eval "\$(rbenv "sh-\$command" "\$@")";;
   *)
     command rbenv "\$command" "\$@";;
   esac
