@@ -844,6 +844,23 @@ build_package_jython() {
       ( cd "${PREFIX_PATH}/bin" && ln -fs jython python )
     fi
   } >&4 2>&1
+  fix_jython_shebangs
+}
+
+fix_jython_shebangs() {
+  # Workaround for Jython 2.7+ (#458)
+  for file in "${PREFIX_PATH}/bin"/*; do
+    case "$(head -1 "${file}")" in
+    "#!"*"/bin/jython" )
+      sed -i.bak "1 s:.*:#\!\/usr\/bin\/env ${PREFIX_PATH}\/bin\/jython:" "${file}"
+      ;;
+    "#!"*"/bin/python2.7"* )
+      # Jython 2.7+ requires CPython 2.7 to run
+      sed -i.bak "1 s:.*:#\!\/usr\/bin\/env python2.7:" "${file}"
+      ;;
+    esac
+    rm -f "${file}.bak"
+  done
 }
 
 build_package_jython_builder() {
