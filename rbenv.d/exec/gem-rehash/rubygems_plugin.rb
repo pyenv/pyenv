@@ -10,7 +10,7 @@ hook = lambda do |installer|
   end
 end
 
-if defined?(Bundler::Installer) && Bundler::Installer.respond_to?(:install)
+if defined?(Bundler::Installer) && Bundler::Installer.respond_to?(:install) && !Bundler::Installer.respond_to?(:install_without_rbenv_rehash)
   Bundler::Installer.class_eval do
     class << self
       alias install_without_rbenv_rehash install
