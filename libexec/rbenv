@@ -12,7 +12,7 @@ if [ -n "$RBENV_DEBUG" ]; then
   set -x
 fi
 
-if enable -f "${0%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
+if enable -f "${BASH_SOURCE%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
   abs_dirname() {
     local path="$(realpath "$1")"
     echo "${path%/*}"
