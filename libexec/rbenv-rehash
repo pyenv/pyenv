@@ -113,7 +113,7 @@ install_registered_shims() {
   local shim file
   for shim in $registered_shims; do
     file="${SHIM_PATH}/${shim}"
-    [ -e "$file" ] || ln -f "$PROTOTYPE_SHIM_PATH" "$file"
+    [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
   done
 }
 
