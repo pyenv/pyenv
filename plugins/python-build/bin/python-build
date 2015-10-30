@@ -888,6 +888,8 @@ pypy_architecture() {
     "armel" ) echo "linux-armel" ;;
     "armhf" | "armv6l" | "armv7l" ) echo "linux-armhf" ;;
     "i386" | "i486" | "i586" | "i686" | "i786" ) echo "linux" ;;
+    "ppc64" ) echo "linux-ppc64" ;;
+    "ppc64le" ) echo "linux-ppc64le" ;;
     "x86_64" ) echo "linux64" ;;
     * ) return 1 ;;
     esac
