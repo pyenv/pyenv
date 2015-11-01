@@ -1,4 +1,7 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
+"freebsd64" )
+  install_package "pypy-2.6.1-freebsd64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.6.1-freebsd64.tar.bz2#58118e88ce01c1d48b31d293db40687efbdeba54334eb55ba96de9ecf3c39055" "pypy" verify_py27 ensurepip
+  ;;
 "linux" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy-2.6.1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.6.1-linux.tar.bz2#d010b1f1aafdb01beb107f16843985508ce81698260ce830690686d9b2768c88" "pypy" verify_py27 ensurepip
