@@ -1,7 +1,4 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
-"freebsd64" )
-  install_package "pypy-4.0.0-freebsd64" "https://bitbucket.org/pypy/pypy/downloads/pypy-4.0.0-freebsd64.tar.bz2#c616cffee0f344c37fd4e045a7a87054" "pypy" verify_py27 ensurepip
-  ;;
 "linux" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy-4.0.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-4.0.0-linux.tar.bz2#365600947775bc73a902a5b1d11f8b96cf49f07cdbbab28bb47240097b4bb4c5" "pypy" verify_py27 ensurepip
