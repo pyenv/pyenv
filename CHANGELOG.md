@@ -1,5 +1,11 @@
 ## Version History
 
+### 20151103
+
+* python-build: Add PyPy 4.0.0 (#463)
+* python-build: Add Jython 2.7.1b2
+* python-build: Add warning about setuptools issues on CPython 3.0.1 on OS X (#456)
+
 ### 20151006
 
 * pyenv: Different behaviour when invoking .py script through symlink (#379, #404)
