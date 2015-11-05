@@ -1,5 +1,10 @@
 ## Version History
 
+### 20151105
+
+* python-build: Add anaconda2-2.4.0 and anacondaa3-2.4.0
+* python-biuld: Add Portable PyPy 4.0 (#472)
+
 ### 20151103
 
 * python-build: Add PyPy 4.0.0 (#463)

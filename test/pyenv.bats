@@ -5,7 +5,7 @@ load test_helper
 @test "blank invocation" {
   run pyenv
   assert_success
-  assert [ "${lines[0]}" == "pyenv 20151103" ]
+  assert [ "${lines[0]}" == "pyenv 20151105" ]
 }
 
 @test "invalid command" {
