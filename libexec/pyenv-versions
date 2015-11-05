@@ -53,6 +53,12 @@ shopt -s nullglob
 for path in "${PYENV_ROOT}/versions/"*; do
   if [ -d "$path" ]; then
     print_version "${path##*/}"
+    # virtual environments created by anaconda/miniconda
+    for env_path in "${path}/envs/"*; do
+      if [ -d "${env_path}" ]; then
+        print_version "${env_path#${PYENV_ROOT}/versions/}"
+      fi
+    done
   fi
 done
 shopt -u nullglob
