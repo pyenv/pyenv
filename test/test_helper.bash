@@ -111,7 +111,7 @@ assert() {
 # but in which system utils necessary for rbenv operation are still available.
 path_without() {
   local exe="$1"
-  local path="${PATH}:"
+  local path=":${PATH}:"
   local found alt util
   for found in $(which -a "$exe"); do
     found="${found%/*}"
@@ -123,8 +123,9 @@ path_without() {
           ln -s "${found}/$util" "${alt}/$util"
         fi
       done
-      path="${path/${found}:/${alt}:}"
+      path="${path/:${found}:/:${alt}:}"
     fi
   done
+  path="${path#:}"
   echo "${path%:}"
 }
