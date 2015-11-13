@@ -15,6 +15,13 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  echo --usage
+  rbenv-commands
+  exit
+fi
+
 command_path() {
   local command="$1"
   command -v rbenv-"$command" || command -v rbenv-sh-"$command" || true
