@@ -68,6 +68,12 @@ create_executable() {
   assert_failure "rbenv: rake: command not found"
 }
 
+@test "no executable found for system version" {
+  export PATH="$(path_without "rake")"
+  RBENV_VERSION=system run rbenv-which rake
+  assert_failure "rbenv: rake: command not found"
+}
+
 @test "executable found in other versions" {
   create_executable "1.8" "ruby"
   create_executable "1.9" "rspec"
