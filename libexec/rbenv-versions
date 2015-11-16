@@ -9,8 +9,13 @@ set -e
 
 unset bare
 unset skip_aliases
+# Provide rbenv completions
 for arg; do
   case "$arg" in
+  --complete )
+    echo --bare
+    echo --skip-aliases
+    exit ;;
   --bare ) bare=1 ;;
   --skip-aliases ) skip_aliases=1 ;;
   * )
