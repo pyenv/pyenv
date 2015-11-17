@@ -97,7 +97,7 @@ case "$command" in
   } >&2
   exit 1
   ;;
--v )
+-v | --version )
   exec rbenv---version
   ;;
 -h | --help )
