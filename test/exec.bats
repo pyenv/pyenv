@@ -35,6 +35,7 @@ create_executable() {
   run rbenv-completions exec
   assert_success
   assert_output <<OUT
+--help
 rake
 ruby
 OUT
