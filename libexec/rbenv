@@ -36,7 +36,7 @@ else
   }
 
   abs_dirname() {
-    local cwd="$(pwd)"
+    local cwd="$PWD"
     local path="$1"
 
     while [ -n "$path" ]; do
@@ -58,10 +58,10 @@ fi
 export RBENV_ROOT
 
 if [ -z "${RBENV_DIR}" ]; then
-  RBENV_DIR="$(pwd)"
+  RBENV_DIR="$PWD"
 else
   cd "$RBENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$RBENV_DIR'"
-  RBENV_DIR="$(pwd)"
+  RBENV_DIR="$PWD"
   cd "$OLDPWD"
 fi
 export RBENV_DIR
