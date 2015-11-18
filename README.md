@@ -49,7 +49,7 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
     * [Homebrew on Mac OS X](#homebrew-on-mac-os-x)
-    * [Neckbeard Configuration](#neckbeard-configuration)
+    * [Advanced Configuration](#advanced-configuration)
     * [Uninstalling Python Versions](#uninstalling-python-versions)
 * **[Command Reference](#command-reference)**
 * **[Development](#development)**
@@ -274,7 +274,7 @@ profile (as stated in the caveats). You'll only ever have to do this
 once.
 
 
-### Neckbeard Configuration
+### Advanced Configuration
 
 Skip this section unless you must know what every line in your shell
 profile is doing.
