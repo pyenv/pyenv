@@ -267,12 +267,11 @@ package manager for Mac OS X.
     $ brew install pyenv
 
 
-To upgrade pyenv in the future, just use `upgrade` instead of `install`.
+To upgrade pyenv in the future, use `upgrade` instead of `install`.
 
-After installation, you'll still need to add `eval "$(pyenv init -)"` to your
-profile (as stated in the caveats). You'll only ever have to do this
-once.
+After installation, you'll need to add `eval "$(pyenv init -)"` to your profile (as stated in the caveats displayed by Homebrew — to display them again, use `brew info pyenv`). You only need to add that to your profile once.
 
+Then follow the rest of the post-installation steps under "Basic GitHub Checkout" above, starting with #4 ("restart your shell so the path changes take effect").
 
 ### Advanced Configuration
 
