@@ -4,7 +4,7 @@ load test_helper
 
 @test "blank invocation" {
   run rbenv
-  assert_success
+  assert_failure
   assert_line 0 "$(rbenv---version)"
 }
 
