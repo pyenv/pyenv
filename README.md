@@ -194,7 +194,7 @@ easy to fork and contribute any changes back upstream.
     **Ubuntu note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
 3. **Add `pyenv init` to your shell** to enable shims and autocompletion.
-   Please make sure `eval "$(pyenv init -)"` is placed toward the end of shell
+   Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
    configuration file since it manipulates `PATH` during the initialization.
 
         $ echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
@@ -202,7 +202,7 @@ easy to fork and contribute any changes back upstream.
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
     **Ubuntu note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
     
-    **General warning**: There are some systems, where the `BASH_ENV` variable is configured
+    **General warning**: There are some systems where the `BASH_ENV` variable is configured
     to point to `.bashrc`. On such systems you should almost certainly put the abovementioned line
     `eval "$(pyenv init -)` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
     may observe strange behaviour, such as `pyenv` getting into an infinite loop.
