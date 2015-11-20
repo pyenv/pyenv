@@ -97,7 +97,7 @@ case "$command" in
   } >&2
   exit 1
   ;;
--v )
+-v | --version )
   exec rbenv---version
   ;;
 -h | --help )
@@ -111,6 +111,10 @@ case "$command" in
   fi
 
   shift 1
-  exec "$command_path" "$@"
+  if [ "$1" = --help ]; then
+    exec rbenv-help "$command"
+  else
+    exec "$command_path" "$@"
+  fi
   ;;
 esac
