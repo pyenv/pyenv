@@ -12,21 +12,24 @@ if [ -n "$RBENV_DEBUG" ]; then
   set -x
 fi
 
+abort() {
+  { if [ "$#" -eq 0 ]; then cat -
+    else echo "rbenv: $*"
+    fi
+  } >&2
+  exit 1
+}
+
 if enable -f "${BASH_SOURCE%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
   abs_dirname() {
     local path="$(realpath "$1")"
     echo "${path%/*}"
   }
 else
-  if [ -n "$RBENV_NATIVE_EXT" ]; then
-    echo "rbenv: failed to load \`realpath' builtin" >&2
-    exit 1
-  fi
+  [ -z "$RBENV_NATIVE_EXT" ] || abort "failed to load \`realpath' builtin"
+
 READLINK=$(type -p greadlink readlink | head -1)
-if [ -z "$READLINK" ]; then
-  echo "rbenv: cannot find readlink - are you missing GNU coreutils?" >&2
-  exit 1
-fi
+[ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
 
 resolve_link() {
   $READLINK "$1"
@@ -57,10 +60,7 @@ export RBENV_ROOT
 if [ -z "${RBENV_DIR}" ]; then
   RBENV_DIR="$(pwd)"
 else
-  cd "$RBENV_DIR" 2>/dev/null || {
-    echo "rbenv: cannot change working directory to \`$RBENV_DIR'"
-    exit 1
-  } >&2
+  cd "$RBENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$RBENV_DIR'"
   RBENV_DIR="$(pwd)"
   cd "$OLDPWD"
 fi
@@ -94,8 +94,7 @@ case "$command" in
 "" )
   { rbenv---version
     rbenv-help
-  } >&2
-  exit 1
+  } | abort
   ;;
 -v | --version )
   exec rbenv---version
@@ -105,10 +104,7 @@ case "$command" in
   ;;
 * )
   command_path="$(command -v "rbenv-$command" || true)"
-  if [ -z "$command_path" ]; then
-    echo "rbenv: no such command \`$command'" >&2
-    exit 1
-  fi
+  [ -n "$command_path" ] || abort "no such command \`$command'"
 
   shift 1
   if [ "$1" = --help ]; then
