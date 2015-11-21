@@ -12,7 +12,9 @@
 #   -g/--debug       Build a debug version
 #
 
-PYTHON_BUILD_VERSION="20150818"
+PYTHON_BUILD_VERSION="20151028"
+
+OLDIFS="$IFS"
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -103,6 +105,7 @@ os_information() {
 osx_version() {
   local -a ver
   IFS=. ver=( `sw_vers -productVersion` )
+  IFS="$OLDIFS"
   echo $(( ${ver[0]}*100 + ${ver[1]} ))
 }
 
@@ -518,6 +521,8 @@ fetch_svn() {
 
   if type svn &>/dev/null; then
     svn co -r "$svn_rev" "$svn_url" "${package_name}" >&4 2>&1
+  elif type svnlite &>/dev/null; then
+    svnlite co -r "$svn_rev" "$svn_url" "${package_name}" >&4 2>&1
   else
     echo "error: please install Subversion and try again" >&2
     exit 1
@@ -682,7 +687,7 @@ build_package_standard() {
       export CC=clang
     fi
     ${!PACKAGE_CONFIGURE:-./configure} --prefix="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}" \
-      $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}"
+      $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}" || return 1
   ) >&4 2>&1
 
   { "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
@@ -1101,6 +1106,7 @@ require_gcc() {
 locate_gcc() {
   local gcc gccs
   IFS=: gccs=($(gccs_in_path))
+  IFS="$OLDIFS"
 
   verify_gcc "$CC" ||
   verify_gcc "$(command -v gcc || true)" || {
@@ -1116,6 +1122,7 @@ gccs_in_path() {
   local gcc path paths
   local gccs=()
   IFS=: paths=($PATH)
+  IFS="$OLDIFS"
 
   shopt -s nullglob
   for path in "${paths[@]}"; do
@@ -1334,11 +1341,16 @@ build_package_verify_openssl() {
 
 # Ensure that directories listed in LDFLAGS exist
 build_package_ldflags_dirs() {
-  local arg
-  for arg in $LDFLAGS; do
-    case "$arg" in
-    -L* ) mkdir -p "${arg#-L}" ;;
+  local arg dir
+  set - $LDFLAGS
+  while [ $# -gt 0 ]; do
+    dir=""
+    case "$1" in
+    -L  ) dir="$2" ;;
+    -L* ) dir="${1#-L}" ;;
     esac
+    [ -z "$dir" ] || mkdir -p "$dir"
+    shift 1
   done
 }
 
@@ -1646,7 +1658,6 @@ unset IPV6
 
 PYTHON_BUILD_INSTALL_PREFIX="$(abs_dirname "$0")/.."
 
-OLDIFS="$IFS"
 IFS=: PYTHON_BUILD_DEFINITIONS=($PYTHON_BUILD_DEFINITIONS ${PYTHON_BUILD_ROOT:-$PYTHON_BUILD_INSTALL_PREFIX}/share/python-build)
 IFS="$OLDIFS"
 
