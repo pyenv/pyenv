@@ -16,8 +16,16 @@ create_executable() {
 
 @test "fails with invalid version" {
   export PYENV_VERSION="3.4"
-  run pyenv-exec python -v
-  assert_failure "pyenv: version \`3.4' is not installed"
+  run pyenv-exec python -V
+  assert_failure "pyenv: version \`3.4' is not installed (set by PYENV_VERSION environment variable)"
+}
+
+@test "fails with invalid version set from file" {
+  mkdir -p "$PYENV_TEST_DIR"
+  cd "$PYENV_TEST_DIR"
+  echo 2.7 > .python-version
+  run pyenv-exec rspec
+  assert_failure "pyenv: version \`2.7' is not installed (set by $PWD/.python-version)"
 }
 
 @test "completes with names of executables" {
@@ -29,6 +37,7 @@ create_executable() {
   run pyenv-completions exec
   assert_success
   assert_output <<OUT
+--help
 fab
 python
 OUT

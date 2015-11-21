@@ -6,4 +6,4 @@
 /libexec/*.dylib
 /src/Makefile
 /src/*.o
-bats/
+/bats/

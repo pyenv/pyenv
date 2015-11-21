@@ -1,13 +1,69 @@
 #!/usr/bin/env bash
 # Summary: List all Python versions available to pyenv
-# Usage: pyenv versions [--bare]
+# Usage: pyenv versions [--bare] [--skip-aliases]
 #
 # Lists all Python versions found in `$PYENV_ROOT/versions/*'.
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-if [ "$1" = "--bare" ]; then
+unset bare
+unset skip_aliases
+# Provide pyenv completions
+for arg; do
+  case "$arg" in
+  --complete )
+    echo --bare
+    echo --skip-aliases
+    exit ;;
+  --bare ) bare=1 ;;
+  --skip-aliases ) skip_aliases=1 ;;
+  * )
+    pyenv-help --usage versions >&2
+    exit 1
+    ;;
+  esac
+done
+
+versions_dir="${PYENV_ROOT}/versions"
+
+if ! enable -f "${BASH_SOURCE%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
+  if [ -n "$PYENV_NATIVE_EXT" ]; then
+    echo "pyenv: failed to load \`realpath' builtin" >&2
+    exit 1
+  fi
+
+  READLINK=$(type -p greadlink readlink | head -1)
+  if [ -z "$READLINK" ]; then
+    echo "pyenv: cannot find readlink - are you missing GNU coreutils?" >&2
+    exit 1
+  fi
+
+  resolve_link() {
+    $READLINK "$1"
+  }
+
+  realpath() {
+    local cwd="$PWD"
+    local path="$1"
+    local name
+
+    while [ -n "$path" ]; do
+      name="${path##*/}"
+      [ "$name" = "$path" ] || cd "${path%/*}"
+      path="$(resolve_link "$name" || true)"
+    done
+
+    echo "${PWD}/$name"
+    cd "$cwd"
+  }
+fi
+
+if [ -d "$versions_dir" ]; then
+  versions_dir="$(realpath "$versions_dir")"
+fi
+
+if [ -n "$bare" ]; then
   hit_prefix=""
   miss_prefix=""
   current_versions=()
@@ -50,8 +106,12 @@ if [ -n "$include_system" ] && PYENV_VERSION=system pyenv-which python >/dev/nul
 fi
 
 shopt -s nullglob
-for path in "${PYENV_ROOT}/versions/"*; do
+for path in "$versions_dir"/*; do
   if [ -d "$path" ]; then
+    if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
+      target="$(realpath "$path")"
+      [ "${target%/*}" != "$versions_dir" ] || continue
+    fi
     print_version "${path##*/}"
     # virtual environments created by anaconda/miniconda
     for env_path in "${path}/envs/"*; do

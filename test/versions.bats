@@ -139,3 +139,18 @@ OUT
 2.7.8
 OUT
 }
+
+@test "doesn't list symlink aliases when --skip-aliases" {
+  create_version "1.8.7"
+  ln -s "1.8.7" "${PYENV_ROOT}/versions/1.8"
+  mkdir moo
+  ln -s "${PWD}/moo" "${PYENV_ROOT}/versions/1.9"
+
+  run pyenv-versions --bare --skip-aliases
+  assert_success
+
+  assert_output <<OUT
+1.8.7
+1.9
+OUT
+}

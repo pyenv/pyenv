@@ -49,7 +49,7 @@ setup() {
 
 @test "missing version" {
   PYENV_VERSION=1.2 run pyenv-version-name
-  assert_failure "pyenv: version \`1.2' is not installed"
+  assert_failure "pyenv: version \`1.2' is not installed (set by PYENV_VERSION environment variable)"
 }
 
 @test "one missing version (second missing)" {
@@ -57,7 +57,7 @@ setup() {
   PYENV_VERSION="3.4.2:1.2" run pyenv-version-name
   assert_failure
   assert_output <<OUT
-pyenv: version \`1.2' is not installed
+pyenv: version \`1.2' is not installed (set by PYENV_VERSION environment variable)
 3.4.2
 OUT
 }
@@ -67,7 +67,7 @@ OUT
   PYENV_VERSION="1.2:3.4.2" run pyenv-version-name
   assert_failure
   assert_output <<OUT
-pyenv: version \`1.2' is not installed
+pyenv: version \`1.2' is not installed (set by PYENV_VERSION environment variable)
 3.4.2
 OUT
 }

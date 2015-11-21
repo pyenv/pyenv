@@ -5,7 +5,8 @@ set -e
 
 find_local_version_file() {
   local root="$1"
-  while [ -n "$root" ]; do
+  while true; do
+    [[ "$root" =~ ^//[^/]*$ ]] && break
     if [ -e "${root}/.python-version" ]; then
       echo "${root}/.python-version"
       exit
@@ -13,7 +14,7 @@ find_local_version_file() {
       echo "${root}/.pyenv-version"
       exit
     fi
-    [ "${root}" = "${root%/*}" ] && break
+    [ -n "$root" ] || break
     root="${root%/*}"
   done
 }

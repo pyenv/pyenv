@@ -15,6 +15,12 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  echo --usage
+  exec pyenv-commands
+fi
+
 command_path() {
   local command="$1"
   command -v pyenv-"$command" || command -v pyenv-sh-"$command" || true
