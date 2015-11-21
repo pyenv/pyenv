@@ -49,7 +49,7 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
     * [Homebrew on Mac OS X](#homebrew-on-mac-os-x)
-    * [Neckbeard Configuration](#neckbeard-configuration)
+    * [Advanced Configuration](#advanced-configuration)
     * [Uninstalling Python Versions](#uninstalling-python-versions)
 * **[Command Reference](#command-reference)**
 * **[Development](#development)**
@@ -111,19 +111,19 @@ When you execute a shim, pyenv determines which Python version to use by
 reading it from the following sources, in this order:
 
 1. The `PYENV_VERSION` environment variable (if specified). You can use
-   the [`pyenv shell`](#pyenv-shell) command to set this environment
+   the [`pyenv shell`](https://github.com/yyuu/pyenv/blob/master/COMMANDS.md#pyenv-shell) command to set this environment
    variable in your current shell session.
 
 2. The application-specific `.python-version` file in the current
    directory (if present). You can modify the current directory's
-   `.python-version` file with the [`pyenv local`](#pyenv-local)
+   `.python-version` file with the [`pyenv local`](https://github.com/yyuu/pyenv/blob/master/COMMANDS.md#pyenv-local)
    command.
 
 3. The first `.python-version` file found (if any) by searching each parent
    directory, until reaching the root of your filesystem.
 
 4. The global `~/.pyenv/version` file. You can modify this file using
-   the [`pyenv global`](#pyenv-global) command. If the global version
+   the [`pyenv global`](https://github.com/yyuu/pyenv/blob/master/COMMANDS.md#pyenv-global) command. If the global version
    file is not present, pyenv assumes you want to use the "system"
    Python. (In other words, whatever version would run if pyenv weren't in your
    `PATH`.)
@@ -194,7 +194,7 @@ easy to fork and contribute any changes back upstream.
     **Ubuntu note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
 3. **Add `pyenv init` to your shell** to enable shims and autocompletion.
-   Please make sure `eval "$(pyenv init -)"` is placed toward the end of shell
+   Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
    configuration file since it manipulates `PATH` during the initialization.
 
         $ echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
@@ -202,7 +202,7 @@ easy to fork and contribute any changes back upstream.
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
     **Ubuntu note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
     
-    **General warning**: There are some systems, where the `BASH_ENV` variable is configured
+    **General warning**: There are some systems where the `BASH_ENV` variable is configured
     to point to `.bashrc`. On such systems you should almost certainly put the abovementioned line
     `eval "$(pyenv init -)` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
     may observe strange behaviour, such as `pyenv` getting into an infinite loop.
@@ -214,7 +214,7 @@ easy to fork and contribute any changes back upstream.
         $ exec $SHELL
 
 5. **Install Python versions into `$PYENV_ROOT/versions`.**
-   For example, to install Python 2.7.8, download and unpack the source, then run:
+   For example, to download and install Python 2.7.8, run:
 
         $ pyenv install 2.7.8
 
@@ -267,14 +267,13 @@ package manager for Mac OS X.
     $ brew install pyenv
 
 
-To upgrade pyenv in the future, just use `upgrade` instead of `install`.
+To upgrade pyenv in the future, use `upgrade` instead of `install`.
 
-After installation, you'll still need to add `eval "$(pyenv init -)"` to your
-profile (as stated in the caveats). You'll only ever have to do this
-once.
+After installation, you'll need to add `eval "$(pyenv init -)"` to your profile (as stated in the caveats displayed by Homebrew — to display them again, use `brew info pyenv`). You only need to add that to your profile once.
 
+Then follow the rest of the post-installation steps under "Basic GitHub Checkout" above, starting with #4 ("restart your shell so the path changes take effect").
 
-### Neckbeard Configuration
+### Advanced Configuration
 
 Skip this section unless you must know what every line in your shell
 profile is doing.
