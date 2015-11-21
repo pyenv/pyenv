@@ -257,6 +257,31 @@ To upgrade to a specific release of pyenv, check out the corresponding tag:
     v0.1.0
     $ git checkout v0.1.0
 
+### Uninstalling pyenv
+
+The simplicity of pyenv makes it easy to temporarily disable it, or
+uninstall from the system.
+
+1. To **disable** pyenv managing your Python versions, simply remove the
+  `pyenv init` line from your shell startup configuration. This will
+  remove pyenv shims directory from PATH, and future invocations like
+  `python` will execute the system Python version, as before pyenv.
+
+  `pyenv` will still be accessible on the command line, but your Python
+  apps won't be affected by version switching.
+
+2. To completely **uninstall** pyenv, perform step (1) and then remove
+   its root directory. This will **delete all Python versions** that were
+   installed under `` `pyenv root`/versions/ `` directory:
+
+        rm -rf `pyenv root`
+
+   If you've installed pyenv using a package manager, as a final step
+   perform the pyenv package removal. For instance, for Homebrew:
+
+        brew uninstall pyenv
+
+## Command Reference
 
 ### Homebrew on Mac OS X
 
@@ -328,43 +353,32 @@ See [COMMANDS.md](COMMANDS.md).
 
 ----
 
+## Environment variables
+
+You can affect how pyenv operates with the following settings:
+
+name | default | description
+-----|---------|------------
+`PYENV_VERSION` | | Specifies the Python version to be used.<br>Also see [`pyenv shell`](#pyenv-shell)
+`PYENV_ROOT` | `~/.pyenv` | Defines the directory under which Python versions and shims reside.<br>Also see `pyenv root`
+`PYENV_DEBUG` | | Outputs debug information.<br>Also as: `pyenv --debug <subcommand>`
+`PYENV_HOOK_PATH` | [_see wiki_][hooks] | Colon-separated list of paths searched for pyenv hooks.
+`PYENV_DIR` | `$PWD` | Directory to start searching for `.python-version` files.
 
 ## Development
 
-The pyenv source code is [hosted on GitHub](https://github.com/yyuu/pyenv).
-It's clean, modular, and easy to understand--even if you're not a shell hacker.
+The pyenv source code is [hosted on
+GitHub](https://github.com/yyuu/pyenv).  It's clean, modular,
+and easy to understand, even if you're not a shell hacker.
 
-Please feel free to submit Pull Requests and report bugs on the
-[issue tracker](https://github.com/yyuu/pyenv/issues).
+Tests are executed using [Bats](https://github.com/sstephenson/bats):
+
+    $ bats test
+    $ bats/test/<file>.bats
+
+Please feel free to submit pull requests and file bugs on the [issue
+tracker](https://github.com/yyuu/pyenv/issues).
 
 
-### Version History
-
-See [CHANGELOG.md](CHANGELOG.md).
-
-
-### License
-
-(The MIT license)
-
-* Copyright (c) 2013 Yamashita, Yuu
-* Copyright (c) 2013 Sam Stephenson
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  [pyenv-virtualenv]: https://github.com/yyuu/pyenv-virtualenv#readme
+  [hooks]: https://github.com/yyuu/pyenv/wiki/Authoring-plugins#pyenv-hooks

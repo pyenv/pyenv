@@ -5,6 +5,17 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  echo -
+  echo --no-rehash
+  echo bash
+  echo fish
+  echo ksh
+  echo zsh
+  exit
+fi
+
 print=""
 no_rehash=""
 for args in "$@"
@@ -25,7 +36,8 @@ if [ -z "$shell" ]; then
   shell="$(ps c -p "$PPID" -o 'ucomm=' 2>/dev/null || true)"
   shell="${shell##-}"
   shell="${shell%% *}"
-  shell="$(basename "${shell:-$SHELL}")"
+  shell="${shell:-$SHELL}"
+  shell="${shell##*/}"
 fi
 
 root="${0%/*}/.."
@@ -33,7 +45,11 @@ root="${0%/*}/.."
 if [ -z "$print" ]; then
   case "$shell" in
   bash )
-    profile='~/.bash_profile'
+    if [ -f "${HOME}/.bashrc" ] && [ ! -f "${HOME}/.bash_profile" ]; then
+      profile='~/.bashrc'
+    else
+      profile='~/.bash_profile'
+    fi
     ;;
   zsh )
     profile='~/.zshrc'
@@ -49,8 +65,8 @@ if [ -z "$print" ]; then
     ;;
   esac
 
-  { echo "# Load pyenv automatically by adding"
-    echo "# the following to the end of ${profile}:"
+  { echo "# Load pyenv automatically by appending"
+    echo "# the following to ${profile}:"
     echo
     case "$shell" in
     fish )
@@ -88,7 +104,7 @@ if [ -r "$completion" ]; then
 fi
 
 if [ -z "$no_rehash" ]; then
-  echo 'pyenv rehash 2>/dev/null'
+  echo 'command pyenv rehash 2>/dev/null'
 fi
 
 commands=(`pyenv-commands --sh`)
@@ -101,7 +117,7 @@ function pyenv
 
   switch "\$command"
   case ${commands[*]}
-    eval (pyenv "sh-\$command" \$argv)
+    . (pyenv "sh-\$command" \$argv|psub)
   case '*'
     command pyenv "\$command" \$argv
   end
@@ -132,7 +148,7 @@ cat <<EOS
 
   case "\$command" in
   ${commands[*]})
-    eval "\`pyenv "sh-\$command" "\$@"\`";;
+    eval "\$(pyenv "sh-\$command" "\$@")";;
   *)
     command pyenv "\$command" "\$@";;
   esac

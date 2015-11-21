@@ -14,7 +14,7 @@ load test_helper
 @test "auto rehash" {
   run pyenv-init -
   assert_success
-  assert_line "pyenv rehash 2>/dev/null"
+  assert_line "command pyenv rehash 2>/dev/null"
 }
 
 @test "setup shell completions" {
