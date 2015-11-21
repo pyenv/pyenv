@@ -17,7 +17,7 @@ create_executable() {
 @test "fails with invalid version" {
   export PYENV_VERSION="3.4"
   run pyenv-exec python -v
-  assert_failure "pyenv: version \`3.4' is not installed"
+  assert_failure "pyenv: version \`3.4' is not installed (set by PYENV_VERSION environment variable)"
 }
 
 @test "completes with names of executables" {

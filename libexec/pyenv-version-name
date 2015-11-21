@@ -28,7 +28,7 @@ OLDIFS="$IFS"
     elif version_exists "${version#python-}"; then
       versions=("${versions[@]}" "${version#python-}")
     else
-      echo "pyenv: version \`$version' is not installed" >&2
+      echo "pyenv: version \`$version' is not installed (set by $(pyenv-version-origin))" >&2
       any_not_installed=1
     fi
   done

@@ -65,7 +65,7 @@ else
       continue
     fi
     if ! [ -d "${PYENV_ROOT}/versions/${version}" ]; then
-      echo "pyenv: version \`$version' is not installed" >&2
+      echo "pyenv: version \`$version' is not installed (set by $(pyenv-version-origin))" >&2
       any_not_installed=1
     fi
   done
