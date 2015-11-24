@@ -1,0 +1,2 @@
+require_gcc
+install_package "pypy-4.0.1-src" "https://bitbucket.org/pypy/pypy/downloads/pypy-4.0.1-src.tar.bz2#29f5aa6ba17b34fd980e85172dfeb4086fdc373ad392b1feff2677d2d8aea23c" "pypy_builder" verify_py27 ensurepip
