@@ -12,7 +12,7 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-version="20151105"
+version="20151124"
 git_revision=""
 
 for source_dir in "${BASH_SOURCE%/*}" "$PYENV_ROOT"; do

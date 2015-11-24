@@ -1,5 +1,14 @@
 ## Version History
 
+### 20151124
+
+* pyenv: Import recent changes from rbenv 5fb9c84e14c8123b2591d22e248f045c7f8d8a2c
+* pyenv: List anaconda-style virtual environments as a version in pyenv (#471)
+* python-build: Import recent changes from ruby-build v20151028
+* python-build: Add PyPy 4.0.1 (#489)
+* python-build: Add `miniconda*-3.18.3` (#477)
+* python-build: Add CPython 2.7.11 RC1
+
 ### 20151105
 
 * python-build: Add anaconda2-2.4.0 and anacondaa3-2.4.0
