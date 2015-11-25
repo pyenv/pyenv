@@ -13,7 +13,7 @@ bulletproof deployments.
 
 **Rock-solid in production.** Your application's executables are its
   interface with ops. With rbenv and [Bundler
-  binstubs](https://github.com/sstephenson/rbenv/wiki/Understanding-binstubs)
+  binstubs](https://github.com/rbenv/rbenv/wiki/Understanding-binstubs)
   you'll never again need to `cd` in a cron job or Chef recipe to
   ensure you've selected the right runtime. The Ruby version
   dependency lives in one place—your app—so upgrades and rollbacks are
@@ -24,12 +24,12 @@ bulletproof deployments.
   you tailor it to suit your needs. Compile your own Ruby versions, or
   use the [ruby-build][]
   plugin to automate the process. Specify per-application environment
-  variables with [rbenv-vars](https://github.com/sstephenson/rbenv-vars).
+  variables with [rbenv-vars](https://github.com/rbenv/rbenv-vars).
   See more [plugins on the
-  wiki](https://github.com/sstephenson/rbenv/wiki/Plugins).
+  wiki](https://github.com/rbenv/rbenv/wiki/Plugins).
 
 [**Why choose rbenv over
-RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
+RVM?**](https://github.com/rbenv/rbenv/wiki/Why-rbenv%3F)
 
 ## Table of Contents
 
@@ -453,8 +453,8 @@ Tests are executed using [Bats](https://github.com/sstephenson/bats):
     $ bats test/<file>.bats
 
 Please feel free to submit pull requests and file bugs on the [issue
-tracker](https://github.com/sstephenson/rbenv/issues).
+tracker](https://github.com/rbenv/rbenv/issues).
 
 
-  [ruby-build]: https://github.com/sstephenson/ruby-build#readme
-  [hooks]: https://github.com/sstephenson/rbenv/wiki/Authoring-plugins#rbenv-hooks
+  [ruby-build]: https://github.com/rbenv/ruby-build#readme
+  [hooks]: https://github.com/rbenv/rbenv/wiki/Authoring-plugins#rbenv-hooks
