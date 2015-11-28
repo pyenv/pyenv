@@ -8,8 +8,8 @@ pyenv lets you easily switch between multiple versions of Python. It's
 simple, unobtrusive, and follows the UNIX tradition of single-purpose
 tools that do one thing well.
 
-This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
-[ruby-build](https://github.com/sstephenson/ruby-build), and modified for Python.
+This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
+[ruby-build](https://github.com/rbenv/ruby-build), and modified for Python.
 
 <img src="https://i.gyazo.com/699a58927b77e46e71cd674c7fc7a78d.png" width="735" height="490" />
 
@@ -21,7 +21,7 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
 * Allow you to **override the Python version** with an environment
   variable.
 * Search commands from **multiple versions of Python at a time**.
-  This may be helpful to test across Python versions with [tox](http://pypi.python.org/pypi/tox).
+  This may be helpful to test across Python versions with [tox](https://pypi.python.org/pypi/tox).
 
 
 ### In contrast with pythonbrew and pythonz, pyenv _does not..._
@@ -30,7 +30,7 @@ This project was forked from [rbenv](https://github.com/sstephenson/rbenv) and
     There is no bootstrap problem of Python.
 * **Need to be loaded into your shell.** Instead, pyenv's shim
     approach works by adding a directory to your `$PATH`.
-* **Manage virtualenv.** Of course, you can create [virtualenv](http://pypi.python.org/pypi/virtualenv)
+* **Manage virtualenv.** Of course, you can create [virtualenv](https://pypi.python.org/pypi/virtualenv)
     yourself, or [pyenv-virtualenv](https://github.com/yyuu/pyenv-virtualenv)
     to automate the process.
 
