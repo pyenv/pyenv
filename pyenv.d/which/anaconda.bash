@@ -14,11 +14,14 @@ conda_exists() {
 }
 
 conda_shims() {
+  ## curl
   cat <<EOS
-assistant
 curl
 curl-config
-designer
+EOS
+
+  ## fontconfig
+  cat <<EOS
 fc-cache
 fc-cat
 fc-list
@@ -27,14 +30,32 @@ fc-pattern
 fc-query
 fc-scan
 fc-validate
+EOS
+
+  ## freetype
+  cat <<EOS
 freetype-config
-lconvert
+EOS
+
+  ## libpng
+  cat <<EOS
 libpng-config
+EOS
+
+  ## openssl
+  cat <<EOS
+openssl
+EOS
+
+  ## qtchooser
+  cat <<EOS
+assistant
+designer
+lconvert
 linguist
 lrelease
 lupdate
 moc
-openssl
 pixeltool
 qcollectiongenerator
 qdbus
@@ -48,17 +69,37 @@ qmlplugindump
 qmlviewer
 qtconfig
 rcc
+uic
+xmlpatterns
+xmlpatternsvalidator
+EOS
+
+  ## redis
+  cat <<EOS
 redis-benchmark
 redis-check-aof
 redis-check-dump
 redis-cli
 redis-server
+EOS
+
+  ## sqlite3
+  cat <<EOS
 sqlite3
-uic
+EOS
+
+  ## libxml2
+  cat <<EOS
 xml2-config
-xmlpatterns
-xmlpatternsvalidator
+EOS
+
+  ## libxslt
+  cat <<EOS
 xslt-config
+EOS
+
+  ## xsltproc
+  cat <<EOS
 xsltproc
 EOS
 }
