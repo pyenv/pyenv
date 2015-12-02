@@ -111,6 +111,7 @@ for path in "$versions_dir"/*; do
     if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
       target="$(realpath "$path")"
       [ "${target%/*}" != "$versions_dir" ] || continue
+      [ "${target%/*/envs/*}" != "$versions_dir" ] || continue
     fi
     print_version "${path##*/}"
     # virtual environments created by anaconda/miniconda
