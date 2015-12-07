@@ -158,7 +158,7 @@ easy to fork and contribute any changes back upstream.
 1. Check out rbenv into `~/.rbenv`.
 
     ~~~ sh
-    $ git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
+    $ git clone https://github.com/rbenv/rbenv.git ~/.rbenv
     ~~~
 
 2. Add `~/.rbenv/bin` to your `$PATH` for access to the `rbenv`
@@ -444,7 +444,7 @@ name | default | description
 ## Development
 
 The rbenv source code is [hosted on
-GitHub](https://github.com/sstephenson/rbenv). It's clean, modular,
+GitHub](https://github.com/rbenv/rbenv). It's clean, modular,
 and easy to understand, even if you're not a shell hacker.
 
 Tests are executed using [Bats](https://github.com/sstephenson/bats):
