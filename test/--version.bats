@@ -49,7 +49,7 @@ git_commit() {
   mkdir -p "$RBENV_ROOT"
   cd "$RBENV_ROOT"
   git init
-  git remote add origin https://github.com/sstephenson/rbenv.git
+  git remote add origin https://github.com/rbenv/rbenv.git
   git_commit
   git tag v0.4.1
   git_commit
@@ -65,7 +65,7 @@ git_commit() {
   mkdir -p "$RBENV_ROOT"
   cd "$RBENV_ROOT"
   git init
-  git remote add origin https://github.com/sstephenson/rbenv.git
+  git remote add origin https://github.com/rbenv/rbenv.git
   git_commit
 
   cd "$RBENV_TEST_DIR"
