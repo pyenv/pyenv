@@ -183,7 +183,8 @@ fi
 # fail.)
 if [[ "${VERSION_NAME}" == [23]"."* ]]; then
   for version in "${VERSION_NAME%-dev}" "${VERSION_NAME%.*}" "${VERSION_NAME%%.*}"; do
-    PYENV_VERSION="$(pyenv-whence "python${version}" 2>/dev/null | tail -n 1 || true)"
+    # Anaconda's `curl` doesn't work on platfrom where `/etc/pki/tls/certs/ca-bundle.crt` isn't available (e.g. Debian)
+    PYENV_VERSION="$(pyenv-whence "python${version}" 2>/dev/null | grep -v conda | tail -n 1 || true)"
     if [ -n "${PYENV_VERSION}" ]; then
       export PYENV_VERSION
       break
