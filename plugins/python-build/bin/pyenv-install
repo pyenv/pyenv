@@ -177,41 +177,50 @@ if [ -z "${PYTHON_BUILD_CACHE_PATH}" ] && [ -d "${PYENV_ROOT}/cache" ]; then
   export PYTHON_BUILD_CACHE_PATH="${PYENV_ROOT}/cache"
 fi
 
-# Default PYENV_VERSION to the friendly Python version. (The
-# CPython installer requires an existing Python installation to run. An
-# unsatisfied local .python-version file can cause the installer to
-# fail.)
-if [[ "${VERSION_NAME}" == [23]"."* ]]; then
-  for version in "${VERSION_NAME%-dev}" "${VERSION_NAME%.*}" "${VERSION_NAME%%.*}"; do
-    # Anaconda's `curl` doesn't work on platfrom where `/etc/pki/tls/certs/ca-bundle.crt` isn't available (e.g. Debian)
-    PYENV_VERSION="$(pyenv-whence "python${version}" 2>/dev/null | grep -v conda | tail -n 1 || true)"
-    if [ -n "${PYENV_VERSION}" ]; then
-      export PYENV_VERSION
-      break
-    fi
-  done
-fi
-
-# PyPy/PyPy3 requires existing Python 2.7 to build
-if [[ "${VERSION_NAME}" == "pypy-"*"-src" ]] || [[ "${VERSION_NAME}" == "pypy3-"*"-src" ]]; then
-  if [ -z "$PYENV_RPYTHON_VERSION" ]; then
-    for version in $(pyenv-versions --bare | sort -r); do
-      if [[ "$version" == "2.7"* ]]; then
-        PYENV_RPYTHON_VERSION="$version"
-      fi
+if [ -z "${PYENV_BOOTSTRAP_VERSION}" ]; then
+  case "${VERSION_NAME}" in
+  [23]"."* )
+    # Default PYENV_VERSION to the friendly Python version. (The
+    # CPython installer requires an existing Python installation to run. An
+    # unsatisfied local .python-version file can cause the installer to
+    # fail.)
+    for version_info in "${VERSION_NAME%-dev}" "${VERSION_NAME%.*}" "${VERSION_NAME%%.*}"; do
+      # Anaconda's `curl` doesn't work on platfrom where `/etc/pki/tls/certs/ca-bundle.crt` isn't available (e.g. Debian)
+      for version in $(pyenv-whence "python${version_info}" 2>/dev/null || true); do
+        if [[ "${version}" != "anaconda"* ]] && [[ "${version}" != "miniconda"* ]]; then
+          PYENV_BOOTSTRAP_VERSION="${version}"
+          break 2
+        fi
+      done
     done
-  fi
-  if [ -n "$PYENV_RPYTHON_VERSION" ]; then
-    if PYENV_VERSION="$PYENV_RPYTHON_VERSION" pyenv-exec python -c 'import curses' 1>/dev/null 2>&1; then
-      export PYENV_VERSION="$PYENV_RPYTHON_VERSION"
+    ;;
+  "pypy-"*"-src" | "pypy3-"*"-src" )
+    # PyPy/PyPy3 requires existing Python 2.7 to build
+    if [ -n "${PYENV_RPYTHON_VERSION}" ]; then
+      PYENV_BOOTSTRAP_VERSION="${PYENV_RPYTHON_VERSION}"
     else
-      echo "pyenv-install: $VERSION_NAME: PyPy requires \`curses' in $PYENV_RPYTHON_VERSION to build from source." >&2
+      for version in $(pyenv-versions --bare | sort -r); do
+        if [[ "${version}" == "2.7"* ]]; then
+          PYENV_BOOTSTRAP_VERSION="$version"
+          break
+        fi
+      done
+    fi
+    if [ -n "$PYENV_BOOTSTRAP_VERSION" ]; then
+      if ! PYENV_VERSION="$PYENV_BOOTSTRAP_VERSION" pyenv-exec python -c 'import curses' 1>/dev/null 2>&1; then
+        echo "pyenv-install: $VERSION_NAME: PyPy requires \`curses' in $PYENV_BOOTSTRAP_VERSION to build from source." >&2
+        exit 1
+      fi
+    else
+      echo "pyenv-install: $VERSION_NAME: PyPy requires Python 2.7 to build from source." >&2
       exit 1
     fi
-  else
-    echo "pyenv-install: $VERSION_NAME: PyPy requires Python 2.5, 2.6 or 2.7 to build from source." >&2
-    exit 1
-  fi
+    ;;
+  esac
+fi
+
+if [ -n "${PYENV_BOOTSTRAP_VERSION}" ]; then
+  export PYENV_VERSION="${PYENV_BOOTSTRAP_VERSION}"
 fi
 
 # Execute `before_install` hooks.
