@@ -1,5 +1,13 @@
 ## Version History
 
+### 20151210
+
++ pyenv: Add a default hook for Anaconda to look for original `$PATH` (#491)
++ pyenv: Skip virtualenv aliases on `pyenv versions --skip-aliases` (yyuu/pyenv-virtualenv#126)
++ python-build: Add CPython 2.7.11, 3.5.1 (#494, #498)
++ python-build: Update OpenSSL to 1.0.1q (#496)
++ python-build: Adding SSL patch to build 2.7.3 on Debian (#495)
+
 ### 20151124
 
 * pyenv: Import recent changes from rbenv 5fb9c84e14c8123b2591d22e248f045c7f8d8a2c
