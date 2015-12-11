@@ -146,8 +146,20 @@ lookup_from_path() {
   echo "$result"
 }
 
-if [ -n "$PYENV_COMMAND" ] && [ ! -x "$PYENV_COMMAND_PATH" ]; then
-  if conda_exists && conda_shims | grep -q -x "$PYENV_COMMAND"; then
-    PYENV_COMMAND_PATH="$(lookup_from_path "$PYENV_COMMAND" || true)"
+if [ -n "$PYENV_COMMAND" ]; then
+  if conda_exists; then
+    if [ -x "$PYENV_COMMAND_PATH" ]; then
+      # `curl` bundled with Anaconda does not work on Debian
+      # https://github.com/ContinuumIO/anaconda-issues/issues/72
+      if [[ "$PYENV_COMMAND" == "curl" ]] && [[ -x "${PYENV_COMMAND_PATH%/*}/curl-config" ]]; then
+        if [ ! -f "$("${PYENV_COMMAND_PATH%/*}/curl-config" --ca 2>/dev/null || true)" ]; then
+          PYENV_COMMAND_PATH="$(lookup_from_path "$PYENV_COMMAND" || true)"
+        fi
+      fi
+    else
+      if conda_shims | grep -q -x "$PYENV_COMMAND"; then
+        PYENV_COMMAND_PATH="$(lookup_from_path "$PYENV_COMMAND" || true)"
+      fi
+    fi
   fi
 fi
