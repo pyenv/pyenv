@@ -23,7 +23,8 @@ remove_from_path() {
     path_before="$result"
     result="${result//:$path_to_remove:/:}"
   done
-  echo "${result%:}"
+  result="${result%:}"
+  echo "${result#:}"
 }
 
 PYENV_COMMAND="$1"

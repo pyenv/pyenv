@@ -59,6 +59,16 @@ create_executable() {
   assert_success "${PYENV_TEST_DIR}/bin/kill-all-humans"
 }
 
+@test "doesn't include current directory in PATH search" {
+  export PATH="$(path_without "kill-all-humans")"
+  mkdir -p "$PYENV_TEST_DIR"
+  cd "$PYENV_TEST_DIR"
+  touch kill-all-humans
+  chmod +x kill-all-humans
+  PYENV_VERSION=system run pyenv-which kill-all-humans
+  assert_failure "pyenv: kill-all-humans: command not found"
+}
+
 @test "version not installed" {
   create_executable "3.4" "py.test"
   PYENV_VERSION=3.3 run pyenv-which py.test
