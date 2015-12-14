@@ -56,6 +56,16 @@ create_executable() {
   assert_success "${RBENV_TEST_DIR}/bin/kill-all-humans"
 }
 
+@test "doesn't include current directory in PATH search" {
+  export PATH="$(path_without "kill-all-humans")"
+  mkdir -p "$RBENV_TEST_DIR"
+  cd "$RBENV_TEST_DIR"
+  touch kill-all-humans
+  chmod +x kill-all-humans
+  RBENV_VERSION=system run rbenv-which kill-all-humans
+  assert_failure "rbenv: kill-all-humans: command not found"
+}
+
 @test "version not installed" {
   create_executable "2.0" "rspec"
   RBENV_VERSION=1.9 run rbenv-which rspec
