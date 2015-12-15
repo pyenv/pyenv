@@ -67,7 +67,6 @@ executables injected into your `PATH`, determines which Python version
 has been specified by your application, and passes your commands along
 to the correct Python installation.
 
-
 ### Understanding PATH
 
 When you run a command like `python` or `pip`, your operating system
@@ -82,7 +81,6 @@ executable in a directory at the beginning of the list takes
 precedence over another one at the end. In this example, the
 `/usr/local/bin` directory will be searched first, then `/usr/bin`,
 then `/bin`.
-
 
 ### Understanding Shims
 
@@ -103,7 +101,6 @@ operating system will do the following:
 * Find the pyenv shim named `pip` at the beginning of your `PATH`
 * Run the shim named `pip`, which in turn passes the command along to
   pyenv
-
 
 ### Choosing the Python Version
 
