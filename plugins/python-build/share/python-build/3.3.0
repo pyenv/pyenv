@@ -1,4 +1,4 @@
 #require_gcc
 install_package "openssl-1.0.1q" "https://www.openssl.org/source/openssl-1.0.1q.tar.gz#b3658b84e9ea606a5ded3c972a5517cd785282e7ea86b20c78aa4b773a047fb7" mac_openssl --if has_broken_mac_openssl
 install_package "readline-6.3" "http://ftpmirror.gnu.org/readline/readline-6.3.tar.gz#56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43" standard --if has_broken_mac_readline
-install_package "Python-3.3.0" "http://python.org/ftp/python/3.3.0/Python-3.3.0.tgz#cfe531eaace2503e13a74addc7f4a89482e99f8b8fca51b469ae5c83f450604e" ldflags_dirs standard verify_py33 ensurepip
+install_package "Python-3.3.0" "http://www.python.org/ftp/python/3.3.0/Python-3.3.0.tgz#cfe531eaace2503e13a74addc7f4a89482e99f8b8fca51b469ae5c83f450604e" ldflags_dirs standard verify_py33 ensurepip
