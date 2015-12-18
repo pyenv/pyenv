@@ -1,0 +1,72 @@
+diff -r -u ../Python-3.4.2.orig/Lib/ssl.py ./Lib/ssl.py
+--- ../Python-3.4.2.orig/Lib/ssl.py	2014-10-08 08:18:12.000000000 +0000
++++ ./Lib/ssl.py	2015-12-18 13:34:24.530051626 +0000
+@@ -106,7 +106,12 @@
+ from _ssl import (VERIFY_DEFAULT, VERIFY_CRL_CHECK_LEAF, VERIFY_CRL_CHECK_CHAIN,
+     VERIFY_X509_STRICT)
+ from _ssl import txt2obj as _txt2obj, nid2obj as _nid2obj
+-from _ssl import RAND_status, RAND_egd, RAND_add, RAND_bytes, RAND_pseudo_bytes
++from _ssl import RAND_status, RAND_add, RAND_bytes, RAND_pseudo_bytes
++try:
++    from _ssl import RAND_egd
++except ImportError:
++    # LibreSSL does not provide RAND_egd
++    pass
+ 
+ def _import_symbols(prefix):
+     for n in dir(_ssl):
+@@ -116,18 +121,14 @@
+ _import_symbols('OP_')
+ _import_symbols('ALERT_DESCRIPTION_')
+ _import_symbols('SSL_ERROR_')
++_import_symbols('PROTOCOL_')
+ 
+ from _ssl import HAS_SNI, HAS_ECDH, HAS_NPN
+ 
+-from _ssl import PROTOCOL_SSLv3, PROTOCOL_SSLv23, PROTOCOL_TLSv1
+ from _ssl import _OPENSSL_API_VERSION
+ 
+ 
+-_PROTOCOL_NAMES = {
+-    PROTOCOL_TLSv1: "TLSv1",
+-    PROTOCOL_SSLv23: "SSLv23",
+-    PROTOCOL_SSLv3: "SSLv3",
+-}
++_PROTOCOL_NAMES = {value: name for name, value in globals().items() if name.startswith('PROTOCOL_')}
+ try:
+     from _ssl import PROTOCOL_SSLv2
+     _SSLv2_IF_EXISTS = PROTOCOL_SSLv2
+@@ -922,7 +923,7 @@
+     d = pem_cert_string.strip()[len(PEM_HEADER):-len(PEM_FOOTER)]
+     return base64.decodebytes(d.encode('ASCII', 'strict'))
+ 
+-def get_server_certificate(addr, ssl_version=PROTOCOL_SSLv3, ca_certs=None):
++def get_server_certificate(addr, ssl_version=PROTOCOL_SSLv23, ca_certs=None):
+     """Retrieve the certificate from the server at the specified address,
+     and return it as a PEM-encoded string.
+     If 'ca_certs' is specified, validate the server cert against it.
+diff -r -u ../Python-3.4.2.orig/Modules/_ssl.c ./Modules/_ssl.c
+--- ../Python-3.4.2.orig/Modules/_ssl.c	2014-10-08 08:18:15.000000000 +0000
++++ ./Modules/_ssl.c	2015-12-18 13:32:44.967611074 +0000
+@@ -2016,8 +2016,10 @@
+     else if (proto_version == PY_SSL_VERSION_TLS1_2)
+         ctx = SSL_CTX_new(TLSv1_2_method());
+ #endif
++#ifndef OPENSSL_NO_SSL3
+     else if (proto_version == PY_SSL_VERSION_SSL3)
+         ctx = SSL_CTX_new(SSLv3_method());
++#endif
+ #ifndef OPENSSL_NO_SSL2
+     else if (proto_version == PY_SSL_VERSION_SSL2)
+         ctx = SSL_CTX_new(SSLv2_method());
+@@ -4071,8 +4073,10 @@
+     PyModule_AddIntConstant(m, "PROTOCOL_SSLv2",
+                             PY_SSL_VERSION_SSL2);
+ #endif
++#ifndef OPENSSL_NO_SSL3
+     PyModule_AddIntConstant(m, "PROTOCOL_SSLv3",
+                             PY_SSL_VERSION_SSL3);
++#endif
+     PyModule_AddIntConstant(m, "PROTOCOL_SSLv23",
+                             PY_SSL_VERSION_SSL23);
+     PyModule_AddIntConstant(m, "PROTOCOL_TLSv1",
