@@ -1,7 +1,7 @@
 diff -r -u ../Python-3.3.6.orig/Lib/ssl.py ./Lib/ssl.py
 --- ../Python-3.3.6.orig/Lib/ssl.py	2014-10-12 07:03:53.000000000 +0000
-+++ ./Lib/ssl.py	2015-12-18 12:49:03.860983039 +0000
-@@ -66,40 +66,27 @@
++++ ./Lib/ssl.py	2015-12-20 06:43:59.175134734 +0000
+@@ -66,47 +66,32 @@
      SSLSyscallError, SSLEOFError,
      )
  from _ssl import CERT_NONE, CERT_OPTIONAL, CERT_REQUIRED
@@ -54,25 +54,19 @@ diff -r -u ../Python-3.3.6.orig/Lib/ssl.py ./Lib/ssl.py
 -    PROTOCOL_SSLv3: "SSLv3",
 -}
 +_PROTOCOL_NAMES = {value: name for name, value in globals().items() if name.startswith('PROTOCOL_')}
- try:
-     from _ssl import PROTOCOL_SSLv2
-     _SSLv2_IF_EXISTS = PROTOCOL_SSLv2
-@@ -108,6 +95,14 @@
- else:
-     _PROTOCOL_NAMES[PROTOCOL_SSLv2] = "SSLv2"
- 
-+try:
-+    from _ssl import PROTOCOL_TLSv1_1, PROTOCOL_TLSv1_2
-+except ImportError:
-+    pass
-+else:
-+    _PROTOCOL_NAMES[PROTOCOL_TLSv1_1] = "TLSv1.1"
-+    _PROTOCOL_NAMES[PROTOCOL_TLSv1_2] = "TLSv1.2"
 +
+ try:
+-    from _ssl import PROTOCOL_SSLv2
+     _SSLv2_IF_EXISTS = PROTOCOL_SSLv2
+-except ImportError:
++except NameError:
+     _SSLv2_IF_EXISTS = None
+-else:
+-    _PROTOCOL_NAMES[PROTOCOL_SSLv2] = "SSLv2"
+ 
  from socket import getnameinfo as _getnameinfo
  from socket import error as socket_error
- from socket import socket, AF_INET, SOCK_STREAM, create_connection
-@@ -664,7 +659,7 @@
+@@ -664,7 +649,7 @@
      d = pem_cert_string.strip()[len(PEM_HEADER):-len(PEM_FOOTER)]
      return base64.decodebytes(d.encode('ASCII', 'strict'))
  
@@ -83,7 +77,7 @@ diff -r -u ../Python-3.3.6.orig/Lib/ssl.py ./Lib/ssl.py
      If 'ca_certs' is specified, validate the server cert against it.
 diff -r -u ../Python-3.3.6.orig/Modules/_ssl.c ./Modules/_ssl.c
 --- ../Python-3.3.6.orig/Modules/_ssl.c	2014-10-12 07:03:53.000000000 +0000
-+++ ./Modules/_ssl.c	2015-12-18 12:41:01.706137147 +0000
++++ ./Modules/_ssl.c	2015-12-20 06:42:45.773667904 +0000
 @@ -1746,8 +1746,10 @@
      PySSL_BEGIN_ALLOW_THREADS
      if (proto_version == PY_SSL_VERSION_TLS1)
