@@ -1231,8 +1231,31 @@ require_distro() {
   return 1
 }
 
+configured_with_package_dir() {
+  local package_var_name="$(capitalize "$1")"
+  shift 1
+  local PACKAGE_CONFIGURE_OPTS="${package_var_name}_CONFIGURE_OPTS"
+  local PACKAGE_CONFIGURE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
+  local arg flag
+  for arg in ${CONFIGURE_OPTS} ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}"; do
+    if [[ "$arg" == "CPPFLAGS="* ]]; then
+      for flag in ${CPPFLAGS} ${arg##CPPFLAGS=}; do
+        if [[ "$flag" == "-I"* ]]; then
+          local header
+          for header in "$@"; do
+            if [ -e "${flag##-I}/${header#/}" ]; then
+              return 0
+            fi
+          done
+        fi
+      done
+    fi
+  done
+  return 1
+}
+
 needs_yaml() {
-  [[ "$RUBY_CONFIGURE_OPTS" != *--with-libyaml-dir=* ]] &&
+  ! configured_with_package_dir "python" "yaml.h" &&
   ! use_homebrew_yaml
 }
 
@@ -1246,30 +1269,16 @@ use_homebrew_yaml() {
   fi
 }
 
-configured_with_readline_dir() {
+has_broken_mac_readline() {
   # Mac OS X 10.4 has broken readline.
   # https://github.com/yyuu/pyenv/issues/23
-  local arg flag
-  for arg in ${CONFIGURE_OPTS} ${PYTHON_CONFIGURE_OPTS} "${PYTHON_CONFIGURE_OPTS_ARRAY[@]}"; do
-    if [[ "$arg" == "CPPFLAGS="* ]]; then
-      for flag in ${CPPFLAGS} ${arg##CPPFLAGS=}; do
-        if [[ "$flag" == "-I"* ]] && [ -e "${flag##-I}/readline/rlconf.h" ]; then
-          return 0
-        fi
-      done
-    fi
-  done
-  return 1
-}
-
-has_broken_mac_readline() {
   [ "$(uname -s)" = "Darwin" ] &&
-  ! configured_with_readline_dir &&
+  ! configured_with_package_dir "python" "readline/rlconf.h" &&
   ! use_homebrew_readline
 }
 
 use_homebrew_readline() {
-  if ! configured_with_readline_dir; then
+  if ! configured_with_package_dir "python" "readline/rlconf.h"; then
     local libdir="$(brew --prefix readline 2>/dev/null || true)"
     if [ -d "$libdir" ]; then
       export CPPFLAGS="-I$libdir/include ${CPPFLAGS}"

@@ -91,9 +91,9 @@ OUT
 }
 
 @test "no executable found for system version" {
-  export PATH="$(path_without "rake")"
-  PYENV_VERSION=system run pyenv-which rake
-  assert_failure "pyenv: rake: command not found"
+  export PATH="$(path_without "py.test")"
+  PYENV_VERSION=system run pyenv-which py.test
+  assert_failure "pyenv: py.test: command not found"
 }
 
 @test "executable found in other versions" {
