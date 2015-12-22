@@ -1,12 +1,18 @@
 ## Version History
 
+### 20151222
+
+* pyenv: Merge recent changes from rbenv as of 2015-12-14 (#504)
+* python-build: Add a `OPENSSL_NO_SSL3` patch for CPython 2.6, 2.7, 3.0, 3.1, 3.2 and 3.3 series (#507, #511)
+* python-build: Stopped using mirror at yyuu.github.io for CPython since http://www.python.org is on fast.ly
+
 ### 20151210
 
-+ pyenv: Add a default hook for Anaconda to look for original `$PATH` (#491)
-+ pyenv: Skip virtualenv aliases on `pyenv versions --skip-aliases` (yyuu/pyenv-virtualenv#126)
-+ python-build: Add CPython 2.7.11, 3.5.1 (#494, #498)
-+ python-build: Update OpenSSL to 1.0.1q (#496)
-+ python-build: Adding SSL patch to build 2.7.3 on Debian (#495)
+* pyenv: Add a default hook for Anaconda to look for original `$PATH` (#491)
+* pyenv: Skip virtualenv aliases on `pyenv versions --skip-aliases` (yyuu/pyenv-virtualenv#126)
+* python-build: Add CPython 2.7.11, 3.5.1 (#494, #498)
+* python-build: Update OpenSSL to 1.0.1q (#496)
+* python-build: Adding SSL patch to build 2.7.3 on Debian (#495)
 
 ### 20151124
 
