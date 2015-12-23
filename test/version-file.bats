@@ -97,3 +97,14 @@ create_file() {
   RBENV_DIR="${RBENV_TEST_DIR}/widget/blank" run rbenv-version-file
   assert_success "${RBENV_TEST_DIR}/project/.ruby-version"
 }
+
+@test "finds version file in target directory" {
+  create_file "project/.ruby-version"
+  run rbenv-version-file "${PWD}/project"
+  assert_success "${RBENV_TEST_DIR}/project/.ruby-version"
+}
+
+@test "fails when no version file in target directory" {
+  run rbenv-version-file "$PWD"
+  assert_failure ""
+}

@@ -47,9 +47,10 @@ elif [ -n "$RBENV_VERSION" ]; then
     } >&2
   fi
 else
-  rbenv-version-file-read .ruby-version ||
-  rbenv-version-file-read .rbenv-version ||
-  { echo "rbenv: no local version configured for this directory"
+  if version_file="$(rbenv-version-file "$PWD")"; then
+    rbenv-version-file-read "$version_file"
+  else
+    echo "rbenv: no local version configured for this directory" >&2
     exit 1
-  } >&2
+  fi
 fi

@@ -32,11 +32,11 @@ setup() {
   assert_success "2.0"
 }
 
-@test "ignores version in parent directory" {
+@test "discovers version file in parent directory" {
   echo "1.2.3" > .ruby-version
   mkdir -p "subdir" && cd "subdir"
   run rbenv-local
-  assert_failure
+  assert_success "1.2.3"
 }
 
 @test "ignores RBENV_DIR" {

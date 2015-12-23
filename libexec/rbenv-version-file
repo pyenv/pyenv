@@ -1,35 +1,45 @@
 #!/usr/bin/env bash
+# Usage: rbenv version-file [<dir>]
 # Summary: Detect the file that sets the current rbenv version
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
+target_dir="$1"
+
 find_local_version_file() {
   local root="$1"
-  while true; do
-    [[ "$root" =~ ^//[^/]*$ ]] && break
+  while ! [[ "$root" =~ ^//[^/]*$ ]]; do
     if [ -e "${root}/.ruby-version" ]; then
       echo "${root}/.ruby-version"
-      exit
+      return 0
     elif [ -e "${root}/.rbenv-version" ]; then
       echo "${root}/.rbenv-version"
-      exit
+      return 0
     fi
     [ -n "$root" ] || break
     root="${root%/*}"
   done
+  return 1
 }
 
-find_local_version_file "$RBENV_DIR"
-[ "$RBENV_DIR" = "$PWD" ] || find_local_version_file "$PWD"
+find_global_version_file() {
+  local global_version_file="${RBENV_ROOT}/version"
 
-global_version_file="${RBENV_ROOT}/version"
+  if [ -e "$global_version_file" ]; then
+    echo "$global_version_file"
+  elif [ -e "${RBENV_ROOT}/global" ]; then
+    echo "${RBENV_ROOT}/global"
+  elif [ -e "${RBENV_ROOT}/default" ]; then
+    echo "${RBENV_ROOT}/default"
+  else
+    echo "$global_version_file"
+  fi
+}
 
-if [ -e "$global_version_file" ]; then
-  echo "$global_version_file"
-elif [ -e "${RBENV_ROOT}/global" ]; then
-  echo "${RBENV_ROOT}/global"
-elif [ -e "${RBENV_ROOT}/default" ]; then
-  echo "${RBENV_ROOT}/default"
+if [ -n "$target_dir" ]; then
+  find_local_version_file "$target_dir"
 else
-  echo "$global_version_file"
+  find_local_version_file "$RBENV_DIR" || {
+    [ "$RBENV_DIR" != "$PWD" ] && find_local_version_file "$PWD"
+  } || find_global_version_file
 fi
