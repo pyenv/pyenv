@@ -4,8 +4,8 @@ load test_helper
 
 @test "blank invocation" {
   run rbenv
-  assert_success
-  assert [ "${lines[0]}" = "rbenv 0.4.0" ]
+  assert_failure
+  assert_line 0 "$(rbenv---version)"
 }
 
 @test "invalid command" {

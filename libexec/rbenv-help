@@ -15,6 +15,12 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  echo --usage
+  exec rbenv-commands
+fi
+
 command_path() {
   local command="$1"
   command -v rbenv-"$command" || command -v rbenv-sh-"$command" || true
@@ -146,7 +152,7 @@ if [ -z "$1" ] || [ "$1" == "rbenv" ]; then
   print_summaries commands local global shell install uninstall rehash version versions which whence
   echo
   echo "See \`rbenv help <command>' for information on a specific command."
-  echo "For full documentation, see: https://github.com/sstephenson/rbenv#readme"
+  echo "For full documentation, see: https://github.com/rbenv/rbenv#readme"
 else
   command="$1"
   if [ -n "$(command_path "$command")" ]; then

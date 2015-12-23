@@ -10,7 +10,16 @@ if [ -z "$COMMAND" ]; then
   exit 1
 fi
 
+# Provide rbenv completions
+if [ "$COMMAND" = "--complete" ]; then
+  exec rbenv-commands
+fi
+
 COMMAND_PATH="$(command -v "rbenv-$COMMAND" || command -v "rbenv-sh-$COMMAND")"
+
+# --help is provided automatically
+echo --help
+
 if grep -iE "^([#%]|--|//) provide rbenv completions" "$COMMAND_PATH" >/dev/null; then
   shift
   exec "$COMMAND_PATH" --complete "$@"

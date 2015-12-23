@@ -12,39 +12,42 @@ if [ -n "$RBENV_DEBUG" ]; then
   set -x
 fi
 
-if enable -f "${0%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
+abort() {
+  { if [ "$#" -eq 0 ]; then cat -
+    else echo "rbenv: $*"
+    fi
+  } >&2
+  exit 1
+}
+
+if enable -f "${BASH_SOURCE%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
   abs_dirname() {
     local path="$(realpath "$1")"
     echo "${path%/*}"
   }
 else
-  if [ -n "$RBENV_NATIVE_EXT" ]; then
-    echo "rbenv: failed to load \`realpath' builtin" >&2
-    exit 1
-  fi
-READLINK=$(type -p greadlink readlink | head -1)
-if [ -z "$READLINK" ]; then
-  echo "rbenv: cannot find readlink - are you missing GNU coreutils?" >&2
-  exit 1
-fi
+  [ -z "$RBENV_NATIVE_EXT" ] || abort "failed to load \`realpath' builtin"
 
-resolve_link() {
-  $READLINK "$1"
-}
+  READLINK=$(type -p greadlink readlink | head -1)
+  [ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
 
-abs_dirname() {
-  local cwd="$(pwd)"
-  local path="$1"
+  resolve_link() {
+    $READLINK "$1"
+  }
 
-  while [ -n "$path" ]; do
-    cd "${path%/*}"
-    local name="${path##*/}"
-    path="$(resolve_link "$name" || true)"
-  done
+  abs_dirname() {
+    local cwd="$PWD"
+    local path="$1"
 
-  pwd
-  cd "$cwd"
-}
+    while [ -n "$path" ]; do
+      cd "${path%/*}"
+      local name="${path##*/}"
+      path="$(resolve_link "$name" || true)"
+    done
+
+    pwd
+    cd "$cwd"
+  }
 fi
 
 if [ -z "${RBENV_ROOT}" ]; then
@@ -55,13 +58,10 @@ fi
 export RBENV_ROOT
 
 if [ -z "${RBENV_DIR}" ]; then
-  RBENV_DIR="$(pwd)"
+  RBENV_DIR="$PWD"
 else
-  cd "$RBENV_DIR" 2>/dev/null || {
-    echo "rbenv: cannot change working directory to \`$RBENV_DIR'"
-    exit 1
-  } >&2
-  RBENV_DIR="$(pwd)"
+  cd "$RBENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$RBENV_DIR'"
+  RBENV_DIR="$PWD"
   cd "$OLDPWD"
 fi
 export RBENV_DIR
@@ -91,20 +91,26 @@ shopt -u nullglob
 
 command="$1"
 case "$command" in
-"" | "-h" | "--help" )
-  echo -e "$(rbenv---version)\n$(rbenv-help)" >&2
+"" )
+  { rbenv---version
+    rbenv-help
+  } | abort
   ;;
-"-v" )
+-v | --version )
   exec rbenv---version
+  ;;
+-h | --help )
+  exec rbenv-help
   ;;
 * )
   command_path="$(command -v "rbenv-$command" || true)"
-  if [ -z "$command_path" ]; then
-    echo "rbenv: no such command \`$command'" >&2
-    exit 1
-  fi
+  [ -n "$command_path" ] || abort "no such command \`$command'"
 
   shift 1
-  exec "$command_path" "$@"
+  if [ "$1" = --help ]; then
+    exec rbenv-help "$command"
+  else
+    exec "$command_path" "$@"
+  fi
   ;;
 esac

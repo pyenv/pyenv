@@ -13,7 +13,7 @@ bulletproof deployments.
 
 **Rock-solid in production.** Your application's executables are its
   interface with ops. With rbenv and [Bundler
-  binstubs](https://github.com/sstephenson/rbenv/wiki/Understanding-binstubs)
+  binstubs](https://github.com/rbenv/rbenv/wiki/Understanding-binstubs)
   you'll never again need to `cd` in a cron job or Chef recipe to
   ensure you've selected the right runtime. The Ruby version
   dependency lives in one place—your app—so upgrades and rollbacks are
@@ -24,12 +24,12 @@ bulletproof deployments.
   you tailor it to suit your needs. Compile your own Ruby versions, or
   use the [ruby-build][]
   plugin to automate the process. Specify per-application environment
-  variables with [rbenv-vars](https://github.com/sstephenson/rbenv-vars).
+  variables with [rbenv-vars](https://github.com/rbenv/rbenv-vars).
   See more [plugins on the
-  wiki](https://github.com/sstephenson/rbenv/wiki/Plugins).
+  wiki](https://github.com/rbenv/rbenv/wiki/Plugins).
 
 [**Why choose rbenv over
-RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
+RVM?**](https://github.com/rbenv/rbenv/wiki/Why-rbenv%3F)
 
 ## Table of Contents
 
@@ -45,6 +45,7 @@ RVM?**](https://github.com/sstephenson/rbenv/wiki/Why-rbenv%3F)
   * [How rbenv hooks into your shell](#how-rbenv-hooks-into-your-shell)
   * [Installing Ruby Versions](#installing-ruby-versions)
   * [Uninstalling Ruby Versions](#uninstalling-ruby-versions)
+  * [Uninstalling rbenv](#uninstalling-rbenv)
 * [Command Reference](#command-reference)
   * [rbenv local](#rbenv-local)
   * [rbenv global](#rbenv-global)
@@ -157,7 +158,7 @@ easy to fork and contribute any changes back upstream.
 1. Check out rbenv into `~/.rbenv`.
 
     ~~~ sh
-    $ git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
+    $ git clone https://github.com/rbenv/rbenv.git ~/.rbenv
     ~~~
 
 2. Add `~/.rbenv/bin` to your `$PATH` for access to the `rbenv`
@@ -298,6 +299,30 @@ Ruby version with the `rbenv prefix` command, e.g. `rbenv prefix
 The [ruby-build][] plugin provides an `rbenv uninstall` command to
 automate the removal process.
 
+### Uninstalling rbenv
+
+The simplicity of rbenv makes it easy to temporarily disable it, or
+uninstall from the system.
+
+1. To **disable** rbenv managing your Ruby versions, simply remove the
+  `rbenv init` line from your shell startup configuration. This will
+  remove rbenv shims directory from PATH, and future invocations like
+  `ruby` will execute the system Ruby version, as before rbenv.
+
+  `rbenv` will still be accessible on the command line, but your Ruby
+  apps won't be affected by version switching.
+
+2. To completely **uninstall** rbenv, perform step (1) and then remove
+   its root directory. This will **delete all Ruby versions** that were
+   installed under `` `rbenv root`/versions/ `` directory:
+
+        rm -rf `rbenv root`
+
+   If you've installed rbenv using a package manager, as a final step
+   perform the rbenv package removal. For instance, for Homebrew:
+
+        brew uninstall rbenv
+
 ## Command Reference
 
 Like `git`, the `rbenv` command delegates to subcommands based on its
@@ -419,7 +444,7 @@ name | default | description
 ## Development
 
 The rbenv source code is [hosted on
-GitHub](https://github.com/sstephenson/rbenv). It's clean, modular,
+GitHub](https://github.com/rbenv/rbenv). It's clean, modular,
 and easy to understand, even if you're not a shell hacker.
 
 Tests are executed using [Bats](https://github.com/sstephenson/bats):
@@ -428,8 +453,8 @@ Tests are executed using [Bats](https://github.com/sstephenson/bats):
     $ bats test/<file>.bats
 
 Please feel free to submit pull requests and file bugs on the [issue
-tracker](https://github.com/sstephenson/rbenv/issues).
+tracker](https://github.com/rbenv/rbenv/issues).
 
 
-  [ruby-build]: https://github.com/sstephenson/ruby-build#readme
-  [hooks]: https://github.com/sstephenson/rbenv/wiki/Authoring-plugins#rbenv-hooks
+  [ruby-build]: https://github.com/rbenv/ruby-build#readme
+  [hooks]: https://github.com/rbenv/rbenv/wiki/Authoring-plugins#rbenv-hooks
