@@ -2,13 +2,6 @@
 
 load test_helper
 
-export RBENV_HOOK_PATH="${RBENV_ROOT}/rbenv.d"
-
-create_hook() {
-  mkdir -p "${RBENV_ROOT}/rbenv.d/version-origin"
-  cat > "${RBENV_ROOT}/rbenv.d/version-origin/$1" <<<"$2"
-}
-
 setup() {
   mkdir -p "$RBENV_TEST_DIR"
   cd "$RBENV_TEST_DIR"
@@ -45,11 +38,12 @@ setup() {
 }
 
 @test "reports from hook" {
-  touch .ruby-version
-  create_hook test.bash "RBENV_VERSION_ORIGIN=plugin"
+  mkdir -p "${RBENV_ROOT}/rbenv.d/version-origin"
+  cat > "${RBENV_ROOT}/rbenv.d/version-origin/test.bash" <<HOOK
+RBENV_VERSION_ORIGIN=plugin
+HOOK
 
-  RBENV_VERSION=1 run rbenv-version-origin
-
+  RBENV_VERSION=1 RBENV_HOOK_PATH="${RBENV_ROOT}/rbenv.d" run rbenv-version-origin
   assert_success "plugin"
 }
 

@@ -2,13 +2,6 @@
 
 load test_helper
 
-export RBENV_HOOK_PATH="${RBENV_ROOT}/rbenv.d"
-
-create_hook() {
-  mkdir -p "${RBENV_ROOT}/rbenv.d/version-name"
-  cat > "${RBENV_ROOT}/rbenv.d/version-name/$1" <<<"$2"
-}
-
 create_version() {
   mkdir -p "${RBENV_ROOT}/versions/$1"
 }
@@ -33,11 +26,12 @@ setup() {
   create_version "1.8.7"
   create_version "1.9.3"
 
-  RBENV_VERSION=1.8.7 run rbenv-version-name
-  assert_success "1.8.7"
+  mkdir -p "${RBENV_ROOT}/rbenv.d/version-name"
+  cat > "${RBENV_ROOT}/rbenv.d/version-name/test.bash" <<HOOK
+RBENV_VERSION=1.9.3
+HOOK
 
-  create_hook test.bash "RBENV_VERSION=1.9.3"
-  RBENV_VERSION=1.8.7 run rbenv-version-name
+  RBENV_VERSION=1.8.7 RBENV_HOOK_PATH="${RBENV_ROOT}/rbenv.d" run rbenv-version-name
   assert_success "1.9.3"
 }
 
