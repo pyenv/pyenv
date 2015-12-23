@@ -8,6 +8,13 @@ if [ -z "$RBENV_VERSION" ]; then
   RBENV_VERSION="$(rbenv-version-file-read "$RBENV_VERSION_FILE" || true)"
 fi
 
+OLDIFS="$IFS"
+IFS=$'\n' scripts=(`rbenv-hooks version-name`)
+IFS="$OLDIFS"
+for script in "${scripts[@]}"; do
+  source "$script"
+done
+
 if [ -z "$RBENV_VERSION" ] || [ "$RBENV_VERSION" = "system" ]; then
   echo "system"
   exit

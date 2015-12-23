@@ -36,3 +36,18 @@ setup() {
   run rbenv-version-origin
   assert_success "${PWD}/.rbenv-version"
 }
+
+@test "reports from hook" {
+  mkdir -p "${RBENV_ROOT}/rbenv.d/version-origin"
+  cat > "${RBENV_ROOT}/rbenv.d/version-origin/test.bash" <<HOOK
+RBENV_VERSION_ORIGIN=plugin
+HOOK
+
+  RBENV_VERSION=1 RBENV_HOOK_PATH="${RBENV_ROOT}/rbenv.d" run rbenv-version-origin
+  assert_success "plugin"
+}
+
+@test "doesn't inherit RBENV_VERSION_ORIGIN from environment" {
+  RBENV_VERSION_ORIGIN=ignored run rbenv-version-origin
+  assert_success "${RBENV_ROOT}/version"
+}
