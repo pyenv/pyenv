@@ -52,3 +52,8 @@ setup() {
 
   assert_success "plugin"
 }
+
+@test "doesn't inherit RBENV_VERSION_ORIGIN from environment" {
+  RBENV_VERSION_ORIGIN=ignored run rbenv-version-origin
+  assert_success "${RBENV_ROOT}/version"
+}

@@ -3,6 +3,8 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
+unset RBENV_VERSION_ORIGIN
+
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`rbenv-hooks version-origin`)
 IFS="$OLDIFS"
