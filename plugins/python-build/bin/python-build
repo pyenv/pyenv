@@ -957,7 +957,9 @@ anaconda_architecture() {
   "Darwin" ) echo "MacOSX-x86_64" ;;
   "Linux" )
     case "$(uname -m)" in
+    "armv7l" ) echo "Linux-armv7l" ;;
     "i386" | "i486" | "i586" | "i686" | "i786" ) echo "Linux-x86" ;;
+    "ppc64le" ) echo "Linux-ppc64le" ;;
     "x86_64" ) echo "Linux-x86_64" ;;
     * ) return 1 ;;
     esac
