@@ -15,12 +15,9 @@ set -e
 version="0.4.0"
 git_revision=""
 
-for source_dir in "${BASH_SOURCE%/*}" "$RBENV_ROOT"; do
-  if cd "$source_dir" 2>/dev/null && git remote -v 2>/dev/null | grep -q rbenv; then
-    git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
-    git_revision="${git_revision#v}"
-    [ -z "$git_revision" ] || break
-  fi
-done
+if cd "${BASH_SOURCE%/*}" 2>/dev/null && git remote -v 2>/dev/null | grep -q rbenv; then
+  git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
+  git_revision="${git_revision#v}"
+fi
 
 echo "rbenv ${git_revision:-$version}"
