@@ -84,6 +84,7 @@ RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib
 for plugin_hook in "${RBENV_ROOT}/plugins/"*/etc/rbenv.d; do
   RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${plugin_hook}"
 done
+RBENV_HOOK_PATH="${RBENV_HOOK_PATH#:}"
 export RBENV_HOOK_PATH
 
 shopt -u nullglob

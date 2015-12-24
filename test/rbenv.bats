@@ -71,5 +71,5 @@ load test_helper
 
 @test "RBENV_HOOK_PATH includes rbenv built-in plugins" {
   run rbenv echo "RBENV_HOOK_PATH"
-  assert_success ":${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+  assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 }
