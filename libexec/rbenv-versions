@@ -27,7 +27,7 @@ done
 
 versions_dir="${RBENV_ROOT}/versions"
 
-if ! enable -f "${BASH_SOURCE%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
+if ! enable -f "${BASH_SOURCE%/*}"/rbenv-realpath.dylib realpath 2>/dev/null; then
   if [ -n "$RBENV_NATIVE_EXT" ]; then
     echo "rbenv: failed to load \`realpath' builtin" >&2
     exit 1
