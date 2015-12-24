@@ -293,6 +293,29 @@ that directory can also be a symlink to a Ruby version installed
 elsewhere on the filesystem. rbenv doesn't care; it will simply treat
 any entry in the `versions/` directory as a separate Ruby version.
 
+#### Installing Ruby Gems
+
+Once you've installed some Ruby versions, you'll want to install gems.
+First, ensure that the target version for your project is the one you want by
+checking `rbenv version` (see [Command Reference](#command-reference)). Select
+another version using `rbenv local 2.0.0-p247`, for example. Then, proceed to
+install gems as you normally would:
+
+```sh
+$ gem install bundler
+```
+
+**You don't need sudo** to install gems. Typically, the Ruby versions will be
+installed and writeable by your user. No extra privileges are required to
+install gems.
+
+Check the location where gems are being installed with `gem env`:
+
+```sh
+$ gem env home
+# => ~/.rbenv/versions/<ruby-version>/lib/ruby/gems/...
+```
+
 ### Uninstalling Ruby Versions
 
 As time goes on, Ruby versions you install will accumulate in your
