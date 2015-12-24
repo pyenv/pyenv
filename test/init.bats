@@ -25,10 +25,22 @@ load test_helper
 }
 
 @test "detect parent shell" {
-  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   SHELL=/bin/false run rbenv-init -
   assert_success
   assert_line "export RBENV_SHELL=bash"
+}
+
+@test "detect parent shell from script" {
+  mkdir -p "$RBENV_TEST_DIR"
+  cd "$RBENV_TEST_DIR"
+  cat > myscript.sh <<OUT
+#!/bin/sh
+eval "\$(rbenv-init -)"
+echo \$RBENV_SHELL
+OUT
+  chmod +x myscript.sh
+  run ./myscript.sh /bin/zsh
+  assert_success "sh"
 }
 
 @test "setup shell completions (fish)" {
