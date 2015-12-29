@@ -105,15 +105,13 @@ OUT
 }
 
 @test "carries original IFS within hooks" {
-  hook_path="${RBENV_TEST_DIR}/rbenv.d"
-  mkdir -p "${hook_path}/rehash"
-  cat > "${hook_path}/rehash/hello.bash" <<SH
+  create_hook rehash hello.bash <<SH
 hellos=(\$(printf "hello\\tugly world\\nagain"))
 echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
 exit
 SH
 
-  RBENV_HOOK_PATH="$hook_path" IFS=$' \t\n' run rbenv-rehash
+  IFS=$' \t\n' run rbenv-rehash
   assert_success
   assert_output "HELLO=:hello:ugly:world:again"
 }
