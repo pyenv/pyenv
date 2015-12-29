@@ -374,11 +374,6 @@ configured local version. You can also unset the local version:
 
     $ rbenv local --unset
 
-Previous versions of rbenv stored local version specifications in a
-file named `.rbenv-version`. For backwards compatibility, rbenv will
-read a local version specified in an `.rbenv-version` file, but a
-`.ruby-version` file in the same directory will take precedence.
-
 ### rbenv global
 
 Sets the global version of Ruby to be used in all shells by writing

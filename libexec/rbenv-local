@@ -15,10 +15,6 @@
 # `RBENV_VERSION' environment variable takes precedence over local
 # and global versions.
 #
-# For backwards compatibility, rbenv will also read version
-# specifications from `.rbenv-version' files, but a `.ruby-version'
-# file in the same directory takes precedence.
-#
 # <version> should be a string matching a Ruby version known to rbenv.
 # The special version string `system' will use your default system Ruby.
 # Run `rbenv versions' for a list of available Ruby versions.
@@ -36,16 +32,9 @@ fi
 RBENV_VERSION="$1"
 
 if [ "$RBENV_VERSION" = "--unset" ]; then
-  rm -f .ruby-version .rbenv-version
+  rm -f .ruby-version
 elif [ -n "$RBENV_VERSION" ]; then
-  previous_file="$(RBENV_VERSION= rbenv-version-origin || true)"
   rbenv-version-file-write .ruby-version "$RBENV_VERSION"
-  if [ "$previous_file" -ef .rbenv-version ]; then
-    rm -f .rbenv-version
-    { echo "rbenv: removed existing \`.rbenv-version' file and migrated"
-      echo "       local version specification to \`.ruby-version' file"
-    } >&2
-  fi
 else
   if version_file="$(rbenv-version-file "$PWD")"; then
     rbenv-version-file-read "$version_file"
