@@ -92,7 +92,7 @@ OUT
   touch .ruby-version
   run rbenv-local --unset
   assert_success ""
-  assert [ ! -e .rbenv-version ]
+  assert [ ! -e .ruby-version ]
 }
 
 @test "unsets alternate version file" {
