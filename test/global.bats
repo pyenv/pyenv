@@ -3,7 +3,7 @@
 load test_helper
 
 @test "default" {
-  run rbenv global
+  run rbenv-global
   assert_success
   assert_output "system"
 }
@@ -20,7 +20,7 @@ load test_helper
   mkdir -p "$RBENV_ROOT/versions/1.2.3"
   run rbenv-global "1.2.3"
   assert_success
-  run rbenv global
+  run rbenv-global
   assert_success "1.2.3"
 }
 
