@@ -12,29 +12,15 @@ create_file() {
   touch "$1"
 }
 
-@test "prints global file if no version files exist" {
-  assert [ ! -e "${RBENV_ROOT}/version" ]
-  assert [ ! -e ".ruby-version" ]
+@test "detects global 'version' file" {
+  create_file "${RBENV_ROOT}/version"
   run rbenv-version-file
   assert_success "${RBENV_ROOT}/version"
 }
 
-@test "detects 'global' file" {
-  create_file "${RBENV_ROOT}/global"
-  run rbenv-version-file
-  assert_success "${RBENV_ROOT}/global"
-}
-
-@test "detects 'default' file" {
-  create_file "${RBENV_ROOT}/default"
-  run rbenv-version-file
-  assert_success "${RBENV_ROOT}/default"
-}
-
-@test "'version' has precedence over 'global' and 'default'" {
-  create_file "${RBENV_ROOT}/version"
-  create_file "${RBENV_ROOT}/global"
-  create_file "${RBENV_ROOT}/default"
+@test "prints global file if no version files exist" {
+  assert [ ! -e "${RBENV_ROOT}/version" ]
+  assert [ ! -e ".ruby-version" ]
   run rbenv-version-file
   assert_success "${RBENV_ROOT}/version"
 }

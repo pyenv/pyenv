@@ -22,15 +22,7 @@ find_local_version_file() {
 find_global_version_file() {
   local global_version_file="${RBENV_ROOT}/version"
 
-  if [ -e "$global_version_file" ]; then
-    echo "$global_version_file"
-  elif [ -e "${RBENV_ROOT}/global" ]; then
-    echo "${RBENV_ROOT}/global"
-  elif [ -e "${RBENV_ROOT}/default" ]; then
-    echo "${RBENV_ROOT}/default"
-  else
-    echo "$global_version_file"
-  fi
+  echo "$global_version_file"
 }
 
 if [ -n "$target_dir" ]; then

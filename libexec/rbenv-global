@@ -27,8 +27,5 @@ RBENV_VERSION_FILE="${RBENV_ROOT}/version"
 if [ -n "$RBENV_VERSION" ]; then
   rbenv-version-file-write "$RBENV_VERSION_FILE" "$RBENV_VERSION"
 else
-  rbenv-version-file-read "$RBENV_VERSION_FILE" ||
-  rbenv-version-file-read "${RBENV_ROOT}/global" ||
-  rbenv-version-file-read "${RBENV_ROOT}/default" ||
-  echo system
+  rbenv-version-file-read "$RBENV_VERSION_FILE" || echo system
 fi
