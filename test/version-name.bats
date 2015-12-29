@@ -31,6 +31,18 @@ setup() {
   assert_success "1.9.3"
 }
 
+@test "carries original IFS within hooks" {
+  create_hook version-name hello.bash <<SH
+hellos=(\$(printf "hello\\tugly world\\nagain"))
+echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
+SH
+
+  export RBENV_VERSION=system
+  IFS=$' \t\n' run rbenv-version-name env
+  assert_success
+  assert_line "HELLO=:hello:ugly:world:again"
+}
+
 @test "RBENV_VERSION has precedence over local" {
   create_version "1.8.7"
   create_version "1.9.3"
