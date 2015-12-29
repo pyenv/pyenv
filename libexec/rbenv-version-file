@@ -19,16 +19,10 @@ find_local_version_file() {
   return 1
 }
 
-find_global_version_file() {
-  local global_version_file="${RBENV_ROOT}/version"
-
-  echo "$global_version_file"
-}
-
 if [ -n "$target_dir" ]; then
   find_local_version_file "$target_dir"
 else
   find_local_version_file "$RBENV_DIR" || {
     [ "$RBENV_DIR" != "$PWD" ] && find_local_version_file "$PWD"
-  } || find_global_version_file
+  } || echo "${RBENV_ROOT}/version"
 fi
