@@ -31,12 +31,6 @@ setup() {
   assert_success "${PWD}/.ruby-version"
 }
 
-@test "detects alternate version file" {
-  touch .rbenv-version
-  run rbenv-version-origin
-  assert_success "${PWD}/.rbenv-version"
-}
-
 @test "reports from hook" {
   mkdir -p "${RBENV_ROOT}/rbenv.d/version-origin"
   cat > "${RBENV_ROOT}/rbenv.d/version-origin/test.bash" <<HOOK

@@ -45,19 +45,6 @@ create_file() {
   assert_success "${RBENV_TEST_DIR}/.ruby-version"
 }
 
-@test "legacy file in current directory" {
-  create_file ".rbenv-version"
-  run rbenv-version-file
-  assert_success "${RBENV_TEST_DIR}/.rbenv-version"
-}
-
-@test ".ruby-version has precedence over legacy file" {
-  create_file ".ruby-version"
-  create_file ".rbenv-version"
-  run rbenv-version-file
-  assert_success "${RBENV_TEST_DIR}/.ruby-version"
-}
-
 @test "in parent directory" {
   create_file ".ruby-version"
   mkdir -p project
@@ -72,14 +59,6 @@ create_file() {
   cd project
   run rbenv-version-file
   assert_success "${RBENV_TEST_DIR}/project/.ruby-version"
-}
-
-@test "legacy file has precedence if higher" {
-  create_file ".ruby-version"
-  create_file "project/.rbenv-version"
-  cd project
-  run rbenv-version-file
-  assert_success "${RBENV_TEST_DIR}/project/.rbenv-version"
 }
 
 @test "RBENV_DIR has precedence over PWD" {

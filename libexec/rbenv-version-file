@@ -12,9 +12,6 @@ find_local_version_file() {
     if [ -e "${root}/.ruby-version" ]; then
       echo "${root}/.ruby-version"
       return 0
-    elif [ -e "${root}/.rbenv-version" ]; then
-      echo "${root}/.rbenv-version"
-      return 0
     fi
     [ -n "$root" ] || break
     root="${root%/*}"
