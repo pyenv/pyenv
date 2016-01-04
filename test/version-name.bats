@@ -25,14 +25,22 @@ setup() {
 @test "RBENV_VERSION can be overridden by hook" {
   create_version "1.8.7"
   create_version "1.9.3"
+  create_hook version-name test.bash <<<"RBENV_VERSION=1.9.3"
 
-  mkdir -p "${RBENV_ROOT}/rbenv.d/version-name"
-  cat > "${RBENV_ROOT}/rbenv.d/version-name/test.bash" <<HOOK
-RBENV_VERSION=1.9.3
-HOOK
-
-  RBENV_VERSION=1.8.7 RBENV_HOOK_PATH="${RBENV_ROOT}/rbenv.d" run rbenv-version-name
+  RBENV_VERSION=1.8.7 run rbenv-version-name
   assert_success "1.9.3"
+}
+
+@test "carries original IFS within hooks" {
+  create_hook version-name hello.bash <<SH
+hellos=(\$(printf "hello\\tugly world\\nagain"))
+echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
+SH
+
+  export RBENV_VERSION=system
+  IFS=$' \t\n' run rbenv-version-name env
+  assert_success
+  assert_line "HELLO=:hello:ugly:world:again"
 }
 
 @test "RBENV_VERSION has precedence over local" {

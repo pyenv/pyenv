@@ -17,6 +17,7 @@ if [ -z "$RBENV_TEST_DIR" ]; then
 
   export RBENV_ROOT="${RBENV_TEST_DIR}/root"
   export HOME="${RBENV_TEST_DIR}/home"
+  export RBENV_HOOK_PATH="${RBENV_ROOT}/rbenv.d"
 
   PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
   PATH="${RBENV_TEST_DIR}/bin:$PATH"
@@ -128,4 +129,12 @@ path_without() {
   done
   path="${path#:}"
   echo "${path%:}"
+}
+
+create_hook() {
+  mkdir -p "${RBENV_HOOK_PATH}/$1"
+  touch "${RBENV_HOOK_PATH}/$1/$2"
+  if [ ! -t 0 ]; then
+    cat > "${RBENV_HOOK_PATH}/$1/$2"
+  fi
 }

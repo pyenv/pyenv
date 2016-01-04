@@ -32,13 +32,22 @@ setup() {
 }
 
 @test "reports from hook" {
-  mkdir -p "${RBENV_ROOT}/rbenv.d/version-origin"
-  cat > "${RBENV_ROOT}/rbenv.d/version-origin/test.bash" <<HOOK
-RBENV_VERSION_ORIGIN=plugin
-HOOK
+  create_hook version-origin test.bash <<<"RBENV_VERSION_ORIGIN=plugin"
 
-  RBENV_VERSION=1 RBENV_HOOK_PATH="${RBENV_ROOT}/rbenv.d" run rbenv-version-origin
+  RBENV_VERSION=1 run rbenv-version-origin
   assert_success "plugin"
+}
+
+@test "carries original IFS within hooks" {
+  create_hook version-origin hello.bash <<SH
+hellos=(\$(printf "hello\\tugly world\\nagain"))
+echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
+SH
+
+  export RBENV_VERSION=system
+  IFS=$' \t\n' run rbenv-version-origin env
+  assert_success
+  assert_line "HELLO=:hello:ugly:world:again"
 }
 
 @test "doesn't inherit RBENV_VERSION_ORIGIN from environment" {
