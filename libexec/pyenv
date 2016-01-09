@@ -84,7 +84,7 @@ shopt -s nullglob
 
 bin_path="$(abs_dirname "$0")"
 for plugin_bin in "${PYENV_ROOT}/plugins/"*/bin; do
-  PATH="${plugin_bin}:${PATH}"
+  [[ ":${PATH}:" == *":${plugin_bin}:"* ]] || export PATH="${plugin_bin}:${PATH}"
 done
 [[ ":${PATH}:" == *":${bin_path}:"* ]] || export PATH="${bin_path}:${PATH}"
 
