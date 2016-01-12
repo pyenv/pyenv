@@ -22,12 +22,18 @@ load test_helper
 
 @test "shell unset" {
   RBENV_SHELL=bash run rbenv-sh-shell --unset
-  assert_success "unset RBENV_VERSION"
+  assert_output <<OUT
+unset OLD_RBENV_VERSION
+unset RBENV_VERSION
+OUT
 }
 
 @test "shell unset (fish)" {
   RBENV_SHELL=fish run rbenv-sh-shell --unset
-  assert_success "set -e RBENV_VERSION"
+  assert_output <<OUT
+set -e OLD_RBENV_VERSION
+set -e RBENV_VERSION
+OUT
 }
 
 @test "shell change invalid version" {
@@ -42,7 +48,52 @@ SH
 @test "shell change version" {
   mkdir -p "${RBENV_ROOT}/versions/1.2.3"
   RBENV_SHELL=bash run rbenv-sh-shell 1.2.3
-  assert_success 'export RBENV_VERSION="1.2.3"'
+  assert_output <<OUT
+export OLD_RBENV_VERSION=""
+export RBENV_VERSION="1.2.3"
+OUT
+}
+
+@test "shell change version pushes away previous OLD_RBENV_VERSION" {
+  mkdir -p "${RBENV_ROOT}/versions/1.2.3"
+  mkdir -p "${RBENV_ROOT}/versions/1.2.4"
+  mkdir -p "${RBENV_ROOT}/versions/1.2.5"
+  export OLD_RBENV_VERSION="1.2.3"
+  export RBENV_VERSION="1.2.4"
+  RBENV_SHELL=bash run rbenv-sh-shell 1.2.5
+  assert_output <<OUT
+export OLD_RBENV_VERSION="1.2.4"
+export RBENV_VERSION="1.2.5"
+OUT
+}
+
+@test "shell change version to the same version does not lose OLD_RBENV_VERSION" {
+  mkdir -p "${RBENV_ROOT}/versions/1.2.3"
+  mkdir -p "${RBENV_ROOT}/versions/1.2.4"
+  export OLD_RBENV_VERSION="1.2.3"
+  export RBENV_VERSION="1.2.4"
+  RBENV_SHELL=bash run rbenv-sh-shell 1.2.4
+  assert_output ''
+}
+
+@test "shell change version to - swaps old and new versions" {
+  mkdir -p "${RBENV_ROOT}/versions/1.2.3"
+  mkdir -p "${RBENV_ROOT}/versions/1.2.4"
+  export OLD_RBENV_VERSION="1.2.3"
+  export RBENV_VERSION="1.2.4"
+  RBENV_SHELL=bash run rbenv-sh-shell -
+  assert_output <<OUT
+export OLD_RBENV_VERSION="1.2.4"
+export RBENV_VERSION="1.2.3"
+OUT
+}
+
+@test "shell change version to - with no previous is an error" {
+  mkdir -p "${RBENV_ROOT}/versions/1.2.3"
+  RBENV_SHELL=bash run rbenv-sh-shell -
+  assert_failure <<OUT
+rbenv: OLD_RBENV_VERSION not set
+OUT
 }
 
 @test "shell change version (fish)" {

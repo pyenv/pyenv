@@ -39,10 +39,32 @@ fi
 if [ "$version" = "--unset" ]; then
   case "$shell" in
   fish )
+    echo "set -e OLD_RBENV_VERSION"
     echo "set -e RBENV_VERSION"
     ;;
   * )
+    echo "unset OLD_RBENV_VERSION"
     echo "unset RBENV_VERSION"
+    ;;
+  esac
+  exit
+fi
+
+if [ "$version" = "-" ]; then
+  if [ -z "$OLD_RBENV_VERSION" ]; then
+    echo "rbenv: OLD_RBENV_VERSION not set" >&2
+    exit 1;
+  fi
+  case "$shell" in
+  fish )
+    rbenv_version=$RBENV_VERSION
+    echo "set -e OLD_RBENV_VERSION \"$rbenv_version\""
+    echo "set -e RBENV_VERSION \"$OLD_RBENV_VERSION\""
+    ;;
+  * )
+    rbenv_version=$RBENV_VERSION
+    echo "export OLD_RBENV_VERSION=\"$rbenv_version\""
+    echo "export RBENV_VERSION=\"$OLD_RBENV_VERSION\""
     ;;
   esac
   exit
@@ -50,14 +72,17 @@ fi
 
 # Make sure the specified version is installed.
 if rbenv-prefix "$version" >/dev/null; then
-  case "$shell" in
-  fish )
-    echo "setenv RBENV_VERSION \"${version}\""
-    ;;
-  * )
-    echo "export RBENV_VERSION=\"${version}\""
-    ;;
-  esac
+  if [ "$version" != "$RBENV_VERSION" ]; then
+    case "$shell" in
+    fish )
+      echo "setenv RBENV_VERSION \"${version}\""
+      ;;
+    * )
+      echo "export OLD_RBENV_VERSION=\"$RBENV_VERSION\""
+      echo "export RBENV_VERSION=\"${version}\""
+      ;;
+    esac
+  fi
 else
   echo "false"
   exit 1
