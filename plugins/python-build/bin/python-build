@@ -1410,7 +1410,7 @@ isolated_gem_install() {
 apply_python_patch() {
   local patchfile
   case "$1" in
-  Python-* | jython-* | pypy-* )
+  Python-* | jython-* | pypy-* | stackless-* )
     patchfile="$(mktemp "${TMP}/python-patch.XXXXXX")"
     cat "${2:--}" >"$patchfile"
 
