@@ -234,7 +234,7 @@ manager on Mac OS X:
 
 ~~~
 $ brew update
-$ brew install rbenv ruby-build
+$ brew install rbenv
 ~~~
 
 Afterwards you'll still need to add `eval "$(rbenv init -)"` to your
