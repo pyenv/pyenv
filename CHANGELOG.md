@@ -1,5 +1,12 @@
 ## Version History
 
+## 20160202
+
+* pyenv: Run rehash automatically after `conda install`
+* python-build: Add CPython 3.4.4 (#511)
+* python-build: Add anaconda[23]-2.4.1, miniconda[23]-3.19.0
+* python-build: Fix broken build definitions of CPython/Stackless 3.2.x (#531)
+
 ### 20151222
 
 * pyenv: Merge recent changes from rbenv as of 2015-12-14 (#504)
