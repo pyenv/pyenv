@@ -191,8 +191,9 @@ Install a Python version (using `python-build`).
            pyenv install [-f] [-kvp] <definition-file>
            pyenv install -l|--list
 
-      -l/--list        List all available versions
-      -f/--force       Install even if the version appears to be installed already
+      -l/--list             List all available versions
+      -f/--force            Install even if the version appears to be installed already
+      -s/--skip-existing    Skip the installation if the version appears to be installed already
 
       python-build options:
 
