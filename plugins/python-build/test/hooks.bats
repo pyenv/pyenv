@@ -52,5 +52,5 @@ rehashed
 after.
 OUT
 
-  assert [ ! -d "${PYENV_ROOT}/versions/3.2.1" ]
+  refute [ -d "${PYENV_ROOT}/versions/3.2.1" ]
 }

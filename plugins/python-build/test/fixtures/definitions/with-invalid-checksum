@@ -1,1 +1,1 @@
-install_package "package-1.0.0" "http://example.com/packages/package-1.0.0.tar.gz#invalid" copy
+install_package "package-1.0.0" "http://example.com/packages/package-1.0.0.tar.gz#invalid_64_character_checksum_0000000000000000000000000000000000" copy

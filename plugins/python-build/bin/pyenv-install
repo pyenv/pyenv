@@ -5,6 +5,7 @@
 # Usage: pyenv install [-f] [-kvp] <version>
 #        pyenv install [-f] [-kvp] <definition-file>
 #        pyenv install -l|--list
+#        pyenv install --version
 #
 #   -l/--list          List all available versions
 #   -f/--force         Install even if the version appears to be installed already
@@ -14,8 +15,9 @@
 #
 #   -k/--keep          Keep source tree in $PYENV_BUILD_ROOT after installation
 #                      (defaults to $PYENV_ROOT/sources)
-#   -v/--verbose       Verbose mode: print compilation status to stdout
 #   -p/--patch         Apply a patch from stdin before building
+#   -v/--verbose       Verbose mode: print compilation status to stdout
+#   --version          Show version of python-build
 #   -g/--debug         Build a debug version
 #
 # For detailed information on installing Python versions with
@@ -24,10 +26,6 @@
 #
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
-
-if [ -z "$PYENV_ROOT" ]; then
-  PYENV_ROOT="${HOME}/.pyenv"
-fi
 
 # Add `share/python-build/` directory from each pyenv plugin to the list of
 # paths where build definitions are looked up.
@@ -40,6 +38,14 @@ shopt -u nullglob
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
+  echo --list
+  echo --force
+  echo --skip-existing
+  echo --keep
+  echo --patch
+  echo --verbose
+  echo --version
+  echo --debug
   exec python-build --definitions
 fi
 

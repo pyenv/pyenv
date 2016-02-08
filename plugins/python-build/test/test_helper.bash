@@ -71,6 +71,12 @@ assert() {
   fi
 }
 
+refute() {
+  if "$@"; then
+    flunk "expected to fail: $@"
+  fi
+}
+
 flunk() {
   { if [ "$#" -eq 0 ]; then cat -
     else echo "$@"

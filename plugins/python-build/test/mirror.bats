@@ -12,8 +12,9 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
 
   install_fixture definitions/without-checksum
   echo "$output" >&2
-  [ "$status" -eq 0 ]
-  [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
   unstub curl
   unstub shasum
@@ -25,8 +26,9 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   install_fixture definitions/with-checksum
-  [ "$status" -eq 0 ]
-  [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
   unstub curl
   unstub shasum
@@ -42,8 +44,9 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
     "-q -o * -*S* $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
 
   install_fixture definitions/with-checksum
-  [ "$status" -eq 0 ]
-  [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
   unstub curl
   unstub shasum
@@ -59,8 +62,9 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
     "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   install_fixture definitions/with-checksum
-  [ "$status" -eq 0 ]
-  [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
   unstub curl
   unstub shasum
@@ -78,8 +82,9 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
 
   install_fixture definitions/with-checksum
   echo "$output" >&2
-  [ "$status" -eq 0 ]
-  [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
   unstub curl
   unstub shasum
@@ -95,8 +100,28 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
     "-q -o * -*S* https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
 
   install_fixture definitions/with-checksum
-  [ "$status" -eq 0 ]
-  [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  unstub curl
+  unstub shasum
+}
+
+
+@test "package URL with ruby-lang CDN with default mirror URL will bypasses mirror" {
+  export PYTHON_BUILD_MIRROR_URL=
+  local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
+
+  stub shasum true "echo $checksum"
+  stub curl "-q -o * -*S* https://www.python.org/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
+
+  run_inline_definition <<DEF
+install_package "package-1.0.0" "https://www.python.org/packages/package-1.0.0.tar.gz#ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5" copy
+DEF
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
   unstub curl
   unstub shasum

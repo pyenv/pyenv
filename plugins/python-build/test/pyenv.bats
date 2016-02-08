@@ -141,6 +141,14 @@ OUT
   run pyenv-install --complete
   assert_success
   assert_output <<OUT
+--list
+--force
+--skip-existing
+--keep
+--patch
+--verbose
+--version
+--debug
 
 ${PYENV_ROOT}/plugins/bar/share/python-build
 ${PYENV_ROOT}/plugins/foo/share/python-build

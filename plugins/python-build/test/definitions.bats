@@ -13,7 +13,7 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
 
 @test "custom PYTHON_BUILD_ROOT: nonexistent" {
   export PYTHON_BUILD_ROOT="$TMP"
-  assert [ ! -e "${PYTHON_BUILD_ROOT}/share/python-build" ]
+  refute [ -e "${PYTHON_BUILD_ROOT}/share/python-build" ]
   run python-build --definitions
   assert_success ""
 }

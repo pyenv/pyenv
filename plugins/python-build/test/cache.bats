@@ -10,30 +10,28 @@ setup() {
 
 
 @test "packages are saved to download cache" {
-  stub shasum true
   stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   install_fixture definitions/without-checksum
-  [ "$status" -eq 0 ]
-  [ -e "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" ]
+
+  assert_success
+  assert [ -e "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" ]
 
   unstub curl
-  unstub shasum
 }
 
 
 @test "cached package without checksum" {
-  stub shasum true
   stub curl
 
   cp "${FIXTURE_ROOT}/package-1.0.0.tar.gz" "$PYTHON_BUILD_CACHE_PATH"
 
   install_fixture definitions/without-checksum
-  [ "$status" -eq 0 ]
-  [ -e "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" ]
+
+  assert_success
+  assert [ -e "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" ]
 
   unstub curl
-  unstub shasum
 }
 
 
@@ -44,9 +42,10 @@ setup() {
   cp "${FIXTURE_ROOT}/package-1.0.0.tar.gz" "$PYTHON_BUILD_CACHE_PATH"
 
   install_fixture definitions/with-checksum
-  [ "$status" -eq 0 ]
-  [ -x "${INSTALL_ROOT}/bin/package" ]
-  [ -e "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" ]
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
+  assert [ -e "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" ]
 
   unstub curl
   unstub shasum
@@ -64,10 +63,11 @@ setup() {
   touch "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz"
 
   install_fixture definitions/with-checksum
-  [ "$status" -eq 0 ]
-  [ -x "${INSTALL_ROOT}/bin/package" ]
-  [ -e "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" ]
-  diff -q "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" "${FIXTURE_ROOT}/package-1.0.0.tar.gz"
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
+  assert [ -e "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" ]
+  assert diff -q "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz" "${FIXTURE_ROOT}/package-1.0.0.tar.gz"
 
   unstub curl
   unstub shasum
@@ -75,16 +75,15 @@ setup() {
 
 
 @test "nonexistent cache directory is ignored" {
-  stub shasum true
   stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   export PYTHON_BUILD_CACHE_PATH="${TMP}/nonexistent"
 
   install_fixture definitions/without-checksum
-  [ "$status" -eq 0 ]
-  [ -x "${INSTALL_ROOT}/bin/package" ]
-  [ ! -d "$PYTHON_BUILD_CACHE_PATH" ]
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
+  refute [ -d "$PYTHON_BUILD_CACHE_PATH" ]
 
   unstub curl
-  unstub shasum
 }
