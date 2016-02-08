@@ -11,7 +11,7 @@ export TMP_FIXTURES="$TMP/fixtures"
 setup() {
   mkdir -p "$INSTALL_ROOT"
   stub md5 false
-  stub curl false
+  stub aria2c false
 }
 
 executable() {

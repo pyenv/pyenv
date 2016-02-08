@@ -10,7 +10,7 @@ export -n PYTHON_CONFIGURE_OPTS
 setup() {
   mkdir -p "$INSTALL_ROOT"
   stub md5 false
-  stub curl false
+  stub aria2c false
 }
 
 executable() {

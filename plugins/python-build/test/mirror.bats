@@ -8,7 +8,7 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
 
 @test "package URL without checksum bypasses mirror" {
   stub shasum true
-  stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
+  stub aria2c "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/without-checksum
   echo "$output" >&2
@@ -16,21 +16,21 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub curl
+  unstub aria2c
   unstub shasum
 }
 
 
 @test "package URL with checksum but no shasum support bypasses mirror" {
   stub shasum false
-  stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
+  stub aria2c "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-checksum
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub curl
+  unstub aria2c
   unstub shasum
 }
 
@@ -40,15 +40,15 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true "echo $checksum"
-  stub curl "-*I* $mirror_url : true" \
-    "-q -o * -*S* $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
+  stub aria2c "-q --dry-run $mirror_url : true" \
+    "-q -o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
 
   install_fixture definitions/with-checksum
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub curl
+  unstub aria2c
   unstub shasum
 }
 
@@ -58,15 +58,15 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true "echo $checksum"
-  stub curl "-*I* $mirror_url : false" \
-    "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
+  stub aria2c "-q --dry-run $mirror_url : false" \
+    "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-checksum
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub curl
+  unstub aria2c
   unstub shasum
 }
 
@@ -76,9 +76,9 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true "echo invalid" "echo $checksum"
-  stub curl "-*I* $mirror_url : true" \
-    "-q -o * -*S* $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
-    "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
+  stub aria2c "-q --dry-run $mirror_url : true" \
+    "-q -o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
+    "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-checksum
   echo "$output" >&2
@@ -86,7 +86,7 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub curl
+  unstub aria2c
   unstub shasum
 }
 
@@ -96,15 +96,15 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
 
   stub shasum true "echo $checksum"
-  stub curl "-*I* : true" \
-    "-q -o * -*S* https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
+  stub aria2c "-q --dry-run : true" \
+    "-q -o * https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
 
   install_fixture definitions/with-checksum
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub curl
+  unstub aria2c
   unstub shasum
 }
 
@@ -114,7 +114,7 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
 
   stub shasum true "echo $checksum"
-  stub curl "-q -o * -*S* https://www.python.org/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
+  stub aria2c "-q -o * https://www.python.org/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   run_inline_definition <<DEF
 install_package "package-1.0.0" "https://www.python.org/packages/package-1.0.0.tar.gz#ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5" copy
@@ -123,6 +123,6 @@ DEF
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub curl
+  unstub aria2c
   unstub shasum
 }
