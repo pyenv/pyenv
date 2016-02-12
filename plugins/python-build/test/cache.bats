@@ -10,7 +10,7 @@ setup() {
 
 
 @test "packages are saved to download cache" {
-  stub aria2c "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
 
   install_fixture definitions/without-checksum
 
@@ -57,8 +57,8 @@ setup() {
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
 
   stub shasum true "echo invalid" "echo $checksum"
-  stub aria2c "-q --dry-run * : true" \
-    "-q -o * https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
+  stub aria2c "--dry-run * : true" \
+    "-o * https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$2"
 
   touch "${PYTHON_BUILD_CACHE_PATH}/package-1.0.0.tar.gz"
 
@@ -75,7 +75,7 @@ setup() {
 
 
 @test "nonexistent cache directory is ignored" {
-  stub aria2c "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
 
   export PYTHON_BUILD_CACHE_PATH="${TMP}/nonexistent"
 

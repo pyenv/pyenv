@@ -339,14 +339,14 @@ http_head_aria2c() {
   options=""
   [ -n "${IPV4}" ] && options="--disable-ipv6=true"
   [ -n "${IPV6}" ] && options="--disable-ipv6=false"
-  aria2c -q --dry-run  ${options} "$1" >&4 2>&1
+  aria2c --dry-run  ${options} "$1" >&4 2>&1
 }
 
 http_get_aria2c() {
   options=""
   [ -n "${IPV4}" ] && options="--disable-ipv6=true"
   [ -n "${IPV6}" ] && options="--disable-ipv6=false"
-  aria2c -q -o "${2:--}" ${options} "$1"
+  aria2c -o "${2:--}" ${options} "$1"
 }
 
 http_head_curl() {

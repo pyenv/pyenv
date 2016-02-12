@@ -8,7 +8,7 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
 
 @test "package URL without checksum bypasses mirror" {
   stub shasum true
-  stub aria2c "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
 
   install_fixture definitions/without-checksum
   echo "$output" >&2
@@ -23,7 +23,7 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
 
 @test "package URL with checksum but no shasum support bypasses mirror" {
   stub shasum false
-  stub aria2c "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
 
   install_fixture definitions/with-checksum
 
@@ -40,8 +40,8 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true "echo $checksum"
-  stub aria2c "-q --dry-run $mirror_url : true" \
-    "-q -o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
+  stub aria2c "--dry-run $mirror_url : true" \
+    "-o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$2"
 
   install_fixture definitions/with-checksum
 
@@ -58,8 +58,8 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true "echo $checksum"
-  stub aria2c "-q --dry-run $mirror_url : false" \
-    "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub aria2c "--dry-run $mirror_url : false" \
+    "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
 
   install_fixture definitions/with-checksum
 
@@ -76,9 +76,9 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true "echo invalid" "echo $checksum"
-  stub aria2c "-q --dry-run $mirror_url : true" \
-    "-q -o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
-    "-q -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub aria2c "--dry-run $mirror_url : true" \
+    "-o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$2" \
+    "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
 
   install_fixture definitions/with-checksum
   echo "$output" >&2
@@ -96,8 +96,8 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
 
   stub shasum true "echo $checksum"
-  stub aria2c "-q --dry-run : true" \
-    "-q -o * https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
+  stub aria2c "--dry-run : true" \
+    "-o * https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$2" \
 
   install_fixture definitions/with-checksum
 
@@ -114,7 +114,7 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
 
   stub shasum true "echo $checksum"
-  stub aria2c "-q -o * https://www.python.org/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub aria2c "-o * https://www.python.org/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
 
   run_inline_definition <<DEF
 install_package "package-1.0.0" "https://www.python.org/packages/package-1.0.0.tar.gz#ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5" copy
