@@ -180,13 +180,8 @@ easy to fork and contribute any changes back upstream.
 
     **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
 
-3. Add `rbenv init` to your shell to enable shims and autocompletion.
-
-    ~~~ sh
-    $ echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
-    ~~~
-
-    _Same as in previous step, use `~/.bashrc` on Ubuntu, or `~/.zshrc` for Zsh._
+3. Run `~/.rbenv/bin/rbenv init` for shell-specific instructions on how to
+   initialize rbenv to enable shims and autocompletion.
 
 4. Restart your shell so that PATH changes take effect. (Opening a new
    terminal tab will usually do it.) Now check if rbenv was set up:
@@ -237,9 +232,8 @@ $ brew update
 $ brew install rbenv
 ~~~
 
-Afterwards you'll still need to add `eval "$(rbenv init -)"` to your
-profile as stated in the caveats. You'll only ever have to do this
-once.
+Afterwards you'll still need to run `rbenv init` for instructions
+as stated in the caveats. You'll only ever have to do this once.
 
 ### How rbenv hooks into your shell
 
