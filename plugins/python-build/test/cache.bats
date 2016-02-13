@@ -3,6 +3,7 @@
 load test_helper
 export PYTHON_BUILD_SKIP_MIRROR=1
 export PYTHON_BUILD_CACHE_PATH="$TMP/cache"
+unset PYTHON_BUILD_ARIA2_OPTS
 
 setup() {
   mkdir "$PYTHON_BUILD_CACHE_PATH"

@@ -4,6 +4,7 @@ load test_helper
 export PYTHON_BUILD_SKIP_MIRROR=
 export PYTHON_BUILD_CACHE_PATH=
 export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
+unset PYTHON_BUILD_ARIA2_OPTS
 
 
 @test "package URL without checksum bypasses mirror" {
