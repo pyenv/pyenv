@@ -3,7 +3,7 @@
 load test_helper
 export PYTHON_BUILD_SKIP_MIRROR=1
 export PYTHON_BUILD_CACHE_PATH=
-unset PYTHON_BUILD_ARIA2_OPTS
+export PYTHON_BUILD_ARIA2_OPTS=
 
 
 @test "package URL without checksum" {
