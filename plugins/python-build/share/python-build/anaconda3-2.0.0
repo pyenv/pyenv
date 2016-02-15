@@ -1,12 +1,12 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-x86" )
-  install_script "Anaconda3-2.0.0-Linux-x86" "http://repo.continuum.io/archive/Anaconda3-2.0.0-Linux-x86.sh#439761159d5604e182951650a478dd53caff52e9dccf17c20ae66689b7b289dd" "anaconda" verify_py34
+  install_script "Anaconda3-2.0.0-Linux-x86" "https://repo.continuum.io/archive/Anaconda3-2.0.0-Linux-x86.sh#439761159d5604e182951650a478dd53caff52e9dccf17c20ae66689b7b289dd" "anaconda" verify_py34
   ;;
 "Linux-x86_64" )
-  install_script "Anaconda3-2.0.0-Linux-x86_64" "http://repo.continuum.io/archive/Anaconda3-2.0.0-Linux-x86_64.sh#57ce4f97e300cf94c5724f72d992e9eecef708fdaa13bc672ae9779773056540" "anaconda" verify_py34
+  install_script "Anaconda3-2.0.0-Linux-x86_64" "https://repo.continuum.io/archive/Anaconda3-2.0.0-Linux-x86_64.sh#57ce4f97e300cf94c5724f72d992e9eecef708fdaa13bc672ae9779773056540" "anaconda" verify_py34
   ;;
 "MacOSX-x86_64" )
-  install_script "Anaconda3-2.0.0-MacOSX-x86_64" "http://repo.continuum.io/archive/Anaconda3-2.0.0-MacOSX-x86_64.sh#776a1cf8a8e898b41bb6558c093632cc922698dc48486fee35d1e8eae3f604fa" "anaconda" verify_py34
+  install_script "Anaconda3-2.0.0-MacOSX-x86_64" "https://repo.continuum.io/archive/Anaconda3-2.0.0-MacOSX-x86_64.sh#776a1cf8a8e898b41bb6558c093632cc922698dc48486fee35d1e8eae3f604fa" "anaconda" verify_py34
   ;;
 * )
   { echo

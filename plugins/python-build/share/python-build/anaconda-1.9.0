@@ -1,12 +1,12 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-x86" )
-  install_script "Anaconda-1.9.0-Linux-x86" "http://repo.continuum.io/archive/Anaconda-1.9.0-Linux-x86.sh#16471e90b3deb7be1b3d449d8883983d81f035dfaa1a3391497de20577de6f66" "anaconda" verify_py27
+  install_script "Anaconda-1.9.0-Linux-x86" "https://repo.continuum.io/archive/Anaconda-1.9.0-Linux-x86.sh#16471e90b3deb7be1b3d449d8883983d81f035dfaa1a3391497de20577de6f66" "anaconda" verify_py27
   ;;
 "Linux-x86_64" )
-  install_script "Anaconda-1.9.0-Linux-x86_64" "http://repo.continuum.io/archive/Anaconda-1.9.0-Linux-x86_64.sh#855f1265e4c0b40d50f5a3a0fe7bae05b1cccb0a5301b378a19e0a8f7262913a" "anaconda" verify_py27
+  install_script "Anaconda-1.9.0-Linux-x86_64" "https://repo.continuum.io/archive/Anaconda-1.9.0-Linux-x86_64.sh#855f1265e4c0b40d50f5a3a0fe7bae05b1cccb0a5301b378a19e0a8f7262913a" "anaconda" verify_py27
   ;;
 "MacOSX-x86_64" )
-  install_script "Anaconda-1.9.0-MacOSX-x86_64" "http://repo.continuum.io/archive/Anaconda-1.9.0-MacOSX-x86_64.sh#722fe4d4406e88c5023e7ee21dc1401bb2a540d6c031d303f0330a95e60131fd" "anaconda" verify_py27
+  install_script "Anaconda-1.9.0-MacOSX-x86_64" "https://repo.continuum.io/archive/Anaconda-1.9.0-MacOSX-x86_64.sh#722fe4d4406e88c5023e7ee21dc1401bb2a540d6c031d303f0330a95e60131fd" "anaconda" verify_py27
   ;;
 * )
   { echo
