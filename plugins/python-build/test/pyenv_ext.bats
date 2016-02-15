@@ -222,7 +222,7 @@ OUT
   [[ "$(resolve_link "${INSTALL_ROOT}/bin/python-config")" == "python3.4-config" ]]
 }
 
-@test "--enable-framework" {
+@test "enable framework" {
   mkdir -p "${INSTALL_ROOT}/Python.framework/Versions/Current/bin"
   touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3"
   chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3"
@@ -248,7 +248,7 @@ EOS
   [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python-config" ]
 }
 
-@test "--enable-universalsdk" {
+@test "enable universalsdk" {
   stub uname '-s : echo Darwin'
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
@@ -258,6 +258,27 @@ OUT
   assert_output <<EOS
 PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/ --with-universal-archs=intel --enable-unicode=ucs4)
 EOS
+}
+
+@test "enable custom unicode configuration" {
+  cached_tarball "Python-3.2.1"
+
+  stub brew false
+  stub "$MAKE" \
+    " : echo \"$MAKE \$@\" >> build.log" \
+    " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
+
+  PYTHON_CONFIGURE_OPTS="--enable-unicode=ucs2" TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
+  assert_success
+
+  assert_build_log <<OUT
+Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.2.1: --prefix=$INSTALL_ROOT --enable-unicode=ucs2 --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+
+  unstub make
 }
 
 @test "default MACOSX_DEPLOYMENT_TARGET" {
