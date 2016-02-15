@@ -1850,6 +1850,11 @@ if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
   package_option python configure --enable-universalsdk=/ --with-universal-archs=intel
 fi
 
+# Compile with `--enable-unicode=ucs4` by default (#257)
+if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
+  package_option python configure --enable-unicode=ucs4
+fi
+
 # SSL Certificate error with older wget that does not support Server Name Indication (#60)
 if ! command -v curl 1>/dev/null 2>&1 && [[ "$(wget --version 2>/dev/null || true)" = "GNU Wget 1.1"[0-3]* ]]; then
   echo "python-build: wget (< 1.14) doesn't support Server Name Indication. Please install curl (>= 7.18.1) and try again" >&2
