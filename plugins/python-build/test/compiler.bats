@@ -89,7 +89,7 @@ build_package_standard python
 DEF
   assert_success
   assert_output <<OUT
-./configure --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib
+./configure --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib --enable-unicode=ucs4
 CC=clang
 CFLAGS=no
 make -j 2
