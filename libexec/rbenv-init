@@ -70,7 +70,7 @@ if [ -z "$print" ]; then
     echo
     case "$shell" in
     fish )
-      echo 'status --is-interactive; and . (rbenv init -|psub)'
+      echo 'status --is-interactive; and source (rbenv init -|psub)'
       ;;
     * )
       echo 'eval "$(rbenv init -)"'
@@ -97,10 +97,7 @@ esac
 
 completion="${root}/completions/rbenv.${shell}"
 if [ -r "$completion" ]; then
-  case "$shell" in
-  fish ) echo ". '$completion'" ;;
-  *    ) echo "source '$completion'" ;;
-  esac
+  echo "source '$completion'"
 fi
 
 if [ -z "$no_rehash" ]; then
@@ -117,7 +114,7 @@ function rbenv
 
   switch "\$command"
   case ${commands[*]}
-    . (rbenv "sh-\$command" \$argv|psub)
+    source (rbenv "sh-\$command" \$argv|psub)
   case '*'
     command rbenv "\$command" \$argv
   end
