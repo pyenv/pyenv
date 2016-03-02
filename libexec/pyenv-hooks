@@ -9,6 +9,8 @@ set -e
 if [ "$1" = "--complete" ]; then
   echo exec
   echo rehash
+  echo version-name
+  echo version-origin
   echo which
   exit
 fi

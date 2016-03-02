@@ -22,9 +22,30 @@ setup() {
   assert_success "system"
 }
 
+@test "PYENV_VERSION can be overridden by hook" {
+  create_version "2.7.11"
+  create_version "3.5.1"
+  create_hook version-name test.bash <<<"PYENV_VERSION=3.5.1"
+
+  PYENV_VERSION=2.7.11 run pyenv-version-name
+  assert_success "3.5.1"
+}
+
+@test "carries original IFS within hooks" {
+  create_hook version-name hello.bash <<SH
+hellos=(\$(printf "hello\\tugly world\\nagain"))
+echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
+SH
+
+  export PYENV_VERSION=system
+  IFS=$' \t\n' run pyenv-version-name env
+  assert_success
+  assert_line "HELLO=:hello:ugly:world:again"
+}
+
 @test "PYENV_VERSION has precedence over local" {
-  create_version "2.7.6"
-  create_version "3.3.3"
+  create_version "2.7.11"
+  create_version "3.5.1"
 
   cat > ".python-version" <<<"2.7.6"
   run pyenv-version-name

@@ -97,6 +97,7 @@ PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib
 for plugin_hook in "${PYENV_ROOT}/plugins/"*/etc/pyenv.d; do
   PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${plugin_hook}"
 done
+PYENV_HOOK_PATH="${PYENV_HOOK_PATH#:}"
 export PYENV_HOOK_PATH
 
 shopt -u nullglob

@@ -15,10 +15,6 @@
 # `PYENV_VERSION' environment variable takes precedence over local
 # and global versions.
 #
-# For backwards compatibility, pyenv will also read version
-# specifications from `.pyenv-version' files, but a `.python-version'
-# file in the same directory takes precedence.
-#
 # <version> should be a string matching a Python version known to pyenv.
 # The special version string `system' will use your default system Python.
 # Run `pyenv versions' for a list of available Python versions.
