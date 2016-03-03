@@ -1,5 +1,14 @@
 ## Version History
 
+## 20160303
+
+* python-build: Add anaconda[23]-2.5.0 (#543)
+* python-build: Import recent changes from ruby-build 20160130
+* python-build: Compile with `--enable-unicode=ucs4` by default for CPython (#257, #542)
+* python-build: Switch download URL of Continuum products from HTTP to HTTPS (#543)
+* python-build: Added pypy-dev special case in pyenv-install to use py27 (#547)
+* python-build: Upgrade OpenSSL to 1.0.2g (#550)
+
 ## 20160202
 
 * pyenv: Run rehash automatically after `conda install`
