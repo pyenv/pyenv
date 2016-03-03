@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Usage: python-build [-kvp] <definition> <prefix>
+# Usage: python-build [-kpv] <definition> <prefix>
 #        python-build --definitions
 #        python-build --version
 #
@@ -390,6 +390,9 @@ fetch_tarball() {
   fi
 
    if [ "$package_url" != "${package_url%xz}" ]; then
+     if ! type -p xz >/dev/null; then
+      echo "warning: xz not found; consider installing \`xz\` package" >&4
+     fi
      package_filename="${package_filename%.gz}.xz"
      tar_args="${tar_args/z/J}"
    fi
