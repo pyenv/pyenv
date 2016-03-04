@@ -19,7 +19,7 @@ git_commit() {
   assert [ ! -e "$PYENV_ROOT" ]
   run pyenv---version
   assert_success
-  [[ $output == "ybenv "?.?.? ]]
+  [[ $output == "pyenv 20"* ]]
 }
 
 @test "doesn't read version from non-pyenv repo" {
@@ -30,19 +30,19 @@ git_commit() {
 
   run pyenv---version
   assert_success
-  [[ $output == "pyenv "?.?.? ]]
+  [[ $output == "pyenv 20"* ]]
 }
 
 @test "reads version from git repo" {
   git init
   git remote add origin https://github.com/yyuu/pyenv.git
   git_commit
-  git tag v0.4.1
+  git tag v20380119
   git_commit
   git_commit
 
   run pyenv---version
-  assert_success "pyenv 0.4.1-2-g$(git rev-parse --short HEAD)"
+  assert_success "pyenv 20380119-2-g$(git rev-parse --short HEAD)"
 }
 
 @test "prints default version if no tags in git repo" {
@@ -51,5 +51,5 @@ git_commit() {
   git_commit
 
   run pyenv---version
-  [[ $output == "pyenv "?.?.? ]]
+  [[ $output == "pyenv 20"* ]]
 }
