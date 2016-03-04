@@ -3,7 +3,7 @@
 load test_helper
 
 @test "default" {
-  run pyenv global
+  run pyenv-global
   assert_success
   assert_output "system"
 }
@@ -20,7 +20,7 @@ load test_helper
   mkdir -p "$PYENV_ROOT/versions/1.2.3"
   run pyenv-global "1.2.3"
   assert_success
-  run pyenv global
+  run pyenv-global
   assert_success "1.2.3"
 }
 

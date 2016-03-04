@@ -31,8 +31,26 @@ setup() {
   assert_success "${PWD}/.python-version"
 }
 
-@test "detects alternate version file" {
-  touch .pyenv-version
-  run pyenv-version-origin
-  assert_success "${PWD}/.pyenv-version"
+@test "reports from hook" {
+  create_hook version-origin test.bash <<<"PYENV_VERSION_ORIGIN=plugin"
+
+  PYENV_VERSION=1 run pyenv-version-origin
+  assert_success "plugin"
+}
+
+@test "carries original IFS within hooks" {
+  create_hook version-origin hello.bash <<SH
+hellos=(\$(printf "hello\\tugly world\\nagain"))
+echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
+SH
+
+  export PYENV_VERSION=system
+  IFS=$' \t\n' run pyenv-version-origin env
+  assert_success
+  assert_line "HELLO=:hello:ugly:world:again"
+}
+
+@test "doesn't inherit PYENV_VERSION_ORIGIN from environment" {
+  PYENV_VERSION_ORIGIN=ignored run pyenv-version-origin
+  assert_success "${PYENV_ROOT}/version"
 }

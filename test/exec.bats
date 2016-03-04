@@ -43,27 +43,14 @@ python
 OUT
 }
 
-@test "supports hook path with spaces" {
-  hook_path="${PYENV_TEST_DIR}/custom stuff/pyenv hooks"
-  mkdir -p "${hook_path}/exec"
-  echo "export HELLO='from hook'" > "${hook_path}/exec/hello.bash"
-
-  export PYENV_VERSION=system
-  PYENV_HOOK_PATH="$hook_path" run pyenv-exec env
-  assert_success
-  assert_line "HELLO=from hook"
-}
-
 @test "carries original IFS within hooks" {
-  hook_path="${PYENV_TEST_DIR}/pyenv.d"
-  mkdir -p "${hook_path}/exec"
-  cat > "${hook_path}/exec/hello.bash" <<SH
+  create_hook exec hello.bash <<SH
 hellos=(\$(printf "hello\\tugly world\\nagain"))
 echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
 SH
 
   export PYENV_VERSION=system
-  PYENV_HOOK_PATH="$hook_path" IFS=$' \t\n' run pyenv-exec env
+  IFS=$' \t\n' run pyenv-exec env
   assert_success
   assert_line "HELLO=:hello:ugly:world:again"
 }

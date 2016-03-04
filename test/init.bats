@@ -25,10 +25,22 @@ load test_helper
 }
 
 @test "detect parent shell" {
-  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   SHELL=/bin/false run pyenv-init -
   assert_success
   assert_line "export PYENV_SHELL=bash"
+}
+
+@test "detect parent shell from script" {
+  mkdir -p "$PYENV_TEST_DIR"
+  cd "$PYENV_TEST_DIR"
+  cat > myscript.sh <<OUT
+#!/bin/sh
+eval "\$(pyenv-init -)"
+echo \$PYENV_SHELL
+OUT
+  chmod +x myscript.sh
+  run ./myscript.sh /bin/zsh
+  assert_success "sh"
 }
 
 @test "setup shell completions (fish)" {

@@ -1,35 +1,28 @@
 #!/usr/bin/env bash
+# Usage: pyenv version-file [<dir>]
 # Summary: Detect the file that sets the current pyenv version
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
+target_dir="$1"
+
 find_local_version_file() {
   local root="$1"
-  while true; do
-    [[ "$root" =~ ^//[^/]*$ ]] && break
+  while ! [[ "$root" =~ ^//[^/]*$ ]]; do
     if [ -e "${root}/.python-version" ]; then
       echo "${root}/.python-version"
-      exit
-    elif [ -e "${root}/.pyenv-version" ]; then
-      echo "${root}/.pyenv-version"
-      exit
+      return 0
     fi
     [ -n "$root" ] || break
     root="${root%/*}"
   done
+  return 1
 }
 
-find_local_version_file "$PYENV_DIR"
-[ "$PYENV_DIR" = "$PWD" ] || find_local_version_file "$PWD"
-
-global_version_file="${PYENV_ROOT}/version"
-
-if [ -e "$global_version_file" ]; then
-  echo "$global_version_file"
-elif [ -e "${PYENV_ROOT}/global" ]; then
-  echo "${PYENV_ROOT}/global"
-elif [ -e "${PYENV_ROOT}/default" ]; then
-  echo "${PYENV_ROOT}/default"
+if [ -n "$target_dir" ]; then
+  find_local_version_file "$target_dir"
 else
-  echo "$global_version_file"
+  find_local_version_file "$PYENV_DIR" || {
+    [ "$PYENV_DIR" != "$PWD" ] && find_local_version_file "$PWD"
+  } || echo "${PYENV_ROOT}/version"
 fi
