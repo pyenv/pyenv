@@ -1,5 +1,10 @@
 ## Version History
 
+## 20160310
+
+* python-build: Add PyPy-5.0.0 (#555)
+* pyenv: Import recent changes from rbenv 1.0 (#549)
+
 ## 20160303
 
 * python-build: Add anaconda[23]-2.5.0 (#543)
