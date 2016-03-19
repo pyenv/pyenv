@@ -1,0 +1,2 @@
+require_gcc
+install_package "pypy-5.0.1-src" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.0.1-src.tar.bz2#1573c9284d3ec236c8e6ef3b954753932dff29462c54b5885b761d1ee68b6e05" "pypy_builder" verify_py27 ensurepip
