@@ -1,5 +1,9 @@
 ## Version History
 
+## Unreleased
+
+* python-build: Added PyPy 5.0 Portable
+
 ## 20160310
 
 * python-build: Add PyPy-5.0.0 (#555)
