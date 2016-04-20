@@ -102,6 +102,11 @@ EOS
   cat <<EOS
 xsltproc
 EOS
+
+  # xz-utils
+  cat <<EOS
+xz
+EOS
 }
 
 expand_path() {
