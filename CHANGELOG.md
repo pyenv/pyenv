@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* python-build: Added PyPy 5.1 (#579)
 * python-build: Added PyPy 5.0.1 (#558)
 * python-build: Added PyPy 5.0 Portable
 * python-build: Added PyPy 5.0.1 Portable
