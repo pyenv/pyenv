@@ -2,11 +2,15 @@
 
 ## Unreleased
 
+## 20160422
+
 * python-build: Added PyPy 5.1 (#579)
 * python-build: Added PyPy 5.1 Portable
 * python-build: Added PyPy 5.0.1 (#558)
 * python-build: Added PyPy 5.0.1 Portable
 * python-build: Added PyPy 5.0 Portable
+* python-build: Added anaconda[23]-4.0.0 (#572)
+* python-build: Added Jython 2.7.1b3 (#557)
 
 ## 20160310
 
