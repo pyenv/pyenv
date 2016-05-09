@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 20160509
+
+* python-build: Fixed wrong SHA256 of `pypy-5.1-linux_x86_64-portable.tar.bz2` (#586, #587)
+* python-build: Added miniconda[23]-4.0.5
+* python-build: Added PyPy (Portable) 5.1.1 (#591, #592, #593)
+
 ## 20160422
 
 * python-build: Added PyPy 5.1 (#579)
