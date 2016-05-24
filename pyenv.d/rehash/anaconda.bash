@@ -11,111 +11,57 @@ conda_exists() {
   [ -n "${condas}" ]
 }
 
-conda_shims() {
-  ## curl
-  cat <<EOS
-curl
-curl-config
-EOS
-
-  ## fontconfig
-  cat <<EOS
-fc-cache
-fc-cat
-fc-list
-fc-match
-fc-pattern
-fc-query
-fc-scan
-fc-validate
-EOS
-
-  ## freetype
-  cat <<EOS
-freetype-config
-EOS
-
-  ## libpng
-  cat <<EOS
-libpng-config
-EOS
-
-  ## openssl
-  cat <<EOS
-openssl
-EOS
-
-  ## qtchooser
-  cat <<EOS
-assistant
-designer
-lconvert
-linguist
-lrelease
-lupdate
-moc
-pixeltool
-qcollectiongenerator
-qdbus
-qdbuscpp2xml
-qdbusviewer
-qdbusxml2cpp
-qhelpconverter
-qhelpgenerator
-qmake
-qmlplugindump
-qmlviewer
-qtconfig
-rcc
-uic
-xmlpatterns
-xmlpatternsvalidator
-EOS
-
-  ## redis
-  cat <<EOS
-redis-benchmark
-redis-check-aof
-redis-check-dump
-redis-cli
-redis-server
-EOS
-
-  ## sqlite3
-  cat <<EOS
-sqlite3
-EOS
-
-  ## libxml2
-  cat <<EOS
-xml2-config
-EOS
-
-  ## libxslt
-  cat <<EOS
-xslt-config
-EOS
-
-  ## xsltproc
-  cat <<EOS
-xsltproc
-EOS
-
-  # xz-utils
-  cat <<EOS
-xz
-EOS
-}
-
-# Remove conda shims
-filter_conda_shims() {
-  { cat
-    conda_shims
-  } | sort | uniq -c | awk '$1=="1"{print $2}' | tr '\n' ' '
+conda_shim() {
+  case "${1##*/}" in
+  "curl" | "curl-config" )
+    return 0 # curl
+    ;;
+  "fc-cache" | "fc-cat" | "fc-list" | "fc-match" | "fc-pattern" | "fc-query" | "fc-scan" | "fc-validate" )
+    return 0 # fontconfig
+    ;;
+  "freetype-config" )
+    return 0 # freetype
+    ;;
+  "libpng-config" )
+    return 0 # libpng
+    ;;
+  "openssl" )
+    return 0 # openssl
+    ;;
+  "assistant" | "designer" | "lconvert" | "linguist" | "lrelease" | "lupdate" | "moc" | "pixeltool" | "qcollectiongenerator" | "qdbus" | "qdbuscpp2xml" | "qdbusviewer" | "qdbusxml2cpp" | "qhelpconverter" | "qhelpgenerator" | "qmake" | "qmlplugindump" | "qmlviewer" | "qtconfig" | "rcc" | "uic" | "xmlpatterns" | "xmlpatternsvalidator" )
+    return 0 # qtchooser
+    ;;
+  "redis-benchmark" | "redis-check-aof" | "redis-check-dump" | "redis-cli" | "redis-server" )
+    return 0 # redis
+    ;;
+  "sqlite3" )
+    return 0 # sqlite3
+    ;;
+  "xml2-config" )
+    return 0 # libxml2
+    ;;
+  "xslt-config" )
+    return 0 # libxslt
+    ;;
+  "xsltproc" )
+    return 0 # xsltproc
+    ;;
+  "xz" )
+    return 0 # xz-utils
+    ;;
+  esac
+  return 1
 }
 
 deregister_conda_shims() {
-  registered_shims="$(for shim in $registered_shims; do echo "${shim}"; done | filter_conda_shims)"
+  local shim
+  local shims=()
+  for shim in ${registered_shims}; do
+    if ! conda_shim "${shim}" 1>&2; then
+      shims[${#shims[*]}]="${shim}"
+    fi
+  done
+  registered_shims="${shims[@]}"
 }
 
 if conda_exists; then
