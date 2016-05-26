@@ -323,42 +323,40 @@ http() {
   local file="$3"
   [ -n "$url" ] || return 1
 
-  if type curl &>/dev/null; then
+  if type aria2c &>/dev/null; then
+    "http_${method}_aria2c" "$url" "$file"
+  elif type curl &>/dev/null; then
     "http_${method}_curl" "$url" "$file"
   elif type wget &>/dev/null; then
     "http_${method}_wget" "$url" "$file"
   else
-    echo "error: please install \`curl\` or \`wget\` and try again" >&2
+    echo "error: please install \`aria2c\`, \`curl\` or \`wget\` and try again" >&2
     exit 1
   fi
 }
 
+http_head_aria2c() {
+  aria2c --dry-run ${ARIA2_OPTS} "$1" >&4 2>&1
+}
+
+http_get_aria2c() {
+  aria2c -o "${2:--}" ${ARIA2_OPTS} "$1"
+}
+
 http_head_curl() {
-  options=""
-  [ -n "${IPV4}" ] && options="--ipv4"
-  [ -n "${IPV6}" ] && options="--ipv6"
-  curl -qsILf ${options} "$1" >&4 2>&1
+  curl -qsILf ${CURL_OPTS} "$1" >&4 2>&1
 }
 
 http_get_curl() {
-  options=""
-  [ -n "${IPV4}" ] && options="--ipv4"
-  [ -n "${IPV6}" ] && options="--ipv6"
-  curl -q -o "${2:--}" -sSLf ${options} "$1"
+  curl -q -o "${2:--}" -sSLf ${CURL_OPTS} "$1"
 }
 
 http_head_wget() {
-  options=""
-  [ -n "${IPV4}" ] && options="--inet4-only"
-  [ -n "${IPV6}" ] && options="--inet6-only"
-  wget -q --spider ${options} "$1" >&4 2>&1
+  wget -q --spider ${WGET_OPTS} "$1" >&4 2>&1
 }
 
 http_get_wget() {
-  options=""
-  [ -n "${IPV4}" ] && options="--inet4-only"
-  [ -n "${IPV6}" ] && options="--inet6-only"
-  wget -nv ${options} -O "${2:--}" "$1"
+  wget -nv ${WGET_OPTS} -O "${2:--}" "$1"
 }
 
 fetch_tarball() {
@@ -1815,6 +1813,10 @@ fi
 if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ] || ! has_checksum_support compute_sha2; then
   unset PYTHON_BUILD_MIRROR_URL
 fi
+
+ARIA2_OPTS="${PYTHON_BUILD_ARIA2_OPTS} ${IPV4+--disable-ipv6=true} ${IPV6+--disable-ipv6=false}"
+CURL_OPTS="${PYTHON_BUILD_CURL_OPTS} ${IPV4+--ipv4} ${IPV6+--ipv6}"
+WGET_OPTS="${PYTHON_BUILD_WGET_OPTS} ${IPV4+--inet4-only} ${IPV6+--inet6-only}"
 
 # Add an option to build a debug version of Python (#11)
 if [ -n "$DEBUG" ]; then
