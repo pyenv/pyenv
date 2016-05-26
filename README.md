@@ -225,16 +225,6 @@ easy to fork and contribute any changes back upstream.
    please visit the wiki page about
    [Common Build Problems](https://github.com/yyuu/pyenv/wiki/Common-build-problems)
 
-6. **Rebuild the shim binaries.**
-   You should do this any time you install a new Python binary.
-   (Examples: installing a new Python version, or installing a package that provides a binary.)
-
-        $ pyenv rehash
-
-   This can be automated for pip using
-   [pyenv-pip-rehash](https://github.com/yyuu/pyenv-pip-rehash), which invokes
-   `pyenv rehash` after (un)installing packages using pip.
-
 
 #### Upgrading
 

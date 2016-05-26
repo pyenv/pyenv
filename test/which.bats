@@ -113,15 +113,13 @@ OUT
 }
 
 @test "carries original IFS within hooks" {
-  hook_path="${PYENV_TEST_DIR}/pyenv.d"
-  mkdir -p "${hook_path}/which"
-  cat > "${hook_path}/which/hello.bash" <<SH
+  create_hook which hello.bash <<SH
 hellos=(\$(printf "hello\\tugly world\\nagain"))
 echo HELLO="\$(printf ":%s" "\${hellos[@]}")"
 exit
 SH
 
-  PYENV_HOOK_PATH="$hook_path" IFS=$' \t\n' PYENV_VERSION=system run pyenv-which anything
+  IFS=$' \t\n' PYENV_VERSION=system run pyenv-which anything
   assert_success
   assert_output "HELLO=:hello:ugly:world:again"
 }

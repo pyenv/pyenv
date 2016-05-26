@@ -1,0 +1,52 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy-5.1.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.0-linux.tar.bz2#2f6c521b5b3c1082eab58be78655aa01ec400d19baeec93c455864a7483b8744" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-5.1-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.1-linux_i686-portable.tar.bz2#893507603a58b8983b69924e60591de39b8f71f70ba36d6e3894db8f7c49c3ea" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"linux-armel" )
+  require_distro "Ubuntu 12.04" || true
+  install_package "pypy-5.1.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.0-linux-armel.tar.bz2#ea7017449ff0630431866423220c3688fc55c1a0b80a96af0ae138dd0751b81c" "pypy" verify_py27 ensurepip
+  ;;
+"linux-armhf" )
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
+    install_package "pypy-5.1.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.0-linux-armhf-raspbian.tar.bz2#3bfcd251b4f3fd1a09520b2741c647c364d16d50c82b813732a78ac60ccb2b69" "pypy" verify_py27 ensurepip
+  else
+    require_distro "Ubuntu 13.04" || true
+    install_package "pypy-5.1.0-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.0-linux-armhf-raring.tar.bz2#a3e13083591bccc301fb974ff0a6c7e4ab4e611e4b31c0932898b981c794462b" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"linux-ppc64" )
+  require_distro "Fedora 20" || true
+  install_package "pypy-5.1.0-ppc64" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.0-ppc64.tar.bz2#32a31b9ff5174d69f8cf8db711ba2a593fed49b52bdf590bcecd6b727419b6df" "pypy" verify_py27 ensurepip
+  ;;
+"linux-ppc64le" )
+  require_distro "Fedora 21" || true
+  install_package "pypy-5.1.0-ppc64le" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.0-ppc64le.tar.bz2#303764f44154f81d7f0753258c89f8a14653658911a16ec2bcfee04055cbfab6" "pypy" verify_py27 ensurepip
+  ;;
+"linux64" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy-5.1.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.0-linux64.tar.bz2#0e8913351d043a50740b98cb89d99852b8bd6d11225a41c8abfc0baf7084cbf6" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-5.1-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.1-linux_x86_64-portable.tar.bz2#b2df9b0127457d1c3cc0dc9b8f027a53569ccd3ba5a79012d641e576d9cc003a" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"osx64" )
+  install_package "pypy-5.1.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.0-osx64.tar.bz2#7e270c66347158dd794c101c4817f742f760ed805aa0d10abe19ba4a78a75118" "pypy" verify_py27 ensurepip
+  ;;
+"win32" )
+  # FIXME: never tested on Windows
+  install_zip "pypy-5.1.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.0-win32.zip#044e7f35223a443412b5948740e60e93069a6f8b0a72053cc9d472874bb1b6cc" "pypy" verify_py27 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy-5.1.0-src' to build from soruce."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

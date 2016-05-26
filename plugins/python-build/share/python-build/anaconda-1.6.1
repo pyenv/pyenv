@@ -1,12 +1,12 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-x86" )
-  install_script "Anaconda-1.6.1-Linux-x86" "http://repo.continuum.io/archive/Anaconda-1.6.1-Linux-x86.sh#745b9452fd18720deefb465a6687c0d66df8f11edceadcee758082dea1b8e812" "anaconda" verify_py27
+  install_script "Anaconda-1.6.1-Linux-x86" "https://repo.continuum.io/archive/Anaconda-1.6.1-Linux-x86.sh#745b9452fd18720deefb465a6687c0d66df8f11edceadcee758082dea1b8e812" "anaconda" verify_py27
   ;;
 "Linux-x86_64" )
-  install_script "Anaconda-1.6.1-Linux-x86_64" "http://repo.continuum.io/archive/Anaconda-1.6.1-Linux-x86_64.sh#81d1819ba08069343f228b9c819cdba0e4d15f2142c0c033657599808c3960fb" "anaconda" verify_py27
+  install_script "Anaconda-1.6.1-Linux-x86_64" "https://repo.continuum.io/archive/Anaconda-1.6.1-Linux-x86_64.sh#81d1819ba08069343f228b9c819cdba0e4d15f2142c0c033657599808c3960fb" "anaconda" verify_py27
   ;;
 "MacOSX-x86_64" )
-  install_script "Anaconda-1.6.1-MacOSX-x86_64" "http://repo.continuum.io/archive/Anaconda-1.6.1-MacOSX-x86_64.sh#bbc15de34208ce8af5aceedeea1334636fe94c578b9890896729f1a61ace5e4f" "anaconda" verify_py27
+  install_script "Anaconda-1.6.1-MacOSX-x86_64" "https://repo.continuum.io/archive/Anaconda-1.6.1-MacOSX-x86_64.sh#bbc15de34208ce8af5aceedeea1334636fe94c578b9890896729f1a61ace5e4f" "anaconda" verify_py27
   ;;
 * )
   { echo

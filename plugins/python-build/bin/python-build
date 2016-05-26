@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Usage: python-build [-kvp] <definition> <prefix>
+# Usage: python-build [-kpv] <definition> <prefix>
 #        python-build --definitions
 #        python-build --version
 #
@@ -388,6 +388,9 @@ fetch_tarball() {
   fi
 
    if [ "$package_url" != "${package_url%xz}" ]; then
+     if ! type -p xz >/dev/null; then
+      echo "warning: xz not found; consider installing \`xz\` package" >&4
+     fi
      package_filename="${package_filename%.gz}.xz"
      tar_args="${tar_args/z/J}"
    fi
@@ -408,6 +411,19 @@ fetch_tarball() {
       fi
     fi
   } >&4 2>&1
+}
+
+fetch_nightly_tarball() {
+  local package_name="$1"
+  local package_url="$2"
+  local package_pattern="$3"
+  fetch_tarball "$1" "$2"
+  if [ ! -e "${package_name}" ]; then
+    local nightly_package_name="$(echo ${package_pattern})"
+    if [ -e "${nightly_package_name}" ]; then
+      ln -fs "${nightly_package_name}" "${package_name}"
+    fi
+  fi
 }
 
 reuse_existing_tarball() {
@@ -1850,6 +1866,11 @@ if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
     exit 1
   fi
   package_option python configure --enable-universalsdk=/ --with-universal-archs=intel
+fi
+
+# Compile with `--enable-unicode=ucs4` by default (#257)
+if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
+  package_option python configure --enable-unicode=ucs4
 fi
 
 # SSL Certificate error with older wget that does not support Server Name Indication (#60)

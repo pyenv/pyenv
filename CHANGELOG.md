@@ -1,5 +1,37 @@
 ## Version History
 
+## Unreleased
+
+## 20160509
+
+* python-build: Fixed wrong SHA256 of `pypy-5.1-linux_x86_64-portable.tar.bz2` (#586, #587)
+* python-build: Added miniconda[23]-4.0.5
+* python-build: Added PyPy (Portable) 5.1.1 (#591, #592, #593)
+
+## 20160422
+
+* python-build: Added PyPy 5.1 (#579)
+* python-build: Added PyPy 5.1 Portable
+* python-build: Added PyPy 5.0.1 (#558)
+* python-build: Added PyPy 5.0.1 Portable
+* python-build: Added PyPy 5.0 Portable
+* python-build: Added anaconda[23]-4.0.0 (#572)
+* python-build: Added Jython 2.7.1b3 (#557)
+
+## 20160310
+
+* python-build: Add PyPy-5.0.0 (#555)
+* pyenv: Import recent changes from rbenv 1.0 (#549)
+
+## 20160303
+
+* python-build: Add anaconda[23]-2.5.0 (#543)
+* python-build: Import recent changes from ruby-build 20160130
+* python-build: Compile with `--enable-unicode=ucs4` by default for CPython (#257, #542)
+* python-build: Switch download URL of Continuum products from HTTP to HTTPS (#543)
+* python-build: Added pypy-dev special case in pyenv-install to use py27 (#547)
+* python-build: Upgrade OpenSSL to 1.0.2g (#550)
+
 ## 20160202
 
 * pyenv: Run rehash automatically after `conda install`

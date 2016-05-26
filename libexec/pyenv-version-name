@@ -8,6 +8,13 @@ if [ -z "$PYENV_VERSION" ]; then
   PYENV_VERSION="$(pyenv-version-file-read "$PYENV_VERSION_FILE" || true)"
 fi
 
+OLDIFS="$IFS"
+IFS=$'\n' scripts=(`pyenv-hooks version-name`)
+IFS="$OLDIFS"
+for script in "${scripts[@]}"; do
+  source "$script"
+done
+
 if [ -z "$PYENV_VERSION" ] || [ "$PYENV_VERSION" = "system" ]; then
   echo "system"
   exit

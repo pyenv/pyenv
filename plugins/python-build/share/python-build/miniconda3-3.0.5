@@ -1,12 +1,12 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-x86" )
-  install_script "Miniconda3-3.0.5-Linux-x86" "http://repo.continuum.io/miniconda/Miniconda3-3.0.5-Linux-x86.sh#014d0e44b752d9e91373a3c56252b62c0f29b628a8584f8b5515c7c3d8acc6be" "miniconda" verify_py33
+  install_script "Miniconda3-3.0.5-Linux-x86" "https://repo.continuum.io/miniconda/Miniconda3-3.0.5-Linux-x86.sh#014d0e44b752d9e91373a3c56252b62c0f29b628a8584f8b5515c7c3d8acc6be" "miniconda" verify_py33
   ;;
 "Linux-x86_64" )
-  install_script "Miniconda3-3.0.5-Linux-x86_64" "http://repo.continuum.io/miniconda/Miniconda3-3.0.5-Linux-x86_64.sh#eaf8c5005645eecd18cc09d2da2a69314057a9e36eadc5084120bc1deffa332b" "miniconda" verify_py33
+  install_script "Miniconda3-3.0.5-Linux-x86_64" "https://repo.continuum.io/miniconda/Miniconda3-3.0.5-Linux-x86_64.sh#eaf8c5005645eecd18cc09d2da2a69314057a9e36eadc5084120bc1deffa332b" "miniconda" verify_py33
   ;;
 "MacOSX-x86_64" )
-  install_script "Miniconda3-3.0.5-MacOSX-x86_64" "http://repo.continuum.io/miniconda/Miniconda3-3.0.5-MacOSX-x86_64.sh#7c088951665e2c35574f6dde81189467d80806caff47872887525ed3d0b4dbd0" "miniconda" verify_py33
+  install_script "Miniconda3-3.0.5-MacOSX-x86_64" "https://repo.continuum.io/miniconda/Miniconda3-3.0.5-MacOSX-x86_64.sh#7c088951665e2c35574f6dde81189467d80806caff47872887525ed3d0b4dbd0" "miniconda" verify_py33
   ;;
 * )
   { echo

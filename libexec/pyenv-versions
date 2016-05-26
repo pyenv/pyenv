@@ -27,7 +27,7 @@ done
 
 versions_dir="${PYENV_ROOT}/versions"
 
-if ! enable -f "${BASH_SOURCE%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
+if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; then
   if [ -n "$PYENV_NATIVE_EXT" ]; then
     echo "pyenv: failed to load \`realpath' builtin" >&2
     exit 1

@@ -19,24 +19,11 @@ setup() {
   assert_success "1.2.3"
 }
 
-@test "supports legacy .pyenv-version file" {
-  echo "1.2.3" > .pyenv-version
-  run pyenv-local
-  assert_success "1.2.3"
-}
-
-@test "local .python-version has precedence over .pyenv-version" {
-  echo "2.7" > .pyenv-version
-  echo "3.4" > .python-version
-  run pyenv-local
-  assert_success "3.4"
-}
-
-@test "ignores version in parent directory" {
+@test "discovers version file in parent directory" {
   echo "1.2.3" > .python-version
   mkdir -p "subdir" && cd "subdir"
   run pyenv-local
-  assert_failure
+  assert_success "1.2.3"
 }
 
 @test "ignores PYENV_DIR" {
@@ -64,40 +51,9 @@ setup() {
   assert [ "$(cat .python-version)" = "1.2.3" ]
 }
 
-@test "renames .pyenv-version to .python-version" {
-  echo "2.7.6" > .pyenv-version
-  mkdir -p "${PYENV_ROOT}/versions/3.3.3"
-  run pyenv-local
-  assert_success "2.7.6"
-  run pyenv-local "3.3.3"
-  assert_success
-  assert_output <<OUT
-pyenv: removed existing \`.pyenv-version' file and migrated
-       local version specification to \`.python-version' file
-OUT
-  assert [ ! -e .pyenv-version ]
-  assert [ "$(cat .python-version)" = "3.3.3" ]
-}
-
-@test "doesn't rename .pyenv-version if changing the version failed" {
-  echo "2.7.6" > .pyenv-version
-  assert [ ! -e "${PYENV_ROOT}/versions/3.3.3" ]
-  run pyenv-local "3.3.3"
-  assert_failure "pyenv: version \`3.3.3' not installed"
-  assert [ ! -e .python-version ]
-  assert [ "$(cat .pyenv-version)" = "2.7.6" ]
-}
-
 @test "unsets local version" {
   touch .python-version
   run pyenv-local --unset
   assert_success ""
-  assert [ ! -e .pyenv-version ]
-}
-
-@test "unsets alternate version file" {
-  touch .pyenv-version
-  run pyenv-local --unset
-  assert_success ""
-  assert [ ! -e .pyenv-version ]
+  assert [ ! -e .python-version ]
 }

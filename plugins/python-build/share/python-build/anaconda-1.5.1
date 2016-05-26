@@ -1,6 +1,6 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "MacOSX-x86_64" )
-  install_script "Anaconda-1.5.1-MacOSX-x86_64" "http://repo.continuum.io/archive/Anaconda-1.5.1-MacOSX-x86_64.sh#6d3c86a2fdbaeeec2a6c251d5c9034a32b7c68a0437f2fac0b8f25125fe6866f" "anaconda" verify_py27
+  install_script "Anaconda-1.5.1-MacOSX-x86_64" "https://repo.continuum.io/archive/Anaconda-1.5.1-MacOSX-x86_64.sh#6d3c86a2fdbaeeec2a6c251d5c9034a32b7c68a0437f2fac0b8f25125fe6866f" "anaconda" verify_py27
   ;;
 * )
   { echo

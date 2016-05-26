@@ -1,13 +1,13 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+  if require_distro "Ubuntu 10.04" 1>/dev/null 2>&1; then
     install_package "pypy-4.0.1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-4.0.1-linux.tar.bz2#721920fcbb6aefc9a98e868e32b7f4ea5fd68b7f9305d08d0a2595327c9c0611" "pypy" verify_py27 ensurepip
   else
     install_package "pypy-4.0.1-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-4.0.1-linux_i686-portable.tar.bz2#2a1078bf36372b1c2919c11c418860dd7f0d44c92e6772bb36490eaf793b5c47" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
-  require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" || true
+  require_distro "Ubuntu 12.04" || true
   install_package "pypy-4.0.1-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-4.0.1-linux-armel.tar.bz2#d1acdd45ebd34580dd632c63c95211f6bae5e9a8f7a46ffa6f0443286ff9f61b" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )
