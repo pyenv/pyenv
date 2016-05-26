@@ -330,13 +330,13 @@ http() {
   elif type wget &>/dev/null; then
     "http_${method}_wget" "$url" "$file"
   else
-    echo "error: please install \`curl\` or \`wget\` and try again" >&2
+    echo "error: please install \`aria2c\`, \`curl\` or \`wget\` and try again" >&2
     exit 1
   fi
 }
 
 http_head_aria2c() {
-  aria2c --dry-run  ${ARIA2_OPTS} "$1" >&4 2>&1
+  aria2c --dry-run ${ARIA2_OPTS} "$1" >&4 2>&1
 }
 
 http_get_aria2c() {
