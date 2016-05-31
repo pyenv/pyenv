@@ -1,7 +1,149 @@
 sudo: false
-install: git clone --depth 1 https://github.com/sstephenson/bats.git
-script: make test
 language: c
+
+# virtualenv versions:
+# precise: 1.7.1.2
+# trusty: 1.11.4
+# precise: 12.0.6
+# trusty: 13.1.0
+
+addons:
+  apt:
+    # Note that it is not possible to include `virtualenv` from
+    # source `debian-sid`, as pulls in many other debian-sid packages
+    # which conflicts with the Ubuntu packages.
+    packages:
+      - python-pip
+
 env:
-  - PYENV_NATIVE_EXT=
-  - PYENV_NATIVE_EXT=1
+  global:
+    - VIRTUAL_ENV_BASE=~/virtualenv
+    - VIRTUAL_ENV_VERSION_SPEC='<13'
+
+matrix:
+  include:
+    # Plain bats
+
+    - env: PYENV_NATIVE_EXT=
+      addons: false
+    - env: PYENV_NATIVE_EXT=1
+      addons: false
+
+    # CPython
+
+    - env: TESTENV=2.7.11,3.2.6,3.4.4
+      dist: precise
+
+    # Stackless
+
+    - env: TESTENV=stackless-3.4.1,stackless-dev
+      dist: precise
+
+    # PyPy
+
+    - env: TESTENV=pypy-2.4.0,pypy-5.1.1,pypy-c-jit-latest,pypy-c-nojit-latest
+      dist: precise
+
+    # Jython
+
+    - env: TESTENV=jython-2.7.0,jython-dev VIRTUAL_ENV_VERSION_SPEC='==1.7.1.2'
+      dist: precise
+
+    # Anaconda/Miniconda
+
+    - env: TESTENV=anaconda3-4.0.0,miniconda3-4.0.5 VIRTUAL_ENV_ADD_LIB_PATH=1
+      dist: precise
+
+# Failures (must all be replicated into the allow_failures section)
+
+    # Miniconda 2
+
+    - env: TESTENV=miniconda2-4.0.5
+      dist: precise
+
+    # IronPython
+
+    - env: TESTENV=ironpython-2.7.5
+      dist: precise
+      sudo: required
+      addons:
+        apt:
+          packages:
+            - python-pip
+            - mono-xbuild
+            - mono-dmcs
+            - mono-complete
+    - env: TESTENV=ironpython-dev
+      dist: precise
+      sudo: required
+      addons:
+        apt:
+          packages:
+            - python-pip
+            - mono-xbuild
+            - mono-dmcs
+            - mono-complete
+
+  excluded_failures:
+    # Dies after 35+ mins with targetpypystandalone.py killed
+    - env: TESTENV=pypy-5.1.1,pypy-dev PYENV_RPYTHON_VERSION=pypy-5.1.1
+      dist: precise
+
+  allow_failures:
+    # _io.so: undefined symbol: _PyCodec_LookupTextEncoding
+    - env: TESTENV=miniconda2-4.0.5
+      dist: precise
+
+    - env: TESTENV=ironpython-2.7.5
+      dist: precise
+      sudo: required
+      addons:
+        apt:
+          packages:
+            - python-pip
+            - mono-xbuild
+            - mono-dmcs
+            - mono-complete
+    - env: TESTENV=ironpython-dev
+      dist: precise
+      sudo: required
+      addons:
+        apt:
+          packages:
+            - python-pip
+            - mono-xbuild
+            - mono-dmcs
+            - mono-complete
+
+install:
+  - git clone --depth 1 https://github.com/sstephenson/bats.git
+  - |
+    if [[ "${TESTENV%-*}" == 'ironpython' ]]; then
+      echo "binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc none" | sudo tee -a /etc/fstab
+      echo ':CLR:M::MZ::/usr/bin/mono:' | sudo tee /proc/sys/fs/binfmt_misc/register
+    fi
+
+script:
+  - if [[ "$TESTENV" == '' ]]; then make test; fi
+  - |
+    export PYENV_ROOT=.
+    pip install --user --upgrade 'virtualenv'"$VIRTUAL_ENV_VERSION_SPEC"
+    virtualenv --version
+    for PYENV_VERSION in ${TESTENV//,/ }; do
+      ./bin/pyenv install "$PYENV_VERSION"
+      if [[ -x ./versions/$PYENV_VERSION/bin/python ]]; then
+        ./versions/$PYENV_VERSION/bin/python --version
+        if [[ "$VIRTUAL_ENV_ADD_LIB_PATH" == '1' ]]; then
+          export LD_LIBRARY_PATH="./versions/$PYENV_VERSION/lib/"
+        fi
+        virtualenv --python=./versions/$PYENV_VERSION/bin/python "$VIRTUAL_ENV_BASE/$PYENV_VERSION"
+      fi
+      if [[ -f "$VIRTUAL_ENV_BASE/$PYENV_VERSION/bin/activate" ]]; then
+        source "$VIRTUAL_ENV_BASE/$PYENV_VERSION/bin/activate"
+        python --version
+        pip --version
+      else
+        exit 1
+      fi
+      export LD_LIBRARY_PATH=""
+    done
