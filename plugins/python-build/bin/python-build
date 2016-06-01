@@ -340,7 +340,9 @@ http_head_aria2c() {
 }
 
 http_get_aria2c() {
-  aria2c -o "${2:--}" ${ARIA2_OPTS} "$1"
+  local out="${2:-$(mktemp "out.XXXXXX")}"
+  aria2c --allow-overwrite=true -o "${out}" ${ARIA2_OPTS} "$1" >&4
+  [ -n "$2" ] || cat "${out}"
 }
 
 http_head_curl() {
