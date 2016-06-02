@@ -680,6 +680,26 @@ package_option() {
   eval "$variable=( \"\${value[@]}\" )"
 }
 
+build_package_warn_eol() {
+  local package_name="$1"
+
+  { echo
+    echo "WARNING: $package_name is past its end of life and is now unsupported."
+    echo "It no longer receives bug fixes or critical security updates."
+    echo
+  } >&3
+}
+
+build_package_warn_unsupported() {
+  local package_name="$1"
+
+  { echo
+    echo "WARNING: $package_name is nearing its end of life."
+    echo "It only receives critical security updates, no bug fixes."
+    echo
+  } >&3
+}
+
 build_package_standard() {
   local package_name="$1"
 
