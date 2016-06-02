@@ -1623,7 +1623,7 @@ build_package_verify_py36() {
 }
 
 build_package_ez_setup() {
-  local ez_setup="${BUILD_PATH}/ez_setup.py"
+  local ez_setup="ez_setup.py"
   rm -f "${ez_setup}"
   { if [ "${EZ_SETUP+defined}" ] && [ -f "${EZ_SETUP}" ]; then
       echo "Installing setuptools from ${EZ_SETUP}..." 1>&2
@@ -1641,7 +1641,7 @@ build_package_ez_setup() {
 }
 
 build_package_get_pip() {
-  local get_pip="${BUILD_PATH}/get-pip.py"
+  local get_pip="get-pip.py"
   rm -f "${get_pip}"
   { if [ "${GET_PIP+defined}" ] && [ -f "${GET_PIP}" ]; then
       echo "Installing pip from ${GET_PIP}..." 1>&2
