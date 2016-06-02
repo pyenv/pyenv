@@ -9,7 +9,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
 @test "package URL without checksum bypasses mirror" {
   stub shasum true
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/without-checksum
   echo "$output" >&2
@@ -24,7 +24,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
 @test "package URL with checksum but no shasum support bypasses mirror" {
   stub shasum false
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-checksum
 
@@ -42,7 +42,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
   stub shasum true "echo $checksum"
   stub aria2c "--dry-run $mirror_url : true" \
-    "-o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$2"
+    "--allow-overwrite=true -o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
 
   install_fixture definitions/with-checksum
 
@@ -60,7 +60,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
   stub shasum true "echo $checksum"
   stub aria2c "--dry-run $mirror_url : false" \
-    "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+    "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$3"
 
   install_fixture definitions/with-checksum
 
@@ -78,8 +78,8 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
   stub shasum true "echo invalid" "echo $checksum"
   stub aria2c "--dry-run $mirror_url : true" \
-    "-o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$2" \
-    "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+    "--allow-overwrite=true -o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
+    "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-checksum
   echo "$output" >&2
@@ -98,7 +98,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
   stub shasum true "echo $checksum"
   stub aria2c "--dry-run : true" \
-    "-o * https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$2" \
+    "--allow-overwrite=true -o * https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
 
   install_fixture definitions/with-checksum
 
@@ -115,7 +115,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
 
   stub shasum true "echo $checksum"
-  stub aria2c "-o * https://www.python.org/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * https://www.python.org/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   run_inline_definition <<DEF
 install_package "package-1.0.0" "https://www.python.org/packages/package-1.0.0.tar.gz#ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5" copy
