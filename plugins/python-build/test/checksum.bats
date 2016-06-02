@@ -7,7 +7,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
 
 @test "package URL without checksum" {
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/without-checksum
 
@@ -20,7 +20,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
 @test "package URL with valid checksum" {
   stub shasum true "echo ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-checksum
 
@@ -34,7 +34,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
 @test "package URL with invalid checksum" {
   stub shasum true "echo ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-invalid-checksum
 
@@ -48,7 +48,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
 @test "package URL with checksum but no shasum support" {
   stub shasum false
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-checksum
 
@@ -62,7 +62,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
 @test "package URL with valid md5 checksum" {
   stub md5 true "echo 83e6d7725e20166024a1eb74cde80677"
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-md5-checksum
 
@@ -76,7 +76,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
 @test "package URL with md5 checksum but no md5 support" {
   stub md5 false
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-md5-checksum
 
@@ -90,7 +90,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
 
 @test "package with invalid checksum" {
   stub shasum true "echo invalid"
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   install_fixture definitions/with-checksum
 
@@ -127,7 +127,7 @@ DEF
   stub shasum true \
     "echo invalid" \
     "echo ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   export -n PYTHON_BUILD_CACHE_PATH
   export PYTHON_BUILD_BUILD_PATH="${TMP}/build"
@@ -146,7 +146,7 @@ DEF
 }
 
 @test "package URL with checksum of unexpected length" {
-  stub aria2c "-o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$2"
+  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
 
   run_inline_definition <<DEF
 install_package "package-1.0.0" "http://example.com/packages/package-1.0.0.tar.gz#checksum_of_unexpected_length" copy
