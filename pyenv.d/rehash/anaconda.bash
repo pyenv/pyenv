@@ -46,7 +46,7 @@ conda_shim() {
   "xsltproc" )
     return 0 # xsltproc
     ;;
-  "xz" )
+  "unxz" | "xz" | "xzcat" | "xzcmd" | "xzdiff" | "xzegrep" | "xzfgrep" | "xzgrep" | "xzless" | "xzmore" )
     return 0 # xz-utils
     ;;
   esac
