@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* python-build: Added PyPy2 5.3 (#626)
+
 ## 20160509
 
 * python-build: Fixed wrong SHA256 of `pypy-5.1-linux_x86_64-portable.tar.bz2` (#586, #587)
