@@ -1,0 +1,2 @@
+require_gcc
+install_package "pypy3.3-v5.2.0-alpha1-src" "https://bitbucket.org/pypy/pypy/downloads/pypy3.3-v5.2.0-alpha1-src.tar.bz2#344c2f088c82ea1274964bb0505ab80d3f9e538cc03f91aa109325ddbaa61426" "pypy_builder" verify_py33 ensurepip

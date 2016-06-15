@@ -1,0 +1,40 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  if require_distro "Ubuntu 10.04" 1>/dev/null 2>&1; then
+    install_package "pypy3.3-v5.2.0-alpha1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy3.3-v5.2.0-alpha1-linux32.tar.bz2#351aec101bdedddae7ea1b63845a5654b1a95fc9393894ef84a66749f6945f17" "pypy" verify_py33 ensurepip
+  else
+    install_package "pypy3.3-5.2-alpha-20160602-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3.3-5.2-alpha-20160602-linux_i686-portable.tar.bz2#6f2412167c63d6711b41062a23794828f95a75400082a6957595867762cb170d" "pypy" verify_py33 ensurepip
+  fi
+  ;;
+"linux-armel" )
+  require_distro "Ubuntu 12.04" || true
+  install_package "pypy3.3-v5.2.0-alpha1-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy3.3-v5.2.0-alpha1-linux-armel.tar.bz2#ac83e632213f078ab60045e6ad0564b146d65dcd9a52c130026fab6dd85bf2dc" "pypy" verify_py33 ensurepip
+  ;;
+"linux-armhf" )
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
+    install_package "pypy3.3-v5.2.0-alpha1-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy3.3-v5.2.0-alpha1-linux-armhf-raspbian.tar.bz2#ba9a5d0cbac1c622363315b30df288ab2cf8fcccf7e2882bf5946115dbfa657e" "pypy" verify_py33 ensurepip
+  else
+    require_distro "Ubuntu 13.04" || true
+    install_package "pypy3.3-v5.2.0-alpha1-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy3.3-v5.2.0-alpha1-linux-armhf-raring.tar.bz2#b4d847d33c1bf9b3956d1d17b9e37505eb32f68e341c9333a74a82010a63e799" "pypy" verify_py33 ensurepip
+  fi
+  ;;
+"linux64" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy3.3-v5.2.0-alpha1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3.3-v5.2.0-alpha1-linux64.tar.bz2#f5e66ab24267d6ddf662d07c512d06c10ebc732ae62093dabbd775ac63b9060a" "pypy" verify_py33 ensurepip
+  else
+    install_package "pypy3.3-5.2-alpha-20160602-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3.3-5.2-alpha-20160602-linux_x86_64-portable.tar.bz2#4d1e7dd727448c1b2caa90c943713c0aa10b32e9d977c2c3b348835f515a3ad4" "pypy" verify_py33 ensurepip
+  fi
+  ;;
+"osx64" )
+  install_package "pypy3.3-v5.2.0-alpha1-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy3.3-v5.2.0-alpha1-osx64.tar.bz2#abaceab5d2790f49e04e0d80669283da41f94b77cf483b30ac0de48d3c19f304" "pypy" verify_py33 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy3.3-5.2-alpha1-src' to build from soruce."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
