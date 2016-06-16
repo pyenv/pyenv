@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* python-build: Added CPython 2.7.12rc1
 * python-build: Added CPython 3.5.2rc1
 * python-build: Added CPython 3.4.5rc1
 * python-build: Added PyPy2 5.3 (#626)
