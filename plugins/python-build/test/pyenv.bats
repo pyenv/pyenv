@@ -4,6 +4,7 @@ load test_helper
 export PYENV_ROOT="${TMP}/pyenv"
 
 setup() {
+  ensure_not_found_in_path aria2c
   stub pyenv-hooks 'install : true'
   stub pyenv-rehash 'true'
 }

@@ -5,12 +5,13 @@ export PYTHON_BUILD_SKIP_MIRROR=1
 export PYTHON_BUILD_CACHE_PATH=
 
 setup() {
+  ensure_not_found_in_path aria2c
   export PYTHON_BUILD_BUILD_PATH="${TMP}/source"
   mkdir -p "${PYTHON_BUILD_BUILD_PATH}"
 }
 
 @test "failed download displays error message" {
-  stub aria2c false
+  stub curl false
 
   install_fixture definitions/without-checksum
   assert_failure
