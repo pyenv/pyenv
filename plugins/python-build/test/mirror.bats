@@ -4,12 +4,12 @@ load test_helper
 export PYTHON_BUILD_SKIP_MIRROR=
 export PYTHON_BUILD_CACHE_PATH=
 export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
-export PYTHON_BUILD_ARIA2_OPTS=
+export PYTHON_BUILD_CURL_OPTS=
 
 
 @test "package URL without checksum bypasses mirror" {
   stub shasum true
-  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   install_fixture definitions/without-checksum
   echo "$output" >&2
@@ -17,21 +17,21 @@ export PYTHON_BUILD_ARIA2_OPTS=
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub aria2c
+  unstub curl
   unstub shasum
 }
 
 
 @test "package URL with checksum but no shasum support bypasses mirror" {
   stub shasum false
-  stub aria2c "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   install_fixture definitions/with-checksum
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub aria2c
+  unstub curl
   unstub shasum
 }
 
@@ -41,15 +41,15 @@ export PYTHON_BUILD_ARIA2_OPTS=
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true "echo $checksum"
-  stub aria2c "--dry-run $mirror_url : true" \
-    "--allow-overwrite=true -o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
+  stub curl "-*I* $mirror_url : true" \
+    "-q -o * -*S* $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
 
   install_fixture definitions/with-checksum
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub aria2c
+  unstub curl
   unstub shasum
 }
 
@@ -59,15 +59,15 @@ export PYTHON_BUILD_ARIA2_OPTS=
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true "echo $checksum"
-  stub aria2c "--dry-run $mirror_url : false" \
-    "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${3##*/} \$3"
+  stub curl "-*I* $mirror_url : false" \
+    "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   install_fixture definitions/with-checksum
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub aria2c
+  unstub curl
   unstub shasum
 }
 
@@ -77,9 +77,9 @@ export PYTHON_BUILD_ARIA2_OPTS=
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true "echo invalid" "echo $checksum"
-  stub aria2c "--dry-run $mirror_url : true" \
-    "--allow-overwrite=true -o * $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
-    "--allow-overwrite=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub curl "-*I* $mirror_url : true" \
+    "-q -o * -*S* $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
+    "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   install_fixture definitions/with-checksum
   echo "$output" >&2
@@ -87,7 +87,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub aria2c
+  unstub curl
   unstub shasum
 }
 
@@ -97,15 +97,15 @@ export PYTHON_BUILD_ARIA2_OPTS=
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
 
   stub shasum true "echo $checksum"
-  stub aria2c "--dry-run : true" \
-    "--allow-overwrite=true -o * https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
+  stub curl "-*I* : true" \
+    "-q -o * -*S* https://?*/$checksum : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
 
   install_fixture definitions/with-checksum
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub aria2c
+  unstub curl
   unstub shasum
 }
 
@@ -115,7 +115,7 @@ export PYTHON_BUILD_ARIA2_OPTS=
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
 
   stub shasum true "echo $checksum"
-  stub aria2c "--allow-overwrite=true -o * https://www.python.org/* : cp $FIXTURE_ROOT/\${4##*/} \$3"
+  stub curl "-q -o * -*S* https://www.python.org/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
   run_inline_definition <<DEF
 install_package "package-1.0.0" "https://www.python.org/packages/package-1.0.0.tar.gz#ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5" copy
@@ -124,6 +124,6 @@ DEF
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
 
-  unstub aria2c
+  unstub curl
   unstub shasum
 }

@@ -9,9 +9,10 @@ export CC=cc
 export TMP_FIXTURES="$TMP/fixtures"
 
 setup() {
+  ensure_not_found_in_path aria2c
   mkdir -p "$INSTALL_ROOT"
   stub md5 false
-  stub aria2c false
+  stub curl false
 }
 
 executable() {
