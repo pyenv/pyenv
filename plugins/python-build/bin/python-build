@@ -336,12 +336,12 @@ http() {
 }
 
 http_head_aria2c() {
-  aria2c --dry-run ${ARIA2_OPTS} "$1" >&4 2>&1
+  aria2c --dry-run --no-conf=true ${ARIA2_OPTS} "$1" >&4 2>&1
 }
 
 http_get_aria2c() {
   local out="${2:-$(mktemp "out.XXXXXX")}"
-  if aria2c --allow-overwrite=true -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
+  if aria2c --allow-overwrite=true --no-conf=true -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
     [ -n "$2" ] || cat "${out}"
   else
     false
