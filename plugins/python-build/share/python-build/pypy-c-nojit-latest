@@ -1,28 +1,28 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  install_nightly_package "pypy-c-nojit-latest-linux" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux.tar.bz2" "pypy-c-nojit-*-linux" "pypy" ensurepip verify_py27
+  install_nightly_package "pypy-c-nojit-latest-linux" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux.tar.bz2" "pypy-c-nojit-*-linux" "pypy" verify_py27 ensurepip verify_py27
   ;;
 "linux-armel" )
-  install_nightly_package "pypy-c-nojit-latest-linux-armel" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux-armel.tar.bz2" "pypy-c-nojit-*-linux-armel" "pypy" ensurepip verify_py27
+  install_nightly_package "pypy-c-nojit-latest-linux-armel" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux-armel.tar.bz2" "pypy-c-nojit-*-linux-armel" "pypy" verify_py27 ensurepip verify_py27
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_nightly_package "pypy-c-nojit-latest-linux-armhf-raspbian" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux-armhf-raspbian.tar.bz2" "pypy-c-nojit-*-linux-armhf-raspbian" "pypy" ensurepip verify_py27
+    install_nightly_package "pypy-c-nojit-latest-linux-armhf-raspbian" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux-armhf-raspbian.tar.bz2" "pypy-c-nojit-*-linux-armhf-raspbian" "pypy" verify_py27 ensurepip verify_py27
   else
-    install_nightly_package "pypy-c-nojit-latest-linux-armhf-raring" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux-armhf-raring.tar.bz2" "pypy-c-nojit-*-linux-armhf-raring" "pypy" ensurepip verify_py27
+    install_nightly_package "pypy-c-nojit-latest-linux-armhf-raring" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux-armhf-raring.tar.bz2" "pypy-c-nojit-*-linux-armhf-raring" "pypy" verify_py27 ensurepip verify_py27
   fi
   ;;
 "linux64" )
-  install_nightly_package "pypy-c-nojit-latest-linux64" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux64.tar.bz2" "pypy-c-nojit-*-linux64" "pypy" ensurepip verify_py27
+  install_nightly_package "pypy-c-nojit-latest-linux64" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-linux64.tar.bz2" "pypy-c-nojit-*-linux64" "pypy" verify_py27 ensurepip verify_py27
   ;;
 "osx64" )
-  install_nightly_package "pypy-c-nojit-latest-osx64" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-osx64.tar.bz2" "pypy-c-nojit-*-osx64" "pypy" ensurepip verify_py27
+  install_nightly_package "pypy-c-nojit-latest-osx64" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-osx64.tar.bz2" "pypy-c-nojit-*-osx64" "pypy" verify_py27 ensurepip verify_py27
   ;;
 "freebsd64" )
-  install_nightly_package "pypy-c-nojit-latest-freebsd64" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-freebsd64.tar.bz2" "pypy-c-nojit-*-freebsd64" "pypy" ensurepip verify_py27
+  install_nightly_package "pypy-c-nojit-latest-freebsd64" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-freebsd64.tar.bz2" "pypy-c-nojit-*-freebsd64" "pypy" verify_py27 ensurepip verify_py27
   ;;
 #"win32" )
-#  install_zip "pypy-c-nojit-latest-win32" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-win32.zip" "pypy" ensurepip verify_py27
+#  install_zip "pypy-c-nojit-latest-win32" "http://buildbot.pypy.org/nightly/trunk/pypy-c-nojit-latest-win32.zip" "pypy" verify_py27 ensurepip verify_py27
 #  ;;
 * )
   { echo

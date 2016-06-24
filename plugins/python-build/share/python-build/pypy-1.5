@@ -1,16 +1,16 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  install_package "pypy-c-jit-43780-b590cf6de419-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux.tar.bz2#a5a28457134a050bae59ee8d83cc65807bab10f0c7c3be547c6d9284f9a77989" "pypy" ensurepip verify_py27
+  install_package "pypy-c-jit-43780-b590cf6de419-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux.tar.bz2#a5a28457134a050bae59ee8d83cc65807bab10f0c7c3be547c6d9284f9a77989" "pypy" verify_py27 ensurepip verify_py27
   ;;
 "linux64" )
-  install_package "pypy-c-jit-43780-b590cf6de419-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux64.tar.bz2#880b7f9288a6046aff62ded61a4f432ccb45038daee526356afa311d14c010a9" "pypy" ensurepip verify_py27
+  install_package "pypy-c-jit-43780-b590cf6de419-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-linux64.tar.bz2#880b7f9288a6046aff62ded61a4f432ccb45038daee526356afa311d14c010a9" "pypy" verify_py27 ensurepip verify_py27
   ;;
 "osx64" )
-  install_package "pypy-c-jit-43780-b590cf6de419-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-osx64.tar.bz2#87294182aeacf2597c2bde358ffd6810295214db8cf81b07340598bb03ac44f0" "pypy" ensurepip verify_py27
+  install_package "pypy-c-jit-43780-b590cf6de419-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-osx64.tar.bz2#87294182aeacf2597c2bde358ffd6810295214db8cf81b07340598bb03ac44f0" "pypy" verify_py27 ensurepip verify_py27
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.5.0a0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-win32.zip#8ee727a9cfdc1957ced24a136a263279361efda73cc1354cc4877383565a4fe6" "pypy" ensurepip verify_py27
+  install_zip "pypy-1.5.0a0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-win32.zip#8ee727a9cfdc1957ced24a136a263279361efda73cc1354cc4877383565a4fe6" "pypy" verify_py27 ensurepip verify_py27
   ;;
 * )
   { echo

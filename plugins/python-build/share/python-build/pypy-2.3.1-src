@@ -1,2 +1,2 @@
 require_gcc
-install_package "pypy-pypy-32f35069a16d" "https://bitbucket.org/pypy/pypy/get/release-2.3.1.tar.bz2#3fd10d97c0177c33ed358a78eb26f5bf1f91b266af853564b1a9d8c310a1e439" "pypy_builder" ensurepip verify_py27
+install_package "pypy-pypy-32f35069a16d" "https://bitbucket.org/pypy/pypy/get/release-2.3.1.tar.bz2#3fd10d97c0177c33ed358a78eb26f5bf1f91b266af853564b1a9d8c310a1e439" "pypy_builder" verify_py27 ensurepip verify_py27
