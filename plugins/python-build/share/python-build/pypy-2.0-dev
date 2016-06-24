@@ -1,2 +1,2 @@
 require_gcc
-install_hg "pypy-2.0-dev" "https://bitbucket.org/pypy/pypy" "release-2.0.x" "pypy_builder" verify_py27 ensurepip
+install_hg "pypy-2.0-dev" "https://bitbucket.org/pypy/pypy" "release-2.0.x" "pypy_builder" ensurepip verify_py27

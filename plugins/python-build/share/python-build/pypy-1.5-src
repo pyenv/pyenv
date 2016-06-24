@@ -1,2 +1,2 @@
 require_gcc
-install_package "pypy-1.5-src" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-src.tar.bz2" "pypy_builder" verify_py27 ensurepip
+install_package "pypy-1.5-src" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.5-src.tar.bz2" "pypy_builder" ensurepip verify_py27
