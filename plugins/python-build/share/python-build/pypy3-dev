@@ -1,2 +1,2 @@
 require_gcc
-install_hg "pypy3-dev" "https://bitbucket.org/pypy/pypy" "py3k" "pypy_builder" verify_py32 ensurepip verify_py32
+install_hg "pypy3-dev" "https://bitbucket.org/pypy/pypy" "py3k" "pypy_builder" verify_py32 ensurepip

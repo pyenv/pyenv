@@ -1462,38 +1462,44 @@ apply_python_patch() {
   esac
 }
 
-verify_python() {
-  if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+build_package_symlink_version_suffix() {
+  if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]] && [ ! -e "${PREFIX_PATH}/bin" ]; then
     # Only symlinks are installed in ${PREFIX_PATH}/bin
-    rm -fr "${PREFIX_PATH}/bin"
     ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
   fi
 
   # Not create symlinks on `altinstall` (#255)
   if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
-    local suffix="${1#python}"
-    local file link
     shopt -s nullglob
-    for file in "${PREFIX_PATH}/bin"/*; do
-      unset link
-      case "${file}" in
-      */"python${suffix}-config" )
-        # Symlink `pythonX.Y-config` to `python-config` if `python-config` is missing (#296)
-        link="${file%/*}/python-config"
-      ;;
-      */*"-${suffix}" )
-        link="${file%%-${suffix}}"
-      ;;
-      */*"${suffix}" )
-        link="${file%%${suffix}}"
-      ;;
-      esac
-      if [ -n "$link" ] && [ ! -e "$link" ]; then
-        ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
-      fi
-    done
+    local version_bin="$(ls -1 "${PREFIX_PATH}/bin/python"* | grep '[0-9]$' | sort | tail -1)"
+    suffix="$(basename "${version_bin}" | sed -e 's/^python//')"
+    if [ -n "${suffix}" ]; then
+      local file link
+      for file in "${PREFIX_PATH}/bin"/*; do
+        unset link
+        case "${file}" in
+        */"python${suffix}-config" )
+          # Symlink `pythonX.Y-config` to `python-config` if `python-config` is missing (#296)
+          link="${file%/*}/python-config"
+        ;;
+        */*"-${suffix}" )
+          link="${file%%-${suffix}}"
+        ;;
+        */*"${suffix}" )
+          link="${file%%${suffix}}"
+        ;;
+        esac
+        if [ -n "$link" ] && [ ! -e "$link" ]; then
+          ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
+        fi
+      done
+    fi
     shopt -u nullglob
   fi
+}
+
+verify_python() {
+  build_package_symlink_version_suffix
 
   if [ ! -x "${PYTHON_BIN}" ]; then
     { colorize 1 "ERROR"
@@ -1643,6 +1649,7 @@ build_package_ez_setup() {
     echo "error: failed to install setuptools via ez_setup.py" >&2
     return 1
   }
+  build_package_symlink_version_suffix
 }
 
 build_package_get_pip() {
@@ -1661,6 +1668,7 @@ build_package_get_pip() {
     echo "error: failed to install pip via get-pip.py" >&2
     return 1
   }
+  build_package_symlink_version_suffix
 }
 
 build_package_ensurepip() {
@@ -1671,6 +1679,7 @@ build_package_ensurepip() {
   fi
   # FIXME: `--altinstall` with `get-pip.py`
   "$PYTHON_BIN" -s -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
+  build_package_symlink_version_suffix
 }
 
 version() {

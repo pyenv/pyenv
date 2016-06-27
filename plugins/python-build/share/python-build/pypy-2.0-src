@@ -1,2 +1,2 @@
 require_gcc
-install_package "pypy-2.0-src" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-src.tar.bz2#d92dfd418beac915d3efc28f8a2090f3c13a89ec653419deff3d7112c5c111f3" "pypy_builder" verify_py27 ensurepip verify_py27
+install_package "pypy-2.0-src" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-src.tar.bz2#d92dfd418beac915d3efc28f8a2090f3c13a89ec653419deff3d7112c5c111f3" "pypy_builder" verify_py27 ensurepip
