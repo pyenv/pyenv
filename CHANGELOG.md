@@ -1,6 +1,6 @@
 ## Version History
 
-## Unreleased
+## 20160628
 
 * python-build: Added PyPy3.3 5.2-alpha1 (#631)
 * python-build: Added CPython 2.7.12rc1
@@ -8,6 +8,9 @@
 * python-build: Added CPython 3.5.2 (#643)
 * python-build: Added CPython 3.4.5 (#643)
 * python-build: Added PyPy2 5.3 (#626)
+* pyenv: Skip creating shims for system executables bundled with Anaconda rather than ignoring them in `pyenv-which` (#594, #595, #599)
+* python-build: Configured GCC as a requirement to build CPython prior to 2.4.4 (#613)
+* python-build: Use `aria2c` - ultra fast download utility if available (#534)
 
 ## 20160509
 
