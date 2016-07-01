@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-export -n CDPATH
+unset CDPATH
 
 if [ "$1" = "--debug" ]; then
   export PYENV_DEBUG=1
