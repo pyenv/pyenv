@@ -110,7 +110,7 @@ case "$command" in
   shift 1
   if [ "$1" = --help ]; then
     if [[ "$command" == "sh-"* ]]; then
-      exec rbenv-help "$command" 1>&2
+      echo "rbenv help \"$command\""
     else
       exec rbenv-help "$command"
     fi
