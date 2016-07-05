@@ -1,12 +1,12 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-x86" )
-  install_script "Anaconda2-4.1.0-Linux-x86" "https://repo.continuum.io/archive/Anaconda2-4.1.0-Linux-x86.sh#96e842ef2d5789411c550b0f9bce2314" "anaconda" verify_py27
+  install_script "Anaconda2-4.1.0-Linux-x86" "https://repo.continuum.io/archive/Anaconda2-4.1.0-Linux-x86.sh#54c06cd1b11cb687db6ba3613df443c057f769cdb87693e11674d956d8e5d081" "anaconda" verify_py27
   ;;
 "Linux-x86_64" )
-  install_script "Anaconda2-4.1.0-Linux-x86_64" "https://repo.continuum.io/archive/Anaconda2-4.1.0-Linux-x86_64.sh#e24d4264205d8d0c8533617db99ff1d3" "anaconda" verify_py27
+  install_script "Anaconda2-4.1.0-Linux-x86_64" "https://repo.continuum.io/archive/Anaconda2-4.1.0-Linux-x86_64.sh#3b7e504ca0132fb555d1f10e174cae07007f1bc6898cad0f7d416a68aca01f45" "anaconda" verify_py27
   ;;
 "MacOSX-x86_64" )
-  install_script "Anaconda2-4.1.0-MacOSX-x86_64" "https://repo.continuum.io/archive/Anaconda2-4.1.0-MacOSX-x86_64.sh#262c5c9a12d94a956ceb301d9f258c77" "anaconda" verify_py27
+  install_script "Anaconda2-4.1.0-MacOSX-x86_64" "https://repo.continuum.io/archive/Anaconda2-4.1.0-MacOSX-x86_64.sh#8b2c2a32f5e0da75cf8c81c568124cc1ea701a58cd46b7816133573a7f5b7b45" "anaconda" verify_py27
   ;;
 * )
   { echo
