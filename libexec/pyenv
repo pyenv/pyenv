@@ -123,7 +123,7 @@ case "$command" in
   shift 1
   if [ "$1" = --help ]; then
     if [[ "$command" == "sh-"* ]]; then
-      exec pyenv-help "$command" 1>&2
+      echo "pyenv help \"$command\""
     else
       exec pyenv-help "$command"
     fi
