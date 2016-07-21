@@ -32,6 +32,7 @@ OLDIFS="$IFS"
     if [ "$version" = "system" ]; then
       if PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python 2>/dev/null)"; then
         PYENV_PREFIX_PATH="${PYTHON_PATH%/bin/*}"
+        PYENV_PREFIX_PATH="${PYENV_PREFIX_PATH:-/}"
       else
         echo "pyenv: system version not found in PATH" >&2
         exit 1
