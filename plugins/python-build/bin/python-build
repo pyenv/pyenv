@@ -473,6 +473,11 @@ download_tarball() {
   fi
 }
 
+has_tar_xz_support() {
+  local tarxz="$(mktemp "XXXXXXXX.tar.xz")"
+  tar Jcf "${tarxz}" /dev/null 1>/dev/null 2>&1
+}
+
 fetch_git() {
   local package_name="$1"
   local git_url="$2"
