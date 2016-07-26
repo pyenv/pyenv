@@ -1,5 +1,14 @@
 ## Version History
 
+## 20160726
+
+* python-build: pypy-5.3.1: Remove stray text (#648)
+* python-build: Add CPython 3.6.0a3 (#657)
+* python-build: Add anaconda[23]-4.1.0
+* pyenv: Keep using `.tar.gz` archives if tar doesn't support `-J` (especially on BSD) (#654, #663)
+* pyenv: Fixed conflict between pyenv-virtualenv's `rehash` hooks of `envs.bash`
+* pyenv: Write help message of `sh-*` commands to stdout properly (#650, #651)
+
 ## 20160629
 
 * python-build: Added CPython 2.7.12 (#645)
