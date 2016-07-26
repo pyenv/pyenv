@@ -53,6 +53,18 @@ conda_shim() {
   return 1
 }
 
+# override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`
+# https://github.com/yyuu/pyenv-virtualenv/blob/v20160716/etc/pyenv.d/rehash/envs.bash
+make_shims() {
+  local file shim
+  for file do
+    shim="${file##*/}"
+    if ! conda_shim "${shim}" 1>&2; then
+      register_shim "$shim"
+    fi
+  done
+}
+
 deregister_conda_shims() {
   local shim
   local shims=()
@@ -61,7 +73,7 @@ deregister_conda_shims() {
       shims[${#shims[*]}]="${shim}"
     fi
   done
-  registered_shims="${shims[@]}"
+  registered_shims=" ${shims[@]} "
 }
 
 if conda_exists; then
