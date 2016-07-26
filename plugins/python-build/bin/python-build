@@ -474,8 +474,7 @@ download_tarball() {
 }
 
 has_tar_xz_support() {
-  local tarxz="$(mktemp "XXXXXXXX.tar.xz")"
-  tar Jcf "${tarxz}" /dev/null 1>/dev/null 2>&1
+  tar Jc /dev/null 1>/dev/null 2>&1
 }
 
 fetch_git() {
