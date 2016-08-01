@@ -20,10 +20,10 @@ if [ -z "$PYENV_TEST_DIR" ]; then
   export PYENV_HOOK_PATH="${PYENV_ROOT}/pyenv.d"
 
   PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
-  PATH="${PYENV_TEST_DIR}/bin:$PATH"
   PATH="${BATS_TEST_DIRNAME}/../libexec:$PATH"
   PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
   PATH="${PYENV_ROOT}/shims:$PATH"
+  PATH="${PYENV_TEST_DIR}/bin:$PATH"
   export PATH
 
   for xdg_var in `env 2>/dev/null | grep ^XDG_ | cut -d= -f1`; do unset "$xdg_var"; done
