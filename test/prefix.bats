@@ -24,6 +24,15 @@ load test_helper
   assert_success "$RBENV_TEST_DIR"
 }
 
+@test "prefix for system in /" {
+  mkdir -p "${RBENV_TEST_DIR}/bin"
+  touch "${RBENV_TEST_DIR}/bin/rbenv-which"
+  echo "echo /bin/ruby" >"${RBENV_TEST_DIR}/bin/rbenv-which"
+  chmod +x "${RBENV_TEST_DIR}/bin/rbenv-which"
+  RBENV_VERSION="system" run rbenv-prefix
+  assert_success "/"
+}
+
 @test "prefix for invalid system" {
   PATH="$(path_without ruby)" run rbenv-prefix system
   assert_failure "rbenv: system version not found in PATH"
