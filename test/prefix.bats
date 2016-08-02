@@ -25,12 +25,13 @@ load test_helper
 }
 
 @test "prefix for system in /" {
-  mkdir -p "${RBENV_TEST_DIR}/bin"
-  touch "${RBENV_TEST_DIR}/bin/rbenv-which"
-  echo "echo /bin/ruby" >"${RBENV_TEST_DIR}/bin/rbenv-which"
-  chmod +x "${RBENV_TEST_DIR}/bin/rbenv-which"
+  mkdir -p "${BATS_TEST_DIRNAME}/libexec"
+  touch "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
+  echo "echo /bin/ruby" >"${BATS_TEST_DIRNAME}/libexec/rbenv-which"
+  chmod +x "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
   RBENV_VERSION="system" run rbenv-prefix
   assert_success "/"
+  rm -f "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
 }
 
 @test "prefix for invalid system" {

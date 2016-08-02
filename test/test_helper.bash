@@ -20,10 +20,10 @@ if [ -z "$RBENV_TEST_DIR" ]; then
   export RBENV_HOOK_PATH="${RBENV_ROOT}/rbenv.d"
 
   PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
+  PATH="${RBENV_TEST_DIR}/bin:$PATH"
   PATH="${BATS_TEST_DIRNAME}/../libexec:$PATH"
   PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
   PATH="${RBENV_ROOT}/shims:$PATH"
-  PATH="${RBENV_TEST_DIR}/bin:$PATH"
   export PATH
 
   for xdg_var in `env 2>/dev/null | grep ^XDG_ | cut -d= -f1`; do unset "$xdg_var"; done
