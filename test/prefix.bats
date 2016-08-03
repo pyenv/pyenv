@@ -26,9 +26,10 @@ load test_helper
 
 @test "prefix for system in /" {
   mkdir -p "${BATS_TEST_DIRNAME}/libexec"
-  { echo "#!/bin/sh"
-    echo "echo /bin/ruby"
-  } >"${BATS_TEST_DIRNAME}/libexec/rbenv-which"
+  cat >"${BATS_TEST_DIRNAME}/libexec/rbenv-which" <<OUT
+#!/bin/sh
+echo /bin/ruby
+OUT
   chmod +x "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
   RBENV_VERSION="system" run rbenv-prefix
   assert_success "/"
