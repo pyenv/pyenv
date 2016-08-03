@@ -1467,7 +1467,11 @@ apply_python_patch() {
 }
 
 build_package_symlink_version_suffix() {
-  if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]] && [ ! -e "${PREFIX_PATH}/bin" ]; then
+  if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+    if [ -e "${PREFIX_PATH}/bin" ]; then
+      # Always create `bin` as symlink to framework path if the version was built with `--enable-frameowrk` (#590)
+      mv -f "${PREFIX_PATH}/bin" "${PREFIX_PATH}/bin.orig"
+    fi
     # Only symlinks are installed in ${PREFIX_PATH}/bin
     ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
   fi
