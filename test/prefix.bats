@@ -26,9 +26,10 @@ load test_helper
 
 @test "prefix for system in /" {
   mkdir -p "${BATS_TEST_DIRNAME}/libexec"
-  { echo "#!/bin/sh"
-    echo "echo /bin/python"
-  } >"${BATS_TEST_DIRNAME}/libexec/pyenv-which"
+  cat >"${BATS_TEST_DIRNAME}/libexec/pyenv-which" <<OUT
+#!/bin/sh
+echo /bin/python
+OUT
   chmod +x "${BATS_TEST_DIRNAME}/libexec/pyenv-which"
   PYENV_VERSION="system" run pyenv-prefix
   assert_success "/"
