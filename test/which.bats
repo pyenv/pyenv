@@ -72,7 +72,7 @@ create_executable() {
 @test "version not installed" {
   create_executable "3.4" "py.test"
   PYENV_VERSION=3.3 run pyenv-which py.test
-  assert_failure "pyenv: version \`3.3' is not installed (set by PYENV_VERSION environment variable)"
+  assert_failure "pyenv: version \`3.3' is not installed"
 }
 
 @test "versions not installed" {
