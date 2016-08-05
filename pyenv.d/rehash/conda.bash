@@ -12,45 +12,7 @@ conda_exists() {
 }
 
 conda_shim() {
-  case "${1##*/}" in
-  "curl" | "curl-config" )
-    return 0 # curl
-    ;;
-  "fc-cache" | "fc-cat" | "fc-list" | "fc-match" | "fc-pattern" | "fc-query" | "fc-scan" | "fc-validate" )
-    return 0 # fontconfig
-    ;;
-  "freetype-config" )
-    return 0 # freetype
-    ;;
-  "libpng-config" )
-    return 0 # libpng
-    ;;
-  "openssl" )
-    return 0 # openssl
-    ;;
-  "assistant" | "designer" | "lconvert" | "linguist" | "lrelease" | "lupdate" | "moc" | "pixeltool" | "qcollectiongenerator" | "qdbus" | "qdbuscpp2xml" | "qdbusviewer" | "qdbusxml2cpp" | "qhelpconverter" | "qhelpgenerator" | "qmake" | "qmlplugindump" | "qmlviewer" | "qtconfig" | "rcc" | "uic" | "xmlpatterns" | "xmlpatternsvalidator" )
-    return 0 # qtchooser
-    ;;
-  "redis-benchmark" | "redis-check-aof" | "redis-check-dump" | "redis-cli" | "redis-server" )
-    return 0 # redis
-    ;;
-  "sqlite3" )
-    return 0 # sqlite3
-    ;;
-  "xml2-config" )
-    return 0 # libxml2
-    ;;
-  "xslt-config" )
-    return 0 # libxslt
-    ;;
-  "xsltproc" )
-    return 0 # xsltproc
-    ;;
-  "unxz" | "xz" | "xzcat" | "xzcmd" | "xzdiff" | "xzegrep" | "xzfgrep" | "xzgrep" | "xzless" | "xzmore" )
-    return 0 # xz-utils
-    ;;
-  esac
-  return 1
+  sed -e 's/#.*//' "${BASH_SOURCE%/*}/conda.txt" | fgrep -q -x "${1##*/}"
 }
 
 # override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`
