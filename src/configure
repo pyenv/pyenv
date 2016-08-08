@@ -21,6 +21,9 @@ case "$(uname -s)" in
 Darwin* )
   host_os="darwin$(uname -r)"
   ;;
+FreeBSD* )
+  host_os="freebsd$(uname -r)"
+  ;;
 OpenBSD* )
   host_os="openbsd$(uname -r)"
   ;;
