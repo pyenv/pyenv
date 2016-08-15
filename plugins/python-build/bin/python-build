@@ -14,7 +14,7 @@
 #   -g/--debug       Build a debug version
 #
 
-PYTHON_BUILD_VERSION="20160130"
+PYTHON_BUILD_VERSION="20160602"
 
 OLDIFS="$IFS"
 
@@ -1831,8 +1831,16 @@ fi
 #fi
 
 if [ -z "$MAKE" ]; then
-  if [ "FreeBSD" = "$(uname -s)" ] && [ "$(uname -r | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
-    export MAKE="gmake"
+  if [ "FreeBSD" = "$(uname -s)" ]; then
+#   if [ $(echo $1 | sed 's/-.*$//') = "jruby" ]; then
+#     export MAKE="gmake"
+#   else
+      if [ "$(uname -r | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
+	export MAKE="gmake"
+      else
+	export MAKE="make"
+      fi
+#   fi
   else
     export MAKE="make"
   fi
