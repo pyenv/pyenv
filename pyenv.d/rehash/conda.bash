@@ -11,9 +11,13 @@ conda_exists() {
   [ -n "${condas}" ]
 }
 
-conda_shim() {
-  sed -e 's/#.*//' "${BASH_SOURCE%/*}/conda.txt" | fgrep -q -x "${1##*/}"
-}
+shims=()
+for shim in $(cat "${BASH_SOURCE%/*}/conda.txt"); do
+  if [ -n "${shim%%#*}" ]; then
+    shims[${#shims[*]}]="${shim})return 0;;"
+  fi
+done
+eval "conda_shim(){ case \"\$1\" in ${shims[@]} *)return 1;;esac;}"
 
 # override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`
 # https://github.com/yyuu/pyenv-virtualenv/blob/v20160716/etc/pyenv.d/rehash/envs.bash
