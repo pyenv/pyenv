@@ -1,6 +1,6 @@
 ## Version History
 
-## Unreleased
+## 1.0.0
 
 * pyenv: Import latest changes from rbenv as of Aug 15, 2016 (#669)
 * pyenv: Add workaround for system python at `/bin/python` (#628)
