@@ -1,5 +1,10 @@
 ## Version History
 
+## Unreleased
+
+* pyenv: Add workaround for system python at `/bin/python` (#628)
+* python-build: Import changes from ruby-build v20160602 (#668)
+
 ## 20160726
 
 * python-build: pypy-5.3.1: Remove stray text (#648)
