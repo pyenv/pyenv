@@ -36,6 +36,18 @@ OUT
   rm -f "${BATS_TEST_DIRNAME}/libexec/pyenv-which"
 }
 
+@test "prefix for system in /" {
+  mkdir -p "${BATS_TEST_DIRNAME}/libexec"
+  cat >"${BATS_TEST_DIRNAME}/libexec/rbenv-which" <<OUT
+#!/bin/sh
+echo /bin/ruby
+OUT
+  chmod +x "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
+  RBENV_VERSION="system" run rbenv-prefix
+  assert_success "/"
+  rm -f "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
+}
+
 @test "prefix for invalid system" {
   PATH="$(path_without python)" run pyenv-prefix system
   assert_failure "pyenv: system version not found in PATH"
