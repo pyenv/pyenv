@@ -3,7 +3,6 @@
 load test_helper
 
 setup() {
-  ensure_not_found_in_path aria2c
   export PYENV_ROOT="${TMP}/pyenv"
   export HOOK_PATH="${TMP}/i has hooks"
   mkdir -p "$HOOK_PATH"
