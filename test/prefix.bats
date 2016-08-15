@@ -38,14 +38,14 @@ OUT
 
 @test "prefix for system in /" {
   mkdir -p "${BATS_TEST_DIRNAME}/libexec"
-  cat >"${BATS_TEST_DIRNAME}/libexec/rbenv-which" <<OUT
+  cat >"${BATS_TEST_DIRNAME}/libexec/pyenv-which" <<OUT
 #!/bin/sh
-echo /bin/ruby
+echo /bin/python
 OUT
-  chmod +x "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
-  RBENV_VERSION="system" run rbenv-prefix
+  chmod +x "${BATS_TEST_DIRNAME}/libexec/pyenv-which"
+  PYENV_VERSION="system" run pyenv-prefix
   assert_success "/"
-  rm -f "${BATS_TEST_DIRNAME}/libexec/rbenv-which"
+  rm -f "${BATS_TEST_DIRNAME}/libexec/pyenv-which"
 }
 
 @test "prefix for invalid system" {
