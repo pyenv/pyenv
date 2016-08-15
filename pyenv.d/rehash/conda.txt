@@ -1,0 +1,78 @@
+# curl
+curl
+curl-config
+# fontconfig
+fc-cache
+fc-cat
+fc-list
+fc-match
+fc-pattern
+fc-query
+fc-scan
+fc-validate
+# freetype
+freetype-config
+# libglib2.0-bin
+gapplication
+gdbus
+gresource
+gsettings
+gio-querymodules
+glib-compile-resources
+glib-compile-schemas
+# libpng
+libpng-config
+# libxml2
+xml2-config
+# libxml2-utils
+xmlcatalog
+xmllint
+# openssl
+openssl
+# qtchooser
+assistant
+designer
+lconvert
+linguist
+lrelease
+lupdate
+moc
+pixeltool
+qcollectiongenerator
+qdbus
+qdbuscpp2xml
+qdbusviewer
+qdbusxml2cpp
+qhelpconverter
+qhelpgenerator
+qmake
+qmlplugindump
+qmlviewer
+qtconfig
+rcc
+uic
+xmlpatterns
+xmlpatternsvalidator
+# redis
+redis-benchmark
+redis-check-aof
+redis-check-dump
+redis-cli
+redis-server
+# sqlite3
+sqlite3
+# xslt-config
+xslt-config
+# xsltproc
+xsltproc
+# xz
+unxz
+xz
+xzcat
+xzcmd
+xzdiff
+xzegrep
+xzfgrep
+xzgrep
+xzless
+xzmore
