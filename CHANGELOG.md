@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* pyenv: Import latest changes from rbenv as of Aug 15, 2016 (#669)
 * pyenv: Add workaround for system python at `/bin/python` (#628)
 * python-build: Import changes from ruby-build v20160602 (#668)
 
