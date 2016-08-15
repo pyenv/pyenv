@@ -1836,9 +1836,9 @@ if [ -z "$MAKE" ]; then
 #     export MAKE="gmake"
 #   else
       if [ "$(uname -r | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
-	export MAKE="gmake"
+        export MAKE="gmake"
       else
-	export MAKE="make"
+        export MAKE="make"
       fi
 #   fi
   else

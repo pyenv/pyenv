@@ -38,10 +38,6 @@ ensure_not_found_in_path() {
   done
 }
 
-setup() {
-  ensure_not_found_in_path aria2c
-}
-
 teardown() {
   rm -fr "${TMP:?}"/*
 }
