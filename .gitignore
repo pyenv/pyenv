@@ -7,3 +7,4 @@
 /src/Makefile
 /src/*.o
 /bats/
+/default-packages
