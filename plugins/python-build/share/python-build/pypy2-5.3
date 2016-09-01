@@ -1,0 +1,56 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy2-v5.3.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.0-linux32.tar.bz2#bd422fe9d0b7d525d1da3f32855b047bc39ba397d0cf708d8f4f96fe874424f2" "pypy" verify_py27 ensurepip
+  else
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+      echo "try 'pypy-5.3-src' to build from soruce."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"linux-armel" )
+  require_distro "Ubuntu 12.04" || true
+  install_package "pypy2-v5.3.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.0-linux-armel.tar.bz2#81b6f589a947d7353bb69408c46d4833d6e9cb501f3c3f0c73bd28d0e3df69aa" "pypy" verify_py27 ensurepip
+  ;;
+"linux-armhf" )
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
+    install_package "pypy2-v5.3.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.0-linux-armhf-raspbian.tar.bz2#87b3566b6bbb8bf31c2f0d72bf31d95142fdce004d987812336a59d788005bed" "pypy" verify_py27 ensurepip
+  else
+    require_distro "Ubuntu 13.04" || true
+    install_package "pypy2-v5.3.0-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.0-linux-armhf-raring.tar.bz2#bdb911a87e773a292334061b9c33b907f46d987e403fe94cc627a3b9b1c9cb19" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"linux64" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy2-v5.3.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.0-linux64.tar.bz2#ac336e8877ed676bf87a9a546d5926b6afc4679fa2d3fdf9f3ca56f28ec40588" "pypy" verify_py27 ensurepip
+  else
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+      echo "try 'pypy-5.3-src' to build from soruce."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"osx64" )
+  install_package "pypy2-v5.3.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.0-osx64.tar.bz2#1b103bacbdcdbbc490660ec0c7b3d99d1ff1cfc2f13cd403db21c27f03d36a1d" "pypy" verify_py27 ensurepip
+  ;;
+"win32" )
+  # FIXME: never tested on Windows
+  install_zip "pypy2-v5.3.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.3.0-win32.zip#32a9e5286fc344165f63b529a9f84e521e9368e717c583488115654676428a20" "pypy" verify_py27 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy-5.3-src' to build from soruce."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

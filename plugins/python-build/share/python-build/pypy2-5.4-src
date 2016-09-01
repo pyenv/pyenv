@@ -1,0 +1,2 @@
+require_gcc
+install_package "pypy2-v5.4.0-src" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-src.tar.bz2#d9568ebe9a14d0eaefde887d78f3cba63d665e95c0d234bb583932341f55a655" "pypy_builder" verify_py27 ensurepip
