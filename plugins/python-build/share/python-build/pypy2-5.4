@@ -3,13 +3,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy2-v5.4.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-linux32.tar.bz2#ce581270464b14cdecd13dedb9bd7bf98232f767ac4ac282229a405d8e807af1" "pypy" verify_py27 ensurepip
   else
-    { echo
-      colorize 1 "ERROR"
-      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
-      echo "try 'pypy2-5.4-src' to build from soruce."
-      echo
-    } >&2
-    exit 1
+    install_package "pypy-5.4-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.4-linux_i686-portable.tar.bz2#7d7d253f009bb2624f43db6b8caeeb73d29177c4166a643a581a231a099c8689" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
@@ -28,13 +22,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy2-v5.4.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-linux64.tar.bz2#bdfea513d59dcd580970cb6f79f3a250d00191fd46b68133d5327e924ca845f8" "pypy" verify_py27 ensurepip
   else
-    { echo
-      colorize 1 "ERROR"
-      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
-      echo "try 'pypy2-5.4-src' to build from soruce."
-      echo
-    } >&2
-    exit 1
+    install_package "pypy-5.4-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.4-linux_x86_64-portable.tar.bz2#0a48c7ba7163589b1ade9cfe184f422d1bc9a0f988321b2fdcbd924d90594d9a" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
