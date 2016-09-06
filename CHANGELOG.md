@@ -1,5 +1,12 @@
 ## Version History
 
+## Unreleased
+
+* python-build: Add CPython 3.6.0a4 (#673)
+* python-build: Add PyPy2 5.4 (#683, #684)
+* python-build: Add PyPy Portable 5.4 (#685, #686)
+* python-build: Make all HTTP source URLs to HTTPS (#680)
+
 ## 1.0.0
 
 * pyenv: Import latest changes from rbenv as of Aug 15, 2016 (#669)
