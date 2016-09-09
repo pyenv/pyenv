@@ -18,7 +18,7 @@ fi
 remove_from_path() {
   local path_to_remove="$1"
   local path_before
-  local result=":$PATH:"
+  local result=":${PATH//\~/$HOME}:"
   while [ "$path_before" != "$result" ]; do
     path_before="$result"
     result="${result//:$path_to_remove:/:}"
