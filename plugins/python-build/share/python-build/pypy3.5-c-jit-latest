@@ -1,3 +1,15 @@
+echo
+colorize 1 "WARNING"
+echo "This may eat your kittens/ affect timespace in alternate dimensions/"
+echo "cause you to complain more. Nightly builds are meant for testing only."
+echo "The PyPy team is interested in reports of what's already implemented, see:"
+echo
+echo "https://bitbucket.org/pypy/extradoc/src/c70f20cfb870/planning/py3.5/?at=extradoc"
+echo
+echo "for the latest status updates. To report bugs/regressions, please see:"
+echo
+echo "http://doc.pypy.org/en/latest/faq.html#how-should-i-report-a-bug"
+
 case "$(pypy_architecture 2>/dev/null || true)" in
 #"linux" )
 #  install_nightly_package "pypy-c-jit-latest-linux" "http://buildbot.pypy.org/nightly/py3.5/pypy-c-jit-latest-linux.tar.bz2" "pypy-c-jit-*-linux" "pypy" verify_py27 ensurepip
