@@ -1,10 +1,10 @@
 ## Version History
 
-## Unreleased
+## 1.0.1
 
 * python-build: Add CPython 3.6.0a4 (#673)
-* python-build: Add PyPy2 5.4 (#683, #684)
-* python-build: Add PyPy Portable 5.4 (#685, #686)
+* python-build: Add PyPy2 5.4, 5.4.1 (#683, #684, #695, #697)
+* python-build: Add PyPy Portable 5.4, 5.4.1 (#685, #686, #696)
 * python-build: Make all HTTP source URLs to HTTPS (#680)
 
 ## 1.0.0
