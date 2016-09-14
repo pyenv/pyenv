@@ -1470,6 +1470,7 @@ build_package_symlink_version_suffix() {
   if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
     if [ -e "${PREFIX_PATH}/bin" ]; then
       # Always create `bin` as symlink to framework path if the version was built with `--enable-frameowrk` (#590)
+      rm -rf "${PREFIX_PATH}/bin.orig"
       mv -f "${PREFIX_PATH}/bin" "${PREFIX_PATH}/bin.orig"
     fi
     # Only symlinks are installed in ${PREFIX_PATH}/bin
