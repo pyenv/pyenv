@@ -185,7 +185,7 @@ or, if you prefer 3.3.3 over 2.7.6,
 
 ## `pyenv install`
 
-Install a Python version (using `python-build`).
+Install a Python version (using [`python-build`](https://github.com/yyuu/pyenv/tree/master/plugins/python-build)).
 
     Usage: pyenv install [-f] [-kvp] <version>
            pyenv install [-f] [-kvp] <definition-file>
@@ -203,6 +203,18 @@ Install a Python version (using `python-build`).
       -p/--patch       Apply a patch from stdin before building
       -g/--debug       Build a debug version
 
+To list the all available versions of Python, including Anaconda, Jython, pypy, and stackless, use:
+
+    $ pyenv install --list
+
+Then install the desired versions:
+
+    $ pyenv install 2.7.6
+    $ pyenv install 2.6.8
+    $ pyenv versions
+      system
+      2.6.8
+    * 2.7.6 (set by /home/yyuu/.pyenv/version)
 
 ## `pyenv uninstall`
 
@@ -264,24 +276,3 @@ Lists all Python versions with the given command installed.
     2.6.8
     2.7.6
     3.3.3
-
-
-## `pyenv install`
-
-Part of [Python-build](https://github.com/yyuu/pyenv/tree/master/plugins/python-build), this installs versions of python
-
-    $ pyenv install 2.7.6
-    $ pyenv install 2.6.8
-    $ pyenv versions
-      system
-      2.6.8
-    * 2.7.6 (set by /home/yyuu/.pyenv/version)
-
-
-## `pyenv install --list`
-
-List available remote versions of Python, including Anaconda, Jython, pypy, and stackless
-
-    $ pyenv install --list
-
-
