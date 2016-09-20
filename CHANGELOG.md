@@ -1,5 +1,12 @@
 ## Version History
 
+## 1.0.2
+
+* python-build: Add CPython 3.6.0b1 (#699)
+* python-build: Add anaconda[23] 4.1.1 (#701, #702)
+* python-build: Add miniconda[23] 4.1.11 (#703, #704, #706)
+* python-build: Remove `bin.orig` if exists to fix an issue with `--enable-framework` (#687, #700)
+
 ## 1.0.1
 
 * python-build: Add CPython 3.6.0a4 (#673)
