@@ -1,1 +1,0 @@
-source "${BASH_SOURCE%/*}/pyston-0.5.1"
