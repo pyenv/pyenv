@@ -964,6 +964,10 @@ pypy_architecture() {
   esac
 }
 
+pyston_architecture() {
+  pypy_architecture
+}
+
 build_package_pypy() {
   build_package_copy
   mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
