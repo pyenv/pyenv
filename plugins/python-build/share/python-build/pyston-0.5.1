@@ -5,8 +5,15 @@ case "$(pyston_architecture 2>/dev/null || true)" in
   # pyston targets python 2.7.7 and does not have ensurepip, when attempting to
   # run https://bootstrap.pypa.io/get-pip.py it dumps core, see
   # https://github.com/dropbox/pyston/issues/1373
-  # FIXME: more ugly hacks because Olenna Tyrell would approve
+  # FIXME ugly hack below adapted from
+  # https://github.com/dropbox/pyston/blob/master/docker/pyston/Dockerfile
+  ( cd "${PREFIX_PATH}/" && ./pyston virtualenv/virtualenv.py . )
+  # activate the virtualenv so that we're using the correct pip and site-packages location
+  ( source "${PREFIX_PATH}/bin/activate" )
+  # FIXME: if this fails it should not break the installation
   ( cd "${PREFIX_PATH}/bin" && ./pip install https://github.com/dropbox/pyston/releases/download/v0.5.1/Cython-0.24-pyston.tar.gz && ./pip install git+git://github.com/numpy/numpy@v1.11.0 )
+  # deactivate the virtualenv
+  ( deactivate )
   ;;
 * )
   { echo
