@@ -6,11 +6,11 @@ case "$(pyston_architecture 2>/dev/null || true)" in
   # run https://bootstrap.pypa.io/get-pip.py it dumps core, see
   # https://github.com/dropbox/pyston/issues/1373
   # activate the virtualenv so that we're using the correct pip and site-packages location
-  ( source "${PREFIX_PATH}/bin/activate" )
+  # ( source "${PREFIX_PATH}/bin/activate" )
   # FIXME: if this fails it should not break the installation
-  ( cd "${PREFIX_PATH}/bin" && ./pip install https://github.com/dropbox/pyston/releases/download/v0.5.1/Cython-0.24-pyston.tar.gz && ./pip install git+git://github.com/numpy/numpy@v1.11.0 )
+  # ( cd "${PREFIX_PATH}/bin" && ./pip install https://github.com/dropbox/pyston/releases/download/v0.5.1/Cython-0.24-pyston.tar.gz && ./pip install git+git://github.com/numpy/numpy@v1.11.0 )
   # deactivate the virtualenv
-  ( deactivate )
+  # ( deactivate )
   ;;
 * )
   { echo
