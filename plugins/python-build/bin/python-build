@@ -922,9 +922,6 @@ build_package_pyston() {
   mkdir -p "${PREFIX_PATH}/"
   cp -fR . "${PREFIX_PATH}/"
   chmod +x "${PREFIX_PATH}/"pyston
-  # FIXME ugly hack below adapted from
-  # https://github.com/dropbox/pyston/blob/master/docker/pyston/Dockerfile
-  ( cd "${PREFIX_PATH}/" && ./pyston virtualenv/virtualenv.py . )
 }
 
 build_package_ironpython() {
