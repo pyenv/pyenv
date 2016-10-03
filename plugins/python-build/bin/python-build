@@ -918,6 +918,15 @@ build_package_jython_builder() {
   ( cd "dist" && build_package_jython )
 }
 
+build_package_pyston() {
+  mkdir -p "${PREFIX_PATH}/"
+  cp -fR . "${PREFIX_PATH}/"
+  chmod +x "${PREFIX_PATH}/"pyston
+  # FIXME ugly hack below adapted from
+  # https://github.com/dropbox/pyston/blob/master/docker/pyston/Dockerfile
+  ( cd "${PREFIX_PATH}/" && ./pyston virtualenv/virtualenv.py . )
+}
+
 build_package_ironpython() {
   mkdir -p "${PREFIX_PATH}/bin"
   cp -fR . "${PREFIX_PATH}/bin"
@@ -953,6 +962,10 @@ pypy_architecture() {
     ;;
   * ) return 1 ;;
   esac
+}
+
+pyston_architecture() {
+  pypy_architecture
 }
 
 build_package_pypy() {
