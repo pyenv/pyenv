@@ -1,0 +1,23 @@
+
+# HG changeset patch
+# User Brett Cannon <brett@python.org>
+# Date 1467312199 25200
+# Node ID 8d7bde14d7a48f747b1ea2f77385352c507da6b9
+# Parent  f2d1dba10a0e9db6c77889ff8ca18718ce1e76c6# Parent  4fc0154ec84a65feb580e62729ac1d26ddfcbfa1
+Merge from 3.5 for issue #26664
+
+diff --git a/Lib/venv/scripts/posix/activate.fish b/Lib/venv/scripts/posix/activate.fish
+--- a/Lib/venv/scripts/posix/activate.fish
++++ b/Lib/venv/scripts/posix/activate.fish
+@@ -55,8 +55,8 @@ if test -z "$VIRTUAL_ENV_DISABLE_PROMPT"
+     # with the original prompt function renamed, we can override with our own.
+     function fish_prompt
+         # Prompt override?
+-        if test -n "$__VENV_PROMPT__"
+-            printf "%s%s%s" "$__VENV_PROMPT__" (set_color normal) (_old_fish_prompt)
++        if test -n "__VENV_PROMPT__"
++            printf "%s%s%s" "__VENV_PROMPT__" (set_color normal) (_old_fish_prompt)
+             return
+         end
+         # ...Otherwise, prepend env
+
