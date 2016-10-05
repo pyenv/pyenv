@@ -101,6 +101,10 @@ resolve_link() {
 
   echo | install_patch definitions/vanilla-python "Python-3.2.1/empty.patch"
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
+
   TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
 
@@ -127,6 +131,10 @@ OUT
   echo "bar" | install_patch definitions/vanilla-python "Python-3.2.1/bar.patch"
   echo "baz" | install_patch definitions/vanilla-python "Python-3.2.1/baz.patch"
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
+
   TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
 
@@ -151,6 +159,10 @@ OUT
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
+
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
 
   PYTHON_MAKE_INSTALL_TARGET="altinstall" TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success

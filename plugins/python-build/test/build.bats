@@ -67,6 +67,10 @@ assert_build_log() {
   stub_make_install
   stub_make_install
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
+
   install_fixture definitions/needs-yaml
   assert_success
 
@@ -92,6 +96,10 @@ OUT
   stub_make_install
   stub_make_install
   stub patch ' : echo patch "$@" | sed -E "s/\.[[:alnum:]]+$/.XXX/" >> build.log'
+
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
 
   TMPDIR="$TMP" install_fixture --patch definitions/needs-yaml <<<""
   assert_success
@@ -121,6 +129,10 @@ OUT
   stub_make_install
   stub patch ' : echo patch "$@" | sed -E "s/\.[[:alnum:]]+$/.XXX/" >> build.log'
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
+
   TMPDIR="$TMP" install_fixture --patch definitions/needs-yaml <<<"diff --git a/script.py"
   assert_success
 
@@ -149,6 +161,10 @@ OUT
   stub brew "--prefix libyaml : echo '$brew_libdir'" false
   stub_make_install
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
+
   install_fixture definitions/needs-yaml
   assert_success
 
@@ -171,6 +187,10 @@ OUT
 
   stub brew "--prefix readline : echo '$readline_libdir'"
   stub_make_install
+
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
 
   run_inline_definition <<DEF
 install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
@@ -198,6 +218,10 @@ OUT
 
   stub brew
   stub_make_install
+
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
 
   export PYTHON_CONFIGURE_OPTS="CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib"
   run_inline_definition <<DEF
@@ -317,6 +341,10 @@ OUT
 
   stub_make_install
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
+
   export PYTHON_MAKE_INSTALL_OPTS="DOGE=\"such wow\""
   run_inline_definition <<DEF
 install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
@@ -411,6 +439,10 @@ CONF
 
   stub apply 'echo apply "$@" >> build.log'
   stub_make_install
+
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
 
   export PYTHON_CONFIGURE="${TMP}/custom-configure"
   run_inline_definition <<DEF
