@@ -366,6 +366,10 @@ OUT
 
   stub_make_install
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
+
   export MAKE_INSTALL_OPTS="DOGE=\"such wow\""
   run_inline_definition <<DEF
 install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
