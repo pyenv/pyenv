@@ -223,7 +223,11 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
 
+  # yyuu/pyenv#257
   stub uname '-s : echo Darwin'
+
+  stub uname '-s : echo Darwin'
+
   stub sysctl false
   stub_make_install
 
@@ -238,7 +242,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -251,7 +255,11 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
 
+  # yyuu/pyenv#257
   stub uname '-s : echo Darwin'
+
+  stub uname '-s : echo Darwin'
+
   stub sysctl '-n hw.ncpu : echo 4'
   stub_make_install
 
@@ -267,7 +275,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 4
 make install
 OUT
@@ -281,6 +289,9 @@ OUT
   stub_make_install
 
   # yyuu/pyenv#222
+  stub uname '-s : echo FreeBSD'
+
+  # yyuu/pyenv#257
   stub uname '-s : echo FreeBSD'
 
   export -n MAKE_OPTS
@@ -361,6 +372,9 @@ OUT
   # yyuu/pyenv#222
   stub uname '-s : echo FreeBSD'
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo FreeBSD'
+
   MAKE= install_fixture definitions/vanilla-python
   assert_success
 
@@ -375,6 +389,9 @@ OUT
   stub_make_install
 
   # yyuu/pyenv#222
+  stub uname '-s : echo FreeBSD'
+
+  # yyuu/pyenv#257
   stub uname '-s : echo FreeBSD'
 
   MAKE= install_fixture definitions/vanilla-python

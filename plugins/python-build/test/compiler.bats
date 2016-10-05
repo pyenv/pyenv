@@ -12,6 +12,9 @@ export -n PYTHON_CONFIGURE_OPTS
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.9.5'
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Darwin'
+
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.9.5'
   stub gcc '--version : echo 4.2.1'
@@ -32,6 +35,9 @@ OUT
   # yyuu/pyenv#222
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
+
+  # yyuu/pyenv#257
+  stub uname '-s : echo Darwin'
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
@@ -67,6 +73,9 @@ DEF
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Darwin'
+
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
   stub cc 'false'
@@ -89,7 +98,7 @@ build_package_standard python
 DEF
   assert_success
   assert_output <<OUT
-./configure --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib --enable-unicode=ucs4
+./configure --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib
 CC=clang
 CFLAGS=no
 make -j 2
