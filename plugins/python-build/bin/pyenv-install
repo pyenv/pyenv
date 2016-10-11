@@ -191,7 +191,7 @@ if [ -z "${PYENV_BOOTSTRAP_VERSION}" ]; then
     # unsatisfied local .python-version file can cause the installer to
     # fail.)
     for version_info in "${VERSION_NAME%-dev}" "${VERSION_NAME%.*}" "${VERSION_NAME%%.*}"; do
-      # Anaconda's `curl` doesn't work on platfrom where `/etc/pki/tls/certs/ca-bundle.crt` isn't available (e.g. Debian)
+      # Anaconda's `curl` doesn't work on platform where `/etc/pki/tls/certs/ca-bundle.crt` isn't available (e.g. Debian)
       for version in $(pyenv-whence "python${version_info}" 2>/dev/null || true); do
         if [[ "${version}" != "anaconda"* ]] && [[ "${version}" != "miniconda"* ]]; then
           PYENV_BOOTSTRAP_VERSION="${version}"
