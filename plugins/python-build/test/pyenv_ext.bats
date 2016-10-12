@@ -101,6 +101,10 @@ resolve_link() {
 
   echo | install_patch definitions/vanilla-python "Python-3.2.1/empty.patch"
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
+
   TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
 
@@ -127,6 +131,10 @@ OUT
   echo "bar" | install_patch definitions/vanilla-python "Python-3.2.1/bar.patch"
   echo "baz" | install_patch definitions/vanilla-python "Python-3.2.1/baz.patch"
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
+
   TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
 
@@ -151,6 +159,10 @@ OUT
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
+
+  # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux'
 
   PYTHON_MAKE_INSTALL_TARGET="altinstall" TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
@@ -234,6 +246,9 @@ OUT
   touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4-config"
   chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4-config"
 
+  # yyuu/pyenv#257
+  stub uname '-s : echo Darwin'
+
   stub uname '-s : echo Darwin'
 
   PYTHON_CONFIGURE_OPTS="--enable-framework" TMPDIR="$TMP" run_inline_definition <<OUT
@@ -242,7 +257,7 @@ verify_python python3.4
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-framework=${TMP}/install --enable-unicode=ucs4)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-framework=${TMP}/install)
 EOS
 
   [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python" ]
@@ -250,6 +265,9 @@ EOS
 }
 
 @test "enable universalsdk" {
+  # yyuu/pyenv#257
+  stub uname '-s : echo Darwin'
+
   stub uname '-s : echo Darwin'
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
@@ -257,7 +275,7 @@ echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/ --with-universal-archs=intel --enable-unicode=ucs4)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/ --with-universal-archs=intel)
 EOS
 }
 
@@ -283,6 +301,9 @@ OUT
 }
 
 @test "default MACOSX_DEPLOYMENT_TARGET" {
+  # yyuu/pyenv#257
+  stub uname '-s : echo Darwin'
+
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
 
@@ -294,6 +315,9 @@ OUT
 }
 
 @test "use custom MACOSX_DEPLOYMENT_TARGET if defined" {
+  # yyuu/pyenv#257
+  stub uname '-s : echo Darwin'
+
   stub uname '-s : echo Darwin'
 
   MACOSX_DEPLOYMENT_TARGET="10.4" TMPDIR="$TMP" run_inline_definition <<OUT
