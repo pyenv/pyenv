@@ -918,6 +918,15 @@ build_package_jython_builder() {
   ( cd "dist" && build_package_jython )
 }
 
+build_package_pyston() {
+  mkdir -p "${PREFIX_PATH}/"
+  cp -fR . "${PREFIX_PATH}/"
+  chmod +x "${PREFIX_PATH}/"pyston
+  # FIXME ugly hack below adapted from
+  # https://github.com/dropbox/pyston/blob/master/docker/pyston/Dockerfile
+  ( cd "${PREFIX_PATH}/" && ./pyston virtualenv/virtualenv.py . )
+}
+
 build_package_ironpython() {
   mkdir -p "${PREFIX_PATH}/bin"
   cp -fR . "${PREFIX_PATH}/bin"
@@ -953,6 +962,10 @@ pypy_architecture() {
     ;;
   * ) return 1 ;;
   esac
+}
+
+pyston_architecture() {
+  pypy_architecture
 }
 
 build_package_pypy() {
@@ -1470,6 +1483,7 @@ build_package_symlink_version_suffix() {
   if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
     if [ -e "${PREFIX_PATH}/bin" ]; then
       # Always create `bin` as symlink to framework path if the version was built with `--enable-frameowrk` (#590)
+      rm -rf "${PREFIX_PATH}/bin.orig"
       mv -f "${PREFIX_PATH}/bin" "${PREFIX_PATH}/bin.orig"
     fi
     # Only symlinks are installed in ${PREFIX_PATH}/bin
@@ -1639,6 +1653,11 @@ build_package_verify_py35() {
 # Post-install check for Python 3.6.x
 build_package_verify_py36() {
   build_package_verify_py35 "$1" "${2:-3.6}"
+}
+
+# Post-install check for Python 3.7.x
+build_package_verify_py37() {
+  build_package_verify_py36 "$1" "${2:-3.7}"
 }
 
 build_package_ez_setup() {
@@ -1920,7 +1939,9 @@ fi
 
 # Compile with `--enable-unicode=ucs4` by default (#257)
 if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
-  package_option python configure --enable-unicode=ucs4
+  if ! is_mac; then
+    package_option python configure --enable-unicode=ucs4
+  fi
 fi
 
 # SSL Certificate error with older wget that does not support Server Name Indication (#60)

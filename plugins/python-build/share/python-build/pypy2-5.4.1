@@ -1,7 +1,7 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.4.1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.1-linux32.tar.bz2#6d1e2386ec1e05dffed493aa2d5e6db5cf5de18d7350d44b85f2e45aa5c9a774" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.4.1-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.1-linux32.tar.bz2#6d1e2386ec1e05dffed493aa2d5e6db5cf5de18d7350d44b85f2e45aa5c9a774" "pypy" verify_py27 ensurepip
   else
     install_package "pypy-5.4.1-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.4.1-linux_i686-portable.tar.bz2#190e1df78886f0b2bd700f110b7d312d91cafc84886c5de3c5d55c10fe1a5e75" "pypy" verify_py27 ensurepip
   fi

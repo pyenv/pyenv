@@ -1,5 +1,12 @@
 ## Version History
 
+## 1.0.2
+
+* python-build: Add CPython 3.6.0b1 (#699)
+* python-build: Add anaconda[23] 4.1.1 (#701, #702)
+* python-build: Add miniconda[23] 4.1.11 (#703, #704, #706)
+* python-build: Remove `bin.orig` if exists to fix an issue with `--enable-framework` (#687, #700)
+
 ## 1.0.1
 
 * python-build: Add CPython 3.6.0a4 (#673)
@@ -308,7 +315,7 @@
 * python-build: Fix build of Tkinter with Tcl/Tk 8.6 (#131)
 * python-build: Fix build problem with Readline 6.3 (#126, #131, #149, #152)
 * python-build: Do not exit with errors even if some of modules are absent (#131)
-* python-build: MacOSX was mispelled as MaxOSX in `anaconda_architecture` (#136)
+* python-build: MacOSX was misspelled as MaxOSX in `anaconda_architecture` (#136)
 * python-build: Use default `cc` as the C Compiler to build CPython (#148, #150)
 * python-build: Display value from `pypy_architecture` and `anaconda_architecture` on errors (yyuu/pyenv-virtualenv#18)
 * python-build: Remove old development version; 2.6-dev

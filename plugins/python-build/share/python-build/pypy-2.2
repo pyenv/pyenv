@@ -30,7 +30,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   { echo
     colorize 1 "ERROR"
     echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
-    echo "try 'pypy-2.2-src' to build from soruce."
+    echo "try 'pypy-2.2-src' to build from source."
     echo
   } >&2
   exit 1
