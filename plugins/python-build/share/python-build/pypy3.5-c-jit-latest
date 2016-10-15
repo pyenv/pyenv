@@ -40,7 +40,8 @@ case "$(pypy_architecture 2>/dev/null || true)" in
 * )
   { echo
     colorize 1 "ERROR"
-    echo ": The binary distribution of PyPy 3.5 is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo ": The latest nightly build of PyPy 3.5 is not available for $(pypy_architecture 2>/dev/null || true),"
+    echo "Please check http://buildbot.pypy.org/nightly/py3.5/ for previous builds."
     echo
   } >&2
   exit 1
