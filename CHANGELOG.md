@@ -1,5 +1,17 @@
 ## Version History
 
+## 1.0.3
+
+* python-build: Add CPython 3.6.0b3 (#731, #744)
+* python-build: Add PyPy3.3 5.5-alpha (#734, #736)
+* python-build: Stop specifying `--enable-unicode=ucs4` on OS X (#257, #726)
+* python-build: Fix 3.6-dev and add 3.7-dev (#729, #730)
+* python-build: Add a patch for https://bugs.python.org/issue26664 (#725)
+* python-build: Add Pyston 0.5.1 (#718)
+* python-build: Add Stackless 3.4.2 (#720)
+* python-build: Add IronPython 2.7.6.3 (#716)
+* python-build: Add Stackless 2.7.9 (#714)
+
 ## 1.0.2
 
 * python-build: Add CPython 3.6.0b1 (#699)
