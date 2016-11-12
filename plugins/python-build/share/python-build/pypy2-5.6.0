@@ -1,0 +1,44 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy2-v5.6.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.6.0-linux32.tar.bz2#5d4ad43aed5c5e147f7e7c84766c729f34f63b714b6d224e912a2bb42dc95d62" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-5.6-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.6-linux_i686-portable.tar.bz2#1f220e05ddd4423882794f0e9d3e2dfdecee259d00f1151a52dd244607313399" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"linux-armel" )
+  require_distro "Ubuntu 12.04" || true
+  install_package "pypy2-v5.6.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.6.0-linux-armel.tar.bz2#2d1c7820f6368c92bb43a153d2c995f70aa183ff8f1df6916b0d2e57838d8a30" "pypy" verify_py27 ensurepip
+  ;;
+"linux-armhf" )
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
+    install_package "pypy2-v5.6.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.6.0-linux-armhf-raspbian.tar.bz2#0f69c40a38d72254bf12094620bda9d2face758f763cd0d989588642d81eccae" "pypy" verify_py27 ensurepip
+  else
+    require_distro "Ubuntu 13.04" || true
+    install_package "pypy2-v5.6.0-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.6.0-linux-armhf-raring.tar.bz2#2c430240cecb562102c677598f106aa57899f00cd37f719989e18ed9ca44bd01" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"linux64" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy2-v5.6.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.6.0-linux64.tar.bz2#aad55328cb0673a60b2633dcc3c36cf452917ac906b577eb3aed5876a7666fca" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-5.6-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.6-linux_x86_64-portable.tar.bz2#9bd220bc54000e142bd4929435959305efeef8c832fbe3c907211cc5214095ce" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"osx64" )
+  install_package "pypy2-v5.6.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.6.0-osx64.tar.bz2#6121f791f440564d3a0a41315e9f2d2d61bc484654acffd85d9e1c6e92b85c36" "pypy" verify_py27 ensurepip
+  ;;
+"win32" )
+  # FIXME: never tested on Windows
+  install_zip "pypy2-v5.6.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.6.0-win32.zip#bab4fa37ef2d32660e291393d955a4e951d5e883abea8bee83be1ec044ddcaac" "pypy" verify_py27 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy2-5.6.0-src' to build from source."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
