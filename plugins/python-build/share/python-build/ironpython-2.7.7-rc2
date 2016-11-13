@@ -1,2 +1,2 @@
-install_zip "IronPython-2.7.7rc2" "https://github.com/IronLanguages/main/releases/download/ipy-2.7.7-rc2/IronPython-2.7.7rc2-unix.tar.bz2#338b855d007a2f8f12498fe67039483e671c98f6ea8320add4cdedd53b118113" ironpython
+install_package "IronPython-2.7.7rc2" "https://github.com/IronLanguages/main/releases/download/ipy-2.7.7-rc2/IronPython-2.7.7rc2-unix.tar.bz2#338b855d007a2f8f12498fe67039483e671c98f6ea8320add4cdedd53b118113" ironpython
 # FIXME: have not confirmed to install setuptools into IronPython yet
