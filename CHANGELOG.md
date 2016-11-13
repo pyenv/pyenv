@@ -1,5 +1,12 @@
 ## Version History
 
+## Unreleased
+
+* python-build: Add PyPy 5.6.0 (#751)
+* python-build: Add Stackless 2.7.12 (#753)
+* python-build: Add Stackless 2.7.11
+* python-build: Add Stackless 2.7.10
+
 ## 1.0.3
 
 * python-build: Add CPython 3.6.0b3 (#731, #744)
