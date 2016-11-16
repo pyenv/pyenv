@@ -1,0 +1,4 @@
+#require_gcc
+install_package "openssl-1.0.2g" "https://www.openssl.org/source/openssl-1.0.2g.tar.gz#b784b1b3907ce39abf4098702dade6365522a253ad1552e267a9a0e89594aa33" mac_openssl --if has_broken_mac_openssl
+install_package "readline-6.3" "https://ftpmirror.gnu.org/readline/readline-6.3.tar.gz#56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43" standard --if has_broken_mac_readline
+install_package "stackless-dev-stackless-82aaa252fbdc" "https://bitbucket.org/stackless-dev/stackless/get/v2.7.12-slp.tar.bz2#af57d08477e8b9545d30b36df0ea903bdc96073898af6b4730f713bb74fd277d" ldflags_dirs standard verify_py27 ensurepip
