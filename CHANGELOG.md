@@ -6,6 +6,7 @@
 * python-build: Add Stackless 2.7.12 (#753)
 * python-build: Add Stackless 2.7.11
 * python-build: Add Stackless 2.7.10
+* python-build: Add Pyston 0.6.0
 
 ## 1.0.3
 

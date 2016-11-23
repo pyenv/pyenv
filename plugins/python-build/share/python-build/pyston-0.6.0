@@ -1,0 +1,23 @@
+case "$(pyston_architecture 2>/dev/null || true)" in
+"linux64" )
+  install_package "pyston-0.6.0-linux64" "https://github.com/dropbox/pyston/releases/download/v0.6/pyston-0.6.0-linux64.tar.gz#c31240a66cd3ed566ef88a8818a960d925fbf60ab17db722224794346b827f9f" "pyston" verify_py27
+  # disabling ensurepip avoids having installation aborted because of a coredump
+  # pyston targets python 2.7.7 and does not have ensurepip, when attempting to
+  # run https://bootstrap.pypa.io/get-pip.py it dumps core, see
+  # https://github.com/dropbox/pyston/issues/1373
+  # activate the virtualenv so that we're using the correct pip and site-packages location
+  # ( source "${PREFIX_PATH}/bin/activate" )
+  # FIXME: if this fails it should not break the installation
+  # ( cd "${PREFIX_PATH}/bin" && ./pip install https://github.com/dropbox/pyston/releases/download/v0.6/Cython-0.24-pyston.tar.gz && ./pip install git+git://github.com/numpy/numpy@v1.11.0 )
+  # deactivate the virtualenv
+  # ( deactivate )
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": A Pyston 0.6.0 binary is not available for $(pyston_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
