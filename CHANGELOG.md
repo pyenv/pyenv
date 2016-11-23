@@ -1,12 +1,14 @@
 ## Version History
 
-## Unreleased
+## 1.0.4
 
 * python-build: Add PyPy 5.6.0 (#751)
+* python-build: Add PyPy3 3.5 nightlies (`pypy3.5-c-jit-latest` #737)
 * python-build: Add Stackless 2.7.12 (#753)
 * python-build: Add Stackless 2.7.11
 * python-build: Add Stackless 2.7.10
 * python-build: Add Pyston 0.6.0
+* python-build: Add CPython 3.6.0b4 (#762)
 
 ## 1.0.3
 
