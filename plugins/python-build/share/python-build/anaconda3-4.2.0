@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-x86" )
+  install_script "Anaconda3-4.2.0-Linux-x86" "https://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86.sh#1a8320635f2f06ec9d8610e77d6d0f9cb2c5d11d20a4ff7fcda113e04b0a8a50" "anaconda" verify_py35
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda3-4.2.0-Linux-x86_64" "https://repo.continuum.io/archive/Anaconda3-4.2.0-Linux-x86_64.sh#73b51715a12b6382dd4df3dd1905b531bd6792d4aa7273b2377a0436d45f0e78" "anaconda" verify_py35
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda3-4.2.0-MacOSX-x86_64" "https://repo.continuum.io/archive/Anaconda3-4.2.0-MacOSX-x86_64.sh#95448921601e1952e01a17ba9767cd3621c154af7fc52dd6b7f57d462155a358" "anaconda" verify_py35
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Anaconda3 is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
