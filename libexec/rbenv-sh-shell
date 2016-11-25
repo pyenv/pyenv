@@ -3,6 +3,7 @@
 # Summary: Set or show the shell-specific Ruby version
 #
 # Usage: rbenv shell <version>
+#        rbenv shell -
 #        rbenv shell --unset
 #
 # Sets a shell-specific Ruby version by setting the `RBENV_VERSION'
@@ -12,6 +13,11 @@
 # <version> should be a string matching a Ruby version known to rbenv.
 # The special version string `system' will use your default system Ruby.
 # Run `rbenv versions' for a list of available Ruby versions.
+#
+# When `-` is passed instead of the version string, the previously set
+# version will be restored. With `--unset`, the `RBENV_VERSION`
+# environment variable gets unset, restoring the environment to the
+# state before the first `rbenv shell` call.
 
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
@@ -31,7 +37,7 @@ if [ -z "$version" ]; then
     echo "rbenv: no shell-specific version configured" >&2
     exit 1
   else
-    echo "echo \"\$RBENV_VERSION\""
+    echo 'echo "$RBENV_VERSION"'
     exit
   fi
 fi
@@ -39,11 +45,11 @@ fi
 if [ "$version" = "--unset" ]; then
   case "$shell" in
   fish )
-    echo "set -e OLD_RBENV_VERSION"
+    echo 'set -gu OLD_RBENV_VERSION "$RBENV_VERSION"'
     echo "set -e RBENV_VERSION"
     ;;
   * )
-    echo "unset OLD_RBENV_VERSION"
+    echo 'OLD_RBENV_VERSION="$RBENV_VERSION"'
     echo "unset RBENV_VERSION"
     ;;
   esac
@@ -51,20 +57,42 @@ if [ "$version" = "--unset" ]; then
 fi
 
 if [ "$version" = "-" ]; then
-  if [ -z "$OLD_RBENV_VERSION" ]; then
-    echo "rbenv: OLD_RBENV_VERSION not set" >&2
-    exit 1;
-  fi
   case "$shell" in
   fish )
-    rbenv_version=$RBENV_VERSION
-    echo "set -e OLD_RBENV_VERSION \"$rbenv_version\""
-    echo "set -e RBENV_VERSION \"$OLD_RBENV_VERSION\""
+    cat <<EOS
+if set -q OLD_RBENV_VERSION
+  if [ -n "\$OLD_RBENV_VERSION" ]
+    set OLD_RBENV_VERSION_ "\$RBENV_VERSION"
+    set -gx RBENV_VERSION "\$OLD_RBENV_VERSION"
+    set -gu OLD_RBENV_VERSION "\$OLD_RBENV_VERSION_"
+    set -e OLD_RBENV_VERSION_
+  else
+    set -gu OLD_RBENV_VERSION "\$RBENV_VERSION"
+    set -e RBENV_VERSION
+  end
+else
+  echo "rbenv: OLD_RBENV_VERSION is not set" >&2
+  false
+end
+EOS
     ;;
   * )
-    rbenv_version=$RBENV_VERSION
-    echo "export OLD_RBENV_VERSION=\"$rbenv_version\""
-    echo "export RBENV_VERSION=\"$OLD_RBENV_VERSION\""
+    cat <<EOS
+if [ -n "\${OLD_RBENV_VERSION+x}" ]; then
+  if [ -n "\$OLD_RBENV_VERSION" ]; then
+    OLD_RBENV_VERSION_="\$RBENV_VERSION"
+    export RBENV_VERSION="\$OLD_RBENV_VERSION"
+    OLD_RBENV_VERSION="\$OLD_RBENV_VERSION_"
+    unset OLD_RBENV_VERSION_
+  else
+    OLD_RBENV_VERSION="\$RBENV_VERSION"
+    unset RBENV_VERSION
+  fi
+else
+  echo "rbenv: OLD_RBENV_VERSION is not set" >&2
+  false
+fi
+EOS
     ;;
   esac
   exit
@@ -75,11 +103,12 @@ if rbenv-prefix "$version" >/dev/null; then
   if [ "$version" != "$RBENV_VERSION" ]; then
     case "$shell" in
     fish )
-      echo "setenv RBENV_VERSION \"${version}\""
+      echo 'set -gu OLD_RBENV_VERSION "$RBENV_VERSION"'
+      echo "set -gx RBENV_VERSION \"$version\""
       ;;
     * )
-      echo "export OLD_RBENV_VERSION=\"$RBENV_VERSION\""
-      echo "export RBENV_VERSION=\"${version}\""
+      echo 'OLD_RBENV_VERSION="$RBENV_VERSION"'
+      echo "export RBENV_VERSION=\"$version\""
       ;;
     esac
   fi
