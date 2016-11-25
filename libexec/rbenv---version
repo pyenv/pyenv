@@ -12,7 +12,7 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
-version="1.0.0"
+version="1.1.0"
 git_revision=""
 
 if cd "${BASH_SOURCE%/*}" 2>/dev/null && git remote -v 2>/dev/null | grep -q rbenv; then
