@@ -1,8 +1,12 @@
 ## Version History
 
-## Unreleased
+## 1.0.5
 
+* python-build: Add CPython 2.7.13 (#782)
 * python-build: Add CPython 3.6.0rc2 (#781)
+* python-build: Add Anaconda 4.2.0 (#774)
+* python-build: Add Anaconda3 4.2.0 (#765)
+* python-build: Add IronPython 2.7.7 (#755)
 
 ## 1.0.4
 
