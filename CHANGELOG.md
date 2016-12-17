@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-* python-build: Add CPython 3.6.0rc1
+* python-build: Add CPython 3.6.0rc2 (#781)
 
 ## 1.0.4
 
