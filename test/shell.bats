@@ -23,20 +23,20 @@ load test_helper
 @test "shell revert" {
   RBENV_SHELL=bash run rbenv-sh-shell -
   assert_success
-  assert_line 0 'if [ -n "${OLD_RBENV_VERSION+x}" ]; then'
+  assert_line 0 'if [ -n "${RBENV_VERSION_OLD+x}" ]; then'
 }
 
 @test "shell revert (fish)" {
   RBENV_SHELL=fish run rbenv-sh-shell -
   assert_success
-  assert_line 0 'if set -q OLD_RBENV_VERSION'
+  assert_line 0 'if set -q RBENV_VERSION_OLD'
 }
 
 @test "shell unset" {
   RBENV_SHELL=bash run rbenv-sh-shell --unset
   assert_success
   assert_output <<OUT
-OLD_RBENV_VERSION="\$RBENV_VERSION"
+RBENV_VERSION_OLD="\$RBENV_VERSION"
 unset RBENV_VERSION
 OUT
 }
@@ -45,7 +45,7 @@ OUT
   RBENV_SHELL=fish run rbenv-sh-shell --unset
   assert_success
   assert_output <<OUT
-set -gu OLD_RBENV_VERSION "\$RBENV_VERSION"
+set -gu RBENV_VERSION_OLD "\$RBENV_VERSION"
 set -e RBENV_VERSION
 OUT
 }
@@ -64,7 +64,7 @@ SH
   RBENV_SHELL=bash run rbenv-sh-shell 1.2.3
   assert_success
   assert_output <<OUT
-OLD_RBENV_VERSION="\$RBENV_VERSION"
+RBENV_VERSION_OLD="\$RBENV_VERSION"
 export RBENV_VERSION="1.2.3"
 OUT
 }
@@ -74,7 +74,7 @@ OUT
   RBENV_SHELL=fish run rbenv-sh-shell 1.2.3
   assert_success
   assert_output <<OUT
-set -gu OLD_RBENV_VERSION "\$RBENV_VERSION"
+set -gu RBENV_VERSION_OLD "\$RBENV_VERSION"
 set -gx RBENV_VERSION "1.2.3"
 OUT
 }
