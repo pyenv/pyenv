@@ -45,11 +45,11 @@ fi
 if [ "$version" = "--unset" ]; then
   case "$shell" in
   fish )
-    echo 'set -gu OLD_RBENV_VERSION "$RBENV_VERSION"'
+    echo 'set -gu RBENV_VERSION_OLD "$RBENV_VERSION"'
     echo "set -e RBENV_VERSION"
     ;;
   * )
-    echo 'OLD_RBENV_VERSION="$RBENV_VERSION"'
+    echo 'RBENV_VERSION_OLD="$RBENV_VERSION"'
     echo "unset RBENV_VERSION"
     ;;
   esac
@@ -60,36 +60,36 @@ if [ "$version" = "-" ]; then
   case "$shell" in
   fish )
     cat <<EOS
-if set -q OLD_RBENV_VERSION
-  if [ -n "\$OLD_RBENV_VERSION" ]
-    set OLD_RBENV_VERSION_ "\$RBENV_VERSION"
-    set -gx RBENV_VERSION "\$OLD_RBENV_VERSION"
-    set -gu OLD_RBENV_VERSION "\$OLD_RBENV_VERSION_"
-    set -e OLD_RBENV_VERSION_
+if set -q RBENV_VERSION_OLD
+  if [ -n "\$RBENV_VERSION_OLD" ]
+    set RBENV_VERSION_OLD_ "\$RBENV_VERSION"
+    set -gx RBENV_VERSION "\$RBENV_VERSION_OLD"
+    set -gu RBENV_VERSION_OLD "\$RBENV_VERSION_OLD_"
+    set -e RBENV_VERSION_OLD_
   else
-    set -gu OLD_RBENV_VERSION "\$RBENV_VERSION"
+    set -gu RBENV_VERSION_OLD "\$RBENV_VERSION"
     set -e RBENV_VERSION
   end
 else
-  echo "rbenv: OLD_RBENV_VERSION is not set" >&2
+  echo "rbenv: RBENV_VERSION_OLD is not set" >&2
   false
 end
 EOS
     ;;
   * )
     cat <<EOS
-if [ -n "\${OLD_RBENV_VERSION+x}" ]; then
-  if [ -n "\$OLD_RBENV_VERSION" ]; then
-    OLD_RBENV_VERSION_="\$RBENV_VERSION"
-    export RBENV_VERSION="\$OLD_RBENV_VERSION"
-    OLD_RBENV_VERSION="\$OLD_RBENV_VERSION_"
-    unset OLD_RBENV_VERSION_
+if [ -n "\${RBENV_VERSION_OLD+x}" ]; then
+  if [ -n "\$RBENV_VERSION_OLD" ]; then
+    RBENV_VERSION_OLD_="\$RBENV_VERSION"
+    export RBENV_VERSION="\$RBENV_VERSION_OLD"
+    RBENV_VERSION_OLD="\$RBENV_VERSION_OLD_"
+    unset RBENV_VERSION_OLD_
   else
-    OLD_RBENV_VERSION="\$RBENV_VERSION"
+    RBENV_VERSION_OLD="\$RBENV_VERSION"
     unset RBENV_VERSION
   fi
 else
-  echo "rbenv: OLD_RBENV_VERSION is not set" >&2
+  echo "rbenv: RBENV_VERSION_OLD is not set" >&2
   false
 fi
 EOS
@@ -103,11 +103,11 @@ if rbenv-prefix "$version" >/dev/null; then
   if [ "$version" != "$RBENV_VERSION" ]; then
     case "$shell" in
     fish )
-      echo 'set -gu OLD_RBENV_VERSION "$RBENV_VERSION"'
+      echo 'set -gu RBENV_VERSION_OLD "$RBENV_VERSION"'
       echo "set -gx RBENV_VERSION \"$version\""
       ;;
     * )
-      echo 'OLD_RBENV_VERSION="$RBENV_VERSION"'
+      echo 'RBENV_VERSION_OLD="$RBENV_VERSION"'
       echo "export RBENV_VERSION=\"$version\""
       ;;
     esac
