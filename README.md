@@ -154,6 +154,12 @@ For example, you might have these versions installed:
 As far as pyenv is concerned, version names are simply the directories in
 `~/.pyenv/versions`.
 
+### Managing Virtual Environments
+
+There is a pyenv plugin named [pyenv-virtualenv](https://github.com/yyuu/pyenv-virtualenv) which comes with various features to help pyenv users to manage virtual environments created by virtualenv or Anaconda.
+Because the `activate` script of those virtual environments are relying on mutating `$PATH` variable of user's interactive shell, it will intercept pyenv's shim style command execution hooks.
+We'd recommend to install pyenv-virtualenv as well if you have some plan to play with those virtual environments.
+
 
 ----
 
