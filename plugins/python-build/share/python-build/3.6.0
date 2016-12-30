@@ -4,5 +4,5 @@ install_package "readline-6.3" "https://ftpmirror.gnu.org/readline/readline-6.3.
 if has_tar_xz_support; then
   install_package "Python-3.6.0" "https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz#b0c5f904f685e32d9232f7bdcbece9819a892929063b6e385414ad2dd6a23622" ldflags_dirs standard verify_py36 ensurepip
 else
-  install_package "Python-3.6.0" "https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tgz#b0c5f904f685e32d9232f7bdcbece9819a892929063b6e385414ad2dd6a23622" ldflags_dirs standard verify_py36 ensurepip
+  install_package "Python-3.6.0" "https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tgz#aa472515800d25a3739833f76ca3735d9f4b2fe77c3cb21f69275e0cce30cb2b" ldflags_dirs standard verify_py36 ensurepip
 fi
