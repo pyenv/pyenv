@@ -9,4 +9,4 @@ test: bats
 	cd plugins/python-build && $(PWD)/bats/bin/bats $${CI:+--tap} test
 
 bats:
-	git clone https://github.com/sstephenson/bats.git
+	git clone --depth 1 https://github.com/sstephenson/bats.git
