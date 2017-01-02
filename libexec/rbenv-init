@@ -138,7 +138,7 @@ esac
 if [ "$shell" != "fish" ]; then
 IFS="|"
 cat <<EOS
-  command="\$1"
+  command="\${1:-}"
   if [ "\$#" -gt 0 ]; then
     shift
   fi
