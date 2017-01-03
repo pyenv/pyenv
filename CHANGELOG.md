@@ -1,5 +1,9 @@
 ## Version History
 
+## Unreleased
+
+* Add CPython 3.5.3rc1
+
 ## 1.0.6
 
 * python-build: Add CPython 3.6.0 (#787)
