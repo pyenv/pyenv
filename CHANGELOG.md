@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Add CPython 3.5.3rc1
+* Add CPython 3.4.6rc1
 
 ## 1.0.6
 
