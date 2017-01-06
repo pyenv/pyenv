@@ -588,7 +588,7 @@ fetch_jar() {
 
   # Must use full path to jar and destination directory:
   #   http://bugs.jython.org/issue2350
-  { if $JAVA -jar $PWD/${package_name}.jar -s -d $PWD/${package_name}; then
+  { if $JAVA -jar "$PWD/${package_name}.jar" -s -d "$PWD/${package_name}"; then
       if [ -z "$KEEP_BUILD_PATH" ]; then
         rm -f "$package_filename"
       else
@@ -902,11 +902,10 @@ fix_jython_shebangs() {
   for file in "${PREFIX_PATH}/bin"/*; do
     case "$(head -1 "${file}")" in
     "#!"*"/bin/jython" )
-      sed -i.bak "1 s:.*:#\!\/usr\/bin\/env ${PREFIX_PATH}\/bin\/jython:" "${file}"
+      sed -i.bak "1 s:.*:#\!${PREFIX_PATH}\/bin\/jython:" "${file}"
       ;;
     "#!"*"/bin/python2.7"* )
-      # Jython 2.7+ requires CPython 2.7 to run
-      sed -i.bak "1 s:.*:#\!\/usr\/bin\/env python2.7:" "${file}"
+      sed -i.bak "1 s:.*:#\!\/usr\/bin\/env python:" "${file}"
       ;;
     esac
     rm -f "${file}.bak"
@@ -1274,6 +1273,17 @@ require_java() {
   fi
 
   export JAVA="$java"
+}
+
+# Let Jython installer to generate shell script instead of python script even if there's `python2.7` available in `$PATH` (#800)
+# FIXME: better function naming
+unrequire_python27() {
+  export PATH="${PWD}/bin:${PATH}"
+  mkdir -p "${PWD}/bin"
+  if command -v python2.7 1>/dev/null 2>&1; then
+    echo false > "${PWD}/bin/python2.7"
+    chmod +x "${PWD}/bin/python2.7"
+  fi
 }
 
 require_distro() {

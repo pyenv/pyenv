@@ -1,4 +1,5 @@
 require_java
+unrequire_python27
 install_jar "jython-2.7.1b2" "https://repo1.maven.org/maven2/org/python/jython-installer/2.7.1b2/jython-installer-2.7.1b2.jar#d994500808c8d448baab1f98e043e6a11360cff302f401901e73f0e34c27251a" jython
 
 case "$(pypy_architecture 2>/dev/null || true)" in
