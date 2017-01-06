@@ -1,4 +1,5 @@
 require_java
+unrequire_python27
 install_hg "jython-dev" "https://hg.python.org/jython" "default" jython_builder ez_setup
 # pip (>= 1.3) does not work properly since it uses HTTPS for downloads
 # * https://github.com/yyuu/pyenv/issues/15
