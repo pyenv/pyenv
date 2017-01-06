@@ -1278,11 +1278,11 @@ require_java() {
 # Let Jython installer to generate shell script instead of python script even if there's `python2.7` available in `$PATH` (#800)
 # FIXME: better function naming
 unrequire_python27() {
-  export PATH="${PWD}/bin:${PATH}"
-  mkdir -p "${PWD}/bin"
+  export PATH="${BUILD_PATH}/bin:${PATH}"
+  mkdir -p "${BUILD_PATH}/bin"
   if command -v python2.7 1>/dev/null 2>&1; then
-    echo false > "${PWD}/bin/python2.7"
-    chmod +x "${PWD}/bin/python2.7"
+    echo false > "${BUILD_PATH}/bin/python2.7"
+    chmod +x "${BUILD_PATH}/bin/python2.7"
   fi
 }
 
