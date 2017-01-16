@@ -1783,6 +1783,8 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "g" | "debug" )
     DEBUG=true
+    # Disable optimization (#808)
+    PYTHON_CFLAGS="-O0 ${PYTHON_CFLAGS}"
     ;;
   "4" | "ipv4")
     IPV4=true
