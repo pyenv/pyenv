@@ -1,9 +1,12 @@
 ## Version History
 
-## Unreleased
+## 1.0.7
 
-* Add CPython 3.5.3rc1
-* Add CPython 3.4.6rc1
+* python-build: Add CPython 3.5.3 (#811)
+* python-build: Add CPython 3.4.6 (#812)
+* python-build: Fix tar.gz checksum of CPython 3.6.0 (#793)
+* python-build: Jython installer workaround (#800)
+* python-build: Disable optimization (`-O0`) when `--debug` was specified (#808)
 
 ## 1.0.6
 
