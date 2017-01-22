@@ -1,0 +1,33 @@
+#compdef pyenv
+
+_pyenv() {
+  _arguments -s '*::pyenv command:_pyenv_command'
+}
+
+(( ${+functions[_pyenv_command]} )) || _pyenv_command() {
+  (( ${+_pyenv_cmds} )) || _pyenv_cmds=(${(f)"$(_call_program commands pyenv commands 2>&1)"})
+
+  if (( CURRENT == 1 )); then
+    _describe -t commands 'pyenv command' _pyenv_cmds
+  else
+    cmd=$words[1]
+    curcontext="${curcontext%:*:*}:pyenv-${cmd}:"
+    _call_function ret _pyenv_args $cmd || _message "no more arguments"
+    return ret
+  fi
+}
+
+(( ${+functions[_pyenv_args]} )) || _pyenv_args() {
+  _pyenv_args=(${(f)"$(_call_program commands pyenv completions $1 2>&1)"})
+  compadd -a _pyenv_args
+}
+
+_pyenv "${@}"
+
+# Local Variables:
+# mode: Shell-Script
+# sh-indentation: 2
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# End:
+# vim: ft=zsh sw=2 ts=2 et
