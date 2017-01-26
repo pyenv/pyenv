@@ -1911,7 +1911,7 @@ package_option python configure --libdir="${PREFIX_PATH}/lib"
 if [[ "$CONFIGURE_OPTS" == *"--enable-shared"* ]] || [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]]; then
   # The ld on Darwin embeds the full paths to each dylib by default
   if [[ "$LDFLAGS" != *"-rpath="* ]] && ! is_mac; then
-    export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
+    export LDFLAGS="-Wl,-rpath='\$\$ORIGIN/../lib' ${LDFLAGS}"
   fi
 fi
 
