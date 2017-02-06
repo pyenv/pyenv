@@ -87,7 +87,7 @@ then `/bin`.
 pyenv works by inserting a directory of _shims_ at the front of your
 `PATH`:
 
-    ~/.pyenv/shims:/usr/local/bin:/usr/bin:/bin
+    $(pyenv root)/shims:/usr/local/bin:/usr/bin:/bin
 
 Through a process called _rehashing_, pyenv maintains shims in that
 directory to match every Python command across every installed version
@@ -119,7 +119,7 @@ reading it from the following sources, in this order:
 3. The first `.python-version` file found (if any) by searching each parent
    directory, until reaching the root of your filesystem.
 
-4. The global `~/.pyenv/version` file. You can modify this file using
+4. The global `.python-version` file. You can modify this file using
    the [`pyenv global`](https://github.com/yyuu/pyenv/blob/master/COMMANDS.md#pyenv-global) command. If the global version
    file is not present, pyenv assumes you want to use the "system"
    Python. (In other words, whatever version would run if pyenv weren't in your
@@ -133,7 +133,7 @@ in this example), but also have Python 3.3.6, 3.2, and 2.5 available on your
 `PATH`, one would first `pyenv install` the missing versions, then set `pyenv
 global system 3.3.6 3.2 2.5`. At this point, one should be able to find the full
 executable path to each of these using `pyenv which`, e.g. `pyenv which python2.5`
-(should display `$PYENV_ROOT/versions/2.5/bin/python2.5`), or `pyenv which
+(should display `$(pyenv root)/versions/2.5/bin/python2.5`), or `pyenv which
 python3.4` (should display path to system Python3). You can also specify multiple
 versions in a `.python-version` file, separated by newlines or any whitespace.
 
@@ -144,16 +144,16 @@ specified, it passes the command along to the corresponding Python
 installation.
 
 Each Python version is installed into its own directory under
-`~/.pyenv/versions`.
+`$(pyenv root)/versions`.
 
 For example, you might have these versions installed:
 
-* `~/.pyenv/versions/2.7.8/`
-* `~/.pyenv/versions/3.4.2/`
-* `~/.pyenv/versions/pypy-2.4.0/`
+* `$(pyenv root)/versions/2.7.8/`
+* `$(pyenv root)/versions/3.4.2/`
+* `$(pyenv root)/versions/pypy-2.4.0/`
 
 As far as pyenv is concerned, version names are simply the directories in
-`~/.pyenv/versions`.
+`$(pyenv root)/versions`.
 
 ### Managing Virtual Environments
 
@@ -218,7 +218,7 @@ easy to fork and contribute any changes back upstream.
     ```sh
     $ exec $SHELL
     ```
-5. **Install Python versions into `$PYENV_ROOT/versions`.**
+5. **Install Python versions into `$(pyenv root)/versions`.**
    For example, to download and install Python 2.7.8, run:
     ```sh
     $ pyenv install 2.7.8
@@ -242,14 +242,14 @@ upgrade your installation at any time using git.
 To upgrade to the latest development version of pyenv, use `git pull`:
 
 ```sh
-$ cd ~/.pyenv
+$ cd $(pyenv root)
 $ git pull
 ```
 
 To upgrade to a specific release of pyenv, check out the corresponding tag:
 
 ```sh
-$ cd ~/.pyenv
+$ cd $(pyenv root)
 $ git fetch
 $ git tag
 v0.1.0
@@ -271,9 +271,9 @@ uninstall from the system.
 
 2. To completely **uninstall** pyenv, perform step (1) and then remove
    its root directory. This will **delete all Python versions** that were
-   installed under `` `pyenv root`/versions/ `` directory:
+   installed under `` $(pyenv root)/versions/ `` directory:
     ```sh
-    rm -rf `pyenv root`
+    rm -rf $(pyenv root)
     ```
    If you've installed pyenv using a package manager, as a final step
    perform the pyenv package removal. For instance, for Homebrew:
@@ -308,11 +308,11 @@ opposed to this idea. Here's what `pyenv init` actually does:
 
 1. **Sets up your shims path.** This is the only requirement for pyenv to
    function properly. You can do this by hand by prepending
-   `~/.pyenv/shims` to your `$PATH`.
+   `$(pyenv root)/shims` to your `$PATH`.
 
 2. **Installs autocompletion.** This is entirely optional but pretty
-   useful. Sourcing `~/.pyenv/completions/pyenv.bash` will set that
-   up. There is also a `~/.pyenv/completions/pyenv.zsh` for Zsh
+   useful. Sourcing `$(pyenv root)/completions/pyenv.bash` will set that
+   up. There is also a `$(pyenv root)/completions/pyenv.zsh` for Zsh
    users.
 
 3. **Rehashes shims.** From time to time you'll need to rebuild your
@@ -332,7 +332,7 @@ To see exactly what happens under the hood for yourself, run `pyenv init -`.
 ### Uninstalling Python Versions
 
 As time goes on, you will accumulate Python versions in your
-`~/.pyenv/versions` directory.
+`$(pyenv root)/versions` directory.
 
 To remove old Python versions, `pyenv uninstall` command to automate
 the removal process.
