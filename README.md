@@ -119,7 +119,7 @@ reading it from the following sources, in this order:
 3. The first `.python-version` file found (if any) by searching each parent
    directory, until reaching the root of your filesystem.
 
-4. The global `.python-version` file. You can modify this file using
+4. The global `$(pyenv root)/version` file. You can modify this file using
    the [`pyenv global`](https://github.com/yyuu/pyenv/blob/master/COMMANDS.md#pyenv-global) command. If the global version
    file is not present, pyenv assumes you want to use the "system"
    Python. (In other words, whatever version would run if pyenv weren't in your
