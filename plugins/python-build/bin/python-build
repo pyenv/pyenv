@@ -247,7 +247,7 @@ compute_sha2() {
     output="$("$openssl" dgst -sha256 2>/dev/null)" || return 1
     echo "${output##* }"
   elif type sha256sum &>/dev/null; then
-    output="$(sha256sum --quiet)" || return 1
+    output="$(sha256sum -b)" || return 1
     echo "${output% *}"
   else
     return 1
