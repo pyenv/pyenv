@@ -1,5 +1,12 @@
 ## Version History
 
+## 1.0.8
+
+* pyenv: Fix fish subcommand completion (#831)
+* python-build: Add Anaconda2/Anaconda3 4.3.0  (#824)
+* python-build: Use CPython on GitHub as the source repository of CPython development versions (#836, #837)
+* python-build: Fix checksum verification issue on the platform where OpenSSL isn't available (#840)
+
 ## 1.0.7
 
 * python-build: Add CPython 3.5.3 (#811)
