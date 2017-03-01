@@ -13,7 +13,7 @@ for changes in each version.
 
 ## Installation
 
-### Installing as an pyenv plugin (recommended)
+### Installing as a pyenv plugin (recommended)
 
 You need nothing to do since python-build is bundled with pyenv by
 default.
@@ -124,7 +124,7 @@ You can set certain environment variables to control the build process.
 * `MAKE_OPTS` (or `MAKEOPTS`) lets you pass additional options to `make`.
 * `MAKE_INSTALL_OPTS` lets you pass additional options to `make install`.
 * `PYTHON_CONFIGURE_OPTS` and `PYTHON_MAKE_OPTS` and `PYTHON_MAKE_INSTALL_OPTS` allow
-  you to specify configure and make options for buildling CPython. These variables
+  you to specify configure and make options for building CPython. These variables
   will be passed to Python only, not any dependent packages (e.g. libyaml).
 
 ### Applying patches to Python before compiling

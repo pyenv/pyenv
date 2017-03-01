@@ -159,7 +159,7 @@
 ### 20151105
 
 * python-build: Add anaconda2-2.4.0 and anacondaa3-2.4.0
-* python-biuld: Add Portable PyPy 4.0 (#472)
+* python-build: Add Portable PyPy 4.0 (#472)
 
 ### 20151103
 
@@ -172,7 +172,7 @@
 * pyenv: Different behaviour when invoking .py script through symlink (#379, #404)
 * pyenv: Enabled Gitter on the project (#436, #444)
 * python-build: Add Jython 2.7.1b1
-* python-build: Install OpenSSL on OS X if no proper versionn is available (#429)
+* python-build: Install OpenSSL on OS X if no proper version is available (#429)
 
 ### 20150913
 
@@ -249,12 +249,12 @@
 #### 20150124
 
 * python-build: Import recent changes from ruby-build v20150112
-* python-build: Prevent adding `/Library/Python/X.X/site-packages` to `sys.path` whtn `--enable-framework` is enabled on OS X. Thanks @s1341 (#292)
+* python-build: Prevent adding `/Library/Python/X.X/site-packages` to `sys.path` when `--enable-framework` is enabled on OS X. Thanks @s1341 (#292)
 * python-build: Add new IronPython release; 2.7.5
 
 #### 20141211
 
-* pyenv: Add bulit-in `pip-rehash` feature. You don't need to install [pyenv-pip-rehash](https://github.com/yyuu/pyenv-pip-rehash) anymore.
+* pyenv: Add built-in `pip-rehash` feature. You don't need to install [pyenv-pip-rehash](https://github.com/yyuu/pyenv-pip-rehash) anymore.
 * python-build: Add new CPython release; 2.7.9 (#284)
 * python-build: Add new PyPy releases; pypy3-2.4.0, pypy3-2.4.0-src (#277)
 * python-build: Add build definitions of PyPy nightly build
