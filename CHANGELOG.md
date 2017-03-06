@@ -1,5 +1,12 @@
 ## Version History
 
+## Unreleased
+
+* pyenv: Migarte project site from https://github.com/yyuu/pyenv to https://github.com/pyenv/pyenv
+* python-build: Change default mirror site URL from https://yyuu.github.io/pythons to https://pyenv.github.io/pythons
+* python-build: Upgrade OpenSSL from 1.0.2g to 1.0.2k (#850)
+* python-build: Add CPython 3.6.1rc1 (#851)
+
 ## 1.0.8
 
 * pyenv: Fix fish subcommand completion (#831)

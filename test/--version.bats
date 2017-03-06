@@ -35,7 +35,7 @@ git_commit() {
 
 @test "reads version from git repo" {
   git init
-  git remote add origin https://github.com/yyuu/pyenv.git
+  git remote add origin https://github.com/pyenv/pyenv.git
   git_commit
   git tag v0.4.1
   git_commit
@@ -47,7 +47,7 @@ git_commit() {
 
 @test "prints default version if no tags in git repo" {
   git init
-  git remote add origin https://github.com/yyuu/pyenv.git
+  git remote add origin https://github.com/pyenv/pyenv.git
   git_commit
 
   run pyenv---version
