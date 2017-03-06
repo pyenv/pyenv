@@ -1341,7 +1341,7 @@ use_homebrew_yaml() {
 
 has_broken_mac_readline() {
   # Mac OS X 10.4 has broken readline.
-  # https://github.com/yyuu/pyenv/issues/23
+  # https://github.com/pyenv/pyenv/issues/23
   is_mac &&
   ! configured_with_package_dir "python" "readline/rlconf.h" &&
   ! use_homebrew_readline
@@ -1539,7 +1539,7 @@ verify_python() {
       echo
       echo "The python-build could not find proper executable of Python after successful build."
       echo "Please open an issue for future improvements."
-      echo "https://github.com/yyuu/pyenv/issues"
+      echo "https://github.com/pyenv/pyenv/issues"
       return 1
     } >&3
   fi
@@ -1560,7 +1560,7 @@ verify_python_module() {
       echo ": The Python $1 extension was not compiled. Missing the ${2:-$1}?"
       echo
       echo "Please consult to the Wiki page to fix the problem."
-      echo "https://github.com/yyuu/pyenv/wiki/Common-build-problems"
+      echo "https://github.com/pyenv/pyenv/wiki/Common-build-problems"
       echo
       return 1
     } >&3

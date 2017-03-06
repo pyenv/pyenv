@@ -22,7 +22,7 @@
 #
 # For detailed information on installing Python versions with
 # python-build, including a list of environment variables for adjusting
-# compilation, see: https://github.com/yyuu/pyenv#readme
+# compilation, see: https://github.com/pyenv/pyenv#readme
 #
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x

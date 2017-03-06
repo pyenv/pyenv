@@ -14,7 +14,7 @@ static_version="$(grep VERSION "$bats_bin" | head -1 | cut -d'"' -f 2)"
 
 @test "python-build git version" {
   stub git \
-    'remote -v : echo origin https://github.com/yyuu/pyenv.git' \
+    'remote -v : echo origin https://github.com/pyenv/pyenv.git' \
     "describe --tags HEAD : echo v1984-12-gSHA"
   run python-build --version
   assert_success "python-build 1984-12-gSHA"
@@ -23,7 +23,7 @@ static_version="$(grep VERSION "$bats_bin" | head -1 | cut -d'"' -f 2)"
 
 @test "git describe fails" {
   stub git \
-    'remote -v : echo origin https://github.com/yyuu/pyenv.git' \
+    'remote -v : echo origin https://github.com/pyenv/pyenv.git' \
     "describe --tags HEAD : echo ASPLODE >&2; exit 1"
   run python-build --version
   assert_success "python-build ${static_version}"
