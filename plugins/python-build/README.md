@@ -1,13 +1,13 @@
 # python-build
 
-python-build is a [pyenv](https://github.com/yyuu/pyenv) plugin that
+python-build is a [pyenv](https://github.com/pyenv/pyenv) plugin that
 provides a `pyenv install` command to compile and install different versions
 of Python on UNIX-like systems.
 
 You can also use python-build without pyenv in environments where you need
 precise control over Python version installation.
 
-See the [list of releases](https://github.com/yyuu/pyenv/releases)
+See the [list of releases](https://github.com/pyenv/pyenv/releases)
 for changes in each version.
 
 
@@ -24,7 +24,7 @@ Installing python-build as a standalone program will give you access to the
 `python-build` command for precise control over Python version installation. If you
 have pyenv installed, you will also be able to use the `pyenv install` command.
 
-    git clone git://github.com/yyuu/pyenv.git
+    git clone git://github.com/pyenv/pyenv.git
     cd pyenv/plugins/python-build
     ./install.sh
 
@@ -55,7 +55,7 @@ Or, if you would like to install the latest development release:
 ## Usage
 
 Before you begin, you should ensure that your build environment has the proper
-system dependencies for compiling the wanted Python Version (see our [recommendations](https://github.com/yyuu/pyenv/wiki#suggested-build-environment)).
+system dependencies for compiling the wanted Python Version (see our [recommendations](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)).
 
 ### Using `pyenv install` with pyenv
 
@@ -93,10 +93,10 @@ Both `pyenv install` and `python-build` accept a path to a custom definition fil
 in place of a version name. Custom definitions let you develop and install
 versions of Python that are not yet supported by python-build.
 
-See the [python-build built-in definitions](https://github.com/yyuu/pyenv/tree/master/plugins/python-build/share/python-build) as a starting point for
+See the [python-build built-in definitions](https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build) as a starting point for
 custom definition files.
 
-[definitions]: https://github.com/yyuu/pyenv/tree/master/plugins/python-build/share/python-build
+[definitions]: https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build
 
 ### Special environment variables
 
@@ -213,10 +213,10 @@ variable when using `--keep` with `python-build`.
 
 ## Getting Help
 
-Please see the [pyenv wiki](https://github.com/yyuu/pyenv/wiki) for solutions to common problems.
+Please see the [pyenv wiki](https://github.com/pyenv/pyenv/wiki) for solutions to common problems.
 
-[wiki]: https://github.com/yyuu/pyenv/wiki
+[wiki]: https://github.com/pyenv/pyenv/wiki
 
 If you can't find an answer on the wiki, open an issue on the [issue
-tracker](https://github.com/yyuu/pyenv/issues). Be sure to include
+tracker](https://github.com/pyenv/pyenv/issues). Be sure to include
 the full build log for build failures.
