@@ -1884,7 +1884,7 @@ else
 fi
 
 if [ -z "$PYTHON_BUILD_MIRROR_URL" ]; then
-  PYTHON_BUILD_MIRROR_URL="https://yyuu.github.io/pythons"
+  PYTHON_BUILD_MIRROR_URL="https://pyenv.github.io/pythons"
   PYTHON_BUILD_DEFAULT_MIRROR=1
 else
   PYTHON_BUILD_MIRROR_URL="${PYTHON_BUILD_MIRROR_URL%/}"
