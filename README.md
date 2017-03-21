@@ -294,7 +294,7 @@ package manager for Mac OS X.
 
 To upgrade pyenv in the future, use `upgrade` instead of `install`.
 
-Then follow the rest of the post-installation steps under "Basic GitHub Checkout" above, starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
+Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout) above, starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
 
 ### Advanced Configuration
 
