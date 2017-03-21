@@ -1,3 +1,10 @@
+echo
+colorize 1 "WARNING"
+echo ": Pyston only runs on x86_64 platforms, and only has been tested on Ubuntu"
+echo "(copied from the Pyston README at https://github.com/dropbox/pyston), so"
+echo "your mileage may vary with other Linux distributions"
+echo
+
 case "$(pyston_architecture 2>/dev/null || true)" in
 "linux64" )
   install_package "pyston-0.6.1-linux64" "https://github.com/dropbox/pyston/releases/download/v0.6.1/pyston-0.6.1-linux64.tar.gz#b09516d8e421cb004ef39d832bae600face4ecf80d9791469fb2c026bcf1faae" "pyston" verify_py27
