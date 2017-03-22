@@ -1,0 +1,42 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy2-v5.7.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.0-linux32.tar.bz2#aaa55085d11a49cb982b059b4159495d7a4fb9afcfda7bfd680cc0175e9fa33b" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"linux-armel" )
+  require_distro "Ubuntu 12.04" || true
+  install_package "pypy2-v5.7.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.0-linux-armel.tar.bz2#3bc0d2616cacef9f544e739d4c25a89e16d7aa8c1ccb18c32dceeb021ed73711" "pypy" verify_py27 ensurepip
+  ;;
+"linux-armhf" )
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
+    install_package "pypy2-v5.7.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.0-linux-armhf-raspbian.tar.bz2#6328e4767cf20d20a290739db2d1ec769f3c9c360fa9824f61581b3356add79b" "pypy" verify_py27 ensurepip
+  else
+    require_distro "Ubuntu 13.04" || true
+    install_package "pypy2-v5.7.0-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.0-linux-armhf-raring.tar.bz2#413df8097c87a8e79cc46df65837b1d533de83b7cb06ce88b168697807fff696" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"linux64" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy2-v5.7.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.0-linux64.tar.bz2#64bed80e299b09c13296f577a0f52c5d4be9f7c699a390ca6026f967aeff3846" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-5.7-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.7-linux_x86_64-portable.tar.bz2#209d2224fe461d85afb201a0c8da18df21219687defadd4550b60420a120bacb" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"osx64" )
+  install_package "pypy2-v5.7.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.0-osx64.tar.bz2#9204aa1b55771a374a3118bb43e498c88caca8c33710eecf3249855c4dd1352a" "pypy" verify_py27 ensurepip
+  ;;
+"win32" )
+  # FIXME: never tested on Windows
+  install_zip "pypy2-v5.7.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.0-win32.zip#09c8da3a7e09cea821f9b300c6f4f52f4a571d949d91839ecbce93b84a08d570" "pypy" verify_py27 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy2-5.7.0-src' to build from source."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
