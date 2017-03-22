@@ -2,6 +2,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy2-v5.7.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.0-linux32.tar.bz2#aaa55085d11a49cb982b059b4159495d7a4fb9afcfda7bfd680cc0175e9fa33b" "pypy" verify_py27 ensurepip
+  fi
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
