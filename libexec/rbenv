@@ -106,7 +106,13 @@ case "$command" in
   ;;
 * )
   command_path="$(command -v "rbenv-$command" || true)"
-  [ -n "$command_path" ] || abort "no such command \`$command'"
+  if [ -z "$command_path" ]; then
+    if [ "$command" == "shell" ]; then
+      abort "shell integration not enabled. Run \`rbenv init' for instructions."
+    else
+      abort "no such command \`$command'"
+    fi
+  fi
 
   shift 1
   if [ "$1" = --help ]; then
