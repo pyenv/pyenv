@@ -1,8 +1,8 @@
 ## Version History
 
-## Unreleased
+## 1.0.9
 
-* pyenv: Migarte project site from https://github.com/yyuu/pyenv to https://github.com/pyenv/pyenv
+* pyenv: Migrate project site from https://github.com/yyuu/pyenv to https://github.com/pyenv/pyenv
 * python-build: Add PyPy2 5.7.0 (#872, #868)
 * python-build: Add PyPy3 5.7.0-beta (#871, #869)
 * python-build: Add CPython 3.6.1 (#873)
