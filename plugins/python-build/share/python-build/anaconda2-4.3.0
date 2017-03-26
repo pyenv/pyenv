@@ -6,7 +6,7 @@ case "$(anaconda_architecture 2>/dev/null || true)" in
   install_script "Anaconda2-4.3.0-Linux-x86_64" "https://repo.continuum.io/archive/Anaconda2-4.3.0-Linux-x86_64.sh#7c52e6e99aabb24a49880130615a48e685da444c3c14eb48d6a65f3313bf745c" "anaconda" verify_py27
   ;;
 "MacOSX-x86_64" )
-  install_script "Anaconda2-4.2.1-MacOSX-x86_64" "https://repo.continuum.io/archive/Anaconda2-4.3.0-MacOSX-x86_64.sh#834ac0287062929ab5930661735ee617fd379bdfe79f3e0a20aebd614835b6c5" "anaconda" verify_py27
+  install_script "Anaconda2-4.3.0-MacOSX-x86_64" "https://repo.continuum.io/archive/Anaconda2-4.3.0-MacOSX-x86_64.sh#834ac0287062929ab5930661735ee617fd379bdfe79f3e0a20aebd614835b6c5" "anaconda" verify_py27
   ;;
 * )
   { echo
