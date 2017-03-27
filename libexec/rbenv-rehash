@@ -16,7 +16,7 @@ mkdir -p "$SHIM_PATH"
 # to stderr and exit with a non-zero status.
 set -o noclobber
 { echo > "$PROTOTYPE_SHIM_PATH"
-} 2>/dev/null ||
+} 2>| /dev/null ||
 { if [ -w "$SHIM_PATH" ]; then
     echo "rbenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
   else
