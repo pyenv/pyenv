@@ -19,7 +19,7 @@ git_commit() {
   assert [ ! -e "$PYENV_ROOT" ]
   run pyenv---version
   assert_success
-  [[ $output == "pyenv "?.?.? ]]
+  [[ $output == "pyenv "?.?.* ]]
 }
 
 @test "doesn't read version from non-pyenv repo" {
@@ -30,7 +30,7 @@ git_commit() {
 
   run pyenv---version
   assert_success
-  [[ $output == "pyenv "?.?.? ]]
+  [[ $output == "pyenv "?.?.* ]]
 }
 
 @test "reads version from git repo" {
@@ -51,5 +51,5 @@ git_commit() {
   git_commit
 
   run pyenv---version
-  [[ $output == "pyenv "?.?.? ]]
+  [[ $output == "pyenv "?.?.* ]]
 }
