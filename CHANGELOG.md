@@ -1,5 +1,11 @@
 ## Version History
 
+## 1.0.10
+
+* python-build: Add Anaconda2/Anaconda3 4.3.1 (#876)
+* python-build: Make miniconda-latest point to miniconda2-latest (#881)
+* python-build: Fix typo in MacOS packages for anaconda2-4.3.0/4.2.0 (#880)
+
 ## 1.0.9
 
 * pyenv: Migrate project site from https://github.com/yyuu/pyenv to https://github.com/pyenv/pyenv
