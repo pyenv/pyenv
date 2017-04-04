@@ -1,0 +1,1 @@
+source "${BASH_SOURCE%/*}/pypy2-5.7.2-src"

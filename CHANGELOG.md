@@ -1,5 +1,9 @@
 ## Version History
 
+## Unreleased
+
+* python-build: Add PyPy 5.7.1 (#888)
+
 ## 1.0.10
 
 * python-build: Add Anaconda2/Anaconda3 4.3.1 (#876)
