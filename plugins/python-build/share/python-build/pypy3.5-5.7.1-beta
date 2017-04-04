@@ -1,0 +1,18 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux64" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy3-v5.7.1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v5.7.1-linux64.tar.bz2#2abaa54d88c9b70b64c37083e7e430a1d3a8f78f8de92e484a988b7aca1e50a7" "pypy" verify_py35 ensurepip
+  else
+    install_package "pypy3.5-5.7.1-beta-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3.5-5.7.1-beta-linux_x86_64-portable.tar.bz2#3d1b02f6ef50d4e9069885e0b3f19f26491c7f4f9c5ccc8aa118e38fd6a23997" "pypy" verify_py35 ensurepip
+  fi
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy3.5-5.7-beta-src' to build from source."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
