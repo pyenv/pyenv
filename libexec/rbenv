@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -e
-unset CDPATH
 
 if [ "$1" = "--debug" ]; then
   export RBENV_DEBUG=1
