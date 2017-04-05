@@ -60,6 +60,7 @@ export RBENV_ROOT
 if [ -z "${RBENV_DIR}" ]; then
   RBENV_DIR="$PWD"
 else
+  [[ $RBENV_DIR == /* ]] || RBENV_DIR=$PWD/$RBENV_DIR
   cd "$RBENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$RBENV_DIR'"
   RBENV_DIR="$PWD"
   cd "$OLDPWD"
