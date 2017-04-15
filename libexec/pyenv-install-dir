@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Summary: Display the installation directory for a Python
+# Usage: pyenv install
+#
+# Displays the directory where a given version of Python should
+# be installed, if the current working directory is a Python
+# download.
+
+dir=$(basename $PWD)
+if [ ${dir:0:7} != 'Python-' ]; then
+  echo 1>&2 "${dir} is not a Python"
+  exit 1
+fi
+
+python_dir=${dir:7}
+echo "$(pyenv root)/versions/${python_dir}"
