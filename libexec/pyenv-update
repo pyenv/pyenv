@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Summary: Update pyenv to the latest version
+#
+# Update pyenv to the latest version with git.
+
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+if [ -n "$PYENV_ROOT" ]; then
+  git --git-dir=$PYENV_ROOT/.git pull
+else
+  echo "Please set PYENV_ROOT."
+fi
+
