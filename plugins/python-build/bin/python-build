@@ -718,6 +718,12 @@ build_package_standard() {
     MAKE_OPTS="-j $(num_cpu_cores)"
   fi
 
+  if [[ ! $MACOSX_DEPLOYMENT_TARGET && "Darwin" = $(uname) ]]; then
+      local target=$(sw_vers -productVersion)
+      local target=(${target//\./ })
+      export MACOSX_DEPLOYMENT_TARGET="${target[0]}.${target[1]}"
+  fi
+
   # Support YAML_CONFIGURE_OPTS, PYTHON_CONFIGURE_OPTS, etc.
   local package_var_name="$(capitalize "${package_name%%-*}")"
   local PACKAGE_CONFIGURE="${package_var_name}_CONFIGURE"
