@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# Summary: Register a python exacutable in outside of pyenv
+#
+# Usage: pyenv register [-f|--force] <python-executable> [<name>]
+#
+# <name>     A name of environment will be created in versions.
+#            If ommited, name is automatically defined.
+#
+# -f/--force Install even if the version appears to be installed already
+#
+usage() {
+  # We can remove the sed fallback once pyenv 0.4.0 is widely available.
+  pyenv-help register 2>/dev/null || sed -ne '/^#/!q;s/.//;s/.//;1,4d;p' < "$0"
+  [ -z "$1" ] || exit "$1"
+}
+
+if [ $# -lt 1 ]; then
+  usage 1
+fi
+
+FORCE=0
+ARGS=()
+
+while [ -n "$1" ]; do
+  case "$1" in
+    "-f" | "--force" )
+      FORCE=1
+      ;;
+    * )
+      ARGS=("${ARGS[@]}" "$1")
+      ;;
+  esac
+  shift
+done
+
+if [ ${#ARGS[@]} -gt 2 ]; then
+  usage 1
+fi
+
+PYTHON=${ARGS[0]}
+
+if [ ${#ARGS[@]} -eq 2 ]; then
+  NAME=${ARGS[1]}
+else
+  NAME=$(
+    python -c '
+from platform import *
+import sys
+imp = python_implementation().lower()
+v = ".".join(map(str, sys.version_info[:3]))
+if imp == "cpython":
+  print("system-" + v)
+else:
+  print("system-" + imp + "-" + v)
+'
+  )
+fi
+
+DEST_DIR="$PYENV_ROOT/versions/$NAME"
+echo "Register $PYTHON => $DEST_DIR"
+
+if [ $FORCE -eq "0" ] && [ -e $VERSION_DIR ]; then
+  echo "$DEST_DIR already exists. Use --force option to override." >&2
+  exit 1
+fi
+
+VIRTUALENV_OPTION="--system-site-packages"
+
+if $PYTHON -c 'import virtualenv' &> /dev/null; then
+  # Use installed virtualenv
+  $PYTHON -m virtualenv $DEST_DIR $VIRTUALENV_OPTION || {
+    exit 1
+  }
+else
+  # Virtualenv is not installed, download script
+  echo "virtualenv is not installed to $PYTHON"
+
+  TEMP_DIR=$(mktemp -d)
+  if [ $? -ne 0 ]; then
+    echo "pyenv: Failed to create temporary dir" >&2
+    exit 1
+  fi
+
+  VIRTUALENV_URL=https://pypi.python.org/packages/source/v/virtualenv/virtualenv-1.11.4.tar.gz
+  echo "Download $VIRTUALENV_URL"
+  cd $TEMP_DIR
+  wget -q "$VIRTUALENV_URL" -O virtualenv.tgz || {
+    echo "pyenv: Failed to download virtualenv" >&2
+    exit 1
+  }
+
+  tar xzf virtualenv.tgz --strip-components=1 || {
+    exit 1
+  }
+
+  $PYTHON virtualenv.py $DEST_DIR $VIRTUALENV_OPTION || {
+    exit 1
+  }
+fi
