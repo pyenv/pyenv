@@ -12,7 +12,7 @@
 
 ## 1.0.9
 
-* pyenv: Migrate project site from https://github.com/yyuu/pyenv to https://github.com/pyenv/pyenv
+* pyenv: Migrate project site from https://github.com/pyenv/pyenv to https://github.com/pyenv/pyenv
 * python-build: Add PyPy2 5.7.0 (#872, #868)
 * python-build: Add PyPy3 5.7.0-beta (#871, #869)
 * python-build: Add CPython 3.6.1 (#873)
@@ -274,7 +274,7 @@
 
 #### 20141211
 
-* pyenv: Add built-in `pip-rehash` feature. You don't need to install [pyenv-pip-rehash](https://github.com/yyuu/pyenv-pip-rehash) anymore.
+* pyenv: Add built-in `pip-rehash` feature. You don't need to install [pyenv-pip-rehash](https://github.com/pyenv/pyenv-pip-rehash) anymore.
 * python-build: Add new CPython release; 2.7.9 (#284)
 * python-build: Add new PyPy releases; pypy3-2.4.0, pypy3-2.4.0-src (#277)
 * python-build: Add build definitions of PyPy nightly build
@@ -440,7 +440,7 @@
 * python-build: Activate friendly CPython during build if the one is not activated (8fa6b4a1847851919ad7857c6c42ed809a4d277b)
 * python-build: Fix broken install.sh
 * python-build: Import recent changes from ruby-build v20131225.1
-* version-ext-compat: Removed from default plugin. Please use [pyenv-version-ext](https://github.com/yyuu/pyenv-version-ext) instead.
+* version-ext-compat: Removed from default plugin. Please use [pyenv-version-ext](https://github.com/pyenv/pyenv-version-ext) instead.
 
 #### 0.4.0-20131217
 
