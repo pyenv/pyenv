@@ -1,9 +1,9 @@
 require_java
 install_jar "jython-2.5.0" "https://downloads.sourceforge.net/project/jython/jython/2.5.0/jython_installer-2.5.0.jar#e3d8209ef9eb143df8101a5da6b3482cf457084e3a6247031fd510d71c13ab98" jython
 # distribute (>= 0.33) does not support Jython prior to 2.5.2
-# * https://github.com/yyuu/pyenv/issues/15
+# * https://github.com/pyenv/pyenv/issues/15
 # * https://bitbucket.org/tarek/distribute/issue/367/importing-setuptoolssandbox-fails-on
 install_package "distribute-0.6.32" "https://pypi.python.org/packages/source/d/distribute/distribute-0.6.32.tar.gz#8970cd1e148b5d1fea9430584aea66c45ea22d80e0933393ec49ebc388f718df" python
 # pip (>= 1.3) does not work properly since it uses HTTPS for downloads
-# * https://github.com/yyuu/pyenv/issues/15
+# * https://github.com/pyenv/pyenv/issues/15
 install_package "pip-1.2.1" "https://pypi.python.org/packages/source/p/pip/pip-1.2.1.tar.gz#12a9302acfca62cdc7bc5d83386cac3e0581db61ac39acdb3a4e766a16b88eb1" python

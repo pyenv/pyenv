@@ -1,7 +1,7 @@
 # Command Reference
 
 Like `git`, the `pyenv` command delegates to subcommands based on its
-first argument. 
+first argument.
 
 The most common subcommands are:
 
@@ -185,7 +185,7 @@ or, if you prefer 3.3.3 over 2.7.6,
 
 ## `pyenv install`
 
-Install a Python version (using [`python-build`](https://github.com/yyuu/pyenv/tree/master/plugins/python-build)).
+Install a Python version (using [`python-build`](https://github.com/pyenv/pyenv/tree/master/plugins/python-build)).
 
     Usage: pyenv install [-f] [-kvp] <version>
            pyenv install [-f] [-kvp] <definition-file>

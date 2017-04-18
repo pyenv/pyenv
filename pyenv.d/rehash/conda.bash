@@ -20,7 +20,7 @@ done
 eval "conda_shim(){ case \"\$1\" in ${shims[@]} *)return 1;;esac;}"
 
 # override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`
-# https://github.com/yyuu/pyenv-virtualenv/blob/v20160716/etc/pyenv.d/rehash/envs.bash
+# https://github.com/pyenv/pyenv-virtualenv/blob/v20160716/etc/pyenv.d/rehash/envs.bash
 make_shims() {
   local file shim
   for file do
