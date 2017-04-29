@@ -281,8 +281,6 @@ uninstall from the system.
 
         brew uninstall pyenv
 
-## Command Reference
-
 ### Homebrew on Mac OS X
 
 You can also install pyenv using the [Homebrew](http://brew.sh)
