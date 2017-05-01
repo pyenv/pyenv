@@ -1027,7 +1027,7 @@ anaconda_architecture() {
 
 build_package_anaconda() {
   local package_name="$1"
-  { bash "${package_name}.sh" -b -p "${PREFIX_PATH}"
+  { bash "${package_name}.sh" -f -b -p "${PREFIX_PATH}"
   } >&4 2>&1
 }
 
