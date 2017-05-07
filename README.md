@@ -195,7 +195,7 @@ easy to fork and contribute any changes back upstream.
     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
     ```
-    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.  
+    **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.  
     **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.  
     **Proxy note**: If you use a proxy, export `http_proxy` and `HTTPS_PROXY` too.
 
@@ -205,7 +205,7 @@ easy to fork and contribute any changes back upstream.
     ```sh
     $ echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
     ```
-    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.  
+    **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.  
     **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
     **General warning**: There are some systems where the `BASH_ENV` variable is configured
