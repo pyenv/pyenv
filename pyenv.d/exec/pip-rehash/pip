@@ -23,13 +23,9 @@ STATUS=0
 if [ "$STATUS" == "0" ]; then
   for piparg in "$@"; do
     case ${piparg} in
-    "install" | "uninstall" ) REHASH=0;;
+    "install" | "uninstall" ) pyenv-rehash ; break;;
     esac
   done
 fi
 
-if [ "$REHASH" == "0" ]; then
- pyenv-rehash
-fi
-
-exit "$STATUS"
+exit "$STATUS";
