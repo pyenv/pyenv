@@ -28,4 +28,4 @@ if [ "$STATUS" == "0" ]; then
   done
 fi
 
-exit "$STATUS";
+exit "$STATUS"
