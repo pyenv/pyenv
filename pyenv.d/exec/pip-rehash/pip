@@ -21,9 +21,11 @@ STATUS=0
 
 # Run `pyenv-rehash` after a successful installation.
 if [ "$STATUS" == "0" ]; then
-  case "$1" in
-  "install" | "uninstall" ) pyenv-rehash;;
-  esac
+  for piparg in "$@"; do
+    case ${piparg} in
+    "install" | "uninstall" ) pyenv-rehash ; break;;
+    esac
+  done
 fi
 
 exit "$STATUS"
