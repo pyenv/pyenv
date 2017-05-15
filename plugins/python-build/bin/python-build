@@ -257,7 +257,12 @@ compute_sha2() {
 compute_md5() {
   local output
   if type md5 &>/dev/null; then
-    md5 -q
+    if echo test | md5 -q &>/dev/null; then
+        md5 -q
+    else
+        # NetBSD does not have "md5 -q"
+        md5 | cut -d '=' -f 2 | tr -d ' '
+    fi
   elif type openssl &>/dev/null; then
     output="$(openssl md5)" || return 1
     echo "${output##* }"
