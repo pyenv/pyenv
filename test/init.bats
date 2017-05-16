@@ -73,7 +73,7 @@ OUT
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run rbenv-init - fish
   assert_success
-  assert_line 0 "setenv PATH '${RBENV_ROOT}/shims' \$PATH"
+  assert_line 0 "set -gx PATH '${RBENV_ROOT}/shims' \$PATH"
 }
 
 @test "can add shims to PATH more than once" {
@@ -87,7 +87,7 @@ OUT
   export PATH="${RBENV_ROOT}/shims:$PATH"
   run rbenv-init - fish
   assert_success
-  assert_line 0 "setenv PATH '${RBENV_ROOT}/shims' \$PATH"
+  assert_line 0 "set -gx PATH '${RBENV_ROOT}/shims' \$PATH"
 }
 
 @test "outputs sh-compatible syntax" {
