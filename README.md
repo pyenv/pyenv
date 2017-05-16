@@ -230,10 +230,10 @@ manager on Mac OS X:
 ~~~
 $ brew update
 $ brew install rbenv
+$ rbenv init
 ~~~
 
-Afterwards you'll still need to run `rbenv init` for instructions
-as stated in the caveats. You'll only ever have to do this once.
+You'll only ever have to run `rbenv init` once.
 
 ### How rbenv hooks into your shell
 
