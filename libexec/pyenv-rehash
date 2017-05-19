@@ -42,6 +42,7 @@ remove_prototype_shim() {
 create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
+# PYENV-SHIM-SCRIPT
 set -e
 [ -n "\$PYENV_DEBUG" ] && set -x
 
