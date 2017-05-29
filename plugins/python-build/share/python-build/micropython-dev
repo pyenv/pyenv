@@ -1,0 +1,2 @@
+#require_gcc
+install_git micropython-dev https://github.com/micropython/micropython master micropython
