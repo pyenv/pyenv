@@ -72,6 +72,7 @@ unset KEEP
 unset VERBOSE
 unset HAS_PATCH
 unset DEBUG
+unset USE_ALIAS
 
 parse_options "$@"
 for option in "${OPTIONS[@]}"; do
@@ -101,6 +102,9 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "g" | "debug" )
     DEBUG="-g"
+    ;;
+  "a" | "alias" )
+    USE_ALIAS=true
     ;;
   "version" )
     exec python-build --version
@@ -149,6 +153,13 @@ for script in "${scripts[@]}"; do source "$script"; done
 [ -n "$VERSION_NAME" ] || VERSION_NAME="${DEFINITION##*/}"
 [ -n "$DEBUG" ] && VERSION_NAME="${VERSION_NAME}-debug"
 PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
+
+if [ -n "$USE_ALIAS" ] && [ -n "${ARGUMENTS[1]}" ]; then
+  # The second argument is the alias name.
+  ALIAS_NAME="${ARGUMENTS[1]}"
+  PREFIX="${PYENV_ROOT}/versions/${ALIAS_NAME}"
+  [ -n "$DEBUG" ] && PREFIX="${PREFIX}-debug"
+fi
 
 [ -d "${PREFIX}" ] && PREFIX_EXISTS=1
 
