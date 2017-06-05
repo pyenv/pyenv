@@ -57,12 +57,11 @@ create_executable() {
 }
 
 @test "doesn't include current directory in PATH search" {
-  export PATH="$(path_without "kill-all-humans")"
   mkdir -p "$RBENV_TEST_DIR"
   cd "$RBENV_TEST_DIR"
   touch kill-all-humans
   chmod +x kill-all-humans
-  RBENV_VERSION=system run rbenv-which kill-all-humans
+  PATH="$(path_without "kill-all-humans")" RBENV_VERSION=system run rbenv-which kill-all-humans
   assert_failure "rbenv: kill-all-humans: command not found"
 }
 
@@ -79,8 +78,7 @@ create_executable() {
 }
 
 @test "no executable found for system version" {
-  export PATH="$(path_without "rake")"
-  RBENV_VERSION=system run rbenv-which rake
+  PATH="$(path_without "rake")" RBENV_VERSION=system run rbenv-which rake
   assert_failure "rbenv: rake: command not found"
 }
 
