@@ -9,7 +9,7 @@ target_dir="$1"
 find_local_version_file() {
   local root="$1"
   while ! [[ "$root" =~ ^//[^/]*$ ]]; do
-    if [ -e "${root}/.ruby-version" ]; then
+    if [ -f "${root}/.ruby-version" ]; then
       echo "${root}/.ruby-version"
       return 0
     fi
