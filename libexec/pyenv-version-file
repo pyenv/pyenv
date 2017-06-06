@@ -9,7 +9,7 @@ target_dir="$1"
 find_local_version_file() {
   local root="$1"
   while ! [[ "$root" =~ ^//[^/]*$ ]]; do
-    if [ -e "${root}/.python-version" ]; then
+    if [ -f "${root}/.python-version" ]; then
       echo "${root}/.python-version"
       return 0
     fi
