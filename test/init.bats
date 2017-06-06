@@ -47,7 +47,7 @@ OUT
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - fish
   assert_success
-  assert_line ". '${root}/test/../libexec/../completions/pyenv.fish'"
+  assert_line "source '${root}/test/../libexec/../completions/pyenv.fish'"
 }
 
 @test "fish instructions" {
@@ -73,7 +73,7 @@ OUT
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run pyenv-init - fish
   assert_success
-  assert_line 0 "setenv PATH '${PYENV_ROOT}/shims' \$PATH"
+  assert_line 0 "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
 }
 
 @test "can add shims to PATH more than once" {
@@ -87,7 +87,7 @@ OUT
   export PATH="${PYENV_ROOT}/shims:$PATH"
   run pyenv-init - fish
   assert_success
-  assert_line 0 "setenv PATH '${PYENV_ROOT}/shims' \$PATH"
+  assert_line 0 "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
 }
 
 @test "outputs sh-compatible syntax" {

@@ -86,8 +86,8 @@ mkdir -p "${PYENV_ROOT}/"{shims,versions}
 
 case "$shell" in
 fish )
-  echo "setenv PATH '${PYENV_ROOT}/shims' \$PATH"
-  echo "setenv PYENV_SHELL $shell"
+  echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+  echo "set -gx PYENV_SHELL $shell"
 ;;
 * )
   echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
@@ -97,10 +97,7 @@ esac
 
 completion="${root}/completions/pyenv.${shell}"
 if [ -r "$completion" ]; then
-  case "$shell" in
-  fish ) echo ". '$completion'" ;;
-  *    ) echo "source '$completion'" ;;
-  esac
+  echo "source '$completion'"
 fi
 
 if [ -z "$no_rehash" ]; then
@@ -117,7 +114,7 @@ function pyenv
 
   switch "\$command"
   case ${commands[*]}
-    . (pyenv "sh-\$command" \$argv|psub)
+    source (pyenv "sh-\$command" \$argv|psub)
   case '*'
     command pyenv "\$command" \$argv
   end
