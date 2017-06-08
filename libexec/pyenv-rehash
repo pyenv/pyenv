@@ -27,8 +27,9 @@ set -o noclobber
 set +o noclobber
 
 # If we were able to obtain a lock, register a trap to clean up the
-# prototype shim when the process exits.
-trap remove_prototype_shim EXIT
+# prototype shim when the process is interrupted, terminated, 
+# has an error or exits.
+trap remove_prototype_shim SIGINT SIGTERM ERR EXIT
 
 remove_prototype_shim() {
   rm -f "$PROTOTYPE_SHIM_PATH"
