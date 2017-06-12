@@ -1,0 +1,2 @@
+require_gcc
+install_package "pypy2-v5.8.0-src" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.8.0-src.tar.bz2#504c2d522595baf8775ae1045a217a2b120732537861d31b889d47c340b58bd5" "pypy_builder" verify_py27 ensurepip
