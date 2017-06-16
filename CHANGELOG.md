@@ -2,7 +2,13 @@
 
 ## Unreleased
 
+## v1.1.0
+
 * python-build: Add PyPy 5.7.1 (#888)
+* pyenv: Merge rbenv master (#927)
+* python-build: Add PyPy 5.8.0 (#932)
+* python-build: Anaconda[23] 4.4.0
+* python-build: Add micropython-dev
 
 ## 1.0.10
 
