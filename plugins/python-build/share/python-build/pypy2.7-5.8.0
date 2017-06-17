@@ -20,7 +20,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy2-v5.8.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.8.0-linux64.tar.bz2#6274292d0e954a2609b15978cde6efa30942ba20aa5d2acbbf1c70c0a54e9b1e" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.8-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.8-linux_x86_64-portable.tar.bz2#337fd7e947a74cb09253f5ff330fb1be471b1d7a64c2d0340ac387920e71bf3c" "pypy" verify_py27 ensurepip
+    install_package "pypy-5.8-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.8-1-linux_x86_64-portable.tar.bz2#52556230af5769c656173ae8a1bdcb2e16aef46e3993ed89f3aec3d220aec862" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
