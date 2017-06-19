@@ -35,12 +35,12 @@ eval "$("$src_dir"/shobj-conf -C "$CC" -o "$host_os")"
 
 sed "
   s,@CC@,${CC},
-  s,@CFLAGS@,${CFLAGS},
-  s,@LOCAL_CFLAGS@,${LOCAL_CFLAGS},
+  s,@CFLAGS@,${CFLAGS//,/\\,},
+  s,@LOCAL_CFLAGS@,${LOCAL_CFLAGS//,/\\,},
   s,@DEFS@,${DEFS},
   s,@LOCAL_DEFS@,${LOCAL_DEFS},
   s,@SHOBJ_CC@,${SHOBJ_CC},
-  s,@SHOBJ_CFLAGS@,${SHOBJ_CFLAGS},
+  s,@SHOBJ_CFLAGS@,${SHOBJ_CFLAGS//,/\\,},
   s,@SHOBJ_LD@,${SHOBJ_LD},
   s,@SHOBJ_LDFLAGS@,${SHOBJ_LDFLAGS//,/\\,},
   s,@SHOBJ_XLDFLAGS@,${SHOBJ_XLDFLAGS//,/\\,},
