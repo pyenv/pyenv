@@ -42,6 +42,7 @@ extract_initial_comment_block() {
 }
 
 collect_documentation() {
+  # shellcheck disable=SC2016
   $(type -p gawk awk | head -1) '
     /^Summary:/ {
       summary = substr($0, 10)
@@ -86,7 +87,8 @@ collect_documentation() {
 }
 
 documentation_for() {
-  local filename="$(command_path "$1")"
+  local filename
+  filename="$(command_path "$1")"
   if [ -n "$filename" ]; then
     extract_initial_comment_block < "$filename" | collect_documentation
   fi
@@ -114,7 +116,7 @@ print_help() {
   eval "$(documentation_for "$command")"
   [ -n "$help" ] || help="$summary"
 
-  if [ -n "$usage" -o -n "$summary" ]; then
+  if [ -n "$usage" ] || [ -n "$summary" ]; then
     if [ -n "$usage" ]; then
       echo "$usage"
     else
