@@ -101,9 +101,12 @@ os_information() {
   fi
 }
 
+# Is this MacOS?
+# This can be called with arguments for test/[[ optionally, in which case it is
+# tested against the version from osx_version.
 is_mac() {
-  [ "$(uname -s)" = "Darwin" ] || return 1
-  [ $# -eq 0 ] || [ "$(osx_version)" "$@" ]
+  [[ "$(uname -s)" == 'Darwin' ]] || return 1
+  (( $# == 0 )) || eval "[[ '$(osx_version)' $* ]]"
 }
 
 #  9.1  -> 901
