@@ -2,7 +2,12 @@
 
 ## Unreleased
 
+## v1.1.2
+
+* pyenv: Fix incorrect `pyenv --version` output in v1.1.1 (#947)
+
 ## v1.1.1
+
 * python-build: Update links to Portable Pypy 5.8-1 bugfix release, affects pypy2.7-5.8.0 and pypy3.5-5.8.0 definitions (#939)
 
 ## v1.1.0
