@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v1.1.3
+
+* python-build: Add CPython 3.6.2 (#951)
+
 ## v1.1.2
 
 * pyenv: Fix incorrect `pyenv --version` output in v1.1.1 (#947)
