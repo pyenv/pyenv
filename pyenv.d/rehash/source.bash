@@ -8,7 +8,7 @@ for shim in $(cat "${BASH_SOURCE%/*}/source.d/"*".list" | sort | uniq | sed -e '
   fi
 done
 shopt -u nullglob
-eval "source_shim(){ case \"\$1\" in ${shims[@]} *)return 1;;esac;}"
+eval "source_shim(){ case \"\${1##*/}\" in ${shims[@]} *)return 1;;esac;}"
 
 cat > "${PROTOTYPE_SOURCE_SHIM_PATH}" <<SH
 #!/usr/bin/env bash
