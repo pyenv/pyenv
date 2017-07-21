@@ -1,0 +1,6 @@
+# virtualenv
+activate
+activate.csh
+activate.fish
+# gettext (#688)
+gettext.sh
