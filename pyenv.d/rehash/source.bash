@@ -1,11 +1,13 @@
 PROTOTYPE_SOURCE_SHIM_PATH="${SHIM_PATH}/.pyenv-source-shim"
 
 shims=()
-for shim in $(cat "${BASH_SOURCE%/*}/source.txt"); do
-  if [ -n "${shim%%#*}" ]; then
+shopt -s nullglob
+for shim in $(cat "${BASH_SOURCE%/*}/source.d/"*".list" | sort | uniq | sed -e 's/#.*$//' | sed -e '/^[[:space:]]*$/d'); do
+  if [ -n "${shim##*/}" ]; then
     shims[${#shims[*]}]="${shim})return 0;;"
   fi
 done
+shopt -u nullglob
 eval "source_shim(){ case \"\$1\" in ${shims[@]} *)return 1;;esac;}"
 
 cat > "${PROTOTYPE_SOURCE_SHIM_PATH}" <<SH
