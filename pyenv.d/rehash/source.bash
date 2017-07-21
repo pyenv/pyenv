@@ -11,7 +11,6 @@ shopt -u nullglob
 eval "source_shim(){ case \"\${1##*/}\" in ${shims[@]} *)return 1;;esac;}"
 
 cat > "${PROTOTYPE_SOURCE_SHIM_PATH}" <<SH
-#!/usr/bin/env bash
 [ -n "\$PYENV_DEBUG" ] && set -x
 export PYENV_ROOT="${PYENV_ROOT}"
 program="\$("$(command -v pyenv)" which "\${BASH_SOURCE##*/}")"
