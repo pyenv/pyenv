@@ -987,7 +987,7 @@ build_package_pypy() {
   mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
   local pypy libpypy python
   shopt -s nullglob
-  for bin in "bin/pypy"*; do
+  for bin in "bin/"*; do
     case "${bin##*/}" in
     "libpypy"* )
       ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/${bin##*/}" "${bin##*/}" )
@@ -997,7 +997,7 @@ build_package_pypy() {
       ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
       ;;
     "pypy"* )
-      python="$(basename "${pypy}" | sed -e 's/pypy/python/')"
+      python="$(basename "${bin}" | sed -e 's/pypy/python/')"
       ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
       ;;
     esac
