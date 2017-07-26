@@ -987,19 +987,20 @@ build_package_pypy() {
   mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
   local pypy libpypy python
   shopt -s nullglob
-  for pypy in "bin/pypy"*; do
-    case "${pypy##*/}" in
+  for bin in "bin/pypy"*; do
+    case "${bin##*/}" in
+    "libpypy"* )
+      ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/${bin##*/}" "${bin##*/}" )
+      ;;
     "pypy-stm" )
       python="bin/python"
+      ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
       ;;
-    * )
+    "pypy"* )
       python="$(basename "${pypy}" | sed -e 's/pypy/python/')"
+      ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
       ;;
     esac
-    ( cd "${PREFIX_PATH}/bin" && ln -fs "${pypy##*/}" "${python##*/}" )
-  done
-  for libpypy in "bin/libpypy-c."*; do
-    ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/$(basename "${libpypy}")" "$(basename "${libpypy}")" )
   done
   shopt -u nullglob
 }
@@ -1014,11 +1015,11 @@ build_package_pypy_builder() {
     return 1
   fi
   { mkdir -p "bin" "lib"
-    if [ -x "pypy-c" ]; then
-      mv -f "pypy-c" "bin/pypy"
-    fi
-    for libpypy in "libpypy-c."*; do
-      mv -f "${libpypy}" "bin/"
+    for pypy in "pypy"*; do
+      mv -f "${pypy}" "bin/${pypy##*/}"
+    done
+    for libpypy in "libpypy"*; do
+      mv -f "${libpypy}" "bin/${libpypy##*/}"
     done
   } >&4 2>&1
   build_package_pypy
