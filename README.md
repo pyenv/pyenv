@@ -217,7 +217,7 @@ easy to fork and contribute any changes back upstream.
 4. **Restart your shell so the path changes take effect.**
    You can now begin using pyenv.
     ```sh
-    $ exec $SHELL
+    $ exec "$SHELL"
     ```
 5. **Install Python versions into `$(pyenv root)/versions`.**
    For example, to download and install Python 2.7.8, run:
