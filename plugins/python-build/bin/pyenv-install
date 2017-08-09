@@ -200,7 +200,7 @@ if [ -z "${PYENV_BOOTSTRAP_VERSION}" ]; then
       done
     done
     ;;
-  "pypy-dev" | "pypy-"*"-src" | "pypy3-"*"-src" )
+  "pypy"*"-dev" | "pypy"*"-src" )
     # PyPy/PyPy3 requires existing Python 2.7 to build
     if [ -n "${PYENV_RPYTHON_VERSION}" ]; then
       PYENV_BOOTSTRAP_VERSION="${PYENV_RPYTHON_VERSION}"
