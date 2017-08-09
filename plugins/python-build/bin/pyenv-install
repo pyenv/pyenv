@@ -213,10 +213,12 @@ if [ -z "${PYENV_BOOTSTRAP_VERSION}" ]; then
       done
     fi
     if [ -n "$PYENV_BOOTSTRAP_VERSION" ]; then
-      if ! PYENV_VERSION="$PYENV_BOOTSTRAP_VERSION" pyenv-exec python -c 'import curses' 1>/dev/null 2>&1; then
-        echo "pyenv-install: $VERSION_NAME: PyPy requires \`curses' in $PYENV_BOOTSTRAP_VERSION to build from source." >&2
-        exit 1
-      fi
+      for dep in curses pycparser; do
+        if ! PYENV_VERSION="$PYENV_BOOTSTRAP_VERSION" pyenv-exec python -c "import ${dep}" 1>/dev/null 2>&1; then
+          echo "pyenv-install: $VERSION_NAME: PyPy requires \`${dep}' in $PYENV_BOOTSTRAP_VERSION to build from source." >&2
+          exit 1
+        fi
+      done
     else
       echo "pyenv-install: $VERSION_NAME: PyPy requires Python 2.7 to build from source." >&2
       exit 1
