@@ -1007,9 +1007,15 @@ build_package_pypy() {
 
 build_package_pypy_builder() {
   if [ -f "rpython/bin/rpython" ]; then # pypy 2.x
-    python "rpython/bin/rpython" ${PYPY_OPTS:-"-Ojit"} "pypy/goal/targetpypystandalone.py" >&4 2>&1
+    if [ -z "${PYPY_OPTS}" ]; then
+      local PYPY_OPTS="--opt=jit --batch --make-jobs=$(num_cpu_cores)"
+    fi
+    python "rpython/bin/rpython" ${PYPY_OPTS} "pypy/goal/targetpypystandalone.py" >&4 2>&1
   elif [ -f "pypy/translator/goal/translate.py" ]; then # pypy 1.x
-    ( cd "pypy/translator/goal" && python "translate.py" ${PYPY_OPTS:-"--opt=jit"} "targetpypystandalone.py" ) 1>&4 2>&1
+    if [ -z "${PYPY_OPTS}" ]; then
+      local PYPY_OPTS="--opt=jit"
+    fi
+    ( cd "pypy/translator/goal" && python "translate.py" ${PYPY_OPTS} "targetpypystandalone.py" ) 1>&4 2>&1
   else
     echo "not a pypy source tree" 1>&3
     return 1
