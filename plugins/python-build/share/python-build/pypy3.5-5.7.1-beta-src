@@ -1,2 +1,2 @@
-require_gcc
+#require_gcc
 install_package "pypy3-v5.7.1-src" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v5.7.1-src.tar.bz2#40ece0145282980ac121390f13709404c0532896507d5767496381180b631bd0" "pypy_builder" verify_py35 ensurepip

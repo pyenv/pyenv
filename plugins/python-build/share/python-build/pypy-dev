@@ -1,2 +1,2 @@
-require_gcc
+#require_gcc
 install_hg "pypy-dev" "https://bitbucket.org/pypy/pypy" "default" "pypy_builder" verify_py27 ensurepip
