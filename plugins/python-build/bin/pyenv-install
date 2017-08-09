@@ -207,12 +207,8 @@ if [ -z "${PYENV_BOOTSTRAP_VERSION}" ]; then
     else
       for version in $(pyenv-versions --bare | sort -r); do
         if [[ "${version}" == "2.7"* ]]; then
-          if [ -f "$(pyenv-prefix "${version}")/bin/activate" ]; then
-            : # avoid choosing virtualenv since it may not have some necessary modules (e.g. cffi, pycparser)
-          else
-            PYENV_BOOTSTRAP_VERSION="$version"
-            break
-          fi
+          PYENV_BOOTSTRAP_VERSION="$version"
+          break
         fi
       done
     fi
