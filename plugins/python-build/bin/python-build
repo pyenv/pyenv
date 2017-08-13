@@ -985,21 +985,16 @@ pyston_architecture() {
 build_package_pypy() {
   build_package_copy
   mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
-  local pypy libpypy python
+  local bin
   shopt -s nullglob
   for bin in "bin/"*; do
-    if [ -f "${bin}" ]; then
+    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
       case "${bin##*/}" in
       "libpypy"* )
         ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/${bin##*/}" "${bin##*/}" )
         ;;
-      "pypy-stm" )
-        python="bin/python"
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
-        ;;
       "pypy"* )
-        python="$(basename "${bin}" | sed -e 's/pypy/python/')"
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
+        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
         ;;
       esac
     fi
@@ -1023,13 +1018,15 @@ build_package_pypy_builder() {
     return 1
   fi
   { mkdir -p "bin" "lib"
+    local pypy
     for pypy in "pypy"*; do
-      if [ -f "${pypy}" ]; then
+      if [ -f "${pypy}" ] && [ -x "${pypy}" ] && [ ! -L "${pypy}" ]; then
         mv -f "${pypy}" "bin/${pypy##*/}"
       fi
     done
+    local libpypy
     for libpypy in "libpypy"*; do
-      if [ -f "${libpypy}" ]; then
+      if [ -f "${libpypy}" ] && [ -x "${libpypy}" ] && [ ! -L "${libpypy}" ]; then
         mv -f "${libpypy}" "bin/${libpypy##*/}"
       fi
     done
