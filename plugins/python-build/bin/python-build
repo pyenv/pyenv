@@ -988,19 +988,21 @@ build_package_pypy() {
   local pypy libpypy python
   shopt -s nullglob
   for bin in "bin/"*; do
-    case "${bin##*/}" in
-    "libpypy"* )
-      ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/${bin##*/}" "${bin##*/}" )
-      ;;
-    "pypy-stm" )
-      python="bin/python"
-      ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
-      ;;
-    "pypy"* )
-      python="$(basename "${bin}" | sed -e 's/pypy/python/')"
-      ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
-      ;;
-    esac
+    if [ -f "${bin}" ]; then
+      case "${bin##*/}" in
+      "libpypy"* )
+        ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/${bin##*/}" "${bin##*/}" )
+        ;;
+      "pypy-stm" )
+        python="bin/python"
+        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
+        ;;
+      "pypy"* )
+        python="$(basename "${bin}" | sed -e 's/pypy/python/')"
+        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "${python##*/}" )
+        ;;
+      esac
+    fi
   done
   shopt -u nullglob
 }
@@ -1022,10 +1024,14 @@ build_package_pypy_builder() {
   fi
   { mkdir -p "bin" "lib"
     for pypy in "pypy"*; do
-      mv -f "${pypy}" "bin/${pypy##*/}"
+      if [ -f "${pypy}" ]; then
+        mv -f "${pypy}" "bin/${pypy##*/}"
+      fi
     done
     for libpypy in "libpypy"*; do
-      mv -f "${libpypy}" "bin/${libpypy##*/}"
+      if [ -f "${libpypy}" ]; then
+        mv -f "${libpypy}" "bin/${libpypy##*/}"
+      fi
     done
   } >&4 2>&1
   build_package_pypy
