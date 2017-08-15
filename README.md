@@ -41,6 +41,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 ## Table of Contents
 
 * **[How It Works](#how-it-works)**
+  * [How to switch python versions](#switch-python-versions)
   * [Understanding PATH](#understanding-path)
   * [Understanding Shims](#understanding-shims)
   * [Choosing the Python Version](#choosing-the-python-version)
@@ -59,6 +60,19 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 
 ----
 
+## How to Switch Python Versions
+
+To list available python versions:
+
+    pyenv versions
+
+To set the Python version for the local directory only:
+
+    pyenv local VERSION
+
+To set the Python version for all sessions (overwritten by pyenv local):
+
+    pyenv global VERSION
 
 ## How It Works
 
