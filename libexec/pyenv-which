@@ -76,15 +76,17 @@ else
 
   echo "pyenv: $PYENV_COMMAND: command not found" >&2
 
-  if [ -z $PYENV_NO_IMPLICIT_WHENCE ]; then
-    versions="$(pyenv-whence "$PYENV_COMMAND" || true)"
-    if [ -n "$versions" ]; then
-      { echo
-        echo "The \`$1' command exists in these Python versions:"
-        echo "$versions" | sed 's/^/  /g'
-        echo
-      } >&2
-    fi
+  if [ -n $PYENV_NO_IMPLICIT_WHENCE ]; then
+    exit 127
+  fi
+
+  versions="$(pyenv-whence "$PYENV_COMMAND" || true)"
+  if [ -n "$versions" ]; then
+    { echo
+      echo "The \`$1' command exists in these Python versions:"
+      echo "$versions" | sed 's/^/  /g'
+      echo
+    } >&2
   fi
 
   exit 127
