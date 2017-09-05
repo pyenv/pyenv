@@ -248,7 +248,7 @@ compute_sha2() {
     echo "${output##* }"
   elif type sha256sum &>/dev/null; then
     output="$(sha256sum -b)" || return 1
-    echo "${output% *}"
+    echo "${output%% *}"
   else
     return 1
   fi
@@ -263,7 +263,7 @@ compute_md5() {
     echo "${output##* }"
   elif type md5sum &>/dev/null; then
     output="$(md5sum -b)" || return 1
-    echo "${output% *}"
+    echo "${output%% *}"
   else
     return 1
   fi
