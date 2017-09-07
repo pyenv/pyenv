@@ -203,7 +203,7 @@ easy to fork and contribute any changes back upstream.
    Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
    configuration file since it manipulates `PATH` during the initialization.
     ```sh
-    $ echo '[ -x $PYENV_ROOT/bin/pyenv ] && eval "$(pyenv init -)"' >> ~/.bash_profile
+    $ echo 'eval "$([[ -x $PYENV_ROOT/bin/pyenv ]] && pyenv init -)"' >> ~/.bash_profile
     ```
     **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.  
     **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
