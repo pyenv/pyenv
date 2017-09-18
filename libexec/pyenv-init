@@ -86,8 +86,10 @@ mkdir -p "${PYENV_ROOT}/"{shims,versions}
 
 case "$shell" in
 fish )
-  echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
-  echo "set -gx PYENV_SHELL $shell"
+  echo "if status --is-login"
+  echo "    set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+  echo "    set -gx PYENV_SHELL $shell"
+  echo "end"
 ;;
 * )
   echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
