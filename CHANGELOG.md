@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## v1.1.4
+
+* pyenv: Workaround for scripts in `$PATH` which needs to be source'd (#100, #688, #953)
+* python-build: Add support for PyPy3 executables like `libpypy3-c.so` (#955, #956)
+* python-build: Add CPython 2.7.14, 3.4.7, 3.5.4 (#965, #971, #980)
+* python-build: Add Jython 2.7.1 (#973)
+
 ## v1.1.3
 
 * python-build: Add CPython 3.6.2 (#951)
