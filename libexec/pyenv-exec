@@ -41,7 +41,15 @@ for script in "${scripts[@]}"; do
 done
 
 shift 1
-# CPython's `sys.executable` requires the `PYENV_BIN_PATH` to be at the top of the `PATH`.
-# https://github.com/pyenv/pyenv/issues/98
-export PATH="${PYENV_BIN_PATH}:${PATH}"
+
+# reset path to original path
+# https://github.com/pyenv/pyenv/issues/985
+export PATH="$PYENV_ORIGINAL_PATH"
+
+if [ "$PYENV_COMMAND" = "virtualenv" ]; then
+  # CPython's `sys.executable` requires the `PYENV_BIN_PATH` to be at the top of the `PATH`.
+  # https://github.com/pyenv/pyenv/issues/98
+  export PATH="${PYENV_BIN_PATH}:${PATH}"
+fi
+
 exec -a "$PYENV_COMMAND" "$PYENV_COMMAND_PATH" "$@"

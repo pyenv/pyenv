@@ -86,6 +86,7 @@ bin_path="$(abs_dirname "$0")"
 for plugin_bin in "${PYENV_ROOT}/plugins/"*/bin; do
   PATH="${plugin_bin}:${PATH}"
 done
+export PYENV_ORIGINAL_PATH="$PATH"
 export PATH="${bin_path}:${PATH}"
 
 PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${PYENV_ROOT}/pyenv.d"
