@@ -44,7 +44,12 @@ shift 1
 
 # reset path to original path
 # https://github.com/pyenv/pyenv/issues/985
-export PATH="$PYENV_ORIGINAL_PATH"
+# if installing package via pip/conda/easy_install, do not reset path as pyenv-which will be needed for auto rehash
+if [[ "$PYENV_COMMAND" != "pip" && "$PYENV_COMMAND" != "conda" && "$PYENV_COMMAND" != "easy_install" ]]; then
+  if [ -z "$PYENV_ORIGINAL_PATH" ]; then
+  	export PATH="$PYENV_ORIGINAL_PATH"
+  fi
+fi
 
 if [ "$PYENV_COMMAND" = "virtualenv" ]; then
   # CPython's `sys.executable` requires the `PYENV_BIN_PATH` to be at the top of the `PATH`.
