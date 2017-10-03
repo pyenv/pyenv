@@ -1058,7 +1058,7 @@ build_package_anaconda() {
 
 build_package_miniconda() {
   build_package_anaconda "$@"
-  "${PREFIX_PATH}/bin/conda" install --yes "pip"
+  CONDA_AUTO_UPDATE=False "${PREFIX_PATH}/bin/conda" install --yes "pip"
 }
 
 build_package_copy() {
