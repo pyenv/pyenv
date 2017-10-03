@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## v1.1.5
+
+* python-build: Add CPython 3.6.3
+* python-build: Add CPython 3.7.0a1
+* python-build: Add Anaconda[23] 5.0.0
+
 ## v1.1.4
 
 * pyenv: Workaround for scripts in `$PATH` which needs to be source'd (#100, #688, #953)
