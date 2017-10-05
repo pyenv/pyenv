@@ -27,6 +27,8 @@ xml2-config
 # libxml2-utils
 xmlcatalog
 xmllint
+# ncurses
+tput
 # openssl
 openssl
 # qtchooser
