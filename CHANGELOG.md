@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* python-build: Add PyPy 5.9.0
+
 ## v1.1.5
 
 * python-build: Add CPython 3.6.3

@@ -1,0 +1,3 @@
+#require_gcc
+install_package "openssl-1.0.2k" "https://www.openssl.org/source/openssl-1.0.2k.tar.gz#6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0" mac_openssl --if has_broken_mac_openssl
+install_package "pypy2-v5.9.0-src" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.9.0-src.tar.bz2#de4bf05df47f1349dbac97233d9277bbaf1ef3331663ea2557fd5da3dbcfd0a7" "pypy_builder" verify_py27 ensurepip
