@@ -3,6 +3,7 @@
 ## Unreleased
 
 * python-build: Add PyPy 5.9.0
+* python-build: Add Miniconda[23] 4.3.14, 4.3.21, 4.3.27
 
 ## v1.1.5
 

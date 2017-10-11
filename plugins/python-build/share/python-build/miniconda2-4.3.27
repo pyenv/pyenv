@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-x86" )
+  install_script "Miniconda2-4.3.27.1-Linux-x86" "https://repo.continuum.io/miniconda/Miniconda2-4.3.27.1-Linux-x86.sh#3d80246ff3942599669f86c10468e25af482cdd1197c3168027ef6680c857f95" "miniconda" verify_py35
+  ;;
+"Linux-x86_64" )
+  install_script "Miniconda2-4.3.27.1-Linux-x86_64" "https://repo.continuum.io/miniconda/Miniconda2-4.3.27.1-Linux-x86_64.sh#f7bb442faeed33330564bfc33188a9dcd4ebe2ab3771aa89a823c03e67197e1d" "miniconda" verify_py35
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniconda2-4.3.27-MacOSX-x86_64" "https://repo.continuum.io/miniconda/Miniconda2-4.3.27-MacOSX-x86_64.sh#7e3d2bc3e48f1daca127062a59e518df37f279aa750ca595c2c8c9569eff2fba" "miniconda" verify_py35
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
