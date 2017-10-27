@@ -4,6 +4,7 @@
 
 * python-build: Add PyPy 5.9.0
 * python-build: Add Miniconda[23] 4.3.14, 4.3.21, 4.3.27
+* python-build: Add Anaconda[23] 5.0.1
 
 ## v1.1.5
 
