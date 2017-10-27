@@ -5,3 +5,6 @@ language: c
 env:
   - PYENV_NATIVE_EXT=
   - PYENV_NATIVE_EXT=1
+notifications:
+  email:
+    on_success: never
