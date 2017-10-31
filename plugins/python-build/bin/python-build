@@ -709,7 +709,7 @@ build_package_warn_unsupported() {
   } >&3
 }
 
-build_package_standard() {
+build_package_standard_build() {
   local package_name="$1"
 
   if [ "${MAKEOPTS+defined}" ]; then
@@ -726,12 +726,11 @@ build_package_standard() {
   local PACKAGE_CONFIGURE_OPTS_ARRAY="${package_var_name}_CONFIGURE_OPTS_ARRAY[@]"
   local PACKAGE_MAKE_OPTS="${package_var_name}_MAKE_OPTS"
   local PACKAGE_MAKE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
-  local PACKAGE_MAKE_INSTALL_OPTS="${package_var_name}_MAKE_INSTALL_OPTS"
-  local PACKAGE_MAKE_INSTALL_OPTS_ARRAY="${package_var_name}_MAKE_INSTALL_OPTS_ARRAY[@]"
-  local PACKAGE_MAKE_INSTALL_TARGET="${package_var_name}_MAKE_INSTALL_TARGET"
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
-  [ "$package_var_name" = "PYTHON" ] && use_homebrew_readline || true
+  if [ "$package_var_name" = "PYTHON" ]; then
+      use_homebrew_readline || use_freebsd_pkg ||true
+  fi
 
   ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
       export CFLAGS="$CFLAGS ${!PACKAGE_CFLAGS}"
@@ -744,8 +743,32 @@ build_package_standard() {
   ) >&4 2>&1
 
   { "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
-    "$MAKE" "${!PACKAGE_MAKE_INSTALL_TARGET:-install}" $MAKE_INSTALL_OPTS ${!PACKAGE_MAKE_INSTALL_OPTS} "${!PACKAGE_MAKE_INSTALL_OPTS_ARRAY}"
   } >&4 2>&1
+}
+
+build_package_standard_install() {
+  local package_name="$1"
+  local package_var_name="$(capitalize "${package_name%%-*}")"
+
+  local PACKAGE_MAKE_INSTALL_OPTS="${package_var_name}_MAKE_INSTALL_OPTS"
+  local PACKAGE_MAKE_INSTALL_OPTS_ARRAY="${package_var_name}_MAKE_INSTALL_OPTS_ARRAY[@]"
+
+  { "$MAKE" "${!PACKAGE_MAKE_INSTALL_TARGET:-install}" $MAKE_INSTALL_OPTS ${!PACKAGE_MAKE_INSTALL_OPTS} "${!PACKAGE_MAKE_INSTALL_OPTS_ARRAY}"
+  } >&4 2>&1
+}
+
+build_package_standard_install_with_bundled_gems() {
+  { "$MAKE" update-gems
+    "$MAKE" extract-gems
+  } >&4 2>&1
+
+  build_package_standard_install "$@"
+}
+
+# Backword Compatibility for standard function
+build_package_standard() {
+  build_package_standard_build "$@"
+  build_package_standard_install "$@"
 }
 
 build_package_autoconf() {
@@ -806,7 +829,7 @@ build_package_rbx() {
       fi
     done
 
-    RUBYOPT="-rubygems $RUBYOPT" ./configure --prefix="$PREFIX_PATH" $RUBY_CONFIGURE_OPTS "${configure_opts[@]}"
+    RUBYOPT="-rrubygems $RUBYOPT" ./configure --prefix="$PREFIX_PATH" $RUBY_CONFIGURE_OPTS "${configure_opts[@]}"
     rake install
     fix_rbx_gem_binstubs "$PREFIX_PATH"
     fix_rbx_irb "$PREFIX_PATH"
@@ -1245,20 +1268,21 @@ require_llvm() {
       3.2 )
         package_option python configure --prebuilt-name="llvm-3.2-x86_64-apple-darwin13.tar.bz2"
         ;;
-      3.5 )
+      3.[56] )
         local llvm_config="$(locate_llvm "$llvm_version")"
         if [ -n "$llvm_config" ]; then
           package_option python configure --llvm-config="$llvm_config"
         else
+          local homebrew_package="llvm@$llvm_version"
           { echo
             colorize 1 "ERROR"
             echo ": Rubinius will not be able to compile using Apple's LLVM-based "
-            echo "build tools on OS X. You will need to install LLVM 3.5 first."
+            echo "build tools on OS X. You will need to install LLVM $llvm_version first."
             echo
             colorize 1 "TO FIX THE PROBLEM"
             echo ": Install Homebrew's llvm package with this"
             echo -n "command: "
-            colorize 4 "brew tap homebrew/versions ; brew install llvm35"
+            colorize 4 "brew install $homebrew_package"
             echo
           } >&3
           return 1
@@ -1357,10 +1381,35 @@ needs_yaml() {
 use_homebrew_yaml() {
   local libdir="$(brew --prefix libyaml 2>/dev/null || true)"
   if [ -d "$libdir" ]; then
+    echo "python-build: use libyaml from homebrew"
     export CPPFLAGS="-I$libdir/include ${CPPFLAGS}"
     export LDFLAGS="-L$libdir/lib ${LDFLAGS}"
   else
     return 1
+  fi
+}
+
+use_freebsd_pkg() {
+  # check if FreeBSD
+  if [ "FreeBSD" = "$(uname -s)" ]; then
+    # use openssl if installed from Ports Collection
+    if [ -f /usr/local/include/openssl/ssl.h ]; then
+      package_option ruby configure --with-openssl-dir="/usr/local"
+    fi
+
+    # check if 11-R or later
+    release="$(uname -r)"
+    if [ "${release%%.*}" -ge 11 ]; then
+      # prefers readline to compile most of ruby versions
+      if pkg info -e readline > /dev/null; then
+        # use readline from Ports Collection
+        package_option ruby configure --with-readline-dir="/usr/local"
+      elif pkg info -e libedit > /dev/null; then
+        # use libedit from Ports Collection
+        package_option ruby configure --enable-libedit
+        package_option ruby configure --with-libedit-dir="/usr/local"
+      fi
+    fi
   fi
 }
 
@@ -1376,6 +1425,7 @@ use_homebrew_readline() {
   if ! configured_with_package_dir "python" "readline/rlconf.h"; then
     local libdir="$(brew --prefix readline 2>/dev/null || true)"
     if [ -d "$libdir" ]; then
+      echo "python-build: use readline from homebrew"
       export CPPFLAGS="-I$libdir/include ${CPPFLAGS}"
       export LDFLAGS="-L$libdir/lib ${LDFLAGS}"
     else
@@ -1394,6 +1444,7 @@ has_broken_mac_openssl() {
 use_homebrew_openssl() {
   local ssldir="$(brew --prefix openssl 2>/dev/null || true)"
   if [ -d "$ssldir" ]; then
+    echo "python-build: use openssl from homebrew"
     export CPPFLAGS="-I$ssldir/include ${CPPFLAGS}"
     export LDFLAGS="-L$ssldir/lib ${LDFLAGS}"
   else
@@ -1457,6 +1508,10 @@ build_package_ldflags_dirs() {
     [ -z "$dir" ] || mkdir -p "$dir"
     shift 1
   done
+}
+
+build_package_enable_shared() {
+    package_option python configure --enable-shared
 }
 
 build_package_auto_tcltk() {
@@ -1768,7 +1823,7 @@ list_definitions() {
 }
 
 sort_versions() {
-  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z\1/; s/$/.z/; G; s/\n/ /' | \
+  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z.\1/; s/$/.z/; G; s/\n/ /' | \
     LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
 }
 
@@ -1877,27 +1932,30 @@ if [ -n "$noexec" ]; then
   exit 1
 fi
 
-# Work around warnings building Ruby 2.0 on Clang 2.x:
-# pass -Wno-error=shorten-64-to-32 if the compiler accepts it.
-#
-# When we set CFLAGS, Ruby won't apply its default flags, though. Since clang
-# builds 1.9.x and 2.x only, where -O3 is default, we can safely set that flag.
-# Ensure it's the first flag since later flags take precedence.
-#if "${CC:-cc}" -x c /dev/null -E -Wno-error=shorten-64-to-32 &>/dev/null; then
-#  PYTHON_CFLAGS="-O3 -Wno-error=shorten-64-to-32 $PYTHON_CFLAGS"
+## Apply following work around, if gcc is not installed.
+#if [ -z "$(locate_gcc)" ]; then
+#  # Work around warnings building Ruby 2.0 on Clang 2.x:
+#  # pass -Wno-error=shorten-64-to-32 if the compiler accepts it.
+#  #
+#  # When we set CFLAGS, Ruby won't apply its default flags, though. Since clang
+#  # builds 1.9.x and 2.x only, where -O3 is default, we can safely set that flag.
+#  # Ensure it's the first flag since later flags take precedence.
+#  if "${CC:-cc}" -x c /dev/null -E -Wno-error=shorten-64-to-32 &>/dev/null; then
+#    RUBY_CFLAGS="-O3 -Wno-error=shorten-64-to-32 $RUBY_CFLAGS"
+#  fi
 #fi
 
 if [ -z "$MAKE" ]; then
   if [ "FreeBSD" = "$(uname -s)" ]; then
-#   if [ $(echo $1 | sed 's/-.*$//') = "jruby" ]; then
-#     export MAKE="gmake"
-#   else
+    if [ "$(echo $1 | sed 's/-.*$//')" = "jruby" ]; then
+      export MAKE="gmake"
+    else
       if [ "$(uname -r | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
         export MAKE="gmake"
       else
         export MAKE="make"
       fi
-#   fi
+    fi
   else
     export MAKE="make"
   fi
