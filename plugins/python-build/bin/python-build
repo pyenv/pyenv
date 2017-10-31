@@ -1978,7 +1978,15 @@ fi
 # Compile with `--enable-unicode=ucs4` by default (#257)
 if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
   if ! is_mac; then
-    package_option python configure --enable-unicode=ucs4
+    # Skip specifying `--enable-unicode` for CPython 3.3+ (#912)
+    case "${DEFINITION_PATH##*/}" in
+    "2."* | \
+    "3.0" | "3.0."* | "3.0-"* | \
+    "3.1" | "3.1."* | "3.1-"* | \
+    "3.2" | "3.2."* | "3.2-"* )
+      package_option python configure --enable-unicode=ucs4
+      ;;
+    esac
   fi
 fi
 

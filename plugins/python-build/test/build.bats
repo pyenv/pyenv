@@ -61,7 +61,7 @@ assert_build_log() {
 
 @test "yaml is installed for python" {
   cached_tarball "yaml-0.1.6"
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub brew false
   stub_make_install
@@ -81,8 +81,8 @@ yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
 yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -90,7 +90,7 @@ OUT
 
 @test "apply python patch before building" {
   cached_tarball "yaml-0.1.6"
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub brew false
   stub_make_install
@@ -113,8 +113,8 @@ yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
 patch -p0 --force -i $TMP/python-patch.XXX
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -122,7 +122,7 @@ OUT
 
 @test "apply python patch from git diff before building" {
   cached_tarball "yaml-0.1.6"
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub brew false
   stub_make_install
@@ -145,15 +145,15 @@ yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
 patch -p1 --force -i $TMP/python-patch.XXX
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
 }
 
 @test "yaml is linked from Homebrew" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   brew_libdir="$TMP/homebrew-yaml"
   mkdir -p "$brew_libdir"
@@ -172,15 +172,15 @@ OUT
   unstub make
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I$brew_libdir/include -I${TMP}/install/include " LDFLAGS="-L$brew_libdir/lib -L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I$brew_libdir/include -I${TMP}/install/include " LDFLAGS="-L$brew_libdir/lib -L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
 }
 
 @test "readline is linked from Homebrew" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   readline_libdir="$TMP/homebrew-readline"
   mkdir -p "$readline_libdir"
@@ -193,7 +193,7 @@ OUT
   stub uname '-s : echo Linux'
 
   run_inline_definition <<DEF
-install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
 DEF
   assert_success
 
@@ -201,15 +201,15 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I$readline_libdir/include -I${TMP}/install/include " LDFLAGS="-L$readline_libdir/lib -L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I$readline_libdir/include -I${TMP}/install/include " LDFLAGS="-L$readline_libdir/lib -L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
 }
 
 @test "readline is not linked from Homebrew when explicitly defined" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   # python-build
   readline_libdir="$TMP/custom"
@@ -225,7 +225,7 @@ OUT
 
   export PYTHON_CONFIGURE_OPTS="CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib"
   run_inline_definition <<DEF
-install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
 DEF
   assert_success
 
@@ -233,15 +233,15 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
 }
 
 @test "number of CPU cores defaults to 2" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   # yyuu/pyenv#222
   stub uname '-s : echo Darwin'
@@ -257,7 +257,7 @@ OUT
 
   export -n MAKE_OPTS
   run_inline_definition <<DEF
-install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
 DEF
   assert_success
 
@@ -265,15 +265,15 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
 }
 
 @test "number of CPU cores is detected on Mac" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   # yyuu/pyenv#222
   stub uname '-s : echo Darwin'
@@ -289,7 +289,7 @@ OUT
 
   export -n MAKE_OPTS
   run_inline_definition <<DEF
-install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
 DEF
   assert_success
 
@@ -298,15 +298,15 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 4
 make install
 OUT
 }
 
 @test "number of CPU cores is detected on FreeBSD" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub uname '-s : echo FreeBSD'
   stub sysctl '-n hw.ncpu : echo 1'
@@ -320,7 +320,7 @@ OUT
 
   export -n MAKE_OPTS
   run_inline_definition <<DEF
-install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
 DEF
   assert_success
 
@@ -329,15 +329,15 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 1
 make install
 OUT
 }
 
 @test "setting PYTHON_MAKE_INSTALL_OPTS to a multi-word string" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub_make_install
 
@@ -347,22 +347,22 @@ OUT
 
   export PYTHON_MAKE_INSTALL_OPTS="DOGE=\"such wow\""
   run_inline_definition <<DEF
-install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
 DEF
   assert_success
 
   unstub make
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install DOGE="such wow"
 OUT
 }
 
 @test "setting MAKE_INSTALL_OPTS to a multi-word string" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub_make_install
 
@@ -372,15 +372,15 @@ OUT
 
   export MAKE_INSTALL_OPTS="DOGE=\"such wow\""
   run_inline_definition <<DEF
-install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
 DEF
   assert_success
 
   unstub make
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install DOGE="such wow"
 OUT
@@ -396,7 +396,7 @@ OUT
 }
 
 @test "make on FreeBSD 9 defaults to gmake" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub uname "-s : echo FreeBSD" "-r : echo 9.1"
   MAKE=gmake stub_make_install
@@ -415,7 +415,7 @@ OUT
 }
 
 @test "make on FreeBSD 10" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub uname "-s : echo FreeBSD" "-r : echo 10.0-RELEASE"
   stub_make_install
@@ -433,7 +433,7 @@ OUT
 }
 
 @test "can use PYTHON_CONFIGURE to apply a patch" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   executable "${TMP}/custom-configure" <<CONF
 #!$BASH
@@ -450,7 +450,7 @@ CONF
 
   export PYTHON_CONFIGURE="${TMP}/custom-configure"
   run_inline_definition <<DEF
-install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz"
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
 DEF
   assert_success
 
@@ -459,8 +459,8 @@ DEF
 
   assert_build_log <<OUT
 apply -p1 -i /my/patch.diff
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -545,11 +545,11 @@ OUT
 }
 
 @test "initializes LDFLAGS directories" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   export LDFLAGS="-L ${BATS_TEST_DIRNAME}/what/evs"
   run_inline_definition <<DEF
-install_package "Python-3.2.1" "http://python.org/ftp/python/3.2.1/Python-3.2.1.tar.gz" ldflags_dirs
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz" ldflags_dirs
 DEF
   assert_success
 

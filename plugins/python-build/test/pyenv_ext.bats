@@ -93,13 +93,13 @@ resolve_link() {
 }
 
 @test "apply built-in python patch before building" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub brew false
   stub_make_install
   stub patch ' : echo patch "$@" | sed -E "s/\.[[:alnum:]]+$/.XXX/" >> build.log'
 
-  echo | install_patch definitions/vanilla-python "Python-3.2.1/empty.patch"
+  echo | install_patch definitions/vanilla-python "Python-3.6.2/empty.patch"
 
   # yyuu/pyenv#257
   stub uname '-s : echo Linux'
@@ -110,8 +110,8 @@ resolve_link() {
 
   assert_build_log <<OUT
 patch -p0 --force -i $TMP/python-patch.XXX
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -121,15 +121,15 @@ OUT
 }
 
 @test "apply built-in python patches should be sorted by its name" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub brew false
   stub_make_install
   stub patch ' : for arg; do [[ "$arg" == "-"* ]] || sed -e "s/^/patch: /" "$arg"; done >> build.log'
 
-  echo "foo" | install_patch definitions/vanilla-python "Python-3.2.1/foo.patch"
-  echo "bar" | install_patch definitions/vanilla-python "Python-3.2.1/bar.patch"
-  echo "baz" | install_patch definitions/vanilla-python "Python-3.2.1/baz.patch"
+  echo "foo" | install_patch definitions/vanilla-python "Python-3.6.2/foo.patch"
+  echo "bar" | install_patch definitions/vanilla-python "Python-3.6.2/bar.patch"
+  echo "baz" | install_patch definitions/vanilla-python "Python-3.6.2/baz.patch"
 
   # yyuu/pyenv#257
   stub uname '-s : echo Linux'
@@ -142,8 +142,8 @@ OUT
 patch: bar
 patch: baz
 patch: foo
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -153,7 +153,7 @@ OUT
 }
 
 @test "allow custom make install target" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub brew false
   stub "$MAKE" \
@@ -168,8 +168,8 @@ OUT
   assert_success
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs4
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make altinstall
 OUT
@@ -280,7 +280,7 @@ EOS
 }
 
 @test "enable custom unicode configuration" {
-  cached_tarball "Python-3.2.1"
+  cached_tarball "Python-3.6.2"
 
   stub brew false
   stub "$MAKE" \
@@ -291,8 +291,8 @@ EOS
   assert_success
 
   assert_build_log <<OUT
-Python-3.2.1: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.2.1: --prefix=$INSTALL_ROOT --enable-unicode=ucs2 --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-unicode=ucs2 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT

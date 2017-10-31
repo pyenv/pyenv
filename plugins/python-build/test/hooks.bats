@@ -16,13 +16,13 @@ OUT
   stub pyenv-hooks "install : echo '$HOOK_PATH'/install.bash"
   stub pyenv-rehash "echo rehashed"
 
-  definition="${TMP}/3.2.1"
+  definition="${TMP}/3.6.2"
   cat > "$definition" <<<"echo python-build"
   run pyenv-install "$definition"
 
   assert_success
   assert_output <<-OUT
-before: ${PYENV_ROOT}/versions/3.2.1
+before: ${PYENV_ROOT}/versions/3.6.2
 python-build
 after: 0
 rehashed
@@ -41,16 +41,16 @@ OUT
   stub pyenv-hooks "uninstall : echo '$HOOK_PATH'/uninstall.bash"
   stub pyenv-rehash "echo rehashed"
 
-  mkdir -p "${PYENV_ROOT}/versions/3.2.1"
-  run pyenv-uninstall -f 3.2.1
+  mkdir -p "${PYENV_ROOT}/versions/3.6.2"
+  run pyenv-uninstall -f 3.6.2
 
   assert_success
   assert_output <<-OUT
-before: ${PYENV_ROOT}/versions/3.2.1
-rm -rf ${PYENV_ROOT}/versions/3.2.1
+before: ${PYENV_ROOT}/versions/3.6.2
+rm -rf ${PYENV_ROOT}/versions/3.6.2
 rehashed
 after.
 OUT
 
-  refute [ -d "${PYENV_ROOT}/versions/3.2.1" ]
+  refute [ -d "${PYENV_ROOT}/versions/3.6.2" ]
 }
