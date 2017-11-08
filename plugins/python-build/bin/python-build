@@ -482,6 +482,13 @@ fetch_git() {
   local git_url="$2"
   local git_ref="$3"
 
+  local fetch_args=(${git_ref})
+  if [ ${#fetch_args[@]} -eq 1 ]; then  # just a branch name
+    fetch_args[0]="+${fetch_args[0]}:${fetch_args[0]}"
+  elif [[ ${#fetch_args[@]} -eq 2 && ${fetch_args[0]} == tag ]]; then
+    git_ref="${fetch_args[1]}"
+  fi
+
   echo "Cloning ${git_url}..." >&2
 
   if type git &>/dev/null; then
@@ -490,7 +497,7 @@ fetch_git() {
       local clone_name="$(sanitize "$git_url")"
       if [ -e "${clone_name}" ]; then
         { cd "${clone_name}"
-          git fetch --force "$git_url" "+${git_ref}:${git_ref}"
+          git fetch --force "$git_url" "${fetch_args[@]}"
         } >&4 2>&1
       else
         git clone --bare --branch "$git_ref" "$git_url" "${clone_name}" >&4 2>&1
@@ -501,7 +508,7 @@ fetch_git() {
 
     if [ -e "${package_name}" ]; then
       ( cd "${package_name}"
-        git fetch --depth 1 origin "+${git_ref}"
+        git fetch --depth 1 origin "${fetch_args[@]}"
         git checkout -q -B "$git_ref" "origin/${git_ref}"
       ) >&4 2>&1
     else
