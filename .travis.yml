@@ -8,3 +8,10 @@ env:
 notifications:
   email:
     on_success: never
+deploy:
+  provider: releases
+  api_key:
+    secure: FLWevL09KYp7V1SjJUNEdWzuomuocXwNvPr1DSAFH7mmrjKTtjzwrjINAthSqzjlDrs5B//P47l1VLyHp5byEzy673W+bOmEg8swmqc7E9FrHLRyEByd/yca3DzkZgXEXgGdY/cl7tHhM4V2fYKEgAIWbFV+takmTFMK4WkEtNg=
+  on:
+    repo: pyenv/pyenv
+    tags: true
