@@ -37,10 +37,10 @@ resolve_link() {
 }
 
 realpath() {
-  local cwd="$PWD"
   local path="$1"
   local name
-
+  # Use a subshell to avoid changing the current path
+  (
   while [ -n "$path" ]; do
     name="${path##*/}"
     [ "$name" = "$path" ] || cd "${path%/*}"
@@ -48,7 +48,7 @@ realpath() {
   done
 
   echo "${PWD}/$name"
-  cd "$cwd"
+  )
 }
 fi
 

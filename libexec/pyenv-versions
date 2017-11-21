@@ -44,10 +44,11 @@ if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; th
   }
 
   realpath() {
-    local cwd="$PWD"
     local path="$1"
     local name
 
+    # Use a subshell to avoid changing the current path
+    (
     while [ -n "$path" ]; do
       name="${path##*/}"
       [ "$name" = "$path" ] || cd "${path%/*}"
@@ -55,7 +56,7 @@ if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; th
     done
 
     echo "${PWD}/$name"
-    cd "$cwd"
+    )
   }
 fi
 

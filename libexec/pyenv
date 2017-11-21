@@ -36,9 +36,10 @@ else
   }
 
   abs_dirname() {
-    local cwd="$PWD"
     local path="$1"
 
+    # Use a subshell to avoid changing the current path
+    (
     while [ -n "$path" ]; do
       cd "${path%/*}"
       local name="${path##*/}"
@@ -46,7 +47,7 @@ else
     done
 
     pwd
-    cd "$cwd"
+    )
   }
 fi
 
@@ -72,11 +73,13 @@ fi
 
 if [ -z "${PYENV_DIR}" ]; then
   PYENV_DIR="$PWD"
-else
-  cd "$PYENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$PYENV_DIR'"
-  PYENV_DIR="$PWD"
-  cd "$OLDPWD"
 fi
+
+if [ ! -d "$PYENV_DIR" ] || [ ! -e "$PYENV_DIR" ]; then
+  abort "cannot change working directory to \`$PYENV_DIR'"
+fi
+
+PYENV_DIR=$(cd "$PYENV_DIR" && echo "$PWD")
 export PYENV_DIR
 
 
