@@ -330,6 +330,11 @@ http() {
   elif type curl &>/dev/null; then
     "http_${method}_curl" "$url" "$file"
   elif type wget &>/dev/null; then
+    # SSL Certificate error with older wget that does not support Server Name Indication (#60)
+    if [[ "$(wget --version 2>/dev/null || true)" = "GNU Wget 1.1"[0-3]* ]]; then
+      echo "python-build: wget (< 1.14) doesn't support Server Name Indication. Please install curl (>= 7.18.1) and try again" >&2
+      return 1
+    fi
     "http_${method}_wget" "$url" "$file"
   else
     echo "error: please install \`aria2c\`, \`curl\` or \`wget\` and try again" >&2
@@ -2049,12 +2054,6 @@ if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
       ;;
     esac
   fi
-fi
-
-# SSL Certificate error with older wget that does not support Server Name Indication (#60)
-if ! command -v curl 1>/dev/null 2>&1 && [[ "$(wget --version 2>/dev/null || true)" = "GNU Wget 1.1"[0-3]* ]]; then
-  echo "python-build: wget (< 1.14) doesn't support Server Name Indication. Please install curl (>= 7.18.1) and try again" >&2
-  exit 1
 fi
 
 # Unset `PIP_REQUIRE_VENV` during build (#216)
