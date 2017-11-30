@@ -21,7 +21,8 @@ abort() {
 
 if enable -f "${BASH_SOURCE%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
   abs_dirname() {
-    local path="$(realpath "$1")"
+    local path
+    path="$(realpath "$1")"
     echo "${path%/*}"
   }
 else

@@ -20,7 +20,7 @@ fi
 
 whence() {
   local command="$1"
-  rbenv-versions --bare | while read version; do
+  rbenv-versions --bare | while read -r version; do
     path="$(rbenv-prefix "$version")/bin/${command}"
     if [ -x "$path" ]; then
       [ "$print_paths" ] && echo "$path" || echo "$version"
