@@ -2,6 +2,17 @@
 
 load test_helper
 
+@test "shell integration disabled" {
+  run rbenv shell
+  assert_failure "rbenv: shell integration not enabled. Run \`rbenv init' for instructions."
+}
+
+@test "shell integration enabled" {
+  eval "$(rbenv init -)"
+  run rbenv shell
+  assert_success "rbenv: no shell-specific version configured"
+}
+
 @test "no shell version" {
   mkdir -p "${RBENV_TEST_DIR}/myproject"
   cd "${RBENV_TEST_DIR}/myproject"
