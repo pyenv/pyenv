@@ -1,7 +1,12 @@
 ## Version History
 
-## Unreleased
+## 1.2.0
 
+* python-build: Import changes from ruby-build v20171031 (#1026)
+* python-build: Ignore LibreSSL bundled with macOS 10.13 (#1025)
+* python-build: Skip passing `--enable-unicode` to CPython 3.3+ (#912)
+* python-build: Add CPython 3.3.7 (#1053)
+* python-build: Add micropython 1.9.3
 * python-build: Add PyPy 5.9.0
 * python-build: Add Miniconda[23] 4.3.14, 4.3.21, 4.3.27, 4.3.30
 * python-build: Add Anaconda[23] 5.0.1
