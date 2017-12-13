@@ -156,7 +156,7 @@ num_cpu_cores() {
     num="$(sysctl -n hw.ncpu 2>/dev/null || true)"
     ;;
   * )
-    num="$({ getconf _NPROCESSORS_ONLN ||
+    num="$({ getconf _NPROCESSORS_ONLN || getconf NPROCESSORS_ONLN ||
              grep -c ^processor /proc/cpuinfo; } 2>/dev/null)"
     num="${num#0}"
     ;;
