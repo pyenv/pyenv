@@ -155,6 +155,9 @@ num_cpu_cores() {
   Darwin | *BSD )
     num="$(sysctl -n hw.ncpu 2>/dev/null || true)"
     ;;
+  SunOS )
+    num="$(getconf NPROCESSORS_ONLN 2>/dev/null || true)"
+    ;;
   * )
     num="$({ getconf _NPROCESSORS_ONLN ||
              grep -c ^processor /proc/cpuinfo; } 2>/dev/null)"
