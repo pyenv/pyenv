@@ -1429,7 +1429,8 @@ has_broken_mac_readline() {
   # https://github.com/pyenv/pyenv/issues/23
   is_mac &&
   ! configured_with_package_dir "python" "readline/rlconf.h" &&
-  ! use_homebrew_readline
+  ! use_homebrew_readline &&
+  ! use_pkgsrc_readline
 }
 
 use_homebrew_readline() {
@@ -1445,17 +1446,46 @@ use_homebrew_readline() {
   fi
 }
 
+use_pkgsrc_readline() {
+  if ! configured_with_package_dir "python" "readline/rlconf.h"; then
+    local libdir="$(pkg_info -p readline 2>/dev/null |
+                   awk '/CWD/ {print $NF}' |
+                   sort -u || true)"
+    if [ -d "$libdir" ]; then
+      echo "python-build: use readline from pkgsrc"
+      export CPPFLAGS="-I$libdir/include ${CPPFLAGS}"
+      export LDFLAGS="-L$libdir/lib ${LDFLAGS}"
+    else
+      return 1
+    fi
+  fi
+}
+
 has_broken_mac_openssl() {
   is_mac || return 1
   local openssl_version="$(/usr/bin/openssl version 2>/dev/null || true)"
   [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]] &&
-  ! use_homebrew_openssl
+  ! use_homebrew_openssl &&
+  ! use_pkgsrc_openssl
 }
 
 use_homebrew_openssl() {
   local ssldir="$(brew --prefix openssl 2>/dev/null || true)"
   if [ -d "$ssldir" ]; then
     echo "python-build: use openssl from homebrew"
+    export CPPFLAGS="-I$ssldir/include ${CPPFLAGS}"
+    export LDFLAGS="-L$ssldir/lib ${LDFLAGS}"
+  else
+    return 1
+  fi
+}
+
+use_pkgsrc_openssl() {
+  local ssldir="$(pkg_info -p openssl 2>/dev/null |
+                 awk '/CWD/ {print $NF}' |
+                 sort -u || true)"
+  if [ -d "$ssldir" ]; then
+    echo "python-build: use openssl from pkgsrc"
     export CPPFLAGS="-I$ssldir/include ${CPPFLAGS}"
     export LDFLAGS="-L$ssldir/lib ${LDFLAGS}"
   else
