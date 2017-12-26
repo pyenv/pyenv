@@ -1361,6 +1361,17 @@ require_distro() {
   return 1
 }
 
+require_osx_version() {
+  function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
+
+  local required_version="$@"
+  local osx_version="$(sw_vers -productVersion)"
+  if [[ $(version $osx_version) -ge $(version $required_version) ]]; then
+    return 0
+  fi
+  return 1
+}
+
 configured_with_package_dir() {
   local package_var_name="$(capitalize "$1")"
   shift 1

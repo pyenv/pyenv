@@ -1,5 +1,9 @@
 ## Version History
 
+# Unreleased
+
+* python-build: Add PyPy[23] 5.10
+
 ## 1.2.0
 
 * python-build: Import changes from ruby-build v20171031 (#1026)
