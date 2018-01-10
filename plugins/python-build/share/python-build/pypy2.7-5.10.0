@@ -5,9 +5,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "linux64" )
-  if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.10.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.10.0-linux64.tar.bz2#da85af9240220179493ad66c857934dc7ea91aef8f168cd293a2d99af8346ee2" "pypy" verify_py27 ensurepip
-  elif require_distro "Ubuntu 16.04" 1>/dev/null 2>&1; then
+  if require_distro "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
     install_package "pypy2-v5.10.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.10.0-linux64.tar.bz2#da85af9240220179493ad66c857934dc7ea91aef8f168cd293a2d99af8346ee2" "pypy" verify_py27 ensurepip
   else
     { echo
