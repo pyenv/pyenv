@@ -5,7 +5,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "linux64" )
-  if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
+  if require_distro "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
     install_package "pypy3-v5.10.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v5.10.0-linux64.tar.bz2#aa4fb52fb858d973dd838dcf8d74f30705e5afdf1150acb8e056eb99353dfe77" "pypy" verify_py27 ensurepip
   else
     { echo
