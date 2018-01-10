@@ -1,7 +1,8 @@
 ## Version History
 
-# Unreleased
+## 1.2.1
 
+* python-build: Add CPython 3.6.4
 * python-build: Add PyPy[23] 5.10
 
 ## 1.2.0
