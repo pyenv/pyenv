@@ -1,4 +1,5 @@
 bunzip2
+clear
 # curl
 curl
 curl-config
