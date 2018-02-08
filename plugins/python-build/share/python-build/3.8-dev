@@ -1,4 +1,4 @@
 #require_gcc
 install_package "openssl-1.0.2k" "https://www.openssl.org/source/openssl-1.0.2k.tar.gz#6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0" mac_openssl --if has_broken_mac_openssl
 install_package "readline-6.3" "https://ftpmirror.gnu.org/readline/readline-6.3.tar.gz#56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43" standard --if has_broken_mac_readline
-install_git "Python-3.7-dev" "https://github.com/python/cpython" "3.7" standard verify_py37 ensurepip
+install_git "Python-3.8-dev" "https://github.com/python/cpython" master standard verify_py38 ensurepip
