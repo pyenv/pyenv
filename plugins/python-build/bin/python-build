@@ -1773,6 +1773,11 @@ build_package_verify_py37() {
   build_package_verify_py36 "$1" "${2:-3.7}"
 }
 
+# Post-install check for Python 3.8.x
+build_package_verify_py38() {
+  build_package_verify_py37 "$1" "${2:-3.8}"
+}
+
 build_package_ez_setup() {
   local ez_setup="ez_setup.py"
   rm -f "${ez_setup}"
