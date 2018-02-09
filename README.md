@@ -11,7 +11,7 @@ tools that do one thing well.
 This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 [ruby-build](https://github.com/rbenv/ruby-build), and modified for Python.
 
-<img src="https://i.gyazo.com/699a58927b77e46e71cd674c7fc7a78d.png" width="735" height="490" />
+<img src="/terminal_output.png" width="595" height="490" />
 
 
 ### pyenv _does..._
