@@ -16,7 +16,25 @@
 
 PYTHON_BUILD_VERSION="20160602"
 
+# Define `before_build` and `after_build` functions that allow
+# plugin hooks to register a string of code for execution before or
+# after the build process.
+declare -a before_hooks after_hooks
+
+before_build() {
+  local hook="$1"
+  before_hooks["${#before_hooks[@]}"]="$hook"
+}
+
+after_build() {
+  local hook="$1"
+  after_hooks["${#after_hooks[@]}"]="$hook"
+}
+
 OLDIFS="$IFS"
+IFS=$'\n' scripts=(`pyenv-hooks build`)
+IFS="$OLDIFS"
+for script in "${scripts[@]}"; do source "$script"; done
 
 set -E
 exec 3<&2 # preserve original stderr at fd 3
@@ -220,7 +238,15 @@ install_package_using() {
 
   pushd "$BUILD_PATH" >&4
   "fetch_${package_type}" "${fetch_args[@]}"
+
+  # Execute `before_build` hooks.
+  for hook in "${before_hooks[@]}"; do eval "$hook"; done
+
   make_package "${make_args[@]}"
+
+  # Execute `after_build` hooks.
+  for hook in "${after_hooks[@]}"; do eval "$hook"; done
+
   popd >&4
 
   { echo "Installed ${package_name} to ${PREFIX_PATH}"
