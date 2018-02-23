@@ -2022,13 +2022,13 @@ package_option python configure --libdir="${PREFIX_PATH}/lib"
 if [[ "$CONFIGURE_OPTS" == *"--enable-shared"* ]] || [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]]; then
   # The ld on Darwin embeds the full paths to each dylib by default
   if [[ "$LDFLAGS" != *"-rpath="* ]] && ! is_mac; then
-    export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
+    export LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib' ${LDFLAGS}"
   fi
 fi
 
 # python-build: Set `RPATH` if --shared` was given for PyPy (#244)
 if [[ "$PYPY_OPTS" == *"--shared"* ]]; then
-  export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
+  export LDFLAGS="-Wl,-rpath,'\$\$ORIGIN/../lib' ${LDFLAGS}"
 fi
 
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
