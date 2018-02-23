@@ -11,7 +11,7 @@ tools that do one thing well.
 This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 [ruby-build](https://github.com/rbenv/ruby-build), and modified for Python.
 
-<img src="/terminal_output.png" width="595" height="490" />
+![Terminal output example](/terminal_output.png)
 
 
 ### pyenv _does..._
@@ -195,8 +195,8 @@ easy to fork and contribute any changes back upstream.
     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
     ```
-    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.  
-    **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.  
+    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
+    **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
     **Proxy note**: If you use a proxy, export `http_proxy` and `HTTPS_PROXY` too.
 
 3. **Add `pyenv init` to your shell** to enable shims and autocompletion.
@@ -205,7 +205,7 @@ easy to fork and contribute any changes back upstream.
     ```sh
     $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
     ```
-    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.  
+    **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
     **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
     **General warning**: There are some systems where the `BASH_ENV` variable is configured
