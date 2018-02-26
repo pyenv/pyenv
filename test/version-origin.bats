@@ -26,7 +26,7 @@ setup() {
 }
 
 @test "detects local file" {
-  touch .ruby-version
+  echo "system" > .ruby-version
   run rbenv-version-origin
   assert_success "${PWD}/.ruby-version"
 }
