@@ -1,5 +1,12 @@
 ## Version History
 
+## 1.2.2
+
+* python-build: Add PyPy3 5.10.1 (#1084)
+* python-build: Add CPython 3.5.5 (#1090)
+* python-build: Add Anaconda[23]-5.1.0 (#1100)
+* python-build: Fix checksum issue for CPython 3.4.8 (#1094)
+* python-build: Prevent Anaconda from installing a `clear` shim (#1084)
 ## 1.2.1
 
 * python-build: Add CPython 3.6.4
