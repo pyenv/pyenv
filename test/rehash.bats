@@ -25,6 +25,10 @@ create_executable() {
 }
 
 @test "rehash in progress" {
+  # Skip this when flock/shlock are available
+  if [ -n $(command -v flock) ] || [ -n $(command -v shlock) ]; then
+    skip
+  fi
   mkdir -p "${PYENV_ROOT}/shims"
   touch "${PYENV_ROOT}/shims/.pyenv-shim"
   run pyenv-rehash
