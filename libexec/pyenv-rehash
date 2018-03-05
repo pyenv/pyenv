@@ -12,62 +12,47 @@ LOCK_FILE_FD=90
 # Create the shims directory if it doesn't already exist.
 mkdir -p "$SHIM_PATH"
 
-wait_for_lock() {
-  # flock(1) exists on Linux with util-linux and is the most reliable
-  if command -v flock &>/dev/null; then
-    eval "exec $LOCK_FILE_FD>\"$LOCK_FILE_PATH\""
-    flock --exclusive $LOCK_FILE_FD
-  # Fall back to shlock on BSD systems
-  elif command -v shlock &>/dev/null; then
-    # Try forever to acquire the lock
-    while ! shlock -f "$LOCK_FILE_PATH" -p $$; do
-      sleep 0.5
-    done
-  else
-    echo 'pyenv: cannot rehash: $PYENV_REHASH_PARALLEL_SAFE is set, but this system does not have flock or shlock.' >&2
+# Ensure only one instance of pyenv-rehash is running at a time.
+if command -v flock &>/dev/null; then
+  # flock(1) exists on Linux and is the most reliable
+  eval "exec $LOCK_FILE_FD>\"$LOCK_FILE_PATH\""
+  flock --exclusive $LOCK_FILE_FD
+elif command -v shlock &>/dev/null; then
+  # On macOS/BSD, use shlock when flock is not installed
+  # Try forever to acquire the lock
+  while ! shlock -f "$LOCK_FILE_PATH" -p $$; do
+    sleep 0.5
+  done
+else
+  # This is the fallback behavior when no flock/shlock exists, by
+  # setting the shell's `noclobber` option and attempting to write to
+  # the prototype shim file. If the file already exists, print a warning
+  # to stderr and exit with a non-zero status.
+  set -o noclobber
+  { echo > "$PROTOTYPE_SHIM_PATH"
+  } 2>/dev/null ||
+  { if [ -w "$SHIM_PATH" ]; then
+      echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
+    else
+      echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
+    fi
     exit 1
-  fi
-}
+  } >&2
+  set +o noclobber
+fi
+
+# If we were able to obtain a lock, register a trap to clean up the
+# prototype shim and release a possible lock when the process exits.
+trap release_lock EXIT
 
 release_lock() {
+  # Even if flock/shlock were used, the prototype shim should be removed.
+  rm -f "$PROTOTYPE_SHIM_PATH"
+
   if command -v flock &>/dev/null; then
     flock --unlock $LOCK_FILE_FD
   elif command -v shlock &>/dev/null; then
     rm -f $LOCK_FILE_PATH
-  fi
-}
-
-# When the PYENV_REHASH_PARALLEL_SAFE variable is set and flock(1) or shlock(1)
-# is available, this script can acquire an exclusive file lock to ensure only
-# one process is running pyenv-rehash.
-if [ -n "$PYENV_REHASH_PARALLEL_SAFE" ]; then
-  wait_for_lock
-fi
-
-# Ensure only one instance of pyenv-rehash is running at a time by
-# setting the shell's `noclobber` option and attempting to write to
-# the prototype shim file. If the file already exists, print a warning
-# to stderr and exit with a non-zero status.
-set -o noclobber
-{ echo > "$PROTOTYPE_SHIM_PATH"
-} 2>/dev/null ||
-{ if [ -w "$SHIM_PATH" ]; then
-    echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
-  else
-    echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
-  fi
-  exit 1
-} >&2
-set +o noclobber
-
-# If we were able to obtain a lock, register a trap to clean up the
-# prototype shim when the process exits.
-trap remove_prototype_shim EXIT
-
-remove_prototype_shim() {
-  rm -f "$PROTOTYPE_SHIM_PATH"
-  if [ -n "$PYENV_REHASH_PARALLEL_SAFE" ]; then
-    release_lock
   fi
 }
 
