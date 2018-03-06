@@ -2,6 +2,18 @@
 set -e
 unset CDPATH
 
+# Safely adds new paths to the PATH variable.
+path_add_front() {
+  if ! echo ${PATH} | egrep -q "(^|:)$1($|:)" ; then
+    PATH=${1}:${PATH}
+  fi
+}
+path_add_back() {
+  if ! echo ${PATH} | egrep -q "(^|:)$1($|:)" ; then
+    PATH=${PATH}:${1}
+  fi
+}
+
 if [ "$1" = "--debug" ]; then
   export PYENV_DEBUG=1
   shift
@@ -87,9 +99,10 @@ shopt -s nullglob
 
 bin_path="$(abs_dirname "$0")"
 for plugin_bin in "${PYENV_ROOT}/plugins/"*/bin; do
-  PATH="${plugin_bin}:${PATH}"
+  path_add_front "${plugin_bin}"
 done
-export PATH="${bin_path}:${PATH}"
+path_add_front "${bin_path}"
+export PATH
 
 PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${PYENV_ROOT}/pyenv.d"
 if [ "${bin_path%/*}" != "$PYENV_ROOT" ]; then
