@@ -1,6 +1,8 @@
+# Download source: http://downloads.activestate.com/ActivePython/releases/2.7.14.2717/
+
 case "$(activepython_architecture 2>/dev/null || true)" in
 "linux-x86_64" )
-  install_package "ActivePython-2.7.14.2717-linux-x86_64-glibc-2.12-404899" "http://downloads.activestate.com/ActivePython/releases/2.7.14.2717/ActivePython-2.7.14.2717-linux-x86_64-glibc-2.12-404899.tar.gz" "activepython" verify_py27
+  install_package "ActivePython-2.7.14.2717-linux-x86_64-glibc-2.12-404899" "http://downloads.activestate.com/ActivePython/releases/2.7.14.2717/ActivePython-2.7.14.2717-linux-x86_64-glibc-2.12-404899.tar.gz#0b514b0edb6b847524d44637f56fdebcedb007864c61f8500e68bc2015dad937" "activepython" verify_py27
   ;;
 * )
   { echo
