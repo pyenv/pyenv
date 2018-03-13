@@ -1,0 +1,18 @@
+# Download source: http://downloads.activestate.com/ActivePython/releases/3.6.0.3600/
+
+case "$(activepython_architecture 2>/dev/null || true)" in
+"linux-x86_64" )
+  install_package "ActivePython-3.6.0.3600-linux-x86_64-glibc-2.3.6-401834" "http://downloads.activestate.com/ActivePython/releases/3.6.0.3600/ActivePython-3.6.0.3600-linux-x86_64-glibc-2.3.6-401834.tar.gz#edd17d3221d9744fe27d37842b325f55d0261e69073de3be54e29c1806fe57ae" "activepython" verify_py36
+  ;;
+"linux-x86" )
+  install_package "ActivePython-3.6.0.3600-linux-x86-glibc-2.3.6-401834" "http://downloads.activestate.com/ActivePython/releases/3.6.0.3600/ActivePython-3.6.0.3600-linux-x86-glibc-2.3.6-401834.tar.gz#fafa22ad3346532384866ad009da0c9f23323167dff9de5995f94e827a5eba32" "activepython" verify_py36
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Active Python is not available for $(activepython_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

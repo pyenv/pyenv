@@ -1068,6 +1068,26 @@ build_package_pypy_builder() {
   build_package_pypy
 }
 
+activepython_architecture() {
+  case "$(uname -s)" in
+  "Darwin" ) echo "macosx10.9-i386-x86_64" ;;
+  "Linux" )
+    case "$(uname -m)" in
+    "i368" | "i486" | "i586" | "i686" | "i786" ) echo "linux-x86" ;;
+    "x86_64" ) echo "linux-x86_64" ;;
+    * ) return 1 ;;
+    esac
+    ;;
+  * ) return 1 ;;
+  esac
+}
+
+build_package_activepython() {
+  local package_name="$1"
+  { bash "install.sh" --install-dir "${PREFIX_PATH}"
+  } >&4 2>&1
+}
+
 anaconda_architecture() {
   case "$(uname -s)" in
   "Darwin" ) echo "MacOSX-x86_64" ;;

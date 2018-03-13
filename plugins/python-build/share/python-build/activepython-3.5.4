@@ -1,0 +1,15 @@
+# Location source: http://downloads.activestate.com/ActivePython/releases/3.5.4.3504/
+
+case "$(activepython_architecture 2>/dev/null || true)" in
+"linux-x86_64" )
+  install_package "ActivePython-3.5.4.3504-linux-x86_64-glibc-2.12-404899" "http://downloads.activestate.com/ActivePython/releases/3.5.4.3504/ActivePython-3.5.4.3504-linux-x86_64-glibc-2.12-404899.tar.gz#c65e7384bcff715399ef077aea5a17a9f60c3f5de3532a3767497af1d555f092" "activepython" verify_py35
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Active Python is not available for $(activepython_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
