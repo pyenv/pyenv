@@ -35,22 +35,18 @@ else
     $READLINK "$1"
   }
 
-  resolve_link_follow() {
-    $READLINK -f "$1"
-  }
-
   abs_dirname() {
     local path="$1"
 
     # Use a subshell to avoid changing the current path
     (
-    while [ -n "$path" ]; do
+    while [[ -n "$path" && $(echo "$path" | grep /) ]]; do
       cd "${path%/*}"
       local name="${path##*/}"
       path="$(resolve_link "$name" || true)"
     done
 
-    resolve_link_follow "$(pwd)"
+    pwd
     )
   }
 fi
