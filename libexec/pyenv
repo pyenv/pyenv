@@ -35,6 +35,10 @@ else
     $READLINK "$1"
   }
 
+  resolve_link_follow() {
+    $READLINK -f "$1"
+  }
+
   abs_dirname() {
     local path="$1"
 
@@ -43,10 +47,10 @@ else
     while [ -n "$path" ]; do
       cd "${path%/*}"
       local name="${path##*/}"
-      path="$(test -d "$name" && resolve_link "$name" || true)"
+      path="$(resolve_link "$name" || true)"
     done
 
-    pwd
+    resolve_link_follow "$(pwd)"
     )
   }
 fi
