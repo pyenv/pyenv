@@ -43,7 +43,7 @@ else
     while [ -n "$path" ]; do
       cd "${path%/*}"
       local name="${path##*/}"
-      path="$(resolve_link "$name" || true)"
+      path="$(test -d "$name" && resolve_link "$name" || true)"
     done
 
     pwd
