@@ -381,3 +381,11 @@ tracker](https://github.com/pyenv/pyenv/issues).
 
   [pyenv-virtualenv]: https://github.com/pyenv/pyenv-virtualenv#readme
   [hooks]: https://github.com/pyenv/pyenv/wiki/Authoring-plugins#pyenv-hooks
+
+### Version History
+
+See [CHANGELOG.md](CHANGELOG.md).
+
+### License
+
+[The MIT License](LICENSE)
