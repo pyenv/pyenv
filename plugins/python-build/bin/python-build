@@ -2110,9 +2110,12 @@ fi
 # Download specified version of ez_setup.py/get-pip.py (#202)
 if [ -n "${SETUPTOOLS_VERSION}" ]; then
   EZ_SETUP_URL="https://bitbucket.org/pypa/setuptools/raw/${SETUPTOOLS_VERSION}/ez_setup.py"
+  unset SETUPTOOLS_VERSION
 fi
 if [ -n "${PIP_VERSION}" ]; then
   GET_PIP_URL="https://raw.githubusercontent.com/pypa/pip/${PIP_VERSION}/contrib/get-pip.py"
+  # Unset `PIP_VERSION` from environment before invoking `get-pip.py` to deal with "ValueError: invalid truth value" (pypa/pip#4528)
+  unset PIP_VERSION
 fi
 
 # Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
