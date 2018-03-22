@@ -1806,7 +1806,7 @@ build_package_ez_setup() {
       echo "Installing setuptools from ${EZ_SETUP}..." 1>&2
       cat "${EZ_SETUP}"
     else
-      [ -n "${EZ_SETUP_URL}" ] || EZ_SETUP_URL="https://bootstrap.pypa.io/ez_setup.py"
+      [ -n "${EZ_SETUP_URL}" ]
       echo "Installing setuptools from ${EZ_SETUP_URL}..." 1>&2
       http get "${EZ_SETUP_URL}"
     fi
@@ -1825,7 +1825,7 @@ build_package_get_pip() {
       echo "Installing pip from ${GET_PIP}..." 1>&2
       cat "${GET_PIP}"
     else
-      [ -n "${GET_PIP_URL}" ] || GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
+      [ -n "${GET_PIP_URL}" ]
       echo "Installing pip from ${GET_PIP_URL}..." 1>&2
       http get "${GET_PIP_URL}"
     fi
@@ -2108,14 +2108,22 @@ if [ -e "$HOME/.pydistutils.cfg" ]; then
 fi
 
 # Download specified version of ez_setup.py/get-pip.py (#202)
-if [ -n "${SETUPTOOLS_VERSION}" ]; then
-  EZ_SETUP_URL="https://bitbucket.org/pypa/setuptools/raw/${SETUPTOOLS_VERSION}/ez_setup.py"
-  unset SETUPTOOLS_VERSION
+if [ -z "${EZ_SETUP_URL}" ]; then
+  if [ -n "${SETUPTOOLS_VERSION}" ]; then
+    EZ_SETUP_URL="https://bitbucket.org/pypa/setuptools/raw/${SETUPTOOLS_VERSION}/ez_setup.py"
+    unset SETUPTOOLS_VERSION
+  else
+    EZ_SETUP_URL="https://bootstrap.pypa.io/ez_setup.py"
+  fi
 fi
-if [ -n "${PIP_VERSION}" ]; then
-  GET_PIP_URL="https://raw.githubusercontent.com/pypa/pip/${PIP_VERSION}/contrib/get-pip.py"
-  # Unset `PIP_VERSION` from environment before invoking `get-pip.py` to deal with "ValueError: invalid truth value" (pypa/pip#4528)
-  unset PIP_VERSION
+if [ -z "${GET_PIP_URL}" ]; then
+  if [ -n "${PIP_VERSION}" ]; then
+    GET_PIP_URL="https://raw.githubusercontent.com/pypa/pip/${PIP_VERSION}/contrib/get-pip.py"
+    # Unset `PIP_VERSION` from environment before invoking `get-pip.py` to deal with "ValueError: invalid truth value" (pypa/pip#4528)
+    unset PIP_VERSION
+  else
+    GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
+  fi
 fi
 
 # Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
