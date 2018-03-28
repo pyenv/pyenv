@@ -2,7 +2,7 @@
 
 ## 1.2.3
 
-* python-build: Add CPython 3.5.6
+* python-build: Add CPython 3.6.5
 * python-build: Set openssl PKG_CONFIG_PATH for python 3.7 (#1117)
 * python-build: Add ActivePython versions 2.7.14, 3.5.4, 3.6.0 (#1113)
 * python-build: Unset `PIP_VERSION` before invoking `get-pip.py` as a workaround for `invalid truth value` error (#1124)
