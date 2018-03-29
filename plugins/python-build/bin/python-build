@@ -2122,7 +2122,21 @@ if [ -z "${GET_PIP_URL}" ]; then
     # Unset `PIP_VERSION` from environment before invoking `get-pip.py` to deal with "ValueError: invalid truth value" (pypa/pip#4528)
     unset PIP_VERSION
   else
-    GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
+    # Use custom get-pip URL based on the target version (#1127)
+    case "${DEFINITION_PATH##*/}" in
+    2.6 | 2.6.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/2.6/get-pip.py"
+      ;;
+    3.2 | 3.2.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/3.2/get-pip.py"
+      ;;
+    3.3 | 3.3.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/3.3/get-pip.py"
+      ;;
+    * )
+      GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
+      ;;
+    esac
   fi
 fi
 
