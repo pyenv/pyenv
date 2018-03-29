@@ -2118,11 +2118,28 @@ if [ -z "${EZ_SETUP_URL}" ]; then
 fi
 if [ -z "${GET_PIP_URL}" ]; then
   if [ -n "${PIP_VERSION}" ]; then
+    { colorize 1 "WARNING"
+      echo ": Setting PIP_VERSION=${PIP_VERSION} is no longer supported and may cause failures during the install process."
+    } 1>&2
     GET_PIP_URL="https://raw.githubusercontent.com/pypa/pip/${PIP_VERSION}/contrib/get-pip.py"
     # Unset `PIP_VERSION` from environment before invoking `get-pip.py` to deal with "ValueError: invalid truth value" (pypa/pip#4528)
     unset PIP_VERSION
   else
-    GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
+    # Use custom get-pip URL based on the target version (#1127)
+    case "${DEFINITION_PATH##*/}" in
+    2.6 | 2.6.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/2.6/get-pip.py"
+      ;;
+    3.2 | 3.2.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/3.2/get-pip.py"
+      ;;
+    3.3 | 3.3.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/3.3/get-pip.py"
+      ;;
+    * )
+      GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
+      ;;
+    esac
   fi
 fi
 
