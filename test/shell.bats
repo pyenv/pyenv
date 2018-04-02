@@ -3,14 +3,14 @@
 load test_helper
 
 @test "shell integration disabled" {
-  run rbenv shell
-  assert_failure "rbenv: shell integration not enabled. Run \`rbenv init' for instructions."
+  run pyenv shell
+  assert_failure "pyenv: shell integration not enabled. Run \`pyenv init' for instructions."
 }
 
 @test "shell integration enabled" {
-  eval "$(rbenv init -)"
-  run rbenv shell
-  assert_success "rbenv: no shell-specific version configured"
+  eval "$(pyenv init -)"
+  run pyenv shell
+  assert_success "pyenv: no shell-specific version configured"
 }
 
 @test "no shell version" {
