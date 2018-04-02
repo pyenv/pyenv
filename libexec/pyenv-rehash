@@ -6,32 +6,58 @@ set -e
 
 SHIM_PATH="${PYENV_ROOT}/shims"
 PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
+LOCK_FILE_PATH="${SHIM_PATH}/.pyenv.lock"
+LOCK_FILE_FD=90
 
 # Create the shims directory if it doesn't already exist.
 mkdir -p "$SHIM_PATH"
 
-# Ensure only one instance of pyenv-rehash is running at a time by
-# setting the shell's `noclobber` option and attempting to write to
-# the prototype shim file. If the file already exists, print a warning
-# to stderr and exit with a non-zero status.
-set -o noclobber
-{ echo > "$PROTOTYPE_SHIM_PATH"
-} 2>/dev/null ||
-{ if [ -w "$SHIM_PATH" ]; then
-    echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
-  else
-    echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
-  fi
+if ! [ -w "$SHIM_PATH" ]; then
+  echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
   exit 1
-} >&2
-set +o noclobber
+fi
+
+# Ensure only one instance of pyenv-rehash is running at a time.
+if command -v flock &>/dev/null; then
+  # flock(1) exists on Linux and is the most reliable
+  eval "exec $LOCK_FILE_FD>\"$LOCK_FILE_PATH\""
+  flock --exclusive $LOCK_FILE_FD
+elif command -v shlock &>/dev/null; then
+  # On macOS/BSD, use shlock when flock is not installed
+  # Try forever to acquire the lock
+  while ! shlock -f "$LOCK_FILE_PATH" -p $$; do
+    sleep 0.5
+  done
+else
+  # This is the fallback behavior when no flock/shlock exists, by
+  # setting the shell's `noclobber` option and attempting to write to
+  # the prototype shim file. If the file already exists, print a warning
+  # to stderr and exit with a non-zero status.
+  set -o noclobber
+  { echo > "$PROTOTYPE_SHIM_PATH"
+  } 2>/dev/null ||
+  { if [ -e "$SHIM_PATH" ]; then
+      echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
+      exit 1
+    fi
+  } >&2
+  set +o noclobber
+fi
 
 # If we were able to obtain a lock, register a trap to clean up the
-# prototype shim when the process exits.
-trap remove_prototype_shim EXIT
+# prototype shim and release a possible lock when the process exits.
+trap release_lock EXIT
 
-remove_prototype_shim() {
+release_lock() {
+  # Even if flock/shlock were used, the prototype shim should be removed.
   rm -f "$PROTOTYPE_SHIM_PATH"
+
+  if command -v flock &>/dev/null; then
+    flock --unlock $LOCK_FILE_FD
+    rm -f $LOCK_FILE_PATH
+  elif command -v shlock &>/dev/null; then
+    rm -f $LOCK_FILE_PATH
+  fi
 }
 
 # The prototype shim file is a script that re-execs itself, passing
