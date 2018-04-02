@@ -9,7 +9,7 @@ setup() {
 
 create_file() {
   mkdir -p "$(dirname "$1")"
-  touch "$1"
+  echo "system" > "$1"
 }
 
 @test "detects global 'version' file" {

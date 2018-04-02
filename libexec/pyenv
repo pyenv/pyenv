@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -e
-unset CDPATH
 
 if [ "$1" = "--debug" ]; then
   export PYENV_DEBUG=1
@@ -22,7 +21,8 @@ abort() {
 
 if enable -f "${BASH_SOURCE%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
   abs_dirname() {
-    local path="$(realpath "$1")"
+    local path
+    path="$(realpath "$1")"
     echo "${path%/*}"
   }
 else
@@ -69,6 +69,11 @@ if [ -z "${PYENV_DIR}" ]; then
     export PYENV_DIR
     unset PYENV_FILE_ARG
   fi
+else
+  [[ $PYENV_DIR == /* ]] || PYENV_DIR="$PWD/$PYENV_DIR"
+  cd "$PYENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$PYENV_DIR'"
+  PYENV_DIR="$PWD"
+  cd "$OLDPWD"
 fi
 
 if [ -z "${PYENV_DIR}" ]; then
@@ -121,7 +126,13 @@ case "$command" in
   ;;
 * )
   command_path="$(command -v "pyenv-$command" || true)"
-  [ -n "$command_path" ] || abort "no such command \`$command'"
+  if [ -z "$command_path" ]; then
+    if [ "$command" == "shell" ]; then
+      abort "shell integration not enabled. Run \`pyenv init' for instructions."
+    else
+      abort "no such command \`$command'"
+    fi
+  fi
 
   shift 1
   if [ "$1" = --help ]; then

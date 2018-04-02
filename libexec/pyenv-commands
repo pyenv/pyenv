@@ -28,15 +28,15 @@ shopt -s nullglob
     for command in "${path}/pyenv-"*; do
       command="${command##*pyenv-}"
       if [ -n "$sh" ]; then
-        if [ ${command:0:3} = "sh-" ]; then
-          echo ${command##sh-}
+        if [ "${command:0:3}" = "sh-" ]; then
+          echo "${command##sh-}"
         fi
       elif [ -n "$nosh" ]; then
-        if [ ${command:0:3} != "sh-" ]; then
-          echo ${command##sh-}
+        if [ "${command:0:3}" != "sh-" ]; then
+          echo "${command##sh-}"
         fi
       else
-        echo ${command##sh-}
+        echo "${command##sh-}"
       fi
     done
   done

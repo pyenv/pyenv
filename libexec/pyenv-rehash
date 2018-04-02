@@ -16,7 +16,7 @@ mkdir -p "$SHIM_PATH"
 # to stderr and exit with a non-zero status.
 set -o noclobber
 { echo > "$PROTOTYPE_SHIM_PATH"
-} 2>/dev/null ||
+} 2>| /dev/null ||
 { if [ -w "$SHIM_PATH" ]; then
     echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
   else
@@ -83,7 +83,7 @@ remove_outdated_shims() {
 list_executable_names() {
   local version file
   pyenv-versions --bare --skip-aliases | \
-  while read version; do
+  while read -r version; do
     for file in "${PYENV_ROOT}/versions/${version}/bin/"*; do
       echo "${file##*/}"
     done
@@ -136,6 +136,7 @@ shopt -s nullglob
 # executables.
 create_prototype_shim
 remove_outdated_shims
+# shellcheck disable=SC2046
 make_shims $(list_executable_names | sort -u)
 
 
