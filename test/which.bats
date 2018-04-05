@@ -60,12 +60,11 @@ create_executable() {
 }
 
 @test "doesn't include current directory in PATH search" {
-  export PATH="$(path_without "kill-all-humans")"
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
   touch kill-all-humans
   chmod +x kill-all-humans
-  PYENV_VERSION=system run pyenv-which kill-all-humans
+  PATH="$(path_without "kill-all-humans")" PYENV_VERSION=system run pyenv-which kill-all-humans
   assert_failure "pyenv: kill-all-humans: command not found"
 }
 
@@ -91,9 +90,8 @@ OUT
 }
 
 @test "no executable found for system version" {
-  export PATH="$(path_without "py.test")"
-  PYENV_VERSION=system run pyenv-which py.test
-  assert_failure "pyenv: py.test: command not found"
+  PATH="$(path_without "rake")" PYENV_VERSION=system run pyenv-which rake
+  assert_failure "pyenv: rake: command not found"
 }
 
 @test "executable found in other versions" {

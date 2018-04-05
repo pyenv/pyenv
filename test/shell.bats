@@ -2,6 +2,17 @@
 
 load test_helper
 
+@test "shell integration disabled" {
+  run pyenv shell
+  assert_failure "pyenv: shell integration not enabled. Run \`pyenv init' for instructions."
+}
+
+@test "shell integration enabled" {
+  eval "$(pyenv init -)"
+  run pyenv shell
+  assert_success "pyenv: no shell-specific version configured"
+}
+
 @test "no shell version" {
   mkdir -p "${PYENV_TEST_DIR}/myproject"
   cd "${PYENV_TEST_DIR}/myproject"
