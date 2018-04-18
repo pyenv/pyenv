@@ -86,8 +86,12 @@ mkdir -p "${PYENV_ROOT}/"{shims,versions}
 
 case "$shell" in
 fish )
-  echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
-  echo "set -gx PYENV_SHELL $shell"
+  # add check to prevent duplicate `$PYENV_ROOT/shims` directories in `$PATH`
+  echo "if not contains '${PYENV_ROOT}/shims' \$PATH"
+  echo "and test -d '${PYENV_ROOT}/shims'"
+    echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+    echo "set -gx PYENV_SHELL $shell"
+  echo "end"
 ;;
 * )
   echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
