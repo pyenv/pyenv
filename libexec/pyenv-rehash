@@ -34,6 +34,11 @@ release_lock() {
   remove_prototype_shim
 }
 
+if [ ! -w "$SHIM_PATH" ]; then
+  echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
+  exit 1
+fi
+
 unset acquired
 for _ in $(seq "${PYENV_REHASH_TIMEOUT:-60}"); do
   if acquire_lock 2>/dev/null; then
@@ -46,11 +51,7 @@ for _ in $(seq "${PYENV_REHASH_TIMEOUT:-60}"); do
 done
 
 if [ -z "${acquired}" ]; then
-  if [ -w "$SHIM_PATH" ]; then
-    echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
-  else
-    echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
-  fi
+  echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
   exit 1
 fi
 

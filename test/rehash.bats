@@ -25,6 +25,7 @@ create_executable() {
 }
 
 @test "rehash in progress" {
+  export PYENV_REHASH_TIMEOUT=1
   mkdir -p "${PYENV_ROOT}/shims"
   touch "${PYENV_ROOT}/shims/.pyenv-shim"
   run pyenv-rehash
