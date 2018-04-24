@@ -35,7 +35,7 @@ release_lock() {
 }
 
 unset acquired
-for _ in $(seq "${PYENV_REHASH_LOCK_TIMEOUT:-60}"); do
+for _ in $(seq "${PYENV_REHASH_TIMEOUT:-60}"); do
   if acquire_lock 2>/dev/null; then
     acquired=1
     break
