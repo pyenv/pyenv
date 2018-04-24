@@ -32,6 +32,15 @@ create_executable() {
   assert_failure "pyenv: cannot rehash: ${PYENV_ROOT}/shims/.pyenv-shim exists"
 }
 
+@test "wait until lock acquisition" {
+  export PYENV_REHASH_TIMEOUT=5
+  mkdir -p "${PYENV_ROOT}/shims"
+  touch "${PYENV_ROOT}/shims/.pyenv-shim"
+  bash -c "sleep 1 && rm -f ${PYENV_ROOT}/shims/.pyenv-shim" &
+  run pyenv-rehash
+  assert_success
+}
+
 @test "creates shims" {
   create_executable "2.7" "python"
   create_executable "2.7" "fab"
