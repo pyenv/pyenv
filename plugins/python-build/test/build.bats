@@ -6,9 +6,9 @@ export MAKE=make
 export MAKE_OPTS="-j 2"
 export CC=cc
 export -n PYTHON_CONFIGURE_OPTS
+export PYTHON_BUILD_HTTP_CLIENT="curl"
 
 setup() {
-  ensure_not_found_in_path aria2c
   mkdir -p "$INSTALL_ROOT"
   stub md5 false
   stub curl false

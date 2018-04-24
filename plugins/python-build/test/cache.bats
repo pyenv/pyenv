@@ -4,9 +4,9 @@ load test_helper
 export PYTHON_BUILD_SKIP_MIRROR=1
 export PYTHON_BUILD_CACHE_PATH="$TMP/cache"
 export PYTHON_BUILD_CURL_OPTS=
+export PYTHON_BUILD_HTTP_CLIENT="curl"
 
 setup() {
-  ensure_not_found_in_path aria2c
   mkdir "$PYTHON_BUILD_CACHE_PATH"
 }
 

@@ -5,10 +5,7 @@ export PYTHON_BUILD_SKIP_MIRROR=
 export PYTHON_BUILD_CACHE_PATH=
 export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
 export PYTHON_BUILD_CURL_OPTS=
-
-setup() {
-  ensure_not_found_in_path aria2c
-}
+export PYTHON_BUILD_HTTP_CLIENT="curl"
 
 
 @test "package URL without checksum bypasses mirror" {
