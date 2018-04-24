@@ -328,21 +328,22 @@ http() {
   local file="$3"
   [ -n "$url" ] || return 1
 
-  if type aria2c &>/dev/null; then
-    "http_${method}_aria2c" "$url" "$file"
-  elif type curl &>/dev/null; then
-    "http_${method}_curl" "$url" "$file"
-  elif type wget &>/dev/null; then
-    # SSL Certificate error with older wget that does not support Server Name Indication (#60)
-    if [[ "$(wget --version 2>/dev/null || true)" = "GNU Wget 1.1"[0-3]* ]]; then
-      echo "python-build: wget (< 1.14) doesn't support Server Name Indication. Please install curl (>= 7.18.1) and try again" >&2
-      return 1
-    fi
-    "http_${method}_wget" "$url" "$file"
+  local http_client
+  if [ -n "${PYTHON_BUILD_HTTP_CLIENT}" ]; then
+    http_client="http_${method}_${PYTHON_BUILD_HTTP_CLIENT}"
   else
-    echo "error: please install \`aria2c\`, \`curl\` or \`wget\` and try again" >&2
-    exit 1
+    if type aria2c &>/dev/null; then
+      http_client="http_${method}_aria2c"
+    elif type curl &>/dev/null; then
+      http_client="http_${method}_curl"
+    elif type wget &>/dev/null; then
+      http_client="http_${method}_wget"
+    else
+      echo "error: please install \`aria2c\`, \`curl\` or \`wget\` and try again" >&2
+      exit 1
+    fi
   fi
+  "${http_client}" "$url" "$file"
 }
 
 http_head_aria2c() {
@@ -2030,6 +2031,14 @@ fi
 ARIA2_OPTS="${PYTHON_BUILD_ARIA2_OPTS} ${IPV4+--disable-ipv6=true} ${IPV6+--disable-ipv6=false}"
 CURL_OPTS="${PYTHON_BUILD_CURL_OPTS} ${IPV4+--ipv4} ${IPV6+--ipv6}"
 WGET_OPTS="${PYTHON_BUILD_WGET_OPTS} ${IPV4+--inet4-only} ${IPV6+--inet6-only}"
+
+if [ -z "${PYTHON_BUILD_HTTP_CLIENT}" ] && ! type aria2c &>/dev/null && ! type curl &>/dev/null; then
+  # SSL Certificate error with older wget that does not support Server Name Indication (#60)
+  if [[ "$(wget --version 2>/dev/null || true)" = "GNU Wget 1.1"[0-3]* ]]; then
+    echo "python-build: wget (< 1.14) doesn't support Server Name Indication. Please install curl (>= 7.18.1) and try again" >&2
+    return 1
+  fi
+fi
 
 # Add an option to build a debug version of Python (#11)
 if [ -n "$DEBUG" ]; then
