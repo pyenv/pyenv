@@ -1615,7 +1615,7 @@ apply_python_patch() {
 
 build_package_symlink_version_suffix() {
   if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
-    if [ -e "${PREFIX_PATH}/bin" ]; then
+    if [ -e "${PREFIX_PATH}/bin" ] && [ ! -L "${PREFIX_PATH}/bin" ]; then
       # Always create `bin` as symlink to framework path if the version was built with `--enable-frameowrk` (#590)
       rm -rf "${PREFIX_PATH}/bin.orig"
       mv -f "${PREFIX_PATH}/bin" "${PREFIX_PATH}/bin.orig"
@@ -1627,27 +1627,50 @@ build_package_symlink_version_suffix() {
   # Not create symlinks on `altinstall` (#255)
   if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
     shopt -s nullglob
-    local version_bin="$(ls -1 "${PREFIX_PATH}/bin/python"* | grep '[0-9]$' | sort | tail -1)"
-    suffix="$(basename "${version_bin}" | sed -e 's/^python//')"
-    if [ -n "${suffix}" ]; then
-      local file link
-      for file in "${PREFIX_PATH}/bin"/*; do
-        unset link
+    local major_minor_version_bin="$(ls -1 "${PREFIX_PATH}/bin/python"* | grep '/python[0-9][0-9]*\.[0-9][0-9]*$' | sort | tail -1)"
+    local major_minor_version_suffix="$(basename "${major_minor_version_bin}" | sed -e 's/^python//')"
+    if [ -n "${major_minor_version_suffix}" ]; then
+      local major_version_suffix="${major_minor_version_suffix%%.*}"
+    else
+      local major_version_bin="$(ls -1 "${PREFIX_PATH}/bin/python"* | grep '/python[0-9][0-9]*$' | sort | tail -1)"
+      local major_version_suffix="$(basename "${major_version_bin}" | sed -e 's/^python//')"
+    fi
+    create_symlink_if_missing() {
+      local file="$1" link="$2"
+      if [ -n "${link}" ] && [ ! -e "${link}" ]; then
+        ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
+      fi
+    }
+    if [ -n "${major_minor_version_suffix}" ]; then
+      for file in $(ls -1 "${PREFIX_PATH}/bin/"* | sort); do
         case "${file}" in
-        */"python${suffix}-config" )
+        */"python${major_minor_version_suffix}-config" )
           # Symlink `pythonX.Y-config` to `python-config` if `python-config` is missing (#296)
-          link="${file%/*}/python-config"
+          create_symlink_if_missing "${file}" "python-config"
         ;;
-        */*"-${suffix}" )
-          link="${file%%-${suffix}}"
+        */*"-${major_minor_version_suffix}" )
+          create_symlink_if_missing "${file}" "${file%%-${major_minor_version_suffix}}"
         ;;
-        */*"${suffix}" )
-          link="${file%%${suffix}}"
+        */*"${major_minor_version_suffix}" )
+          create_symlink_if_missing "${file}" "${file%%${major_minor_version_suffix}}"
         ;;
         esac
-        if [ -n "$link" ] && [ ! -e "$link" ]; then
-          ( cd "${file%/*}" && ln -fs "${file##*/}" "${link##*/}" )
-        fi
+      done
+    fi
+    if [ -n "${major_version_suffix}" ]; then
+      for file in $(ls -1 "${PREFIX_PATH}/bin/"* | sort); do
+        case "${file}" in
+        */"python${major_version_suffix}-config" )
+          # Symlink `pythonX.Y-config` to `python-config` if `python-config` is missing (#296)
+          create_symlink_if_missing "${file}" "python-config"
+        ;;
+        */*"-${major_version_suffix}" )
+          create_symlink_if_missing "${file}" "${file%%-${major_version_suffix}}"
+        ;;
+        */*"${major_version_suffix}" )
+          create_symlink_if_missing "${file}" "${file%%${major_version_suffix}}"
+        ;;
+        esac
       done
     fi
     shopt -u nullglob
