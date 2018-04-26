@@ -537,6 +537,10 @@ OUT
   # nop
 }
 
+@test "JRuby Java 9 version string" {
+  # nop
+}
+
 @test "non-writable TMPDIR aborts build" {
   export TMPDIR="${TMP}/build"
   mkdir -p "$TMPDIR"

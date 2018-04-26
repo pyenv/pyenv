@@ -14,7 +14,7 @@
 #   -g/--debug       Build a debug version
 #
 
-PYTHON_BUILD_VERSION="20160602"
+PYTHON_BUILD_VERSION="20180424"
 
 OLDIFS="$IFS"
 
@@ -60,6 +60,7 @@ resolve_link() {
 }
 
 abs_dirname() {
+  local cwd="$(pwd)"
   local path="$1"
 
   # Use a subshell to avoid modifying the current path
@@ -72,6 +73,7 @@ abs_dirname() {
 
   pwd
   )
+# cd "$cwd"
 }
 
 capitalize() {
@@ -1183,7 +1185,7 @@ fix_rbx_irb() {
 
 require_java7() {
   local version="$(java -version 2>&1 | grep '\(java\|openjdk\) version' | head -1)"
-  if [[ $version != *1.[789]* ]]; then
+  if [[ $version != *[789]* ]]; then
     colorize 1 "ERROR" >&3
     echo ": Java 7 required. Please install a 1.7-compatible JRE." >&3
     return 1
@@ -1506,9 +1508,15 @@ build_package_mac_openssl() {
   export CPPFLAGS="-I${OPENSSL_PREFIX_PATH}/include ${CPPFLAGS}"
   export LDFLAGS="-L${OPENSSL_PREFIX_PATH}/lib ${LDFLAGS}"
 
+  # Make sure pkg-config finds our build first.
+  export PKG_CONFIG_PATH="${OPENSSL_PREFIX_PATH}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+
   # Hint OpenSSL that we prefer a 64-bit build.
   export KERNEL_BITS="64"
   OPENSSL_CONFIGURE="${OPENSSL_CONFIGURE:-./config}"
+
+  local nokerberos
+  [[ "$1" != openssl-1.0.* ]] || nokerberos=1
 
   # Compile a shared lib with zlib dynamically linked, no kerberos.
   package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl2 no-ssl3 no-krb5 shared
