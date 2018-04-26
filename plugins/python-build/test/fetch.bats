@@ -3,8 +3,6 @@
 load test_helper
 export PYTHON_BUILD_SKIP_MIRROR=1
 export PYTHON_BUILD_CACHE_PATH=
-export PYTHON_BUILD_ARIA2_OPTS=
-export PYTHON_BUILD_HTTP_CLIENT="curl"
 
 setup() {
   export PYTHON_BUILD_BUILD_PATH="${TMP}/source"
@@ -21,6 +19,7 @@ setup() {
 }
 
 @test "using aria2c if available" {
+  export PYTHON_BUILD_ARIA2_OPTS=
   export PYTHON_BUILD_HTTP_CLIENT="aria2c"
   stub aria2c "--allow-overwrite=true --no-conf=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$4"
 

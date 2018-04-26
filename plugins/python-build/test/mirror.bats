@@ -4,8 +4,6 @@ load test_helper
 export PYTHON_BUILD_SKIP_MIRROR=
 export PYTHON_BUILD_CACHE_PATH=
 export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
-export PYTHON_BUILD_CURL_OPTS=
-export PYTHON_BUILD_HTTP_CLIENT="curl"
 
 
 @test "package URL without checksum bypasses mirror" {

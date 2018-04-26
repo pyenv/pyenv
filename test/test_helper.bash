@@ -1,6 +1,5 @@
 unset PYENV_VERSION
 unset PYENV_DIR
-unset PYTHON_BUILD_HTTP_CLIENT
 
 # guard against executing this block twice due to bats internals
 if [ -z "$PYENV_TEST_DIR" ]; then

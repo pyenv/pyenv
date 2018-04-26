@@ -3,8 +3,6 @@
 load test_helper
 export PYTHON_BUILD_SKIP_MIRROR=1
 export PYTHON_BUILD_CACHE_PATH=
-export PYTHON_BUILD_CURL_OPTS=
-export PYTHON_BUILD_HTTP_CLIENT="curl"
 
 
 @test "package URL without checksum" {

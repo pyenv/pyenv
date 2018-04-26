@@ -1,4 +1,6 @@
 export TMP="$BATS_TEST_DIRNAME/tmp"
+export RUBY_BUILD_CURL_OPTS=
+export RUBY_BUILD_HTTP_CLIENT="curl"
 
 if [ "$FIXTURE_ROOT" != "$BATS_TEST_DIRNAME/fixtures" ]; then
   export FIXTURE_ROOT="$BATS_TEST_DIRNAME/fixtures"
