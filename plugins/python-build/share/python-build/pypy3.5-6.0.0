@@ -1,0 +1,64 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
+    install_package "pypy3-v6.0.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-linux32.tar.bz2#b04eeee5160e6cb5f8962de80f077ea1dc7be34e77d74bf075519c23603f5ff9" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"linux64" )
+  if require_distro "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
+    install_package "pypy3-v6.0.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-linux64.tar.bz2#4cfffa292b9ef34bb6ba39cdbaa196c5c5cbbc5aa3faaa157cf45d7e34027048" "pypy" verify_py27 ensurepip
+  else
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
+      echo "try 'pypy3.5-6.0.0-src' to build from source."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"linux-armel" )
+  require_distro "Ubuntu 12.04" || true
+  install_package "pypy3-v6.0.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-linux-armel.tar.bz2#6a6888a55192f58594838b8b3d2e7daaad43d3bf4293afab3dd8987d0bbd1124" "pypy" verify_py27 ensurepip
+  ;;
+"linux-armhf" )
+  if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
+    install_package "pypy3-v6.0.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-linux-armhf-raspbian.tar.bz2#8a0420dda23413925400538bbfc0cff2bbb2ab0de984eef6faaeab6d3309cbcc" "pypy" verify_py27 ensurepip
+  else
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+      echo "try 'pypy3.5-6.0.0-src' to build from source."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"osx64" )
+  if require_osx_version "10.13"; then
+    install_package "pypy3-v6.0.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-osx64.tar.bz2#938b8034e30f5f5060d2a079070c56c3be5559bc7ae9cc0c8395fe6fc45cfe4c" "pypy" verify_py27 ensurepip
+  else
+  #  install_package "pypy3-v6.0.0-osx64-2" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-osx64-2.tar.bz2#" "pypy" verify_py27 ensurepip
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
+      echo "try 'pypy3.5-6.0.0-src' to build from source."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"win32" )
+  # FIXME: never tested on Windows
+  install_zip "pypy3-v6.0.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v6.0.0-win32.zip#72dddb3746a51f7672c77d619c818e27efe899e08ae82762448e50dbfdc2f5f3" "pypy" verify_py27 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy3.5-6.0.0-src' to build from source."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
