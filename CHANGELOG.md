@@ -1,5 +1,14 @@
 ## Version History
 
+## 1.2.4
+
+* python-build: Add CPython 2.7.15
+* python-build: Add PyPy 6.0.0
+* python-build: Allow overriding HTTP client type based on environment variable `PYTHON_BUILD_HTTP_CLIENT` (#1126)
+* python-build: Use version-specific `get-pip.py` when installing 2.6 and 3.2 (#1131)
+* pyenv: Merge rbenv master (#1151)
+* pyenv: Make `pyenv-rehash` safer for multiple processes (#1092)
+
 ## 1.2.3
 
 * python-build: Add CPython 3.6.5
