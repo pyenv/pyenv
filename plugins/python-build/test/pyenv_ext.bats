@@ -5,11 +5,11 @@ export PYTHON_BUILD_CACHE_PATH="$TMP/cache"
 export MAKE=make
 export MAKE_OPTS="-j 2"
 export CC=cc
+export PYTHON_BUILD_HTTP_CLIENT="curl"
 
 export TMP_FIXTURES="$TMP/fixtures"
 
 setup() {
-  ensure_not_found_in_path aria2c
   mkdir -p "$INSTALL_ROOT"
   stub md5 false
   stub curl false

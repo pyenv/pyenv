@@ -1,4 +1,6 @@
 export TMP="$BATS_TEST_DIRNAME/tmp"
+export RUBY_BUILD_CURL_OPTS=
+export RUBY_BUILD_HTTP_CLIENT="curl"
 
 if [ "$FIXTURE_ROOT" != "$BATS_TEST_DIRNAME/fixtures" ]; then
   export FIXTURE_ROOT="$BATS_TEST_DIRNAME/fixtures"
@@ -8,35 +10,6 @@ if [ "$FIXTURE_ROOT" != "$BATS_TEST_DIRNAME/fixtures" ]; then
   PATH="$TMP/bin:$PATH"
   export PATH
 fi
-
-remove_command_from_path() {
-  OLDIFS="${IFS}"
-  local cmd="$1"
-  local path
-  local paths=()
-  IFS=:
-  for path in ${PATH}; do
-    if [ -e "${path}/${cmd}" ]; then
-      local tmp_path="$(mktemp -d "${TMP}/path.XXXXX")"
-      ln -fs "${path}"/* "${tmp_path}"
-      rm -f "${tmp_path}/${cmd}"
-      paths["${#paths[@]}"]="${tmp_path}"
-    else
-      paths["${#paths[@]}"]="${path}"
-    fi
-  done
-  export PATH="${paths[*]}"
-  IFS="${OLDIFS}"
-}
-
-ensure_not_found_in_path() {
-  local cmd
-  for cmd; do
-    if command -v "${cmd}" 1>/dev/null 2>&1; then
-      remove_command_from_path "${cmd}"
-    fi
-  done
-}
 
 teardown() {
   rm -fr "${TMP:?}"/*

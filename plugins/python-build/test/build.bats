@@ -8,7 +8,6 @@ export CC=cc
 export -n PYTHON_CONFIGURE_OPTS
 
 setup() {
-  ensure_not_found_in_path aria2c
   mkdir -p "$INSTALL_ROOT"
   stub md5 false
   stub curl false
