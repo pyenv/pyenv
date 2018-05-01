@@ -1,3 +1,2 @@
-#!/usr/bin/env bash
 # Summary: Display the root directory where versions and shims are kept
 echo "$PYENV_ROOT"

@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Summary: List hook scripts for a given pyenv command
 # Usage: pyenv hooks <command>
 

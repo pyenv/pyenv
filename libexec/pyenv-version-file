@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Usage: pyenv version-file [<dir>]
 # Summary: Detect the file that sets the current pyenv version
 set -e

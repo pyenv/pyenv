@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-#
 # Summary: Display the full path to an executable
 #
 # Usage: pyenv which <command>
