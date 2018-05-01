@@ -10,29 +10,50 @@ PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
 # Create the shims directory if it doesn't already exist.
 mkdir -p "$SHIM_PATH"
 
-# Ensure only one instance of pyenv-rehash is running at a time by
-# setting the shell's `noclobber` option and attempting to write to
-# the prototype shim file. If the file already exists, print a warning
-# to stderr and exit with a non-zero status.
-set -o noclobber
-{ echo > "$PROTOTYPE_SHIM_PATH"
-} 2>| /dev/null ||
-{ if [ -w "$SHIM_PATH" ]; then
-    echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
-  else
-    echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
-  fi
-  exit 1
-} >&2
-set +o noclobber
+acquire_lock() {
+  # Ensure only one instance of pyenv-rehash is running at a time by
+  # setting the shell's `noclobber` option and attempting to write to
+  # the prototype shim file. If the file already exists, print a warning
+  # to stderr and exit with a non-zero status.
+  local ret
+  set -o noclobber
+  echo > "$PROTOTYPE_SHIM_PATH" 2>| /dev/null || ret=1
+  set +o noclobber
+  [ -z "${ret}" ]
+}
 
 # If we were able to obtain a lock, register a trap to clean up the
 # prototype shim when the process exits.
-trap remove_prototype_shim EXIT
+trap release_lock EXIT
 
 remove_prototype_shim() {
   rm -f "$PROTOTYPE_SHIM_PATH"
 }
+
+release_lock() {
+  remove_prototype_shim
+}
+
+if [ ! -w "$SHIM_PATH" ]; then
+  echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
+  exit 1
+fi
+
+unset acquired
+for _ in $(seq "${PYENV_REHASH_TIMEOUT:-60}"); do
+  if acquire_lock 2>/dev/null; then
+    acquired=1
+    break
+  else
+    # POSIX sleep(1) doesn't provides time precision of subsecond
+    sleep 1
+  fi
+done
+
+if [ -z "${acquired}" ]; then
+  echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
+  exit 1
+fi
 
 # The prototype shim file is a script that re-execs itself, passing
 # its filename and any arguments to `pyenv exec`. This file is
