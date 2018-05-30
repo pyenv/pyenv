@@ -221,13 +221,25 @@ a systemwide install.
 2. Add `~/.rbenv/bin` to your `$PATH` for access to the `rbenv`
    command-line utility.
 
-    ~~~ sh
-    $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
-    ~~~
-
-    **Ubuntu Desktop note**: Modify your `~/.bashrc` instead of `~/.bash_profile`.
-
-    **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
+   * For **bash**:
+     ~~~ bash
+     $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
+     ~~~
+     
+   * For **Ubuntu Desktop**:
+     ~~~ bash
+     $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+     ~~~
+     
+   * For **Zsh**:
+     ~~~ zsh
+     $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.zshrc
+     ~~~
+   
+   * For **Fish shell**:
+     ~~~ fish
+     $ set -Ux fish_user_paths $HOME/.rbenv/bin $fish_user_paths
+     ~~~
 
 3. Run `~/.rbenv/bin/rbenv init` and follow the instructions to set up
    rbenv integration with your shell. This is the step that will make
