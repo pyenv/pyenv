@@ -71,9 +71,6 @@ if [ -z "${PYENV_DIR}" ]; then
   fi
 else
   [[ $PYENV_DIR == /* ]] || PYENV_DIR="$PWD/$PYENV_DIR"
-  cd "$PYENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$PYENV_DIR'"
-  PYENV_DIR="$PWD"
-  cd "$OLDPWD"
 fi
 
 if [ -z "${PYENV_DIR}" ]; then
