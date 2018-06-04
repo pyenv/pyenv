@@ -202,6 +202,10 @@ $ brew upgrade rbenv ruby-build
 
 ### Basic GitHub Checkout
 
+For a more automated install, you can use
+[rbenv-installer](https://github.com/rbenv/rbenv-installer#rbenv-installer).
+If you prefer a manual approach, follow the steps below.
+
 This will get you going with the latest version of rbenv without needing
 a systemwide install.
 
