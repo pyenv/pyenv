@@ -306,7 +306,7 @@ opposed to this idea. Here's what `rbenv init` actually does:
 4. Installs the sh dispatcher. This bit is also optional, but allows
    rbenv and plugins to change variables in your current shell, making
    commands like `rbenv shell` possible. The sh dispatcher doesn't do
-   anything crazy like override `cd` or hack your shell prompt, but if
+   anything invasive like override `cd` or hack your shell prompt, but if
    for some reason you need `rbenv` to be a real script rather than a
    shell function, you can safely skip it.
 
