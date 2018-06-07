@@ -37,8 +37,8 @@ fi
 RBENV_VERSION="${RBENV_VERSION:-$(rbenv-version-name)}"
 
 if [ "$RBENV_VERSION" = "system" ]; then
-  PATH="$(remove_from_path "${RBENV_ROOT}/shims")"
-  RBENV_COMMAND_PATH="$(command -v "$RBENV_COMMAND" || true)"
+  PATH="$(remove_from_path "${RBENV_ROOT}/shims")" \
+    RBENV_COMMAND_PATH="$(command -v "$RBENV_COMMAND" || true)"
 else
   RBENV_COMMAND_PATH="${RBENV_ROOT}/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
 fi
