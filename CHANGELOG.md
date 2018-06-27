@@ -1,5 +1,12 @@
 ## Version History
 
+## 1.2.5
+
+* python-build: Add CPython 3.7.0 (#1177)
+* python-build: Add micropython 1.9.4 (#1160)
+* python-build: Add anaconda[23]-5.2.0 (#1165)
+* pyenv: Fix `seq(1)` is not available on OpenBSD (#1166)
+
 ## 1.2.4
 
 * python-build: Add CPython 2.7.15
