@@ -4,7 +4,9 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-SHIM_PATH="${PYENV_ROOT}/shims"
+SHIM_PATH=${PYENV_SHIM_PATH:-"${PYENV_ROOT}/shims/$(pyenv-version-name)"}
+# For debugging/feedback.  TODO: remove
+echo "pyenv-rehash: using $SHIM_PATH" >&2
 PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
 
 # Create the shims directory if it doesn't already exist.
@@ -82,6 +84,7 @@ if [[ "\$program" = "python"* ]]; then
 fi
 
 export PYENV_ROOT="$PYENV_ROOT"
+export PYENV_SHIM="\$0"
 exec "$(command -v pyenv)" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
@@ -94,17 +97,25 @@ remove_outdated_shims() {
   local shim
   for shim in "$SHIM_PATH"/*; do
     if ! diff "$PROTOTYPE_SHIM_PATH" "$shim" >/dev/null 2>&1; then
-      rm -f "$SHIM_PATH"/*
+      # NOTE: does not use "rm …/*", since there might be directories now.
+      for file in "$SHIM_PATH"/*; do
+        if [[ -f "$file" ]]; then
+          rm "$file"
+        fi
+      done
     fi
     break
   done
 }
 
-# List basenames of executables for every Python version
+# List basenames of executables for the current Python version(s).
 list_executable_names() {
   local version file
-  pyenv-versions --bare --skip-aliases | \
-  while read -r version; do
+  OLDIFS="$IFS"
+  # shellcheck disable=SC2207
+  IFS=: versions=($(pyenv-version-name))
+  IFS="$OLDIFS"
+  for version in "${versions[@]}"; do
     for file in "${PYENV_ROOT}/versions/${version}/bin/"*; do
       echo "${file##*/}"
     done
@@ -145,8 +156,8 @@ install_registered_shims() {
 remove_stale_shims() {
   local shim
   for shim in "$SHIM_PATH"/*; do
-    if [[ "$registered_shims" != *" ${shim##*/} "* ]]; then
-      rm -f "$shim"
+    if [[ -f "$shim" ]] && [[ "$registered_shims" != *" ${shim##*/} "* ]]; then
+      rm "$shim"
     fi
   done
 }
