@@ -112,6 +112,25 @@ if pyenv-prefix "${versions[@]}" >/dev/null; then
     * )
       echo 'PYENV_VERSION_OLD="$PYENV_VERSION"'
       echo "export PYENV_VERSION=\"${version}\""
+
+      # Replace shims dir in PATH.
+      shims_base_dir="$PYENV_ROOT/shims"
+      new_shims_dir="$shims_base_dir/$version"
+
+      # based on remove_from_path
+      result=":${PATH//\~/$HOME}:"
+      shopt -s extglob
+      while [ "$path_before" != "$result" ]; do
+        path_before="$result"
+        result="${result/:${shims_base_dir}*([^:]):/:$new_shims_dir:}"
+      done
+      result="${result%:}"
+      new_path="${result#:}"
+
+      if [[ "$new_path" == "$PATH" ]]; then
+        echo "pyenv: warning: PATH was not changed: $old_shims_dir not found" >&2
+      fi
+      echo "PATH=$new_path"
       ;;
     esac
   fi
