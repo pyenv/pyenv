@@ -71,10 +71,10 @@ if [ -z "$print" ]; then
     echo
     case "$shell" in
     fish )
-      echo 'status --is-interactive; and rbenv init - | source'
+      echo 'status --is-interactive; and rbenv init - fish | source'
       ;;
     * )
-      echo 'eval "$(rbenv init -)"'
+      printf 'eval "$(rbenv init - %s)"\n' "$shell"
       ;;
     esac
     echo

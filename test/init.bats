@@ -51,10 +51,16 @@ OUT
   [ -z "$line" ] || flunk "did not expect line: $line"
 }
 
+@test "posix shell instructions" {
+  run rbenv-init bash
+  assert [ "$status" -eq 1 ]
+  assert_line 'eval "$(rbenv init - bash)"'
+}
+
 @test "fish instructions" {
   run rbenv-init fish
   assert [ "$status" -eq 1 ]
-  assert_line 'status --is-interactive; and rbenv init - | source'
+  assert_line 'status --is-interactive; and rbenv init - fish | source'
 }
 
 @test "option to skip rehash" {
