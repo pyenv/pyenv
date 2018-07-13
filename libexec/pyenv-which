@@ -41,13 +41,10 @@ IFS="$OLDIFS"
 
 for version in "${versions[@]}"; do
   if [ "$version" = "system" ]; then
-    if [[ -n "$PYENV_SHIM" ]]; then
-      shim_dir=${PYENV_SHIM%/*}
-    else
-      shim_dir="${PYENV_ROOT}/shims"
-    fi
-    PATH="$(remove_from_path "$shim_dir")"
-    PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
+    shopt -s extglob
+    # Remove any shim dir from PATH.
+    path_without_shims="$(remove_from_path "${PYENV_ROOT}/shims*([^:])")"
+    PYENV_COMMAND_PATH="$(PATH="$path_without_shims" command -v "$PYENV_COMMAND" || true)"
   else
     PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${version}/bin/${PYENV_COMMAND}"
   fi
