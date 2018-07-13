@@ -22,7 +22,7 @@ elif [ -z "$RBENV_VERSION" ]; then
 fi
 
 if [ "$RBENV_VERSION" = "system" ]; then
-  if RUBY_PATH="$(rbenv-which ruby 2>/dev/null)"; then
+  if RUBY_PATH="$(rbenv-which ruby)"; then
     RUBY_PATH="${RUBY_PATH%/*}"
     RBENV_PREFIX_PATH="${RUBY_PATH%/bin}"
     echo "${RBENV_PREFIX_PATH:-/}"
