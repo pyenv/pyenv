@@ -29,7 +29,7 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-versions --bare
 fi
 
-update_path_for_shims() {
+updated_path_for_shims() {
   local version="$1"
   # Replace shims dir in PATH.
   shims_base_dir="$PYENV_ROOT/shims"
@@ -43,15 +43,24 @@ update_path_for_shims() {
     result="${result/:${shims_base_dir}*([^:]):/:$new_shims_dir:}"
   done
   result="${result%:}"
-  echo "${result#:}"
 
   if [[ "$result" == "$PATH" ]]; then
     echo "pyenv: warning: PATH was not changed: $shims_base_dir not found" >&2
   else
+    echo "PATH=${result#:}"
     # for debug/feedback.  TODO: remove
     echo "pyenv: updated PATH for $version" >&2
   fi
 }
+
+if [[ "$1" = "--updated-path" ]]; then
+  if [[ -z "$2" ]]; then
+    echo 'pyenv-sh-shell: missing version with --updated-path' >&2
+    exit 1
+  fi
+  updated_path_for_shims "$2"
+  exit
+fi
 
 versions=("$@")
 shell="$(basename "${PYENV_SHELL:-$SHELL}")"
@@ -75,7 +84,7 @@ if [ "$versions" = "--unset" ]; then
   * )
     echo 'PYENV_VERSION_OLD="$PYENV_VERSION"'
     echo "unset PYENV_VERSION"
-    echo "PATH=$(update_path_for_shims "$(PYENV_VERSION='' pyenv-version-name)")"
+    updated_path_for_shims "$(PYENV_VERSION='' pyenv-version-name)"
     ;;
   esac
   exit
@@ -137,7 +146,7 @@ if pyenv-prefix "${versions[@]}" >/dev/null; then
     * )
       echo 'PYENV_VERSION_OLD="$PYENV_VERSION"'
       echo "export PYENV_VERSION=\"${version}\""
-      echo "PATH=$(update_path_for_shims $version)"
+      updated_path_for_shims "$version"
       ;;
     esac
   fi
