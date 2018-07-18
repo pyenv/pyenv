@@ -1,5 +1,10 @@
 ## Version History
 
+## 1.2.6
+
+* python-build: Added CPython 3.6.6 (#1178)
+* python-build: Check wget version iff wget is going to be used (#1180)
+
 ## 1.2.5
 
 * python-build: Add CPython 3.7.0 (#1177)
