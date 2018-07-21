@@ -4,7 +4,9 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-SHIM_PATH=${PYENV_SHIM_PATH:-"${PYENV_ROOT}/shims/$(pyenv-version-name)"}
+version_name="$(pyenv-version-name)"
+# NOTE: replacement also done in updated_path_for_shims
+SHIM_PATH="${PYENV_ROOT}/shims/${version_name//:/_}"
 if [ "$SHIM_PATH" = "${PYENV_ROOT}/shims/system" ]; then
   # Note: this might lead to infinite loops, e.g. with pyenv-which-ext, which
   # uses an old method of removing shims from PATH.

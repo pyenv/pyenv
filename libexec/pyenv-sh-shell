@@ -33,7 +33,9 @@ updated_path_for_shims() {
   local version="$1"
   # Replace shims dir in PATH.
   shims_base_dir="$PYENV_ROOT/shims"
-  new_shims_dir="$shims_base_dir/$version"
+  # Replace colon (reserved/difficult in PATH).
+  # TODO: more unique?  Could something be used that is invalid in version names? ("+"?)
+  new_shims_dir="$shims_base_dir/${version//:/_}"
 
   # based on remove_from_path
   result=":${PATH//\~/$HOME}:"
