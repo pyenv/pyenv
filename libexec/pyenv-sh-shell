@@ -52,6 +52,9 @@ updated_path_for_shims() {
     echo "PATH=${result#:}"
     # for debug/feedback.  TODO: remove
     echo "pyenv: updated PATH for $version" >&2
+    if ! [ -d "$new_shims_dir" ]; then
+      PYENV_VERSION="$version" "$PYENV_ROOT/libexec/pyenv-rehash"
+    fi
   fi
 }
 
