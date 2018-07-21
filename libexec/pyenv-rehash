@@ -5,6 +5,12 @@ set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 SHIM_PATH=${PYENV_SHIM_PATH:-"${PYENV_ROOT}/shims/$(pyenv-version-name)"}
+if [ "$SHIM_PATH" = "${PYENV_ROOT}/shims/system" ]; then
+  # Note: this might lead to infinite loops, e.g. with pyenv-which-ext, which
+  # uses an old method of removing shims from PATH.
+  echo 'pyenv-rehash: should not be used with "system" version' >&2
+  exit 1
+fi
 # For debugging/feedback.  TODO: remove
 echo "pyenv-rehash: using $SHIM_PATH" >&2
 PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
