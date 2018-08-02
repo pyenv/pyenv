@@ -1504,6 +1504,9 @@ use_homebrew_openssl() {
 }
 
 build_package_mac_openssl() {
+  OPENSSL_VERSION_LTS='1.0.*'
+  OPENSSL_VERSION_STABLE='1.1.*'
+
   # Install to a subdirectory since we don't want shims for bin/openssl.
   OPENSSL_PREFIX_PATH="${PREFIX_PATH}/openssl"
 
@@ -1520,12 +1523,22 @@ build_package_mac_openssl() {
   # Hint OpenSSL that we prefer a 64-bit build.
   export KERNEL_BITS="64"
   OPENSSL_CONFIGURE="${OPENSSL_CONFIGURE:-./config}"
+  OPENSSL_OPTIONS="zlib-dynamic shared no-ssl3"
 
   local nokerberos
-  [[ "$1" != openssl-1.0.* ]] || nokerberos=1
+  [[ "$1" != openssl-${OPENSSL_VERSION_LTS} ]] || nokerberos=1
+
+  local openssl_stable
+  [[ "$1" == openssl-${OPENSSL_VERSION_STABLE} ]] && openssl_stable=1
+
+  # Set additional flags based on LTS versus Stable
+  if [[ ! $openssl_stable ]]; then
+    OPENSSL_OPTIONS="${OPENSSL_OPTIONS} no-ssl2"
+    [[ $nokerberos ]] && OPENSSL_OPTIONS="${OPENSSL_OPTIONS} no-krb5"
+  fi
 
   # Compile a shared lib with zlib dynamically linked, no kerberos.
-  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl2 no-ssl3 no-krb5 shared
+  package_option openssl configure --openssldir="$OPENSSLDIR" ${OPENSSL_OPTIONS}
 
   # Default MAKE_OPTS are -j 2 which can confuse the build. Thankfully, make
   # gives precedence to the last -j option, so we can override that.
