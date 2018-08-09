@@ -38,5 +38,8 @@ OUT
 
 @test "prefix for invalid system" {
   PATH="$(path_without ruby)" run rbenv-prefix system
-  assert_failure "rbenv: system version not found in PATH"
+  assert_failure <<EOF
+rbenv: ruby: command not found
+rbenv: system version not found in PATH"
+EOF
 }
