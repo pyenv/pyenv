@@ -1,5 +1,10 @@
 ## Version History
 
+## 1.2.7
+
+* python-build: Add CPython 3.6.7 (#1199)
+* python-build: Add CPython 3.4.9
+
 ## 1.2.6
 
 * python-build: Added CPython 3.6.6 (#1178)
