@@ -2,7 +2,7 @@
 
 ## 1.2.7
 
-* python-build: Add CPython 3.6.7 (#1199)
+* python-build: Add CPython 3.5.6 (#1199)
 * python-build: Add CPython 3.4.9
 
 ## 1.2.6
