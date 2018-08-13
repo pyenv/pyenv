@@ -86,21 +86,36 @@ print_version() {
   num_versions=$((num_versions + 1))
 }
 
+sort_versions() {
+  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z.\1/; s/$/.z/; G; s/\n/ /' | \
+    LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
+}
+
 # Include "system" in the non-bare output, if it exists
 if [ -n "$include_system" ] && RBENV_VERSION=system rbenv-which ruby >/dev/null 2>&1; then
   print_version system
 fi
 
 shopt -s nullglob
+
+versions=($(
 for path in "$versions_dir"/*; do
   if [ -d "$path" ]; then
     if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
       target="$(realpath "$path")"
       [ "${target%/*}" != "$versions_dir" ] || continue
     fi
-    print_version "${path##*/}"
+    echo "${path##*/}"
   fi
 done
+))
+
+sorted_versions=($(printf "%s\n" ${versions[@]} | sort_versions))
+
+for version in ${sorted_versions[@]}; do
+  print_version $version
+done
+
 shopt -u nullglob
 
 if [ "$num_versions" -eq 0 ] && [ -n "$include_system" ]; then
