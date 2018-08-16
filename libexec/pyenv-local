@@ -15,10 +15,10 @@
 # `PYENV_VERSION' environment variable takes precedence over local
 # and global versions.
 #
-# <version> should be a space-separated list of Python version known
-# to pyenv.  The special version string `system' will use your default
-# system Python.  Run `pyenv versions' for a list of available Python
-# versions.
+# <version> can be specified multiple times and should be a version
+# tag known to pyenv.  The special version string `system' will use
+# your default system Python.  Run `pyenv versions' for a list of
+# available Python versions.
 #
 # Example: To enable the python2.7 and python3.7 shims to find their
 #          respective executables you could set both versions with:
