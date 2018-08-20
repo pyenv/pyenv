@@ -80,7 +80,6 @@ for hook in "${before_hooks[@]}"; do eval "$hook"; done
 
 if [ -d "$PREFIX" ]; then
   rm -rf "$PREFIX"
-  pyenv-rehash
   echo "pyenv: $VERSION_NAME uninstalled"
 fi
 

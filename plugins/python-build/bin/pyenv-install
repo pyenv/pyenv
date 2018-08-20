@@ -273,10 +273,7 @@ fi
 # Execute `after_install` hooks.
 for hook in "${after_hooks[@]}"; do eval "$hook"; done
 
-# Run `pyenv-rehash` after a successful installation.
-if [ "$STATUS" == "0" ]; then
-  pyenv-rehash
-else
+if [ "$STATUS" != "0" ]; then
   cleanup
 fi
 
