@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
-# Usage: eval "$(pyenv init - [--no-rehash] [<shell>])"
+# Usage: eval "$(pyenv init - [<shell>])"
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -8,7 +8,6 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   echo -
-  echo --no-rehash
   echo bash
   echo fish
   echo ksh
@@ -17,7 +16,6 @@ if [ "$1" = "--complete" ]; then
 fi
 
 print=""
-no_rehash=""
 for args in "$@"
 do
   if [ "$args" = "-" ]; then
@@ -26,7 +24,7 @@ do
   fi
 
   if [ "$args" = "--no-rehash" ]; then
-    no_rehash=1
+    # Ignored, for backward-compatibility.
     shift
   fi
 done
@@ -98,10 +96,6 @@ esac
 completion="${root}/completions/pyenv.${shell}"
 if [ -r "$completion" ]; then
   echo "source '$completion'"
-fi
-
-if [ -z "$no_rehash" ]; then
-  echo 'command pyenv rehash 2>/dev/null'
 fi
 
 commands=(`pyenv-commands --sh`)

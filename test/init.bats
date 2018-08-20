@@ -11,12 +11,6 @@ load test_helper
   assert [ -d "${PYENV_ROOT}/versions" ]
 }
 
-@test "auto rehash" {
-  run pyenv-init -
-  assert_success
-  assert_line "command pyenv rehash 2>/dev/null"
-}
-
 @test "setup shell completions" {
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - bash
@@ -54,12 +48,6 @@ OUT
   run pyenv-init fish
   assert [ "$status" -eq 1 ]
   assert_line 'pyenv init - | source'
-}
-
-@test "option to skip rehash" {
-  run pyenv-init - --no-rehash
-  assert_success
-  refute_line "pyenv rehash 2>/dev/null"
 }
 
 @test "adds shims to PATH" {
