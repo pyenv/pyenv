@@ -58,12 +58,12 @@ updated_path_for_shims() {
   fi
 }
 
-if [[ "$1" = "--updated-path" ]]; then
+if [[ "$1" = "--update-path" ]]; then
+  version="$2"
   if [[ -z "$2" ]]; then
-    echo 'pyenv-sh-shell: missing version with --updated-path' >&2
-    exit 1
+    version="$(pyenv-version-name)"
   fi
-  updated_path_for_shims "$2"
+  updated_path_for_shims "$version"
   exit
 fi
 
