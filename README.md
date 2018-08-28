@@ -219,7 +219,12 @@ easy to fork and contribute any changes back upstream.
     ```sh
     $ exec "$SHELL"
     ```
-5. **Install Python versions into `$(pyenv root)/versions`.**
+
+5. **Install Python build dependencies** before attempting to install a new Python version.  The
+   [pyenv wiki](https://github.com/pyenv/pyenv/wiki) provides suggested installation packages
+   and commands for various operating systems.
+
+6. **Install Python versions into `$(pyenv root)/versions`.**
    For example, to download and install Python 2.7.8, run:
     ```sh
     $ pyenv install 2.7.8
