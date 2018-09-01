@@ -41,7 +41,7 @@ else
     # Use a subshell to avoid changing the current path
     (
     while [ -n "$path" ]; do
-      cd "${path%/*}"
+      [ -d "${path%/*}" ] && cd "${path%/*}"
       local name="${path##*/}"
       path="$(resolve_link "$name" || true)"
     done
