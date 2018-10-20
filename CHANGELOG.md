@@ -1,5 +1,11 @@
 ## Version History
 
+## 1.2.8
+
+* python-build: Add CPython 3.7.1
+* python-build: Add CPython 3.6.7
+* python-build: Add anaconda[23]-5.3.0 (#1220)
+
 ## 1.2.7
 
 * python-build: Add CPython 3.5.6 (#1199)

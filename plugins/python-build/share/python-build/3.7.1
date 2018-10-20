@@ -2,7 +2,7 @@
 install_package "openssl-1.0.2k" "https://www.openssl.org/source/openssl-1.0.2k.tar.gz#6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0" mac_openssl --if has_broken_mac_openssl
 install_package "readline-6.3" "https://ftpmirror.gnu.org/readline/readline-6.3.tar.gz#56ba6071b9462f980c5a72ab0023893b65ba6debb4eeb475d7a563dc65cafd43" standard --if has_broken_mac_readline
 if has_tar_xz_support; then
-  install_package "Python-3.6.7rc2" "https://www.python.org/ftp/python/3.6.7/Python-3.6.7rc2.tar.xz#9710181b545f9b16e490323d9884db75e141fa469f88bbed58886767d109d6af" ldflags_dirs standard verify_py37 ensurepip
+  install_package "Python-3.7.1" "https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tar.xz#fa7e2b8e8c9402f192ad56dc4f814089d1c4466c97d780f5e5acc02c04243d6d" ldflags_dirs standard verify_py37 ensurepip
 else
-  install_package "Python-3.6.7rc2" "https://www.python.org/ftp/python/3.6.7/Python-3.6.7rc2.tgz#2527e7a3312c3de6e9d4c3a2b65a9de752afa6dcf3f44734f4fdb96891fd91e3" ldflags_dirs standard verify_py37 ensurepip
+  install_package "Python-3.7.1" "https://www.python.org/ftp/python/3.7.1/Python-3.7.1.tgz#36c1b81ac29d0f8341f727ef40864d99d8206897be96be73dc34d4739c9c9f06" ldflags_dirs standard verify_py37 ensurepip
 fi
