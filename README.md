@@ -48,7 +48,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 * **[Installation](#installation)**
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
-    * [Homebrew on Mac OS X](#homebrew-on-mac-os-x)
+    * [Homebrew on macOS](#homebrew-on-macos)
     * [Advanced Configuration](#advanced-configuration)
     * [Uninstalling Python Versions](#uninstalling-python-versions)
 * **[Command Reference](#command-reference)**
@@ -167,7 +167,7 @@ We'd recommend to install pyenv-virtualenv as well if you have some plan to play
 
 ## Installation
 
-If you're on Mac OS X, consider [installing with Homebrew](#homebrew-on-mac-os-x).
+If you're on macOS, consider [installing with Homebrew](#homebrew-on-macos).
 
 
 ### The automatic installer
@@ -286,10 +286,10 @@ uninstall from the system.
 
         brew uninstall pyenv
 
-### Homebrew on Mac OS X
+### Homebrew on macOS
 
-You can also install pyenv using the [Homebrew](http://brew.sh)
-package manager for Mac OS X.
+You can also install pyenv using the [Homebrew](https://brew.sh)
+package manager for macOS.
 
     $ brew update
     $ brew install pyenv
