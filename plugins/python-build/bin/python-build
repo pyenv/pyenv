@@ -1537,6 +1537,9 @@ build_package_mac_openssl() {
   local pem_file="$OPENSSLDIR/cert.pem"
   security find-certificate -a -p /Library/Keychains/System.keychain > "$pem_file"
   security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> "$pem_file"
+
+  # Make sure we build Python with *this* OpenSSL
+  package_option python configure --with-openssl="$OPENSSL_PREFIX_PATH"
 }
 
 # Post-install check that the openssl extension was built.
