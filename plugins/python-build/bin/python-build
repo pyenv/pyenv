@@ -1879,7 +1879,7 @@ usage() {
 
 list_definitions() {
   { for DEFINITION_DIR in "${PYTHON_BUILD_DEFINITIONS[@]}"; do
-      [ -d "$DEFINITION_DIR" ] && find "$DEFINITION_DIR" -maxdepth 1 -type f -print0 | xargs -0 -n 1 basename 2>/dev/null
+      [ -d "$DEFINITION_DIR" ] && ls "$DEFINITION_DIR" | grep -xv patches
     done
   } | sort_versions | uniq
 }
