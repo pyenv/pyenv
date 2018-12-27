@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-x86" )
+  install_script "Anaconda2-2018.12-Linux-x86.sh" "https://repo.anaconda.com/archive/Anaconda2-2018.12-Linux-x86.sh#e086c041695c0e50642aee8f4e7adad3185c6ce1d11737665653497d2edd78fd" "anaconda" verify_py27
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda2-2018.12-Linux-x86_64.sh" "https://repo.anaconda.com/archive/Anaconda2-2018.12-Linux-x86_64.sh#1821d4b623ed449e0acb6df3ecbabd3944cffa98f96a5234b7a102a7c0853dc6" "anaconda" verify_py27
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda2-2018.12-MacOSX-x86_64.sh" "https://repo.anaconda.com/archive/Anaconda2-2018.12-MacOSX-x86_64.sh#5c590b1b3cdc2eedd52edce0caabbce6665d84084d31b913e789e8c46a94859d" "anaconda" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Anaconda2 is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
