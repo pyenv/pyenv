@@ -1,2 +1,2 @@
-install_git "ironpython-dev" "https://github.com/IronLanguages/main.git" master ironpython_builder
+install_git "ironpython-dev" "https://github.com/IronLanguages/ironpython2.git" master ironpython_builder
 # FIXME: have not confirmed to install setuptools into IronPython yet
