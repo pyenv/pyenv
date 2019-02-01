@@ -64,6 +64,7 @@ create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
 set -e
+set +u
 [ -n "\$PYENV_DEBUG" ] && set -x
 
 program="\${0##*/}"
