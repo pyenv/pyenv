@@ -199,6 +199,10 @@ darwin*)
 			;;
 		 *) 	# Mac OS X 10.9 (Mavericks) and later
 			SHOBJ_ARCHFLAGS=
+
+			# Xcode 10 and later no longer install mac OS SDK headers in the base system
+			SHOBJ_CFLAGS="${SHOBJ_CFLAGS} -I${xcrun --show-sdk-path}/usr/include"
+
 			# for 32 and 64bit universal library
 			#SHOBJ_ARCHFLAGS='-arch i386 -arch x86_64'
 			#SHOBJ_CFLAGS=${SHOBJ_CFLAGS}' -arch i386 -arch x86_64'
@@ -209,7 +213,7 @@ darwin*)
 		;;
 	esac
 
-	SHLIB_LIBS='-lncurses'	# see if -lcurses works on MacOS X 10.1 
+	SHLIB_LIBS='-lncurses'	# see if -lcurses works on MacOS X 10.1
 	;;
 
 openbsd*|netbsd*|mirbsd*)
@@ -349,7 +353,7 @@ hpux9*)
 #
 #	SHLIB_XLDFLAGS='+b $(libdir)'
 #	SHLIB_LIBSUFF='sl'
-#	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)'	
+#	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)'
 
 	;;
 
@@ -381,7 +385,7 @@ hpux10*)
 #
 #	SHLIB_XLDFLAGS='+b $(libdir)'
 #	SHLIB_LIBSUFF='sl'
-#	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)'	
+#	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)'
 
 	;;
 
@@ -412,7 +416,7 @@ hpux11*)
 #
 #	SHLIB_XLDFLAGS='+b $(libdir)'
 #	SHLIB_LIBSUFF='sl'
-#	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)'	
+#	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)'
 
 	;;
 
