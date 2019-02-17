@@ -1,2 +1,5 @@
 #require_gcc
-install_package micropython-1.9.4 "https://github.com/micropython/micropython/releases/download/v1.9.4/micropython-1.9.4.tar.gz#0db042011bffcbd65362b67eb3cca87eaefa9f2a55b747fa75e922c706b8ce1a" micropython
+has_tar_xz_support \
+  && src="https://micropython.org/resources/source/micropython-1.9.4.tar.xz#1d358d99e908a94fd6dd0d6b448ee56c5830b609cf27a42e0db3bee40cc52a9e" \
+  || src="https://github.com/micropython/micropython/releases/download/v1.9.4/micropython-1.9.4.tar.gz#0db042011bffcbd65362b67eb3cca87eaefa9f2a55b747fa75e922c706b8ce1a"
+install_package micropython-1.9.4 "$src" micropython
