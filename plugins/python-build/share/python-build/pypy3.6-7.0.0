@@ -1,0 +1,43 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy3.6-7.0.0-src' to build from source."
+    echo
+  } >&2
+  exit 1
+  ;;
+"linux64" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
+    install_package "pypy3.6-v7.0.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.0.0-linux64.tar.bz2#8576bde0760c239040706cf4952995eb0e77938b175885392a465a0d1616173d" "pypy" verify_py36 ensurepip
+  else
+    install_package "pypy3.6-7.0.0-alpha-20190209-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3.6-7.0.0-alpha-20190209-linux_x86_64-portable.tar.bz2#ef8a5254b9a082dec23a6e029b1bb674a122a789c29d9c452452a9e97498bcbe" "pypy" verify_py36 ensurepip
+  fi
+  ;;
+"osx64" )
+  if require_osx_version "10.13"; then
+    install_package "pypy3.6-v7.0.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.0.0-osx64.tar.bz2#4a95ffd61fd2d626a9c099db6e44889c2a7eecee9cb1cbc29e06603c218ba8e2" "pypy" verify_py36 ensurepip
+  else
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
+      echo "try 'pypy3.6-7.0.0-src' to build from source."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"win32" )
+  install_zip "pypy3.6-v7.0.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.0.0-win32.zip#645d81472d16922fd592e9261da449cb19847ff7d5eaa89bcf05d9214b6b2698" "pypy" verify_py36 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy3.6-7.0.0-src' to build from source."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
