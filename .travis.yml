@@ -1,13 +1,78 @@
-sudo: false
-install: git clone --depth 1 https://github.com/sstephenson/bats.git
-script: make test
+# Two types of tests:
+#
+# 1. shell tests run using bats
+# 2. build tests also run using bats
+#
+# Shell tests are run unconditionally on Linux (see jobs.include).
+#
+# Build tests can be skipped by starting the commit message with
+# '[skip build]'.
+#
+# Build tests are run on platforms generated from all combinations
+# of keys below.
 language: c
+
+os:
+- linux
+- osx
+
+dist:
+- xenial
+
+# https://docs.travis-ci.com/user/reference/osx/#macos-version
+osx_image:
+- xcode9.4
+- xcode10
+
 env:
-  - PYENV_NATIVE_EXT=
-  - PYENV_NATIVE_EXT=1
+- PYTHON_BUILD_VERSION=3.8-dev
+- PYTHON_BUILD_VERSION=3.7.2
+
+before_install:
+- date +%Y-%m-%dT%H:%M:%S
+
+install: git clone --depth 1 https://github.com/bats-core/bats-core.git bats
+
+# Default for auto-generated jobs.
+script: make test-build
+
+after_script: |
+  cat "$(ls -tr ${TMPDIR:-/tmp}/python-build.*.log | tail -1)"
+
+jobs:
+  include:
+  # Shell-based tests should execute every time.
+  - stage: test shell
+    script: make test
+    env: PYENV_NATIVE_EXT=1
+    after_script: []
+    os: linux
+  - stage: test shell
+    script: make test
+    env: PYENV_NATIVE_EXT=
+    after_script: []
+    os: linux
+
+  exclude:
+  # For each osx_image but one there should be an entry in the exclude
+  # list, to prevent duplicate Linux builds.
+  - os: linux
+    osx_image: xcode9.4
+
+  allow_failures:
+  - env: PYTHON_BUILD_VERSION=3.8-dev
+
+stages:
+- test shell
+- name: test
+  if: NOT (commit_message =~ /^\[skip build\]/)
+
+# Default 
+
 notifications:
   email:
     on_success: never
+
 deploy:
   provider: releases
   api_key:
