@@ -201,7 +201,7 @@ darwin*)
 			SHOBJ_ARCHFLAGS=
 
 			# Xcode 10 and later no longer install mac OS SDK headers in the base system
-			SHOBJ_CFLAGS="${SHOBJ_CFLAGS} -I${xcrun --show-sdk-path}/usr/include"
+			SHOBJ_CFLAGS="${SHOBJ_CFLAGS} -I$(xcrun --show-sdk-path)/usr/include"
 
 			# for 32 and 64bit universal library
 			#SHOBJ_ARCHFLAGS='-arch i386 -arch x86_64'
