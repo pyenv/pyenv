@@ -71,7 +71,7 @@ if [ -z "$FORCE" ]; then
 
   read -p "pyenv: remove $PREFIX? "
   case "$REPLY" in
-  y* | Y* ) ;;
+  y | Y | yes | YES ) ;;
   * ) exit 1 ;;
   esac
 fi

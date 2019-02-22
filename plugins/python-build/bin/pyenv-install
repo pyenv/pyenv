@@ -160,7 +160,7 @@ if [ -d "${PREFIX}/bin" ]; then
     read -p "continue with installation? (y/N) "
 
     case "$REPLY" in
-    y* | Y* ) ;;
+    y | Y | yes | YES ) ;;
     * ) exit 1 ;;
     esac
   elif [ -n "$SKIP_EXISTING" ]; then
