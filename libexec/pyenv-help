@@ -154,7 +154,7 @@ if [ -z "$1" ] || [ "$1" == "pyenv" ]; then
   print_summaries commands local global shell install uninstall rehash version versions which whence
   echo
   echo "See \`pyenv help <command>' for information on a specific command."
-  echo "For full documentation, see: https://github.com/pyenv/pyenv#readme"
+  echo "For full documentation, see: https://github.com/pyenv/pyenv/blob/master/COMMANDS.md"
 else
   command="$1"
   if [ -n "$(command_path "$command")" ]; then
