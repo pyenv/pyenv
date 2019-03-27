@@ -16,13 +16,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
     install_package "pypy2.7-v7.1.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.1.0-linux64.tar.bz2#fef176a29a2ef068c00c8098e59dab935ca6e956f089672b3f7351da95a034f5" "pypy" verify_py27 ensurepip
   else
-    { echo
-      colorize 1 "ERROR"
-      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
-      echo "try 'pypy2.7-7.1.0-src' to build from source."
-      echo
-    } >&2
-    exit 1
+    install_package "pypy-7.1.0-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-7.1.0-linux_x86_64-portable.tar.bz2#ee917d9d72fb6a7d15e31e6c5e470ce561a940f112e99f29ac5dd6b41f512657" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
