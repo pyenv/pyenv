@@ -11,7 +11,9 @@ if [ -e "$VERSION_FILE" ]; then
   words=( $(cut -b 1-1024 "$VERSION_FILE") )
   version="${words[0]}"
 
-  if [ -n "$version" ]; then
+  if [ "$version" = ".." ] || [[ $version == */* ]]; then
+    echo "rbenv: invalid version in \`$VERSION_FILE'" >&2
+  elif [ -n "$version" ]; then
     echo "$version"
     exit
   fi

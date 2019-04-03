@@ -70,3 +70,19 @@ IN
   run rbenv-version-file-read my-version
   assert_success "1.9.3"
 }
+
+@test "prevents directory traversal" {
+  cat > my-version <<<".."
+  run rbenv-version-file-read my-version
+  assert_failure "rbenv: invalid version in \`my-version'"
+
+  cat > my-version <<<"../foo"
+  run rbenv-version-file-read my-version
+  assert_failure "rbenv: invalid version in \`my-version'"
+}
+
+@test "disallows path segments in version string" {
+  cat > my-version <<<"foo/bar"
+  run rbenv-version-file-read my-version
+  assert_failure "rbenv: invalid version in \`my-version'"
+}
