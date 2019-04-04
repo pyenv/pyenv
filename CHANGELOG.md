@@ -1,5 +1,14 @@
 ## Version History
 
+## 1.2.10
+
+* python-build: Force y, Y, yes or YES to confirm installation (#1217)
+* python-build: Add PyPy 7.0.0, 7.1.0
+* python-build: Add CPython 2.7.16, 3.5.7 and 3.7.3
+* python-build: Install `python-gdb.py` (#1190, #1289)
+* python-build: Add micropython 1.10
+* python-build: Prefer Homebrew's OpenSSL 1.1 over 1.0 (#839, #1302)
+
 ## 1.2.9
 
 * python-build: Add CPython 3.7.2 and CPython 3.6.8 (#1256)
