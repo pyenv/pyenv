@@ -1,0 +1,20 @@
+--- Modules/posixmodule.c.orig	2019-04-04 20:27:41.000000000 +0200
++++ Modules/posixmodule.c	2019-04-04 20:28:07.000000000 +0200
+@@ -5300,7 +5300,7 @@
+ Close a file descriptor (for low level IO).");
+ 
+ static PyObject *
+-posix_close(PyObject *self, PyObject *args)
++posix_closex(PyObject *self, PyObject *args)
+ {
+ 	int fd, res;
+ 	if (!PyArg_ParseTuple(args, "i:close", &fd))
+@@ -7554,7 +7554,7 @@
+ 	{"tcsetpgrp",	posix_tcsetpgrp, METH_VARARGS, posix_tcsetpgrp__doc__},
+ #endif /* HAVE_TCSETPGRP */
+ 	{"open",	posix_open, METH_VARARGS, posix_open__doc__},
+-	{"close",	posix_close, METH_VARARGS, posix_close__doc__},
++	{"close",	posix_closex, METH_VARARGS, posix_close__doc__},
+ 	{"dup",		posix_dup, METH_VARARGS, posix_dup__doc__},
+ 	{"dup2",	posix_dup2, METH_VARARGS, posix_dup2__doc__},
+ 	{"lseek",	posix_lseek, METH_VARARGS, posix_lseek__doc__},
