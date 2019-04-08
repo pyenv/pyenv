@@ -1486,8 +1486,8 @@ use_homebrew_readline() {
 
 prefer_openssl11() {
   # Allow overriding the preference of OpenSSL version per definition basis (#1302, #1325, #1326)
-  PYTHON_BUILD_HOMEBRE_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBRE_OPENSSL_FORMULA:-openssl@1.1 openssl}"
-  export PYTHON_BUILD_HOMEBRE_OPENSSL_FORMULA
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@1.1 openssl}"
+  export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
 }
 
 has_broken_mac_openssl() {
@@ -1498,12 +1498,12 @@ has_broken_mac_openssl() {
 }
 
 use_homebrew_openssl() {
-  for openssl in ${PYTHON_BUILD_HOMEBRE_OPENSSL_FORMULA:-openssl}; do
+  for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
     local ssldir="$(brew --prefix "${openssl}" || true)"
     if [ -d "$ssldir" ]; then
       echo "python-build: use ${openssl} from homebrew"
       if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
-        # configure scriopt of newer CPython versions support `--with-openssl`
+        # configure script of newer CPython versions support `--with-openssl`
         # https://bugs.python.org/issue21541
         package_option python configure --with-openssl="${ssldir}"
       else
@@ -1526,7 +1526,7 @@ build_package_mac_openssl() {
 
   # Tell Python to use this openssl for its extension.
   if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
-    # configure scriopt of newer CPython versions support `--with-openssl`
+    # configure script of newer CPython versions support `--with-openssl`
     # https://bugs.python.org/issue21541
     package_option python configure --with-openssl="${OPENSSL_PREFIX_PATH}"
   else
