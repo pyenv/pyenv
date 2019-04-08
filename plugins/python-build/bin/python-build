@@ -1502,9 +1502,15 @@ use_homebrew_openssl() {
     local ssldir="$(brew --prefix "${openssl}" || true)"
     if [ -d "$ssldir" ]; then
       echo "python-build: use ${openssl} from homebrew"
+      if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
+        # configure scriopt of newer CPython versions support `--with-openssl`
+        # https://bugs.python.org/issue21541
+        package_option python configure --with-openssl="${ssldir}"
+      else
+        export CPPFLAGS="-I$ssldir/include ${CPPFLAGS}"
+        export LDFLAGS="-L$ssldir/lib ${LDFLAGS}"
+      fi
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
-      export CPPFLAGS="-I$ssldir/include ${CPPFLAGS}"
-      export LDFLAGS="-L$ssldir/lib ${LDFLAGS}"
       return
     fi
   done
@@ -1519,8 +1525,14 @@ build_package_mac_openssl() {
   OPENSSLDIR="${OPENSSLDIR:-$OPENSSL_PREFIX_PATH/ssl}"
 
   # Tell Python to use this openssl for its extension.
-  export CPPFLAGS="-I${OPENSSL_PREFIX_PATH}/include ${CPPFLAGS}"
-  export LDFLAGS="-L${OPENSSL_PREFIX_PATH}/lib ${LDFLAGS}"
+  if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
+    # configure scriopt of newer CPython versions support `--with-openssl`
+    # https://bugs.python.org/issue21541
+    package_option python configure --with-openssl="${OPENSSL_PREFIX_PATH}"
+  else
+    export CPPFLAGS="-I${OPENSSL_PREFIX_PATH}/include ${CPPFLAGS}"
+    export LDFLAGS="-L${OPENSSL_PREFIX_PATH}/lib ${LDFLAGS}"
+  fi
 
   # Make sure pkg-config finds our build first.
   export PKG_CONFIG_PATH="${OPENSSL_PREFIX_PATH}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
