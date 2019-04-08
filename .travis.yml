@@ -36,9 +36,6 @@ install: git clone --depth 1 https://github.com/bats-core/bats-core.git bats
 # Default for auto-generated jobs.
 script: make test-build
 
-after_script: |
-  cat "$(ls -tr ${TMPDIR:-/tmp}/python-build.*.log | tail -1)"
-
 jobs:
   include:
   # Shell-based tests should execute every time.
