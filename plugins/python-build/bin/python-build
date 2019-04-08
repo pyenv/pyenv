@@ -326,31 +326,25 @@ verify_checksum() {
 
 http() {
   local method="$1"
-  local url="$2"
-  local file="$3"
-  [ -n "$url" ] || return 1
+  [ -n "$2" ] || return 1
+  shift 1
 
-  local http_client
-  if [ -n "${PYTHON_BUILD_HTTP_CLIENT}" ]; then
-    http_client="http_${method}_${PYTHON_BUILD_HTTP_CLIENT}"
-  else
-    if type aria2c &>/dev/null; then
-      http_client="http_${method}_aria2c"
-    elif type curl &>/dev/null; then
-      http_client="http_${method}_curl"
-    elif type wget &>/dev/null; then
-      # SSL Certificate error with older wget that does not support Server Name Indication (#60)
-      if [[ "$(wget --version 2>/dev/null || true)" = "GNU Wget 1.1"[0-3]* ]]; then
-        echo "python-build: wget (< 1.14) doesn't support Server Name Indication. Please install curl (>= 7.18.1) and try again" >&2
-        return 1
-      fi
-      http_client="http_${method}_wget"
-    else
-      echo "error: please install \`aria2c\`, \`curl\` or \`wget\` and try again" >&2
-      exit 1
+  PYTHON_BUILD_HTTP_CLIENT="${PYTHON_BUILD_HTTP_CLIENT:-$(detect_http_client)}"
+  [ -n "$PYTHON_BUILD_HTTP_CLIENT" ] || return 1
+
+  "http_${method}_${PYTHON_BUILD_HTTP_CLIENT}" "$@"
+}
+
+detect_http_client() {
+  local client
+  for client in aria2c curl wget; do
+    if type "$client" &>/dev/null; then
+      echo "$client"
+      return
     fi
-  fi
-  "${http_client}" "$url" "$file"
+  done
+  echo "error: please install \`aria2c\`, \`curl\`, or \`wget\` and try again" >&2
+  return 1
 }
 
 http_head_aria2c() {
@@ -387,6 +381,7 @@ fetch_tarball() {
   local package_url="$2"
   local mirror_url
   local checksum
+  local extracted_dir
 
   if [ "$package_url" != "${package_url/\#}" ]; then
     checksum="${package_url#*#}"
@@ -419,7 +414,7 @@ fetch_tarball() {
    fi
 
   if ! reuse_existing_tarball "$package_filename" "$checksum"; then
-    local tarball_filename=$(basename $package_url)
+    local tarball_filename="$(basename "$package_url")"
     echo "Downloading ${tarball_filename}..." >&2
     http head "$mirror_url" &&
     download_tarball "$mirror_url" "$package_filename" "$checksum" ||
@@ -427,6 +422,11 @@ fetch_tarball() {
   fi
 
   { if tar $tar_args "$package_filename"; then
+      if [ ! -d "$package_name" ]; then
+        extracted_dir="$(find_extracted_directory)"
+        mv "$extracted_dir" "$package_name"
+      fi
+
       if [ -z "$KEEP_BUILD_PATH" ]; then
         rm -f "$package_filename"
       else
@@ -434,6 +434,17 @@ fetch_tarball() {
       fi
     fi
   } >&4 2>&1
+}
+
+find_extracted_directory() {
+  for f in *; do
+    if [ -d "$f" ]; then
+      echo "$f"
+      return
+    fi
+  done
+  echo "Extracted directory not found" >&2
+  return 1
 }
 
 fetch_nightly_tarball() {
@@ -925,6 +936,13 @@ fix_jruby_shebangs() {
   done
 }
 
+build_package_truffleruby() {
+  build_package_copy
+
+  cd "${PREFIX_PATH}"
+  ./lib/truffle/post_install_hook.sh
+}
+
 remove_windows_files() {
   cd "$PREFIX_PATH"
   rm -f bin/*.exe bin/*.dll bin/*.bat bin/jruby.sh
@@ -1223,9 +1241,9 @@ require_gcc() {
 
         colorize 1 "TO FIX THE PROBLEM"
         if type brew &>/dev/null; then
-          echo ": Install Homebrew's apple-gcc42 package with this"
+          echo ": Install Homebrew's GCC package with this"
           echo -n "command: "
-          colorize 4 "brew tap homebrew/dupes ; brew install apple-gcc42"
+          colorize 4 "brew install gcc@4.9"
         else
           echo ": Install the official GCC compiler using these"
           echo -n "packages: "
@@ -1544,8 +1562,8 @@ build_package_mac_openssl() {
   local nokerberos
   [[ "$1" != openssl-1.0.* ]] || nokerberos=1
 
-  # Compile a shared lib with zlib dynamically linked, no kerberos.
-  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl2 no-ssl3 no-krb5 shared
+  # Compile a shared lib with zlib dynamically linked.
+  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5}
 
   # Default MAKE_OPTS are -j 2 which can confuse the build. Thankfully, make
   # gives precedence to the last -j option, so we can override that.
@@ -1561,15 +1579,38 @@ build_package_mac_openssl() {
 
 # Post-install check that the openssl extension was built.
 build_package_verify_openssl() {
-  "$RUBY_BIN" -e 'begin
-    require "openssl"
-  rescue LoadError
-    $stderr.puts "The Ruby openssl extension was not compiled. Missing the OpenSSL lib?"
-    $stderr.puts "Configure options used:"
-    require "rbconfig"; require "shellwords"
-    RbConfig::CONFIG.fetch("configure_args").shellsplit.each { |arg| $stderr.puts "  #{arg}" }
-    exit 1
-  end' >&4 2>&1
+  "$RUBY_BIN" -e '
+    manager = ARGV[0]
+    packages = {
+      "apt-get" => Hash.new {|h,k| "lib#{k}-dev" }.update(
+        "openssl" => "libssl-dev",
+        "zlib" => "zlib1g-dev"
+      ),
+      "yum" => Hash.new {|h,k| "#{k}-devel" }.update(
+        "yaml" => "libyaml-devel"
+      )
+    }
+
+    failed = %w[openssl readline zlib yaml].reject do |lib|
+      begin
+        require lib
+      rescue LoadError
+        $stderr.puts "The Ruby #{lib} extension was not compiled."
+      end
+    end
+
+    if failed.size > 0
+      $stderr.puts "ERROR: Ruby install aborted due to missing extensions"
+      $stderr.print "Try running `%s install -y %s` to fetch missing dependencies.\n\n" % [
+        manager,
+        failed.map { |lib| packages.fetch(manager)[lib] }.join(" ")
+      ] unless manager.empty?
+      $stderr.puts "Configure options used:"
+      require "rbconfig"; require "shellwords"
+      RbConfig::CONFIG.fetch("configure_args").shellsplit.each { |arg| $stderr.puts "  #{arg}" }
+      exit 1
+    end
+  ' "$(basename "$(type -p yum apt-get | head -1)")" >&4 2>&1
 }
 
 # Ensure that directories listed in LDFLAGS exist

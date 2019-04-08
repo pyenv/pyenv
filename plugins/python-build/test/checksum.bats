@@ -103,7 +103,6 @@ export PYTHON_BUILD_CACHE_PATH=
 @test "existing tarball in build location is reused" {
   stub shasum true "echo ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
   stub curl false
-  stub curl false
   stub wget false
 
   export -n PYTHON_BUILD_CACHE_PATH
