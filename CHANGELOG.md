@@ -1,5 +1,14 @@
 ## Version History
 
+## 1.2.11
+
+* python-build: Fix `posix_close` name collision in 2.4 builds (#1321)
+* python-build: Add CPython 3.4.10 (#1322)
+* python-build: Add Anaconda 2019.03
+* python-build: Allow overriding the preference of OpenSSL version per definition basis (#1302, #1325, #1326)
+* python-build: Imported changes from rbenv/ruby-build 20190401 (#1327)
+* python-build: Use GNU Readline 8.0 on macOS if brew's package isn't available (#1329)
+
 ## 1.2.10
 
 * python-build: Force y, Y, yes or YES to confirm installation (#1217)
