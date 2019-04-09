@@ -1508,6 +1508,20 @@ prefer_openssl11() {
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
 }
 
+build_package_mac_readline() {
+  # Install to a subdirectory since we don't want shims for bin/readline.
+  READLINE_PREFIX_PATH="${PREFIX_PATH}/readline"
+
+  # Tell Python to use this readline for its extension.
+  export CPPFLAGS="-I${READLINE_PREFIX_PATH}/include ${CPPFLAGS}"
+  export LDFLAGS="-L${READLINE_PREFIX_PATH}/lib ${LDFLAGS}"
+
+  # Make sure pkg-config finds our build first.
+  export PKG_CONFIG_PATH="${READLINE_PREFIX_PATH}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+
+  build_package_standard "$@"
+}
+
 has_broken_mac_openssl() {
   is_mac || return 1
   local openssl_version="$(/usr/bin/openssl version 2>/dev/null || true)"
