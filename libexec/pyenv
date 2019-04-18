@@ -41,12 +41,15 @@ else
     # Use a subshell to avoid changing the current path
     (
     while [ -n "$path" ]; do
-      cd "${path%/*}"
-      local name="${path##*/}"
+      cd_path="${path%/*}"
+      if [[ "$cd_path" != "$path" ]]; then
+        cd "$cd_path"
+      fi
+      name="${path##*/}"
       path="$(resolve_link "$name" || true)"
     done
 
-    pwd
+    echo "$PWD"
     )
   }
 fi

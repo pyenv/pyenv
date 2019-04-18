@@ -28,3 +28,12 @@ load test_helper
   PYENV_FILE_ARG="${PYENV_TEST_DIR}/dir2/symlink.py" run pyenv echo PYENV_DIR
   assert_output "${PYENV_TEST_DIR}/dir1"
 }
+
+@test "should handle relative symlinks for file argument (#580)" {
+  mkdir -p "${PYENV_TEST_DIR}"
+  cd "${PYENV_TEST_DIR}"
+  touch file.py
+  ln -s file.py symlink.py
+  PYENV_FILE_ARG="symlink.py" run pyenv echo PYENV_DIR
+  assert_output "${PYENV_TEST_DIR}"
+}
