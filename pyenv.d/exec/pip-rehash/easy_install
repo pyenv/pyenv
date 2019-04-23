@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 

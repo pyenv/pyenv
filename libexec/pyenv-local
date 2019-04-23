@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+#
 # Summary: Set or show the local application-specific Python version
 #
 # Usage: pyenv local <version>
