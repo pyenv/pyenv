@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Summary: Explain how the current Python version is set
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x

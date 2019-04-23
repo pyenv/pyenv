@@ -35,7 +35,7 @@ load test_helper
   cd "$PYENV_TEST_DIR"
   cat > myscript.sh <<OUT
 #!/bin/sh
-eval "\$(pyenv-init -)"
+eval "\$(pyenv init -)"
 echo \$PYENV_SHELL
 OUT
   chmod +x myscript.sh

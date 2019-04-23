@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
 # Usage: eval "$(pyenv init - [--no-rehash] [<shell>])"
 

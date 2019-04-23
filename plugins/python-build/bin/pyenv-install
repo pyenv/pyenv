@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-#
 # Summary: Install a Python version using python-build
 #
 # Usage: pyenv install [-f] [-kvp] <version>

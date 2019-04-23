@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-#
 # Summary: Set or show the shell-specific Python version
 #
 # Usage: pyenv shell <version>...

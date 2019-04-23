@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-#
 # Summary: Run an executable with the selected Python version
 #
 # Usage: pyenv exec <command> [arg1 arg2...]

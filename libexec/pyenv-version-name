@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Summary: Show the current Python version
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
