@@ -169,6 +169,7 @@ We'd recommend to install pyenv-virtualenv as well if you have some plan to play
 
 If you're on macOS, consider [installing with Homebrew](#homebrew-on-macos).
 
+If you're on Windows, consider using @kirankotari's [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) fork. (`pyenv` does not work on windows outside the Windows Subsystem for Linux)
 
 ### The automatic installer
 
