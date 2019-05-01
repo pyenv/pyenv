@@ -2147,6 +2147,20 @@ if [[ "$CONFIGURE_OPTS" == *"--enable-shared"* ]] || [[ "$PYTHON_CONFIGURE_OPTS"
   fi
 fi
 
+# Mojave and higher don't keep zlib in the usual compiler include path, so we
+# use xcrun or homebrew to find it (#1219)
+if is_mac && require_osx_version "10.14"; then
+  xc_sdk_path="$(xcrun --show-sdk-path 2>/dev/null)"
+  brew_zlib="$(brew --prefix zlib 2>/dev/null)"
+  if [ "$xc_sdk_path" ]; then
+    echo "python-build: use zlib from xcode"
+    export CFLAGS="-I${xc_sdk_path}/usr/include ${CFLAGS}"
+  elif [ "$brew_zlib" ]; then
+    echo "python-build: use zlib from homebrew"
+    export CFLAGS="-I${brew_zlib} ${CFLAGS}"
+  fi
+fi
+
 # python-build: Set `RPATH` if --shared` was given for PyPy (#244)
 if [[ "$PYPY_OPTS" == *"--shared"* ]]; then
   export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"

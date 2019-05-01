@@ -263,6 +263,7 @@ OUT
   stub uname '-s : echo Darwin'
 
   stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
 
   PYTHON_CONFIGURE_OPTS="--enable-framework" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
@@ -282,6 +283,7 @@ EOS
   stub uname '-s : echo Darwin'
 
   stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
@@ -332,6 +334,7 @@ OUT
   stub uname '-s : echo Darwin'
 
   stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.4'
 
   MACOSX_DEPLOYMENT_TARGET="10.4" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "\${MACOSX_DEPLOYMENT_TARGET}"
