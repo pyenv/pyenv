@@ -759,7 +759,10 @@ build_package_standard_build() {
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
-      use_homebrew_readline || use_freebsd_pkg ||true
+      use_homebrew_readline || use_freebsd_pkg || true
+    if is_mac -ge 1014; then
+      use_xcode_sdk_zlib || use_homebrew_zlib || true
+    fi
   fi
 
   ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
@@ -1626,6 +1629,22 @@ build_package_verify_openssl() {
       exit 1
     end
   ' "$(basename "$(type -p yum apt-get | head -1)")" >&4 2>&1
+}
+
+use_homebrew_zlib() {
+  local brew_zlib="$(brew --prefix zlib 2>/dev/null || true)"
+  if [ -d "$brew_zlib" ]; then
+    echo "python-build: use zlib from homebrew"
+    export CFLAGS="-I${brew_zlib} ${CFLAGS}"
+  fi
+}
+
+use_xcode_sdk_zlib() {
+  local xc_sdk_path="$(xcrun --show-sdk-path 2>/dev/null || true)"
+  if [ -d "$xc_sdk_path" ]; then
+    echo "python-build: use zlib from xcode sdk"
+    export CFLAGS="-I${xc_sdk_path}/usr/include ${CFLAGS}"
+  fi
 }
 
 # Ensure that directories listed in LDFLAGS exist

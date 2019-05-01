@@ -23,6 +23,7 @@ dist:
 osx_image:
 - xcode9.4
 - xcode10
+- xcode10.2
 
 env:
 - PYTHON_BUILD_VERSION=3.8-dev
@@ -55,6 +56,8 @@ jobs:
   # list, to prevent duplicate Linux builds.
   - os: linux
     osx_image: xcode9.4
+  - os: linux
+    osx_image: xcode10
 
   allow_failures:
   - env: PYTHON_BUILD_VERSION=3.8-dev
