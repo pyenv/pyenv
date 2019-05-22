@@ -204,7 +204,7 @@ easy to fork and contribute any changes back upstream.
    Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
    configuration file since it manipulates `PATH` during the initialization.
     ```sh
-    $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
+    $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
     ```
     - **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
     - **fish note**: Use `pyenv init - | source` instead of `eval (pyenv init -)`.
