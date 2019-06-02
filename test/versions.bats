@@ -154,3 +154,10 @@ OUT
 1.9
 OUT
 }
+
+@test "lists dot directories under versions" {
+  create_version ".venv"
+
+  run pyenv-versions --bare
+  assert_success ".venv"
+}
