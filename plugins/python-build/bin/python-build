@@ -1889,6 +1889,11 @@ build_package_verify_py38() {
   build_package_verify_py37 "$1" "${2:-3.8}"
 }
 
+# Post-install check for Python 3.9.x
+build_package_verify_py39() {
+  build_package_verify_py38 "$1" "${2:-3.9}"
+}
+
 # Copy Tools/gdb/libpython.py to pythonX.Y-gdb.py (#1190)
 build_package_copy_python_gdb() {
   if [ -e "$BUILD_PATH/$1/Tools/gdb/libpython.py" ]; then
