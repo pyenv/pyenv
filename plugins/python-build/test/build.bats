@@ -65,7 +65,7 @@ assert_build_log() {
   # pyenv/pyenv#1026
   stub uname false false
 
-  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux' '-s : echo Linux'
   stub brew false
   stub_make_install
   stub_make_install
@@ -95,7 +95,7 @@ OUT
   # pyenv/pyenv#1026
   stub uname false false
 
-  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux' '-s : echo Linux'
   stub brew false
   stub_make_install
   stub_make_install
@@ -125,7 +125,7 @@ OUT
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  stub uname '-s : echo Linux'
+  stub uname '-s : echo Linux' '-s : echo Linux'
   stub brew false
   stub_make_install
   stub_make_install
@@ -164,6 +164,7 @@ OUT
   stub uname false false
 
   stub uname '-s : echo Linux'
+  stub uname '-s : echo Darwin'
   stub brew "--prefix libyaml : echo '$brew_libdir'" false
   stub_make_install
 
@@ -251,7 +252,7 @@ OUT
   # yyuu/pyenv#257
   stub uname '-s : echo Darwin'
 
-  stub uname '-s : echo Darwin' false
+  stub uname '-s : echo Darwin' false '-s : echo Darwin'
   stub sysctl false
   stub_make_install
 
@@ -282,7 +283,7 @@ OUT
   # yyuu/pyenv#257
   stub uname '-s : echo Darwin'
 
-  stub uname '-s : echo Darwin' false
+  stub uname '-s : echo Darwin' false '-s : echo Darwin'
   stub sysctl '-n hw.ncpu : echo 4'
   stub_make_install
 
@@ -310,7 +311,7 @@ OUT
   # pyenv/pyenv#1026
   stub uname false false
 
-  stub uname '-s : echo FreeBSD' false
+  stub uname '-s : echo FreeBSD' false false
   stub sysctl '-n hw.ncpu : echo 1'
   stub_make_install
 
@@ -336,7 +337,7 @@ OUT
   cached_tarball "Python-3.6.2"
 
   # pyenv/pyenv#1026
-  stub uname false false
+  stub uname false false false
 
   stub uname '-s : echo Linux'
   stub_make_install
@@ -362,7 +363,7 @@ OUT
   cached_tarball "Python-3.6.2"
 
   # pyenv/pyenv#1026
-  stub uname false false
+  stub uname false false false
 
   stub uname '-s : echo Linux'
   stub_make_install
@@ -399,7 +400,7 @@ OUT
   stub uname "-s : echo FreeBSD" "-r : echo 9.1" false
 
   # pyenv/pyenv#1026
-  stub uname false false
+  stub uname false false false
 
   MAKE=gmake stub_make_install
 
@@ -416,7 +417,7 @@ OUT
   stub uname "-s : echo FreeBSD" "-r : echo 10.0-RELEASE" false
 
   # pyenv/pyenv#1026
-  stub uname false false
+  stub uname false false false
 
   stub_make_install
 
@@ -432,7 +433,7 @@ OUT
   stub uname "-s : echo FreeBSD" "-r : echo 11.0-RELEASE" false
 
   # pyenv/pyenv#1026
-  stub uname false false
+  stub uname false false false
 
   stub_make_install
 
@@ -456,6 +457,7 @@ CONF
   stub_make_install
 
   # yyuu/pyenv#257
+  stub uname '-s : echo Linux'
   stub uname '-s : echo Linux'
   stub uname '-s : echo Linux'
 

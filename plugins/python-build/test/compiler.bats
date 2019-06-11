@@ -64,9 +64,11 @@ DEF
   cd "$INSTALL_ROOT"
 
   # pyenv/pyenv#1026
-  stub uname false '-s : echo Darwin' false '-s : echo Darwin'
+  stub uname false '-s : echo Darwin' false '-s : echo Darwin' '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
 
+  stub sw_vers '-productVersion : echo 10.10'
+  stub sw_vers '-productVersion : echo 10.10'
   stub sw_vers '-productVersion : echo 10.10'
   stub cc 'false'
   stub brew 'false'
