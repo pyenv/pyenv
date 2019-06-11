@@ -1,5 +1,11 @@
 ## Version History
 
+## 1.2.12
+
+* python-build: Find zlib from Xcode or brew on Mojave (#1353)
+* python-build: Add PyPy 7.1.1 (#1335)
+* python-build: Add CPython 3.8.0b1
+
 ## 1.2.11
 
 * python-build: Fix `posix_close` name collision in 2.4 builds (#1321)
