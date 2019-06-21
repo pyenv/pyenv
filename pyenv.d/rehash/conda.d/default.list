@@ -22,6 +22,7 @@ gsettings
 gio-querymodules
 glib-compile-resources
 glib-compile-schemas
+infocmp
 # libpng
 libpng-config
 # libxml2
