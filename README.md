@@ -190,12 +190,16 @@ easy to fork and contribute any changes back upstream.
 
 2. **Define environment variable `PYENV_ROOT`** to point to the path where
    pyenv repo is cloned and add `$PYENV_ROOT/bin` to your `$PATH` for access
-   to the `pyenv` command-line utility.
-
+   to the `pyenv` command-line utility. For example, if you would like to put
+   environment variables in `~/.bash_profile`:
     ```sh
     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
     ```
+    
+    - **Linux note**: Your desktop environment may not source `~/.bash_profile`.
+      If this happens, you may want to use `~/.profile` instead, since it's usually
+      sourced by the display manager.
     - **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
     - **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
     - **Proxy note**: If you use a proxy, export `http_proxy` and `HTTPS_PROXY` too.
@@ -206,14 +210,21 @@ easy to fork and contribute any changes back upstream.
     ```sh
     $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
     ```
+    
+    You may need to put `export -f pyenv` after this if `$pyenv shell` and `$pyenv rehash`
+    commands doesn't work.
+    
+    - **Linux note**: As is said above, if `~/.bash_profile` is not sourced by desktop
+    environment, you may want to use `~/.profile` instead.
     - **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
     - **fish note**: Use `pyenv init - | source` instead of `eval (pyenv init -)`.
     - **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
     **General warning**: There are some systems where the `BASH_ENV` variable is configured
     to point to `.bashrc`. On such systems you should almost certainly put the abovementioned line
-    `eval "$(pyenv init -)"` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
-    may observe strange behaviour, such as `pyenv` getting into an infinite loop.
+    `eval "$(pyenv init -)"` into `.bash_profile` or `.profile`, and **not** into
+    `.bashrc`. Otherwise you may observe strange behaviour, such as `pyenv` getting
+    into an infinite loop.
     See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
 
 4. **Restart your shell so the path changes take effect.**
