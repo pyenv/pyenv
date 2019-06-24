@@ -206,13 +206,14 @@ easy to fork and contribute any changes back upstream.
 
 3. **Add `pyenv init` to your shell** to enable shims and autocompletion.
    Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
-   configuration file since it manipulates `PATH` during the initialization.
+   configuration file since it manipulates `PATH` during the initialization. For example:
     ```sh
     $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
     ```
     
-    You may need to put `export -f pyenv` after this if `$pyenv shell` and `$pyenv rehash`
-    commands doesn't work.
+    If you put this in the run control file (like `~/.bashrc`), this will work fine; otherwise (like if you
+    use `~/.bash_profile` or `~/.profile` instead, and it is not sourced in `~/.bashrc`), you need to put
+    `export -f pyenv` after this to access the function from a sub-shell.
     
     - **Linux note**: As is said above, if `~/.bash_profile` is not sourced by desktop
     environment, you may want to use `~/.profile` instead.
