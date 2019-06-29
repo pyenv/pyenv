@@ -5,54 +5,12 @@ set -e
 
 if [ -z "$PYENV_VERSION" ]; then
   PYENV_VERSION_FILE="$(pyenv-version-file)"
-  PYENV_VERSION="$(pyenv-version-file-read "$PYENV_VERSION_FILE" || true)"
+  PYENV_VERSION_NAME="$(pyenv-version-name)"
   PYENV_VERSION_ALIAS="$(pyenv-version-file-read-alias "$PYENV_VERSION_FILE" || true)"
 fi
-
-OLDIFS="$IFS"
-IFS=$'\n' scripts=(`pyenv-hooks version-name`)
-IFS="$OLDIFS"
-for script in "${scripts[@]}"; do
-  source "$script"
-done
-
-if [ -z "$PYENV_VERSION" ] || [ "$PYENV_VERSION" = "system" ]; then
-  echo "system"
-  exit
-fi
-
-version_exists() {
-  local version="$1"
-  [ -d "${PYENV_ROOT}/versions/${version}" ]
-}
-
-versions=()
-OLDIFS="$IFS"
-{ IFS=:
-  any_not_installed=0
-  for version in ${PYENV_VERSION}; do
-    if version_exists "$version" || [ "$version" = "system" ]; then
-      versions=("${versions[@]}" "${version}")
-    elif version_exists "${version#python-}"; then
-      versions=("${versions[@]}" "${version#python-}")
-    else
-      echo "pyenv: version \`$version' is not installed (set by $(pyenv-version-origin))" >&2
-      any_not_installed=1
-    fi
-  done
-}
-IFS="$OLDIFS"
 
 if [ -n "$PYENV_VERSION_ALIAS" ]; then
     echo "$PYENV_VERSION_ALIAS"
 else
-    OLDIFS="$IFS"
-    { IFS=:
-      echo "${versions[*]}"
-    }
-    IFS="$OLDIFS"
-fi
-
-if [ "$any_not_installed" = 1 ]; then
-  exit 1
+    echo "$PYENV_VERSION_NAME"
 fi
