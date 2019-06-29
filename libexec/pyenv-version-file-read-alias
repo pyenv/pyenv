@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Usage: pyenv version-file-read-alias <file>
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+VERSION_FILE="$1"
+
+if [ -e "$VERSION_FILE" ]; then
+    version_alias=$(grep "alias:" $VERSION_FILE | cut -d":" -f2)
+    if [ -n "$version_alias" ]; then
+        echo "$version_alias"
+        exit
+    fi
+fi
+
+exit 1
