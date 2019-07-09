@@ -1,5 +1,10 @@
 ## Version History
 
+## 1.2.13
+
+* python-build: Add CPython 3.7.4
+* python-build: Add CPython 3.6.9
+
 ## 1.2.12
 
 * python-build: Find zlib from Xcode or brew on Mojave (#1353)
