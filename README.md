@@ -299,7 +299,14 @@ package manager for macOS.
 
 To upgrade pyenv in the future, use `upgrade` instead of `install`.
 
-Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout) above, starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
+Then:
+1. Define environment variable `PYENV_ROOT`:
+
+```
+$ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
+```
+
+2. Follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout) above, starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
 
 ### Advanced Configuration
 
