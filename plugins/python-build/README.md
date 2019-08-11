@@ -109,6 +109,8 @@ You can set certain environment variables to control the build process.
   downloaded package files.
 * `PYTHON_BUILD_MIRROR_URL` overrides the default mirror URL root to one of your
   choosing.
+* `PYENV_PYTHON_MIRROR_URL` replaces the python source mirror URL to one of your
+  choosing(e.g. export PYENV_PYTHON_MIRROR_URL="http://npm.taobao.org/mirrors/python").
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
@@ -188,6 +190,25 @@ mirror by setting the `PYTHON_BUILD_SKIP_MIRROR` environment variable.
 
 The official python-build download mirror is provided by
 [GitHub Pages](http://yyuu.github.io/pythons/).
+
+### Package install mirrors
+
+python-build will first attempt to download package files from a mirror hosted on
+GitHub Pages. If a package is not available on the mirror, if the mirror
+is down, or if the download is corrupt, python-build will fall back to the
+official URL specified in the definition file.
+
+If you install and download slowly , you can use `PYENV_PYTHON_MIRROR_URL`.
+
+Example usage:
+
+```sh
+# Temporary addition of third-party Python open source sites
+$ export PYENV_PYTHON_MIRROR_URL="http://npm.taobao.org/mirrors/python"
+
+$ pyenv install 2.7.4
+
+
 
 ### Package download caching
 
