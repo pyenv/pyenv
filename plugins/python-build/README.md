@@ -207,8 +207,7 @@ Example usage:
 $ export PYENV_PYTHON_MIRROR_URL="http://npm.taobao.org/mirrors/python"
 
 $ pyenv install 2.7.4
-
-
+```
 
 ### Package download caching
 
