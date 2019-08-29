@@ -51,6 +51,8 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
     * [Homebrew on macOS](#homebrew-on-macos)
     * [Advanced Configuration](#advanced-configuration)
     * [Uninstalling Python Versions](#uninstalling-python-versions)
+* **[Troubleshooting](#troubleshooting)**
+  * [Linux Questions](#linux-questions)
 * **[Command Reference](#command-reference)**
 * **[Development](#development)**
   * [Version History](#version-history)
@@ -344,6 +346,36 @@ the removal process.
 Alternatively, simply `rm -rf` the directory of the version you want
 to remove. You can find the directory of a particular Python version
 with the `pyenv prefix` command, e.g. `pyenv prefix 2.6.8`.
+
+
+
+---
+
+
+## Troubleshooting
+
+### Linux Questions
+
+#### I ran into errors when trying to install Python.  What do I do?
+
+It is likely that you are missing some of Python's core dependencies.
+
+Run the following command(s) based on your distribution.
+
+For Debian-based distros:
+
+```bash
+sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+    libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
+    libncursesw5-dev xz-utils tk-dev
+```
+
+For yum-based distros:
+
+```bash
+sudo yum -y groupinstall development
+sudo yum -y install zlib-devel
+```
 
 
 ----
