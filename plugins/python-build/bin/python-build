@@ -1008,7 +1008,9 @@ build_package_micropython() {
   elif [ -z "${MAKE_OPTS+defined}" ]; then
     MAKE_OPTS="-j $(num_cpu_cores)"
   fi
-  { cd ports/unix
+  { cd mpy-cross
+    "$MAKE" $MAKE_OPTS
+    cd ports/unix
     "$MAKE" $MAKE_OPTS axtls
     "$MAKE" $MAKE_OPTS CFLAGS_EXTRA="-DMICROPY_PY_SYS_PATH_DEFAULT='\"${PREFIX_PATH}/lib/micropython\"'"
     "$MAKE" install $MAKE_INSTALL_OPTS PREFIX="${PREFIX_PATH}"
