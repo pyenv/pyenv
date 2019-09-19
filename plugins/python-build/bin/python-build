@@ -2222,6 +2222,19 @@ if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
   fi
 fi
 
+# regex_to_match="(--with-tcltk-libs='([^']+)')"
+if [[ "$PYTHON_CONFIGURE_OPTS" =~ (--with-tcltk-libs=\'([^\']+)\') ]]; then
+  tcltk_match="${BASH_REMATCH[1]}"
+  tcltk_match_quoted="${tcltk_match//--with-tcltk-libs=/}"
+  # remove it from PYTHON_CONFIGURE_OPTS since it will mess up compile
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//$tcltk_match/}"
+
+  # having issues passing the single quoted part, couldnt pass as single var and still work
+  package_option python configure "--with-tcltk-libs='${tcltk_match_quoted}'"
+  unset tcltk_match
+  unset tcltk_match_quoted
+fi
+
 # Unset `PIP_REQUIRE_VENV` during build (#216)
 unset PIP_REQUIRE_VENV
 unset PIP_REQUIRE_VIRTUALENV
