@@ -38,14 +38,16 @@ OLDIFS="$IFS"
 IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name)})
 IFS="$OLDIFS"
 
+PYENV_COMMAND_PATH=
 for version in "${versions[@]}"; do
   if [ "$version" = "system" ]; then
     PATH="$(remove_from_path "${PYENV_ROOT}/shims")"
-    PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
+    command_path="$(command -v "$PYENV_COMMAND" || true)"
   else
-    PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${version}/bin/${PYENV_COMMAND}"
+    command_path="${PYENV_ROOT}/versions/${version}/bin/${PYENV_COMMAND}"
   fi
-  if [ -x "$PYENV_COMMAND_PATH" ]; then
+  if [ -x "$command_path" ]; then
+    PYENV_COMMAND_PATH="$command_path"
     break
   fi
 done
@@ -57,7 +59,7 @@ for script in "${scripts[@]}"; do
   source "$script"
 done
 
-if [ -x "$PYENV_COMMAND_PATH" ]; then
+if [ -n "$PYENV_COMMAND_PATH" ]; then
   echo "$PYENV_COMMAND_PATH"
 else
   any_not_installed=0
