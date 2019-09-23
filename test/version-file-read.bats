@@ -70,3 +70,25 @@ IN
   run pyenv-version-file-read my-version
   assert_success "3.3.5"
 }
+
+@test "prevents directory traversal" {
+  cat > my-version <<<".."
+  run pyenv-version-file-read my-version
+  assert_failure "pyenv: invalid version in \`my-version'"
+
+  cat > my-version <<<"../foo"
+  run pyenv-version-file-read my-version
+  assert_failure "pyenv: invalid version in \`my-version'"
+}
+
+@test "disallows path segments in version string" {
+  cat > my-version <<<"foo/bar"
+  run pyenv-version-file-read my-version
+  assert_failure "pyenv: invalid version in \`my-version'"
+}
+
+@test "displays valid versions with invalid ones" {
+  cat > my-version <<< $'foo/bar\nvalid'
+  run pyenv-version-file-read my-version
+  assert_success $'pyenv: invalid version in `my-version\'\nvalid'
+}

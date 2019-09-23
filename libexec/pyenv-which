@@ -40,8 +40,8 @@ IFS="$OLDIFS"
 
 for version in "${versions[@]}"; do
   if [ "$version" = "system" ]; then
-    PATH="$(remove_from_path "${PYENV_ROOT}/shims")"
-    PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
+    PATH="$(remove_from_path "${PYENV_ROOT}/shims")" \
+      PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
   else
     PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${version}/bin/${PYENV_COMMAND}"
   fi

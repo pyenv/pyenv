@@ -50,5 +50,8 @@ OUT
 
 @test "prefix for invalid system" {
   PATH="$(path_without python)" run pyenv-prefix system
-  assert_failure "pyenv: system version not found in PATH"
+  assert_failure <<EOF
+pyenv: python: command not found
+pyenv: system version not found in PATH"
+EOF
 }

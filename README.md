@@ -326,7 +326,7 @@ opposed to this idea. Here's what `pyenv init` actually does:
 4. **Installs the sh dispatcher.** This bit is also optional, but allows
    pyenv and plugins to change variables in your current shell, making
    commands like `pyenv shell` possible. The sh dispatcher doesn't do
-   anything crazy like override `cd` or hack your shell prompt, but if
+   anything invasive like override `cd` or hack your shell prompt, but if
    for some reason you need `pyenv` to be a real script rather than a
    shell function, you can safely skip it.
 

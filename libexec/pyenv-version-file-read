@@ -6,15 +6,24 @@ set -e
 VERSION_FILE="$1"
 
 if [ -e "$VERSION_FILE" ]; then
-  # Read the first non-whitespace word from the specified version file.
-  # Be careful not to load it whole in case there's something crazy in it.
+  # Read the first word from the specified version file. Avoid reading it whole.
   IFS="${IFS}"$'\r'
   words=($(cut -b 1-1024 "$VERSION_FILE" | sed 's/^\s*\(\S\+\).*/\1/'))
   versions=("${words[@]}")
 
-  if [ -n "$versions" ]; then
+  if [ -n "${versions[*]}" ]; then
+    validated_versions=()
+    for version in "${versions[@]}"; do
+      if [ "$version" = ".." ] || [[ $version == */* ]]; then
+        echo "pyenv: invalid version in \`$VERSION_FILE'" >&2
+      else
+        validated_versions+=("$version")
+      fi
+    done
+  fi
+  if [ -n "${validated_versions[*]}" ]; then
     IFS=":"
-    echo "${versions[*]}"
+    echo "${validated_versions[*]}"
     exit
   fi
 fi
