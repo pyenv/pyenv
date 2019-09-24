@@ -77,33 +77,3 @@ ${PYENV_ROOT}/versions/3.4/bin/python
   args
 OUT
 }
-
-@test "supports python -S <cmd>" {
-  export PYENV_VERSION="3.4"
-
-  # emulate `python -S' behavior
-  create_executable "python" <<SH
-#!$BASH
-if [[ \$1 == "-S"* ]]; then
-  found="\$(PATH="\${PYTHONPATH:-\$PATH}" which \$2)"
-  # assert that the found executable has python for shebang
-  if head -1 "\$found" | grep python >/dev/null; then
-    \$BASH "\$found"
-  else
-    echo "python: no Python script found in input (LoadError)" >&2
-    exit 1
-  fi
-else
-  echo 'python 3.4 (pyenv test)'
-fi
-SH
-
-  create_executable "fab" <<SH
-#!/usr/bin/env python
-echo hello fab
-SH
-
-  pyenv-rehash
-  run python -S fab
-  assert_success "hello fab"
-}
