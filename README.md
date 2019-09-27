@@ -43,6 +43,7 @@ RVM?**](https://github.com/rbenv/rbenv/wiki/Why-rbenv%3F)
     * [Upgrading with Homebrew](#upgrading-with-homebrew)
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading with Git](#upgrading-with-git)
+    * [Updating the list of available Ruby versions](#updating-the-list-of-available-ruby-versions)
   * [How rbenv hooks into your shell](#how-rbenv-hooks-into-your-shell)
   * [Installing Ruby versions](#installing-ruby-versions)
     * [Installing Ruby gems](#installing-ruby-gems)
@@ -288,6 +289,15 @@ latest version by pulling from GitHub:
 $ cd ~/.rbenv
 $ git pull
 ~~~
+
+#### Updating the list of available Ruby versions
+
+If you're using the `rbenv install` command, then the list of available Ruby versions is not automatically updated when pulling from the rbenv repo. To do this manually:
+
+```sh
+$ cd ~/.rbenv/plugins/ruby-build
+$ git pull
+```
 
 ### How rbenv hooks into your shell
 
