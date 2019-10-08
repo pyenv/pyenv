@@ -799,7 +799,7 @@ build_package_standard_install_with_bundled_gems() {
   build_package_standard_install "$@"
 }
 
-# Backword Compatibility for standard function
+# Backward Compatibility for standard function
 build_package_standard() {
   build_package_standard_build "$@"
   build_package_standard_install "$@"
