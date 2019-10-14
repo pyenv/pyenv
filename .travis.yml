@@ -26,7 +26,7 @@ osx_image:
 - xcode10.2
 
 env:
-- PYTHON_BUILD_VERSION=3.8-dev
+- PYTHON_BUILD_VERSION=3.8.0
 - PYTHON_BUILD_VERSION=3.7.2
 
 before_install:
@@ -60,7 +60,7 @@ jobs:
     osx_image: xcode10
 
   allow_failures:
-  - env: PYTHON_BUILD_VERSION=3.8-dev
+  - env: PYTHON_BUILD_VERSION=3.8.0
 
 stages:
 - test shell
