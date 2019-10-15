@@ -1,5 +1,13 @@
 ## Version History
 
+## 1.2.14
+
+* python-build: Add CPython 3.8.0 (#1416)
+* python-build: Add Anaconda-2019.07 (#1382)
+* python-build: Add Micropython 1.11 (#1395)
+* python-build: Fix compatibility issues with Homebrew installed Tcl/Tk (#1397)
+* pyenv-exec: Do not use `exec -a`, do not mangle PATH for system Python (#1169)
+
 ## 1.2.13
 
 * python-build: Add CPython 3.7.4
