@@ -27,7 +27,7 @@ osx_image:
 
 env:
 - PYTHON_BUILD_VERSION=3.8.0
-- PYTHON_BUILD_VERSION=3.7.2
+- PYTHON_BUILD_VERSION=3.7.5
 
 before_install:
 - date +%Y-%m-%dT%H:%M:%S
