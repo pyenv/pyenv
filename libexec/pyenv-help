@@ -151,7 +151,7 @@ if [ -z "$1" ] || [ "$1" == "pyenv" ]; then
   [ -z "$usage" ] || exit
   echo
   echo "Some useful pyenv commands are:"
-  print_summaries commands local global shell install uninstall rehash version versions which whence
+  print_summaries commands $(exec pyenv-commands | sort -u)
   echo
   echo "See \`pyenv help <command>' for information on a specific command."
   echo "For full documentation, see: https://github.com/pyenv/pyenv#readme"
