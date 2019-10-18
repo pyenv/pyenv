@@ -1,0 +1,47 @@
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
+    install_package "pypy2.7-v7.2.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.2.0-linux32.tar.bz2#76d666e5aee54b519d6ec1af4ef0cbdc85f7f9276dd554e97deb026adfd0c936" "pypy" verify_py27 ensurepip
+  else
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+      echo "try 'pypy2.7-7.2.0-src' to build from source."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"linux64" )
+  if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
+    install_package "pypy2.7-v7.2.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.2.0-linux64.tar.bz2#05acf28e6a243026ecad933b9361d8f74b41f00818071b76b38c4694cc4c9599" "pypy" verify_py27 ensurepip
+  else
+    install_package "pypy-7.2.0-linux_x86_64-portable" "https://github.com/squeaky-pl/portable-pypy/releases/download/pypy-7.2.0/pypy-7.2.0-linux_x86_64-portable.tar.bz2#a4f301e7629aafe4691ed1c3e9a39cf2158d86524f6ce584e5b850303e77ad81" "pypy" verify_py27 ensurepip
+  fi
+  ;;
+"osx64" )
+  if require_osx_version "10.13"; then
+    install_package "pypy2.7-v7.2.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.2.0-osx64.tar.bz2#36aa2f2440e762333569118dd0b3d5371d575c40966effa194d116c5453ddb52" "pypy" verify_py27 ensurepip
+  else
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
+      echo "try 'pypy2.7-7.2.0-src' to build from source."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"win32" )
+  install_zip "pypy2.7-v7.2.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.2.0-win32.zip#956eeaaaac053e5d0917e77a3d2ad1933ab5561eb3e6e71235780b5aa5fd2bb7" "pypy" verify_py27 ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy2.7-7.2.0-src' to build from source."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
