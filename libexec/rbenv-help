@@ -42,8 +42,15 @@ extract_initial_comment_block() {
 }
 
 collect_documentation() {
+  local awk
+  awk="$(type -p gawk awk 2>/dev/null | head -1)"
+  if [ -z "$awk" ]; then
+    echo "rbenv: cannot find awk" >&2
+    return 1
+  fi
+
   # shellcheck disable=SC2016
-  $(type -p gawk awk | head -1) '
+  "$awk" '
     /^Summary:/ {
       summary = substr($0, 10)
       next
