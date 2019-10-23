@@ -1,7 +1,0 @@
-sudo: false
-install: git clone --depth 1 https://github.com/sstephenson/bats.git
-script: PATH="./bats/bin:$PATH" test/run
-language: c
-env:
-  - RBENV_NATIVE_EXT=
-  - RBENV_NATIVE_EXT=1
