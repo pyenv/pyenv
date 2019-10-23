@@ -1,0 +1,19 @@
+name: CI
+on: [push]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        native_ext: ['', '1']
+        os: [ubuntu-latest, macOS-latest]
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install bats
+      run: git clone --depth 1 https://github.com/sstephenson/bats.git
+    - name: Run tests
+      env:
+        RBENV_NATIVE_EXT: ${{ matrix.native_ext }}
+      run: PATH="./bats/bin:$PATH" test/run
