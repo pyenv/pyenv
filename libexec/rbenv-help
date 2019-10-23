@@ -42,8 +42,13 @@ extract_initial_comment_block() {
 }
 
 collect_documentation() {
+  local all_awks
+  local first_awk
+  all_awks=$(type -p gawk awk)
+  first_awk=$(head -1 <<<"$all_awks")
+
   # shellcheck disable=SC2016
-  $(type -p gawk awk | head -1) '
+  "$first_awk" '
     /^Summary:/ {
       summary = substr($0, 10)
       next
