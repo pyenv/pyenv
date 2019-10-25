@@ -247,10 +247,7 @@ make_package() {
 
 compute_sha2() {
   local output
-  if type shasum &>/dev/null; then
-    output="$(shasum -a 256 -b)" || return 1
-    echo "${output% *}"
-  elif type openssl &>/dev/null; then
+  if type openssl &>/dev/null; then
     local openssl="$(command -v "$(brew --prefix openssl 2>/dev/null || true)"/bin/openssl openssl | head -1)"
     output="$("$openssl" dgst -sha256 2>/dev/null)" || return 1
     echo "${output##* }"
