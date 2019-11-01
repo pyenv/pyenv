@@ -4,7 +4,7 @@
 - Ignores releases below 4.3.30.
 - Ignores sub-patch releases if that major.minor.patch already exists
   - But otherwise, takes the latest sub-patch release for given OS/arch
-- Assumes all miniconda3 releases default to python 3.6 (correct at time of writing)
+- Assumes all miniconda3 releases < 4.7 default to python 3.6, and anything else 3.7
 
 Use -d for dry run.
 """
@@ -53,10 +53,11 @@ class StrEnum(str, Enum):
     Adapted from https://github.com/kissgyorgy/enum34-custom/blob/dbc89596761c970398701d26c6a5bbcfcf70f548/enum_custom.py#L100
     (MIT license)
     """
+
     def __new__(cls, *args):
         for arg in args:
             if not isinstance(arg, str):
-                raise TypeError('Not text %s:' % arg)
+                raise TypeError("Not text %s:" % arg)
 
         return super(StrEnum, cls).__new__(cls, *args)
 
@@ -92,13 +93,13 @@ class PyVersion(StrEnum):
         return f"{first}.{''.join(others)}"
 
     def version_info(self):
-        return tuple(int(n) for n in self.version().split('.'))
+        return tuple(int(n) for n in self.version().split("."))
 
 
 @total_ordering
 class VersionStr(str):
     def info(self):
-        return tuple(int(n) for n in self.split('.'))
+        return tuple(int(n) for n in self.split("."))
 
     def __eq__(self, other):
         return str(self) == str(other)
@@ -110,7 +111,7 @@ class VersionStr(str):
 
     @classmethod
     def from_info(cls, version_info):
-        return VersionStr('.'.join(str(n) for n in version_info))
+        return VersionStr(".".join(str(n) for n in version_info))
 
     def __hash__(self):
         return hash(str(self))
@@ -122,7 +123,7 @@ class MinicondaVersion(NamedTuple):
 
     @classmethod
     def from_str(cls, s):
-        miniconda_n, ver = s.split('-')
+        miniconda_n, ver = s.split("-")
         return MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver))
 
     def to_filename(self):
@@ -131,12 +132,16 @@ class MinicondaVersion(NamedTuple):
     def default_py_version(self):
         if self.suffix == Suffix.TWO:
             return PyVersion.PY27
-        else:
+        elif self.version_str.info() < (4, 7):
             # https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-python.html
             return PyVersion.PY36
+        else:
+            return PyVersion.PY37
 
     def with_version_triple(self):
-        return MinicondaVersion(self.suffix, VersionStr.from_info(self.version_str.info()[:3]))
+        return MinicondaVersion(
+            self.suffix, VersionStr.from_info(self.version_str.info()[:3])
+        )
 
 
 class MinicondaSpec(NamedTuple):
@@ -148,12 +153,9 @@ class MinicondaSpec(NamedTuple):
 
     @classmethod
     def from_filestem(cls, stem, md5, py_version=None):
-        miniconda_n, ver, os, arch = stem.split('-')
+        miniconda_n, ver, os, arch = stem.split("-")
         spec = MinicondaSpec(
-            MinicondaVersion(
-                Suffix(miniconda_n[-1]),
-                VersionStr(ver),
-            ),
+            MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver)),
             SupportedOS(os),
             SupportedArch(arch),
             md5,
@@ -183,7 +185,7 @@ class MinicondaSpec(NamedTuple):
 
 def make_script(specs: List[MinicondaSpec]):
     install_lines = [s.to_install_lines() for s in specs]
-    return install_script_fmt.format(install_lines='\n'.join(install_lines))
+    return install_script_fmt.format(install_lines="\n".join(install_lines))
 
 
 def get_existing_minicondas():
@@ -203,10 +205,10 @@ def get_available_minicondas():
     session = requests_html.HTMLSession()
     response = session.get(MINICONDA_REPO)
     page: requests_html.HTML = response.html
-    table = page.find('table', first=True)
+    table = page.find("table", first=True)
     rows = table.find("tr")[1:]
     for row in rows:
-        f, size, date, md5 = row.find('td')
+        f, size, date, md5 = row.find("td")
         fname = f.text
         md5 = md5.text
 
@@ -240,7 +242,9 @@ if __name__ == "__main__":
     available_specs = set(get_available_minicondas())
 
     # version triple to triple-ified spec to raw spec
-    to_add: DefaultDict[MinicondaVersion, Dict[MinicondaSpec, MinicondaSpec]] = defaultdict(dict)
+    to_add: DefaultDict[
+        MinicondaVersion, Dict[MinicondaSpec, MinicondaSpec]
+    ] = defaultdict(dict)
 
     for s in sorted(available_specs, key=key_fn):
         key = s.version.with_version_triple()
@@ -255,8 +259,7 @@ if __name__ == "__main__":
         script_str = make_script(specs)
 
         if parsed.dry_run:
-            print(f"Would write spec to {fpath}:\n" + textwrap.indent(script_str, '  '))
+            print(f"Would write spec to {fpath}:\n" + textwrap.indent(script_str, "  "))
         else:
-            with open(fpath, 'w') as f:
+            with open(fpath, "w") as f:
                 f.write(script_str)
-
