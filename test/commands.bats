@@ -37,3 +37,10 @@ load test_helper
   assert_line "init"
   refute_line "shell"
 }
+
+@test "commands excludes realpath builtin extension" {
+  run pyenv-commands
+  assert_success
+  refute_line "realpath.so"
+  refute_line "realpath.dylib"
+}
