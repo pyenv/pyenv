@@ -1,18 +1,12 @@
-if [[ ! -o interactive ]]; then
-    return
-fi
+#compdef pyenv
 
-compctl -K _pyenv pyenv
+# Install as _pyenv into your fpath e.g., /usr/share/zsh/site-functions/ or:
+#
+#   $ . <gitdir>/completions/pyenv.zsh
+#   $ compdef _pyenv pyenv
 
 _pyenv() {
-  local words completions
-  read -cA words
-
-  if [ "${#words}" -eq 2 ]; then
-    completions="$(pyenv commands)"
-  else
-    completions="$(pyenv completions ${words[2,-2]})"
-  fi
-
-  reply=(${(ps:\n:)completions})
+    _arguments \
+        ': :("${(f)$(pyenv commands)}")' \
+        '*: :("${(f)$(pyenv completions ${words[2,-2]})}")'
 }
