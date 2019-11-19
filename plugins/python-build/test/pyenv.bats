@@ -46,6 +46,8 @@ Available versions:
   2.7.9-rc1
   2.7.9-rc2
   3.4.2
+Can't find the version you want? Run:
+pyenv install how-do-i-update-my-pyenv-build-plugin
 OUT
 
   unstub python-build
@@ -130,6 +132,8 @@ Available versions:
   
   ${PYENV_ROOT}/plugins/bar/share/python-build
   ${PYENV_ROOT}/plugins/foo/share/python-build
+Can't find the version you want? Run:
+pyenv install how-do-i-update-my-pyenv-build-plugin
 OUT
 }
 
