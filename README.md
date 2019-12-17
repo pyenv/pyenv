@@ -211,7 +211,7 @@ easy to fork and contribute any changes back upstream.
     - **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
     **General warning**: There are some systems where the `BASH_ENV` variable is configured
-    to point to `.bashrc`. On such systems you should almost certainly put the abovementioned line
+    to point to `.bashrc`. On such systems you should almost certainly put the above mentioned line
     `eval "$(pyenv init -)"` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
     may observe strange behaviour, such as `pyenv` getting into an infinite loop.
     See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
