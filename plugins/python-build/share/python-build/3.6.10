@@ -1,0 +1,9 @@
+#require_gcc
+prefer_openssl11
+install_package "openssl-1.1.0j" "https://www.openssl.org/source/openssl-1.1.0j.tar.gz#31bec6c203ce1a8e93d5994f4ed304c63ccf07676118b6634edded12ad1b3246" mac_openssl --if has_broken_mac_openssl
+install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
+if has_tar_xz_support; then
+  install_package "Python-3.6.10" "https://www.python.org/ftp/python/3.6.10/Python-3.6.10.tar.xz#0a833c398ac8cd7c5538f7232d8531afef943c60495c504484f308dac3af40de" ldflags_dirs standard verify_py37 copy_python_gdb ensurepip
+else
+  install_package "Python-3.6.10" "https://www.python.org/ftp/python/3.6.10/Python-3.6.10.tgz#7034dd7cba98d4f94c74f9edd7345bac71c8814c41672c64d9044fa2f96f334d" ldflags_dirs standard verify_py37 copy_python_gdb ensurepip
+fi
