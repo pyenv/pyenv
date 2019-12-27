@@ -1030,6 +1030,7 @@ pypy_architecture() {
     "ppc64" ) echo "linux-ppc64" ;;
     "ppc64le" ) echo "linux-ppc64le" ;;
     "x86_64" ) echo "linux64" ;;
+    "aarch64" ) echo "linux-aarch64" ;;
     * ) return 1 ;;
     esac
     ;;
