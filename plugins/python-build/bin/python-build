@@ -339,7 +339,7 @@ http() {
 detect_http_client() {
   local client
   for client in aria2c curl wget; do
-    if type "$client" &>/dev/null; then
+    if "$client" --help &>/dev/null; then
       echo "$client"
       return
     fi
