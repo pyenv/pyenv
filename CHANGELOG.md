@@ -1,5 +1,13 @@
 ## Version History
 
+## 1.2.16
+
+* python-build: Add CPython 3.8.1 (#1497)
+* python-build: Add CPython 3.7.6 (#1498)
+* python-build: Add CPython 3.6.10 (#1499)
+* python-build: Add CPython 3.5.9 (#1448)
+* python-build: Add PyPy 7.3.0 (1502)
+
 ## 1.2.15
 
 * python-build: Add CPython 3.7.5 (#1423)
