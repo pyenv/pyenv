@@ -1391,7 +1391,7 @@ require_java() {
 # Let Jython installer to generate shell script instead of python script even if there's `python2.7` available in `$PATH` (#800)
 # FIXME: better function naming
 unrequire_python27() {
-  export PATH="${BUILD_PATH}/bin:${PATH}"
+  [[ ":$PATH:" != *":${BUILD_PATH}/bin:"* ]] && export PATH="${BUILD_PATH}/bin:${PATH}"
   mkdir -p "${BUILD_PATH}/bin"
   if command -v python2.7 1>/dev/null 2>&1; then
     echo false > "${BUILD_PATH}/bin/python2.7"
@@ -1707,7 +1707,7 @@ isolated_gem_dependency() {
 
 isolated_gem_install() {
   export GEM_HOME="${PWD}/.gem"
-  export PATH="${GEM_HOME}/bin:${PATH}"
+  [[ ":$PATH:" != *":${GEM_HOME}/bin:"* ]] && export PATH="${GEM_HOME}/bin:${PATH}"
   gem install "$@"
 }
 

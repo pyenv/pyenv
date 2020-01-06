@@ -90,7 +90,7 @@ fish )
   echo "set -gx PYENV_SHELL $shell"
 ;;
 * )
-  echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  [[ ":$PATH:" != *":${PYENV_ROOT}/shims:"* ]] && echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
   echo "export PYENV_SHELL=$shell"
 ;;
 esac

@@ -14,7 +14,7 @@ PATH="${_PATH}"
 PYENV_COMMAND_PATH="$(pyenv-which "${PYENV_REHASH_REAL_COMMAND}")"
 PYENV_BIN_PATH="${PYENV_COMMAND_PATH%/*}"
 
-export PATH="${PYENV_BIN_PATH}:${PATH}"
+[[ ":$PATH:" != *":${PYENV_BIN_PATH}:"* ]] && export PATH="${PYENV_BIN_PATH}:${PATH}"
 
 STATUS=0
 "$PYENV_COMMAND_PATH" "$@" || STATUS="$?"
