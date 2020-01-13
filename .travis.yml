@@ -22,8 +22,8 @@ dist:
 # https://docs.travis-ci.com/user/reference/osx/#macos-version
 osx_image:
 - xcode9.4
-- xcode10
-- xcode10.2
+- xcode10.3
+- xcode11.2
 
 env:
 - PYTHON_BUILD_VERSION=3.8.0
