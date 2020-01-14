@@ -759,6 +759,7 @@ build_package_standard_build() {
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
+      use_tcltk || true
       use_homebrew_readline || use_freebsd_pkg || true
     if is_mac -ge 1014; then
       use_xcode_sdk_zlib || use_homebrew_zlib || true
@@ -1650,6 +1651,30 @@ use_xcode_sdk_zlib() {
   fi
 }
 
+
+use_tcltk() {
+  # check args passed, use that otherwise check for homebrew tcl-tk
+  local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
+  local regex_tcltk_libs_args="(--with-tcltk-libs='([^']+)')"
+
+  if [[ "$PYTHON_CONFIGURE_OPTS" =~ $regex_tcltk_libs_args ]]; then
+    local tcltk_libs_match="${BASH_REMATCH[1]}"
+    local tcltk_match_quoted="${tcltk_libs_match//--with-tcltk-libs=/}"
+    PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//$tcltk_libs_match/}"
+
+    echo "python-build: use tcl-tk from \$PYTHON_CONFIGURE_OPTS"
+    package_option python configure "--with-tcltk-libs='${tcltk_match_quoted}'"
+  elif [ -d "$tcltk_libdir" ]; then
+    # get the version from the folder that homebrew versions
+    local tcltk_version_long="$(ls "$(brew --cellar tcl-tk)")"
+    local tcltk_version="${tcltk_version_long%.*}"
+
+    echo "python-build: use tcl-tk from homebrew"
+    package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+    package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+  fi
+}
+
 # Ensure that directories listed in LDFLAGS exist
 build_package_ldflags_dirs() {
   local arg dir
@@ -2221,19 +2246,6 @@ if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
       ;;
     esac
   fi
-fi
-
-# regex_to_match="(--with-tcltk-libs='([^']+)')"
-if [[ "$PYTHON_CONFIGURE_OPTS" =~ (--with-tcltk-libs=\'([^\']+)\') ]]; then
-  tcltk_match="${BASH_REMATCH[1]}"
-  tcltk_match_quoted="${tcltk_match//--with-tcltk-libs=/}"
-  # remove it from PYTHON_CONFIGURE_OPTS since it will mess up compile
-  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//$tcltk_match/}"
-
-  # having issues passing the single quoted part, couldnt pass as single var and still work
-  package_option python configure "--with-tcltk-libs='${tcltk_match_quoted}'"
-  unset tcltk_match
-  unset tcltk_match_quoted
 fi
 
 # Unset `PIP_REQUIRE_VENV` during build (#216)
