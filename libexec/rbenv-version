@@ -8,9 +8,11 @@
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
 
-RBENV_VERSION_ORIGIN="$(rbenv-version-origin)"
-if [ -z "$RBENV_VERSION_ORIGIN" ]; then
-  echo "$(rbenv-version-name)"
+version_name="$(rbenv-version-name)"
+version_origin="$(rbenv-version-origin)"
+
+if [ "$version_origin" = "${RBENV_ROOT}/version" ] && [ ! -e "$version_origin" ]; then
+  echo "$version_name"
 else
-  echo "$(rbenv-version-name) (set by $RBENV_VERSION_ORIGIN)"
+  echo "$version_name (set by $version_origin)"
 fi

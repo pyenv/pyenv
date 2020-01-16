@@ -17,8 +17,5 @@ if [ -n "$RBENV_VERSION_ORIGIN" ]; then
 elif [ -n "$RBENV_VERSION" ]; then
   echo "RBENV_VERSION environment variable"
 else
-  RBENV_VERSION_FILE="$(rbenv-version-file)"
-  if [ -e "$RBENV_VERSION_FILE" ]; then
-    echo $RBENV_VERSION_FILE
-  fi
+  rbenv-version-file
 fi
