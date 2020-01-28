@@ -92,13 +92,13 @@ fish )
 * )
   echo 'export PATH="'${RBENV_ROOT}'/shims:${PATH}"'
   echo "export RBENV_SHELL=$shell"
+
+  completion="${root}/completions/rbenv.${shell}"
+  if [ -r "$completion" ]; then
+    echo "source '$completion'"
+  fi
 ;;
 esac
-
-completion="${root}/completions/rbenv.${shell}"
-if [ -r "$completion" ]; then
-  echo "source '$completion'"
-fi
 
 if [ -z "$no_rehash" ]; then
   echo 'command rbenv rehash 2>/dev/null'

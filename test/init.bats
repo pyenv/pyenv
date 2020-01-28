@@ -43,11 +43,12 @@ OUT
   assert_success "sh"
 }
 
-@test "setup shell completions (fish)" {
+@test "skip shell completions (fish)" {
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run rbenv-init - fish
   assert_success
-  assert_line "source '${root}/test/../libexec/../completions/rbenv.fish'"
+  local line="$(grep '^source' <<<"$output")"
+  [ -z "$line" ] || flunk "did not expect line: $line"
 }
 
 @test "fish instructions" {
