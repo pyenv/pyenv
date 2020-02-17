@@ -10,7 +10,7 @@ jobs:
         os: [ubuntu-latest, macOS-latest]
     
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Install bats
       run: git clone --depth 1 https://github.com/sstephenson/bats.git
     - name: Run tests
