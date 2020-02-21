@@ -49,7 +49,7 @@ if [ "$versions" = "--unset" ]; then
     echo "set -e PYENV_VERSION"
     ;;
   * )
-    echo 'PYENV_VERSION_OLD="$PYENV_VERSION"'
+    echo 'PYENV_VERSION_OLD="${PYENV_VERSION-}"'
     echo "unset PYENV_VERSION"
     ;;
   esac
@@ -80,12 +80,12 @@ EOS
     cat <<EOS
 if [ -n "\${PYENV_VERSION_OLD+x}" ]; then
   if [ -n "\$PYENV_VERSION_OLD" ]; then
-    PYENV_VERSION_OLD_="\$PYENV_VERSION"
+    PYENV_VERSION_OLD_="\${PYENV_VERSION-}"
     export PYENV_VERSION="\$PYENV_VERSION_OLD"
     PYENV_VERSION_OLD="\$PYENV_VERSION_OLD_"
     unset PYENV_VERSION_OLD_
   else
-    PYENV_VERSION_OLD="\$PYENV_VERSION"
+    PYENV_VERSION_OLD="\${PYENV_VERSION-}"
     unset PYENV_VERSION
   fi
 else
@@ -103,14 +103,14 @@ if pyenv-prefix "${versions[@]}" >/dev/null; then
   OLDIFS="$IFS"
   IFS=: version="${versions[*]}"
   IFS="$OLDIFS"
-  if [ "$version" != "$PYENV_VERSION" ]; then
+  if [ "$version" != "${PYENV_VERSION-}" ]; then
     case "$shell" in
     fish )
       echo 'set -gu PYENV_VERSION_OLD "$PYENV_VERSION"'
       echo "set -gx PYENV_VERSION \"$version\""
       ;;
     * )
-      echo 'PYENV_VERSION_OLD="$PYENV_VERSION"'
+      echo 'PYENV_VERSION_OLD="${PYENV_VERSION-}"'
       echo "export PYENV_VERSION=\"${version}\""
       ;;
     esac
