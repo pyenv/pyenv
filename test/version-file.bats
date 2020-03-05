@@ -31,12 +31,28 @@ create_file() {
   assert_success "${PYENV_TEST_DIR}/.python-version"
 }
 
+@test "in current directory with custom name" {
+  create_file ".python-version-custom"
+  create_file ".python-version"
+  PYENV_VERSION_FILENAME=.python-version-custom run pyenv-version-file
+  assert_success "${PYENV_TEST_DIR}/.python-version-custom"
+}
+
 @test "in parent directory" {
   create_file ".python-version"
   mkdir -p project
   cd project
   run pyenv-version-file
   assert_success "${PYENV_TEST_DIR}/.python-version"
+}
+
+@test "in parent directory with custom name" {
+  create_file ".python-version-custom"
+  create_file ".python-version"
+  mkdir -p project
+  cd project
+  PYENV_VERSION_FILENAME=.python-version-custom run pyenv-version-file
+  assert_success "${PYENV_TEST_DIR}/.python-version-custom"
 }
 
 @test "topmost file has precedence" {

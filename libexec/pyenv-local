@@ -32,9 +32,9 @@ fi
 versions=("$@")
 
 if [ "$versions" = "--unset" ]; then
-  rm -f .python-version
+  rm -f "${PYENV_VERSION_FILENAME:-.python-version}"
 elif [ -n "$versions" ]; then
-  pyenv-version-file-write .python-version "${versions[@]}"
+  pyenv-version-file-write "${PYENV_VERSION_FILENAME:-.python-version}" "${versions[@]}"
 else
   if version_file="$(pyenv-version-file "$PWD")"; then
     IFS=: versions=($(pyenv-version-file-read "$version_file"))
