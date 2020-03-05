@@ -391,6 +391,21 @@ tracker](https://github.com/pyenv/pyenv/issues).
   [pyenv-virtualenv]: https://github.com/pyenv/pyenv-virtualenv#readme
   [hooks]: https://github.com/pyenv/pyenv/wiki/Authoring-plugins#pyenv-hooks
 
+### Testing new python versions
+
+This repository contains a [vagrant](https://www.vagrantup.com/) configuration,
+to spin up and provision a Ubuntu 18.04 virtual machine with your local copy of the repo
+mounted at `~/.pyenv`.
+
+With vagrant and [virtualbox](https://www.virtualbox.org/) installed, simply
+
+```sh
+vagrant up
+vagrant ssh
+```
+
+and you will be dropped into a bash shell where you can test your pyenv changes.
+
 ### Version History
 
 See [CHANGELOG.md](CHANGELOG.md).
