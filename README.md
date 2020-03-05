@@ -391,6 +391,29 @@ tracker](https://github.com/pyenv/pyenv/issues).
   [pyenv-virtualenv]: https://github.com/pyenv/pyenv-virtualenv#readme
   [hooks]: https://github.com/pyenv/pyenv/wiki/Authoring-plugins#pyenv-hooks
 
+### Testing new python versions
+
+If you are contributing a new python version for python-build, 
+you can test the build in a [docker](https://www.docker.com/) container based on Ubuntu 18.04.
+
+With docker installed:
+
+```sh
+docker build -t my_container .
+docker run my_container pyenv install <my_version>
+```
+
+To enter a shell which will allow you to build and then test a python version,
+replace the second line with
+
+```sh
+docker run -it my_container
+```
+
+The container will need to be rebuilt whenever you change the repo,
+but after the first build, this will be very fast, 
+as the layer including the build dependencies will be cached.
+
 ### Version History
 
 See [CHANGELOG.md](CHANGELOG.md).
