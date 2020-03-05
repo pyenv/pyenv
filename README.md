@@ -414,6 +414,8 @@ The container will need to be rebuilt whenever you change the repo,
 but after the first build, this will be very fast, 
 as the layer including the build dependencies will be cached.
 
+Changes made inside the container will not be persisted.
+
 ### Version History
 
 See [CHANGELOG.md](CHANGELOG.md).
