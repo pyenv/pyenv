@@ -1,1 +1,0 @@
-source "${BASH_SOURCE%/*}/miniconda2-latest"
