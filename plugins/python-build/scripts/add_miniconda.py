@@ -1,12 +1,15 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3
 """Script to add non-"latest" miniconda releases.
+Written for python 3.7.
 
-- Ignores releases below 4.3.30.
-- Ignores sub-patch releases if that major.minor.patch already exists
-  - But otherwise, takes the latest sub-patch release for given OS/arch
-- Assumes all miniconda3 releases < 4.7 default to python 3.6, and anything else 3.7
+Checks the miniconda download archives for new versions,
+then writes a build script for any which do not exist locally,
+saving it to plugins/python-build/share/python-build.
 
-Use -d for dry run.
+Ignores releases below 4.3.30.
+Also ignores sub-patch releases if that major.minor.patch already exists,
+but otherwise, takes the latest sub-patch release for given OS/arch.
+Assumes all miniconda3 releases < 4.7 default to python 3.6, and anything else 3.7.
 """
 import textwrap
 from argparse import ArgumentParser
@@ -15,8 +18,11 @@ from enum import Enum
 from functools import total_ordering
 from pathlib import Path
 from typing import NamedTuple, List, Optional, DefaultDict, Dict
+import logging
 
 import requests_html
+
+logger = logging.getLogger(__name__)
 
 CONDA_REPO = "https://repo.anaconda.com"
 MINICONDA_REPO = CONDA_REPO + "/miniconda"
@@ -47,7 +53,7 @@ out_dir: Path = here.parent.parent / "share" / "python-build"
 
 
 class StrEnum(str, Enum):
-    """Enum subclass which members are also instances of str
+    """Enum subclass whose members are also instances of str
     and directly comparable to strings. str type is forced at declaration.
 
     Adapted from https://github.com/kissgyorgy/enum34-custom/blob/dbc89596761c970398701d26c6a5bbcfcf70f548/enum_custom.py#L100
@@ -189,6 +195,7 @@ def make_script(specs: List[MinicondaSpec]):
 
 
 def get_existing_minicondas():
+    logger.info("Getting known miniconda versions")
     for p in out_dir.iterdir():
         name = p.name
         if not p.is_file() or not name.startswith("miniconda"):
@@ -196,12 +203,14 @@ def get_existing_minicondas():
         try:
             v = MinicondaVersion.from_str(name)
             if v.version_str != "latest":
+                logger.debug("Found existing miniconda version %s", v)
                 yield v
         except ValueError:
             pass
 
 
 def get_available_minicondas():
+    logger.info("Fetching remote miniconda versions")
     session = requests_html.HTMLSession()
     response = session.get(MINICONDA_REPO)
     page: requests_html.HTML = response.html
@@ -219,6 +228,7 @@ def get_available_minicondas():
         try:
             s = MinicondaSpec.from_filestem(stem, md5)
             if s.version.version_str != "latest":
+                logger.debug("Found remote miniconda version %s", s)
                 yield s
         except ValueError:
             pass
@@ -234,9 +244,25 @@ def key_fn(spec: MinicondaSpec):
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser()
-    parser.add_argument("-d", "--dry_run", action="store_true")
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "-d", "--dry-run", action="store_true",
+        help="Do not write scripts, just report them to stdout",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="count",
+        help="Increase verbosity of logging",
+    )
     parsed = parser.parse_args()
+
+    log_level = {
+        0: logging.WARNING,
+        1: logging.INFO,
+        2: logging.DEBUG,
+    }.get(parsed.verbose, logging.DEBUG)
+    logging.basicConfig(level=log_level)
+    if parsed.verbose < 3:
+        logging.getLogger("requests").setLevel(logging.WARNING)
 
     existing_versions = set(get_existing_minicondas())
     available_specs = set(get_available_minicondas())
@@ -246,18 +272,21 @@ if __name__ == "__main__":
         MinicondaVersion, Dict[MinicondaSpec, MinicondaSpec]
     ] = defaultdict(dict)
 
+    logger.info("Checking for new versions")
     for s in sorted(available_specs, key=key_fn):
         key = s.version.with_version_triple()
         if key in existing_versions or key.version_str.info() <= (4, 3, 30):
+            logger.debug("Ignoring version %s (too old or already exists)", s)
             continue
 
         to_add[key][s.with_version_triple()] = s
 
+    logger.info("Writing %s scripts", len(to_add))
     for ver, d in to_add.items():
         specs = list(d.values())
         fpath = out_dir / ver.to_filename()
         script_str = make_script(specs)
-
+        logger.debug("Writing script for %s", ver)
         if parsed.dry_run:
             print(f"Would write spec to {fpath}:\n" + textwrap.indent(script_str, "  "))
         else:
