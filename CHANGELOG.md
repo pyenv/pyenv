@@ -1,5 +1,14 @@
 ## Version History
 
+## 1.2.17
+
+* python-build: Add CPython 3.8.2
+* python-build: Add CPython 3.7.7 (#1553)
+* python-build: Add Miniconda versions newer than 4.3.30 (#1361)
+* python-build: Add Micropython 1.12 (#1542)
+* python-build: Add Add CPython 3.9.0a4
+* pyenv: Fix sed illegal byte sequence error (#1521)
+
 ## 1.2.16
 
 * python-build: Add CPython 3.8.1 (#1497)
