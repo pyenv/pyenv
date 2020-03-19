@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-# Summary: Set or show the local application-specific Python version
+# Summary: Set or show the local application-specific Python version(s)
 #
-# Usage: pyenv local <version>
+# Usage: pyenv local <version> <version2> <..>
 #        pyenv local --unset
 #
-# Sets the local application-specific Python version by writing the
+# Sets the local application-specific Python version(s) by writing the
 # version name to a file named `.python-version'.
 #
 # When you run a Python command, pyenv will look for a `.python-version'
@@ -15,9 +15,16 @@
 # `PYENV_VERSION' environment variable takes precedence over local
 # and global versions.
 #
-# <version> should be a string matching a Python version known to pyenv.
-# The special version string `system' will use your default system Python.
-# Run `pyenv versions' for a list of available Python versions.
+# <version> can be specified multiple times and should be a version
+# tag known to pyenv.  The special version string `system' will use
+# your default system Python.  Run `pyenv versions' for a list of
+# available Python versions.
+#
+# Example: To enable the python2.7 and python3.7 shims to find their
+#          respective executables you could set both versions with:
+#
+# 'pyenv local 3.7.0 2.7.15'
+
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
