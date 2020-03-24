@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Summary: List all Python versions available to pyenv
-# Usage: pyenv versions [--bare] [--skip-aliases]
+# Usage: pyenv versions [--bare] [--show_aliases]
 #
 # Lists all Python versions found in `$PYENV_ROOT/versions/*'.
 
@@ -8,16 +8,16 @@ set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 unset bare
-unset skip_aliases
+unset show_aliases
 # Provide pyenv completions
 for arg; do
   case "$arg" in
   --complete )
     echo --bare
-    echo --skip-aliases
+    echo --show-aliases
     exit ;;
   --bare ) bare=1 ;;
-  --skip-aliases ) skip_aliases=1 ;;
+  --show-aliases ) show_aliases=1 ;;
   * )
     pyenv-help --usage versions >&2
     exit 1
@@ -94,9 +94,9 @@ exists() {
 
 print_version() {
   if exists "$1" "${current_versions[@]}"; then
-    echo "${hit_prefix}$1 (set by $(pyenv-version-origin))"
+    echo "${hit_prefix}$1 $2 (set by $(pyenv-version-origin))"
   else
-    echo "${miss_prefix}$1"
+    echo "${miss_prefix}$1 $2"
   fi
   num_versions=$((num_versions + 1))
 }
@@ -109,16 +109,19 @@ fi
 shopt -s nullglob
 for path in "$versions_dir"/*; do
   if [ -d "$path" ]; then
-    if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
-      target="$(realpath "$path")"
+    target="$(realpath "$path")"
+    if [ ! -n "$show_aliases" ] && [ -L "$path" ]; then
       [ "${target%/*}" != "$versions_dir" ] || continue
       [ "${target%/*/envs/*}" != "$versions_dir" ] || continue
+    elif [ -L "$path" ]; then
+      [ "${target%/*}" != "$versions_dir" ] || path=$path\ 
+      [ "${target%/*/envs/*}" != "$versions_dir" ] || path=$path\ 
     fi
     print_version "${path##*/}"
     # virtual environments created by anaconda/miniconda
     for env_path in "${path}/envs/"*; do
       if [ -d "${env_path}" ]; then
-        print_version "${env_path#${PYENV_ROOT}/versions/}"
+        print_version "${env_path#${PYENV_ROOT}/versions/*/envs/}" "--> ${env_path#${PYENV_ROOT}/versions/}"
       fi
     done
   fi
