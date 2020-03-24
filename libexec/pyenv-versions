@@ -94,9 +94,9 @@ exists() {
 
 print_version() {
   if exists "$1" "${current_versions[@]}"; then
-    echo "${hit_prefix}$1 $2 (set by $(pyenv-version-origin))"
+    echo "${hit_prefix}$1$2 (set by $(pyenv-version-origin))"
   else
-    echo "${miss_prefix}$1 $2"
+    echo "${miss_prefix}$1$2"
   fi
   num_versions=$((num_versions + 1))
 }
@@ -121,7 +121,7 @@ for path in "$versions_dir"/*; do
     # virtual environments created by anaconda/miniconda
     for env_path in "${path}/envs/"*; do
       if [ -d "${env_path}" ]; then
-        print_version "${env_path#${PYENV_ROOT}/versions/*/envs/}" "--> ${env_path#${PYENV_ROOT}/versions/}"
+        print_version "${env_path#${PYENV_ROOT}/versions/*/envs/}" " --> ${env_path#${PYENV_ROOT}/versions/}"
       fi
     done
   fi
