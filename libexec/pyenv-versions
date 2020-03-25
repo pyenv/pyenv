@@ -114,8 +114,8 @@ for path in "$versions_dir"/*; do
       [ "${target%/*}" != "$versions_dir" ] || continue
       [ "${target%/*/envs/*}" != "$versions_dir" ] || continue
     elif [ -L "$path" ]; then
-      [ "${target%/*}" != "$versions_dir" ] || path=$path\ 
-      [ "${target%/*/envs/*}" != "$versions_dir" ] || path=$path\ 
+      [ "${target%/*}" != "$versions_dir" ] || { echo "${miss_prefix}${path##*/}" && continue ;}
+      [ "${target%/*/envs/*}" != "$versions_dir" ] || { echo "${miss_prefix}${path##*/}" && continue ;}
     fi
     print_version "${path##*/}"
     # virtual environments created by anaconda/miniconda
