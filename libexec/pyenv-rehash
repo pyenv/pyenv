@@ -103,7 +103,7 @@ remove_outdated_shims() {
 # List basenames of executables for every Python version
 list_executable_names() {
   local version file
-  pyenv-versions --bare --skip-aliases | \
+  pyenv-versions --bare --show-aliases | \
   while read -r version; do
     for file in "${PYENV_ROOT}/versions/${version}/bin/"*; do
       echo "${file##*/}"

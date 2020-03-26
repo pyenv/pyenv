@@ -128,28 +128,31 @@ OUT
   assert_success "3.3"
 }
 
-@test "lists symlinks under versions" {
+@test "don't show symlinks under versions" {
   create_version "2.7.8"
   ln -s "2.7.8" "${PYENV_ROOT}/versions/2.7"
+  mkdir moo
+  ln -s "${PWD}/moo" "${PYENV_ROOT}/versions/2.7.17"
 
   run pyenv-versions --bare
   assert_success
   assert_output <<OUT
-2.7
+2.7.17
 2.7.8
 OUT
 }
 
-@test "doesn't list symlink aliases when --skip-aliases" {
+@test "list symlink aliases when --show-aliases" {
   create_version "1.8.7"
   ln -s "1.8.7" "${PYENV_ROOT}/versions/1.8"
   mkdir moo
   ln -s "${PWD}/moo" "${PYENV_ROOT}/versions/1.9"
 
-  run pyenv-versions --bare --skip-aliases
+  run pyenv-versions --bare --show-aliases
   assert_success
 
   assert_output <<OUT
+1.8
 1.8.7
 1.9
 OUT
