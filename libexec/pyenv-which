@@ -6,6 +6,7 @@
 #
 # Displays the full path to the executable that pyenv will invoke when
 # you run the given command.
+#
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -82,6 +83,8 @@ else
       echo "The \`$1' command exists in these Python versions:"
       echo "$versions" | sed 's/^/  /g'
       echo
+      echo "Note: See 'pyenv help global' for tips on allowing both"
+      echo "      python2 and python3 to be found."
     } >&2
   fi
 
