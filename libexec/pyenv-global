@@ -26,7 +26,7 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   echo system
-  exec pyenv-versions --bare
+  exec pyenv-versions --bare | sed -r "s/ --> /\n/g" && exit
 fi
 
 versions=("$@")
