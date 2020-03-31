@@ -805,7 +805,7 @@ build_package_standard_install_with_bundled_gems() {
   build_package_standard_install "$@"
 }
 
-# Backword Compatibility for standard function
+# Backward Compatibility for standard function
 build_package_standard() {
   build_package_standard_build "$@"
   build_package_standard_install "$@"
@@ -1014,7 +1014,9 @@ build_package_micropython() {
   elif [ -z "${MAKE_OPTS+defined}" ]; then
     MAKE_OPTS="-j $(num_cpu_cores)"
   fi
-  { cd ports/unix
+  { cd mpy-cross
+    "$MAKE" $MAKE_OPTS
+    cd ../ports/unix
     "$MAKE" $MAKE_OPTS axtls
     "$MAKE" $MAKE_OPTS CFLAGS_EXTRA="-DMICROPY_PY_SYS_PATH_DEFAULT='\"${PREFIX_PATH}/lib/micropython\"'"
     "$MAKE" install $MAKE_INSTALL_OPTS PREFIX="${PREFIX_PATH}"
@@ -1034,6 +1036,7 @@ pypy_architecture() {
     "ppc64" ) echo "linux-ppc64" ;;
     "ppc64le" ) echo "linux-ppc64le" ;;
     "x86_64" ) echo "linux64" ;;
+    "aarch64" ) echo "linux-aarch64" ;;
     * ) return 1 ;;
     esac
     ;;
@@ -2224,6 +2227,19 @@ if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
       ;;
     esac
   fi
+fi
+
+# regex_to_match="(--with-tcltk-libs='([^']+)')"
+if [[ "$PYTHON_CONFIGURE_OPTS" =~ (--with-tcltk-libs=\'([^\']+)\') ]]; then
+  tcltk_match="${BASH_REMATCH[1]}"
+  tcltk_match_quoted="${tcltk_match//--with-tcltk-libs=/}"
+  # remove it from PYTHON_CONFIGURE_OPTS since it will mess up compile
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//$tcltk_match/}"
+
+  # having issues passing the single quoted part, couldnt pass as single var and still work
+  package_option python configure "--with-tcltk-libs='${tcltk_match_quoted}'"
+  unset tcltk_match
+  unset tcltk_match_quoted
 fi
 
 # Unset `PIP_REQUIRE_VENV` during build (#216)

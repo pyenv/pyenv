@@ -21,13 +21,13 @@ dist:
 
 # https://docs.travis-ci.com/user/reference/osx/#macos-version
 osx_image:
-- xcode9.4
-- xcode10
-- xcode10.2
+- xcode9.4.1
+- xcode10.3
+- xcode11.3
 
 env:
-- PYTHON_BUILD_VERSION=3.8-dev
-- PYTHON_BUILD_VERSION=3.7.2
+- PYTHON_BUILD_VERSION=3.8.0
+- PYTHON_BUILD_VERSION=3.7.5
 
 before_install:
 - date +%Y-%m-%dT%H:%M:%S
@@ -60,7 +60,7 @@ jobs:
     osx_image: xcode10
 
   allow_failures:
-  - env: PYTHON_BUILD_VERSION=3.8-dev
+  - env: PYTHON_BUILD_VERSION=3.8.0
 
 stages:
 - test shell

@@ -196,7 +196,7 @@ easy to fork and contribute any changes back upstream.
     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
     ```
-    - **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
+    - **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
     - **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
     - **Proxy note**: If you use a proxy, export `http_proxy` and `HTTPS_PROXY` too.
 
@@ -206,12 +206,12 @@ easy to fork and contribute any changes back upstream.
     ```sh
     $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
     ```
-    - **Zsh note**: Modify your `~/.zshenv` file instead of `~/.bash_profile`.
+    - **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
     - **fish note**: Use `pyenv init - | source` instead of `eval (pyenv init -)`.
     - **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
 
     **General warning**: There are some systems where the `BASH_ENV` variable is configured
-    to point to `.bashrc`. On such systems you should almost certainly put the abovementioned line
+    to point to `.bashrc`. On such systems you should almost certainly put the above mentioned line
     `eval "$(pyenv init -)"` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
     may observe strange behaviour, such as `pyenv` getting into an infinite loop.
     See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
@@ -299,6 +299,8 @@ package manager for macOS.
 
 To upgrade pyenv in the future, use `upgrade` instead of `install`.
 
+#### Post-installation
+
 Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout) above, starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
 
 ### Advanced Configuration
@@ -367,7 +369,7 @@ name | default | description
 `PYENV_DEBUG` | | Outputs debug information.<br>Also as: `pyenv --debug <subcommand>`
 `PYENV_HOOK_PATH` | [_see wiki_][hooks] | Colon-separated list of paths searched for pyenv hooks.
 `PYENV_DIR` | `$PWD` | Directory to start searching for `.python-version` files.
-`PYTHON_BUILD_ARIA2_OPTS` | | Used to pass additional parameters to [`aria2`](https://aria2.github.io/).<br>if `aria2c` binary is available on PATH, pyenv use `aria2c` instead of `curl` or `wget` to download the Python Source code. If you have an unstable internet connection, you can use this variable to instruct `aria2` to accelerate the download.<br>In most cases, you will only need to use `-x 10 -k 1M` as value to `PYTHON_BUILD_ARIA2_OPTS` environment variable
+`PYTHON_BUILD_ARIA2_OPTS` | | Used to pass additional parameters to [`aria2`](https://aria2.github.io/).<br>If the `aria2c` binary is available on PATH, pyenv uses `aria2c` instead of `curl` or `wget` to download the Python Source code. If you have an unstable internet connection, you can use this variable to instruct `aria2` to accelerate the download.<br>In most cases, you will only need to use `-x 10 -k 1M` as value to `PYTHON_BUILD_ARIA2_OPTS` environment variable
 
 
 

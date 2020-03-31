@@ -1,0 +1,4 @@
+#require_gcc
+prefer_openssl11
+install_package "openssl-1.1.0j" "https://www.openssl.org/source/openssl-1.1.0j.tar.gz#31bec6c203ce1a8e93d5994f4ed304c63ccf07676118b6634edded12ad1b3246" mac_openssl --if has_broken_mac_openssl
+install_package "pypy2.7-v7.2.0-src" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.2.0-src.tar.bz2#55cb7757784fbe3952102447f65b27d80e6c885a464a7af1a9ce264492439dcc" "pypy_builder" verify_py27 ensurepip

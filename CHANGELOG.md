@@ -1,5 +1,39 @@
 ## Version History
 
+## 1.2.17
+
+* python-build: Add CPython 3.8.2
+* python-build: Add CPython 3.7.7 (#1553)
+* python-build: Add Miniconda versions newer than 4.3.30 (#1361)
+* python-build: Add Micropython 1.12 (#1542)
+* python-build: Add Add CPython 3.9.0a4
+* pyenv: Fix sed illegal byte sequence error (#1521)
+
+## 1.2.16
+
+* python-build: Add CPython 3.8.1 (#1497)
+* python-build: Add CPython 3.7.6 (#1498)
+* python-build: Add CPython 3.6.10 (#1499)
+* python-build: Add CPython 3.5.9 (#1448)
+* python-build: Add PyPy 7.3.0 (1502)
+
+## 1.2.15
+
+* python-build: Add CPython 3.7.5 (#1423)
+* python-build: Add CPython 2.7.17 (#1433)
+* python-build: Add CPython 3.5.8 (#1441)
+* python-build: Add PyPy 7.2.0 (#1418)
+* python-build: Add anaconda3-2019.10 (#1427)
+* pyenv-help: Show text for all pyenv commands in pyenv-help (#1421)
+
+## 1.2.14
+
+* python-build: Add CPython 3.8.0 (#1416)
+* python-build: Add Anaconda-2019.07 (#1382)
+* python-build: Add Micropython 1.11 (#1395)
+* python-build: Fix compatibility issues with Homebrew installed Tcl/Tk (#1397)
+* pyenv-exec: Do not use `exec -a`, do not mangle PATH for system Python (#1169)
+
 ## 1.2.13
 
 * python-build: Add CPython 3.7.4

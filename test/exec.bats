@@ -78,32 +78,38 @@ ${PYENV_ROOT}/versions/3.4/bin/python
 OUT
 }
 
-@test "supports python -S <cmd>" {
-  export PYENV_VERSION="3.4"
+@test "sys.executable with system version (#98)" {
+  system_python=$(which python)
 
-  # emulate `python -S' behavior
-  create_executable "python" <<SH
-#!$BASH
-if [[ \$1 == "-S"* ]]; then
-  found="\$(PATH="\${PYTHONPATH:-\$PATH}" which \$2)"
-  # assert that the found executable has python for shebang
-  if head -1 "\$found" | grep python >/dev/null; then
-    \$BASH "\$found"
-  else
-    echo "python: no Python script found in input (LoadError)" >&2
-    exit 1
-  fi
-else
-  echo 'python 3.4 (pyenv test)'
-fi
-SH
-
-  create_executable "fab" <<SH
-#!/usr/bin/env python
-echo hello fab
-SH
+  PYENV_VERSION="custom"
+  create_executable "python" ""
+  unset PYENV_VERSION
 
   pyenv-rehash
-  run python -S fab
-  assert_success "hello fab"
+  run pyenv-exec python -c 'import sys; print(sys.executable)'
+  assert_success "${system_python}"
+}
+
+@test '$PATH is not modified with system Python' {
+  # Create a wrapper executable that verifies PATH.
+  PYENV_VERSION="custom"
+  create_executable "python" '[[ "$PATH" == "${PYENV_TEST_DIR}/root/versions/custom/bin:"* ]] || { echo "unexpected:$PATH"; exit 2;}'
+  unset PYENV_VERSION
+  pyenv-rehash
+
+  # Path is not modified with system Python.
+  run pyenv-exec python -c 'import os; print(os.getenv("PATH"))'
+  assert_success "$PATH"
+
+  # Path is modified with custom Python.
+  PYENV_VERSION=custom run pyenv-exec python
+  assert_success
+
+  # Path is modified with custom:system Python.
+  PYENV_VERSION=custom:system run pyenv-exec python
+  assert_success
+
+  # Path is not modified with system:custom Python.
+  PYENV_VERSION=system:custom run pyenv-exec python -c 'import os; print(os.getenv("PATH"))'
+  assert_success "$PATH"
 }

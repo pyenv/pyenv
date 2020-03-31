@@ -15,8 +15,8 @@ for changes in each version.
 
 ### Installing as a pyenv plugin (recommended)
 
-You need nothing to do since python-build is bundled with pyenv by
-default.
+Since python-build is bundled with pyenv by
+default, you do not need to do anything.
 
 ### Installing as a standalone program (advanced)
 
