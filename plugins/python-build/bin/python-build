@@ -1537,6 +1537,7 @@ has_broken_mac_openssl() {
 }
 
 use_homebrew_openssl() {
+  command -v brew >/dev/null || return 1
   for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
     local ssldir="$(brew --prefix "${openssl}" || true)"
     if [ -d "$ssldir" ]; then
