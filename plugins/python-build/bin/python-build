@@ -1739,7 +1739,7 @@ build_package_symlink_version_suffix() {
   # Not create symlinks on `altinstall` (#255)
   if [[ "$PYTHON_MAKE_INSTALL_TARGET" != *"altinstall"* ]]; then
     shopt -s nullglob
-    local version_bin="$(ls -1 "${PREFIX_PATH}/bin/python"* | grep '[0-9]$' | sort | tail -1)"
+    local version_bin="$(command ls -1 "${PREFIX_PATH}/bin/python"* | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | grep '[0-9]$' | sort | tail -1)"
     suffix="$(basename "${version_bin}" | sed -e 's/^python//')"
     if [ -n "${suffix}" ]; then
       local file link
