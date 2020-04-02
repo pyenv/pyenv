@@ -1,5 +1,10 @@
 ## Version History
 
+## 1.2.18
+
+* python-build: Update download URLs for old OpenSSL releases (#1578)
+* python-build: Prevent `brew: command not found` messages that are not errors (#1544)
+
 ## 1.2.17
 
 * python-build: Add CPython 3.8.2
