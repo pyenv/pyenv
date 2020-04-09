@@ -192,13 +192,31 @@ easy to fork and contribute any changes back upstream.
    pyenv repo is cloned and add `$PYENV_ROOT/bin` to your `$PATH` for access
    to the `pyenv` command-line utility.
 
-    ```sh
-    $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
-    $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
-    ```
-    - **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
-    - **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
-    - **Proxy note**: If you use a proxy, export `http_proxy` and `HTTPS_PROXY` too.
+   - For **bash**:
+     ~~~ bash
+     $ echo 'export PYENV_ROOT="$HOME/.pyenv' >> ~/.bash_profile
+     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
+     ~~~
+
+   - For **Ubuntu Desktop**:
+     ~~~ bash
+     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+     ~~~
+
+   - For **Zsh**:
+     ~~~ zsh
+     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
+     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
+     ~~~
+
+   - For **Fish shell**:
+     ~~~ fish
+     $ set -Ux PYENV_ROOT $HOME/.pyenv
+     $ set -Ux fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+     ~~~
+
+   - **Proxy note**: If you use a proxy, export `http_proxy` and `HTTPS_PROXY` too.
 
 3. **Add `pyenv init` to your shell** to enable shims and autocompletion.
    Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
