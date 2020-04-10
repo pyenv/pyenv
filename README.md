@@ -194,7 +194,7 @@ easy to fork and contribute any changes back upstream.
 
    - For **bash**:
      ~~~ bash
-     $ echo 'export PYENV_ROOT="$HOME/.pyenv' >> ~/.bash_profile
+     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
      $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
      ~~~
 
