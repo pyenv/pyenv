@@ -76,9 +76,11 @@ else
   IFS=: current_versions=($(pyenv-version-name || true))
   IFS="$OLDIFS"
   include_system="1"
+  print_symlink="1"
 fi
 
 num_versions=0
+declare -A has_aliases
 
 exists() {
   local car="$1"
@@ -93,10 +95,10 @@ exists() {
 }
 
 print_version() {
-  if exists "$1" "${current_versions[@]}"; then
-    echo "${hit_prefix}$1 (set by $(pyenv-version-origin))"
+  if exists "$1" "${current_versions[@]}" || exists "$3" "${current_versions[@]}"; then
+    echo "${hit_prefix}$1${print_symlink+"${@:2}"} (set by $(pyenv-version-origin))"
   else
-    echo "${miss_prefix}$1"
+    echo "${miss_prefix}$1${print_symlink+"${@:2}"}"
   fi
   num_versions=$((num_versions + 1))
 }
@@ -107,16 +109,54 @@ if [ -n "$include_system" ] && PYENV_VERSION=system pyenv-which python >/dev/nul
 fi
 
 shopt -s nullglob
+if [ -n "$skip_aliases" ]; then
+  for i in "${!current_versions[@]}"; do
+    current_version="${current_versions[$i]}"
+    [ "$current_version" != "system" ] || continue
+    real_path="$(realpath "$versions_dir/${current_version%/envs/*}")"
+    [ "${real_path%/*}" == "$versions_dir" -o "${real_path%/*/envs/*}" == "$versions_dir" ] || continue
+    if [[ "$current_version" == *"/envs/"* ]]; then
+      current_versions[$i]="${real_path#${versions_dir}/}/envs/${current_version#*/envs/}"
+    else
+      current_versions[$i]="${real_path#${versions_dir}/}"
+    fi
+  done
+fi
+
+if [ -z "$bare" -a -z "$skip_aliases" ]; then
+  for path in "$versions_dir"/*; do
+    if [ -d "$path" -a -L "$path" ]; then
+      target="$(realpath "$path")"
+      if [ "${target%/*}" == "$versions_dir" -o "${target%/*/envs/*}" == "$versions_dir" ]; then
+        has_aliases["${target#"${versions_dir}/"}"]="1"
+      fi
+    fi
+  done
+fi
+
 for path in "$versions_dir"/*; do
   if [ -d "$path" ]; then
-    if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
+    has_alias="${has_aliases["${path#"${versions_dir}/"}"]}"
+    [ -z "$skip_aliases" -a -n "$has_alias" ] && continue
+    if [ -L "$path" ]; then
       target="$(realpath "$path")"
-      [ "${target%/*}" != "$versions_dir" ] || continue
-      [ "${target%/*/envs/*}" != "$versions_dir" ] || continue
+      if [ "${target%/*}" == "$versions_dir" -o "${target%/*/envs/*}" == "$versions_dir" ]; then
+        [ -z "$skip_aliases" ] || continue
+        print_version "${path#"${versions_dir}/"}" " ->" "${target#"${versions_dir}/"}"
+        for env_path in "${path}/envs/"*; do
+          if [ -d "${env_path}" ]; then
+            env_path_suffix="${env_path#"${versions_dir}/"*/}"
+            print_version "${env_path#"${versions_dir}/"}" " ->" "${target#"${versions_dir}/"}/$env_path_suffix"
+          fi
+        done
+        continue
+      fi
     fi
-    print_version "${path##*/}"
+    print_version "${path#"${versions_dir}/"}"
     # virtual environments created by anaconda/miniconda
     for env_path in "${path}/envs/"*; do
+      has_alias="${has_aliases["${env_path#"${versions_dir}/"}"]}"
+      [ -z "$skip_aliases" -a -n "$has_alias" ] && continue
       if [ -d "${env_path}" ]; then
         print_version "${env_path#${PYENV_ROOT}/versions/}"
       fi
