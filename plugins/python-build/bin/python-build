@@ -1049,6 +1049,11 @@ pyston_architecture() {
   pypy_architecture
 }
 
+build_package_graalpython() {
+    build_package_copy
+    ln -fs "${PREFIX_PATH}/bin/graalpython" "${PREFIX_PATH}/bin/python"
+}
+
 build_package_pypy() {
   build_package_copy
   mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
