@@ -49,6 +49,7 @@ OUT
 before: ${PYENV_ROOT}/versions/3.6.2
 rm -rf ${PYENV_ROOT}/versions/3.6.2
 rehashed
+pyenv: 3.6.2 uninstalled
 after.
 OUT
 

@@ -69,7 +69,7 @@ if [ -z "$FORCE" ]; then
     exit 1
   fi
 
-  read -p "pyenv: remove $PREFIX? "
+  read -p "pyenv: remove $PREFIX? [y|N]"
   case "$REPLY" in
   y | Y | yes | YES ) ;;
   * ) exit 1 ;;
@@ -81,6 +81,7 @@ for hook in "${before_hooks[@]}"; do eval "$hook"; done
 if [ -d "$PREFIX" ]; then
   rm -rf "$PREFIX"
   pyenv-rehash
+  echo "pyenv: $VERSION_NAME uninstalled"
 fi
 
 for hook in "${after_hooks[@]}"; do eval "$hook"; done
