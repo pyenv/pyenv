@@ -1044,6 +1044,11 @@ cleanup_builtin_patches() {
   HAS_PATCH="$ORIG_HAS_PATCH"
 }
 
+fix_directory_permissions() {
+  # Ensure installed directories are not world-writable
+  find "$PREFIX_PATH" -type d \( -perm -020 -o -perm -002 \) -exec chmod go-w {} \;
+}
+
 require_java7() {
   local version="$(java -version 2>&1 | grep '\(java\|openjdk\) version' | head -1)"
   if [[ $version != *[789]* ]]; then
