@@ -48,7 +48,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 * **[Installation](#installation)**
   * [The Automatic Installer](#the-automatic-installer)
   * [via ZPlug plugin manager for Zsh](#via-zplug-plugin-manager-for-zsh)
-    * [Upgrading via ZPlug](#upgrading via ZPlug)
+    * [Upgrading via ZPlug](#upgrading-via-zplug)
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
   * [Homebrew on macOS](#homebrew-on-macos)
