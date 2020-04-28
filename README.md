@@ -167,7 +167,14 @@ We'd recommend to install pyenv-virtualenv as well if you have some plan to play
 
 ## Installation
 
-If you're on macOS, consider [installing with Homebrew](#homebrew-on-macos).
+For macOS:
+
+   1. Consider installing with [Homebrew](#homebrew-on-macos)
+      ```sh
+      $ brew update
+      $ brew install pyenv
+      ```
+   2. Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout), starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
 
 If you're on Windows, consider using @kirankotari's [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) fork. (`pyenv` does not work on windows outside the Windows Subsystem for Linux)
 
@@ -240,9 +247,7 @@ easy to fork and contribute any changes back upstream.
     $ exec "$SHELL"
     ```
 
-5. **Install Python build dependencies** before attempting to install a new Python version.  The
-   [pyenv wiki](https://github.com/pyenv/pyenv/wiki) provides suggested installation packages
-   and commands for various operating systems.
+5. [**Install Python build dependencies**](https://github.com/pyenv/pyenv/wiki#suggested-build-environment) before attempting to install a new Python version.
 
 6. **Install Python versions into `$(pyenv root)/versions`.**
    For example, to download and install Python 2.7.8, run:
@@ -261,6 +266,11 @@ easy to fork and contribute any changes back upstream.
 
 
 #### Upgrading
+
+If you've installed pyenv using homebrew, upgrade using:
+```sh
+$ brew upgrade pyenv
+```
 
 If you've installed pyenv using the instructions above, you can
 upgrade your installation at any time using git.
@@ -305,21 +315,6 @@ uninstall from the system.
    perform the pyenv package removal. For instance, for Homebrew:
 
         brew uninstall pyenv
-
-### Homebrew on macOS
-
-You can also install pyenv using the [Homebrew](https://brew.sh)
-package manager for macOS.
-
-    $ brew update
-    $ brew install pyenv
-
-
-To upgrade pyenv in the future, use `upgrade` instead of `install`.
-
-#### Post-installation
-
-Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout) above, starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
 
 ### Advanced Configuration
 
