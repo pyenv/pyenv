@@ -176,6 +176,19 @@ If you're on Windows, consider using @kirankotari's [`pyenv-win`](https://github
 Visit my other project:
 https://github.com/pyenv/pyenv-installer
 
+### via ZPlug plugin manager for Zsh
+
+Add the following line to your `.zshrc`:
+
+```zplug "RiverGlide/zsh-pyenv", from:gitlab```
+
+Then install the plugin
+~~~ zsh
+  $ source ~/.zshrc
+  $ zplug install
+~~~
+
+The ZPlug plugin will install and initialise `pyenv` and add `pyenv` and `pyenv-install` to your `PATH`
 
 ### Basic GitHub Checkout
 
