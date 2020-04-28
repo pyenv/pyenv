@@ -46,11 +46,14 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Choosing the Python Version](#choosing-the-python-version)
   * [Locating the Python Installation](#locating-the-python-installation)
 * **[Installation](#installation)**
+  * [The Automatic Installer](#the-automatic-installer)
+  * [via ZPlug plugin manager for Zsh](#via-zplug-plugin-manager-for-zsh)
+    * [Upgrading via ZPlug](#upgrading via ZPlug)
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
-    * [Homebrew on macOS](#homebrew-on-macos)
-    * [Advanced Configuration](#advanced-configuration)
-    * [Uninstalling Python Versions](#uninstalling-python-versions)
+  * [Homebrew on macOS](#homebrew-on-macos)
+* [Advanced Configuration](#advanced-configuration)
+* [Uninstalling Python Versions](#uninstalling-python-versions)
 * **[Command Reference](#command-reference)**
 * **[Development](#development)**
   * [Version History](#version-history)
@@ -189,6 +192,13 @@ Then install the plugin
 ~~~
 
 The ZPlug plugin will install and initialise `pyenv` and add `pyenv` and `pyenv-install` to your `PATH`
+
+#### Upgrading via ZPlug
+To upgrade to the latest version of pyenv, update the ZPlug plugin:
+
+```sh
+$ zplug update RiverGlide/zsh-pyenv
+```
 
 ### Basic GitHub Checkout
 
