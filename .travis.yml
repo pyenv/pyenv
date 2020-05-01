@@ -32,7 +32,7 @@ env:
 before_install:
 - date +%Y-%m-%dT%H:%M:%S
 
-install: git clone --depth 1 https://github.com/bats-core/bats-core.git bats
+install: git clone --depth 1 --branch v1.2.0 https://github.com/bats-core/bats-core.git bats
 
 # Default for auto-generated jobs.
 script: make test-build
