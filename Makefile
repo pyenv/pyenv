@@ -22,4 +22,4 @@ test-build:
 	$(PYTHON_BUILD_TEST_PREFIX)/bin/pip -V
 
 bats:
-	git clone --depth 1 https://github.com/bats-core/bats-core.git bats
+	git clone --depth 1 --branch v1.2.0 https://github.com/bats-core/bats-core.git bats
