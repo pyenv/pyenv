@@ -228,13 +228,26 @@ easy to fork and contribute any changes back upstream.
 3. **Add `pyenv init` to your shell** to enable shims and autocompletion.
    Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
    configuration file since it manipulates `PATH` during the initialization.
-    ```sh
-    $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
-    ```
-    - **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
-    - **fish note**: Use `pyenv init - | source` instead of `eval (pyenv init -)`.
-    - **Ubuntu and Fedora note**: Modify your `~/.bashrc` file instead of `~/.bash_profile`.
-
+   - For **bash**:
+     ~~~ bash
+     $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
+     ~~~
+   
+   - For **Ubuntu and Fedora**:
+     ~~~ bash
+     $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  pyenv init - | source"\nfi' >> ~/.bashrc
+     ~~~
+   
+   - For **Zsh**:
+     ~~~ bash
+     $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.zshrc
+     ~~~
+     
+   - For **Fish**:
+     ~~~ bash
+     $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  pyenv init - | source"\nfi' >> ~/.zshrc
+     ~~~
+    
     **General warning**: There are some systems where the `BASH_ENV` variable is configured
     to point to `.bashrc`. On such systems you should almost certainly put the above mentioned line
     `eval "$(pyenv init -)"` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
