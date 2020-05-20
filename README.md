@@ -171,8 +171,8 @@ For macOS:
 
    1. Consider installing with [Homebrew](#homebrew-on-macos)
       ```sh
-      $ brew update
-      $ brew install pyenv
+      brew update
+      brew install pyenv
       ```
    2. Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout), starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
 
@@ -192,7 +192,7 @@ easy to fork and contribute any changes back upstream.
 1. **Check out pyenv where you want it installed.**
    A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else).
 
-        $ git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+        git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 
 
 2. **Define environment variable `PYENV_ROOT`** to point to the path where
@@ -201,26 +201,26 @@ easy to fork and contribute any changes back upstream.
 
    - For **bash**:
      ~~~ bash
-     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
-     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
+     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
+     echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
      ~~~
 
    - For **Ubuntu Desktop**:
      ~~~ bash
-     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+     echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
      ~~~
 
    - For **Zsh**:
      ~~~ zsh
-     $ echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
-     $ echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
+     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
+     echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
      ~~~
 
    - For **Fish shell**:
      ~~~ fish
-     $ set -Ux PYENV_ROOT $HOME/.pyenv
-     $ set -Ux fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+     set -Ux PYENV_ROOT $HOME/.pyenv
+     set -Ux fish_user_paths $PYENV_ROOT/bin $fish_user_paths
      ~~~
 
    - **Proxy note**: If you use a proxy, export `http_proxy` and `HTTPS_PROXY` too.
@@ -229,7 +229,7 @@ easy to fork and contribute any changes back upstream.
    Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
    configuration file since it manipulates `PATH` during the initialization.
     ```sh
-    $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
+    echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
     ```
     - **Zsh note**: Modify your `~/.zshrc` file instead of `~/.bash_profile`.
     - **fish note**: Use `pyenv init - | source` instead of `eval (pyenv init -)`.
@@ -244,7 +244,7 @@ easy to fork and contribute any changes back upstream.
 4. **Restart your shell so the path changes take effect.**
    You can now begin using pyenv.
     ```sh
-    $ exec "$SHELL"
+    exec "$SHELL"
     ```
 
 5. [**Install Python build dependencies**](https://github.com/pyenv/pyenv/wiki#suggested-build-environment) before attempting to install a new Python version.
@@ -252,7 +252,7 @@ easy to fork and contribute any changes back upstream.
 6. **Install Python versions into `$(pyenv root)/versions`.**
    For example, to download and install Python 2.7.8, run:
     ```sh
-    $ pyenv install 2.7.8
+    pyenv install 2.7.8
     ```
    **NOTE:** If you need to pass configure option to build, please use
    ```CONFIGURE_OPTS``` environment variable.
@@ -269,7 +269,7 @@ easy to fork and contribute any changes back upstream.
 
 If you've installed pyenv using homebrew, upgrade using:
 ```sh
-$ brew upgrade pyenv
+brew upgrade pyenv
 ```
 
 If you've installed pyenv using the instructions above, you can
@@ -278,18 +278,17 @@ upgrade your installation at any time using git.
 To upgrade to the latest development version of pyenv, use `git pull`:
 
 ```sh
-$ cd $(pyenv root)
-$ git pull
+cd $(pyenv root)
+git pull
 ```
 
 To upgrade to a specific release of pyenv, check out the corresponding tag:
 
 ```sh
-$ cd $(pyenv root)
-$ git fetch
-$ git tag
-v0.1.0
-$ git checkout v0.1.0
+cd $(pyenv root)
+git fetch
+git tag
+git checkout v0.1.0
 ```
 
 ### Uninstalling pyenv
@@ -394,8 +393,8 @@ and easy to understand, even if you're not a shell hacker.
 
 Tests are executed using [Bats](https://github.com/bats-core/bats-core):
 
-    $ bats test
-    $ bats/test/<file>.bats
+    bats test
+    bats/test/<file>.bats
 
 Please feel free to submit pull requests and file bugs on the [issue
 tracker](https://github.com/pyenv/pyenv/issues).
