@@ -167,9 +167,9 @@ We'd recommend to install pyenv-virtualenv as well if you have some plan to play
 
 ## Installation
 
-For macOS:
+### Homebrew on macOS
 
-   1. Consider installing with [Homebrew](#homebrew-on-macos)
+   1. Consider installing with [Homebrew](https://brew.sh)
       ```sh
       brew update
       brew install pyenv
