@@ -2,7 +2,7 @@
 
 ## 1.2.19
 
-* python-build: Add CPython 3.8.2 (#1612)
+* python-build: Add CPython 3.8.3 (#1612)
 * python-build: Add CPython 2.7.18 (#1593)
 * python-build: Add CPython 3.10-dev (#1619)
 * python-build: Add anaconda3-2020.02 (#1584)
