@@ -256,14 +256,6 @@ easy to fork and contribute any changes back upstream.
 
 #### Upgrading
 
-If you've installed pyenv using homebrew, upgrade using:
-```sh
-brew upgrade pyenv
-```
-
-If you've installed pyenv using the instructions above, you can
-upgrade your installation at any time using git.
-
 To upgrade to the latest development version of pyenv, use `git pull`:
 
 ```sh
@@ -299,10 +291,6 @@ uninstall from the system.
     ```sh
     rm -rf $(pyenv root)
     ```
-   If you've installed pyenv using a package manager, as a final step
-   perform the pyenv package removal. For instance, for Homebrew:
-
-        brew uninstall pyenv
 
 ### Advanced Configuration
 
