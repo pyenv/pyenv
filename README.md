@@ -167,17 +167,6 @@ We'd recommend to install pyenv-virtualenv as well if you have some plan to play
 
 ## Installation
 
-### Homebrew on macOS
-
-   1. Consider installing with [Homebrew](https://brew.sh)
-      ```sh
-      brew update
-      brew install pyenv
-      ```
-   2. Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout), starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
-
-If you're on Windows, consider using @kirankotari's [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) fork. (`pyenv` does not work on windows outside the Windows Subsystem for Linux)
-
 ### The automatic installer
 
 Visit my other project:
