@@ -244,8 +244,9 @@ easy to fork and contribute any changes back upstream.
      ~~~
      
    - For **Fish**:
-     ~~~ bash
-     $ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  pyenv init - | source"\nfi' >> ~/.zshrc
+     ~~~ fish
+     $ status --is-interactive; and . (pyenv init -|psub)
+     $ status --is-interactive; and . (pyenv virtualenv-init -|psub)
      ~~~
     
     **General warning**: There are some systems where the `BASH_ENV` variable is configured
