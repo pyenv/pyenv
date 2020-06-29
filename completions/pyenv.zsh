@@ -1,18 +1,13 @@
-if [[ ! -o interactive ]]; then
-    return
-fi
-
-compctl -K _pyenv pyenv
+#compdef pyenv
 
 _pyenv() {
-  local words completions
-  read -cA words
-
+  local -a comples
   if [ "${#words}" -eq 2 ]; then
-    completions="$(pyenv commands)"
+    comples=($(pyenv commands))
   else
-    completions="$(pyenv completions ${words[2,-2]})"
+    comples=($(pyenv completions ${words[2,-2]}))
   fi
-
-  reply=(${(ps:\n:)completions})
+  _describe -t comples 'comples' comples
 }
+
+_pyenv
