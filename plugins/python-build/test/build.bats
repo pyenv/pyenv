@@ -78,11 +78,11 @@ assert_build_log() {
 
   assert_build_log <<OUT
 yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-yaml-0.1.6: --prefix=$INSTALL_ROOT
+yaml-0.1.6: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6
 make -j 2
 make install
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -110,12 +110,12 @@ OUT
 
   assert_build_log <<OUT
 yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-yaml-0.1.6: --prefix=$INSTALL_ROOT
+yaml-0.1.6: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6
 make -j 2
 make install
 patch -p0 --force -i $TMP/python-patch.XXX
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -143,12 +143,12 @@ OUT
 
   assert_build_log <<OUT
 yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-yaml-0.1.6: --prefix=$INSTALL_ROOT
+yaml-0.1.6: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6
 make -j 2
 make install
 patch -p1 --force -i $TMP/python-patch.XXX
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -177,7 +177,7 @@ OUT
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I$brew_libdir/include -I${TMP}/install/include " LDFLAGS="-L$brew_libdir/lib -L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -205,7 +205,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I$readline_libdir/include -I${TMP}/install/include " LDFLAGS="-L$readline_libdir/lib -L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -236,7 +236,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -267,7 +267,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -299,7 +299,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 4
 make install
 OUT
@@ -327,7 +327,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 1
 make install
 OUT
@@ -353,7 +353,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install DOGE="such wow"
 OUT
@@ -379,7 +379,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install DOGE="such wow"
 OUT
@@ -474,7 +474,7 @@ DEF
   assert_build_log <<OUT
 apply -p1 -i /my/patch.diff
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
