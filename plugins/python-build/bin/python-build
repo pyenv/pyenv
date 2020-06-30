@@ -759,6 +759,7 @@ build_package_standard_build() {
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
+      use_tcltk || true
       use_homebrew_readline || use_freebsd_pkg || true
     if is_mac -ge 1014; then
       use_xcode_sdk_zlib || use_homebrew_zlib || true
@@ -772,7 +773,7 @@ build_package_standard_build() {
       export CC=clang
     fi
     ${!PACKAGE_CONFIGURE:-./configure} --prefix="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}" \
-        $CONFIGURE_OPTS --with-tcltk-includes='-I/usr/local/opt/tcl-tk/include' --with-tcltk-libs='-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6' ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}" || return 1
+        $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}" || return 1
   ) >&4 2>&1
 
   { "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
@@ -1485,6 +1486,30 @@ use_xcode_sdk_zlib() {
     export CFLAGS="-I${xc_sdk_path}/usr/include ${CFLAGS}"
   fi
 }
+
+use_tcltk() {
+   # check args passed, use that otherwise check for homebrew tcl-tk
+   local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
+   local regex_tcltk_libs_args="(--with-tcltk-libs='([^']+)')"
+
+   if [[ "$PYTHON_CONFIGURE_OPTS" =~ $regex_tcltk_libs_args ]]; then
+     local tcltk_libs_match="${BASH_REMATCH[1]}"
+     local tcltk_match_quoted="${tcltk_libs_match//--with-tcltk-libs=/}"
+     PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//$tcltk_libs_match/}"
+
+     echo "python-build: use tcl-tk from \$PYTHON_CONFIGURE_OPTS"
+     package_option python configure "--with-tcltk-libs='${tcltk_match_quoted}'"
+   elif [ -d "$tcltk_libdir" ]; then
+     # get the version from the folder that homebrew versions
+     local tcltk_version_long="$(ls "$(brew --cellar tcl-tk)")"
+     local tcltk_version="${tcltk_version_long%.*}"
+     local tcltk_flags="--with-tcltk-includes=-I$tcltk_libdir/include --with-tcltk-libs=-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+     echo "python-build: use tcl-tk from homebrew"
+     echo "${tcltk_flags}"
+     package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+     package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+   fi
+ }
 
 # Ensure that directories listed in LDFLAGS exist
 build_package_ldflags_dirs() {
