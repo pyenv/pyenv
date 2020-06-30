@@ -165,7 +165,7 @@ OUT
 
   stub uname '-s : echo Linux'
   stub uname '-s : echo Darwin'
-  stub brew "--prefix libyaml : echo '$brew_libdir'" false
+  stub brew "--prefix libyaml : echo '$brew_libdir'" false false
   stub_make_install
 
   install_fixture definitions/needs-yaml
@@ -192,7 +192,7 @@ OUT
   # pyenv/pyenv#1026
   stub uname false false
 
-  stub brew "--prefix readline : echo '$readline_libdir'"
+  stub brew false "--prefix readline : echo '$readline_libdir'"
   stub_make_install
 
   run_inline_definition <<DEF
@@ -222,7 +222,7 @@ OUT
   # pyenv/pyenv#1026
   stub uname false false
 
-  stub brew
+  stub brew false
   stub_make_install
 
   export PYTHON_CONFIGURE_OPTS="CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib"
@@ -237,6 +237,68 @@ DEF
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
 Python-3.6.2: --prefix=$INSTALL_ROOT CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "tcl-tk is linked from Homebrew" {
+  cached_tarball "Python-3.6.2"
+
+  # python build
+  tcl_tk_libdir="$TMP/homebrew-tcl-tk"
+  tcl_tk_version_long="8.6.10"
+  tcl_tk_version="${tcl_tk_version_long%.*}"
+  mkdir -p "$tcl_tk_libdir"
+  mkdir -p "$tcl_tk_libdir/$tcl_tk_version_long"
+
+  # pyenv/pyenv#1026
+  stub uname false false
+
+  stub brew "--prefix tcl-tk : echo '$tcl_tk_libdir'" "--cellar tcl-tk : echo '$TMP/homebrew-tcl-tk'" false
+  stub_make_install
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=${TMP}/install --libdir=${TMP}/install/lib --with-tcltk-libs=-L${TMP}/homebrew-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version --with-tcltk-includes=-I${TMP}/homebrew-tcl-tk/include
+make -j 2
+make install
+OUT
+}
+
+@test "tcl-tk is not linked from Homebrew when explicitly defined" {
+  cached_tarball "Python-3.6.2"
+
+  # python build
+  tcl_tk_version_long="8.6.10"
+  tcl_tk_version="${tcl_tk_version_long%.*}"
+
+  # pyenv/pyenv#1026
+  stub uname false false
+
+  stub brew false false
+  stub_make_install
+
+  export PYTHON_CONFIGURE_OPTS="--with-tcltk-libs='-L${TMP}/custom-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version'"
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --with-tcltk-libs=-L${TMP}/custom-tcl-tk/lib -ltcl8.6 -ltk8.6
 make -j 2
 make install
 OUT
