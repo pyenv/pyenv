@@ -2,9 +2,11 @@ export TMP="$BATS_TEST_DIRNAME/tmp"
 export PYTHON_BUILD_CURL_OPTS=
 export PYTHON_BUILD_HTTP_CLIENT="curl"
 
+
 if [ "$FIXTURE_ROOT" != "$BATS_TEST_DIRNAME/fixtures" ]; then
   export FIXTURE_ROOT="$BATS_TEST_DIRNAME/fixtures"
   export INSTALL_ROOT="$TMP/install"
+  export WITH_TCLTK_FLAGS="--with-tcltk-includes=-I/usr/local/opt/tcl-tk/include --with-tcltk-libs=-L/usr/local/opt/tcl-tk/lib -ltcl8.6 -ltk8.6"
   PATH="/usr/bin:/bin:/usr/sbin:/sbin"
   if [ "FreeBSD" = "$(uname -s)" ]; then
     PATH="/usr/local/bin:$PATH"

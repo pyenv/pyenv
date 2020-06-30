@@ -124,7 +124,7 @@ run_inline_definition_with_name() {
   assert_build_log <<OUT
 patch -p0 --force -i $TMP/python-patch.XXX
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install ${WITH_TCLTK_FLAGS}  --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -156,7 +156,7 @@ patch: bar
 patch: baz
 patch: foo
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install ${WITH_TCLTK_FLAGS} --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -182,7 +182,7 @@ OUT
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install ${WITH_TCLTK_FLAGS} --libdir=$INSTALL_ROOT/lib
 make -j 2
 make altinstall
 OUT
@@ -305,7 +305,7 @@ EOS
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --enable-unicode=ucs2 --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install ${WITH_TCLTK_FLAGS} --enable-unicode=ucs2 --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT

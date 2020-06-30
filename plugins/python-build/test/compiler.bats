@@ -90,7 +90,7 @@ build_package_standard python
 DEF
   assert_success
   assert_output <<OUT
-./configure --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib
+./configure --prefix=${TMP}/install ${WITH_TCLTK_FLAGS}  --libdir=${TMP}/install/lib
 CC=clang
 CFLAGS=no
 make -j 2
