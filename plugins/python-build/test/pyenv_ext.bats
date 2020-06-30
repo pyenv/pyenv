@@ -124,7 +124,7 @@ run_inline_definition_with_name() {
   assert_build_log <<OUT
 patch -p0 --force -i $TMP/python-patch.XXX
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=${TMP}/install ${WITH_TCLTK_FLAGS}  --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install ${WITH_TCLTK_FLAGS} --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
