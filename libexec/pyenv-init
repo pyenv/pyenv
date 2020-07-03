@@ -86,11 +86,19 @@ mkdir -p "${PYENV_ROOT}/"{shims,versions}
 
 case "$shell" in
 fish )
-  echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+  echo "
+if not echo \$PATH | grep -q -E \"(^|\\s)${PYENV_ROOT}/shims(\\$|\\s)\"
+  set -gx PATH '${PYENV_ROOT}/shims' \$PATH
+end
+"
   echo "set -gx PYENV_SHELL $shell"
 ;;
 * )
-  echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  echo "
+if ! echo \$PATH | grep -q -E \"(^|:)${PYENV_ROOT}/shims(\$|:)\"; then
+  export PATH=\"${PYENV_ROOT}/shims:\${PATH}\"
+fi
+"
   echo "export PYENV_SHELL=$shell"
 ;;
 esac
