@@ -1,5 +1,9 @@
 ## Version History
 
+## 1.2.20
+
+* python-build: Add CPython 3.9.0b4 (#1654)
+
 ## 1.2.19
 
 * python-build: Add CPython 3.8.3 (#1612)
