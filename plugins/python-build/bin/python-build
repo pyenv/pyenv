@@ -1880,8 +1880,18 @@ elif [ ! -f "$DEFINITION_PATH" ]; then
   done
 
   if [ ! -f "$DEFINITION_PATH" ]; then
-    echo "python-build: definition not found: ${DEFINITION_PATH}" >&2
-    exit 2
+    # Check if specified version is a prefix for a valid version
+    # Uses the latest version e.g. 3.7 will give 3.7.8
+    PYTHON_PREFIX_MATCH=$(ls $DEFINITION_DIR -hr | grep ^"${DEFINITION_PATH}" | grep -v "dev" | head -n 1)
+
+    # If match found, install, else print error
+    if [ -n "$PYTHON_PREFIX_MATCH" ]; then
+      echo "python-build: installing latest version $PYTHON_PREFIX_MATCH" >&2
+      DEFINITION_PATH="${DEFINITION_DIR}/${PYTHON_PREFIX_MATCH}"
+    else
+      echo "python-build: definition not found: ${DEFINITION_PATH}" >&2
+      exit 2
+    fi
   fi
 fi
 
