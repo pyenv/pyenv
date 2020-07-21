@@ -4,6 +4,7 @@
 
 * python-build: Add CPython 3.9.0b4 (#1654)
 * python-build: Add CPython 3.8.4 (#1658)
+* python-build: Add CPython 3.8.5 (#1668)
 
 ## 1.2.19
 
