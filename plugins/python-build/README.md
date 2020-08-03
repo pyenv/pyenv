@@ -109,6 +109,8 @@ You can set certain environment variables to control the build process.
   downloaded package files.
 * `PYTHON_BUILD_MIRROR_URL` overrides the default mirror URL root to one of your
   choosing.
+* `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM`, if set, does not append the SHA2
+  checksum of the file to the mirror URL.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
@@ -181,6 +183,10 @@ You can point python-build to another mirror by specifying the
 `PYTHON_BUILD_MIRROR_URL` environment variable--useful if you'd like to run your
 own local mirror, for example. Package mirror URLs are constructed by joining
 this variable with the SHA2 checksum of the package file.
+
+If the mirror being used does not have the same checksum (*e.g.* with a
+pull-through cache like Artifactory), you can set the
+`PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` environment variable.
 
 If you don't have an SHA2 program installed, python-build will skip the download
 mirror and use official URLs instead. You can force python-build to bypass the
