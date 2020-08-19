@@ -1,16 +1,16 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  install_package "pypy-1.7" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.7-linux.tar.bz2#d8f6af52dd5c32ca65de8b1507ef49490188ec131d53a68db6f81201943b4227" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.7" "https://downloads.python.org/pypy/pypy-1.7-linux.tar.bz2#d8f6af52dd5c32ca65de8b1507ef49490188ec131d53a68db6f81201943b4227" "pypy" verify_py27 ensurepip
   ;;
 "linux64" )
-  install_package "pypy-1.7" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.7-linux64.tar.bz2#cd7ff7a4beaaa78c3b9dbcd567fb0b2d672258051f837e727d4fd636788552ca" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.7" "https://downloads.python.org/pypy/pypy-1.7-linux64.tar.bz2#cd7ff7a4beaaa78c3b9dbcd567fb0b2d672258051f837e727d4fd636788552ca" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
-  install_package "pypy-1.7" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.7-osx64.tar.bz2#9ad01f6e194b1a3d5f2fa82cd6760b4f9e8a791d5ca28cc156c5f03fe43a08ac" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.7" "https://downloads.python.org/pypy/pypy-1.7-osx64.tar.bz2#9ad01f6e194b1a3d5f2fa82cd6760b4f9e8a791d5ca28cc156c5f03fe43a08ac" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.7" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.7-win32.zip#1d70faaed00f2f69c634dfbb61b54901df64f093d07d976e035578f812ed31ea" "pypy" verify_py27 ensurepip
+  install_zip "pypy-1.7" "https://downloads.python.org/pypy/pypy-1.7-win32.zip#1d70faaed00f2f69c634dfbb61b54901df64f093d07d976e035578f812ed31ea" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo
