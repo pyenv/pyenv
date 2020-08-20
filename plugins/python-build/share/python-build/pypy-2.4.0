@@ -1,36 +1,36 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 10.04" 1>/dev/null 2>&1; then
-    install_package "pypy-2.4.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux.tar.bz2#a24adb366f87ac0eba829d7188a156a7d897e71893689fab06502c3f4152ac0e" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.4.0-linux" "https://downloads.python.org/pypy/pypy-2.4.0-linux.tar.bz2#a24adb366f87ac0eba829d7188a156a7d897e71893689fab06502c3f4152ac0e" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-2.4-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.4-linux_i686-portable.tar.bz2#2a330bbeae038c143366982f2104bf4096752f1ec7520fc5608f0527c124b0c2" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.4-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-2.4-linux_i686-portable.tar.bz2#2a330bbeae038c143366982f2104bf4096752f1ec7520fc5608f0527c124b0c2" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.4.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux-armel.tar.bz2#8362d634bf86fbfb3b99b578b13c0a9fd673b2b7580d6d65b4a181934c659ccd" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.4.0-linux-armel" "https://downloads.python.org/pypy/pypy-2.4.0-linux-armel.tar.bz2#8362d634bf86fbfb3b99b578b13c0a9fd673b2b7580d6d65b4a181934c659ccd" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy-2.4.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux-armhf-raspbian.tar.bz2#5e0ba69b28ffbd5b61b0b6be2a130ab0c80e7d2da289d9530b0b6eac4302d5fa" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.4.0-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy-2.4.0-linux-armhf-raspbian.tar.bz2#5e0ba69b28ffbd5b61b0b6be2a130ab0c80e7d2da289d9530b0b6eac4302d5fa" "pypy" verify_py27 ensurepip
   else
     require_distro "Ubuntu 13.04" || true
-    install_package "pypy-2.4.0-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux-armhf-raring.tar.bz2#ddbdd6207c41cf82d8c96d52a2a204a2cdada9301cb577f9b323f22394bb1f0a" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.4.0-linux-armhf-raring" "https://downloads.python.org/pypy/pypy-2.4.0-linux-armhf-raring.tar.bz2#ddbdd6207c41cf82d8c96d52a2a204a2cdada9301cb577f9b323f22394bb1f0a" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux64" )
   if require_distro "Ubuntu 12.04" 1>/dev/null 2>&1; then
-    install_package "pypy-2.4.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-linux64.tar.bz2#27cdc0d6e8bce2637678f6d076fc780877dffe1bf9aec9e253f95219af9ed099" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.4.0-linux64" "https://downloads.python.org/pypy/pypy-2.4.0-linux64.tar.bz2#27cdc0d6e8bce2637678f6d076fc780877dffe1bf9aec9e253f95219af9ed099" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-2.4-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.4-linux_x86_64-portable.tar.bz2#b6ed31aff0ebcc9b40554576b1ce789fe4e8c93f7a34cd3983515e1a9a8a45b6" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.4-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-2.4-linux_x86_64-portable.tar.bz2#b6ed31aff0ebcc9b40554576b1ce789fe4e8c93f7a34cd3983515e1a9a8a45b6" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
-  install_package "pypy-2.4.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-osx64.tar.bz2#3eb8afdfa42bc9b08b4d3058e21d4ce978a52722fdcfdc67d6c3ee5013a51aaa" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.4.0-osx64" "https://downloads.python.org/pypy/pypy-2.4.0-osx64.tar.bz2#3eb8afdfa42bc9b08b4d3058e21d4ce978a52722fdcfdc67d6c3ee5013a51aaa" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.4.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.4.0-win32.zip#3eb8afdfa42bc9b08b4d3058e21d4ce978a52722fdcfdc67d6c3ee5013a51aaa" "pypy" verify_py27 ensurepip
+  install_zip "pypy-2.4.0-win32" "https://downloads.python.org/pypy/pypy-2.4.0-win32.zip#3eb8afdfa42bc9b08b4d3058e21d4ce978a52722fdcfdc67d6c3ee5013a51aaa" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

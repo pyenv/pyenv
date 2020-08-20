@@ -1,16 +1,16 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  install_package "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux.tar.bz2#9c293d8540780260718f8fd8dc433c97b614a31b115ccfe2d68df720ad7e55b1" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.8" "https://downloads.python.org/pypy/pypy-1.8-linux.tar.bz2#9c293d8540780260718f8fd8dc433c97b614a31b115ccfe2d68df720ad7e55b1" "pypy" verify_py27 ensurepip
   ;;
 "linux64" )
-  install_package "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-linux64.tar.bz2#1045606cceb993844a016b76c55aa43a9924bcf526f91a0572fc97cee69b61dc" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.8" "https://downloads.python.org/pypy/pypy-1.8-linux64.tar.bz2#1045606cceb993844a016b76c55aa43a9924bcf526f91a0572fc97cee69b61dc" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
-  install_package "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-osx64.tar.bz2#b823b6b919082cfb67861b8253313b877618672377164086c0364fa8eaa88b8a" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.8" "https://downloads.python.org/pypy/pypy-1.8-osx64.tar.bz2#b823b6b919082cfb67861b8253313b877618672377164086c0364fa8eaa88b8a" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.8" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-win32.zip#a844f54551805d300beffd10b18684e0c08fa080c1b6f7be52bb7fbdfdf38292" "pypy" verify_py27 ensurepip
+  install_zip "pypy-1.8" "https://downloads.python.org/pypy/pypy-1.8-win32.zip#a844f54551805d300beffd10b18684e0c08fa080c1b6f7be52bb7fbdfdf38292" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

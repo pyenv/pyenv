@@ -1,7 +1,7 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v6.0.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux32.tar.bz2#ad1082d4328ae8f32617b14628648583b82b6d29df3aa42b97bd1853c08c4bc8" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v6.0.0-linux32" "https://downloads.python.org/pypy/pypy2-v6.0.0-linux32.tar.bz2#ad1082d4328ae8f32617b14628648583b82b6d29df3aa42b97bd1853c08c4bc8" "pypy" verify_py27 ensurepip
   else
     { echo
       colorize 1 "ERROR"
@@ -14,11 +14,11 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy2-v6.0.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux-armel.tar.bz2#924ca3f90aa28e8961859508c25752c95253b842318a0f267267ffe90f56a916" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v6.0.0-linux-armel" "https://downloads.python.org/pypy/pypy2-v6.0.0-linux-armel.tar.bz2#924ca3f90aa28e8961859508c25752c95253b842318a0f267267ffe90f56a916" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy2-v6.0.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux-armhf-raspbian.tar.bz2#6506ce739e31981e5596d3cc2e2c7f5b086ee77bb4d97773082b62b2f283eef2" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v6.0.0-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy2-v6.0.0-linux-armhf-raspbian.tar.bz2#6506ce739e31981e5596d3cc2e2c7f5b086ee77bb4d97773082b62b2f283eef2" "pypy" verify_py27 ensurepip
   else
     require_distro "Ubuntu 13.04" || true
     install_package "pypy2-v6.0.0-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux-armhf-raring.tar.bz2#2c430240cecb562102c677598f106aa57899f00cd37f719989e18ed9ca44bd01" "pypy" verify_py27 ensurepip
@@ -26,17 +26,17 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 "linux64" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v6.0.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux64.tar.bz2#6cbf942ba7c90f504d8d6a2e45d4244e3bf146c8722d64e9410b85eac6b5af67" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v6.0.0-linux64" "https://downloads.python.org/pypy/pypy2-v6.0.0-linux64.tar.bz2#6cbf942ba7c90f504d8d6a2e45d4244e3bf146c8722d64e9410b85eac6b5af67" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-6.0.0-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-6.0.0-linux_x86_64-portable.tar.bz2#1d2a833680f9432b6b5f6b8503f656535f429eeb6c4bc5408abe5b637bfb9b94" "pypy" verify_py27 ensurepip
+    install_package "pypy-6.0.0-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-6.0.0-linux_x86_64-portable.tar.bz2#1d2a833680f9432b6b5f6b8503f656535f429eeb6c4bc5408abe5b637bfb9b94" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
-  install_package "pypy2-v6.0.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-osx64.tar.bz2#d7dc443e6bb9a45212e8d8f5a63e9f6ce23f1d88c50709efea1c75b76c8bc186" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v6.0.0-osx64" "https://downloads.python.org/pypy/pypy2-v6.0.0-osx64.tar.bz2#d7dc443e6bb9a45212e8d8f5a63e9f6ce23f1d88c50709efea1c75b76c8bc186" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy2-v6.0.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-win32.zip#6e2210dae1ae721ed4eb9cba19f15453514b64111511c84f24843c4fdefdaf7f" "pypy" verify_py27 ensurepip
+  install_zip "pypy2-v6.0.0-win32" "https://downloads.python.org/pypy/pypy2-v6.0.0-win32.zip#6e2210dae1ae721ed4eb9cba19f15453514b64111511c84f24843c4fdefdaf7f" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

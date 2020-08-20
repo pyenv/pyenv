@@ -1,18 +1,18 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   require_distro "Ubuntu 10.04" || true
-  install_package "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux.tar.bz2#548686c5b95b424c79586d9a303ed41fca8eba52bd35c1527f39f5cd8fa35ea9" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.0.1" "https://downloads.python.org/pypy/pypy-2.0.1-linux.tar.bz2#548686c5b95b424c79586d9a303ed41fca8eba52bd35c1527f39f5cd8fa35ea9" "pypy" verify_py27 ensurepip
   ;;
 "linux64" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-linux64.tar.bz2#0eb57e28f2bd5f2a4ad396df322de5adf711eb7d9a2bfeb8be2d9eb9e125c5cc" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.0.1" "https://downloads.python.org/pypy/pypy-2.0.1-linux64.tar.bz2#0eb57e28f2bd5f2a4ad396df322de5adf711eb7d9a2bfeb8be2d9eb9e125c5cc" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
-  install_package "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-osx64.tar.bz2#337f2fda672827f2d706fd98e3344a83a8b80675e21b83dd6933da38d110c857" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.0.1" "https://downloads.python.org/pypy/pypy-2.0.1-osx64.tar.bz2#337f2fda672827f2d706fd98e3344a83a8b80675e21b83dd6933da38d110c857" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.0.1" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0.1-win32.zip#78fff168c10176a3a7f6a5b97d2048ed87f3cd9a6284b5afa86115baa19af946" "pypy" verify_py27 ensurepip
+  install_zip "pypy-2.0.1" "https://downloads.python.org/pypy/pypy-2.0.1-win32.zip#78fff168c10176a3a7f6a5b97d2048ed87f3cd9a6284b5afa86115baa19af946" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

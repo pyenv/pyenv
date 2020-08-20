@@ -1,7 +1,7 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux64" )
   if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy3-v5.8.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v5.8.0-linux64.tar.bz2#57d871a7f1135719c138cee4e3533c3275d682a76a40ff668e95150c65923035" "pypy" verify_py35 ensurepip
+    install_package "pypy3-v5.8.0-linux64" "https://downloads.python.org/pypy/pypy3-v5.8.0-linux64.tar.bz2#57d871a7f1135719c138cee4e3533c3275d682a76a40ff668e95150c65923035" "pypy" verify_py35 ensurepip
   else
     install_package "pypy3.5-5.8-beta-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3.5-5.8-1-beta-linux_x86_64-portable.tar.bz2#cab20a6d315a1bb05aa953ebc37d8deaa34dcbe298cb5938e373c42c05542b99" "pypy" verify_py35 ensurepip
   fi

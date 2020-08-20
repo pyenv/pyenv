@@ -1,7 +1,7 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
-    install_package "pypy2.7-v7.1.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.1.0-linux32.tar.bz2#44ec91e8cb01caab289d8763c203f3aaf288d14325a6c42692bd1ac4e870d758" "pypy" verify_py27 ensurepip
+    install_package "pypy2.7-v7.1.0-linux32" "https://downloads.python.org/pypy/pypy2.7-v7.1.0-linux32.tar.bz2#44ec91e8cb01caab289d8763c203f3aaf288d14325a6c42692bd1ac4e870d758" "pypy" verify_py27 ensurepip
   else
     { echo
       colorize 1 "ERROR"
@@ -14,14 +14,14 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 "linux64" )
   if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
-    install_package "pypy2.7-v7.1.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.1.0-linux64.tar.bz2#fef176a29a2ef068c00c8098e59dab935ca6e956f089672b3f7351da95a034f5" "pypy" verify_py27 ensurepip
+    install_package "pypy2.7-v7.1.0-linux64" "https://downloads.python.org/pypy/pypy2.7-v7.1.0-linux64.tar.bz2#fef176a29a2ef068c00c8098e59dab935ca6e956f089672b3f7351da95a034f5" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-7.1.0-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-7.1.0-linux_x86_64-portable.tar.bz2#ee917d9d72fb6a7d15e31e6c5e470ce561a940f112e99f29ac5dd6b41f512657" "pypy" verify_py27 ensurepip
+    install_package "pypy-7.1.0-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-7.1.0-linux_x86_64-portable.tar.bz2#ee917d9d72fb6a7d15e31e6c5e470ce561a940f112e99f29ac5dd6b41f512657" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
   if require_osx_version "10.13"; then
-    install_package "pypy2.7-v7.1.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.1.0-osx64.tar.bz2#8be43685ce718b0768387450fc6dc395d60809b778b6146c353ef67826022153" "pypy" verify_py27 ensurepip
+    install_package "pypy2.7-v7.1.0-osx64" "https://downloads.python.org/pypy/pypy2.7-v7.1.0-osx64.tar.bz2#8be43685ce718b0768387450fc6dc395d60809b778b6146c353ef67826022153" "pypy" verify_py27 ensurepip
   else
     { echo
       colorize 1 "ERROR"
@@ -33,7 +33,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "win32" )
-  install_zip "pypy2.7-v7.1.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.1.0-win32.zip#76658c9ad679d562b8b6a09d006caa666406337b9834ff56db16980c5e549f20" "pypy" verify_py27 ensurepip
+  install_zip "pypy2.7-v7.1.0-win32" "https://downloads.python.org/pypy/pypy2.7-v7.1.0-win32.zip#76658c9ad679d562b8b6a09d006caa666406337b9834ff56db16980c5e549f20" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

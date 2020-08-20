@@ -1,34 +1,34 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.9.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.9.0-linux32.tar.bz2#a2431a9e4ef879da1a2b56b111013b4a6efb87d4173a37bf650de47834ac5fe4" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.9.0-linux32" "https://downloads.python.org/pypy/pypy2-v5.9.0-linux32.tar.bz2#a2431a9e4ef879da1a2b56b111013b4a6efb87d4173a37bf650de47834ac5fe4" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy2-v5.9.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.9.0-linux-armel.tar.bz2#ac0676d91dfb388c799ec5c2845f42018a666423376f52f3ae13d61fd2e6f87d" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v5.9.0-linux-armel" "https://downloads.python.org/pypy/pypy2-v5.9.0-linux-armel.tar.bz2#ac0676d91dfb388c799ec5c2845f42018a666423376f52f3ae13d61fd2e6f87d" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy2-v5.9.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.9.0-linux-armhf-raspbian.tar.bz2#b8a20042a3f34486a372ff7c751539b2e16859c0a7ea69d5a73af92f0fdcb25a" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.9.0-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy2-v5.9.0-linux-armhf-raspbian.tar.bz2#b8a20042a3f34486a372ff7c751539b2e16859c0a7ea69d5a73af92f0fdcb25a" "pypy" verify_py27 ensurepip
   else
     require_distro "Ubuntu 13.04" || true
-    install_package "pypy2-v5.9.0-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.9.0-linux-armhf-raring.tar.bz2#2597b7b21acdef4f2b81074a594157c9450363c74a17f005548c6b102f93cff4" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.9.0-linux-armhf-raring" "https://downloads.python.org/pypy/pypy2-v5.9.0-linux-armhf-raring.tar.bz2#2597b7b21acdef4f2b81074a594157c9450363c74a17f005548c6b102f93cff4" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux64" )
   if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.9.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.9.0-linux64.tar.bz2#790febd4f09e22d6e2f81154efc7dc4b2feec72712aaf4f82aa91b550abb4b48" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.9.0-linux64" "https://downloads.python.org/pypy/pypy2-v5.9.0-linux64.tar.bz2#790febd4f09e22d6e2f81154efc7dc4b2feec72712aaf4f82aa91b550abb4b48" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.9-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.9-linux_x86_64-portable.tar.bz2#8d39eb98df3adf7882a7f3551f47b8c7cff47a0e20d6aabc57bb592f155c2616" "pypy" verify_py27 ensurepip
+    install_package "pypy-5.9-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.9-linux_x86_64-portable.tar.bz2#8d39eb98df3adf7882a7f3551f47b8c7cff47a0e20d6aabc57bb592f155c2616" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
-  install_package "pypy2-v5.9.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.9.0-osx64.tar.bz2#94de50ed80c7f6392ed356c03fd54cdc84858df43ad21e9e971d1b6da0f6b867" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v5.9.0-osx64" "https://downloads.python.org/pypy/pypy2-v5.9.0-osx64.tar.bz2#94de50ed80c7f6392ed356c03fd54cdc84858df43ad21e9e971d1b6da0f6b867" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy2-v5.9.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.9.0-win32.zip#b61081e24e05b83d8110da1262be19f0094532c6cacc293e318a1c186d926533" "pypy" verify_py27 ensurepip
+  install_zip "pypy2-v5.9.0-win32" "https://downloads.python.org/pypy/pypy2-v5.9.0-win32.zip#b61081e24e05b83d8110da1262be19f0094532c6cacc293e318a1c186d926533" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

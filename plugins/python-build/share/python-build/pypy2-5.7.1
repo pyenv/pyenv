@@ -1,34 +1,34 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.7.1-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.1-linux32.tar.bz2#f125a227f8c814ba1698168a639ea6ca59bb69c280529639eed29076d8429a73" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.7.1-linux32" "https://downloads.python.org/pypy/pypy2-v5.7.1-linux32.tar.bz2#f125a227f8c814ba1698168a639ea6ca59bb69c280529639eed29076d8429a73" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy2-v5.7.1-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.1-linux-armel.tar.bz2#591a4a73cc945a1125848f3615a28559692db8febf677d7087eaef40cb119a8d" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v5.7.1-linux-armel" "https://downloads.python.org/pypy/pypy2-v5.7.1-linux-armel.tar.bz2#591a4a73cc945a1125848f3615a28559692db8febf677d7087eaef40cb119a8d" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy2-v5.7.1-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.1-linux-armhf-raspbian.tar.bz2#67544f8c4b284db71cf1af74edef290722f97f82476cbdaff2015fdab244c6ee" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.7.1-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy2-v5.7.1-linux-armhf-raspbian.tar.bz2#67544f8c4b284db71cf1af74edef290722f97f82476cbdaff2015fdab244c6ee" "pypy" verify_py27 ensurepip
   else
     require_distro "Ubuntu 13.04" || true
-    install_package "pypy2-v5.7.1-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.1-linux-armhf-raring.tar.bz2#c1b1a0968b22c58672f7492dc7900bc85e3bd02c791f219f31401a00ef387207" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.7.1-linux-armhf-raring" "https://downloads.python.org/pypy/pypy2-v5.7.1-linux-armhf-raring.tar.bz2#c1b1a0968b22c58672f7492dc7900bc85e3bd02c791f219f31401a00ef387207" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux64" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.7.1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.1-linux64.tar.bz2#c4fa3da42156bed4a9d912433b618a141e0c5161d7cc8c328786736ea5d1c2da" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.7.1-linux64" "https://downloads.python.org/pypy/pypy2-v5.7.1-linux64.tar.bz2#c4fa3da42156bed4a9d912433b618a141e0c5161d7cc8c328786736ea5d1c2da" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.7.1-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.7.1-linux_x86_64-portable.tar.bz2#8a6a194963eb58d582413c4bcdef6119f9f9f117a05032d1fb13192d934510c6" "pypy" verify_py27 ensurepip
+    install_package "pypy-5.7.1-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.7.1-linux_x86_64-portable.tar.bz2#8a6a194963eb58d582413c4bcdef6119f9f9f117a05032d1fb13192d934510c6" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
-  install_package "pypy2-v5.7.1-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.1-osx64.tar.bz2#4e99ba356432861534917a9477ace0ccee617bd631512759a530f8383e153a3d" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v5.7.1-osx64" "https://downloads.python.org/pypy/pypy2-v5.7.1-osx64.tar.bz2#4e99ba356432861534917a9477ace0ccee617bd631512759a530f8383e153a3d" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy2-v5.7.1-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.7.1-win32.zip#a3ba7c946635236836f8536d8767a0f456b3b9a86876cb5c3173a04522bf451b" "pypy" verify_py27 ensurepip
+  install_zip "pypy2-v5.7.1-win32" "https://downloads.python.org/pypy/pypy2-v5.7.1-win32.zip#a3ba7c946635236836f8536d8767a0f456b3b9a86876cb5c3173a04522bf451b" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

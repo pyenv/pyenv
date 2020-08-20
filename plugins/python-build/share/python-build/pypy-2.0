@@ -1,26 +1,26 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   require_distro "Ubuntu 10.04" || true
-  install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux.tar.bz2#275dbbee67eac527a1177403a0386b17d008740f83030544800d87994edd46b9" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.0" "https://downloads.python.org/pypy/pypy-2.0-linux.tar.bz2#275dbbee67eac527a1177403a0386b17d008740f83030544800d87994edd46b9" "pypy" verify_py27 ensurepip
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.0-alpha-arm" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armel.tar.bz2#2f8f252d43a15661602a98f93d3292e333423459c5facb43eb2de1bda8eb8495" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.0-alpha-arm" "https://downloads.python.org/pypy/pypy-2.0-alpha-arm-armel.tar.bz2#2f8f252d43a15661602a98f93d3292e333423459c5facb43eb2de1bda8eb8495" "pypy" verify_py27 ensurepip
     ;;
 "linux-armhf" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.0-alpha-arm" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-alpha-arm-armhf.tar.bz2#00e678e5a226be0692ee18438ace1c91d346256cfab8f32e34a24584d018ca34" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.0-alpha-arm" "https://downloads.python.org/pypy/pypy-2.0-alpha-arm-armhf.tar.bz2#00e678e5a226be0692ee18438ace1c91d346256cfab8f32e34a24584d018ca34" "pypy" verify_py27 ensurepip
   ;;
 "linux64" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-linux64.tar.bz2#14c716d53a507eece89606d547456b886dbdfc0ba6e3fb29062fafe86d1b6038" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.0" "https://downloads.python.org/pypy/pypy-2.0-linux64.tar.bz2#14c716d53a507eece89606d547456b886dbdfc0ba6e3fb29062fafe86d1b6038" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
-  install_package "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-osx64.tar.bz2#6d190f32c9dce9d36d4a2bb91faed581a50fb7fa6249eee201dbf5dbc3e3c7d7" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.0" "https://downloads.python.org/pypy/pypy-2.0-osx64.tar.bz2#6d190f32c9dce9d36d4a2bb91faed581a50fb7fa6249eee201dbf5dbc3e3c7d7" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.0" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.0-win32.zip#2f1d5a0d2cb2fa61902eba5479b100d6d26aab211149b06d5acf64089dd20fe1" "pypy" verify_py27 ensurepip
+  install_zip "pypy-2.0" "https://downloads.python.org/pypy/pypy-2.0-win32.zip#2f1d5a0d2cb2fa61902eba5479b100d6d26aab211149b06d5acf64089dd20fe1" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo
