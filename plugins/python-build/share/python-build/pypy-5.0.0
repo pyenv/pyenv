@@ -3,7 +3,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 10.04" 1>/dev/null 2>&1; then
   install_package "pypy-5.0.0-linux" "https://downloads.python.org/pypy/pypy-5.0.0-linux.tar.bz2#a9cc9afa94ff1cde811626a70081c477c9840e7816c0562d1903fd823d222ceb" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.0-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.0-linux_i686-portable.tar.bz2#316e03afdd2f6212857789933c01f0d41a1665c80d28526c0fb4082b6d3f4f60" "pypy" verify_py27 ensurepip
+  install_package "pypy-5.0-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.0-linux_i686-portable.tar.bz2#316e03afdd2f6212857789933c01f0d41a1665c80d28526c0fb4082b6d3f4f60" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
@@ -30,7 +30,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
   install_package "pypy-5.0.0-linux64" "https://downloads.python.org/pypy/pypy-5.0.0-linux64.tar.bz2#b9c73be8e3c3b0835df83bdb86335712005240071cdd4dc245ac30b457063ae0" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.0-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.0-linux_x86_64-portable.tar.bz2#57c9ea251bf1e7074e14aeecdd1ac8bb2fc53dbf3f90a9613d03e33076a7fa08" "pypy" verify_py27 ensurepip
+  install_package "pypy-5.0-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.0-linux_x86_64-portable.tar.bz2#57c9ea251bf1e7074e14aeecdd1ac8bb2fc53dbf3f90a9613d03e33076a7fa08" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )

@@ -16,7 +16,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
   install_package "pypy3.6-v7.1.1-linux64" "https://downloads.python.org/pypy/pypy3.6-v7.1.1-linux64.tar.bz2#8014f63b1a34b155548852c7bf73aab2d41ebddf2c8fb603dc9dd8509be93db0" "pypy" verify_py36 ensurepip
   else
-    install_package "pypy3.6-7.1.1-beta-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3.6-7.1.1-beta-linux_x86_64-portable.tar.bz2#82c878b61ad34fc2cf1686fa600a7a002d352e1b33a99a43007eec486ecd068e" "pypy" verify_py36 ensurepip
+  install_package "pypy3.6-7.1.1-beta-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy3.6-7.1.1-beta-linux_x86_64-portable.tar.bz2#82c878b61ad34fc2cf1686fa600a7a002d352e1b33a99a43007eec486ecd068e" "pypy" verify_py36 ensurepip
   fi
   ;;
 "osx64" )

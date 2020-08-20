@@ -3,7 +3,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
   install_package "pypy2-v5.6.0-linux32" "https://downloads.python.org/pypy/pypy2-v5.6.0-linux32.tar.bz2#5d4ad43aed5c5e147f7e7c84766c729f34f63b714b6d224e912a2bb42dc95d62" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.6-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.6-linux_i686-portable.tar.bz2#1f220e05ddd4423882794f0e9d3e2dfdecee259d00f1151a52dd244607313399" "pypy" verify_py27 ensurepip
+  install_package "pypy-5.6-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.6-linux_i686-portable.tar.bz2#1f220e05ddd4423882794f0e9d3e2dfdecee259d00f1151a52dd244607313399" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
@@ -22,7 +22,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
   install_package "pypy2-v5.6.0-linux64" "https://downloads.python.org/pypy/pypy2-v5.6.0-linux64.tar.bz2#aad55328cb0673a60b2633dcc3c36cf452917ac906b577eb3aed5876a7666fca" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.6-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.6-linux_x86_64-portable.tar.bz2#9bd220bc54000e142bd4929435959305efeef8c832fbe3c907211cc5214095ce" "pypy" verify_py27 ensurepip
+  install_package "pypy-5.6-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.6-linux_x86_64-portable.tar.bz2#9bd220bc54000e142bd4929435959305efeef8c832fbe3c907211cc5214095ce" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )

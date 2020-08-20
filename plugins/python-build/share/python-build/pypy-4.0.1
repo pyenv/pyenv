@@ -3,7 +3,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 10.04" 1>/dev/null 2>&1; then
   install_package "pypy-4.0.1-linux" "https://downloads.python.org/pypy/pypy-4.0.1-linux.tar.bz2#721920fcbb6aefc9a98e868e32b7f4ea5fd68b7f9305d08d0a2595327c9c0611" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-4.0.1-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-4.0.1-linux_i686-portable.tar.bz2#2a1078bf36372b1c2919c11c418860dd7f0d44c92e6772bb36490eaf793b5c47" "pypy" verify_py27 ensurepip
+  install_package "pypy-4.0.1-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-4.0.1-linux_i686-portable.tar.bz2#2a1078bf36372b1c2919c11c418860dd7f0d44c92e6772bb36490eaf793b5c47" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )

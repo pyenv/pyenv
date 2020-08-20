@@ -16,7 +16,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
   install_package "pypy2.7-v7.1.0-linux64" "https://downloads.python.org/pypy/pypy2.7-v7.1.0-linux64.tar.bz2#fef176a29a2ef068c00c8098e59dab935ca6e956f089672b3f7351da95a034f5" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-7.1.0-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-7.1.0-linux_x86_64-portable.tar.bz2#ee917d9d72fb6a7d15e31e6c5e470ce561a940f112e99f29ac5dd6b41f512657" "pypy" verify_py27 ensurepip
+  install_package "pypy-7.1.0-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-7.1.0-linux_x86_64-portable.tar.bz2#ee917d9d72fb6a7d15e31e6c5e470ce561a940f112e99f29ac5dd6b41f512657" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )

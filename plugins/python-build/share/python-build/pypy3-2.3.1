@@ -3,7 +3,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 10.04" 1>/dev/null 2>&1; then
   install_package "pypy3-2.3.1-linux" "https://downloads.python.org/pypy/pypy3-2.3.1-linux.tar.bz2#7eddc6826e58c9c89e68b59ec8caf1596b76401517ad8d26ad5e18e0ffa45db9" "pypy" verify_py32 ensurepip
   else
-    install_package "pypy3-2.3.1-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3-2.3.1-linux_i686-portable.tar.bz2#32a5b3fd4299b13aedf7bc6262eee0f6be9a27744ccf787718553d973ec38abb" "pypy" verify_py32 ensurepip
+  install_package "pypy3-2.3.1-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy3-2.3.1-linux_i686-portable.tar.bz2#32a5b3fd4299b13aedf7bc6262eee0f6be9a27744ccf787718553d973ec38abb" "pypy" verify_py32 ensurepip
   fi
   ;;
 "linux-armel" )
@@ -22,7 +22,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" 1>/dev/null 2>&1; then
   install_package "pypy3-2.3.1-linux64" "https://downloads.python.org/pypy/pypy3-2.3.1-linux64.tar.bz2#303df2cf4766db20ec77786d9091dce284fdab01d7173c5828a35e86bc931b99" "pypy" verify_py32 ensurepip
   else
-    install_package "pypy3-2.3.1-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3-2.3.1-linux_x86_64-portable.tar.bz2#cb56b5bde8f444d44a0ea9cd475ddeed00aa895f3dcc89fd37577a51439540aa" "pypy" verify_py32 ensurepip
+  install_package "pypy3-2.3.1-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy3-2.3.1-linux_x86_64-portable.tar.bz2#cb56b5bde8f444d44a0ea9cd475ddeed00aa895f3dcc89fd37577a51439540aa" "pypy" verify_py32 ensurepip
   fi
   ;;
 "osx64" )
