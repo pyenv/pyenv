@@ -9,10 +9,10 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-  install_package "pypy-2.3-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy-2.3-linux-armhf-raspbian.tar.bz2#92584cfccde188b6a3a850ecf226daa9924788a1da8574c57c10a7551fb127d4" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.3-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy-2.3-linux-armhf-raspbian.tar.bz2#92584cfccde188b6a3a850ecf226daa9924788a1da8574c57c10a7551fb127d4" "pypy" verify_py27 ensurepip
   else
     require_distro "Ubuntu 13.04" || true
-  install_package "pypy-2.3-linux-armhf-raring" "https://downloads.python.org/pypy/pypy-2.3-linux-armhf-raring.tar.bz2#c8c4a4da406db8ea6dfec074951e1ac150619b0709317ceaafb6bdd837acf96e" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.3-linux-armhf-raring" "https://downloads.python.org/pypy/pypy-2.3-linux-armhf-raring.tar.bz2#c8c4a4da406db8ea6dfec074951e1ac150619b0709317ceaafb6bdd837acf96e" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux64" )
