@@ -32,7 +32,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_osx_version "10.13"; then
     install_package "pypy3-v5.10.1-osx64" "https://downloads.python.org/pypy/pypy3-v5.10.1-osx64.tar.bz2#52f006611513c995fdebba6e72d394186d4085460408cbbe086e5467bf3fb9b6" "pypy" verify_py27 ensurepip
   else
-  #  install_package "pypy3-v5.10.1-osx64-2" "https://bitbucket.org/pypy/pypy/downloads/pypy3-v5.10.1-osx64-2.tar.bz2#" "pypy" verify_py27 ensurepip
+  #  install_package "pypy3-v5.10.1-osx64-2" "https://downloads.python.org/pypy/pypy3-v5.10.1-osx64.tar.bz2#52f006611513c995fdebba6e72d394186d4085460408cbbe086e5467bf3fb9b6" "pypy" verify_py27 ensurepip
     { echo
       colorize 1 "ERROR"
       echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."

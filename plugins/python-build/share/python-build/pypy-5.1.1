@@ -18,19 +18,11 @@ case "$(pypy_architecture 2>/dev/null || true)" in
     install_package "pypy-5.1.1-linux-armhf-raring" "https://downloads.python.org/pypy/pypy-5.1.1-linux-armhf-raring.tar.bz2#c4bcdabccd15669ea44d1c715cd36b2ca55b340a27b63e1a92ef5ab6eb158a8d" "pypy" verify_py27 ensurepip
   fi
   ;;
-#"linux-ppc64" )
-#  require_distro "Fedora 20" || true
-#  install_package "pypy-5.1.1-ppc64" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.1-ppc64.tar.bz2#FIXME" "pypy" verify_py27 ensurepip
-#  ;;
-#"linux-ppc64le" )
-#  require_distro "Fedora 21" || true
-#  install_package "pypy-5.1.1-ppc64le" "https://bitbucket.org/pypy/pypy/downloads/pypy-5.1.1-ppc64le.tar.bz2#FIXME" "pypy" verify_py27 ensurepip
-#  ;;
 "linux64" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy-5.1.1-linux64" "https://downloads.python.org/pypy/pypy-5.1.1-linux64.tar.bz2#c852622e8bc81618c137da35fcf57b2349b956c07b6fd853300846e3cefa64fc" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.1.1-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.1.1-linux_x86_64-portable.tar.bz2#c0502d8db1cc2b81513cc6047813669b0a561cb20e41d60e179f51fe8657a794" "pypy" verify_py27 ensurepip
+    install_package "pypy-5.1.1-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.1.1-linux_x86_64-portable.tar.bz2#c0502d8db1cc2b81513cc6047813669b0a561cb20e41d60e179f51fe8657a794" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )

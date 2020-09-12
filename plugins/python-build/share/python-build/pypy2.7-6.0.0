@@ -20,8 +20,13 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
     install_package "pypy2-v6.0.0-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy2-v6.0.0-linux-armhf-raspbian.tar.bz2#6506ce739e31981e5596d3cc2e2c7f5b086ee77bb4d97773082b62b2f283eef2" "pypy" verify_py27 ensurepip
   else
-    require_distro "Ubuntu 13.04" || true
-    install_package "pypy2-v6.0.0-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v6.0.0-linux-armhf-raring.tar.bz2#2c430240cecb562102c677598f106aa57899f00cd37f719989e18ed9ca44bd01" "pypy" verify_py27 ensurepip
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+      echo "try 'pypy2-6.0.0-src' to build from source."
+      echo
+    } >&2
+    exit 1
   fi
   ;;
 "linux64" )
