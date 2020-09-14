@@ -1871,7 +1871,7 @@ done
 DEFINITION_PATH="${ARGUMENTS[0]}"
 if [ -z "$DEFINITION_PATH" ]; then
   usage 1 >&2
-elif [ ! -f "$DEFINITION_PATH" ]; then
+elif [[ ! "$DEFINITION_PATH" =~ \/ || ! -f "$DEFINITION_PATH" ]]; then
   for DEFINITION_DIR in "${PYTHON_BUILD_DEFINITIONS[@]}"; do
     if [ -f "${DEFINITION_DIR}/${DEFINITION_PATH}" ]; then
       DEFINITION_PATH="${DEFINITION_DIR}/${DEFINITION_PATH}"
