@@ -94,7 +94,7 @@ export PYENV_DIR
 shopt -s nullglob
 
 bin_path="$(abs_dirname "$0")"
-for plugin_bin in "${PYENV_ROOT}/plugins/"*/bin; do
+for plugin_bin in {${PYENV_ROOT},${PYENV_DIR}}/plugins/*/bin; do
   PATH="${plugin_bin}:${PATH}"
 done
 export PATH="${bin_path}:${PATH}"
