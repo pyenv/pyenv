@@ -67,9 +67,9 @@ members of the project's leadership.
 
 ## Project Maintainers
 
-* Sam Stephenson <<sstephenson@gmail.com>>
-* Mislav Marohnić <<mislav.marohnic@gmail.com>>
-* Erik Michaels-Ober <<sferik@gmail.com>>
+* Yamashita, Yuu <<peek824545201@gmail.com>>
+* Daniel Hahler <<git@thequod.de>>
+* Josh Friend <<josh@fueledbycaffeine.com>>
 
 ## Attribution
 
