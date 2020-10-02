@@ -27,7 +27,7 @@ command_path() {
 }
 
 extract_initial_comment_block() {
-  LC_CTYPE=C
+  LC_ALL=C
   LANG=C
   sed -ne "
     /^#/ !{
