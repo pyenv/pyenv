@@ -70,7 +70,7 @@ if [ -z "$print" ]; then
     echo
     case "$shell" in
     fish )
-      echo 'status --is-interactive; and source (pyenv init -|psub)'
+      echo 'pyenv init - | source'
       ;;
     * )
       echo 'eval "$(pyenv init -)"'
