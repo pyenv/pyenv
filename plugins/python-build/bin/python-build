@@ -480,7 +480,12 @@ reuse_existing_tarball() {
 }
 
 download_tarball() {
-  local package_url="$1"
+  local official_source="www.python.org/ftp/python"
+  if [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ]; then
+      local package_url="$(echo "$1" | sed -e "s|.*//${URL_BASE:-$official_source}|$PYTHON_BUILD_MIRROR_URL|g")"
+  else
+      local package_url="$1"
+  fi
   [ -n "$package_url" ] || return 1
 
   local package_filename="$2"
@@ -1953,7 +1958,11 @@ else
   PYTHON_BUILD_DEFAULT_MIRROR=
 fi
 
-if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ] || ! has_checksum_support compute_sha2; then
+if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ]; then
+  unset PYTHON_BUILD_MIRROR_URL
+fi
+
+if ! has_checksum_support compute_sha2 && ! [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ] ; then
   unset PYTHON_BUILD_MIRROR_URL
 fi
 
