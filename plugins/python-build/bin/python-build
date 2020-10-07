@@ -1493,6 +1493,9 @@ use_xcode_sdk_zlib() {
   if [ -d "$xc_sdk_path" ]; then
     echo "python-build: use zlib from xcode sdk"
     export CFLAGS="-I${xc_sdk_path}/usr/include ${CFLAGS}"
+    if is_mac -ge 1100; then
+      export LDFLAGS="-L${xc_sdk_path}/usr/lib ${LDFLAGS}"
+    fi
   fi
 }
 
