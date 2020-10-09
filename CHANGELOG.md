@@ -1,5 +1,22 @@
 ## Version History
 
+## 1.2.21
+
+* python-build: Add CPython 3.9.0 (#1706)
+* python-build: Add CPython 3.8.6 (#1698)
+* python-build: Add CPython 3.7.9 (#1680)
+* python-build: Add CPython 3.6.12 (#1680)
+* python-build: Add CPython 3.5.10 (#1690)
+* python-build: Add Jython 2.7.2 (#1672)
+* python-build: Add Graalpython 20.1.0 (#1594)
+* python-build: Add Graalpython 20.2.0 (#1594)
+* python-build: Add Anaconda3-2020.07 (#1684)
+* python-build: Add micropython-1.13 (#1704)
+* python-build: Fix PyPy download links (#1682)
+* python-build: Support for `PYTHON_BUILD_MIRROR_URL` when checksums do not exist (#1673)
+* pyenv: Search for plugins in `PYENV_DIR` and `PYENV_ROOT` (#1697)
+* pyenv-help: Fix 'sed: RE error: illegal byte sequence' (#1670)
+
 ## 1.2.20
 
 * python-build: Add CPython 3.8.5 (#1667)
