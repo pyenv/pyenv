@@ -339,8 +339,11 @@ as part of GitHub checkout process outlined above or via Homebrew, you
 should be able to:
 
 ~~~ sh
-# list all available versions:
+# list latest stable versions:
 $ rbenv install -l
+
+# list all local versions:
+$ rbenv install -L
 
 # install a Ruby version:
 $ rbenv install 2.0.0-p247
