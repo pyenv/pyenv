@@ -304,6 +304,94 @@ make install
 OUT
 }
 
+@test "yaml is linked from MacPorts" {
+  cached_tarball "Python-3.6.2"
+
+  port_libdir="$TMP/port-yaml/opt/local"
+  mkdir -p "$port_libdir"
+
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub port "-q location libyaml : echo '$port_libdir/opt/local'"
+  for i in {1..6}; do stub port false; done
+  stub_make_install
+
+  install_fixture definitions/needs-yaml
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$port_libdir/include -I${TMP}/install/include" LDFLAGS="-L$port_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "readline is linked from MacPorts" {
+  cached_tarball "Python-3.6.2"
+
+  readline_libdir="$TMP/port-readline/opt/local"
+  mkdir -p "$readline_libdir"
+  for i in {1..8}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  for i in {1..3}; do stub port false; done
+  stub port "-q location readline : echo '$readline_libdir'"
+  for i in {1..2}; do stub port false; done
+  stub_make_install
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$readline_libdir/include -I${TMP}/install/include" LDFLAGS="-L$readline_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "ncurses is linked from MacPorts" {
+  cached_tarball "Python-3.6.2"
+
+  ncurses_libdir="$TMP/port-ncurses/opt/local"
+  mkdir -p "$ncurses_libdir"
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  for i in {1..4}; do stub port false; done
+  stub port "-q location ncurses : echo '$ncurses_libdir'"
+  stub port false
+  stub_make_install
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$ncurses_libdir/include -I${TMP}/install/include" LDFLAGS="-L$ncurses_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
 @test "openssl is linked from Ports in FreeBSD if present" {
   cached_tarball "Python-3.6.2"
 
@@ -617,6 +705,75 @@ make -j 2
 make install
 OUT
 }
+
+@test "MacPorts is not touched if PYTHON_BUILD_SKIP_MACPORTS is set" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub port true; port
+  stub_make_install
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "install aborted when PYTHON_BUILD_USE_HOMEBREW and PYTHON_BUILD_USE_MACPORTS both set" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub_make_install
+  export PYTHON_BUILD_USE_HOMEBREW=1
+  export PYTHON_BUILD_USE_MACPORTS=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_failure "Installing Python-3.6.2...
+error: mutually exclusive environment variables PYTHON_BUILD_USE_HOMEBREW and PYTHON_BUILD_USE_MACPORTS are set"
+
+  unstub uname
+  unstub make
+}
+
+@test "MacPorts is not used in non-MacOS" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
+  stub_make_install
+
+  run_inline_definition <<DEF
+  export PYTHON_BUILD_USE_MACPORTS=1
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=${TMP}/install/lib
+make -j 2
+make install
+OUT
+}
+
 @test "number of CPU cores defaults to 2" {
   cached_tarball "Python-3.6.2"
 
