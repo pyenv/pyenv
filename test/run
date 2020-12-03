@@ -6,4 +6,4 @@ if [ -n "$RBENV_NATIVE_EXT" ]; then
   make -C src
 fi
 
-exec bats ${CI:+--tap} test
+exec bats ${CI:+--tap} "${@:-test}"
