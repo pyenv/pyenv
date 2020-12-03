@@ -349,6 +349,8 @@ $ rbenv install -L
 $ rbenv install 2.0.0-p247
 ~~~
 
+Set a Ruby version to finish installation and start using commands `rbenv global 2.0.0-p247` or `rbenv local 2.0.0-p247`
+
 Alternatively to the `install` command, you can download and compile
 Ruby manually as a subdirectory of `~/.rbenv/versions/`. An entry in
 that directory can also be a symlink to a Ruby version installed
