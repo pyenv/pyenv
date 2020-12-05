@@ -64,16 +64,27 @@ if [ -d "$versions_dir" ]; then
   versions_dir="$(realpath "$versions_dir")"
 fi
 
+if ((${BASH_VERSINFO[0]} > 3)); then
+  declare -A current_versions
+else
+  current_versions=()
+fi
 if [ -n "$bare" ]; then
   hit_prefix=""
   miss_prefix=""
-  current_versions=()
   include_system=""
 else
   hit_prefix="* "
   miss_prefix="  "
   OLDIFS="$IFS"
-  IFS=: current_versions=($(pyenv-version-name || true))
+  IFS=:
+  if ((${BASH_VERSINFO[0]} > 3)); then
+    for i in $(pyenv-version-name || true); do
+      current_versions["$i"]="1"
+    done
+  else
+    current_versions=($(pyenv-version-name || true))
+  fi
   IFS="$OLDIFS"
   include_system="1"
 fi
@@ -93,7 +104,9 @@ exists() {
 }
 
 print_version() {
-  if exists "$1" "${current_versions[@]}"; then
+  if [[ ${BASH_VERSINFO[0]} -ge 4 && ${current_versions["$1"]} ]]; then
+    echo "${hit_prefix}$1 (set by $(pyenv-version-origin))"
+  elif (( ${BASH_VERSINFO[0]} < 3 )) && exists "$1" "${current_versions[@]}"; then
     echo "${hit_prefix}$1 (set by $(pyenv-version-origin))"
   else
     echo "${miss_prefix}$1"
