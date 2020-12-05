@@ -45,8 +45,8 @@ for (( i=1; i<="${PYENV_REHASH_TIMEOUT:-60}"; i++ )); do
     acquired=1
     break
   else
-    # POSIX sleep(1) doesn't provides time precision of subsecond
-    sleep 1
+    # POSIX sleep(1) doesn't provide subsecond precision, but many others do
+    sleep 0.1 2>/dev/null || sleep 1
   fi
 done
 
