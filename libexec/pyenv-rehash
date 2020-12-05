@@ -123,34 +123,62 @@ make_shims() {
   done
 }
 
-registered_shims=" "
+if ((${BASH_VERSINFO[0]} > 3)); then
 
-# Registers the name of a shim to be generated.
-register_shim() {
-  registered_shims="${registered_shims}${1} "
-}
+  declare -A registered_shims
 
-# Install all the shims registered via `make_shims` or `register_shim` directly.
-install_registered_shims() {
-  local shim file
-  for shim in $registered_shims; do
-    file="${SHIM_PATH}/${shim}"
-    [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
-  done
-}
+  # Registers the name of a shim to be generated.
+  register_shim() {
+    registered_shims["$1"]=1
+  }
 
-# Once the registered shims have been installed, we make a second pass
-# over the contents of the shims directory. Any file that is present
-# in the directory but has not been registered as a shim should be
-# removed.
-remove_stale_shims() {
-  local shim
-  for shim in "$SHIM_PATH"/*; do
-    if [[ "$registered_shims" != *" ${shim##*/} "* ]]; then
-      rm -f "$shim"
-    fi
-  done
-}
+  # Install all shims registered via `make_shims` or `register_shim` directly.
+  install_registered_shims() {
+    local shim file
+    for shim in "${!registered_shims[@]}"; do
+      file="${SHIM_PATH}/${shim}"
+      [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
+    done
+  }
+
+  # Once the registered shims have been installed, we make a second pass
+  # over the contents of the shims directory. Any file that is present
+  # in the directory but has not been registered as a shim should be
+  # removed.
+  remove_stale_shims() {
+    local shim
+    for shim in "$SHIM_PATH"/*; do
+      if [[ ! ${registered_shims["${shim##*/}"]} ]]; then
+        rm -f "$shim"
+      fi
+    done
+  }
+
+else # Same for bash < 4.
+
+    registered_shims=" "
+
+    register_shim() {
+      registered_shims="${registered_shims}${1} "
+    }
+
+    install_registered_shims() {
+      local shim file
+      for shim in $registered_shims; do
+        file="${SHIM_PATH}/${shim}"
+        [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
+      done
+    }
+
+    remove_stale_shims() {
+      local shim
+      for shim in "$SHIM_PATH"/*; do
+        if [[ "$registered_shims" != *" ${shim##*/} "* ]]; then
+          rm -f "$shim"
+        fi
+      done
+    }
+fi
 
 shopt -s nullglob
 
