@@ -167,6 +167,10 @@ We'd recommend to install pyenv-virtualenv as well if you have some plan to play
 
 ## Installation
 
+### Prerequisites:
+
+For pyenv to install python correctly you should [**install the Python build dependencies**](https://github.com/pyenv/pyenv/wiki#suggested-build-environment).
+
 ### Homebrew on macOS
 
    1. Consider installing with [Homebrew](https://brew.sh)
