@@ -17,17 +17,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-VERSION='20.2.0'
+VERSION='20.3.0'
 BUILD=''
 
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux64" )
   graalpython_arch="linux"
-  checksum="9ba0447523a6cf6f8b74fef2b918672762b7d7f67be9f5be8ab6b479f173cfd7"
+  checksum="121508c64c2f18e9a57294d38a4c090c7a9417087f8549e120d0050906e2c82f"
   ;;
 "osx64" )
   graalpython_arch="macos"
-  checksum="e06f8e6f5766483d5613eca6a4703cec8a93236443c7c6f2866b31307e62bbe6"
+  checksum="1a80bf3fde2dc2d0fdc92605176c281835d912c26847346150b3be82d2a250e0"
   ;;
 * )
   { echo
