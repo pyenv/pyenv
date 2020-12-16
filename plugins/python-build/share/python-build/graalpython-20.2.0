@@ -42,7 +42,7 @@ esac
 if [ -n "${BUILD}" ]; then
   urlprefix="https://github.com/graalvm/graalvm-ce-dev-builds/releases/download/${VERSION}-${BUILD}"
 else
-  urlprefix="https://github.com/graalvm/graalpython/releases/download/vm-${VERSION}"
+  urlprefix="https://github.com/oracle/graalpython/releases/download/vm-${VERSION}"
 fi
 
 install_package "graalpython-${VERSION}${BUILD}" "${urlprefix}/graalpython-${VERSION}-${graalpython_arch}-amd64.tar.gz#${checksum}" "graalpython" ensurepip
