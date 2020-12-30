@@ -995,7 +995,13 @@ build_package_activepython() {
 
 anaconda_architecture() {
   case "$(uname -s)" in
-  "Darwin" ) echo "MacOSX-x86_64" ;;
+  "Darwin" )
+    case "$(uname -m)" in
+    "arm64" ) echo "MacOSX-arm64" ;;
+    "i386" | "x86_64" ) echo "MacOSX-x86_64" ;;
+    * ) return 1 ;;
+    esac
+    ;;
   "Linux" )
     case "$(uname -m)" in
     "armv7l" ) echo "Linux-armv7l" ;;
