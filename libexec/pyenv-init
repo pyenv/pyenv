@@ -84,13 +84,16 @@ fi
 
 mkdir -p "${PYENV_ROOT}/"{shims,versions}
 
+no_path=1
+[[ ":${PATH}:" != *":${PYENV_ROOT}/shims:"* ]] && no_path=""
+
 case "$shell" in
 fish )
-  echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+  [[ -z "$no_path" ]] && echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
   echo "set -gx PYENV_SHELL $shell"
 ;;
 * )
-  echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  [[ -z "$no_path" ]] && echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
   echo "export PYENV_SHELL=$shell"
 ;;
 esac
