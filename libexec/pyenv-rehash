@@ -40,7 +40,8 @@ if [ ! -w "$SHIM_PATH" ]; then
 fi
 
 unset acquired
-for (( i=1; i<="${PYENV_REHASH_TIMEOUT:-60}"; i++ )); do
+start=$SECONDS
+while (( SECONDS <= start + ${PYENV_REHASH_TIMEOUT:-60} )); do
   if acquire_lock 2>/dev/null; then
     acquired=1
     break
