@@ -1,5 +1,17 @@
 ## Version History
 
+## 1.2.22
+
++ python-build: Add LDFLAGS for zlib on macOS >= 1100 (#1711)
++ python-build: Add the CPython 3.9.1 (#1752)
++ python-build: Change order of LDFLAGS paths (#1754)
++ python-build: Docker config for testing python-build (#1548)
++ python-build: Put prerequisite for installation before install (#1750)
++ python-build: Add GraalPython 20.3 (#1736)
++ python-build: Add CPython 3.8.7
++ python-build: Added anaconda3-2020.11 (#1774)
++ python-build: Added arm64 architecture support in python-build for macOS  (#1775)
+
 ## 1.2.21
 
 * python-build: Add CPython 3.9.0 (#1706)
