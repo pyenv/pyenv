@@ -250,7 +250,7 @@ easy to fork and contribute any changes back upstream.
 
    - For **Fish shell**:
      ~~~ fish
-     echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$pyenv init - | source"\nfi' >> ~/.bash_profile
+     echo -e '\n\n# pyenv init\nif command -v pyenv 1>/dev/null 2>&1\n  pyenv init - | source\nend' >> ~/.config/fish/config.fish
      ~~~
 
     **General warning**: There are some systems where the `BASH_ENV` variable is configured
