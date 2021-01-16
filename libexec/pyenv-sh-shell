@@ -49,7 +49,7 @@ if [ "$versions" = "--unset" ]; then
     echo "set -e PYENV_VERSION"
     ;;
   * )
-    echo 'PYENV_VERSION_OLD="$PYENV_VERSION"'
+    echo 'PYENV_VERSION_OLD="${PYENV_VERSION-}"'
     echo "unset PYENV_VERSION"
     ;;
   esac
@@ -110,7 +110,7 @@ if pyenv-prefix "${versions[@]}" >/dev/null; then
       echo "set -gx PYENV_VERSION \"$version\""
       ;;
     * )
-      echo 'PYENV_VERSION_OLD="$PYENV_VERSION"'
+      echo 'PYENV_VERSION_OLD="${PYENV_VERSION-}"'
       echo "export PYENV_VERSION=\"${version}\""
       ;;
     esac
