@@ -198,6 +198,10 @@ easy to fork and contribute any changes back upstream.
 
         git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 
+   Optionally, try to compile dynamic bash extension to speed up pyenv. Don't
+   worry if it fails; pyenv will still work normally:
+
+        cd ~/.pyenv && src/configure && make -C src
 
 2. **Define environment variable `PYENV_ROOT`** to point to the path where
    pyenv repo is cloned and add `$PYENV_ROOT/bin` to your `$PATH` for access
