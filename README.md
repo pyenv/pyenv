@@ -364,6 +364,11 @@ opposed to this idea. Here's what `pyenv init` actually does:
 
 To see exactly what happens under the hood for yourself, run `pyenv init -`.
 
+If you don't want to use `pyenv init` and shims, you can still benefit
+from pyenv's ability to install Python versions for you. Just run 
+`pyenv install` and you will find versions installed in 
+`$(pyenv root)/versions`, which you can manually execute or symlink 
+as required.
 
 ### Uninstalling Python Versions
 
