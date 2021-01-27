@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [2.7.18, 3.4.10, 3.5.10, 3.6.12, 3.7.9, 3.8.7, 3.9.1]
+        python-version: [2.7.6, 2.7.18, 3.4.10, 3.5.10, 3.6.12, 3.7.9, 3.8.7, 3.9.1]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,3 +23,12 @@ jobs:
               libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
               xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
       - run: bin/pyenv install ${{ matrix.python-version }}
+      - run: bin/pyenv global ${{ matrix.python-version }}
+      - run: bin/pyenv rehash
+      - run: python --version         || true
+      - run: python -m pip --version  || true
+      - run: python2 --version        || true
+      - run: python2 -m pip --version || true
+      - run: python3 --version        || true
+      - run: python3 -m pip --version || true
+        
