@@ -1,0 +1,25 @@
+name: ubuntu_tests
+on: [pull_request, push]
+jobs:
+  ubuntu_tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [2.7, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # Normally, we would use the superbly maintained...
+      # - uses: actions/setup-python@v2
+      #   with:
+      #    python-version: ${{ matrix.python-version }}
+      # ... but in the repo, we want to test pyenv builds on Ubuntu
+      # https://github.com/pyenv/pyenv#installation
+      - run: echo 'export PYENV_ROOT=$(pwd)' >> ~/.bash_profile
+      - run: echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
+      - run: echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
+      - run: |
+          sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev
+              libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev
+              xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+      - run: pyenv install ${{ matrix.python-version }}
