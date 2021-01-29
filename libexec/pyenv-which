@@ -39,7 +39,7 @@ OLDIFS="$IFS"
 IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name)})
 IFS="$OLDIFS"
 
-for version in "${versions[@]}"; do
+for version in "${versions[@]}" "system"; do
   if [ "$version" = "system" ]; then
     PATH="$(remove_from_path "${PYENV_ROOT}/shims")"
     PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
