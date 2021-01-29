@@ -1,0 +1,4 @@
+#require_gcc
+prefer_openssl11
+install_package "openssl-1.1.1f" "https://www.openssl.org/source/openssl-1.1.1f.tar.gz#186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35" mac_openssl --if has_broken_mac_openssl
+install_package "pypy3.6-v7.3.2-src" "https://downloads.python.org/pypy/pypy3.6-v7.3.2-src.tar.bz2#fd6175fed63ff9fccd7886068078853078948d98afae9bd4f5554c6f7873c10d" "pypy_builder" verify_py36 ensurepip
