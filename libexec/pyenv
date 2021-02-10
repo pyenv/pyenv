@@ -7,7 +7,8 @@ if [ "$1" = "--debug" ]; then
 fi
 
 if [ -n "$PYENV_DEBUG" ]; then
-  export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
+  # https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful
+  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
   set -x
 fi
 
