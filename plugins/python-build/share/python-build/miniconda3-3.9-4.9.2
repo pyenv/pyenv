@@ -6,7 +6,7 @@ case "$(anaconda_architecture 2>/dev/null || true)" in
   install_script "Miniconda3-py39_4.9.2-Linux-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-Linux-x86_64.sh#b4e46fcc8029e2cfa731b788f25b1d36" "miniconda" verify_py39
   ;;
 "MacOSX-x86_64" )
-  install_script "Miniconda3-py39_4.9.2-MacOSX-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.8.3-MacOSX-x86_64.sh#0658832393a50f5a578bcad825304886" "miniconda" verify_py39
+  install_script "Miniconda3-py39_4.9.2-MacOSX-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-MacOSX-x86_64.sh#0658832393a50f5a578bcad825304886" "miniconda" verify_py39
   ;;
 * )
   { echo
