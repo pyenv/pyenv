@@ -168,9 +168,9 @@ If you're on macOS, we recommend installing rbenv with
     To upgrade to the latest rbenv and update ruby-build with newly released
     Ruby versions, upgrade the Homebrew packages:
 
-~~~ sh
-$ brew upgrade rbenv ruby-build
-~~~
+    ~~~ sh
+    $ brew upgrade rbenv ruby-build
+    ~~~
 - **Debian, Ubuntu and their derivatives**
     ~~~ sh
     $ sudo apt install rbenv
@@ -179,7 +179,7 @@ $ brew upgrade rbenv ruby-build
 
   Archlinux has an [AUR Package](https://aur.archlinux.org/packages/rbenv/) for
   rbenv and you can install it from the AUR using the instructions from this
-  [wiki page](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages)
+  [wiki page](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages).
 
 2. Set up rbenv in your shell.
 
@@ -244,13 +244,13 @@ a systemwide install.
      
    * For **Ubuntu Desktop**:
    
-   In Ubuntu ~/.bash_profile is only sourced by bash when started in interactive login mode. 
-   That is typically only when you login at the console (Ctrl+Alt+F1..F6), or connecting via ssh.
-   This issue is explained in details 
-   [here](https://askubuntu.com/questions/121073/why-bash-profile-is-not-getting-sourced-when-opening-a-terminal#121075).
-     ~~~ bash
-     $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
-     ~~~
+     In Ubuntu ~/.bash_profile is only sourced by bash when started in interactive login mode. 
+     That is typically only when you login at the console (Ctrl+Alt+F1..F6), or connecting via ssh.
+     This issue is explained in detail 
+     [here](https://askubuntu.com/questions/121073/why-bash-profile-is-not-getting-sourced-when-opening-a-terminal#121075).
+       ~~~ bash
+       $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
+       ~~~
      
    * For **Zsh**:
      ~~~ zsh
@@ -433,7 +433,7 @@ uninstall from the system.
         
         `sudo apt purge rbenv`
   
-  - Archlinux and it's derivatives:
+   - Archlinux and it's derivatives:
   
           `sudo pacman -R rbenv`
 
