@@ -106,7 +106,7 @@ exists() {
 print_version() {
   if [[ ${BASH_VERSINFO[0]} -ge 4 && ${current_versions["$1"]} ]]; then
     echo "${hit_prefix}$1 (set by $(pyenv-version-origin))"
-  elif (( ${BASH_VERSINFO[0]} < 3 )) && exists "$1" "${current_versions[@]}"; then
+  elif (( ${BASH_VERSINFO[0]} <= 3 )) && exists "$1" "${current_versions[@]}"; then
     echo "${hit_prefix}$1 (set by $(pyenv-version-origin))"
   else
     echo "${miss_prefix}$1"
