@@ -1,5 +1,26 @@
 ## Version History
 
+## 1.2.23
+
++ python-build: Add CPython v3.7.10 (#1818)
++ python-build: Add CPython v3.6.13 (#1817)
+* python-build: Add PyPy 3.7-c-jit-latest (#1812)
+* python-build: Add PyPy 3.7 (#1718, #1726, #1780)
+* python-build: Add miniconda3 4.9.2 (#1763)
+* python-build: Add miniconda3 4.8.3 (#1763)
+* python-build: Add miniconda3 4.8.2 (#1763)
+* python-build: Add Miniforge3-4.9.2 (#1782)
+* python-build: Fix download links for some PyPy and Stackless versions (#1692)
+* python-build: Add PYENV_DEBUG option (#1806)
+* python-build: Fix get-pip which dropped support for legacy Python (#1793)
+* pyenv-help: Fix `sed: RE error: illegal byte sequence` (#1714)
+* pyenv-versions: Fix not printing asterisk for current version in Bash 3 (#1815)
+* pyenv-prefix: "system" python - support cases where python3 is in PATH but not python (#1655)
+* pyenv-which: Added fallback to system executable (#1797)
+* pyenv-rehash: Use associative arrays for better performance on bash >= 4 (#1749)
+* pyenv-rehash: Try to sleep in 0.1 sec steps when acquiring lock (#1798)
+* pyenv: Use a better PS4 as recommended by Bash Hackers Wiki (#1810)
+
 ## 1.2.22
 
 + python-build: Add LDFLAGS for zlib on macOS >= 1100 (#1711)
