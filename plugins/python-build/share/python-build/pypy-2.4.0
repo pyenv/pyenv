@@ -30,7 +30,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.4.0-win32" "https://downloads.python.org/pypy/pypy-2.4.0-win32.zip#3eb8afdfa42bc9b08b4d3058e21d4ce978a52722fdcfdc67d6c3ee5013a51aaa" "pypy" verify_py27 ensurepip
+  install_zip "pypy-2.4.0-win32" "https://downloads.python.org/pypy/pypy-2.4.0-win32.zip#297fa3820a3aa8da291f52b6e2398b23232192b69773638e3d06999d92a2b0aa" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

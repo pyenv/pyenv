@@ -30,7 +30,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
     install_package "pypy-4.0.0-linux64" "https://downloads.python.org/pypy/pypy-4.0.0-linux64.tar.bz2#30365cf4fa6cd8e9ff44126f06dcaebefda35c2543ddcf9b9e8516c29cabe726" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-4.0-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-4.0-linux_x86_64-portable.tar.bz2#61fb04eaa823763b8de777e16edc02b09116985586f53c14c6e85d531072a38f" "pypy" verify_py27 ensurepip
+    install_package "pypy-4.0-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-4.0-linux_x86_64-portable.tar.bz2#61fb04eaa823763b8de777e16edc02b09116985586f53c14c6e85d531072a38f" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
@@ -38,7 +38,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-4.0.0-win32" "https://downloads.python.org/pypy/pypy-4.0.0-win32.zip#d906ffa98b120496cbbc1623d0fd08662c3a589340ae7071c669432eccf26e00" "pypy" verify_py27 ensurepip
+  install_zip "pypy-4.0.0-win32" "https://downloads.python.org/pypy/pypy-4.0.0-win32.zip#86493202261c62ba5b4b8840b1d0005bc9bf46af4f46d3b9a54ddbe8335da568" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo
