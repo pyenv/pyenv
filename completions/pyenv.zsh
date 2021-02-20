@@ -1,13 +1,28 @@
 #compdef pyenv
+if [[ ! -o interactive ]]; then
+    return
+fi
 
-_pyenv() {
-  local -a comples
-  if [ "${#words}" -eq 2 ]; then
-    comples=($(pyenv commands))
-  else
-    comples=($(pyenv completions ${words[2,-2]}))
-  fi
-  _describe -t comples 'comples' comples
-}
+local state line
+typeset -A opt_args
 
-_pyenv
+_arguments -C \
+    {--help,-h}'[Show help]' \
+    {--version,-v}'[Show pyenv version]' \
+    '(-): :->command' \
+    '*:: :->option-or-argument'
+
+case "$state" in
+    (command)
+        local -a commands
+        commands=(${(f)"$(pyenv commands)"})
+        _describe -t commands 'command' commands
+        ;;
+    (option-or-argument)
+        local -a args
+        args=(${(f)"$(pyenv completions ${line[1]})"})
+        _describe -t args 'arg' args
+        ;;
+esac
+
+return 0
