@@ -21,9 +21,9 @@ dist:
 
 # https://docs.travis-ci.com/user/reference/osx/#macos-version
 osx_image:
-- xcode9.4.1  # macOS 10.13
+- xcode9.4.1  # macOS 10.13.6
 - xcode10.3   # macOS 10.14.4
-- xcode11.6   # macOS 10.14.6
+- xcode11.6   # macOS 10.15.7
 - xcode12.2   # macOS 10.15.7
 
 env:
