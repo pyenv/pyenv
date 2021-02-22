@@ -2,10 +2,12 @@
 #
 # Summary: Display the full path to an executable
 #
-# Usage: pyenv which <command>
+# Usage: pyenv which <command> [--nosystem]
 #
 # Displays the full path to the executable that pyenv will invoke when
 # you run the given command.
+# Use --nosystem argument in case when you don't need to search command in the 
+# system environment.
 #
 
 set -e
@@ -14,6 +16,12 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   exec pyenv-shims --short
+fi
+
+if [ "$2" = "--nosystem" ]; then
+  system=""
+else
+  system="system"
 fi
 
 remove_from_path() {
@@ -39,7 +47,7 @@ OLDIFS="$IFS"
 IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name)})
 IFS="$OLDIFS"
 
-for version in "${versions[@]}" "system"; do
+for version in "${versions[@]}" "$system"; do
   if [ "$version" = "system" ]; then
     PATH="$(remove_from_path "${PYENV_ROOT}/shims")"
     PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
