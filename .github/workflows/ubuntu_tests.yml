@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [2.7.18, 3.5.10, 3.6.12, 3.7.9, 3.8.7, 3.9.1]  # 2.7.6, 3.4.10, 
+        python-version: [2.7.18, 3.5.10, 3.6.13, 3.7.10, 3.8.8, 3.9.2]  # 2.7.6, 3.4.10, 
     runs-on: Ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -22,8 +22,7 @@ jobs:
           sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
               libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
               xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-      - run: git clone https://github.com/pyenv/pyenv-update.git $(bin/pyenv root)/plugins/pyenv-update
-      - run: bin/pyenv update
+      - run: cd $(pyenv root) && git pull
       - run: bin/pyenv install ${{ matrix.python-version }}
       - run: bin/pyenv global ${{ matrix.python-version }}
       - run: bin/pyenv rehash
