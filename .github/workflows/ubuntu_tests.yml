@@ -21,7 +21,7 @@ jobs:
       # https://github.com/pyenv/pyenv#installation
       - run: pwd
       - env:
-          PYENV_ROOT: $(pwd)
+          PYENV_ROOT: /home/runner/work/pyenv/pyenv
         run: |
           echo $PYENV_ROOT
           $(bin/pyenv init -)
