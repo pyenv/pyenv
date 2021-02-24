@@ -21,10 +21,10 @@ jobs:
       # https://github.com/pyenv/pyenv#installation
       - run: pwd
       - env:
-          PYENV_ROOT: $HOME
+          PYENV_ROOT: $(pwd)
         run: |
           echo $PYENV_ROOT
-          bin/pyenv init -
+          $(bin/pyenv init -)
           bin/pyenv install ${{ matrix.python-version }}
           bin/pyenv global ${{ matrix.python-version }}
           bin/pyenv rehash
