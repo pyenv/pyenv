@@ -19,21 +19,14 @@ jobs:
               libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
               xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
       # https://github.com/pyenv/pyenv#installation
-      - run: echo "$HOME/bin" >> $GITHUB_PATH
-      - run: echo "$HOME/.local/bin" >> $GITHUB_PATH
       - run: pwd
-      - run: echo $GITHUB_PATH
-      # - run: echo 'export PYENV_ROOT=$(pwd)' >> ~/.bash_profile
-      # - run: echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
-      - run: echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
-      # - run: cd $(pyenv root) && git pull || true
-      - run: git pull
       - env:
-          PYENV_ROOT: $HOME"
+          PYENV_ROOT: $HOME
         run: |
           echo $PYENV_ROOT
-          pyenv install ${{ matrix.python-version }}
-          pyenv global ${{ matrix.python-version }}
-          pyenv rehash
+          bin/pyenv init -
+          bin/pyenv install ${{ matrix.python-version }}
+          bin/pyenv global ${{ matrix.python-version }}
+          bin/pyenv rehash
           python --version
           python -m pip --version
