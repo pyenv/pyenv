@@ -24,13 +24,9 @@ jobs:
               xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
       - run: cd $(bin/pyenv root) && git pull || true
       - run: git pull
-      - run: bin/pyenv install ${{ matrix.python-version }}
-      - run: bin/pyenv global ${{ matrix.python-version }}
-      - run: bin/pyenv rehash
-      - run: python --version         || true
-      - run: python -m pip --version  || true
-      - run: python2 --version        || true
-      - run: python2 -m pip --version || true
-      - run: python3 --version        || true
-      - run: python3 -m pip --version || true
-        
+      - run: |
+          bin/pyenv install ${{ matrix.python-version }}
+          bin/pyenv global ${{ matrix.python-version }}
+          bin/pyenv rehash
+          python --version
+          python -m pip --version
