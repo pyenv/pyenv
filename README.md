@@ -231,7 +231,7 @@ easy to fork and contribute any changes back upstream.
      set -Ux fish_user_paths $PYENV_ROOT/bin $fish_user_paths
      ~~~
 
-   - **Proxy note**: If you use a proxy, export `http_proxy` and `HTTPS_PROXY` too.
+   - **Proxy note**: If you use a proxy, export `http_proxy` and `https_proxy` too.
 
 3. **Add `pyenv init` to your shell** to enable shims and autocompletion.
    Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
