@@ -47,7 +47,7 @@ load test_helper
   PYENV_SHELL=bash run pyenv-sh-shell --unset
   assert_success
   assert_output <<OUT
-PYENV_VERSION_OLD="\$PYENV_VERSION"
+PYENV_VERSION_OLD="\${PYENV_VERSION-}"
 unset PYENV_VERSION
 OUT
 }
@@ -75,7 +75,7 @@ SH
   PYENV_SHELL=bash run pyenv-sh-shell 1.2.3
   assert_success
   assert_output <<OUT
-PYENV_VERSION_OLD="\$PYENV_VERSION"
+PYENV_VERSION_OLD="\${PYENV_VERSION-}"
 export PYENV_VERSION="1.2.3"
 OUT
 }
