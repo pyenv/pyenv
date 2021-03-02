@@ -24,7 +24,7 @@ jobs:
           PYENV_ROOT: /home/runner/work/pyenv/pyenv
         run: |
           echo $PYENV_ROOT
-          echo "$HOME/bin" >> $GITHUB_PATH
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
           bin/pyenv install ${{ matrix.python-version }}
           bin/pyenv global ${{ matrix.python-version }}
           bin/pyenv rehash
