@@ -20,12 +20,11 @@ jobs:
               xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
       # https://github.com/pyenv/pyenv#installation
       - run: pwd
-      #- env:
-      #    PYENV_ROOT: /home/runner/work/pyenv/pyenv
-      #  run: |
-      #    echo $PYENV_ROOT
-      #    echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
-      - run: PYENV_ROOT=$(pwd) echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+      - env:
+          PYENV_ROOT: /home/runner/work/pyenv/pyenv
+        run: |
+          echo $PYENV_ROOT
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
       - run: |
           bin/pyenv install ${{ matrix.python-version }}
           bin/pyenv global ${{ matrix.python-version }}
