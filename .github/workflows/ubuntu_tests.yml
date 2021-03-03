@@ -30,3 +30,7 @@ jobs:
           bin/pyenv rehash
       - run: python --version
       - run: python -m pip --version
+      - shell: python  # Prove that actual Python == expected Python
+        env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
