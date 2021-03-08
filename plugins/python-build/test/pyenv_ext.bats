@@ -360,7 +360,7 @@ OUT
   run_inline_definition_with_name --name=2.6 <<OUT
 echo "\${GET_PIP_URL}"
 OUT
-  assert_output "https://bootstrap.pypa.io/2.6/get-pip.py"
+  assert_output "https://bootstrap.pypa.io/pip/2.6/get-pip.py"
   assert_success
 }
 
@@ -368,7 +368,7 @@ OUT
   run_inline_definition_with_name --name=3.2 <<OUT
 echo "\${GET_PIP_URL}"
 OUT
-  assert_output "https://bootstrap.pypa.io/3.2/get-pip.py"
+  assert_output "https://bootstrap.pypa.io/pip/3.2/get-pip.py"
   assert_success
 }
 
@@ -376,6 +376,6 @@ OUT
   run_inline_definition_with_name --name=3.3 <<OUT
 echo "\${GET_PIP_URL}"
 OUT
-  assert_output "https://bootstrap.pypa.io/3.3/get-pip.py"
+  assert_output "https://bootstrap.pypa.io/pip/3.3/get-pip.py"
   assert_success
 }
