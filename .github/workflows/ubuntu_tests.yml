@@ -24,9 +24,13 @@ jobs:
           PYENV_ROOT: /home/runner/work/pyenv/pyenv
         run: |
           echo $PYENV_ROOT
-          echo "$HOME/bin" >> $GITHUB_PATH
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
           bin/pyenv install ${{ matrix.python-version }}
           bin/pyenv global ${{ matrix.python-version }}
           bin/pyenv rehash
-          python --version
-          python -m pip --version
+      - run: python --version
+      - run: python -m pip --version
+      - shell: python  # Prove that actual Python == expected Python
+        env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
