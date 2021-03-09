@@ -2091,22 +2091,22 @@ if [ -z "${GET_PIP_URL}" ]; then
     # Use custom get-pip URL based on the target version (#1127)
     case "${DEFINITION_PATH##*/}" in
     2.6 | 2.6.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/2.6/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/2.6/get-pip.py"
       ;;
     2.7 | 2.7.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/2.7/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/2.7/get-pip.py"
       ;;
     3.2 | 3.2.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/3.2/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.2/get-pip.py"
       ;;
     3.3 | 3.3.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/3.3/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.3/get-pip.py"
       ;;
     3.4 | 3.4.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/3.4/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.4/get-pip.py"
       ;;
     3.5 | 3.5.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/3.5/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.5/get-pip.py"
       ;;
     * )
       GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
