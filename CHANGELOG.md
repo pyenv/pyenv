@@ -1,5 +1,24 @@
 ## Version History
 
+## 1.2.24
+
+* GitHub Actions: Add $PYENV_ROOT/shims to $PATH (#1838)
+* Add Python 3.10.0a6 (#1839)
+* Remove the "Using script's directory as PYENV_DIR if shim is invoked with a script argument" feature (#1814)
+* Update GET_PIP_URL (#1844)
+* GitHub Action to build Python versions on Ubuntu (#1794)
+* Make work in nounset (-u) mode (#1786)
+* Update miniforge3-4.9.2 (#1834)
+* Added aarch64 for Linux in anaconda_architecture() (#1833)
+* Hook script to add latest suffix for install command (#1831)
+* Fix error link (#1832)
+* Clarify proxy variable names in readme (#1830)
+* Travis CI: Add Xcode 12 on macOS 10.15.5 (#1708)
+* Added --nosystem argument (#1829)
+* Add CPython 3.8.8 (#1825)
+* Add CPython 3.9.2 (#1826)
+* Add manpage (#1790)
+
 ## 1.2.23
 
 + python-build: Add CPython v3.7.10 (#1818)
