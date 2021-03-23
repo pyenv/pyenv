@@ -39,7 +39,7 @@ eval "\$(pyenv-init -)"
 echo \$PYENV_SHELL
 OUT
   chmod +x myscript.sh
-  run ./myscript.sh /bin/zsh
+  run ./myscript.sh
   assert_success "sh"
 }
 
