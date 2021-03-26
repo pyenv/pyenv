@@ -38,6 +38,7 @@ if [ -z "$shell" ]; then
   shell="${shell##-}"
   shell="${shell:-$SHELL}"
   shell="${shell##*/}"
+  shell="${shell%%-*}"
 fi
 
 root="${0%/*}/.."
