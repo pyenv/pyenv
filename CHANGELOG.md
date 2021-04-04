@@ -1,5 +1,14 @@
 ## Version History
 
+## 1.2.25
+
+* bpo-43631: update to openssl 1.1.1k (#1861)
+* Add CPython 3.9.3 and 3.8.9 (#1859)
+* Add micropython 1.14 (#1858)
+* Shell detect improvements (#1835)
+* Test(init): remove misleading detect from parent shell case arg (#1856)
+* Add GraalPython 21.0.0 (#1855)
+
 ## 1.2.24
 
 * GitHub Actions: Add $PYENV_ROOT/shims to $PATH (#1838)
