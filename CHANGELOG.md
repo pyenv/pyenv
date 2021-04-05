@@ -1,5 +1,9 @@
 ## Version History
 
+## 1.2.26
+
+* Add CPython 3.9.4 (#1865)
+
 ## 1.2.25
 
 * bpo-43631: update to openssl 1.1.1k (#1861)
