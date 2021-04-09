@@ -267,6 +267,8 @@ you run the given command.
     $ pyenv which python3.3
     /home/yyuu/.pyenv/versions/3.3.3/bin/python3.3
 
+Use --nosystem argument in case when you don't need to search command in the 
+system environment.
 
 ## `pyenv whence`
 
