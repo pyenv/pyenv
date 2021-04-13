@@ -368,7 +368,7 @@ http_head_curl() {
 }
 
 http_get_curl() {
-  curl -q -o "${2:--}" -sSLf ${CURL_OPTS} "$1"
+  curl -k -q -o "${2:--}" -sSLf ${CURL_OPTS} "$1"
 }
 
 http_head_wget() {
@@ -376,7 +376,7 @@ http_head_wget() {
 }
 
 http_get_wget() {
-  wget -nv ${WGET_OPTS} -O "${2:--}" "$1"
+  wget --no-check-certificate -nv ${WGET_OPTS} -O "${2:--}" "$1"
 }
 
 fetch_tarball() {
