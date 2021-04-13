@@ -135,7 +135,7 @@ global system 3.3.6 3.2 2.5`. At this point, one should be able to find the full
 executable path to each of these using `pyenv which`, e.g. `pyenv which python2.5`
 (should display `$(pyenv root)/versions/2.5/bin/python2.5`), or `pyenv which
 python3.4` (should display path to system Python3). You can also specify multiple
-versions in a `.python-version` file, separated by newlines or any whitespace.
+versions in a `.python-version` file, separated by newlines.
 Lines starting with a `#` are ignored.
 
 ### Locating the Python Installation
