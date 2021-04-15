@@ -5,9 +5,9 @@
 # This hooks is intended to skip creating shims for those executables.
 
 conda_exists() {
-  shopt -s nullglob
+  shopt -s dotglob nullglob
   local condas=($(echo "${PYENV_ROOT}/versions/"*"/bin/conda" "${PYENV_ROOT}/versions/"*"/envs/"*"/bin/conda"))
-  shopt -u nullglob
+  shopt -u dotglob nullglob
   [ -n "${condas}" ]
 }
 
