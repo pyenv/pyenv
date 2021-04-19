@@ -10,10 +10,19 @@ done
 shopt -u nullglob
 eval "source_shim(){ case \"\${1##*/}\" in ${shims[@]} *)return 1;;esac;}"
 
+pyenv_path="$(command -v pyenv)"
+brew_prefix="$(brew --prefix 2>/dev/null)"
+if [ $? -eq 0 ]; then
+  case "$pyenv_path" in "${brew_prefix}/Cellar"*)
+    pyenv_path="${brew_prefix}/opt/pyenv/bin/pyenv"
+    ;;
+  esac
+fi
+
 cat > "${PROTOTYPE_SOURCE_SHIM_PATH}" <<SH
 [ -n "\$PYENV_DEBUG" ] && set -x
 export PYENV_ROOT="${PYENV_ROOT}"
-program="\$("$(command -v pyenv)" which "\${BASH_SOURCE##*/}")"
+program="\$("$pyenv_path" which "\${BASH_SOURCE##*/}")"
 if [ -e "\${program}" ]; then
   . "\${program}" "\$@"
 fi

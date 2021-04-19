@@ -62,6 +62,15 @@ fi
 # technique is fast, uses less disk space than unique files, and also
 # serves as a locking mechanism.
 create_prototype_shim() {
+  local pyenv_path brew_prefix
+  pyenv_path="$(command -v pyenv)"
+  brew_prefix="$(brew --prefix 2>/dev/null)"
+  if [ $? -eq 0 ]; then
+    case "$pyenv_path" in "${brew_prefix}/Cellar"*)
+      pyenv_path="${brew_prefix}/opt/pyenv/bin/pyenv"
+      ;;
+    esac
+  fi
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
 set -e
@@ -70,7 +79,7 @@ set -e
 program="\${0##*/}"
 
 export PYENV_ROOT="$PYENV_ROOT"
-exec "$(command -v pyenv)" exec "\$program" "\$@"
+exec "$pyenv_path" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
 }
