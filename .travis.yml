@@ -13,25 +13,26 @@
 language: c
 
 os:
-- linux
-- osx
+  - linux
+  - osx
 
 dist:
-- focal
+  - focal
 
 # https://docs.travis-ci.com/user/reference/osx/#macos-version
 osx_image:
-- xcode9.4.1  # macOS 10.13.6
-- xcode10.3   # macOS 10.14.4
-- xcode11.6   # macOS 10.15.7
-- xcode12.2   # macOS 10.15.7
+  - xcode9.4.1 # macOS 10.13.6
+  - xcode10.3 # macOS 10.14.4
+  - xcode11.6 # macOS 10.15.7
+  - xcode12.2 # macOS 10.15.7
 
 env:
-- PYTHON_BUILD_VERSION=3.9.1
-- PYTHON_BUILD_VERSION=3.7.5
+  - PYTHON_BUILD_VERSION=3.9.1
+  - PYTHON_BUILD_VERSION=3.7.5
+  - PYENV_DEBUG=true
 
 before_install:
-- date +%Y-%m-%dT%H:%M:%S
+  - date +%Y-%m-%dT%H:%M:%S
 
 install: git clone --depth 1 --branch v1.2.0 https://github.com/bats-core/bats-core.git bats
 
@@ -40,35 +41,35 @@ script: make test-build
 
 jobs:
   include:
-  # Shell-based tests should execute every time.
-  - stage: test shell
-    script: make test
-    env: PYENV_NATIVE_EXT=1
-    after_script: []
-    os: linux
-  - stage: test shell
-    script: make test
-    env: PYENV_NATIVE_EXT=
-    after_script: []
-    os: linux
+    # Shell-based tests should execute every time.
+    - stage: test shell
+      script: make test
+      env: PYENV_NATIVE_EXT=1
+      after_script: []
+      os: linux
+    - stage: test shell
+      script: make test
+      env: PYENV_NATIVE_EXT=
+      after_script: []
+      os: linux
 
   exclude:
-  # For each osx_image but one there should be an entry in the exclude
-  # list, to prevent duplicate Linux builds.
-  - os: linux
-    osx_image: xcode9.4
-  - os: linux
-    osx_image: xcode10
+    # For each osx_image but one there should be an entry in the exclude
+    # list, to prevent duplicate Linux builds.
+    - os: linux
+      osx_image: xcode9.4
+    - os: linux
+      osx_image: xcode10
 
   allow_failures:
-  - env: PYTHON_BUILD_VERSION=3.9.1
+    - env: PYTHON_BUILD_VERSION=3.9.1
 
 stages:
-- test shell
-- name: test
-  if: NOT (commit_message =~ /^\[skip build\]/)
+  - test shell
+  - name: test
+    if: NOT (commit_message =~ /^\[skip build\]/)
 
-# Default 
+# Default
 
 notifications:
   email:
