@@ -277,7 +277,7 @@ a systemwide install.
    [rbenv-doctor](https://github.com/rbenv/rbenv-installer/blob/master/bin/rbenv-doctor) script:
 
     ~~~ sh
-    $ curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-doctor | bash
+    $ curl -fsSL https://github.com/rbenv/rbenv-installer/raw/main/bin/rbenv-doctor | bash
     Checking for `rbenv' in PATH: /usr/local/bin/rbenv
     Checking for rbenv shims in PATH: OK
     Checking `rbenv install' support: /usr/local/bin/rbenv-install (ruby-build 20170523)
