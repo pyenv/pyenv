@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
-# Usage: eval "$(pyenv init - [--no-rehash] [<shell>])"
+# Usage: eval "$(pyenv init [-|--path] [--no-rehash] [<shell>])"
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -8,6 +8,7 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   echo -
+  echo --path
   echo --no-rehash
   echo bash
   echo fish
@@ -16,15 +17,20 @@ if [ "$1" = "--complete" ]; then
   exit
 fi
 
-print=""
+mode="help"
 no_rehash=""
 for args in "$@"
 do
   if [ "$args" = "-" ]; then
-    print=1
+    mode="print"
     shift
   fi
 
+  if [ "$args" = "--path" ]; then
+    mode="path"
+    shift
+  fi
+  
   if [ "$args" = "--no-rehash" ]; then
     no_rehash=1
     shift
@@ -68,11 +74,7 @@ function main() {
 function help_() {
   case "$shell" in
   bash )
-    if [ -f "${HOME}/.bashrc" ] && [ ! -f "${HOME}/.bash_profile" ]; then
-      profile='~/.bashrc'
-    else
-      profile='~/.bash_profile'
-    fi
+    profile='~/.bashrc'
     ;;
   zsh )
     profile='~/.zshrc'
@@ -100,6 +102,17 @@ function help_() {
       ;;
     esac
     echo
+    echo "# And the following to ~/.profile:"
+    echo
+    case "$shell" in
+    fish )
+      echo 'pyenv init --path | source'
+      ;;
+    * )
+      echo 'eval "$(pyenv init --path)"'
+      ;;
+    esac
+    echo
   } >&2
 }
 
@@ -107,14 +120,24 @@ function init_dirs() {
   mkdir -p "${PYENV_ROOT}/"{shims,versions}
 }
 
+function print_path() {
+  # Need to use the login shell rather than the current one
+  case "$shell" in
+    fish )
+      echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+      ;;
+    * )
+      echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+      ;;
+  esac
+}
+
 function print_env() {
   case "$shell" in
   fish )
-    echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
     echo "set -gx PYENV_SHELL $shell"
     ;;
   * )
-    echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
     echo "export PYENV_SHELL=$shell"
     ;;
   esac
