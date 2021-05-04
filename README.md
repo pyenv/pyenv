@@ -274,7 +274,7 @@ a systemwide install.
    terminal tab will usually do it.)
 
 5. Verify that rbenv is properly set up using this
-   [rbenv-doctor](https://github.com/rbenv/rbenv-installer/blob/master/bin/rbenv-doctor) script:
+   [rbenv-doctor](https://github.com/rbenv/rbenv-installer/blob/main/bin/rbenv-doctor) script:
 
     ~~~ sh
     $ curl -fsSL https://github.com/rbenv/rbenv-installer/raw/main/bin/rbenv-doctor | bash
