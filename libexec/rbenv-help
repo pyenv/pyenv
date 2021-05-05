@@ -43,7 +43,7 @@ extract_initial_comment_block() {
 
 collect_documentation() {
   local awk
-  awk="$(type -p gawk awk 2>/dev/null | head -1)"
+  awk="$(type -p gawk awk 2>/dev/null | head -n1)"
   if [ -z "$awk" ]; then
     echo "rbenv: cannot find awk" >&2
     return 1

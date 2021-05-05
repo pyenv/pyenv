@@ -33,7 +33,7 @@ if ! enable -f "${BASH_SOURCE%/*}"/rbenv-realpath.dylib realpath 2>/dev/null; th
     exit 1
   fi
 
-  READLINK=$(type -p greadlink readlink 2>/dev/null | head -1)
+  READLINK=$(type -p greadlink readlink 2>/dev/null | head -n1)
   if [ -z "$READLINK" ]; then
     echo "rbenv: cannot find readlink - are you missing GNU coreutils?" >&2
     exit 1
