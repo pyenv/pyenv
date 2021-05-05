@@ -87,7 +87,7 @@ OUT
 if [[ \$1 == "-S"* ]]; then
   found="\$(PATH="\${RUBYPATH:-\$PATH}" which \$2)"
   # assert that the found executable has ruby for shebang
-  if head -1 "\$found" | grep ruby >/dev/null; then
+  if head -n1 "\$found" | grep ruby >/dev/null; then
     \$BASH "\$found"
   else
     echo "ruby: no Ruby script found in input (LoadError)" >&2
