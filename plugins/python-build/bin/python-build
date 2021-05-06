@@ -851,12 +851,21 @@ build_package_jython_builder() {
 }
 
 build_package_pyston() {
-  mkdir -p "${PREFIX_PATH}/"
-  cp -fR . "${PREFIX_PATH}/"
-  chmod +x "${PREFIX_PATH}/"pyston
-  # FIXME ugly hack below adapted from
-  # https://github.com/dropbox/pyston/blob/master/docker/pyston/Dockerfile
-  ( cd "${PREFIX_PATH}/" && ./pyston virtualenv/virtualenv.py . )
+  # currently supported version 2.2 and upper
+  build_package_copy
+  mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
+  local bin
+  shopt -s nullglob
+  for bin in "bin/"*; do
+    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
+      case "${bin##*/}" in
+      "pyston"* )
+        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
+        ;;
+      esac
+    fi
+  done
+  shopt -u nullglob
 }
 
 build_package_ironpython() {
