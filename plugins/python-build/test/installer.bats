@@ -57,5 +57,5 @@ OUT
   assert [ -e share/bananas/docs ]
 
   run ls -ld bin
-  assert_equal "r-x" "${output:4:3}"
+  assert_equal "-" "${output:5:1}"
 }
