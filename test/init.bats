@@ -64,30 +64,37 @@ OUT
 
 @test "adds shims to PATH" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
-  run pyenv-init - bash
+  run pyenv-init --path bash
   assert_success
   assert_line 0 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
 }
 
 @test "adds shims to PATH (fish)" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
-  run pyenv-init - fish
+  run pyenv-init --path fish
   assert_success
   assert_line 0 "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
 }
 
 @test "can add shims to PATH more than once" {
   export PATH="${PYENV_ROOT}/shims:$PATH"
-  run pyenv-init - bash
+  run pyenv-init --path bash
   assert_success
   assert_line 0 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
 }
 
 @test "can add shims to PATH more than once (fish)" {
   export PATH="${PYENV_ROOT}/shims:$PATH"
-  run pyenv-init - fish
+  run pyenv-init --path fish
   assert_success
   assert_line 0 "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+}
+
+@test "prints a warning if shims not in PATH" {
+  export PATH="$(perl -0x3A -ls -e 'while (<>) { chomp; ($_ ne $d) && print; }' -- -d="${PYENV_ROOT}/shims" <<<"$PATH")"
+  run pyenv-init -
+  assert_success
+  assert_line 0 'echo '\''WARNING: `pyenv init -` no longer sets PATH.'\'
 }
 
 @test "outputs sh-compatible syntax" {
