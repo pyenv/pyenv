@@ -114,6 +114,9 @@ function help_() {
       ;;
     esac
     echo
+    echo '# Make sure to restart your entire logon session'
+    echo '# for changes to ~/.profile to take effect.'
+    echo
   } >&2
 }
 
