@@ -417,8 +417,8 @@ fetch_tarball() {
    fi
 
   if ! reuse_existing_tarball "$package_filename" "$checksum"; then
-    local tarball_filename="$(basename "$package_url")"
-    echo "Downloading ${tarball_filename}..." >&2
+    # Report the cached file name -- sometimes, it's useful to know (#1743)
+    echo "Downloading ${package_filename}..." >&2
     http head "$mirror_url" &&
     download_tarball "$mirror_url" "$package_filename" "$checksum" ||
     download_tarball "$package_url" "$package_filename" "$checksum"
