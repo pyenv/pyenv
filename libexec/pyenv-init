@@ -91,7 +91,21 @@ function help_() {
     ;;
   esac
 
-  { echo "# Load pyenv automatically by appending"
+  { echo "# Add pyenv executable to PATH by adding"
+    echo "# the following to ~/.profile:"
+    echo
+    case "$shell" in
+    fish )
+      echo 'set -Ux PYENV_ROOT $HOME/.pyenv'
+      echo 'set -Ux fish_user_paths $PYENV_ROOT/bin $fish_user_paths'
+      ;;
+    * )
+      echo 'export PYENV_ROOT="$HOME/.pyenv"'
+      echo 'export PATH="$PYENV_ROOT/bin:$PATH"'
+      ;;
+    esac
+    echo
+    echo "# Load pyenv automatically by appending"
     echo "# the following to ${profile}:"
     echo
     case "$shell" in
@@ -103,7 +117,7 @@ function help_() {
       ;;
     esac
     echo
-    echo "# And the following to ~/.profile:"
+    echo "# and the following to ~/.profile:"
     echo
     case "$shell" in
     fish )
