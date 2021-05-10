@@ -83,58 +83,51 @@ function help_() {
   ksh )
     profile='~/.profile'
     ;;
-  fish )
-    profile='~/.config/fish/config.fish'
-    ;;
   * )
     profile='your profile'
     ;;
   esac
 
-  { echo "# Add pyenv executable to PATH by adding"
-    echo "# the following to ~/.profile:"
-    echo
+  {
     case "$shell" in
     fish )
+      echo "# Add pyenv executable to PATH by running"
+      echo "# the following interactively:"
+      echo
       echo 'set -Ux PYENV_ROOT $HOME/.pyenv'
       echo 'set -Ux fish_user_paths $PYENV_ROOT/bin $fish_user_paths'
-      ;;
-    * )
-      echo 'export PYENV_ROOT="$HOME/.pyenv"'
-      echo 'export PATH="$PYENV_ROOT/bin:$PATH"'
-      ;;
-    esac
-    echo
-    echo "# Load pyenv automatically by appending"
-    echo "# the following to ${profile}:"
-    echo
-    case "$shell" in
-    fish )
+      echo
+      echo "# Load pyenv automatically by appending"
+      echo "# the following to ~/.config/fish/config.fish:"
+      echo
       echo 'pyenv init - | source'
-      ;;
-    * )
-      echo 'eval "$(pyenv init -)"'
-      ;;
-    esac
-    echo
-    echo "# and the following to ~/.profile:"
-    echo
-    case "$shell" in
-    fish )
       echo 'pyenv init --path | source'
       ;;
     * )
+      echo "# Add pyenv executable to PATH by adding"
+      echo "# the following to ~/.profile:"
+      echo
+      echo 'export PYENV_ROOT="$HOME/.pyenv"'
+      echo 'export PATH="$PYENV_ROOT/bin:$PATH"'
+      echo
+      echo "# Load pyenv automatically by appending"
+      echo "# the following to ${profile}:"
+      echo
+      echo 'eval "$(pyenv init -)"'
+      echo
+      echo "# and the following to ~/.profile:"
+      echo
       echo 'eval "$(pyenv init --path)"'
+      echo
+      echo '# If your ~/.profile sources '"${profile}"','
+      echo '# the lines should be inserted before the part'
+      echo '# that does that.'
+      echo
+      echo '# Make sure to restart your entire logon session'
+      echo '# for changes to ~/.profile to take effect.'
+      echo
       ;;
     esac
-    echo
-    echo '# If your ~/.profile sources '"${profile}"','
-    echo '# the lines should be inserted before the part'
-    echo '# that does that.'
-    echo
-    echo '# Make sure to restart your entire logon session'
-    echo '# for changes to ~/.profile to take effect.'
-    echo
   } >&2
 }
 
