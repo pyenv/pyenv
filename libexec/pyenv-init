@@ -101,7 +101,7 @@ function help_() {
       echo "# the following to ~/.config/fish/config.fish:"
       echo
       echo 'pyenv init - | source'
-      echo 'pyenv init --path | source'
+      echo 'status is-login; and pyenv init --path | source'
       ;;
     * )
       echo "# Add pyenv executable to PATH by adding"
