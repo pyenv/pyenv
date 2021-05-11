@@ -216,10 +216,18 @@ easy to fork and contribute any changes back upstream.
      ~~~
 
    - For **Fish shell**:
+
+     Execute this interactively:
      ~~~ fish
      set -Ux PYENV_ROOT $HOME/.pyenv
      set -Ux fish_user_paths $PYENV_ROOT/bin $fish_user_paths
-     pyenv init --path | source
+     ~~~
+
+     And add this to ~/.config/fish/config.fish:
+
+     ~~~ fish
+     status is-login; and pyenv init --path | source
+     pyenv init - | source
      ~~~
 
    - **Proxy note**: If you use a proxy, export `http_proxy` and `https_proxy` too.
