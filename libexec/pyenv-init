@@ -112,24 +112,35 @@ function help_() {
       echo
       ;;
     * )
-      echo "# Add pyenv executable to PATH by adding"
-      echo "# the following to ~/.profile:"
+      echo '# Add pyenv executable to PATH and'
+      echo '# enable shims by adding the following'
+      case "$shell" in
+      zsh )
+        echo '# to ~/.profile and ~/.zprofile:'
+        ;;
+      * )
+        echo '# to ~/.profile:'
+        ;;
+      esac
       echo
       echo 'export PYENV_ROOT="$HOME/.pyenv"'
       echo 'export PATH="$PYENV_ROOT/bin:$PATH"'
+      echo 'eval "$(pyenv init --path)"'
       echo
-      echo "# Load pyenv automatically by appending"
+      if [[ $shell == "bash" ]]; then
+        echo '# If your ~/.profile sources '"${profile}"','
+        echo '# the lines need to be inserted before the part'
+        echo '# that does that. See the README for another option.'
+        echo
+        echo '# If you have ~/.bash_profile, make sure that it'
+        echo '# also executes the above lines -- e.g. by'
+        echo '# copying them there or by sourcing ~/.profile'
+        echo
+      fi
+      echo "# Load pyenv into the shell by adding"
       echo "# the following to ${profile}:"
       echo
       echo 'eval "$(pyenv init -)"'
-      echo
-      echo "# and the following to ~/.profile:"
-      echo
-      echo 'eval "$(pyenv init --path)"'
-      echo
-      echo '# If your ~/.profile sources '"${profile}"','
-      echo '# the lines should be inserted before the part'
-      echo '# that does that.'
       echo
       echo '# Make sure to restart your entire logon session'
       echo '# for changes to ~/.profile to take effect.'
