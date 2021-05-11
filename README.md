@@ -230,6 +230,8 @@ easy to fork and contribute any changes back upstream.
      pyenv init - | source
      ~~~
 
+     If fish is not your login shell, also follow the bash/zsh instructions to add to ~/.profile.
+
    - **Proxy note**: If you use a proxy, export `http_proxy` and `https_proxy` too.
 
 3. **Add `pyenv init` to your shell** to enable shims and autocompletion.

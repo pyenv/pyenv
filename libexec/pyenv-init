@@ -102,6 +102,14 @@ function help_() {
       echo
       echo 'status is-login; and pyenv init --path | source'
       echo 'pyenv init - | source'
+      echo
+      echo "# If fish is not your login shell,"
+      echo "# add the following to ~/.profile:"
+      echo
+      echo 'export PYENV_ROOT="$HOME/.pyenv"'
+      echo 'export PATH="$PYENV_ROOT/bin:$PATH"'
+      echo 'eval "$(pyenv init --path)"'
+      echo
       ;;
     * )
       echo "# Add pyenv executable to PATH by adding"
