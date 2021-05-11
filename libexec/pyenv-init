@@ -100,8 +100,8 @@ function help_() {
       echo "# Load pyenv automatically by appending"
       echo "# the following to ~/.config/fish/config.fish:"
       echo
-      echo 'pyenv init - | source'
       echo 'status is-login; and pyenv init --path | source'
+      echo 'pyenv init - | source'
       ;;
     * )
       echo "# Add pyenv executable to PATH by adding"
