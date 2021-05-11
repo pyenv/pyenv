@@ -95,7 +95,7 @@ function help_() {
       echo "# the following interactively:"
       echo
       echo 'set -Ux PYENV_ROOT $HOME/.pyenv'
-      echo 'set -Ux fish_user_paths $PYENV_ROOT/bin $fish_user_paths'
+      echo 'set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths'
       echo
       echo "# Load pyenv automatically by appending"
       echo "# the following to ~/.config/fish/config.fish:"

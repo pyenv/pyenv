@@ -220,7 +220,7 @@ easy to fork and contribute any changes back upstream.
      Execute this interactively:
      ~~~ fish
      set -Ux PYENV_ROOT $HOME/.pyenv
-     set -Ux fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+     set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
      ~~~
 
      And add this to ~/.config/fish/config.fish:
