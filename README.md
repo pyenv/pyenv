@@ -223,11 +223,9 @@ easy to fork and contribute any changes back upstream.
      set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
      ~~~
 
-     And add this to ~/.config/fish/config.fish:
-
+     And add this to `~/.config/fish/config.fish`:
      ~~~ fish
      status is-login; and pyenv init --path | source
-     pyenv init - | source
      ~~~
 
      If fish is not your login shell, also follow the bash/zsh instructions to add to ~/.profile.
@@ -249,8 +247,9 @@ easy to fork and contribute any changes back upstream.
      ~~~
 
    - For **Fish shell**:
+     Add this to `~/.config/fish/config.fish`:
      ~~~ fish
-     echo -e '\n\n# pyenv init\nif command -v pyenv 1>/dev/null 2>&1\n  pyenv init - | source\nend' >> ~/.config/fish/config.fish
+     pyenv init - | source
      ~~~
 
     **General warning**: There are some systems where the `BASH_ENV` variable is configured
