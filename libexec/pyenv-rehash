@@ -62,13 +62,30 @@ fi
 # technique is fast, uses less disk space than unique files, and also
 # serves as a locking mechanism.
 create_prototype_shim() {
+  local PYENV_VERSION_LOCK_DECLARATION
+  case "$PYENV_VERSION_LOCK" in
+    "")
+      # fully backward compact
+      PYENV_VERSION_LOCK_DECLARATION=""
+      ;;
+    y|Y|yes|Yes|YES|1)
+      PYENV_VERSION_LOCK_DECLARATION="export PYENV_VERSION=\"${PYENV_VERSION}\""
+      ;;
+    n|N|no|No|NO|0)
+      PYENV_VERSION_LOCK_DECLARATION="# export PYENV_VERSION=\"${PYENV_VERSION}\""
+      ;;
+    *)
+      exit 1
+      ;;
+  esac
+  
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
 set -e
 [ -n "\$PYENV_DEBUG" ] && set -x
 
 program="\${0##*/}"
-
+${PYENV_VERSION_LOCK_DECLARATION}
 export PYENV_ROOT="$PYENV_ROOT"
 exec "$(command -v pyenv)" exec "\$program" "\$@"
 SH
