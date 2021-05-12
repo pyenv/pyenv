@@ -153,7 +153,7 @@ For example, you might have these versions installed:
 * `$(pyenv root)/versions/3.4.2/`
 * `$(pyenv root)/versions/pypy-2.4.0/`
 
-As far as pyenv is concerned, version names are simply the directories in
+As far as Pyenv is concerned, version names are simply directories under
 `$(pyenv root)/versions`.
 
 ### Managing Virtual Environments
