@@ -355,8 +355,8 @@ uninstall from the system.
   remove Pyenv shims directory from `PATH`, and future invocations like
   `python` will execute the system Python version, as it was before Pyenv.
 
-  `pyenv` will still be accessible on the command line, but your Python
-  apps won't be affected by version switching.
+   `pyenv` will still be accessible on the command line, but your Python
+   apps won't be affected by version switching.
 
 2. To completely **uninstall** Pyenv, remove _all_ configuration lines for it
    from your shell startup configuration, and then remove
