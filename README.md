@@ -206,9 +206,9 @@ easy to fork and contribute any changes back upstream.
 
 2. **Configure your shell's environment for Pyenv**
 
-   **Note:** The below instructions and code samples are intended for common shell setups.  
-   If you have an uncommon setup and/or they don't work for you,
-   use the guidance text and [Advanced Configuration](#advanced-configuration)
+   **Note:** The below instructions for specific shells are designed for common shell setups.  
+   If you have an uncommon setup and they don't work for you,
+   use the guidance text and the [Advanced Configuration](#advanced-configuration)
    section below to figure out what you need to do in your specific case.
    
    **MacOS note:** If you installed Pyenv with Homebrew, you don't need
