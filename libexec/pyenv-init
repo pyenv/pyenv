@@ -75,20 +75,29 @@ function main() {
 function help_() {
   case "$shell" in
   bash )
-    profile='~/.bashrc'
+    profile='~/.bash_profile'
+    rc='~/.bashrc'
     ;;
   zsh )
-    profile='~/.zshrc'
+    profile='~/.zprofile'
+    rc='~/.zshrc'
     ;;
   ksh )
     profile='~/.profile'
+    rc='~/.profile'
     ;;
   * )
-    profile='your profile'
+    profile='your shell'\''s login startup file'
+    rc='your shell'\''s interactive startup file'
     ;;
   esac
 
   {
+    echo
+    echo '# (The below instructions are intended for common'
+    echo '# shell setups. See the README for more guidance'
+    echo '# if they don'\''t apply and/or don'\''t work for you.)'
+    echo 
     case "$shell" in
     fish )
       echo "# Add pyenv executable to PATH by running"
@@ -115,11 +124,11 @@ function help_() {
       echo '# Add pyenv executable to PATH and'
       echo '# enable shims by adding the following'
       case "$shell" in
-      zsh )
-        echo '# to ~/.profile and ~/.zprofile:'
+      bash|ksh )
+        echo '# to ~/.profile:'
         ;;
       * )
-        echo '# to ~/.profile:'
+        echo '# to ~/.profile and '"${profile}"':'
         ;;
       esac
       echo
@@ -128,22 +137,22 @@ function help_() {
       echo 'eval "$(pyenv init --path)"'
       echo
       if [[ $shell == "bash" ]]; then
-        echo '# If your ~/.profile sources '"${profile}"','
+        echo '# If your ~/.profile sources '"${rc}"','
         echo '# the lines need to be inserted before the part'
-        echo '# that does that. See the README for another option.'
+        echo '# that does that.'
         echo
-        echo '# If you have ~/.bash_profile, make sure that it'
+        echo '# If you have '"${profile}"', make sure that it'
         echo '# also executes the above lines -- e.g. by'
         echo '# copying them there or by sourcing ~/.profile'
         echo
       fi
       echo "# Load pyenv into the shell by adding"
-      echo "# the following to ${profile}:"
+      echo "# the following to ${rc}:"
       echo
       echo 'eval "$(pyenv init -)"'
       echo
       echo '# Make sure to restart your entire logon session'
-      echo '# for changes to ~/.profile to take effect.'
+      echo '# for changes to profile files to take effect.'
       echo
       ;;
     esac
