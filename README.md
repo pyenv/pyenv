@@ -280,6 +280,12 @@ easy to fork and contribute any changes back upstream.
         ~~~ bash
         echo 'eval "$(pyenv init -)"' >> ~/.bashrc
         ~~~
+        
+        - **If your `/etc/profile` sources `~/.bashrc` (SUSE):**
+        
+          ~~~bash
+          echo 'if command -v pyenv >/dev/null; then eval "$(pyenv init -)"; done' >> ~/.bashrc
+          ~~~
 
       - For **Zsh**:
         ~~~ zsh
