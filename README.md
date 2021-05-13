@@ -153,7 +153,7 @@ For example, you might have these versions installed:
 * `$(pyenv root)/versions/3.4.2/`
 * `$(pyenv root)/versions/pypy-2.4.0/`
 
-As far as pyenv is concerned, version names are simply the directories in
+As far as Pyenv is concerned, version names are simply directories under
 `$(pyenv root)/versions`.
 
 ### Managing Virtual Environments
@@ -174,95 +174,137 @@ For pyenv to install python correctly you should [**install the Python build dep
 
 ### Homebrew on macOS
 
-   1. Consider installing with [Homebrew](https://brew.sh)
+   1. Consider installing with [Homebrew](https://brew.sh):
       ```sh
       brew update
       brew install pyenv
       ```
-   2. Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout), starting with #3 ("Add `pyenv init` to your shell to enable shims and autocompletion").
+   2. Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout), starting with #2 ("Configure your shell's environment for Pyenv").
 
-If you're on Windows, consider using @kirankotari's [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) fork. (`pyenv` does not work on windows outside the Windows Subsystem for Linux)
+If you're on Windows, consider using @kirankotari's [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) fork. (Pyenv does not work in Windows outside the Windows Subsystem for Linux.)
 
 ### The automatic installer
 
-Visit my other project:
+Visit our other project:
 https://github.com/pyenv/pyenv-installer
 
 
 ### Basic GitHub Checkout
 
-This will get you going with the latest version of pyenv and make it
+This will get you going with the latest version of Pyenv and make it
 easy to fork and contribute any changes back upstream.
 
-1. **Check out pyenv where you want it installed.**
-   A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else).
+1. **Check out Pyenv where you want it installed.**
+   A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else):
 
         git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 
-   Optionally, try to compile dynamic bash extension to speed up pyenv. Don't
-   worry if it fails; pyenv will still work normally:
+   Optionally, try to compile a dynamic Bash extension to speed up Pyenv. Don't
+   worry if it fails; Pyenv will still work normally:
 
         cd ~/.pyenv && src/configure && make -C src
 
-2. **Define environment variable `PYENV_ROOT`** to point to the path where
-   pyenv repo is cloned and add `$PYENV_ROOT/bin` to your `$PATH` for access
-   to the `pyenv` command-line utility.
+2. **Configure your shell's environment for Pyenv**
 
-   - For **bash**/**Zsh**:
-     ~~~ bash
-     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
-     echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
-     echo 'eval "$(pyenv init --path)"' >> ~/.profile
-     ~~~
+   **Note:** The below instructions for specific shells are designed for common shell setups.  
+   If you have an uncommon setup and they don't work for you,
+   use the guidance text and the [Advanced Configuration](#advanced-configuration)
+   section below to figure out what you need to do in your specific case.
+   
+   1. **Adjust the session-wide environment for your account.** Define
+   the `PYENV_ROOT` environment variable to point to the path where
+   you cloned the Pyenv repo, add the `pyenv` command-line utility to your `PATH`,
+   run the output of `pyenv init --path` to enable shims.
+   
+      These commands need to be added into your shell startup files in such a way
+      that _they are executed only once per session, by its login shell._
+      This typically means they need to be added into a per-user shell-specific
+      `~/.*profile` file, _and_ into `~/.profile`, too, so that they are also
+      run by GUI managers (which typically act as a `sh` login shell).
 
-   - For **Fish shell**:
+      **MacOS note:** If you installed Pyenv with Homebrew, you don't need
+      to add the `PYENV_ROOT=` and `PATH=` lines.  
+      You also don't need to add commands into `~/.profile` if your shell doesn't use it.
+   
+      - For **bash**:
 
-     Execute this interactively:
-     ~~~ fish
-     set -Ux PYENV_ROOT $HOME/.pyenv
-     set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
-     ~~~
+         ~~~ bash
+         echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+         echo 'eval "$(pyenv init --path)"' >> ~/.profile
+         ~~~
 
-     And add this to `~/.config/fish/config.fish`:
-     ~~~ fish
-     status is-login; and pyenv init --path | source
-     ~~~
+         - **If your `~/.profile` sources `~/.bashrc` (Debian, Ubuntu, Mint):**
 
-     If fish is not your login shell, also follow the bash/zsh instructions to add to ~/.profile.
+            Put these lines into `~/.profile` _before_ the part that sources `~/.bashrc`:
+            ~~~bash
+            export PYENV_ROOT="$HOME/.pyenv"
+            export PATH="$PYENV_ROOT/bin:$PATH"
+            eval "$(pyenv init --path)"
+            ~~~
 
-   - **Proxy note**: If you use a proxy, export `http_proxy` and `https_proxy` too.
+         **Note:** If you have `~/.bash_profile`, make sure that it too executes the above-added commands,
+         e.g. by copying them there or by `source`'ing `~/.profile`.
 
-3. **Add `pyenv init` to your shell** to enable shims and autocompletion.
-   Please make sure `eval "$(pyenv init -)"` is placed toward the end of the shell
-   configuration file since it manipulates `PATH` during the initialization.
+      - For **Zsh**:
 
-   - For **bash**:
-     ~~~ bash
-     echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
-     ~~~
+        Same as for Bash above, but add the commands into both `~/.profile`
+        and `~/.zprofile`.
+        
+      - For **Fish shell**:
 
-   - For **Zsh**:
-     ~~~ zsh
-     echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.zshrc
-     ~~~
+        Execute this interactively:
+        ~~~ fish
+        set -Ux PYENV_ROOT $HOME/.pyenv
+        set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+        ~~~
 
-   - For **Fish shell**:
-     Add this to `~/.config/fish/config.fish`:
-     ~~~ fish
-     pyenv init - | source
-     ~~~
+        And add this to `~/.config/fish/config.fish`:
+        ~~~ fish
+        status is-login; and pyenv init --path | source
+        ~~~
 
-    **General warning**: There are some systems where the `BASH_ENV` variable is configured
-    to point to `.bashrc`. On such systems you should almost certainly put the above mentioned line
-    `eval "$(pyenv init -)"` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
-    may observe strange behaviour, such as `pyenv` getting into an infinite loop.
-    See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
+        If Fish is not your login shell, also follow the Bash/Zsh instructions to add to `~/.profile`.
 
-4. **Restart your shell so the path changes take effect.**
-   You can now begin using pyenv.
-    ```sh
-    exec "$SHELL"
-    ```
+      **Proxy note**: If you use a proxy, export `http_proxy` and `https_proxy`, too.
+
+   2. **Add `pyenv` into your shell** by running the output of `pyenv init -`
+     to enable autocompletion and all subcommands.
+   
+      This command needs to run at startup of any interactive shell instance.
+      In an interactive login shell, it needs to run _after_ the commands
+      from the previous step.
+
+      - For **bash**:
+        ~~~ bash
+        echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+        ~~~
+        
+        - **If your `/etc/profile` sources `~/.bashrc` (SUSE):**
+        
+          ~~~bash
+          echo 'if command -v pyenv >/dev/null; then eval "$(pyenv init -)"; done' >> ~/.bashrc 
+          ~~~
+
+      - For **Zsh**:
+        ~~~ zsh
+        echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+        ~~~
+
+      - For **Fish shell**:
+        Add this to `~/.config/fish/config.fish`:
+        ~~~ fish
+        pyenv init - | source
+        ~~~
+
+      **General warning**: There are some systems where the `BASH_ENV` variable is configured
+      to point to `.bashrc`. On such systems you should almost certainly put the above-mentioned line
+      `eval "$(pyenv init -)"` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
+      may observe strange behaviour, such as `pyenv` getting into an infinite loop.
+      See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
+
+4. **Restart your login session for the changes to take effect.**
+   E.g. if you're in a GUI session, you need to fully log out and log back in.
 
 5. [**Install Python build dependencies**](https://github.com/pyenv/pyenv/wiki#suggested-build-environment) before attempting to install a new Python version.
 
@@ -271,26 +313,26 @@ easy to fork and contribute any changes back upstream.
     ```sh
     pyenv install 2.7.8
     ```
-   **NOTE:** If you need to pass configure option to build, please use
+   **NOTE:** If you need to pass a `configure` option to a build, please use the
    ```CONFIGURE_OPTS``` environment variable.
 
-   **NOTE:** If you want to use proxy to download, please use `http_proxy` and `https_proxy`
-   environment variable.
+   **NOTE:** If you want to use proxy to download, please set the `http_proxy` and `https_proxy`
+   environment variables.
 
-   **NOTE:** If you are having trouble installing a python version,
+   **NOTE:** If you are having trouble installing a Python version,
    please visit the wiki page about
-   [Common Build Problems](https://github.com/pyenv/pyenv/wiki/Common-build-problems)
+   [Common Build Problems](https://github.com/pyenv/pyenv/wiki/Common-build-problems).
 
 
 #### Upgrading
 
-If you've installed pyenv using homebrew, upgrade using:
+If you've installed Pyenv using Homebrew, upgrade using:
 ```sh
 brew upgrade pyenv
 ```
 
-If you've installed pyenv using the instructions above, you can
-upgrade your installation at any time using git.
+If you've installed Pyenv using the instructions above, you can
+upgrade your installation at any time using Git.
 
 To upgrade to the latest development version of pyenv, use `git pull`:
 
@@ -299,7 +341,7 @@ cd $(pyenv root)
 git pull
 ```
 
-To upgrade to a specific release of pyenv, check out the corresponding tag:
+To upgrade to a specific release of Pyenv, check out the corresponding tag:
 
 ```sh
 cd $(pyenv root)
@@ -313,24 +355,29 @@ git checkout v0.1.0
 The simplicity of pyenv makes it easy to temporarily disable it, or
 uninstall from the system.
 
-1. To **disable** pyenv managing your Python versions, simply remove the
-  `pyenv init` line from your shell startup configuration. This will
-  remove pyenv shims directory from PATH, and future invocations like
-  `python` will execute the system Python version, as before pyenv.
+1. To **disable** Pyenv managing your Python versions, simply remove the
+  `pyenv init` invocations from your shell startup configuration. This will
+  remove Pyenv shims directory from `PATH`, and future invocations like
+  `python` will execute the system Python version, as it was before Pyenv.
 
-  `pyenv` will still be accessible on the command line, but your Python
-  apps won't be affected by version switching.
+   `pyenv` will still be accessible on the command line, but your Python
+   apps won't be affected by version switching.
 
-2. To completely **uninstall** pyenv, perform step (1) and then remove
+2. To completely **uninstall** Pyenv, remove _all_ configuration lines for it
+   from your shell startup configuration, and then remove
    its root directory. This will **delete all Python versions** that were
    installed under `` $(pyenv root)/versions/ `` directory:
-    ```sh
-    rm -rf $(pyenv root)
-    ```
-   If you've installed pyenv using a package manager, as a final step
-   perform the pyenv package removal. For instance, for Homebrew:
+   
+   ```sh
+   rm -rf $(pyenv root)
+   ```
 
-        brew uninstall pyenv
+   If you've installed Pyenv using a package manager, as a final step,
+   perform the Pyenv package removal. For instance, for Homebrew:
+
+   ```
+   brew uninstall pyenv
+   ```
 
 ### Advanced Configuration
 
@@ -338,8 +385,11 @@ Skip this section unless you must know what every line in your shell
 profile is doing.
 
 `pyenv init` is the only command that crosses the line of loading
-extra commands into your shell. Coming from rvm, some of you might be
-opposed to this idea. Here's what `pyenv init` actually does:
+extra commands into your shell. Coming from RVM, some of you might be
+opposed to this idea. Here's what `pyenv init` actually does.
+Step 1 is done by `eval "$(pyenv init --path)"`, the others are done by
+`eval "$(pyenv init -)"`.
+
 
 1. **Sets up your shims path.** This is the only requirement for pyenv to
    function properly. You can do this by hand by prepending
@@ -361,12 +411,13 @@ opposed to this idea. Here's what `pyenv init` actually does:
    for some reason you need `pyenv` to be a real script rather than a
    shell function, you can safely skip it.
 
-To see exactly what happens under the hood for yourself, run `pyenv init -`.
+To see exactly what happens under the hood for yourself, run `pyenv init -`
+or `pyenv init --path`.
 
 If you don't want to use `pyenv init` and shims, you can still benefit
-from pyenv's ability to install Python versions for you. Just run 
-`pyenv install` and you will find versions installed in 
-`$(pyenv root)/versions`, which you can manually execute or symlink 
+from pyenv's ability to install Python versions for you. Just run
+`pyenv install` and you will find versions installed in
+`$(pyenv root)/versions`, which you can manually execute or symlink
 as required.
 
 ### Uninstalling Python Versions
