@@ -211,9 +211,6 @@ easy to fork and contribute any changes back upstream.
    use the guidance text and the [Advanced Configuration](#advanced-configuration)
    section below to figure out what you need to do in your specific case.
    
-   **MacOS note:** If you installed Pyenv with Homebrew, you don't need
-   to add the `PYENV_ROOT=` and `PATH=` lines.
-   
    1. **Adjust the session-wide environment for your account.** Define
    the `PYENV_ROOT` environment variable to point to the path where
    you cloned the Pyenv repo, add the `pyenv` command-line utility to your `PATH`,
@@ -225,6 +222,10 @@ easy to fork and contribute any changes back upstream.
       `~/.*profile` file, _and_ into `~/.profile`, too, so that they are also
       run by GUI managers (which typically act as a `sh` login shell).
 
+      **MacOS note:** If you installed Pyenv with Homebrew, you don't need
+      to add the `PYENV_ROOT=` and `PATH=` lines.  
+      You also don't need to add commands into `~/.profile` if your shell doesn't use it.
+   
       - For **bash**:
 
          ~~~ bash
