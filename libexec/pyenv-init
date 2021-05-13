@@ -139,7 +139,7 @@ function help_() {
       if [[ $shell == "bash" ]]; then
         echo '# If your ~/.profile sources '"${rc}"','
         echo '# the lines need to be inserted before the part'
-        echo '# that does that.'
+        echo '# that does that. See the README for another option.'
         echo
         echo '# If you have '"${profile}"', make sure that it'
         echo '# also executes the above lines -- e.g. by'
