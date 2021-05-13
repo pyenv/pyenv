@@ -227,7 +227,13 @@ easy to fork and contribute any changes back upstream.
 
       - For **bash**:
 
-         - **If your `~/.profile` sources `~/.bashrc` (Ubuntu):**
+         ~~~ bash
+         echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+         echo 'eval "$(pyenv init --path)"' >> ~/.profile
+         ~~~
+
+         - **If your `~/.profile` sources `~/.bashrc` (Debian, Ubuntu, Mint):**
 
             Put these lines into `~/.profile` _before_ the part that sources `~/.bashrc`:
             ~~~bash
@@ -236,20 +242,12 @@ easy to fork and contribute any changes back upstream.
             eval "$(pyenv init --path)"
             ~~~
 
-         - **If your `~/.profile` doesn't source `~/.bashrc` or doesn't exist (Debian):**
-
-            ~~~ bash
-            echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
-            echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
-            echo 'eval "$(pyenv init --path)"' >> ~/.profile
-            ~~~
-
          **Note:** If you have `~/.bash_profile`, make sure that it too executes the above-added commands,
          e.g. by copying them there or by `source`'ing `~/.profile`.
 
       - For **Zsh**:
 
-        Same as for Debian above, but add the commands into both `~/.profile`
+        Same as for Bash above, but add the commands into both `~/.profile`
         and `~/.zprofile`.
         
       - For **Fish shell**:
@@ -284,7 +282,7 @@ easy to fork and contribute any changes back upstream.
         - **If your `/etc/profile` sources `~/.bashrc` (SUSE):**
         
           ~~~bash
-          echo 'if command -v pyenv >/dev/null; then eval "$(pyenv init -)"; done' >> ~/.bashrc
+          echo 'if command -v pyenv >/dev/null; then eval "$(pyenv init -)"; done' >> ~/.bashrc 
           ~~~
 
       - For **Zsh**:
