@@ -223,7 +223,7 @@ easy to fork and contribute any changes back upstream.
       run by GUI managers (which typically act as a `sh` login shell).
 
       **MacOS note:** If you installed Pyenv with Homebrew, you don't need
-      to add the `PYENV_ROOT=` and `PATH=` lines.  
+      to add the `PYENV_ROOT=` and `PATH=` lines.
       You also don't need to add commands into `~/.profile` if your shell doesn't use it.
    
       - For **bash**:
@@ -320,6 +320,9 @@ easy to fork and contribute any changes back upstream.
 
 4. **Restart your login session for the changes to take effect.**
    E.g. if you're in a GUI session, you need to fully log out and log back in.
+   
+   In MacOS, restarting terminal windows is enough (because MacOS runs shells
+   in them as login shells by default).
 
 5. [**Install Python build dependencies**](https://github.com/pyenv/pyenv/wiki#suggested-build-environment) before attempting to install a new Python version.
 

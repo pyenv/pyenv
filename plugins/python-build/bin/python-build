@@ -1762,6 +1762,13 @@ build_package_verify_py311() {
   build_package_verify_py310 "$1" "${2:-3.11}"
 }
 
+# Post-install check for Python 3.x rolling release scripts
+# XXX: Will need splitting into project-specific ones if there emerge
+# multiple rolling-release scripts with different checks needed
+build_package_verify_py3_latest() {
+  build_package_verify_py311 "$1" "3"
+}
+
 # Copy Tools/gdb/libpython.py to pythonX.Y-gdb.py (#1190)
 build_package_copy_python_gdb() {
   if [ -e "$BUILD_PATH/$1/Tools/gdb/libpython.py" ]; then
