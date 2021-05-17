@@ -45,7 +45,7 @@ extract_initial_comment_block() {
 
 collect_documentation() {
   # shellcheck disable=SC2016
-  $(type -p gawk awk | head -1) '
+  $(type -P gawk awk | head -1) '
     /^Summary:/ {
       summary = substr($0, 10)
       next

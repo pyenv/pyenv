@@ -59,7 +59,7 @@ usage() {
 
 definitions() {
   local query="$1"
-  python-build --definitions | $(type -ap ggrep grep | head -1) -F "$query" || true
+  python-build --definitions | $(type -P ggrep grep | head -1) -F "$query" || true
 }
 
 indent() {

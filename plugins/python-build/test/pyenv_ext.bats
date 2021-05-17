@@ -89,7 +89,7 @@ install_tmp_fixture() {
 }
 
 resolve_link() {
-  $(type -p greadlink readlink | head -1) "$1"
+  $(type -P greadlink readlink | head -1) "$1"
 }
 
 run_inline_definition_with_name() {

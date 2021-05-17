@@ -58,7 +58,7 @@ lib "$1"
 
 
 resolve_link() {
-  $(type -p greadlink readlink | head -1) "$1"
+  $(type -P greadlink readlink | head -1) "$1"
 }
 
 abs_dirname() {
@@ -1494,7 +1494,7 @@ build_package_verify_openssl() {
       RbConfig::CONFIG.fetch("configure_args").shellsplit.each { |arg| $stderr.puts "  #{arg}" }
       exit 1
     end
-  ' "$(basename "$(type -p yum apt-get | head -1)")" >&4 2>&1
+  ' "$(basename "$(type -P yum apt-get | head -1)")" >&4 2>&1
 }
 
 use_homebrew_zlib() {
