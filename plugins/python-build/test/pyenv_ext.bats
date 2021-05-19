@@ -249,15 +249,15 @@ OUT
 }
 
 @test "enable framework" {
-  mkdir -p "${INSTALL_ROOT}/Python.framework/Versions/Current/bin"
-  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3"
-  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3"
-  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4"
-  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4"
-  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3-config"
-  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3-config"
-  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4-config"
-  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4-config"
+  mkdir -p "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin"
+  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3"
+  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3"
+  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4"
+  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4"
+  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3-config"
+  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3-config"
+  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4-config"
+  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4-config"
 
   # yyuu/pyenv#257
   stub uname '-s : echo Darwin'
@@ -273,8 +273,8 @@ OUT
 PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-framework=${TMP}/install/Library/Frameworks)
 EOS
 
-  [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python" ]
-  [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python-config" ]
+  [ -L "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python" ]
+  [ -L "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python-config" ]
 }
 
 @test "enable universalsdk" {
