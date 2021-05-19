@@ -2,7 +2,7 @@
 install_package "openssl-1.0.2k" "https://www.openssl.org/source/old/1.0.2/openssl-1.0.2k.tar.gz#6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
 if has_tar_xz_support; then
-  install_package "Python-3.5.1" "https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz#c6d57c0c366d9060ab6c0cdf889ebf3d92711d466cc0119c441dbf2746f725c9" ldflags_dirs standard verify_py35 copy_python_gdb ensurepip
+  install_package "Python-3.5.1" "https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tar.xz#c6d57c0c366d9060ab6c0cdf889ebf3d92711d466cc0119c441dbf2746f725c9" standard verify_py35 copy_python_gdb ensurepip
 else
-  install_package "Python-3.5.1" "https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tgz#687e067d9f391da645423c7eda8205bae9d35edc0c76ef5218dcbe4cc770d0d7" ldflags_dirs standard verify_py35 copy_python_gdb ensurepip
+  install_package "Python-3.5.1" "https://www.python.org/ftp/python/3.5.1/Python-3.5.1.tgz#687e067d9f391da645423c7eda8205bae9d35edc0c76ef5218dcbe4cc770d0d7" standard verify_py35 copy_python_gdb ensurepip
 fi

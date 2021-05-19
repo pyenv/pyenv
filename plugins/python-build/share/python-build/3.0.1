@@ -1,7 +1,7 @@
 #require_gcc
 install_package "openssl-1.0.2k" "https://www.openssl.org/source/old/1.0.2/openssl-1.0.2k.tar.gz#6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
-install_package "Python-3.0.1" "https://www.python.org/ftp/python/3.0.1/Python-3.0.1.tgz#7d5f2feae9035f1d3d9e6bb7f092dbf374d6bb4b25abd0d2d11f13bba1cb04de" ldflags_dirs standard verify_py30
+install_package "Python-3.0.1" "https://www.python.org/ftp/python/3.0.1/Python-3.0.1.tgz#7d5f2feae9035f1d3d9e6bb7f092dbf374d6bb4b25abd0d2d11f13bba1cb04de" standard verify_py30
 if [[ "Darwin" == "$(uname -s)" ]]; then
   # https://github.com/pyenv/pyenv/issues/456
   { echo

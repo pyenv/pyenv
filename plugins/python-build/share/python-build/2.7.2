@@ -1,4 +1,4 @@
 #require_gcc
 install_package "openssl-1.0.2k" "https://www.openssl.org/source/old/1.0.2/openssl-1.0.2k.tar.gz#6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
-install_package "Python-2.7.2" "https://www.python.org/ftp/python/2.7.2/Python-2.7.2.tgz#1d54b7096c17902c3f40ffce7e5b84e0072d0144024184fff184a84d563abbb3" ldflags_dirs standard verify_py27 copy_python_gdb ensurepip
+install_package "Python-2.7.2" "https://www.python.org/ftp/python/2.7.2/Python-2.7.2.tgz#1d54b7096c17902c3f40ffce7e5b84e0072d0144024184fff184a84d563abbb3" standard verify_py27 copy_python_gdb ensurepip

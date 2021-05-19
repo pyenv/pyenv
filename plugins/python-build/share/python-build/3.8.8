@@ -4,7 +4,7 @@ export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
 install_package "openssl-1.1.1i" "https://www.openssl.org/source/old/1.1.1/openssl-1.1.1i.tar.gz#e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
 if has_tar_xz_support; then
-  install_package "Python-3.8.8" "https://www.python.org/ftp/python/3.8.8/Python-3.8.8.tar.xz#7c664249ff77e443d6ea0e4cf0e587eae918ca3c48d081d1915fe2a1f1bcc5cc" ldflags_dirs standard verify_py38 copy_python_gdb ensurepip
+  install_package "Python-3.8.8" "https://www.python.org/ftp/python/3.8.8/Python-3.8.8.tar.xz#7c664249ff77e443d6ea0e4cf0e587eae918ca3c48d081d1915fe2a1f1bcc5cc" standard verify_py38 copy_python_gdb ensurepip
 else
-  install_package "Python-3.8.8" "https://www.python.org/ftp/python/3.8.8/Python-3.8.8.tgz#76c0763f048e4f9b861d24da76b7dd5c7a3ba7ec086f40caedeea359263276f7" ldflags_dirs standard verify_py38 copy_python_gdb ensurepip
+  install_package "Python-3.8.8" "https://www.python.org/ftp/python/3.8.8/Python-3.8.8.tgz#76c0763f048e4f9b861d24da76b7dd5c7a3ba7ec086f40caedeea359263276f7" standard verify_py38 copy_python_gdb ensurepip
 fi
