@@ -270,7 +270,7 @@ verify_python python3.4
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-framework=${TMP}/install)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-framework=${TMP}/install/Library/Frameworks)
 EOS
 
   [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python" ]

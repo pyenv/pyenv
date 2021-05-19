@@ -1569,7 +1569,7 @@ build_package_symlink_version_suffix() {
       mv -f "${PREFIX_PATH}/bin" "${PREFIX_PATH}/bin.orig"
     fi
     # Only symlinks are installed in ${PREFIX_PATH}/bin
-    ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
+    ln -fs "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
   fi
 
   # Not create symlinks on `altinstall` (#255)
@@ -2031,16 +2031,17 @@ if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   fi
   create_framework_dirs() {
     local version="$(echo "$1" | sed -E 's/^[^0-9]*([0-9]+\.[0-9]+).*$/\1/')"
-    mkdir -p "${PREFIX_PATH}/Python.framework/Versions/${version}"
-    ( cd "${PREFIX_PATH}/Python.framework/Versions" && ln -fs "${version}" "Current")
+    mkdir -p "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/${version}"
+    ( cd "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions" && ln -fs "${version}" "Current")
     local path
     for path in include lib share; do
-      mkdir -p "${PREFIX_PATH}/Python.framework/Versions/Current/${path}"
-      ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/${path}" "${PREFIX_PATH}/${path}"
+      mkdir -p "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/Current/${path}"
+      ln -fs "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/Current/${path}" "${PREFIX_PATH}/${path}"
     done
   }
   create_framework_dirs "${DEFINITION_PATH##*/}"
-  package_option python configure --enable-framework="${PREFIX_PATH}"
+  # the `/Library/Frameworks` suffix makes CPython build install apps under prefix rather than into /Applications (#1003)
+  package_option python configure --enable-framework="${PREFIX_PATH}/Library/Frameworks"
 fi
 
 # Build against universal SDK (#219, #220)
