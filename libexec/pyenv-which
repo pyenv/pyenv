@@ -6,7 +6,7 @@
 #
 # Displays the full path to the executable that pyenv will invoke when
 # you run the given command.
-# Use --nosystem argument in case when you don't need to search command in the 
+# Use --nosystem argument in case when you don't need to search command in the
 # system environment.
 #
 
@@ -58,6 +58,10 @@ for version in "${versions[@]}" "$system"; do
     break
   fi
 done
+
+if [ -z "$PYENV_COMMAND_PATH" ] && [ ! -x "$PYENV_COMMAND" ]; then
+  PYENV_COMMAND_PATH="$PYENV_COMMAND"
+fi
 
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks which`)
