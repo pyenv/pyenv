@@ -4,4 +4,4 @@ install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.
 has_tar_xz_support \
   && src="https://www.python.org/ftp/python/3.4.10/Python-3.4.10.tar.xz#d46a8f6fe91679e199c671b1b0a30aaf172d2acb5bcab25beb35f16c3d195b4e" \
   || src="https://www.python.org/ftp/python/3.4.10/Python-3.4.10.tgz#217757699249ab432571b381386d441e12b433100ab5f908051fcb7cced2539d"
-install_package "Python-3.4.10" "$src" ldflags_dirs standard verify_py34 ensurepip
+install_package "Python-3.4.10" "$src" standard verify_py34 ensurepip

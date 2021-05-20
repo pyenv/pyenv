@@ -4,7 +4,7 @@ export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
 install_package "openssl-1.1.1k" "https://www.openssl.org/source/openssl-1.1.1k.tar.gz#892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
 if has_tar_xz_support; then
-    install_package "Python-3.9.3" "https://www.python.org/ftp/python/3.9.3/Python-3.9.3.tar.xz#30811039c65e04c14fc698e423947e464f9316e69fb44610bd38446046bb82b5" ldflags_dirs standard verify_py39 copy_python_gdb ensurepip
+    install_package "Python-3.9.3" "https://www.python.org/ftp/python/3.9.3/Python-3.9.3.tar.xz#30811039c65e04c14fc698e423947e464f9316e69fb44610bd38446046bb82b5" standard verify_py39 copy_python_gdb ensurepip
 else
-    install_package "Python-3.9.3" "https://www.python.org/ftp/python/3.9.3/Python-3.9.3.tgz#3afeb61a45b5a2e6f1c0f621bd8cf925a4ff406099fdb3d8c97b993a5f43d048" ldflags_dirs standard verify_py39 copy_python_gdb ensurepip
+    install_package "Python-3.9.3" "https://www.python.org/ftp/python/3.9.3/Python-3.9.3.tgz#3afeb61a45b5a2e6f1c0f621bd8cf925a4ff406099fdb3d8c97b993a5f43d048" standard verify_py39 copy_python_gdb ensurepip
 fi
