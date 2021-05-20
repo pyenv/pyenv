@@ -1,5 +1,24 @@
 ## Version History
 
+## Release 2.0.0
+
+* Support for CPython 3.9.5 has been added.
+* Support for CPython 3.8.10 has been added.
+* Support for CPython 3.10.0b1 has been added.
+* Support for GraalPython 21.1.0 has been added.
+* Support for  Anaconda 2021.05 has been added.
+* Support for   Miniforge3 4.10.1-1 has been added.
+* CPython 3.10-dev target branch renamed.
+* CPython 3.10-dev and 3.11-dev updated.
+* Bump OpenSSL to 1.1.1x for all Pythons that support MacOS 11
+* Update generated configuration files before run ./configure
+* Full shell configuration instructions placed into `pyenv init`
+* Prevent build from installing MacOS apps globally
+* ldflags_dirs is not needed for Python and causes failures
+
+## Breaking changes
+* Split startup logic into PATH and everything else (https://github.com/pyenv/pyenv/issues/1649#issuecomment-694388530)
+
 ## 1.2.27
 
 * Add GraalPython 21.1.0 (#1882)
