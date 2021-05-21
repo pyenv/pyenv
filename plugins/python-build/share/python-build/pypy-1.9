@@ -1,16 +1,16 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux.tar.bz2#1e3f9c3d06f8bbfa0dcb1301b40c298096249a7d7c2b4594b3fb1c3e7b9888f2" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.9" "https://downloads.python.org/pypy/pypy-1.9-linux.tar.bz2#1e3f9c3d06f8bbfa0dcb1301b40c298096249a7d7c2b4594b3fb1c3e7b9888f2" "pypy" verify_py27 ensurepip
   ;;
 "linux64" )
-  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-linux64.tar.bz2#4298252515e78c96f4ecd9f25be957411c060ece02d9213eef8d781cf528d18f" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.9" "https://downloads.python.org/pypy/pypy-1.9-linux64.tar.bz2#4298252515e78c96f4ecd9f25be957411c060ece02d9213eef8d781cf528d18f" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
-  install_package "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-osx64.tar.bz2#4858f200e32c1070c77c1234ea0e9473eeda98bcd3832c4231f3e46e4e3b74b1" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.9" "https://downloads.python.org/pypy/pypy-1.9-osx64.tar.bz2#4858f200e32c1070c77c1234ea0e9473eeda98bcd3832c4231f3e46e4e3b74b1" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.9" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.9-win32.zip#54fafe8c69df390d2a460bab022145aaacd2c62c4a569873b22fdc7475f31581" "pypy" verify_py27 ensurepip
+  install_zip "pypy-1.9" "https://downloads.python.org/pypy/pypy-1.9-win32.zip#54fafe8c69df390d2a460bab022145aaacd2c62c4a569873b22fdc7475f31581" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

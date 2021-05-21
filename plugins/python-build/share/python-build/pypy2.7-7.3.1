@@ -1,0 +1,39 @@
+VERSION='7.3.1'
+PYVER='2.7'
+
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  install_package "pypy${PYVER}-v${VERSION}-linux32" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-linux32.tar.bz2#cd155d06cd0956d9de4a16e8a6bdf0722cb45b5bc4bbf805825d393ebd6690ad" "pypy" "verify_py${PYVER//./}" ensurepip
+  ;;
+"linux64" )
+  install_package "pypy${PYVER}-v${VERSION}-linux64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-linux64.tar.bz2#be74886547df7bf7094096a11fc0a48496779d0d1b71901797b0c816f92caca3" "pypy" "verify_py${PYVER//./}" ensurepip
+  ;;
+"linux-aarch64" )
+  install_package "pypy${PYVER}-v${VERSION}-aarch64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-aarch64.tar.bz2#094f23ab262e666d8740bf27459a6b1215a628dad9b6c2a88f1ed5c793fab267" "pypy" "verify_py${PYVER//./}" ensurepip
+  ;;
+"osx64" )
+  if require_osx_version "10.13"; then
+    install_package "pypy${PYVER}-v${VERSION}-osx64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-osx64.tar.bz2#dfd4651243441d2f8f1c348e9ecc09848642d0c31bb323aa8ac320e5b9f232f0" "pypy" "verify_py${PYVER//./}" ensurepip
+  else
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
+      echo "try 'pypy${PYVER}-${VERSION}-src' to build from source."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"win32" )
+  install_zip "pypy${PYVER}-v${VERSION}-win32" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-win32.zip#e3c0dfb385d9825dd7723f26576d55d43ed92f1178f2399ab39e9fa11621a47b" "pypy" "verify_py${PYVER//./}" ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy${PYVER}-${VERSION}-src' to build from source."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

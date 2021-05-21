@@ -1,0 +1,42 @@
+name: ubuntu_tests
+on: [pull_request, push]
+jobs:
+  ubuntu_tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - 2.7.18
+          - 3.5.10
+          - 3.6.13
+          - 3.7.10
+          - 3.8.10
+          - 3.9.5
+    runs-on: Ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      # Normally, we would use the superbly maintained...
+      # - uses: actions/setup-python@v2
+      #   with:
+      #    python-version: ${{ matrix.python-version }}
+      # ... but in the repo, we want to test pyenv builds on Ubuntu
+      - run: |
+          sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
+              libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+              xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+      # https://github.com/pyenv/pyenv#installation
+      - run: pwd
+      - env:
+          PYENV_ROOT: /home/runner/work/pyenv/pyenv
+        run: |
+          echo $PYENV_ROOT
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+          bin/pyenv install ${{ matrix.python-version }}
+          bin/pyenv global ${{ matrix.python-version }}
+          bin/pyenv rehash
+      - run: python --version
+      - run: python -m pip --version
+      - shell: python  # Prove that actual Python == expected Python
+        env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))

@@ -1,0 +1,5 @@
+#require_gcc
+has_tar_xz_support \
+  && src="https://micropython.org/resources/source/micropython-1.12.tar.xz#181bfe82ba310a3f91540ee70d373f247141db3f9de8082fb189145df085d1b4" \
+  || src="https://github.com/micropython/micropython/releases/download/v1.12/micropython-1.12.tar.gz#98fd02366bca23a61c77bbf2b999a45cfc237132db66b5b0874378a5446d81ba"
+install_package micropython-1.12 "$src" micropython

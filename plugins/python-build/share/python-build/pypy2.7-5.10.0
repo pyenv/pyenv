@@ -1,23 +1,23 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.10.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.10.0-linux32.tar.bz2#ee1980467ac8cc9fa9d609f7da93c5282503e59a548781248fe1914a7199d540" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.10.0-linux32" "https://downloads.python.org/pypy/pypy2-v5.10.0-linux32.tar.bz2#ee1980467ac8cc9fa9d609f7da93c5282503e59a548781248fe1914a7199d540" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux64" )
   if require_distro "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.10.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.10.0-linux64.tar.bz2#da85af9240220179493ad66c857934dc7ea91aef8f168cd293a2d99af8346ee2" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.10.0-linux64" "https://downloads.python.org/pypy/pypy2-v5.10.0-linux64.tar.bz2#da85af9240220179493ad66c857934dc7ea91aef8f168cd293a2d99af8346ee2" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.10.0-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.10.0-linux_x86_64-portable.tar.bz2#c966124497ba8728654ce1161fa4c46b035ff30f289be70960f58292e5897cc8" "pypy" verify_py27 ensurepip
+    install_package "pypy-5.10.0-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.10.0-linux_x86_64-portable.tar.bz2#c966124497ba8728654ce1161fa4c46b035ff30f289be70960f58292e5897cc8" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy2-v5.10.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.10.0-linux-armel.tar.bz2#6fdd55dd8f674efd06f76edb60a09a03b9b04a5fbc56741f416a94a0b9d2ff91" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v5.10.0-linux-armel" "https://downloads.python.org/pypy/pypy2-v5.10.0-linux-armel.tar.bz2#6fdd55dd8f674efd06f76edb60a09a03b9b04a5fbc56741f416a94a0b9d2ff91" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy2-v5.10.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.10.0-linux-armhf-raspbian.tar.bz2#5ec3617bb9a07a0a0b2f3c8fbe69912345da4696cdb0a2aca7889b6f1e74435c" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.10.0-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy2-v5.10.0-linux-armhf-raspbian.tar.bz2#5ec3617bb9a07a0a0b2f3c8fbe69912345da4696cdb0a2aca7889b6f1e74435c" "pypy" verify_py27 ensurepip
   else
     { echo
       colorize 1 "ERROR"
@@ -29,11 +29,11 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "osx64" )
-  install_package "pypy2-v5.10.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.10.0-osx64.tar.bz2#7e4120f0a83529a6851cbae0ec107dc7085ba8a4aeff4e7bd9da9aadb1ef37a4" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v5.10.0-osx64" "https://downloads.python.org/pypy/pypy2-v5.10.0-osx64.tar.bz2#7e4120f0a83529a6851cbae0ec107dc7085ba8a4aeff4e7bd9da9aadb1ef37a4" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy2-v5.10.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.10.0-win32.zip#350914f9b70404781674f2f188f84d440d9d25da46ed9733b3f98269a510e033" "pypy" verify_py27 ensurepip
+  install_zip "pypy2-v5.10.0-win32" "https://downloads.python.org/pypy/pypy2-v5.10.0-win32.zip#350914f9b70404781674f2f188f84d440d9d25da46ed9733b3f98269a510e033" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

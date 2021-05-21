@@ -1,7 +1,7 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
-    install_package "pypy3.6-v7.1.0-linux32" "https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.1.0-linux32.tar.bz2#031bfac61210a6e161bace0691b854dc15d01b0e624dc0588c544ee5e1621a83" "pypy" verify_py27 ensurepip
+    install_package "pypy3.6-v7.1.0-linux32" "https://downloads.python.org/pypy/pypy3.6-v7.1.0-linux32.tar.bz2#031bfac61210a6e161bace0691b854dc15d01b0e624dc0588c544ee5e1621a83" "pypy" verify_py27 ensurepip
   else
     { echo
       colorize 1 "ERROR"
@@ -14,14 +14,14 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 "linux64" )
   if require_distro "Ubuntu 12.04" "Ubuntu 14.04" "Ubuntu 16.04" 1>/dev/null 2>&1; then
-    install_package "pypy3.6-v7.1.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.1.0-linux64.tar.bz2#270dd06633cf03337e6f815d7235e790e90dabba6f4b6345c9745121006925fc" "pypy" verify_py36 ensurepip
+    install_package "pypy3.6-v7.1.0-linux64" "https://downloads.python.org/pypy/pypy3.6-v7.1.0-linux64.tar.bz2#270dd06633cf03337e6f815d7235e790e90dabba6f4b6345c9745121006925fc" "pypy" verify_py36 ensurepip
   else
-    install_package "pypy3.6-7.1.0-beta-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3.6-7.1.0-beta-linux_x86_64-portable.tar.bz2#d1bde814fb0c3645dfc0bdab67c335c8aa259b83fb39106e2e11b0112bcbb602" "pypy" verify_py36 ensurepip
+    install_package "pypy3.6-7.1.0-beta-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy3.6-7.1.0-beta-linux_x86_64-portable.tar.bz2#d1bde814fb0c3645dfc0bdab67c335c8aa259b83fb39106e2e11b0112bcbb602" "pypy" verify_py36 ensurepip
   fi
   ;;
 "osx64" )
   if require_osx_version "10.13"; then
-    install_package "pypy3.6-v7.1.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.1.0-osx64.tar.bz2#d46e005ba095cb4a7006079ffbf4fe63c18cf5e9d8ce9ce8383efc1a4863ab5b" "pypy" verify_py36 ensurepip
+    install_package "pypy3.6-v7.1.0-osx64" "https://downloads.python.org/pypy/pypy3.6-v7.1.0-osx64.tar.bz2#d46e005ba095cb4a7006079ffbf4fe63c18cf5e9d8ce9ce8383efc1a4863ab5b" "pypy" verify_py36 ensurepip
   else
     { echo
       colorize 1 "ERROR"
@@ -33,7 +33,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "win32" )
-  install_zip "pypy3.6-v7.1.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy3.6-v7.1.0-win32.zip#77a0576a3d518210467f0df2d0d9a1892c664566dc02f25d974c2dbc6b4749e7" "pypy" verify_py36 ensurepip
+  install_zip "pypy3.6-v7.1.0-win32" "https://downloads.python.org/pypy/pypy3.6-v7.1.0-win32.zip#77a0576a3d518210467f0df2d0d9a1892c664566dc02f25d974c2dbc6b4749e7" "pypy" verify_py36 ensurepip
   ;;
 * )
   { echo

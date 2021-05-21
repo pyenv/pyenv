@@ -12,28 +12,3 @@ load test_helper
   PYENV_VERSION="2.7.10:system" run pyenv-prefix
   assert_success "${PYENV_ROOT}/versions/2.7.10:${PYENV_TEST_DIR}"
 }
-
-@test "should use dirname of file argument as PYENV_DIR" {
-  mkdir -p "${PYENV_TEST_DIR}/dir1"
-  touch "${PYENV_TEST_DIR}/dir1/file.py"
-  PYENV_FILE_ARG="${PYENV_TEST_DIR}/dir1/file.py" run pyenv echo PYENV_DIR
-  assert_output "${PYENV_TEST_DIR}/dir1"
-}
-
-@test "should follow symlink of file argument (#379, #404)" {
-  mkdir -p "${PYENV_TEST_DIR}/dir1"
-  mkdir -p "${PYENV_TEST_DIR}/dir2"
-  touch "${PYENV_TEST_DIR}/dir1/file.py"
-  ln -s "${PYENV_TEST_DIR}/dir1/file.py" "${PYENV_TEST_DIR}/dir2/symlink.py"
-  PYENV_FILE_ARG="${PYENV_TEST_DIR}/dir2/symlink.py" run pyenv echo PYENV_DIR
-  assert_output "${PYENV_TEST_DIR}/dir1"
-}
-
-@test "should handle relative symlinks for file argument (#580)" {
-  mkdir -p "${PYENV_TEST_DIR}"
-  cd "${PYENV_TEST_DIR}"
-  touch file.py
-  ln -s file.py symlink.py
-  PYENV_FILE_ARG="symlink.py" run pyenv echo PYENV_DIR
-  assert_output "${PYENV_TEST_DIR}"
-}

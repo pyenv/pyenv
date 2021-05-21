@@ -27,6 +27,8 @@ command_path() {
 }
 
 extract_initial_comment_block() {
+  LC_ALL= \
+  LC_CTYPE=C \
   sed -ne "
     /^#/ !{
       q
@@ -43,7 +45,7 @@ extract_initial_comment_block() {
 
 collect_documentation() {
   # shellcheck disable=SC2016
-  $(type -p gawk awk | head -1) '
+  $(type -P gawk awk | head -1) '
     /^Summary:/ {
       summary = substr($0, 10)
       next
@@ -151,7 +153,7 @@ if [ -z "$1" ] || [ "$1" == "pyenv" ]; then
   [ -z "$usage" ] || exit
   echo
   echo "Some useful pyenv commands are:"
-  print_summaries commands $(exec pyenv-commands | sort -u)
+  print_summaries $(exec pyenv-commands | sort -u)
   echo
   echo "See \`pyenv help <command>' for information on a specific command."
   echo "For full documentation, see: https://github.com/pyenv/pyenv#readme"

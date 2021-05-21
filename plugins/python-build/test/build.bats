@@ -561,16 +561,3 @@ OUT
   run python-build "${TMP}/build-definition" "$INSTALL_ROOT"
   assert_failure "python-build: TMPDIR=$TMPDIR is set to a non-accessible location"
 }
-
-@test "initializes LDFLAGS directories" {
-  cached_tarball "Python-3.6.2"
-
-  export LDFLAGS="-L ${BATS_TEST_DIRNAME}/what/evs"
-  run_inline_definition <<DEF
-install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz" ldflags_dirs
-DEF
-  assert_success
-
-  assert [ -d "${INSTALL_ROOT}/lib" ]
-  assert [ -d "${BATS_TEST_DIRNAME}/what/evs" ]
-}

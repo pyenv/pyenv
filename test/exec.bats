@@ -90,7 +90,7 @@ OUT
   assert_success "${system_python}"
 }
 
-@test '$PATH is not modified with system Python' {
+@test 'PATH is not modified with system Python' {
   # Create a wrapper executable that verifies PATH.
   PYENV_VERSION="custom"
   create_executable "python" '[[ "$PATH" == "${PYENV_TEST_DIR}/root/versions/custom/bin:"* ]] || { echo "unexpected:$PATH"; exit 2;}'

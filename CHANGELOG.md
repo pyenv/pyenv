@@ -1,5 +1,156 @@
 ## Version History
 
+## Release 2.0.0
+
+* Support for CPython 3.9.5 has been added.
+* Support for CPython 3.8.10 has been added.
+* Support for CPython 3.10.0b1 has been added.
+* Support for GraalPython 21.1.0 has been added.
+* Support for  Anaconda 2021.05 has been added.
+* Support for   Miniforge3 4.10.1-1 has been added.
+* CPython 3.10-dev target branch renamed.
+* CPython 3.10-dev and 3.11-dev updated.
+* Bump OpenSSL to 1.1.1x for all Pythons that support MacOS 11
+* Update generated configuration files before run ./configure
+* Full shell configuration instructions placed into `pyenv init`
+* Prevent build from installing MacOS apps globally
+* ldflags_dirs is not needed for Python and causes failures
+
+## Breaking changes
+* Split startup logic into PATH and everything else (https://github.com/pyenv/pyenv/issues/1649#issuecomment-694388530)
+
+## 1.2.27
+
+* Add GraalPython 21.1.0 (#1882)
+* Add CPython 3.10.0a7 (#1880)
+* Docs(README): fix info about version-file separator (#1874)
+* List versions starting with a dot (#1350)
+* Feat: support (skip) commented lines in version-file (#1866)
+* pypy3.7-7.3.4 (#1873)
+* Create miniforge3-4.10 (#1868)
+* Add CPython 3.9.4 (#1865)
+
+## 1.2.26
+
+* Add CPython 3.9.4 (#1865)
+
+## 1.2.25
+
+* bpo-43631: update to openssl 1.1.1k (#1861)
+* Add CPython 3.9.3 and 3.8.9 (#1859)
+* Add micropython 1.14 (#1858)
+* Shell detect improvements (#1835)
+* Test(init): remove misleading detect from parent shell case arg (#1856)
+* Add GraalPython 21.0.0 (#1855)
+
+## 1.2.24
+
+* GitHub Actions: Add $PYENV_ROOT/shims to $PATH (#1838)
+* Add Python 3.10.0a6 (#1839)
+* Remove the "Using script's directory as PYENV_DIR if shim is invoked with a script argument" feature (#1814)
+* Update GET_PIP_URL (#1844)
+* GitHub Action to build Python versions on Ubuntu (#1794)
+* Make work in nounset (-u) mode (#1786)
+* Update miniforge3-4.9.2 (#1834)
+* Added aarch64 for Linux in anaconda_architecture() (#1833)
+* Hook script to add latest suffix for install command (#1831)
+* Fix error link (#1832)
+* Clarify proxy variable names in readme (#1830)
+* Travis CI: Add Xcode 12 on macOS 10.15.5 (#1708)
+* Added --nosystem argument (#1829)
+* Add CPython 3.8.8 (#1825)
+* Add CPython 3.9.2 (#1826)
+* Add manpage (#1790)
+
+## 1.2.23
+
++ python-build: Add CPython v3.7.10 (#1818)
++ python-build: Add CPython v3.6.13 (#1817)
+* python-build: Add PyPy 3.7-c-jit-latest (#1812)
+* python-build: Add PyPy 3.7 (#1718, #1726, #1780)
+* python-build: Add miniconda3 4.9.2 (#1763)
+* python-build: Add miniconda3 4.8.3 (#1763)
+* python-build: Add miniconda3 4.8.2 (#1763)
+* python-build: Add Miniforge3-4.9.2 (#1782)
+* python-build: Fix download links for some PyPy and Stackless versions (#1692)
+* python-build: Add PYENV_DEBUG option (#1806)
+* python-build: Fix get-pip which dropped support for legacy Python (#1793)
+* pyenv-help: Fix `sed: RE error: illegal byte sequence` (#1714)
+* pyenv-versions: Fix not printing asterisk for current version in Bash 3 (#1815)
+* pyenv-prefix: "system" python - support cases where python3 is in PATH but not python (#1655)
+* pyenv-which: Added fallback to system executable (#1797)
+* pyenv-rehash: Use associative arrays for better performance on bash >= 4 (#1749)
+* pyenv-rehash: Try to sleep in 0.1 sec steps when acquiring lock (#1798)
+* pyenv: Use a better PS4 as recommended by Bash Hackers Wiki (#1810)
+
+## 1.2.22
+
++ python-build: Add LDFLAGS for zlib on macOS >= 1100 (#1711)
++ python-build: Add the CPython 3.9.1 (#1752)
++ python-build: Change order of LDFLAGS paths (#1754)
++ python-build: Docker config for testing python-build (#1548)
++ python-build: Put prerequisite for installation before install (#1750)
++ python-build: Add GraalPython 20.3 (#1736)
++ python-build: Add CPython 3.8.7
++ python-build: Added anaconda3-2020.11 (#1774)
++ python-build: Added arm64 architecture support in python-build for macOS  (#1775)
+
+## 1.2.21
+
+* python-build: Add CPython 3.9.0 (#1706)
+* python-build: Add CPython 3.8.6 (#1698)
+* python-build: Add CPython 3.7.9 (#1680)
+* python-build: Add CPython 3.6.12 (#1680)
+* python-build: Add CPython 3.5.10 (#1690)
+* python-build: Add Jython 2.7.2 (#1672)
+* python-build: Add Graalpython 20.1.0 (#1594)
+* python-build: Add Graalpython 20.2.0 (#1594)
+* python-build: Add Anaconda3-2020.07 (#1684)
+* python-build: Add micropython-1.13 (#1704)
+* python-build: Fix PyPy download links (#1682)
+* python-build: Support for `PYTHON_BUILD_MIRROR_URL` when checksums do not exist (#1673)
+* pyenv: Search for plugins in `PYENV_DIR` and `PYENV_ROOT` (#1697)
+* pyenv-help: Fix 'sed: RE error: illegal byte sequence' (#1670)
+
+## 1.2.20
+
+* python-build: Add CPython 3.8.5 (#1667)
+* python-build: Add CPython 3.8.4 (#1658)
+* python-build: Add CPython 3.7.8
+* python-build: Add CPython 3.6.11
+* pyenv-install: Make grep detection more robust (#1663)
+* python-build: Fix has_tar_xz_support function on FreeBSD. (#1652)
+
+## 1.2.19
+
+* python-build: Add CPython 3.8.3 (#1612)
+* python-build: Add CPython 2.7.18 (#1593)
+* python-build: Add CPython 3.10-dev (#1619)
+* python-build: Add anaconda3-2020.02 (#1584)
+* python-build: Add stackless 3.7.5 (#1589)
+
+## 1.2.18
+
+* python-build: Update download URLs for old OpenSSL releases (#1578)
+* python-build: Prevent `brew: command not found` messages that are not errors (#1544)
+
+## 1.2.17
+
+* python-build: Add CPython 3.8.2
+* python-build: Add CPython 3.7.7 (#1553)
+* python-build: Add Miniconda versions newer than 4.3.30 (#1361)
+* python-build: Add Micropython 1.12 (#1542)
+* python-build: Add Add CPython 3.9.0a4
+* pyenv: Fix sed illegal byte sequence error (#1521)
+
+## 1.2.16
+
+* python-build: Add CPython 3.8.1 (#1497)
+* python-build: Add CPython 3.7.6 (#1498)
+* python-build: Add CPython 3.6.10 (#1499)
+* python-build: Add CPython 3.5.9 (#1448)
+* python-build: Add PyPy 7.3.0 (1502)
+
 ## 1.2.15
 
 * python-build: Add CPython 3.7.5 (#1423)

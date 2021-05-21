@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-ppc64le" )
+  install_script "Miniconda3-py38_4.8.3-Linux-ppc64le" "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux-ppc64le.sh#a48a5db8c22c47cea7b04af2c3af2a1f" "miniconda" verify_py38
+  ;;
+"Linux-x86_64" )
+  install_script "Miniconda3-py38_4.8.3-Linux-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-Linux-x86_64.sh#d63adf39f2c220950a063e0529d4ff74" "miniconda" verify_py38
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniconda3-py38_4.8.3-MacOSX-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py38_4.8.3-MacOSX-x86_64.sh#3fe6d972d40ee60f2e8496cf943ad852" "miniconda" verify_py38
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

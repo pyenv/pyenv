@@ -19,6 +19,8 @@ PYTHON_BUILD_VERSION="20180424"
 OLDIFS="$IFS"
 
 set -E
+[ -n "$PYENV_DEBUG" ] && set -x
+
 exec 3<&2 # preserve original stderr at fd 3
 
 
@@ -56,7 +58,7 @@ lib "$1"
 
 
 resolve_link() {
-  $(type -p greadlink readlink | head -1) "$1"
+  $(type -P greadlink readlink | head -1) "$1"
 }
 
 abs_dirname() {
@@ -480,7 +482,12 @@ reuse_existing_tarball() {
 }
 
 download_tarball() {
-  local package_url="$1"
+  local official_source="www.python.org/ftp/python"
+  if [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ]; then
+      local package_url="$(echo "$1" | sed -e "s|.*//${URL_BASE:-$official_source}|$PYTHON_BUILD_MIRROR_URL|g")"
+  else
+      local package_url="$1"
+  fi
   [ -n "$package_url" ] || return 1
 
   local package_filename="$2"
@@ -504,7 +511,7 @@ download_tarball() {
 }
 
 has_tar_xz_support() {
-  tar Jc /dev/null 1>/dev/null 2>&1
+  tar Jcf - /dev/null 1>/dev/null 2>&1
 }
 
 fetch_git() {
@@ -791,14 +798,6 @@ build_package_standard_install() {
   } >&4 2>&1
 }
 
-build_package_standard_install_with_bundled_gems() {
-  { "$MAKE" update-gems
-    "$MAKE" extract-gems
-  } >&4 2>&1
-
-  build_package_standard_install "$@"
-}
-
 # Backward Compatibility for standard function
 build_package_standard() {
   build_package_standard_build "$@"
@@ -806,14 +805,7 @@ build_package_standard() {
 }
 
 build_package_autoconf() {
-  { autoconf
-  } >&4 2>&1
-}
-
-build_package_ruby() {
-  local package_name="$1"
-
-  { "$RUBY_BIN" setup.rb
+  { autoreconf
   } >&4 2>&1
 }
 
@@ -824,132 +816,9 @@ build_package_python() {
   } >&4 2>&1
 }
 
-build_package_ree_installer() {
-  build_package_auto_tcltk
-
-  local options=""
-  is_mac && options="--no-tcmalloc"
-
-  local option
-  for option in $RUBY_CONFIGURE_OPTS ${RUBY_CONFIGURE_OPTS_ARRAY[@]}; do
-    options="$options -c $option"
-  done
-
-  # Work around install_useful_libraries crash with --dont-install-useful-gems
-  mkdir -p "$PREFIX_PATH/lib/ruby/gems/1.8/gems"
-
-  { ./installer --auto "$PREFIX_PATH" --dont-install-useful-gems $options $CONFIGURE_OPTS
-  } >&4 2>&1
-}
-
-build_package_rbx() {
-  local package_name="$1"
-
-  { [ ! -e "Gemfile" ] || bundle --path=vendor/bundle
-    if [ -n "$RUBY_BUILD_CACHE_PATH" ]; then
-      mkdir -p vendor
-      ln -s "$RUBY_BUILD_CACHE_PATH" vendor/prebuilt
-    fi
-
-    local opt
-    local -a configure_opts
-    for opt in "${RUBY_CONFIGURE_OPTS_ARRAY[@]}"; do
-      if [[ $opt == --with-openssl-dir=* ]]; then
-        local openssl_dir="${opt#*=}"
-        configure_opts[${#configure_opts[@]}]="--with-lib-dir=${openssl_dir}/lib"
-        configure_opts[${#configure_opts[@]}]="--with-include-dir=${openssl_dir}/include"
-      else
-        configure_opts[${#configure_opts[@]}]="$opt"
-      fi
-    done
-
-    RUBYOPT="-rrubygems $RUBYOPT" ./configure --prefix="$PREFIX_PATH" $RUBY_CONFIGURE_OPTS "${configure_opts[@]}"
-    rake install
-    fix_rbx_gem_binstubs "$PREFIX_PATH"
-    fix_rbx_irb "$PREFIX_PATH"
-  } >&4 2>&1
-}
-
-build_package_mruby() {
-  local package_name="$1"
-
-  { rake
-    mkdir -p "$PREFIX_PATH"
-    cp -fR build/host/* "$PREFIX_PATH"
-    cd "$PREFIX_PATH/bin"
-    ln -fs mruby ruby
-    ln -fs mirb irb
-  } >&4 2>&1
-}
-
-build_package_maglev() {
-  build_package_copy
-
-  { cd "${PREFIX_PATH}"
-    ./install.sh
-    cd "${PREFIX_PATH}/bin"
-    echo "Creating symlink for ruby*"
-    ln -fs maglev-ruby ruby
-    echo "Creating symlink for irb*"
-    ln -fs maglev-irb irb
-  } >&4 2>&1
-  echo
-  echo "Run 'maglev start' to start up the stone before using 'ruby' or 'irb'"
-}
-
-build_package_topaz() {
-  build_package_copy
-  { cd "${PREFIX_PATH}/bin"
-    echo "Creating symlink for ruby*"
-    ln -fs topaz ruby
-  } >&4 2>&1
-}
-
-topaz_architecture() {
-  case "$(uname -s)" in
-  "Darwin") echo "osx64";;
-  "Linux") [[ "$(uname -m)" = "x86_64" ]] && echo "linux64" || echo "linux32";;
-  *)
-    echo "no nightly builds available" >&2
-    exit 1;;
-  esac
-}
-
-build_package_jruby() {
-  build_package_copy
-  cd "${PREFIX_PATH}/bin"
-  ln -fs jruby ruby
-  chmod +x ruby
-  install_jruby_launcher
-  remove_windows_files
-  fix_jruby_shebangs
-}
-
-install_jruby_launcher() {
-  cd "${PREFIX_PATH}/bin"
-  { ./ruby gem install jruby-launcher
-  } >&4 2>&1
-}
-
-fix_jruby_shebangs() {
-  for file in "${PREFIX_PATH}/bin"/*; do
-    if [ "$(head -c 20 "$file")" = "#!/usr/bin/env jruby" ]; then
-      sed -i.bak "1 s:.*:#\!${PREFIX_PATH}\/bin\/jruby:" "$file"
-      rm "$file".bak
-    fi
-  done
-}
-
-build_package_truffleruby() {
-  build_package_copy
-
-  cd "${PREFIX_PATH}"
-  ./lib/truffle/post_install_hook.sh
-}
-
 remove_windows_files() {
   cd "$PREFIX_PATH"
-  rm -f bin/*.exe bin/*.dll bin/*.bat bin/jruby.sh
+  rm -f bin/*.exe bin/*.dll bin/*.bat
 }
 
 build_package_jython() {
@@ -982,12 +851,21 @@ build_package_jython_builder() {
 }
 
 build_package_pyston() {
-  mkdir -p "${PREFIX_PATH}/"
-  cp -fR . "${PREFIX_PATH}/"
-  chmod +x "${PREFIX_PATH}/"pyston
-  # FIXME ugly hack below adapted from
-  # https://github.com/dropbox/pyston/blob/master/docker/pyston/Dockerfile
-  ( cd "${PREFIX_PATH}/" && ./pyston virtualenv/virtualenv.py . )
+  # currently supported version 2.2 and upper
+  build_package_copy
+  mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
+  local bin
+  shopt -s nullglob
+  for bin in "bin/"*; do
+    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
+      case "${bin##*/}" in
+      "pyston"* )
+        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
+        ;;
+      esac
+    fi
+  done
+  shopt -u nullglob
 }
 
 build_package_ironpython() {
@@ -1030,6 +908,7 @@ pypy_architecture() {
     "ppc64" ) echo "linux-ppc64" ;;
     "ppc64le" ) echo "linux-ppc64le" ;;
     "x86_64" ) echo "linux64" ;;
+    "aarch64" ) echo "linux-aarch64" ;;
     * ) return 1 ;;
     esac
     ;;
@@ -1046,6 +925,11 @@ pypy_architecture() {
 
 pyston_architecture() {
   pypy_architecture
+}
+
+build_package_graalpython() {
+    build_package_copy
+    ln -fs "${PREFIX_PATH}/bin/graalpython" "${PREFIX_PATH}/bin/python"
 }
 
 build_package_pypy() {
@@ -1122,10 +1006,16 @@ build_package_activepython() {
 
 anaconda_architecture() {
   case "$(uname -s)" in
-  "Darwin" ) echo "MacOSX-x86_64" ;;
+  "Darwin" )
+    case "$(uname -m)" in
+    "arm64" ) echo "MacOSX-arm64" ;;
+    * ) echo "MacOSX-x86_64" ;;
+    esac
+    ;;
   "Linux" )
     case "$(uname -m)" in
     "armv7l" ) echo "Linux-armv7l" ;;
+    "aarch64" ) echo "Linux-aarch64" ;;
     "i386" | "i486" | "i586" | "i686" | "i786" ) echo "Linux-x86" ;;
     "ppc64le" ) echo "Linux-ppc64le" ;;
     "x86_64" ) echo "Linux-x86_64" ;;
@@ -1182,35 +1072,8 @@ cleanup_builtin_patches() {
 }
 
 fix_directory_permissions() {
-  # Ensure installed directories are not world-writable to avoid Bundler warnings
+  # Ensure installed directories are not world-writable
   find "$PREFIX_PATH" -type d \( -perm -020 -o -perm -002 \) -exec chmod go-w {} \;
-}
-
-fix_rbx_gem_binstubs() {
-  local prefix="$1"
-  local gemdir="${prefix}/gems/bin"
-  local bindir="${prefix}/bin"
-  local file binstub
-  # Symlink Rubinius' `gems/bin/` into `bin/`
-  if [ -d "$gemdir" ] && [ ! -L "$gemdir" ]; then
-    for file in "$gemdir"/*; do
-      binstub="${bindir}/${file##*/}"
-      rm -f "$binstub"
-      { echo "#!${bindir}/ruby"
-        grep -v '^#!' "$file"
-      } > "$binstub"
-      chmod +x "$binstub"
-    done
-    rm -rf "$gemdir"
-    ln -s ../bin "$gemdir"
-  fi
-}
-
-fix_rbx_irb() {
-  local prefix="$1"
-  "${prefix}/bin/irb" --version &>/dev/null ||
-    "${prefix}/bin/gem" install rubysl-tracer -v '~> 2.0' --no-rdoc --no-ri &>/dev/null ||
-    true
 }
 
 require_java7() {
@@ -1536,6 +1399,7 @@ has_broken_mac_openssl() {
 }
 
 use_homebrew_openssl() {
+  command -v brew >/dev/null || return 1
   for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
     local ssldir="$(brew --prefix "${openssl}" || true)"
     if [ -d "$ssldir" ]; then
@@ -1630,7 +1494,7 @@ build_package_verify_openssl() {
       RbConfig::CONFIG.fetch("configure_args").shellsplit.each { |arg| $stderr.puts "  #{arg}" }
       exit 1
     end
-  ' "$(basename "$(type -p yum apt-get | head -1)")" >&4 2>&1
+  ' "$(basename "$(type -P yum apt-get | head -1)")" >&4 2>&1
 }
 
 use_homebrew_zlib() {
@@ -1646,22 +1510,10 @@ use_xcode_sdk_zlib() {
   if [ -d "$xc_sdk_path" ]; then
     echo "python-build: use zlib from xcode sdk"
     export CFLAGS="-I${xc_sdk_path}/usr/include ${CFLAGS}"
+    if is_mac -ge 1100; then
+      export LDFLAGS="${LDFLAGS} -L${xc_sdk_path}/usr/lib"
+    fi
   fi
-}
-
-# Ensure that directories listed in LDFLAGS exist
-build_package_ldflags_dirs() {
-  local arg dir
-  set - $LDFLAGS
-  while [ $# -gt 0 ]; do
-    dir=""
-    case "$1" in
-    -L  ) dir="$2" ;;
-    -L* ) dir="${1#-L}" ;;
-    esac
-    [ -z "$dir" ] || mkdir -p "$dir"
-    shift 1
-  done
 }
 
 build_package_enable_shared() {
@@ -1678,36 +1530,6 @@ build_package_auto_tcltk() {
       package_option python configure --without-tk
     fi
   fi
-}
-
-rake() {
-  if [ -e "./Gemfile" ]; then
-    bundle exec rake "$@"
-  else
-    isolated_gem_dependency "rake --version" rake -v '~> 10.1.0'
-    command rake "$@"
-  fi
-}
-
-bundle() {
-  isolated_gem_dependency "bundle --version" bundler -v '~> 1.3.5'
-  command bundle "$@"
-}
-
-isolated_gem_dependency() {
-  set +E
-  ( command $1 &>/dev/null ) || {
-    set -E
-    shift 1
-    isolated_gem_install "$@"
-  }
-  set -E
-}
-
-isolated_gem_install() {
-  export GEM_HOME="${PWD}/.gem"
-  export PATH="${GEM_HOME}/bin:${PATH}"
-  gem install "$@"
 }
 
 apply_python_patch() {
@@ -1732,7 +1554,7 @@ build_package_symlink_version_suffix() {
       mv -f "${PREFIX_PATH}/bin" "${PREFIX_PATH}/bin.orig"
     fi
     # Only symlinks are installed in ${PREFIX_PATH}/bin
-    ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
+    ln -fs "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
   fi
 
   # Not create symlinks on `altinstall` (#255)
@@ -1913,6 +1735,23 @@ build_package_verify_py38() {
 # Post-install check for Python 3.9.x
 build_package_verify_py39() {
   build_package_verify_py38 "$1" "${2:-3.9}"
+}
+
+# Post-install check for Python 3.10.x
+build_package_verify_py310() {
+  build_package_verify_py39 "$1" "${2:-3.10}"
+}
+
+# Post-install check for Python 3.11.x
+build_package_verify_py311() {
+  build_package_verify_py310 "$1" "${2:-3.11}"
+}
+
+# Post-install check for Python 3.x rolling release scripts
+# XXX: Will need splitting into project-specific ones if there emerge
+# multiple rolling-release scripts with different checks needed
+build_package_verify_py3_latest() {
+  build_package_verify_py311 "$1" "3"
 }
 
 # Copy Tools/gdb/libpython.py to pythonX.Y-gdb.py (#1190)
@@ -2106,19 +1945,6 @@ if [ -n "$noexec" ]; then
   exit 1
 fi
 
-## Apply following work around, if gcc is not installed.
-#if [ -z "$(locate_gcc)" ]; then
-#  # Work around warnings building Ruby 2.0 on Clang 2.x:
-#  # pass -Wno-error=shorten-64-to-32 if the compiler accepts it.
-#  #
-#  # When we set CFLAGS, Ruby won't apply its default flags, though. Since clang
-#  # builds 1.9.x and 2.x only, where -O3 is default, we can safely set that flag.
-#  # Ensure it's the first flag since later flags take precedence.
-#  if "${CC:-cc}" -x c /dev/null -E -Wno-error=shorten-64-to-32 &>/dev/null; then
-#    RUBY_CFLAGS="-O3 -Wno-error=shorten-64-to-32 $RUBY_CFLAGS"
-#  fi
-#fi
-
 if [ -z "$MAKE" ]; then
   if [ "FreeBSD" = "$(uname -s)" ]; then
     if [ "$(echo $1 | sed 's/-.*$//')" = "jruby" ]; then
@@ -2149,7 +1975,11 @@ else
   PYTHON_BUILD_DEFAULT_MIRROR=
 fi
 
-if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ] || ! has_checksum_support compute_sha2; then
+if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ]; then
+  unset PYTHON_BUILD_MIRROR_URL
+fi
+
+if ! has_checksum_support compute_sha2 && ! [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ] ; then
   unset PYTHON_BUILD_MIRROR_URL
 fi
 
@@ -2186,16 +2016,17 @@ if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   fi
   create_framework_dirs() {
     local version="$(echo "$1" | sed -E 's/^[^0-9]*([0-9]+\.[0-9]+).*$/\1/')"
-    mkdir -p "${PREFIX_PATH}/Python.framework/Versions/${version}"
-    ( cd "${PREFIX_PATH}/Python.framework/Versions" && ln -fs "${version}" "Current")
+    mkdir -p "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/${version}"
+    ( cd "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions" && ln -fs "${version}" "Current")
     local path
     for path in include lib share; do
-      mkdir -p "${PREFIX_PATH}/Python.framework/Versions/Current/${path}"
-      ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/${path}" "${PREFIX_PATH}/${path}"
+      mkdir -p "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/Current/${path}"
+      ln -fs "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/Current/${path}" "${PREFIX_PATH}/${path}"
     done
   }
   create_framework_dirs "${DEFINITION_PATH##*/}"
-  package_option python configure --enable-framework="${PREFIX_PATH}"
+  # the `/Library/Frameworks` suffix makes CPython build install apps under prefix rather than into /Applications (#1003)
+  package_option python configure --enable-framework="${PREFIX_PATH}/Library/Frameworks"
 fi
 
 # Build against universal SDK (#219, #220)
@@ -2267,13 +2098,22 @@ if [ -z "${GET_PIP_URL}" ]; then
     # Use custom get-pip URL based on the target version (#1127)
     case "${DEFINITION_PATH##*/}" in
     2.6 | 2.6.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/2.6/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/2.6/get-pip.py"
+      ;;
+    2.7 | 2.7.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/2.7/get-pip.py"
       ;;
     3.2 | 3.2.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/3.2/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.2/get-pip.py"
       ;;
     3.3 | 3.3.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/3.3/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.3/get-pip.py"
+      ;;
+    3.4 | 3.4.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.4/get-pip.py"
+      ;;
+    3.5 | 3.5.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.5/get-pip.py"
       ;;
     * )
       GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"

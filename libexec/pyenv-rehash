@@ -40,13 +40,14 @@ if [ ! -w "$SHIM_PATH" ]; then
 fi
 
 unset acquired
-for (( i=1; i<="${PYENV_REHASH_TIMEOUT:-60}"; i++ )); do
+start=$SECONDS
+while (( SECONDS <= start + ${PYENV_REHASH_TIMEOUT:-60} )); do
   if acquire_lock 2>/dev/null; then
     acquired=1
     break
   else
-    # POSIX sleep(1) doesn't provides time precision of subsecond
-    sleep 1
+    # POSIX sleep(1) doesn't provide subsecond precision, but many others do
+    sleep 0.1 2>/dev/null || sleep 1
   fi
 done
 
@@ -67,19 +68,6 @@ set -e
 [ -n "\$PYENV_DEBUG" ] && set -x
 
 program="\${0##*/}"
-if [[ "\$program" = "python"* ]]; then
-  for arg; do
-    case "\$arg" in
-    -c* | -- ) break ;;
-    */* )
-      if [ -f "\$arg" ]; then
-        export PYENV_FILE_ARG="\$arg"
-        break
-      fi
-      ;;
-    esac
-  done
-fi
 
 export PYENV_ROOT="$PYENV_ROOT"
 exec "$(command -v pyenv)" exec "\$program" "\$@"
@@ -122,34 +110,62 @@ make_shims() {
   done
 }
 
-registered_shims=" "
+if ((${BASH_VERSINFO[0]} > 3)); then
 
-# Registers the name of a shim to be generated.
-register_shim() {
-  registered_shims="${registered_shims}${1} "
-}
+  declare -A registered_shims
 
-# Install all the shims registered via `make_shims` or `register_shim` directly.
-install_registered_shims() {
-  local shim file
-  for shim in $registered_shims; do
-    file="${SHIM_PATH}/${shim}"
-    [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
-  done
-}
+  # Registers the name of a shim to be generated.
+  register_shim() {
+    registered_shims["$1"]=1
+  }
 
-# Once the registered shims have been installed, we make a second pass
-# over the contents of the shims directory. Any file that is present
-# in the directory but has not been registered as a shim should be
-# removed.
-remove_stale_shims() {
-  local shim
-  for shim in "$SHIM_PATH"/*; do
-    if [[ "$registered_shims" != *" ${shim##*/} "* ]]; then
-      rm -f "$shim"
-    fi
-  done
-}
+  # Install all shims registered via `make_shims` or `register_shim` directly.
+  install_registered_shims() {
+    local shim file
+    for shim in "${!registered_shims[@]}"; do
+      file="${SHIM_PATH}/${shim}"
+      [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
+    done
+  }
+
+  # Once the registered shims have been installed, we make a second pass
+  # over the contents of the shims directory. Any file that is present
+  # in the directory but has not been registered as a shim should be
+  # removed.
+  remove_stale_shims() {
+    local shim
+    for shim in "$SHIM_PATH"/*; do
+      if [[ ! ${registered_shims["${shim##*/}"]} ]]; then
+        rm -f "$shim"
+      fi
+    done
+  }
+
+else # Same for bash < 4.
+
+    registered_shims=" "
+
+    register_shim() {
+      registered_shims="${registered_shims}${1} "
+    }
+
+    install_registered_shims() {
+      local shim file
+      for shim in $registered_shims; do
+        file="${SHIM_PATH}/${shim}"
+        [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
+      done
+    }
+
+    remove_stale_shims() {
+      local shim
+      for shim in "$SHIM_PATH"/*; do
+        if [[ "$registered_shims" != *" ${shim##*/} "* ]]; then
+          rm -f "$shim"
+        fi
+      done
+    }
+fi
 
 shopt -s nullglob
 

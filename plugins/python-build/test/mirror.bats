@@ -70,6 +70,26 @@ export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   unstub shasum
 }
 
+@test "package is fetched from mirror when checksum is invalid if SKIP_CHECKSUM set" {
+  export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
+  export PYTHON_BUILD_MIRROR_URL=https://custom.mirror.org
+  export URL_BASE=example.com
+  local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
+
+  stub shasum false
+  stub curl "-*I* : true" \
+    "-q -o * -*S* https://custom.mirror.org/* : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3" \
+
+  install_fixture definitions/with-checksum
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  unstub curl
+  unstub shasum
+  unset PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM
+}
+
 
 @test "package is fetched from original URL if mirror download checksum is invalid" {
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"

@@ -1,0 +1,4 @@
+#require_gcc
+prefer_openssl11
+install_package "openssl-1.1.1f" "https://www.openssl.org/source/openssl-1.1.1f.tar.gz#186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35" mac_openssl --if has_broken_mac_openssl
+install_package "pypy3.7-v7.3.2-src" "https://downloads.python.org/pypy/pypy3.7-v7.3.2-src.tar.bz2#9274186eb0c28716a8c6134803b1df857bc3f496e25e50e605c4d95201c8817d" "pypy_builder" verify_py37 ensurepip

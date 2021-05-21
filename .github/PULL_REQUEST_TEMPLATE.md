@@ -7,7 +7,7 @@ Make sure you have checked all steps below.
   * We occasionally import the changes from rbenv. In general, you can expect changes made in rbenv will be imported to pyenv too, eventually.
   * Generally speaking, we prefer not to make changes in the core in order to keep compatibility with rbenv.
 * [ ] My PR addresses the following pyenv issue (if any)
-  - https://github.com/pyenv/pyenv/issues/XXXX
+  - Closes https://github.com/pyenv/pyenv/issues/XXXX
 
 ### Description
 - [ ] Here are some details about my PR
