@@ -15,6 +15,9 @@
 * Full shell configuration instructions placed into `pyenv init`
 * Prevent build from installing MacOS apps globally
 * ldflags_dirs is not needed for Python and causes failures
+* Report cache filename at download
+* Add micropython 1.15
+* Correct URLs for Stackless builds and add Stackless 2.7.16
 
 ## Breaking changes
 * Split startup logic into PATH and everything else (https://github.com/pyenv/pyenv/issues/1649#issuecomment-694388530)
