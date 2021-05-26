@@ -130,13 +130,13 @@ build_failed() {
 
     if ! rmdir "${BUILD_PATH}" 2>/dev/null; then
       echo "Inspect or clean up the working tree at ${BUILD_PATH}"
+    fi
 
-      if file_is_not_empty "$LOG_PATH"; then
-        colorize 33 "Results logged to ${LOG_PATH}"
-        printf "\n\n"
-        echo "Last 10 log lines:"
-        tail -n 10 "$LOG_PATH"
-      fi
+    if file_is_not_empty "$LOG_PATH"; then
+      colorize 33 "Results logged to ${LOG_PATH}"
+      printf "\n\n"
+      echo "Last 10 log lines:"
+      tail -n 10 "$LOG_PATH"
     fi
   } >&3
   exit 1
