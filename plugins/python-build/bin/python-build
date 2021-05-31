@@ -989,7 +989,7 @@ activepython_architecture() {
   "Darwin" ) echo "macosx10.9-i386-x86_64" ;;
   "Linux" )
     case "$(uname -m)" in
-    "i368" | "i486" | "i586" | "i686" | "i786" ) echo "linux-x86" ;;
+    "i386" | "i486" | "i586" | "i686" | "i786" ) echo "linux-x86" ;;
     "x86_64" ) echo "linux-x86_64" ;;
     * ) return 1 ;;
     esac
