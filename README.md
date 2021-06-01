@@ -226,7 +226,7 @@ easy to fork and contribute any changes back upstream.
       to add the `PYENV_ROOT=` and `PATH=` lines.
       You also don't need to add commands into `~/.profile` if your shell doesn't use it.
    
-      - For **bash**:
+      - For **Bash**:
 
          ~~~ bash
          echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
