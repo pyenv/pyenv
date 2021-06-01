@@ -263,8 +263,24 @@ easy to fork and contribute any changes back upstream.
 
       - For **Zsh**:
 
-        Same as for Bash above, but add the commands into both `~/.profile`
-        and `~/.zprofile`.
+         - **MacOS, if Pyenv is installed with Homebrew:**
+
+            ~~~ zsh
+            echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
+            ~~~
+         
+         - **MacOS, if Pyenv is installed with a Git checkout:**
+         
+            ~~~ zsh
+            echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zprofile
+            echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zprofile
+            echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
+            ~~~
+
+         - **Other OSes:**
+         
+           Same as for Bash above, but add the commands into both `~/.profile`
+           and `~/.zprofile`.
         
       - For **Fish shell**:
 
