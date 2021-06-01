@@ -276,7 +276,7 @@ easy to fork and contribute any changes back upstream.
 
         And add this to `~/.config/fish/config.fish`:
         ~~~ fish
-        status is-login; and pyenv init --path | source
+        status is-login; and pyenv init --path fish | source
         ~~~
 
         If Fish is not your login shell, also follow the Bash/Zsh instructions to add to `~/.profile`.
@@ -309,7 +309,7 @@ easy to fork and contribute any changes back upstream.
       - For **Fish shell**:
         Add this to `~/.config/fish/config.fish`:
         ~~~ fish
-        pyenv init - | source
+        pyenv init - fish | source
         ~~~
 
       **General warning**: There are some systems where the `BASH_ENV` variable is configured
