@@ -39,7 +39,7 @@ done
 
 shell="$1"
 if [ -z "$shell" ]; then
-  shell="$(ps -p "$PPID" -o 'args=' 2>/dev/null || true)"
+  shell="$(ps -p $PPID 2>/dev/null | awk 'END {print $NF}' 2>/dev/null)"
   shell="${shell%% *}"
   shell="${shell##-}"
   shell="${shell:-$SHELL}"
