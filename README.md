@@ -341,7 +341,7 @@ easy to fork and contribute any changes back upstream.
 4. **Restart your login session for the changes to take effect.**
    E.g. if you're in a GUI session, you need to fully log out and log back in.
    
-   In MacOS, restarting terminal windows is enough (because MacOS runs shells
+   **In MacOS,** restarting terminal windows is enough (because MacOS runs shells
    in them as login shells by default).
 
 5. [**Install Python build dependencies**](https://github.com/pyenv/pyenv/wiki#suggested-build-environment) before attempting to install a new Python version.
