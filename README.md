@@ -314,7 +314,7 @@ easy to fork and contribute any changes back upstream.
         - **If your `/etc/profile` sources `~/.bashrc` (SUSE):**
         
           ~~~bash
-          echo 'if command -v pyenv >/dev/null; then eval "$(pyenv init -)"; done' >> ~/.bashrc 
+          echo 'if command -v pyenv >/dev/null; then eval "$(pyenv init -)"; fi' >> ~/.bashrc 
           ~~~
 
       - For **Zsh**:
