@@ -23,17 +23,6 @@ stub_python_build() {
   unstub pyenv-rehash
 }
 
-@test "install pyenv local version by default" {
-  stub_python_build 'echo python-build "$1"'
-  stub pyenv-local 'echo 3.4.2'
-
-  run pyenv-install
-  assert_success "python-build 3.4.2"
-
-  unstub python-build
-  unstub pyenv-local
-}
-
 @test "list available versions" {
   stub_python_build \
     "--definitions : echo 2.6.9 2.7.9-rc1 2.7.9-rc2 3.4.2 | tr ' ' $'\\n'"
