@@ -1,5 +1,16 @@
 ## Version History
 
+## Release 2.0.1
+
+* Drop inferring version to install from `pyenv local` (#1907)
+* Create mambaforge-4.10.1-4 (#1971)
+* Add 3.10.0b2 recipe (#1966)
+* Fix .bashrc `echo` install syntax error (#1965)
+* Add explicit Zsh instructions for MacOS (#1964)
+* Install pip with pyston (#1955)
+* Mention log file if an error happened before building, too (#1537)
+* Add pypy3.7-7.3.5 (#1950)
+
 ## Release 2.0.0
 
 * Support for CPython 3.9.5 has been added.
