@@ -233,6 +233,20 @@ easy to fork and contribute any changes back upstream.
          echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
          echo 'eval "$(pyenv init --path)"' >> ~/.profile
          ~~~
+            <!--This is an alternative option and needn't be replicated to `pyenv init`-->
+         Alternatively, for an automated installation, you can run the following:
+         ~~~ bash
+         echo -e 'if shopt -q login_shell; then' \
+                 '\n  export PYENV_ROOT="$HOME/.pyenv"' \
+                 '\n  export PATH="$PYENV_ROOT/bin:$PATH"' \
+                 '\n eval "$(pyenv init --path)"' \
+                 '\nfi' >> ~/.bashrc
+         echo -e 'if [ -z "$BASH_VERSION" ]; then'\
+                 '\n  export PYENV_ROOT="$HOME/.pyenv"'\
+                 '\n  export PATH="$PYENV_ROOT/bin:$PATH"'\
+                 '\n  eval "$(pyenv init --path)"'\
+                 '\nfi' >>~/.profile
+         ~~~
 
          - **If your `~/.profile` sources `~/.bashrc` (Debian, Ubuntu, Mint):**
 
@@ -240,22 +254,10 @@ easy to fork and contribute any changes back upstream.
             ~~~bash
             export PYENV_ROOT="$HOME/.pyenv"
             export PATH="$PYENV_ROOT/bin:$PATH"
-            eval "$(pyenv init --path)"
             ~~~
-
-            <!--This is an alternative option and needn't be replicated to `pyenv init`-->
-            Alternatively, for an automated installation, you can run the following:
-            ~~~ bash
-            echo -e 'if shopt -q login_shell; then' \
-                  '\n  export PYENV_ROOT="$HOME/.pyenv"' \
-                  '\n  export PATH="$PYENV_ROOT/bin:$PATH"' \
-                  '\n eval "$(pyenv init --path)"' \
-                  '\nfi' >> ~/.bashrc
-            echo -e 'if [ -z "$BASH_VERSION" ]; then'\
-                  '\n  export PYENV_ROOT="$HOME/.pyenv"'\
-                  '\n  export PATH="$PYENV_ROOT/bin:$PATH"'\
-                  '\n  eval "$(pyenv init --path)"'\
-                  '\nfi' >>~/.profile
+            And put this line at the _bottom_ of `~/.profile` (_after_ sourcing `~/.bashrc` and any other `$PATH` manipulations):
+            ~~~bash
+            eval "$(pyenv init --path)"
             ~~~
 
          **Note:** If you have `~/.bash_profile`, make sure that it too executes the above-added commands,
