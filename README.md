@@ -240,6 +240,10 @@ easy to fork and contribute any changes back upstream.
             ~~~bash
             export PYENV_ROOT="$HOME/.pyenv"
             export PATH="$PYENV_ROOT/bin:$PATH"
+            ~~~
+            
+            And put this line at the _bottom_ of `~/.profile`:
+            ~~~bash
             eval "$(pyenv init --path)"
             ~~~
 
