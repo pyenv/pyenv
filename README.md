@@ -206,8 +206,9 @@ easy to fork and contribute any changes back upstream.
 
 2. **Configure your shell's environment for Pyenv**
 
-   **Note:** The below instructions for specific shells are designed for common shell setups.  
-   If you have an uncommon setup and they don't work for you,
+   **Note:** The below instructions for specific shells are designed for common shell setups;
+   they also install shell functions into interactive shells only.  
+   If you have an uncommon setup and/or special needs and they don't work for you,
    use the guidance text and the [Advanced Configuration](#advanced-configuration)
    section below to figure out what you need to do in your specific case.
    
@@ -303,10 +304,15 @@ easy to fork and contribute any changes back upstream.
 
       **Proxy note**: If you use a proxy, export `http_proxy` and `https_proxy`, too.
 
-   2. **Add `pyenv` into your shell** by running the output of `pyenv init -`
-     to enable autocompletion and all subcommands.
-   
-      This command needs to run at startup of any interactive shell instance.
+   2. **Add `pyenv` into your shell as a shell function** by running the output of `pyenv init -`
+      to enable autocompletion and subcommands that require `pyenv` to be a shell function.
+
+      The subcommands enabled by this step are those that make changes to the current shell environment.
+      In Pyenv, that's only `pyenv shell`; another example is `pyenv activate` from the
+      [Pyenv-Virtualenv](https://github.com/pyenv/pyenv-virtualenv) plugin.
+      
+      This step is optional. Run it whenever you need the above functions --
+      typically at startup of any interactive shell.
       In an interactive login shell, it needs to run _after_ the commands
       from the previous step.
 
