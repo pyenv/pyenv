@@ -46,6 +46,10 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Choosing the Python Version](#choosing-the-python-version)
   * [Locating the Python Installation](#locating-the-python-installation)
 * **[Installation](#installation)**
+  * [Prerequisites](#prerequisites)
+  * [Homebrew in macOS](#homebrew-in-macos)
+  * [Windows](#windows)
+  * [Automatic installer](#automatic-installer)
   * [Basic GitHub Checkout](#basic-github-checkout)
     * [Upgrading](#upgrading)
     * [Homebrew on macOS](#homebrew-on-macos)
@@ -168,11 +172,11 @@ We'd recommend to install pyenv-virtualenv as well if you have some plan to play
 
 ## Installation
 
-### Prerequisites:
+### Prerequisites
 
 For pyenv to install python correctly you should [**install the Python build dependencies**](https://github.com/pyenv/pyenv/wiki#suggested-build-environment).
 
-### Homebrew on macOS
+### Homebrew in macOS
 
    1. Consider installing with [Homebrew](https://brew.sh):
       ```sh
@@ -181,9 +185,20 @@ For pyenv to install python correctly you should [**install the Python build dep
       ```
    2. Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout), starting with #2 ("Configure your shell's environment for Pyenv").
 
-If you're on Windows, consider using @kirankotari's [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) fork. (Pyenv does not work in Windows outside the Windows Subsystem for Linux.)
 
-### The automatic installer
+### Windows
+
+Pyenv does not officially support Windows and does not work in Windows outside
+the Windows Subsystem for Linux.
+Moreover, even there, the Pythons it installs are not native Windows versions
+but rather Linux versions run through a compatibility layer --
+so you won't get Windows-specific functionality.
+
+If you're in Windows, we recommend using @kirankotari's [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) fork --
+which does install native Windows Python versions.
+
+
+### Automatic installer
 
 Visit our other project:
 https://github.com/pyenv/pyenv-installer
