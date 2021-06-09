@@ -176,7 +176,7 @@ function print_path() {
 }
 
 function warn_path() {
-  if ! perl -ls0x3A -e 'while (<>) { chomp; ($_ eq $d) && exit 0; } exit 1' -- -d="${PYENV_ROOT}/shims" <<<"$PATH" ; then
+  if ! [[ ":${PATH}:" == *":${PYENV_ROOT}/shims:"* ]] ; then
     echo 'echo '\''WARNING: `pyenv init -` no longer sets PATH.'\'
     echo 'echo '\''Run `pyenv init` to see the necessary changes to make to your configuration.'\'
   fi
