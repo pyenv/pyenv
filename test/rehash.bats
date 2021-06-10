@@ -63,6 +63,17 @@ python
 OUT
 }
 
+@test "updates mtime" {
+  create_executable "3.4" "a"
+  create_executable "3.4" "b"
+  pyenv-rehash
+
+  create_executable "3.4" "b"
+  pyenv-rehash
+  run test "${PYENV_ROOT}/shims/b" -nt "${PYENV_ROOT}/shims/a"
+  assert_success
+}
+
 @test "removes stale shims" {
   mkdir -p "${PYENV_ROOT}/shims"
   touch "${PYENV_ROOT}/shims/oldshim1"
