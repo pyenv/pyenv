@@ -110,6 +110,20 @@ make_shims() {
   done
 }
 
+copy_mtime_for_shims() {
+  local version file shim
+  pyenv-versions --bare --skip-aliases | \
+  while read -r version; do
+    for file in "${PYENV_ROOT}/versions/${version}/bin/"*; do
+      shim="${PYENV_ROOT}/shims/${file##*/}"
+      if [ "$file" -nt "$shim" ]; then
+        # Copy the newer timestamp; `touch -r` is defined by POSIX.
+        touch -r "$file" "$shim"
+      fi
+    done
+  done
+}
+
 if ((${BASH_VERSINFO[0]} > 3)); then
 
   declare -A registered_shims
@@ -188,3 +202,5 @@ done
 
 install_registered_shims
 remove_stale_shims
+
+copy_mtime_for_shims
