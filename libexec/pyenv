@@ -62,6 +62,24 @@ else
 fi
 export PYENV_ROOT
 
+# Transfer PYENV_FILE_ARG (from shims) into PYENV_DIR.
+if [ -z "${PYENV_DIR}" ]; then
+  if [ -n "${PYENV_FILE_ARG}" ]; then
+    if [ -L "${PYENV_FILE_ARG}" ]; then
+      PYENV_DIR="$(abs_dirname "${PYENV_FILE_ARG}")"
+    else
+      PYENV_DIR="${PYENV_FILE_ARG%/*}"
+    fi
+    export PYENV_DIR
+    unset PYENV_FILE_ARG
+  fi
+else
+  [[ $PYENV_DIR == /* ]] || PYENV_DIR="$PWD/$PYENV_DIR"
+  cd "$PYENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$PYENV_DIR'"
+  PYENV_DIR="$PWD"
+  cd "$OLDPWD"
+fi
+
 if [ -z "${PYENV_DIR}" ]; then
   PYENV_DIR="$PWD"
 fi
