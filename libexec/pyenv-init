@@ -109,7 +109,7 @@ function help_() {
       echo "# Load pyenv automatically by appending"
       echo "# the following to ~/.config/fish/config.fish:"
       echo
-      echo 'status is-login; and pyenv init --path | source'
+      echo 'status is-interactive; and pyenv init --path | source'
       echo 'pyenv init - | source'
       echo
       echo "# If fish is not your login shell,"
