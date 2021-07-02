@@ -90,13 +90,6 @@ OUT
   assert_line 0 "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
 }
 
-@test "prints a warning if shims not in PATH" {
-  export PATH="$(perl -0x3A -ls -e 'while (<>) { chomp; ($_ ne $d) && print; }' -- -d="${PYENV_ROOT}/shims" <<<"$PATH")"
-  run pyenv-init -
-  assert_success
-  assert_line 0 'echo '\''WARNING: `pyenv init -` no longer sets PATH.'\'
-}
-
 @test "outputs sh-compatible syntax" {
   run pyenv-init - bash
   assert_success
