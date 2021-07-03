@@ -1,5 +1,12 @@
 ## Version History
 
+## Release 2.0.3
+
+* Remove PATH warning (#2001)
+* Add Python 3.6.14, 3.7.11, 3.8.11, and 3.9.6 (#1996)
+* Miniforge minor update to 4.10.1-5 (#1992)
+* Suggest that fish users init in interactive mode (#1991)
+
 ## Release 2.0.2
 
 * Miniforge minor update to 4.10.1-5 (#1992)
