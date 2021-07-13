@@ -16,9 +16,9 @@ export -n PYTHON_CONFIGURE_OPTS
     # touch "$INSTALL_ROOT/bin/python"
     cd "$INSTALL_ROOT"
 
-    stub make 'echo CFLAGS_EXTRA=$CFLAGS_EXTRA'
-    stub ln 'true'
-    stub mkdir 'true'
+    stub make true true '(for a in "$@"; do echo $a; done)|grep -E "^CFLAGS_EXTRA="' true
+    stub ln true
+    stub mkdir true
     run_inline_definition <<DEF
 exec 4<&1
 CFLAGS_EXTRA='-Wno-floating-conversion' build_package_micropython
@@ -26,8 +26,6 @@ DEF
 
     #assert_success
     assert_output <<OUT
-CFLAGS_EXTRA=-Wno-floating-conversion
-CFLAGS_EXTRA=-Wno-floating-conversion
-CFLAGS_EXTRA=-Wno-floating-conversion -DMICROPY_PY_SYS_PATH_DEFAULT='\"${PREFIX_PATH}/lib/micropython\"'
+CFLAGS_EXTRA=-DMICROPY_PY_SYS_PATH_DEFAULT='"${TMP}/install/lib/micropython"' -Wno-floating-conversion
 OUT
 }
