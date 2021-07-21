@@ -6,7 +6,7 @@ echo
 
 case "$(pyston_architecture 2>/dev/null || true)" in
 "linux64" )
-  install_package "pyston_2.3" "https://github.com/pyston/pyston/releases/download/v2.3/pyston_2.3_portable.tar.gz#1d3885ede2d112c8087ec3c3ebf185782562ee5867a2cf15f6ea74e70f2d1db6" "pyston" verify_py38 get_pip
+  install_package "pyston_2.3" "https://github.com/pyston/pyston/releases/download/v2.3/pyston_2.3_portable-v2.tar.gz#90185e29e4a1a19562c095f2bb4e81a5d0715150fa10eca363ec1188b5ba7ee7" "pyston" verify_py38 get_pip
   ;;
 * )
   { echo
