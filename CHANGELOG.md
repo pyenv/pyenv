@@ -1,5 +1,13 @@
 ## Version History
 
+## Release 2.0.4
+
+- Added scripts for rolling releases of Miniforge (#2019)
+- Update pyston-2.3 (#2017)
+- Add GraalPython 21.2.0 (#2018)
+- Add CPython  3.10.0b4 (#2013), (#2005)
+- Add Pyston 2.3 (#2012)
+
 ## Release 2.0.3
 
 * Remove PATH warning (#2001)
