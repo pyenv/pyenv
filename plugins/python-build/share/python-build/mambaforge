@@ -1,0 +1,25 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-ppc64le" )
+  install_script "Mambaforge-Linux-ppc64le" "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-ppc64le.sh" "miniconda" verify_py3_latest
+  ;;
+"Linux-x86_64" )
+  install_script "Mambaforge-Linux-x86_64" "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh" "miniconda" verify_py3_latest
+  ;;
+"Linux-aarch64" )
+  install_script "Mambaforge-Linux-aarch64" "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-aarch64.sh" "miniconda" verify_py3_latest
+  ;;
+"MacOSX-arm64" )
+  install_script "Mambaforge-MacOSX-arm64" "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-arm64.sh" "miniconda" verify_py3_latest
+  ;;
+"MacOSX-x86_64" )
+  install_script "Mambaforge-MacOSX-x86_64" "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh" "miniconda" verify_py3_latest
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Mambaforge3 is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
