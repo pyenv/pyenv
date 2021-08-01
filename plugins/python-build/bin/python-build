@@ -112,6 +112,13 @@ is_mac() {
   [ $# -eq 0 ] || [ "$(osx_version)" "$@" ]
 }
 
+is_arm64_apple() {
+  if [ "$(uname -s)" = "Darwin" ] && [ "$(uname -m)" = "arm64" ]; then
+    return 0
+  fi
+  return 1
+}
+
 #  9.1  -> 901
 # 10.9  -> 1009
 # 10.10 -> 1010
@@ -769,6 +776,9 @@ build_package_standard_build() {
       use_homebrew_readline || use_freebsd_pkg || true
     if is_mac -ge 1014; then
       use_xcode_sdk_zlib || use_homebrew_zlib || true
+      if is_arm64_apple; then
+        patch_arm64_apple || true
+      fi
     fi
   fi
 
@@ -1513,6 +1523,26 @@ use_xcode_sdk_zlib() {
     if is_mac -ge 1100; then
       export LDFLAGS="${LDFLAGS} -L${xc_sdk_path}/usr/lib"
     fi
+  fi
+}
+
+patch_arm64_apple() {
+  disable_homebrew_coreutils
+}
+
+disable_homebrew_coreutils() {
+  local brew_coreutils="$(brew --prefix coreutils 2>/dev/null || true)"
+  if [ -d "$brew_coreutils" ]; then
+    local after_list=()
+    local list=(${PATH//:/ })
+    for str in "${list[@]}"; do
+      if [ -z "`echo $str | grep 'coreutils'`" ]; then
+        local after_list=("${after_list[@]}" $str)
+      else
+        echo "python-build: not use coreutils from homebrew"
+      fi
+    done
+    PATH="$(IFS=":"; echo "${after_list[*]}")"
   fi
 }
 
