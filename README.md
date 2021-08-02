@@ -230,7 +230,7 @@ easy to fork and contribute any changes back upstream.
 
          ~~~ bash
          echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
-         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+         echo 'export PATH="$PYENV_ROOT/shims:$PATH"' >> ~/.profile
          echo 'eval "$(pyenv init --path)"' >> ~/.profile
          ~~~
 
@@ -239,7 +239,7 @@ easy to fork and contribute any changes back upstream.
             Put these lines into `~/.profile` _before_ the part that sources `~/.bashrc`:
             ~~~bash
             export PYENV_ROOT="$HOME/.pyenv"
-            export PATH="$PYENV_ROOT/bin:$PATH"
+            export PATH="$PYENV_ROOT/shims:$PATH"
             ~~~
             
             And put this line at the _bottom_ of `~/.profile`:
@@ -252,12 +252,12 @@ easy to fork and contribute any changes back upstream.
             ~~~ bash
             echo -e 'if shopt -q login_shell; then' \
                   '\n  export PYENV_ROOT="$HOME/.pyenv"' \
-                  '\n  export PATH="$PYENV_ROOT/bin:$PATH"' \
+                  '\n  export PATH="$PYENV_ROOT/shims:$PATH"' \
                   '\n eval "$(pyenv init --path)"' \
                   '\nfi' >> ~/.bashrc
             echo -e 'if [ -z "$BASH_VERSION" ]; then'\
                   '\n  export PYENV_ROOT="$HOME/.pyenv"'\
-                  '\n  export PATH="$PYENV_ROOT/bin:$PATH"'\
+                  '\n  export PATH="$PYENV_ROOT/shims:$PATH"'\
                   '\n  eval "$(pyenv init --path)"'\
                   '\nfi' >>~/.profile
             ~~~
@@ -277,7 +277,7 @@ easy to fork and contribute any changes back upstream.
          
             ~~~ zsh
             echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zprofile
-            echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zprofile
+            echo 'export PATH="$PYENV_ROOT/shims:$PATH"' >> ~/.zprofile
             echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
             ~~~
 
@@ -291,7 +291,7 @@ easy to fork and contribute any changes back upstream.
         Execute this interactively:
         ~~~ fish
         set -Ux PYENV_ROOT $HOME/.pyenv
-        set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+        set -U fish_user_paths $PYENV_ROOT/shims $fish_user_paths
         ~~~
 
         And add this to `~/.config/fish/config.fish`:
