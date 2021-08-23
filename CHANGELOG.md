@@ -1,5 +1,12 @@
 ## Version History
 
+## Release 2.0.5
+
+* Move man page to location where it can be automatically found by man (#2032)
+* Update checksums for CPython 3.10.0rc1 (#2025)
+* Remove 3.9.3 (#2022)
+* Add CPython 3.10.0rc1(#2023)
+
 ## Release 2.0.4
 
 - Added scripts for rolling releases of Miniforge (#2019)
