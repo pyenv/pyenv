@@ -34,14 +34,23 @@ make_shims() {
 }
 
 deregister_conda_shims() {
-  local shim
-  local shims=()
-  for shim in ${registered_shims}; do
-    if ! conda_shim "${shim}" 1>&2; then
-      shims[${#shims[*]}]="${shim}"
-    fi
-  done
-  registered_shims=" ${shims[@]} "
+  # adapted for Bash 4.x's associative array (#1749)
+  if declare -p registered_shims 2> /dev/null | grep -Eq '^(declare|typeset) \-A'; then
+    for shim in ${!registered_shims[*]}; do
+      if conda_shim "${shim}" 1>&2; then
+        unset registered_shims[${shim}]
+      fi
+    done
+  else
+    local shim
+    local shims=()
+    for shim in ${registered_shims}; do
+      if ! conda_shim "${shim}" 1>&2; then
+        shims[${#shims[*]}]="${shim}"
+      fi
+    done
+    registered_shims=" ${shims[@]} "
+  fi
 }
 
 if conda_exists; then
