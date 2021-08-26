@@ -7,7 +7,8 @@ if [ "$1" = "--debug" ]; then
 fi
 
 if [ -n "$PYENV_DEBUG" ]; then
-  export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
+  # https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful
+  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
   set -x
 fi
 
@@ -28,7 +29,7 @@ if enable -f "${BASH_SOURCE%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev
 else
   [ -z "$PYENV_NATIVE_EXT" ] || abort "failed to load \`realpath' builtin"
 
-  READLINK=$(type -p greadlink readlink | head -1)
+  READLINK=$(type -P greadlink readlink | head -1)
   [ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
 
   resolve_link() {
@@ -61,24 +62,6 @@ else
 fi
 export PYENV_ROOT
 
-# Transfer PYENV_FILE_ARG (from shims) into PYENV_DIR.
-if [ -z "${PYENV_DIR}" ]; then
-  if [ -n "${PYENV_FILE_ARG}" ]; then
-    if [ -L "${PYENV_FILE_ARG}" ]; then
-      PYENV_DIR="$(abs_dirname "${PYENV_FILE_ARG}")"
-    else
-      PYENV_DIR="${PYENV_FILE_ARG%/*}"
-    fi
-    export PYENV_DIR
-    unset PYENV_FILE_ARG
-  fi
-else
-  [[ $PYENV_DIR == /* ]] || PYENV_DIR="$PWD/$PYENV_DIR"
-  cd "$PYENV_DIR" 2>/dev/null || abort "cannot change working directory to \`$PYENV_DIR'"
-  PYENV_DIR="$PWD"
-  cd "$OLDPWD"
-fi
-
 if [ -z "${PYENV_DIR}" ]; then
   PYENV_DIR="$PWD"
 fi
@@ -94,7 +77,10 @@ export PYENV_DIR
 shopt -s nullglob
 
 bin_path="$(abs_dirname "$0")"
-for plugin_bin in "${PYENV_ROOT}/plugins/"*/bin; do
+for plugin_bin in "${bin_path%/*}"/plugins/*/bin; do
+  PATH="${plugin_bin}:${PATH}"
+done
+for plugin_bin in "${PYENV_ROOT}"/plugins/*/bin; do
   PATH="${plugin_bin}:${PATH}"
 done
 export PATH="${bin_path}:${PATH}"

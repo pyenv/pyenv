@@ -1,12 +1,12 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-x86" )
-  install_script "Miniconda3-latest-Linux-x86" "https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86.sh" "miniconda" verify_py36
+  install_script "Miniconda3-latest-Linux-x86" "https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86.sh" "miniconda" verify_py3_latest
   ;;
 "Linux-x86_64" )
-  install_script "Miniconda3-latest-Linux-x86_64" "https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh" "miniconda" verify_py36
+  install_script "Miniconda3-latest-Linux-x86_64" "https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh" "miniconda" verify_py3_latest
   ;;
 "MacOSX-x86_64" )
-  install_script "Miniconda3-latest-MacOSX-x86_64" "https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh" "miniconda" verify_py36
+  install_script "Miniconda3-latest-MacOSX-x86_64" "https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh" "miniconda" verify_py3_latest
   ;;
 * )
   { echo

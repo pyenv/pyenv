@@ -89,7 +89,7 @@ install_tmp_fixture() {
 }
 
 resolve_link() {
-  $(type -p greadlink readlink | head -1) "$1"
+  $(type -P greadlink readlink | head -1) "$1"
 }
 
 run_inline_definition_with_name() {
@@ -249,15 +249,15 @@ OUT
 }
 
 @test "enable framework" {
-  mkdir -p "${INSTALL_ROOT}/Python.framework/Versions/Current/bin"
-  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3"
-  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3"
-  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4"
-  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4"
-  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3-config"
-  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3-config"
-  touch "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4-config"
-  chmod +x "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python3.4-config"
+  mkdir -p "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin"
+  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3"
+  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3"
+  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4"
+  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4"
+  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3-config"
+  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3-config"
+  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4-config"
+  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4-config"
 
   # yyuu/pyenv#257
   stub uname '-s : echo Darwin'
@@ -270,11 +270,11 @@ verify_python python3.4
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-framework=${TMP}/install)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-framework=${TMP}/install/Library/Frameworks)
 EOS
 
-  [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python" ]
-  [ -L "${INSTALL_ROOT}/Python.framework/Versions/Current/bin/python-config" ]
+  [ -L "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python" ]
+  [ -L "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python-config" ]
 }
 
 @test "enable universalsdk" {
@@ -360,7 +360,7 @@ OUT
   run_inline_definition_with_name --name=2.6 <<OUT
 echo "\${GET_PIP_URL}"
 OUT
-  assert_output "https://bootstrap.pypa.io/2.6/get-pip.py"
+  assert_output "https://bootstrap.pypa.io/pip/2.6/get-pip.py"
   assert_success
 }
 
@@ -368,7 +368,7 @@ OUT
   run_inline_definition_with_name --name=3.2 <<OUT
 echo "\${GET_PIP_URL}"
 OUT
-  assert_output "https://bootstrap.pypa.io/3.2/get-pip.py"
+  assert_output "https://bootstrap.pypa.io/pip/3.2/get-pip.py"
   assert_success
 }
 
@@ -376,6 +376,6 @@ OUT
   run_inline_definition_with_name --name=3.3 <<OUT
 echo "\${GET_PIP_URL}"
 OUT
-  assert_output "https://bootstrap.pypa.io/3.3/get-pip.py"
+  assert_output "https://bootstrap.pypa.io/pip/3.3/get-pip.py"
   assert_success
 }

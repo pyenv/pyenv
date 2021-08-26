@@ -1,6 +1,6 @@
 #require_gcc
 install_package "openssl-1.0.2k" "https://www.openssl.org/source/old/1.0.2/openssl-1.0.2k.tar.gz#6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
-install_package "Python-3.2.2" "https://www.python.org/ftp/python/3.2.2/Python-3.2.2.tgz#acc6a13cb4fed0b7e86716324a8437e326645b8076177eede5a0cad99ec0313c" ldflags_dirs standard verify_py32
+install_package "Python-3.2.2" "https://www.python.org/ftp/python/3.2.2/Python-3.2.2.tgz#acc6a13cb4fed0b7e86716324a8437e326645b8076177eede5a0cad99ec0313c" standard verify_py32
 install_package "setuptools-17.1.1" "https://pypi.python.org/packages/source/s/setuptools/setuptools-17.1.1.tar.gz#5bf42dbf406fd58a41029f53cffff1c90db5de1c5e0e560b5545cf2ec949c431" python
 install_package "pip-7.1.2" "https://pypi.python.org/packages/source/p/pip/pip-7.1.2.tar.gz#ca047986f0528cfa975a14fb9f7f106271d4e0c3fe1ddced6c1db2e7ae57a477" python

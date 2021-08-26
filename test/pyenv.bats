@@ -48,7 +48,7 @@ load test_helper
 
 @test "adds its own libexec to PATH" {
   run pyenv echo "PATH"
-  assert_success "${BATS_TEST_DIRNAME%/*}/libexec:$PATH"
+  assert_success "${BATS_TEST_DIRNAME%/*}/libexec:${BATS_TEST_DIRNAME%/*}/plugins/python-build/bin:$PATH"
 }
 
 @test "adds plugin bin dirs to PATH" {
@@ -59,6 +59,7 @@ load test_helper
   assert_line 0 "${BATS_TEST_DIRNAME%/*}/libexec"
   assert_line 1 "${PYENV_ROOT}/plugins/python-build/bin"
   assert_line 2 "${PYENV_ROOT}/plugins/pyenv-each/bin"
+  assert_line 3 "${BATS_TEST_DIRNAME%/*}/plugins/python-build/bin"
 }
 
 @test "PYENV_HOOK_PATH preserves value from environment" {

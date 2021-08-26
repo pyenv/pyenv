@@ -3,7 +3,7 @@ prefer_openssl11
 install_package "openssl-1.1.0j" "https://www.openssl.org/source/old/1.1.0/openssl-1.1.0j.tar.gz#31bec6c203ce1a8e93d5994f4ed304c63ccf07676118b6634edded12ad1b3246" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
 if has_tar_xz_support; then
-  install_package "Python-3.6.11" "https://www.python.org/ftp/python/3.6.11/Python-3.6.11.tar.xz#741ebdcbc4e3937a5ff23517dd455ebf7d543ea9fef6f5cf6f46e575d6c4fda4" ldflags_dirs standard verify_py37 copy_python_gdb ensurepip
+  install_package "Python-3.6.11" "https://www.python.org/ftp/python/3.6.11/Python-3.6.11.tar.xz#741ebdcbc4e3937a5ff23517dd455ebf7d543ea9fef6f5cf6f46e575d6c4fda4" standard verify_py37 copy_python_gdb ensurepip
 else
-  install_package "Python-3.6.11" "https://www.python.org/ftp/python/3.6.11/Python-3.6.11.tgz#96621902f89746fffc22f39749c07da7c2917b232e72352e6837d41850f7b90c" ldflags_dirs standard verify_py37 copy_python_gdb ensurepip
+  install_package "Python-3.6.11" "https://www.python.org/ftp/python/3.6.11/Python-3.6.11.tgz#96621902f89746fffc22f39749c07da7c2917b232e72352e6837d41850f7b90c" standard verify_py37 copy_python_gdb ensurepip
 fi

@@ -1,0 +1,19 @@
+echo
+colorize 1 "WARNING"
+echo ": Pyston only runs on x86_64 platforms, and only has been tested on Ubuntu"
+echo "so, your mileage may vary with other Linux distributions."
+echo
+
+case "$(pyston_architecture 2>/dev/null || true)" in
+"linux64" )
+  install_package "pyston_2.2" "https://github.com/pyston/pyston/releases/download/pyston_2.2/pyston_2.2_portable.tar.gz#d113cc4d1f6821c0f117f7a84978823d8ac751d7970fa7841eb994663ec5a59f" "pyston" verify_py38 get_pip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": A Pyston 2.2 binary is not available for $(pyston_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

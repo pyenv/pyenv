@@ -2,7 +2,7 @@
 install_package "openssl-1.0.2k" "https://www.openssl.org/source/old/1.0.2/openssl-1.0.2k.tar.gz#6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
 if has_tar_xz_support; then
-  install_package "Python-2.7.10" "https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tar.xz#1cd3730781b91caf0fa1c4d472dc29274186480161a150294c42ce9b5c5effc0" ldflags_dirs standard verify_py27 copy_python_gdb ensurepip
+  install_package "Python-2.7.10" "https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tar.xz#1cd3730781b91caf0fa1c4d472dc29274186480161a150294c42ce9b5c5effc0" standard verify_py27 copy_python_gdb ensurepip
 else
-  install_package "Python-2.7.10" "https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz#eda8ce6eec03e74991abb5384170e7c65fcd7522e409b8e83d7e6372add0f12a" ldflags_dirs standard verify_py27 copy_python_gdb ensurepip
+  install_package "Python-2.7.10" "https://www.python.org/ftp/python/2.7.10/Python-2.7.10.tgz#eda8ce6eec03e74991abb5384170e7c65fcd7522e409b8e83d7e6372add0f12a" standard verify_py27 copy_python_gdb ensurepip
 fi

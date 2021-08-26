@@ -70,3 +70,15 @@ IN
   run pyenv-version-file-read my-version
   assert_success "3.3.5"
 }
+
+@test "skips comment lines" {
+  cat > my-version <<IN
+3.9.3
+3.8.9
+  # 3.4.0
+#3.3.7
+2.7.16
+IN
+  run pyenv-version-file-read my-version
+  assert_success "3.9.3:3.8.9:2.7.16"
+}

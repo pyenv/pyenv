@@ -5,9 +5,9 @@
 # This hooks is intended to skip creating shims for those executables.
 
 conda_exists() {
-  shopt -s nullglob
+  shopt -s dotglob nullglob
   local condas=($(echo "${PYENV_ROOT}/versions/"*"/bin/conda" "${PYENV_ROOT}/versions/"*"/envs/"*"/bin/conda"))
-  shopt -u nullglob
+  shopt -u dotglob nullglob
   [ -n "${condas}" ]
 }
 
@@ -34,14 +34,23 @@ make_shims() {
 }
 
 deregister_conda_shims() {
-  local shim
-  local shims=()
-  for shim in ${registered_shims}; do
-    if ! conda_shim "${shim}" 1>&2; then
-      shims[${#shims[*]}]="${shim}"
-    fi
-  done
-  registered_shims=" ${shims[@]} "
+  # adapted for Bash 4.x's associative array (#1749)
+  if declare -p registered_shims 2> /dev/null | grep -Eq '^(declare|typeset) \-A'; then
+    for shim in ${!registered_shims[*]}; do
+      if conda_shim "${shim}" 1>&2; then
+        unset registered_shims[${shim}]
+      fi
+    done
+  else
+    local shim
+    local shims=()
+    for shim in ${registered_shims}; do
+      if ! conda_shim "${shim}" 1>&2; then
+        shims[${#shims[*]}]="${shim}"
+      fi
+    done
+    registered_shims=" ${shims[@]} "
+  fi
 }
 
 if conda_exists; then

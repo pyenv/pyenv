@@ -19,6 +19,8 @@ PYTHON_BUILD_VERSION="20180424"
 OLDIFS="$IFS"
 
 set -E
+[ -n "$PYENV_DEBUG" ] && set -x
+
 exec 3<&2 # preserve original stderr at fd 3
 
 
@@ -56,7 +58,7 @@ lib "$1"
 
 
 resolve_link() {
-  $(type -p greadlink readlink | head -1) "$1"
+  $(type -P greadlink readlink | head -1) "$1"
 }
 
 abs_dirname() {
@@ -128,13 +130,13 @@ build_failed() {
 
     if ! rmdir "${BUILD_PATH}" 2>/dev/null; then
       echo "Inspect or clean up the working tree at ${BUILD_PATH}"
+    fi
 
-      if file_is_not_empty "$LOG_PATH"; then
-        colorize 33 "Results logged to ${LOG_PATH}"
-        printf "\n\n"
-        echo "Last 10 log lines:"
-        tail -n 10 "$LOG_PATH"
-      fi
+    if file_is_not_empty "$LOG_PATH"; then
+      colorize 33 "Results logged to ${LOG_PATH}"
+      printf "\n\n"
+      echo "Last 10 log lines:"
+      tail -n 10 "$LOG_PATH"
     fi
   } >&3
   exit 1
@@ -415,8 +417,8 @@ fetch_tarball() {
    fi
 
   if ! reuse_existing_tarball "$package_filename" "$checksum"; then
-    local tarball_filename="$(basename "$package_url")"
-    echo "Downloading ${tarball_filename}..." >&2
+    # Report the cached file name -- sometimes, it's useful to know (#1743)
+    echo "Downloading ${package_filename}..." >&2
     http head "$mirror_url" &&
     download_tarball "$mirror_url" "$package_filename" "$checksum" ||
     download_tarball "$package_url" "$package_filename" "$checksum"
@@ -480,7 +482,12 @@ reuse_existing_tarball() {
 }
 
 download_tarball() {
-  local package_url="$1"
+  local official_source="www.python.org/ftp/python"
+  if [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ]; then
+      local package_url="$(echo "$1" | sed -e "s|.*//${URL_BASE:-$official_source}|$PYTHON_BUILD_MIRROR_URL|g")"
+  else
+      local package_url="$1"
+  fi
   [ -n "$package_url" ] || return 1
 
   local package_filename="$2"
@@ -504,7 +511,7 @@ download_tarball() {
 }
 
 has_tar_xz_support() {
-  tar Jc /dev/null 1>/dev/null 2>&1
+  tar Jcf - /dev/null 1>/dev/null 2>&1
 }
 
 fetch_git() {
@@ -799,7 +806,7 @@ build_package_standard() {
 }
 
 build_package_autoconf() {
-  { autoconf
+  { autoreconf
   } >&4 2>&1
 }
 
@@ -845,12 +852,21 @@ build_package_jython_builder() {
 }
 
 build_package_pyston() {
-  mkdir -p "${PREFIX_PATH}/"
-  cp -fR . "${PREFIX_PATH}/"
-  chmod +x "${PREFIX_PATH}/"pyston
-  # FIXME ugly hack below adapted from
-  # https://github.com/dropbox/pyston/blob/master/docker/pyston/Dockerfile
-  ( cd "${PREFIX_PATH}/" && ./pyston virtualenv/virtualenv.py . )
+  # currently supported version 2.2 and upper
+  build_package_copy
+  mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
+  local bin
+  shopt -s nullglob
+  for bin in "bin/"*; do
+    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
+      case "${bin##*/}" in
+      "pyston"* )
+        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
+        ;;
+      esac
+    fi
+  done
+  shopt -u nullglob
 }
 
 build_package_ironpython() {
@@ -912,6 +928,11 @@ pyston_architecture() {
   pypy_architecture
 }
 
+build_package_graalpython() {
+    build_package_copy
+    ln -fs "${PREFIX_PATH}/bin/graalpython" "${PREFIX_PATH}/bin/python"
+}
+
 build_package_pypy() {
   build_package_copy
   mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
@@ -969,7 +990,7 @@ activepython_architecture() {
   "Darwin" ) echo "macosx10.9-i386-x86_64" ;;
   "Linux" )
     case "$(uname -m)" in
-    "i368" | "i486" | "i586" | "i686" | "i786" ) echo "linux-x86" ;;
+    "i386" | "i486" | "i586" | "i686" | "i786" ) echo "linux-x86" ;;
     "x86_64" ) echo "linux-x86_64" ;;
     * ) return 1 ;;
     esac
@@ -986,10 +1007,16 @@ build_package_activepython() {
 
 anaconda_architecture() {
   case "$(uname -s)" in
-  "Darwin" ) echo "MacOSX-x86_64" ;;
+  "Darwin" )
+    case "$(uname -m)" in
+    "arm64" ) echo "MacOSX-arm64" ;;
+    * ) echo "MacOSX-x86_64" ;;
+    esac
+    ;;
   "Linux" )
     case "$(uname -m)" in
     "armv7l" ) echo "Linux-armv7l" ;;
+    "aarch64" ) echo "Linux-aarch64" ;;
     "i386" | "i486" | "i586" | "i686" | "i786" ) echo "Linux-x86" ;;
     "ppc64le" ) echo "Linux-ppc64le" ;;
     "x86_64" ) echo "Linux-x86_64" ;;
@@ -1468,7 +1495,7 @@ build_package_verify_openssl() {
       RbConfig::CONFIG.fetch("configure_args").shellsplit.each { |arg| $stderr.puts "  #{arg}" }
       exit 1
     end
-  ' "$(basename "$(type -p yum apt-get | head -1)")" >&4 2>&1
+  ' "$(basename "$(type -P yum apt-get | head -1)")" >&4 2>&1
 }
 
 use_homebrew_zlib() {
@@ -1484,6 +1511,9 @@ use_xcode_sdk_zlib() {
   if [ -d "$xc_sdk_path" ]; then
     echo "python-build: use zlib from xcode sdk"
     export CFLAGS="-I${xc_sdk_path}/usr/include ${CFLAGS}"
+    if is_mac -ge 1100; then
+      export LDFLAGS="${LDFLAGS} -L${xc_sdk_path}/usr/lib"
+    fi
   fi
 }
 
@@ -1539,21 +1569,6 @@ use_tcltk() {
   elif [ -d "$tcltk_libdir" ]; then
     use_homebrew_tcltk
   fi
- }
-
-# Ensure that directories listed in LDFLAGS exist
-build_package_ldflags_dirs() {
-  local arg dir
-  set - $LDFLAGS
-  while [ $# -gt 0 ]; do
-    dir=""
-    case "$1" in
-    -L  ) dir="$2" ;;
-    -L* ) dir="${1#-L}" ;;
-    esac
-    [ -z "$dir" ] || mkdir -p "$dir"
-    shift 1
-  done
 }
 
 build_package_enable_shared() {
@@ -1594,7 +1609,7 @@ build_package_symlink_version_suffix() {
       mv -f "${PREFIX_PATH}/bin" "${PREFIX_PATH}/bin.orig"
     fi
     # Only symlinks are installed in ${PREFIX_PATH}/bin
-    ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
+    ln -fs "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/Current/bin" "${PREFIX_PATH}/bin"
   fi
 
   # Not create symlinks on `altinstall` (#255)
@@ -1780,6 +1795,18 @@ build_package_verify_py39() {
 # Post-install check for Python 3.10.x
 build_package_verify_py310() {
   build_package_verify_py39 "$1" "${2:-3.10}"
+}
+
+# Post-install check for Python 3.11.x
+build_package_verify_py311() {
+  build_package_verify_py310 "$1" "${2:-3.11}"
+}
+
+# Post-install check for Python 3.x rolling release scripts
+# XXX: Will need splitting into project-specific ones if there emerge
+# multiple rolling-release scripts with different checks needed
+build_package_verify_py3_latest() {
+  build_package_verify_py311 "$1" "3"
 }
 
 # Copy Tools/gdb/libpython.py to pythonX.Y-gdb.py (#1190)
@@ -2003,7 +2030,11 @@ else
   PYTHON_BUILD_DEFAULT_MIRROR=
 fi
 
-if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ] || ! has_checksum_support compute_sha2; then
+if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ]; then
+  unset PYTHON_BUILD_MIRROR_URL
+fi
+
+if ! has_checksum_support compute_sha2 && ! [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ] ; then
   unset PYTHON_BUILD_MIRROR_URL
 fi
 
@@ -2040,16 +2071,17 @@ if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   fi
   create_framework_dirs() {
     local version="$(echo "$1" | sed -E 's/^[^0-9]*([0-9]+\.[0-9]+).*$/\1/')"
-    mkdir -p "${PREFIX_PATH}/Python.framework/Versions/${version}"
-    ( cd "${PREFIX_PATH}/Python.framework/Versions" && ln -fs "${version}" "Current")
+    mkdir -p "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/${version}"
+    ( cd "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions" && ln -fs "${version}" "Current")
     local path
     for path in include lib share; do
-      mkdir -p "${PREFIX_PATH}/Python.framework/Versions/Current/${path}"
-      ln -fs "${PREFIX_PATH}/Python.framework/Versions/Current/${path}" "${PREFIX_PATH}/${path}"
+      mkdir -p "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/Current/${path}"
+      ln -fs "${PREFIX_PATH}/Library/Frameworks/Python.framework/Versions/Current/${path}" "${PREFIX_PATH}/${path}"
     done
   }
   create_framework_dirs "${DEFINITION_PATH##*/}"
-  package_option python configure --enable-framework="${PREFIX_PATH}"
+  # the `/Library/Frameworks` suffix makes CPython build install apps under prefix rather than into /Applications (#1003)
+  package_option python configure --enable-framework="${PREFIX_PATH}/Library/Frameworks"
 fi
 
 # Build against universal SDK (#219, #220)
@@ -2108,13 +2140,22 @@ if [ -z "${GET_PIP_URL}" ]; then
     # Use custom get-pip URL based on the target version (#1127)
     case "${DEFINITION_PATH##*/}" in
     2.6 | 2.6.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/2.6/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/2.6/get-pip.py"
+      ;;
+    2.7 | 2.7.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/2.7/get-pip.py"
       ;;
     3.2 | 3.2.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/3.2/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.2/get-pip.py"
       ;;
     3.3 | 3.3.* )
-      GET_PIP_URL="https://bootstrap.pypa.io/3.3/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.3/get-pip.py"
+      ;;
+    3.4 | 3.4.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.4/get-pip.py"
+      ;;
+    3.5 | 3.5.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.5/get-pip.py"
       ;;
     * )
       GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"

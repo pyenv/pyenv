@@ -1,36 +1,36 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.4.0-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-linux32.tar.bz2#ce581270464b14cdecd13dedb9bd7bf98232f767ac4ac282229a405d8e807af1" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.4.0-linux" "https://downloads.python.org/pypy/pypy2-v5.4.0-linux32.tar.bz2#ce581270464b14cdecd13dedb9bd7bf98232f767ac4ac282229a405d8e807af1" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.4-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.4-linux_i686-portable.tar.bz2#7d7d253f009bb2624f43db6b8caeeb73d29177c4166a643a581a231a099c8689" "pypy" verify_py27 ensurepip
+    install_package "pypy-5.4-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.4-linux_i686-portable.tar.bz2#7d7d253f009bb2624f43db6b8caeeb73d29177c4166a643a581a231a099c8689" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy2-v5.4.0-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-linux-armel.tar.bz2#04509044f21bb41ee6d3fafcf637fc0c586c248d4cdae6ac3357606a7b660fdb" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v5.4.0-linux-armel" "https://downloads.python.org/pypy/pypy2-v5.4.0-linux-armel.tar.bz2#04509044f21bb41ee6d3fafcf637fc0c586c248d4cdae6ac3357606a7b660fdb" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy2-v5.4.0-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-linux-armhf-raspbian.tar.bz2#839b08db89b7e20cb670b8cf02596e033ea0b76fb8336af7bedfbb04b6b502da" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.4.0-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy2-v5.4.0-linux-armhf-raspbian.tar.bz2#839b08db89b7e20cb670b8cf02596e033ea0b76fb8336af7bedfbb04b6b502da" "pypy" verify_py27 ensurepip
   else
     require_distro "Ubuntu 13.04" || true
-    install_package "pypy2-v5.4.0-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-linux-armhf-raring.tar.bz2#95c690bcae6771ebce6cf06c7c2842e0662e007e35162afc963337aa597b471a" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.4.0-linux-armhf-raring" "https://downloads.python.org/pypy/pypy2-v5.4.0-linux-armhf-raring.tar.bz2#95c690bcae6771ebce6cf06c7c2842e0662e007e35162afc963337aa597b471a" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux64" )
   if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.4.0-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-linux64.tar.bz2#bdfea513d59dcd580970cb6f79f3a250d00191fd46b68133d5327e924ca845f8" "pypy" verify_py27 ensurepip
+    install_package "pypy2-v5.4.0-linux64" "https://downloads.python.org/pypy/pypy2-v5.4.0-linux64.tar.bz2#bdfea513d59dcd580970cb6f79f3a250d00191fd46b68133d5327e924ca845f8" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-5.4-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.4-linux_x86_64-portable.tar.bz2#0a48c7ba7163589b1ade9cfe184f422d1bc9a0f988321b2fdcbd924d90594d9a" "pypy" verify_py27 ensurepip
+    install_package "pypy-5.4-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.4-linux_x86_64-portable.tar.bz2#0a48c7ba7163589b1ade9cfe184f422d1bc9a0f988321b2fdcbd924d90594d9a" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
-  install_package "pypy2-v5.4.0-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-osx64.tar.bz2#3adf21c2bf3432759c99123f21240d71a72aba81d73129e48ef912c34631b723" "pypy" verify_py27 ensurepip
+  install_package "pypy2-v5.4.0-osx64" "https://downloads.python.org/pypy/pypy2-v5.4.0-osx64.tar.bz2#3adf21c2bf3432759c99123f21240d71a72aba81d73129e48ef912c34631b723" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy2-v5.4.0-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy2-v5.4.0-win32.zip#442c0a917781b6155bf78d2648f1ccd9a36c321926a043f83efcea22a99960b4" "pypy" verify_py27 ensurepip
+  install_zip "pypy2-v5.4.0-win32" "https://downloads.python.org/pypy/pypy2-v5.4.0-win32.zip#442c0a917781b6155bf78d2648f1ccd9a36c321926a043f83efcea22a99960b4" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

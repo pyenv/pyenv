@@ -1,30 +1,30 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   require_distro "Ubuntu 10.04" || true
-  install_package "pypy-2.2.1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2.1-linux.tar.bz2#4d13483a0e13fc617a7b3d36918ed0e63cf07a7d2827c0a08132b80bc401a55a" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.2.1-linux" "https://downloads.python.org/pypy/pypy-2.2.1-linux.tar.bz2#4d13483a0e13fc617a7b3d36918ed0e63cf07a7d2827c0a08132b80bc401a55a" "pypy" verify_py27 ensurepip
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.2.1-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2.1-linux-armel.tar.bz2#f0a15c7f4d66f152c58d73475314b906dcd3052fc422a8bb8cf88ae1ca0a8b19" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.2.1-linux-armel" "https://downloads.python.org/pypy/pypy-2.2.1-linux-armel.tar.bz2#f0a15c7f4d66f152c58d73475314b906dcd3052fc422a8bb8cf88ae1ca0a8b19" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy-2.2.1-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2.1-linux-armhf-raspbian.tar.bz2#31d921a8139ec6accf9749df2baff4aed844f6f46eeb37184119ff9c7d6fca55" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.2.1-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy-2.2.1-linux-armhf-raspbian.tar.bz2#31d921a8139ec6accf9749df2baff4aed844f6f46eeb37184119ff9c7d6fca55" "pypy" verify_py27 ensurepip
   else
     require_distro "Ubuntu 13.04" || true
-    install_package "pypy-2.2.1-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2.1-linux-armhf-raring.tar.bz2#6f5fe3285a32d1ea8fe148265467f870c6863ae00bc2e279b31b94d2d7f80102" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.2.1-linux-armhf-raring" "https://downloads.python.org/pypy/pypy-2.2.1-linux-armhf-raring.tar.bz2#6f5fe3285a32d1ea8fe148265467f870c6863ae00bc2e279b31b94d2d7f80102" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux64" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.2.1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2.1-linux64.tar.bz2#022d611ac62a276890d3e262f4f7cc839fcf9f5e1416df01dcd83ba335eacb16" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.2.1-linux64" "https://downloads.python.org/pypy/pypy-2.2.1-linux64.tar.bz2#022d611ac62a276890d3e262f4f7cc839fcf9f5e1416df01dcd83ba335eacb16" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
-  install_package "pypy-2.2.1-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2.1-osx64.tar.bz2#93e215dcffc9073acf41c63518f47fb59de60386aca4416cfe32190c7a096f29" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.2.1-osx64" "https://downloads.python.org/pypy/pypy-2.2.1-osx64.tar.bz2#93e215dcffc9073acf41c63518f47fb59de60386aca4416cfe32190c7a096f29" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.2.1-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.2.1-win32.zip#d36f4f1b4f146b3a0a623abef9b5a837c08f66e67c90023c724dfdcd8e0133bb" "pypy" verify_py27 ensurepip
+  install_zip "pypy-2.2.1-win32" "https://downloads.python.org/pypy/pypy-2.2.1-win32.zip#d36f4f1b4f146b3a0a623abef9b5a837c08f66e67c90023c724dfdcd8e0133bb" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

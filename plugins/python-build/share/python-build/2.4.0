@@ -1,5 +1,5 @@
 require_gcc
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
-install_package "Python-2.4" "https://www.python.org/ftp/python/2.4/Python-2.4.tgz#ff746de0fae8691c082414b42a2bb172da8797e6e8ff66c9a39d2e452f7034e9" ldflags_dirs standard verify_py24
+install_package "Python-2.4" "https://www.python.org/ftp/python/2.4/Python-2.4.tgz#ff746de0fae8691c082414b42a2bb172da8797e6e8ff66c9a39d2e452f7034e9" standard verify_py24
 install_package "setuptools-1.4.2" "https://pypi.python.org/packages/source/s/setuptools/setuptools-1.4.2.tar.gz#263986a60a83aba790a5bffc7d009ac88114ba4e908e5c90e453b3bf2155dbbd" python
 install_package "pip-1.1" "https://pypi.python.org/packages/source/p/pip/pip-1.1.tar.gz#993804bb947d18508acee02141281c77d27677f8c14eaa64d6287a1c53ef01c8" python

@@ -1,0 +1,23 @@
+
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-ppc64le" )
+  install_script "Miniforge-pypy3-Linux-ppc64le" "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge-pypy3-Linux-ppc64le.sh" "miniconda" verify_py3_latest
+  ;;
+"Linux-x86_64" )
+  install_script "Miniforge-pypy3-Linux-x86_64" "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge-pypy3-Linux-x86_64.sh" "miniconda" verify_py3_latest
+  ;;
+"Linux-aarch64" )
+  install_script "Miniforge-pypy3-Linux-aarch64" "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge-pypy3-Linux-aarch64.sh" "miniconda" verify_py3_latest
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniforge-pypy3-MacOSX-x86_64" "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge-pypy3-MacOSX-x86_64.sh" "miniconda" verify_py3_latest
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniforge with PyPy3 is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

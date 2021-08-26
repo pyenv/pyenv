@@ -1,16 +1,16 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  install_package "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-linux.tar.bz2#1266c8b5918d84432b8649535fb5c84f6b977331c242bf45c5944033562ce0b2" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.6" "https://downloads.python.org/pypy/pypy-1.6-linux.tar.bz2#1266c8b5918d84432b8649535fb5c84f6b977331c242bf45c5944033562ce0b2" "pypy" verify_py27 ensurepip
   ;;
 "linux64" )
-  install_package "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-linux64.tar.bz2#95b229c496339a51c4c1e9749bf8dbd11e4f698521803c089b52577be2cdbab8" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.6" "https://downloads.python.org/pypy/pypy-1.6-linux64.tar.bz2#95b229c496339a51c4c1e9749bf8dbd11e4f698521803c089b52577be2cdbab8" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
-  install_package "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-osx64.tar.bz2#147a0e34b3d3a568d5c5926252a2c27e137677b3121cd8daab1d746df2d91e38" "pypy" verify_py27 ensurepip
+  install_package "pypy-1.6" "https://downloads.python.org/pypy/pypy-1.6-osx64.tar.bz2#147a0e34b3d3a568d5c5926252a2c27e137677b3121cd8daab1d746df2d91e38" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-1.6" "https://bitbucket.org/pypy/pypy/downloads/pypy-1.6-win32-c.zip#75bf79f08e2d65fce51b14fb8fe0309f136ffc368f977017dc3029baf8426e53" "pypy" verify_py27 ensurepip
+  install_zip "pypy-1.6" "https://downloads.python.org/pypy/pypy-1.6-win32-c.zip#75bf79f08e2d65fce51b14fb8fe0309f136ffc368f977017dc3029baf8426e53" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

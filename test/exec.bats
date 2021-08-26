@@ -79,37 +79,37 @@ OUT
 }
 
 @test "sys.executable with system version (#98)" {
-  system_python=$(which python)
+  system_python=$(which python3)
 
   PYENV_VERSION="custom"
-  create_executable "python" ""
+  create_executable "python3" ""
   unset PYENV_VERSION
 
   pyenv-rehash
-  run pyenv-exec python -c 'import sys; print(sys.executable)'
+  run pyenv-exec python3 -c 'import sys; print(sys.executable)'
   assert_success "${system_python}"
 }
 
-@test '$PATH is not modified with system Python' {
+@test 'PATH is not modified with system Python' {
   # Create a wrapper executable that verifies PATH.
   PYENV_VERSION="custom"
-  create_executable "python" '[[ "$PATH" == "${PYENV_TEST_DIR}/root/versions/custom/bin:"* ]] || { echo "unexpected:$PATH"; exit 2;}'
+  create_executable "python3" '[[ "$PATH" == "${PYENV_TEST_DIR}/root/versions/custom/bin:"* ]] || { echo "unexpected:$PATH"; exit 2;}'
   unset PYENV_VERSION
   pyenv-rehash
 
   # Path is not modified with system Python.
-  run pyenv-exec python -c 'import os; print(os.getenv("PATH"))'
+  run pyenv-exec python3 -c 'import os; print(os.getenv("PATH"))'
   assert_success "$PATH"
 
   # Path is modified with custom Python.
-  PYENV_VERSION=custom run pyenv-exec python
+  PYENV_VERSION=custom run pyenv-exec python3
   assert_success
 
   # Path is modified with custom:system Python.
-  PYENV_VERSION=custom:system run pyenv-exec python
+  PYENV_VERSION=custom:system run pyenv-exec python3
   assert_success
 
   # Path is not modified with system:custom Python.
-  PYENV_VERSION=system:custom run pyenv-exec python -c 'import os; print(os.getenv("PATH"))'
+  PYENV_VERSION=system:custom run pyenv-exec python3 -c 'import os; print(os.getenv("PATH"))'
   assert_success "$PATH"
 }

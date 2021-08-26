@@ -1,36 +1,36 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   if require_distro "Ubuntu 10.04" 1>/dev/null 2>&1; then
-    install_package "pypy-2.3.1-linux" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3.1-linux.tar.bz2#3eed698e8533cca7cbd2c2c87fce39dc14baa7dec03f4b082d870131d2a470e4" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.3.1-linux" "https://downloads.python.org/pypy/pypy-2.3.1-linux.tar.bz2#3eed698e8533cca7cbd2c2c87fce39dc14baa7dec03f4b082d870131d2a470e4" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-2.3.1-linux_i686-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.3.1-linux_i686-portable.tar.bz2#d8784020f6b8a5812fd8b3f5e1df8afb176fd56c2a929d4408d28d4a925525fa" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.3.1-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-2.3.1-linux_i686-portable.tar.bz2#d8784020f6b8a5812fd8b3f5e1df8afb176fd56c2a929d4408d28d4a925525fa" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.3.1-linux-armel" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3.1-linux-armel.tar.bz2#4d71679597b4e971d7e566d9696851dd2ec1a90a04696184d2d0f6b5446d9706" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.3.1-linux-armel" "https://downloads.python.org/pypy/pypy-2.3.1-linux-armel.tar.bz2#4d71679597b4e971d7e566d9696851dd2ec1a90a04696184d2d0f6b5446d9706" "pypy" verify_py27 ensurepip
   ;;
 "linux-armhf" )
   if [[ "$(cat /etc/issue 2>/dev/null || true)" == "Raspbian"* ]]; then
-    install_package "pypy-2.3.1-linux-armhf-raspbian" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3.1-linux-armhf-raspbian.tar.bz2#74ac62f8cf6dfa0b2f04debd8bbedaed21a12a1a4d4da22856410d06dc0c971c" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.3.1-linux-armhf-raspbian" "https://downloads.python.org/pypy/pypy-2.3.1-linux-armhf-raspbian.tar.bz2#74ac62f8cf6dfa0b2f04debd8bbedaed21a12a1a4d4da22856410d06dc0c971c" "pypy" verify_py27 ensurepip
   else
     require_distro "Ubuntu 13.04" || true
-    install_package "pypy-2.3.1-linux-armhf-raring" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3.1-linux-armhf-raring.tar.bz2#f65ad31c364e8122f55d77388026cf4750c6a8774af361b79dc9942612c3a8c1" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.3.1-linux-armhf-raring" "https://downloads.python.org/pypy/pypy-2.3.1-linux-armhf-raring.tar.bz2#f65ad31c364e8122f55d77388026cf4750c6a8774af361b79dc9942612c3a8c1" "pypy" verify_py27 ensurepip
   fi
   ;;
 "linux64" )
   if require_distro "Ubuntu 12.04" 1>/dev/null 2>&1; then
-    install_package "pypy-2.3.1-linux64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3.1-linux64.tar.bz2#dab7940496d96f1f255a8ef402fa96b94444775e373484e057d2fcabc3928b42" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.3.1-linux64" "https://downloads.python.org/pypy/pypy-2.3.1-linux64.tar.bz2#dab7940496d96f1f255a8ef402fa96b94444775e373484e057d2fcabc3928b42" "pypy" verify_py27 ensurepip
   else
-    install_package "pypy-2.3.1-linux_x86_64-portable" "https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-2.3.1-linux_x86_64-portable.tar.bz2#453bd1291f0372e25ceab6b37b7a8d1756bebd3e708fcce1379ef931ccf9f75a" "pypy" verify_py27 ensurepip
+    install_package "pypy-2.3.1-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-2.3.1-linux_x86_64-portable.tar.bz2#453bd1291f0372e25ceab6b37b7a8d1756bebd3e708fcce1379ef931ccf9f75a" "pypy" verify_py27 ensurepip
   fi
   ;;
 "osx64" )
-  install_package "pypy-2.3.1-osx64" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3.1-osx64.tar.bz2#12e363bf5ea3a508600e043b68c47d4148359ca3d999ee207665bb139f8fbf37" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.3.1-osx64" "https://downloads.python.org/pypy/pypy-2.3.1-osx64.tar.bz2#12e363bf5ea3a508600e043b68c47d4148359ca3d999ee207665bb139f8fbf37" "pypy" verify_py27 ensurepip
   ;;
 "win32" )
   # FIXME: never tested on Windows
-  install_zip "pypy-2.3.1-win32" "https://bitbucket.org/pypy/pypy/downloads/pypy-2.3.1-win32.zip#c8db46d0e5199420dae583f6d2901eb4d4023ced75f035a6e26c232f229f8e0a" "pypy" verify_py27 ensurepip
+  install_zip "pypy-2.3.1-win32" "https://downloads.python.org/pypy/pypy-2.3.1-win32.zip#c8db46d0e5199420dae583f6d2901eb4d4023ced75f035a6e26c232f229f8e0a" "pypy" verify_py27 ensurepip
   ;;
 * )
   { echo

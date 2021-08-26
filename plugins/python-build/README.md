@@ -109,6 +109,8 @@ You can set certain environment variables to control the build process.
   downloaded package files.
 * `PYTHON_BUILD_MIRROR_URL` overrides the default mirror URL root to one of your
   choosing.
+* `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM`, if set, does not append the SHA2
+  checksum of the file to the mirror URL.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
@@ -182,6 +184,10 @@ You can point python-build to another mirror by specifying the
 own local mirror, for example. Package mirror URLs are constructed by joining
 this variable with the SHA2 checksum of the package file.
 
+If the mirror being used does not have the same checksum (*e.g.* with a
+pull-through cache like Artifactory), you can set the
+`PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` environment variable.
+
 If you don't have an SHA2 program installed, python-build will skip the download
 mirror and use official URLs instead. You can force python-build to bypass the
 mirror by setting the `PYTHON_BUILD_SKIP_MIRROR` environment variable.
@@ -220,3 +226,51 @@ Please see the [pyenv wiki](https://github.com/pyenv/pyenv/wiki) for solutions t
 If you can't find an answer on the wiki, open an issue on the [issue
 tracker](https://github.com/pyenv/pyenv/issues). Be sure to include
 the full build log for build failures.
+
+## Contributing
+
+### Testing new python versions
+
+If you are contributing a new python version for python-build, 
+you can test the build in a [docker](https://www.docker.com/) container based on Ubuntu 18.04.
+
+With docker installed:
+
+```sh
+docker build -t my_container .
+docker run my_container pyenv install <my_version>
+```
+
+To enter a shell which will allow you to build and then test a python version,
+replace the second line with
+
+```sh
+docker run -it my_container
+```
+
+The container will need to be rebuilt whenever you change the repo,
+but after the first build, this will be very fast, 
+as the layer including the build dependencies will be cached.
+
+Changes made inside the container will not be persisted.
+
+To test *all* new versions since a particular revision (e.g. `master`), `cd` to the root of your `pyenv` repo, and run this script:
+
+```sh
+set -e
+set -x
+
+docker build -t pyenv-test-container .
+
+git diff --name-only master \
+  | grep '^plugins/python-build/share/python-build/' \
+  | awk -F '/' '{print $NF}' \
+  | xargs -I _ docker run pyenv-test-container pyenv install _
+```
+
+- Build the docker image with the **t**ag pyenv-test-container
+- Look for the names files changed since revision `master`
+- Filter out any which don't live where python-build keeps its build scripts
+- Look only at the file name (i.e. the python version name)
+- Run a new docker container for each, building that version
+

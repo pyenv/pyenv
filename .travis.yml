@@ -17,16 +17,17 @@ os:
 - osx
 
 dist:
-- xenial
+- focal
 
 # https://docs.travis-ci.com/user/reference/osx/#macos-version
 osx_image:
-- xcode9.4.1
-- xcode10.3
-- xcode11.3
+- xcode9.4.1  # macOS 10.13.6
+- xcode10.3   # macOS 10.14.4
+- xcode11.6   # macOS 10.15.7
+- xcode12.2   # macOS 10.15.7
 
 env:
-- PYTHON_BUILD_VERSION=3.8.0
+- PYTHON_BUILD_VERSION=3.9.1
 - PYTHON_BUILD_VERSION=3.7.5
 
 before_install:
@@ -60,7 +61,7 @@ jobs:
     osx_image: xcode10
 
   allow_failures:
-  - env: PYTHON_BUILD_VERSION=3.8.0
+  - env: PYTHON_BUILD_VERSION=3.9.1
 
 stages:
 - test shell
