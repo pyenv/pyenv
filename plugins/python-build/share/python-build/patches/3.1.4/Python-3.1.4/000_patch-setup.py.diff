@@ -1,0 +1,12 @@
+--- setup.py.orig	2012-04-10 01:25:37.000000000 +0200
++++ setup.py	2021-09-03 10:16:58.575042300 +0200
+@@ -1344,8 +1344,7 @@
+         # End multiprocessing
+ 
+         # Platform-specific libraries
+-        if platform in ('linux2', 'freebsd4', 'freebsd5', 'freebsd6',
+-                        'freebsd7', 'freebsd8'):
++        if platform.startswith('linux') or platform.startswith('freebsd'):
+             exts.append( Extension('ossaudiodev', ['ossaudiodev.c']) )
+         else:
+             missing.append('ossaudiodev')
