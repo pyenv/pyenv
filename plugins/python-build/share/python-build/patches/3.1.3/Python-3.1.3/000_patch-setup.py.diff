@@ -44,4 +44,13 @@ diff -r -u setup.py setup.py
  
          # Add paths specified in the environment variables LDFLAGS and
          # CPPFLAGS for header and library files.
-
+@@ -1321,8 +1321,7 @@
+         # End multiprocessing
+ 
+         # Platform-specific libraries
+-        if platform in ('linux2', 'freebsd4', 'freebsd5', 'freebsd6',
+-                        'freebsd7', 'freebsd8'):
++        if platform.startswith('linux') or platform.startswith('freebsd'):
+             exts.append( Extension('ossaudiodev', ['ossaudiodev.c']) )
+         else:
+             missing.append('ossaudiodev')
