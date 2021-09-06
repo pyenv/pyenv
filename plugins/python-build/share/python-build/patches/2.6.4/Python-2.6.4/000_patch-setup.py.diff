@@ -1,0 +1,71 @@
+
+# HG changeset patch
+# User Barry Warsaw <barry@python.org>
+# Date 1302190091 14400
+# Node ID bd0f73a9538e05f526feaf05821e68bdcff498fa
+# Parent  2e4cdaffe493e879fb5367a4aa454491de451137
+Backport for Python 2.7 of issue 11715 support for building Python on
+multiarch Debian/Ubuntu.
+
+diff -r -u setup.py setup.py
+--- setup.py.orig
++++ setup.py
+@@ -15,6 +15,7 @@
+ from distutils.command.build_ext import build_ext
+ from distutils.command.install import install
+ from distutils.command.install_lib import install_lib
++from distutils.spawn import find_executable
+ 
+ # This global variable is used to hold the list of modules to be disabled.
+ disabled_module_list = []
+@@ -308,10 +309,33 @@ class PyBuildExt(build_ext):
+                 return platform
+         return sys.platform
+ 
++    def add_multiarch_paths(self):
++        # Debian/Ubuntu multiarch support.
++        # https://wiki.ubuntu.com/MultiarchSpec
++        if not find_executable('dpkg-architecture'):
++            return
++        tmpfile = os.path.join(self.build_temp, 'multiarch')
++        if not os.path.exists(self.build_temp):
++            os.makedirs(self.build_temp)
++        ret = os.system(
++            'dpkg-architecture -qDEB_HOST_MULTIARCH > %s 2> /dev/null' %
++            tmpfile)
++        try:
++            if ret >> 8 == 0:
++                with open(tmpfile) as fp:
++                    multiarch_path_component = fp.readline().strip()
++                add_dir_to_list(self.compiler.library_dirs,
++                                '/usr/lib/' + multiarch_path_component)
++                add_dir_to_list(self.compiler.include_dirs,
++                                '/usr/include/' + multiarch_path_component)
++        finally:
++            os.unlink(tmpfile)
++
+     def detect_modules(self):
+         # Ensure that /usr/local is always used
+         add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
+         add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
++        self.add_multiarch_paths()
+ 
+         # Add paths specified in the environment variables LDFLAGS and
+         # CPPFLAGS for header and library files.
+@@ -1331,14 +1355,13 @@
+ 
+ 
+         # Platform-specific libraries
+-        if platform == 'linux2':
++        if platform.startswith('linux'):
+             # Linux-specific modules
+             exts.append( Extension('linuxaudiodev', ['linuxaudiodev.c']) )
+         else:
+             missing.append('linuxaudiodev')
+ 
+-        if platform in ('linux2', 'freebsd4', 'freebsd5', 'freebsd6',
+-                        'freebsd7', 'freebsd8'):
++        if platform.startswith('linux') or platform.startswith('freebsd'):
+             exts.append( Extension('ossaudiodev', ['ossaudiodev.c']) )
+         else:
+             missing.append('ossaudiodev')
