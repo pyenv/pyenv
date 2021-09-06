@@ -1,0 +1,12 @@
+diff -r -u ../Python-2.6.5.orig/setup.py ./setup.py
+--- ../Python-2.6.5.orig/setup.py	2013-10-30 00:04:39.000000000 +0900
++++ ./setup.py	2014-04-03 22:28:49.122061684 +0900
+@@ -1581,7 +1581,7 @@
+         # The versions with dots are used on Unix, and the versions without
+         # dots on Windows, for detection by cygwin.
+         tcllib = tklib = tcl_includes = tk_includes = None
+-        for version in ['8.5', '85', '8.4', '84', '8.3', '83', '8.2',
++        for version in ['8.6', '86', '8.5', '85', '8.4', '84', '8.3', '83',
+                         '82', '8.1', '81', '8.0', '80']:
+             tklib = self.compiler.find_library_file(lib_dirs, 'tk' + version)
+             tcllib = self.compiler.find_library_file(lib_dirs, 'tcl' + version)
