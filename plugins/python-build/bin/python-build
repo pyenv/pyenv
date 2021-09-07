@@ -776,9 +776,6 @@ build_package_standard_build() {
       use_homebrew_readline || use_freebsd_pkg || true
     if is_mac -ge 1014; then
       use_xcode_sdk_zlib || use_homebrew_zlib || true
-      if is_arm64_apple; then
-        patch_arm64_apple || true
-      fi
     fi
   fi
 
@@ -810,6 +807,12 @@ build_package_standard_install() {
 
 # Backward Compatibility for standard function
 build_package_standard() {
+  build_package_standard_build "$@"
+  build_package_standard_install "$@"
+}
+
+build_package_arm64_apple() {
+  patch_arm64_apple || true
   build_package_standard_build "$@"
   build_package_standard_install "$@"
 }
