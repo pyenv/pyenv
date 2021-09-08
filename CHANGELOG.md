@@ -1,5 +1,17 @@
 ## Version History
 
+## Release 2.0.6
+* Add CPython 3.9.7 (#2044)
+* Add CPython v3.8.12 (#2043)
+* Adapt conda.bash for bash associative array (#2037)
+
+## Release 2.0.5
+
+* Move man page to location where it can be automatically found by man (#2032)
+* Update checksums for CPython 3.10.0rc1 (#2025)
+* Remove 3.9.3 (#2022)
+* Add CPython 3.10.0rc1(#2023)
+
 ## Release 2.0.4
 
 - Added scripts for rolling releases of Miniforge (#2019)
