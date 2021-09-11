@@ -1,0 +1,85 @@
+From a1b08c7de72c27d80a86b92c263d1f5b351e581b Mon Sep 17 00:00:00 2001
+From: Takumi Sueda <puhitaku@gmail.com>
+Date: Sat, 11 Sep 2021 18:07:48 +0900
+Subject: [PATCH 4/7] Use system libffi for Mac OS 10.15 and up
+
+Modified and imported from: https://github.com/Homebrew/formula-patches/blob/master/python/3.8.7.patch
+---
+ setup.py | 37 ++++++++++++++++++++++++++++---------
+ 1 file changed, 28 insertions(+), 9 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index da1d34efaf..c92d0552e3 100644
+--- a/setup.py
++++ b/setup.py
+@@ -126,6 +126,13 @@ def macosx_sdk_specified():
+     macosx_sdk_root()
+     return MACOS_SDK_SPECIFIED
+ 
++def is_macosx_at_least(vers):
++    if host_platform == 'darwin':
++        dep_target = sysconfig.get_config_var('MACOSX_DEPLOYMENT_TARGET')
++        if dep_target:
++            return tuple(map(int, str(dep_target).split('.'))) >= vers
++    return False
++
+ def is_macosx_sdk_path(path):
+     """
+     Returns True if 'path' can be located in an OSX SDK
+@@ -2180,7 +2187,11 @@ class PyBuildExt(build_ext):
+         return True
+ 
+     def detect_ctypes(self, inc_dirs, lib_dirs):
+-        self.use_system_libffi = False
++        if not sysconfig.get_config_var("LIBFFI_INCLUDEDIR") and is_macosx_at_least((10,15)):
++            self.use_system_libffi = True
++        else:
++            self.use_system_libffi = '--with-system-ffi' in sysconfig.get_config_var("CONFIG_ARGS")
++
+         include_dirs = []
+         extra_compile_args = []
+         extra_link_args = []
+@@ -2224,15 +2235,24 @@ class PyBuildExt(build_ext):
+                              sources=['_ctypes/_ctypes_test.c'])
+         self.extensions.extend([ext, ext_test])
+ 
+-        if not '--with-system-ffi' in sysconfig.get_config_var("CONFIG_ARGS"):
+-            return
++        ffi_inc = [sysconfig.get_config_var("LIBFFI_INCLUDEDIR")]
++        ffi_lib = None
+ 
++        #inc_dirs = self.inc_dirs.copy()
++        inc_dirs = self.compiler.include_dirs[:]
+         if host_platform == 'darwin':
+-            # OS X 10.5 comes with libffi.dylib; the include files are
+-            # in /usr/include/ffi
+-            inc_dirs.append('/usr/include/ffi')
++            if not self.use_system_libffi:
++                return
++            ffi_in_sdk = os.path.join(macosx_sdk_root(), "usr/include/ffi")
++            if os.path.exists(ffi_in_sdk):
++                ffi_inc = [ffi_in_sdk]
++                ffi_lib = 'ffi'
++                sources.remove('_ctypes/malloc_closure.c')
++            else:
++                # OS X 10.5 comes with libffi.dylib; the include files are
++                # in /usr/include/ffi
++                inc_dirs.append('/usr/include/ffi')
+ 
+-        ffi_inc = [sysconfig.get_config_var("LIBFFI_INCLUDEDIR")]
+         if not ffi_inc or ffi_inc[0] == '':
+             ffi_inc = find_file('ffi.h', [], inc_dirs)
+         if ffi_inc is not None:
+@@ -2247,8 +2267,7 @@ class PyBuildExt(build_ext):
+                     ffi_inc = None
+                     print('Header file {} does not define LIBFFI_H or '
+                           'ffi_wrapper_h'.format(ffi_h))
+-        ffi_lib = None
+-        if ffi_inc is not None:
++        if ffi_lib is None and ffi_inc is not None:
+             for lib_name in ('ffi_convenience', 'ffi_pic', 'ffi'):
+                 if (self.compiler.find_library_file(lib_dirs, lib_name)):
+                     ffi_lib = lib_name
+-- 
+2.30.1
+
