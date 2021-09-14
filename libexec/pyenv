@@ -77,15 +77,16 @@ export PYENV_DIR
 shopt -s nullglob
 
 bin_path="$(abs_dirname "$0")"
+for plugin_bin in "${bin_path%/*}"/plugins/*/bin; do
+  PATH="${plugin_bin}:${PATH}"
+done
+# PYENV_ROOT can be set to anything, so it may happen to be equal to the base path above,
+# resulting in duplicate PATH entries
 if [ "${bin_path%/*}" != "$PYENV_ROOT" ]; then
-  # Add the plugins paths for bin_path if it isn't in $PYENV_ROOT
-  for plugin_bin in "${bin_path%/*}"/plugins/*/bin; do
+  for plugin_bin in "${PYENV_ROOT}"/plugins/*/bin; do
     PATH="${plugin_bin}:${PATH}"
   done
 fi
-for plugin_bin in "${PYENV_ROOT}"/plugins/*/bin; do
-  PATH="${plugin_bin}:${PATH}"
-done
 export PATH="${bin_path}:${PATH}"
 
 PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${PYENV_ROOT}/pyenv.d"
