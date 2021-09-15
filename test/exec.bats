@@ -79,7 +79,7 @@ OUT
 }
 
 @test "sys.executable with system version (#98)" {
-  system_python=$(which python3)
+  system_python="$(python3 -c 'import sys; print(sys.executable)')"
 
   PYENV_VERSION="custom"
   create_executable "python3" ""
