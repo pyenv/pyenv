@@ -44,7 +44,8 @@ flunk() {
 
 assert_success() {
   if [ "$status" -ne 0 ]; then
-    flunk "command failed with exit status $status"
+    flunk "command failed with exit status $status" $'\n'\
+    "output: $output"
   elif [ "$#" -gt 0 ]; then
     assert_output "$1"
   fi
@@ -52,7 +53,8 @@ assert_success() {
 
 assert_failure() {
   if [ "$status" -eq 0 ]; then
-    flunk "expected failed exit status"
+    flunk "expected failed exit status" $'\n'\
+    "output: $output"
   elif [ "$#" -gt 0 ]; then
     assert_output "$1"
   fi
