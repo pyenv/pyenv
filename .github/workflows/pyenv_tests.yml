@@ -23,6 +23,8 @@ jobs:
               # libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
               # xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
       # https://github.com/pyenv/pyenv#installation
+      - run: |
+          if test "$RUNNER_OS" == "macOS"; then brew install coreutils; fi
       - run: pwd
       - env:
           PYENV_ROOT: /home/runner/work/pyenv/pyenv
