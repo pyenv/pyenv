@@ -46,6 +46,6 @@ OUT
 }
 
 @test "prefix for invalid system" {
-  PATH="$(path_without python)" run pyenv-prefix system
+  PATH="$(path_without python python2 python3)" run pyenv-prefix system
   assert_failure "pyenv: system version not found in PATH"
 }
