@@ -26,11 +26,10 @@ load test_helper
 
 #Arch has Python at sbin as well as bin
 @test "prefix for sbin system" {
-  export PATH="${PYENV_TEST_DIR}/sbin:$PATH"
   mkdir -p "${PYENV_TEST_DIR}/sbin"
   touch "${PYENV_TEST_DIR}/sbin/python"
   chmod +x "${PYENV_TEST_DIR}/sbin/python"
-  PYENV_VERSION="system" run pyenv-prefix
+  PATH="${PYENV_TEST_DIR}/sbin:$PATH" PYENV_VERSION="system" run pyenv-prefix
   assert_success "$PYENV_TEST_DIR"
 }
 
