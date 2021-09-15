@@ -24,6 +24,15 @@ load test_helper
   assert_success "$PYENV_TEST_DIR"
 }
 
+#Arch has Python at sbin as well as bin
+@test "prefix for sbin system" {
+  mkdir -p "${PYENV_TEST_DIR}/sbin"
+  touch "${PYENV_TEST_DIR}/sbin/python"
+  chmod +x "${PYENV_TEST_DIR}/sbin/python"
+  PYENV_VERSION="system" run pyenv-prefix
+  assert_success "$PYENV_TEST_DIR"
+}
+
 @test "prefix for system in /" {
   mkdir -p "${BATS_TEST_DIRNAME}/libexec"
   cat >"${BATS_TEST_DIRNAME}/libexec/pyenv-which" <<OUT
