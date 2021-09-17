@@ -773,6 +773,7 @@ build_package_standard_build() {
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
+      use_tcltk || true
       use_homebrew_readline || use_freebsd_pkg || true
     if is_mac -ge 1014; then
       use_xcode_sdk_zlib || use_homebrew_zlib || true
@@ -1523,6 +1524,75 @@ use_xcode_sdk_zlib() {
   fi
 }
 
+use_homebrew_tcltk() {
+  # get the version from the folder that homebrew versions
+  local tcltk_version_long="$(ls "$(brew --cellar tcl-tk)")"
+  local tcltk_version="${tcltk_version_long%.*}"
+  local tcltk_flags="--with-tcltk-includes=-I$tcltk_libdir/include --with-tcltk-libs=-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+  echo "python-build: use tcl-tk from homebrew"
+  package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+  package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+}
+
+# FIXME: this function is a workaround for #1125
+# once fixed, it should be removed.
+use_custom_tcltk() {
+  local tcltk_ops="$1"
+  local tcltk_ops_flag="--with-tcltk-libs="
+  # get tcltk libs
+  local tcltk_libs="${tcltk_ops//$tcltk_ops_flag/}"
+  # remove tcltk-flag from configure_opts
+  # this allows for weird input such as
+  # --with-tcltk-libs='    -L/custom-tcl-tk/lib -ltcl8.6 -ltk8.4  '
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//"$tcltk_ops_flag"/}"
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//$tcltk_libs/}"
+
+  # remove quotes, because there mess up compilations
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//"''"/}"
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//'""'/}"
+
+  echo "python-build: use tcl-tk from \$PYTHON_CONFIGURE_OPTS"
+  # echo "PYTHON_CONFIGURE_OPTS=${PYTHON_CONFIGURE_OPTS}"
+  package_option python configure --with-tcltk-libs="${tcltk_libs}"
+  # IFS="$OLDIFS"
+}
+
+# FIXME: this function is a workaround for #1125
+# once fixed, it should be removed.
+# Get tcltk-flag and options from `$1`
+# expects one argument containing a string of configure opts, eg. `PYTHON_CONFIGURE_OPTS`
+# returns tcl_tk flag or an empty string if nothing was found.
+get_tcltk_flag_from() {
+  IFS=$'\n'
+  # parse input string into array
+  local opts_arr=( $(xargs -n1 <<<"$1") ) 
+
+  # iterate through `opts_arr`, break if `--with-tcltk-libs=` was found.
+  for opts in ${opts_arr[@]}; do
+    # `--with-tcltk-libs=` must be the prefix.
+    if [[ "$opts" == "--with-tcltk-libs="* ]]; then
+      # return 
+      echo "$opts"
+      break
+    fi
+  done
+
+  IFS="$OLDIFS"
+}
+
+use_tcltk() {
+  local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
+  local tcl_tk_libs="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
+
+  # if tcltk_ops_flag is in PYTHON_CONFIGURE_OPTS, use user provided tcltk
+  # otherwise default to homebrew-installed tcl-tk, if installed
+  if [[ -n "$tcl_tk_libs" ]]; then
+    use_custom_tcltk "$tcl_tk_libs"
+  elif [ -d "$tcltk_libdir" ]; then
+    use_homebrew_tcltk
+  fi
+}
+
 # CPython 3.9.1+ and 3.8.10+ have old config.sub that doesn't support "arm64" arch
 # which is what Gnu uname (but not Apple uname) produces on Apple M1
 # (https://github.com/pyenv/pyenv/pull/2020#issuecomment-891911842)
@@ -2081,19 +2151,6 @@ if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
       ;;
     esac
   fi
-fi
-
-# regex_to_match="(--with-tcltk-libs='([^']+)')"
-if [[ "$PYTHON_CONFIGURE_OPTS" =~ (--with-tcltk-libs=\'([^\']+)\') ]]; then
-  tcltk_match="${BASH_REMATCH[1]}"
-  tcltk_match_quoted="${tcltk_match//--with-tcltk-libs=/}"
-  # remove it from PYTHON_CONFIGURE_OPTS since it will mess up compile
-  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//$tcltk_match/}"
-
-  # having issues passing the single quoted part, couldnt pass as single var and still work
-  package_option python configure "--with-tcltk-libs='${tcltk_match_quoted}'"
-  unset tcltk_match
-  unset tcltk_match_quoted
 fi
 
 # Unset `PIP_REQUIRE_VENV` during build (#216)
