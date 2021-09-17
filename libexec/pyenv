@@ -80,9 +80,13 @@ bin_path="$(abs_dirname "$0")"
 for plugin_bin in "${bin_path%/*}"/plugins/*/bin; do
   PATH="${plugin_bin}:${PATH}"
 done
-for plugin_bin in "${PYENV_ROOT}"/plugins/*/bin; do
-  PATH="${plugin_bin}:${PATH}"
-done
+# PYENV_ROOT can be set to anything, so it may happen to be equal to the base path above,
+# resulting in duplicate PATH entries
+if [ "${bin_path%/*}" != "$PYENV_ROOT" ]; then
+  for plugin_bin in "${PYENV_ROOT}"/plugins/*/bin; do
+    PATH="${plugin_bin}:${PATH}"
+  done
+fi
 export PATH="${bin_path}:${PATH}"
 
 PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${PYENV_ROOT}/pyenv.d"

@@ -44,4 +44,20 @@ diff -r -u setup.py setup.py
  
          # Add paths specified in the environment variables LDFLAGS and
          # CPPFLAGS for header and library files.
-
+@@ -1443,14 +1443,13 @@
+ 
+ 
+         # Platform-specific libraries
+-        if platform == 'linux2':
++        if platform.startswith('linux'):
+             # Linux-specific modules
+             exts.append( Extension('linuxaudiodev', ['linuxaudiodev.c']) )
+         else:
+             missing.append('linuxaudiodev')
+ 
+-        if platform in ('linux2', 'freebsd4', 'freebsd5', 'freebsd6',
+-                        'freebsd7', 'freebsd8'):
++        if platform.startswith('linux') or platform.startswith('freebsd'):
+             exts.append( Extension('ossaudiodev', ['ossaudiodev.c']) )
+         else:
+             missing.append('ossaudiodev')

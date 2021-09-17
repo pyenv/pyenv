@@ -33,7 +33,9 @@ OLDIFS="$IFS"
       if PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python 2>/dev/null)" || \
           PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python3 2>/dev/null)" || \
           PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python2 2>/dev/null)"; then
-        PYENV_PREFIX_PATH="${PYTHON_PATH%/bin/*}"
+        shopt -s extglob
+        # In some distros (Arch), Python can be found in sbin as well as bin
+        PYENV_PREFIX_PATH="${PYTHON_PATH%/?(s)bin/*}"
         PYENV_PREFIX_PATH="${PYENV_PREFIX_PATH:-/}"
       else
         echo "pyenv: system version not found in PATH" >&2
