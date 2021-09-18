@@ -361,8 +361,8 @@ easy to fork and contribute any changes back upstream.
         And add this to `~/.config/fish/config.fish`:
         
         ~~~ fish
-        status is-interactive; and pyenv init --path | source
-        pyenv init - | source
+        status is-login; and pyenv init --path | source
+        status is-interactive; and pyenv init - | source
         ~~~
 
         If Fish is not your login shell, also follow the Bash/Zsh instructions to add to `~/.profile`.
