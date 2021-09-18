@@ -223,146 +223,157 @@ easy to fork and contribute any changes back upstream.
 
    **Note:** The below instructions for specific shells are designed for common shell setups;
    they also install shell functions into interactive shells only.  
-   If you have an uncommon setup and/or special needs and they don't work for you,
-   use the guidance text and the [Advanced Configuration](#advanced-configuration)
+   If you have an uncommon setup and/or needs and they don't work for you,
+   use the [Advanced Configuration](#advanced-configuration)
    section below to figure out what you need to do in your specific case.
    
-   1. **Adjust the session-wide environment for your account.** Define
-   the `PYENV_ROOT` environment variable to point to the path where
-   you cloned the Pyenv repo, add the `pyenv` command-line utility to your `PATH`,
-   run the output of `pyenv init --path` to enable shims.
+   **General MacOS note:**
+   Make sure that your terminal app is configured to run the shell as a login shell
+   (especially if you're using an alternative terminal app and/or shell).
+   The configuration samples for MacOS are written under this assumption and won't work otherwise.
    
-      These commands need to be added into your shell startup files in such a way
-      that _they are executed only once per session, by its login shell._
-      This typically means they need to be added into a per-user shell-specific
-      `~/.*profile` file, _and_ into `~/.profile`, too, so that they are also
-      run by GUI managers (which typically act as a `sh` login shell).
+   - For **Bash**:
 
-      **MacOS note:** If you installed Pyenv with Homebrew, you don't need
-      to add the `PYENV_ROOT=` and `PATH=` lines.
-      You also don't need to add commands into `~/.profile` if your shell doesn't use it.
-   
-      - For **Bash**:
+      - **If your `~/.profile` sources `~/.bashrc` (Debian, Ubuntu, Mint):**
+
+         ~~~bash
+         # the sed invocation inserts the lines at the start of the file
+         # after any initial comment lines
+         sed -iEe '/^([^#]|$)/ {a \
+         export PYENV_ROOT="$HOME/.pyenv"
+         a \
+         export PATH="$PYENV_ROOT/bin:$PATH"
+         a \
+         ' -e ':a' -e '$!{n;ba};}' ~/.profile
+         echo 'eval "$(pyenv init --path)"' >>~/.profile
+
+         echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+         ~~~
+
+      - **If your `~/.bash_profile` sources `~/.bashrc` (Red Hat, Fedora, CentOS):**
 
          ~~~ bash
+         sed -iEe '/^([^#]|$)/ {a \
+         export PYENV_ROOT="$HOME/.pyenv"
+         a \
+         export PATH="$PYENV_ROOT/bin:$PATH"
+         a \
+         ' -e ':a' -e '$!{n;ba};}' ~/.bash_profile
+         echo 'eval "$(pyenv init --path)"' >> ~/.bash_profile
+
          echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
          echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
          echo 'eval "$(pyenv init --path)"' >> ~/.profile
+
+         echo 'eval "$(pyenv init -)"' >> ~/.bashrc
          ~~~
 
-         - **If your `~/.profile` sources `~/.bashrc` (Debian, Ubuntu, Mint):**
+      - **If you have no `~/.bash_profile` and your `/etc/profile` sources `~/.bashrc` (SUSE):**
 
-            Put these lines into `~/.profile` _before_ the part that sources `~/.bashrc`:
-            ~~~bash
-            export PYENV_ROOT="$HOME/.pyenv"
-            export PATH="$PYENV_ROOT/bin:$PATH"
-            ~~~
+         ~~~bash
+         echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+         echo 'eval "$(pyenv init --path)"' >> ~/.profile
+
+         echo 'if command -v pyenv >/dev/null; then eval "$(pyenv init -)"; fi' >> ~/.bashrc
+         ~~~
             
-            And put this line at the _bottom_ of `~/.profile`:
-            ~~~bash
-            eval "$(pyenv init --path)"
-            ~~~
+      - **Otherwise if you have no stock `~/.profile` or `~/.bash_profile` (MacOS):**
+      
+         ~~~bash
+         echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+         echo 'eval "$(pyenv init --path)"' >> ~/.profile
+         echo 'if [ -n "$PS1" -a -n "$BASH_VERSION" ]; then source ~/.bashrc; fi' >> ~/.profile
 
-            <!--This is an alternative option and needn't be replicated to `pyenv init`-->
-            Alternatively, for an automated installation, you can run the following:
-            ~~~ bash
-            echo -e 'if shopt -q login_shell; then' \
-                  '\n  export PYENV_ROOT="$HOME/.pyenv"' \
-                  '\n  export PATH="$PYENV_ROOT/bin:$PATH"' \
-                  '\n eval "$(pyenv init --path)"' \
-                  '\nfi' >> ~/.bashrc
-            echo -e 'if [ -z "$BASH_VERSION" ]; then'\
-                  '\n  export PYENV_ROOT="$HOME/.pyenv"'\
-                  '\n  export PATH="$PYENV_ROOT/bin:$PATH"'\
-                  '\n  eval "$(pyenv init --path)"'\
-                  '\nfi' >>~/.profile
-            ~~~
+         echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+         ~~~
 
-         **Note:** If you have `~/.bash_profile`, make sure that it too executes the above-added commands,
-         e.g. by copying them there or by `source`'ing `~/.profile`.
+         In MacOS, make sure that your terminal app runs the shell as a login shell.
 
-      - For **Zsh**:
+      - **Temporary environments (CI, batch jobs):**
 
-         - **MacOS, if Pyenv is installed with Homebrew:**
+         In CI/build environments, paths and the environment are usually already set up for you
+         in one of the above ways.
+         You may only need to install Pyenv as a shell function into the (noninteractive) shell
+         that runs the batch script, and only if you need subcommands that require `pyenv`
+         to be a shell function (e.g. `shell` and Pyenv-Virtualenv's `activate`).
 
-            ~~~ zsh
-            echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
-            ~~~
+         ~~~bash
+         echo 'eval "$(pyenv init -)"'
+         ~~~
          
-         - **MacOS, if Pyenv is installed with a Git checkout:**
-         
-            ~~~ zsh
-            echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zprofile
-            echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zprofile
-            echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
-            ~~~
+      **General Bash warning**: There are some systems where the `BASH_ENV` variable is configured
+      to point to `.bashrc`. On such systems, you should almost certainly put the
+      `eval "$(pyenv init -)"` line into `.bash_profile`, and **not** into `.bashrc`. Otherwise, you
+      may observe strange behaviour, such as `pyenv` getting into an infinite loop.
+      See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
 
-         - **Other OSes:**
+
+   - For **Zsh**:
+
+      - **MacOS, if Pyenv is installed with Homebrew:**
+
+         ~~~ zsh
+         echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
+      
+         echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+         ~~~
          
-           Same as for Bash above, but add the commands into both `~/.profile`
-           and `~/.zprofile`.
+         Make sure that your terminal app runs the shell as a login shell.
+
+
+      - **MacOS, if Pyenv is installed with a Git checkout:**
+      
+         ~~~ zsh
+         echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zprofile
+         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zprofile
+         echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
+      
+         echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+         ~~~
+
+         Make sure that your terminal app runs the shell as a login shell.
+
+      - **Other OSes:**
+      
+         ~~~ zsh
+         echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zprofile
+         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zprofile
+         echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
+         
+         echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+         echo 'eval "$(pyenv init --path)"' >> ~/.profile
+
+         echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+         ~~~
         
       - For **Fish shell**:
 
         Execute this interactively:
+        
         ~~~ fish
         set -Ux PYENV_ROOT $HOME/.pyenv
         set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
         ~~~
 
         And add this to `~/.config/fish/config.fish`:
+        
         ~~~ fish
         status is-interactive; and pyenv init --path | source
+        pyenv init - | source
         ~~~
 
         If Fish is not your login shell, also follow the Bash/Zsh instructions to add to `~/.profile`.
 
       **Proxy note**: If you use a proxy, export `http_proxy` and `https_proxy`, too.
 
-   2. **Add `pyenv` into your shell as a shell function** by running the output of `pyenv init -`
-      to enable autocompletion and subcommands that require `pyenv` to be a shell function.
 
-      The subcommands enabled by this step are those that make changes to the current shell environment.
-      In Pyenv, that's only `pyenv shell`; another example is `pyenv activate` from the
-      [Pyenv-Virtualenv](https://github.com/pyenv/pyenv-virtualenv) plugin.
-      
-      This step is optional. Run it whenever you need the above functions --
-      typically at startup of any interactive shell.
-      In an interactive login shell, it needs to run _after_ the commands
-      from the previous step.
-
-      - For **bash**:
-        ~~~ bash
-        echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-        ~~~
-        
-        - **If your `/etc/profile` sources `~/.bashrc` (SUSE):**
-        
-          ~~~bash
-          echo 'if command -v pyenv >/dev/null; then eval "$(pyenv init -)"; fi' >> ~/.bashrc 
-          ~~~
-
-      - For **Zsh**:
-        ~~~ zsh
-        echo 'eval "$(pyenv init -)"' >> ~/.zshrc
-        ~~~
-
-      - For **Fish shell**:
-        Add this to `~/.config/fish/config.fish`:
-        ~~~ fish
-        pyenv init - | source
-        ~~~
-
-      **General warning**: There are some systems where the `BASH_ENV` variable is configured
-      to point to `.bashrc`. On such systems you should almost certainly put the above-mentioned line
-      `eval "$(pyenv init -)"` into `.bash_profile`, and **not** into `.bashrc`. Otherwise you
-      may observe strange behaviour, such as `pyenv` getting into an infinite loop.
-      See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
-
-4. **Restart your login session for the changes to take effect.**
+4. **Restart your login session for the changes to profile files to take effect.**
    E.g. if you're in a GUI session, you need to fully log out and log back in.
    
-   **In MacOS,** restarting terminal windows is enough (because MacOS runs shells
+   In MacOS, restarting terminal windows is enough (because MacOS runs shells
    in them as login shells by default).
 
 5. [**Install Python build dependencies**](https://github.com/pyenv/pyenv/wiki#suggested-build-environment) before attempting to install a new Python version.
@@ -445,30 +456,52 @@ profile is doing.
 
 `pyenv init` is the only command that crosses the line of loading
 extra commands into your shell. Coming from RVM, some of you might be
-opposed to this idea. Here's what `pyenv init` actually does.
-Step 1 is done by `eval "$(pyenv init --path)"`, the others are done by
-`eval "$(pyenv init -)"`.
+opposed to this idea.
+
+Also see the [Environment variables](#environment-variables) section
+for the environment variables that control Pyenv's behavior.
 
 
-1. **Sets up your shims path.** This is the only requirement for pyenv to
-   function properly. You can do this by hand by prepending
-   `$(pyenv root)/shims` to your `$PATH`.
+* `eval "$(pyenv init --path)"`:
 
-2. **Installs autocompletion.** This is entirely optional but pretty
-   useful. Sourcing `$(pyenv root)/completions/pyenv.bash` will set that
-   up. There is also a `$(pyenv root)/completions/pyenv.zsh` for Zsh
-   users.
+   1. **Sets up your shims path.** This is the only requirement for pyenv to
+      function properly. You can do this by hand by prepending
+      `$(pyenv root)/shims` to your `$PATH`.
+   
+   `eval "$(pyenv init --path)"` is supposed to be run in your session's login
+   shell startup script -- so that all processes in the session get access to
+   Pyenv's functionality and it only runs once,
+   avoiding breaking `PATH` in nested shells
+   (e.g. shells started from editors/IDEs).
+   
+   In Linux, GUI managers typically act as a `sh` login shell, running
+   `/etc/profile` and `~/.profile` at their startup. MacOS' GUI doesn't do that,
+   so its terminal emulator apps run their shells as login shells by default
+   to compensate.
 
-3. **Rehashes shims.** From time to time you'll need to rebuild your
-   shim files. Doing this on init makes sure everything is up to
-   date. You can always run `pyenv rehash` manually.
 
-4. **Installs the sh dispatcher.** This bit is also optional, but allows
-   pyenv and plugins to change variables in your current shell, making
-   commands like `pyenv shell` possible. The sh dispatcher doesn't do
-   anything crazy like override `cd` or hack your shell prompt, but if
-   for some reason you need `pyenv` to be a real script rather than a
-   shell function, you can safely skip it.
+* `eval "$(pyenv init -)"`:
+
+   1. **Installs autocompletion.** This is entirely optional but pretty
+      useful. Sourcing `$(pyenv root)/completions/pyenv.bash` will set that
+      up. There is also a `$(pyenv root)/completions/pyenv.zsh` for Zsh
+      users.
+
+   2. **Rehashes shims.** From time to time you'll need to rebuild your
+      shim files. Doing this on init makes sure everything is up to
+      date. You can always run `pyenv rehash` manually.
+
+   3. **Installs `pyenv` into the current shell as a shell function.**
+      This bit is also optional, but allows
+      pyenv and plugins to change variables in your current shell, making
+      commands like `pyenv shell` possible. The sh dispatcher doesn't do
+      anything crazy like override `cd` or hack your shell prompt, but if
+      for some reason you need `pyenv` to be a real script rather than a
+      shell function, you can safely skip it.
+      
+   `eval "$(pyenv init -)"` is supposed to run at any interactive shell's
+   startup (including nested shells) so that you get completion and
+   convenience shell functions.
 
 To see exactly what happens under the hood for yourself, run `pyenv init -`
 or `pyenv init --path`.
