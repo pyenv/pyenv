@@ -250,7 +250,7 @@ if __name__ == "__main__":
         help="Do not write scripts, just report them to stdout",
     )
     parser.add_argument(
-        "-v", "--verbose", action="count",
+        "-v", "--verbose", action="count", default=0,
         help="Increase verbosity of logging",
     )
     parsed = parser.parse_args()
