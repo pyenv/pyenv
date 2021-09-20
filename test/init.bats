@@ -53,7 +53,7 @@ OUT
 @test "fish instructions" {
   run pyenv-init fish
   assert [ "$status" -eq 1 ]
-  assert_line 'pyenv init - | source'
+  assert_line '# See the README for instructions on how to set up'
 }
 
 @test "option to skip rehash" {
