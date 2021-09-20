@@ -1,5 +1,18 @@
 ## Version History
 
+## Release 2.0.7
+* Update setup instructions in the Readme (#2067)
+* Allow tcl-tk as argument or try with homebrew by default (#1646)
+* Allow system Python in sbin (#2065)
+* Prevent addition of duplicate plugin dirs to PATH (#2045)
+* Disable coreutils on M1 Apple Silicon with arm64 (#2020)
+* Add Python 3.10.0rc2 (#2053)
+* Add space after `yes/no` prompt (#2040)
+* Add CPython v3.6.15 and v3.7.12 (#2052)
+* Add missing Python 2.6.x definitions and patches (#2051)
+* Fix build of ossaudiodev in Linux/FreeBSD for Python 2.6 (#2049)
+* Fix build of ossaudiodev in Linux/FreeBSD for Python 3.1 (#2047)
+
 ## Release 2.0.6
 * Add CPython 3.9.7 (#2044)
 * Add CPython v3.8.12 (#2043)
