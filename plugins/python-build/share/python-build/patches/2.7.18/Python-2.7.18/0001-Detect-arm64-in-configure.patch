@@ -1,0 +1,41 @@
+From 5495fb4719fa67ea3abeda0434699c8b28c77bb3 Mon Sep 17 00:00:00 2001
+From: Takumi Sueda <puhitaku@gmail.com>
+Date: Sat, 11 Sep 2021 16:50:14 +0900
+Subject: [PATCH 1/7] Detect arm64 in configure
+
+---
+ configure    | 3 +++
+ configure.ac | 3 +++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/configure b/configure
+index 63d675312d..c40ec120de 100755
+--- a/configure
++++ b/configure
+@@ -8474,6 +8474,9 @@ fi
+     	ppc)
+     		MACOSX_DEFAULT_ARCH="ppc64"
+     		;;
++    	arm64)
++    		MACOSX_DEFAULT_ARCH="arm64"
++    		;;
+     	*)
+     		as_fn_error $? "Unexpected output of 'arch' on OSX" "$LINENO" 5
+     		;;
+diff --git a/configure.ac b/configure.ac
+index efe6922b5d..df05bee87b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2066,6 +2066,9 @@ case $ac_sys_system/$ac_sys_release in
+     	ppc) 
+     		MACOSX_DEFAULT_ARCH="ppc64" 
+     		;;
++    	arm64) 
++    		MACOSX_DEFAULT_ARCH="arm64" 
++    		;;
+     	*)
+     		AC_MSG_ERROR([Unexpected output of 'arch' on OSX])
+     		;;
+-- 
+2.30.1
+

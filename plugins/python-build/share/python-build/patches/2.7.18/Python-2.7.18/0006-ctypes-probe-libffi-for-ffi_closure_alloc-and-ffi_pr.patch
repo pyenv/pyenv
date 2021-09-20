@@ -1,0 +1,108 @@
+From 43819cd35cddd189cbe513032e76f1c1a6ec6d8c Mon Sep 17 00:00:00 2001
+From: Takumi Sueda <puhitaku@gmail.com>
+Date: Sat, 11 Sep 2021 19:14:50 +0900
+Subject: [PATCH 6/7] ctypes: probe libffi for ffi_closure_alloc and
+ ffi_prep_cif_var
+
+Modified and imported from https://github.com/Homebrew/formula-patches/blob/master/python/3.8.7.patch
+---
+ Modules/_ctypes/callproc.c |  4 ----
+ setup.py                   | 34 +++++++++++++++++++++++++---------
+ 2 files changed, 25 insertions(+), 13 deletions(-)
+
+diff --git a/Modules/_ctypes/callproc.c b/Modules/_ctypes/callproc.c
+index 39a539db47..5273e8d246 100644
+--- a/Modules/_ctypes/callproc.c
++++ b/Modules/_ctypes/callproc.c
+@@ -88,10 +88,6 @@
+ #define DONT_USE_SEH
+ #endif
+ 
+-#if defined(__APPLE__) && __arm64__
+-#define HAVE_FFI_PREP_CIF_VAR 1
+-#endif
+-
+ #define CTYPES_CAPSULE_ERROROBJ "_ctypes/callproc.c error object"
+ CTYPES_CAPSULE_INSTANTIATE_DESTRUCTOR(CTYPES_CAPSULE_ERROROBJ)
+ 
+diff --git a/setup.py b/setup.py
+index c92d0552e3..beaf60f3e5 100644
+--- a/setup.py
++++ b/setup.py
+@@ -141,6 +141,13 @@ def is_macosx_sdk_path(path):
+                 or path.startswith('/System/')
+                 or path.startswith('/Library/') )
+ 
++def grep_headers_for(function, headers):
++    for header in headers:
++        with open(header, 'r') as f:
++            if function in f.read():
++                return True
++    return False
++
+ def find_file(filename, std_dirs, paths):
+     """Searches for the directory where a given file is located,
+     and returns a possibly-empty list of additional directories, or None
+@@ -2235,7 +2242,7 @@ class PyBuildExt(build_ext):
+                              sources=['_ctypes/_ctypes_test.c'])
+         self.extensions.extend([ext, ext_test])
+ 
+-        ffi_inc = [sysconfig.get_config_var("LIBFFI_INCLUDEDIR")]
++        ffi_inc = sysconfig.get_config_var("LIBFFI_INCLUDEDIR")
+         ffi_lib = None
+ 
+         #inc_dirs = self.inc_dirs.copy()
+@@ -2245,18 +2252,19 @@ class PyBuildExt(build_ext):
+                 return
+             ffi_in_sdk = os.path.join(macosx_sdk_root(), "usr/include/ffi")
+             if os.path.exists(ffi_in_sdk):
+-                ffi_inc = [ffi_in_sdk]
++                ffi_inc = ffi_in_sdk
+                 ffi_lib = 'ffi'
+-                sources.remove('_ctypes/malloc_closure.c')
+             else:
+                 # OS X 10.5 comes with libffi.dylib; the include files are
+                 # in /usr/include/ffi
+                 inc_dirs.append('/usr/include/ffi')
+ 
+-        if not ffi_inc or ffi_inc[0] == '':
+-            ffi_inc = find_file('ffi.h', [], inc_dirs)
+-        if ffi_inc is not None:
+-            ffi_h = ffi_inc[0] + '/ffi.h'
++        if not ffi_inc:
++            found = find_file('ffi.h', [], inc_dirs)
++            if found:
++                ffi_inc = found[0]
++        if ffi_inc:
++            ffi_h = ffi_inc + '/ffi.h'
+             with open(ffi_h) as f:
+                 for line in f:
+                     line = line.strip()
+@@ -2267,14 +2275,22 @@ class PyBuildExt(build_ext):
+                     ffi_inc = None
+                     print('Header file {} does not define LIBFFI_H or '
+                           'ffi_wrapper_h'.format(ffi_h))
+-        if ffi_lib is None and ffi_inc is not None:
++        if ffi_lib is None and ffi_inc:
+             for lib_name in ('ffi_convenience', 'ffi_pic', 'ffi'):
+                 if (self.compiler.find_library_file(lib_dirs, lib_name)):
+                     ffi_lib = lib_name
+                     break
+ 
+         if ffi_inc and ffi_lib:
+-            ext.include_dirs.extend(ffi_inc)
++            ffi_headers = glob(os.path.join(ffi_inc, '*.h'))
++            if grep_headers_for('ffi_closure_alloc', ffi_headers):
++                try:
++                    sources.remove('_ctypes/malloc_closure.c')
++                except ValueError:
++                    pass
++            if grep_headers_for('ffi_prep_cif_var', ffi_headers):
++                ext.extra_compile_args.append("-DHAVE_FFI_PREP_CIF_VAR=1")
++            ext.include_dirs.append(ffi_inc)
+             ext.libraries.append(ffi_lib)
+             self.use_system_libffi = True
+ 
+-- 
+2.30.1
+

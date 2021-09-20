@@ -1,0 +1,40 @@
+From 41ee254166bb690feb665991fc2442e335631314 Mon Sep 17 00:00:00 2001
+From: Takumi Sueda <puhitaku@gmail.com>
+Date: Sat, 11 Sep 2021 19:20:30 +0900
+Subject: [PATCH 7/7] Remove QuickTime from link args
+
+---
+ Mac/Modules/qt/setup.py | 2 +-
+ setup.py                | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/Mac/Modules/qt/setup.py b/Mac/Modules/qt/setup.py
+index 8442011ab9..4b5bc2bc20 100644
+--- a/Mac/Modules/qt/setup.py
++++ b/Mac/Modules/qt/setup.py
+@@ -6,7 +6,7 @@ from distutils.core import Extension, setup
+ setup(name="QuickTime", version="0.2",
+         ext_modules=[
+                 Extension('QuickTime._Qt', ['_Qtmodule.c'],
+-                extra_link_args=['-framework', 'Carbon', '-framework', 'QuickTime'])
++                extra_link_args=['-framework', 'Carbon'])
+         ],
+         py_modules=['QuickTime.Qt', 'QuickTime.QuickTime'],
+         package_dir={'QuickTime':'../../../Lib/plat-mac/Carbon'}
+diff --git a/setup.py b/setup.py
+index beaf60f3e5..ff2298af91 100644
+--- a/setup.py
++++ b/setup.py
+@@ -1819,8 +1819,7 @@ class PyBuildExt(build_ext):
+ 
+             exts.append( Extension('_Qt', ['qt/_Qtmodule.c'],
+                         extra_compile_args=carbon_extra_compile_args,
+-                        extra_link_args=['-framework', 'QuickTime',
+-                                     '-framework', 'Carbon']) )
++                        extra_link_args=['-framework', 'Carbon']) )
+ 
+ 
+         self.extensions.extend(exts)
+-- 
+2.30.1
+

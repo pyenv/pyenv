@@ -1,0 +1,221 @@
+From 4394ec26842b04335b30b9a0595fcc8591c68496 Mon Sep 17 00:00:00 2001
+From: Takumi Sueda <puhitaku@gmail.com>
+Date: Sat, 11 Sep 2021 18:59:44 +0900
+Subject: [PATCH 5/7] ctypes: use the correct ABI for variadic functions
+
+Modified and imported from https://github.com/Homebrew/formula-patches/blob/master/python/3.8.7.patch
+---
+ Doc/library/ctypes.rst     |  6 +++++
+ Lib/test/test_str.py       |  2 ++
+ Lib/test/test_unicode.py   |  3 +++
+ Modules/_ctypes/_ctypes.c  | 31 +++++++++++++++++++++++
+ Modules/_ctypes/callproc.c | 51 +++++++++++++++++++++++++++++---------
+ Modules/_ctypes/ctypes.h   |  1 +
+ 6 files changed, 82 insertions(+), 12 deletions(-)
+
+diff --git a/Doc/library/ctypes.rst b/Doc/library/ctypes.rst
+index 6a5299145f..ec97da607f 100644
+--- a/Doc/library/ctypes.rst
++++ b/Doc/library/ctypes.rst
+@@ -1584,6 +1584,12 @@ They are instances of a private class:
+       value usable as argument (integer, string, ctypes instance).  This allows
+       defining adapters that can adapt custom objects as function parameters.
+ 
++   .. attribute:: variadic
++
++      Assign a boolean to specify that the function takes a variable number of
++      arguments.   This does not matter on most platforms, but for Apple arm64
++      platforms variadic functions have a different calling convention than
++      normal functions.
+ 
+    .. attribute:: errcheck
+ 
+diff --git a/Lib/test/test_str.py b/Lib/test/test_str.py
+index 73ed542a51..131f6d13e0 100644
+--- a/Lib/test/test_str.py
++++ b/Lib/test/test_str.py
+@@ -489,6 +489,8 @@ class CAPITest(unittest.TestCase):
+             c_char_p)
+ 
+         PyString_FromFormat = pythonapi.PyString_FromFormat
++        PyString_FromFormat.variadic = True
++        PyString_FromFormat.argtypes = (c_char_p,)
+         PyString_FromFormat.restype = py_object
+ 
+         # basic tests
+diff --git a/Lib/test/test_unicode.py b/Lib/test/test_unicode.py
+index 92476f68a5..23e9e643e0 100644
+--- a/Lib/test/test_unicode.py
++++ b/Lib/test/test_unicode.py
+@@ -1676,6 +1676,7 @@ class CAPITest(unittest.TestCase):
+     def test_from_format(self):
+         test_support.import_module('ctypes')
+         from ctypes import (
++            c_char_p,
+             pythonapi, py_object, sizeof,
+             c_int, c_long, c_longlong, c_ssize_t,
+             c_uint, c_ulong, c_ulonglong, c_size_t, c_void_p)
+@@ -1684,6 +1685,8 @@ class CAPITest(unittest.TestCase):
+         else:
+             name = "PyUnicodeUCS4_FromFormat"
+         _PyUnicode_FromFormat = getattr(pythonapi, name)
++        _PyUnicode_FromFormat.argtypes = (c_char_p,)
++        _PyUnicode_FromFormat.variadic = True
+         _PyUnicode_FromFormat.restype = py_object
+ 
+         def PyUnicode_FromFormat(format, *args):
+diff --git a/Modules/_ctypes/_ctypes.c b/Modules/_ctypes/_ctypes.c
+index bef251ef04..d03b98d09c 100644
+--- a/Modules/_ctypes/_ctypes.c
++++ b/Modules/_ctypes/_ctypes.c
+@@ -3253,6 +3253,34 @@ PyCFuncPtr_get_restype(PyCFuncPtrObject *self)
+     }
+ }
+ 
++static int
++PyCFuncPtr_set_variadic(PyCFuncPtrObject *self, PyObject *ob)
++{
++    StgDictObject *dict = PyObject_stgdict((PyObject *)self);
++    assert(dict);
++    int r = PyObject_IsTrue(ob);
++    if (r == 1) {
++        dict->flags |= FUNCFLAG_VARIADIC;
++        return 0;
++    } else if (r == 0) {
++        dict->flags &= ~FUNCFLAG_VARIADIC;
++        return 0;
++    } else {
++        return -1;
++    }
++}
++
++static PyObject *
++PyCFuncPtr_get_variadic(PyCFuncPtrObject *self)
++{
++    StgDictObject *dict = PyObject_stgdict((PyObject *)self);
++    assert(dict); /* Cannot be NULL for PyCFuncPtrObject instances */
++    if (dict->flags & FUNCFLAG_VARIADIC)
++        Py_RETURN_TRUE;
++    else
++        Py_RETURN_FALSE;
++}
++
+ static int
+ PyCFuncPtr_set_argtypes(PyCFuncPtrObject *self, PyObject *ob)
+ {
+@@ -3299,6 +3327,8 @@ static PyGetSetDef PyCFuncPtr_getsets[] = {
+     { "argtypes", (getter)PyCFuncPtr_get_argtypes,
+       (setter)PyCFuncPtr_set_argtypes,
+       "specify the argument types", NULL },
++    { "variadic", (getter)PyCFuncPtr_get_variadic, (setter)PyCFuncPtr_set_variadic,
++      "specify if function takes variable number of arguments", NULL },
+     { NULL, NULL }
+ };
+ 
+@@ -5838,6 +5868,7 @@ init_ctypes(void)
+     PyModule_AddObject(m, "FUNCFLAG_USE_ERRNO", PyInt_FromLong(FUNCFLAG_USE_ERRNO));
+     PyModule_AddObject(m, "FUNCFLAG_USE_LASTERROR", PyInt_FromLong(FUNCFLAG_USE_LASTERROR));
+     PyModule_AddObject(m, "FUNCFLAG_PYTHONAPI", PyInt_FromLong(FUNCFLAG_PYTHONAPI));
++    PyModule_AddObject(m, "FUNCFLAG_VARIADIC", PyInt_FromLong(FUNCFLAG_VARIADIC));
+     PyModule_AddStringConstant(m, "__version__", "1.1.0");
+ 
+     PyModule_AddObject(m, "_memmove_addr", PyLong_FromVoidPtr(memmove));
+diff --git a/Modules/_ctypes/callproc.c b/Modules/_ctypes/callproc.c
+index 066fefc0cc..39a539db47 100644
+--- a/Modules/_ctypes/callproc.c
++++ b/Modules/_ctypes/callproc.c
+@@ -88,6 +88,9 @@
+ #define DONT_USE_SEH
+ #endif
+ 
++#if defined(__APPLE__) && __arm64__
++#define HAVE_FFI_PREP_CIF_VAR 1
++#endif
+ 
+ #define CTYPES_CAPSULE_ERROROBJ "_ctypes/callproc.c error object"
+ CTYPES_CAPSULE_INSTANTIATE_DESTRUCTOR(CTYPES_CAPSULE_ERROROBJ)
+@@ -773,7 +776,8 @@ static int _call_function_pointer(int flags,
+                                   ffi_type **atypes,
+                                   ffi_type *restype,
+                                   void *resmem,
+-                                  int argcount)
++                                  int argcount,
++                                  int argtypecount)
+ {
+ #ifdef WITH_THREAD
+     PyThreadState *_save = NULL; /* For Py_BLOCK_THREADS and Py_UNBLOCK_THREADS */
+@@ -801,15 +805,39 @@ static int _call_function_pointer(int flags,
+     if ((flags & FUNCFLAG_CDECL) == 0)
+         cc = FFI_STDCALL;
+ #endif
+-    if (FFI_OK != ffi_prep_cif(&cif,
+-                               cc,
+-                               argcount,
+-                               restype,
+-                               atypes)) {
+-        PyErr_SetString(PyExc_RuntimeError,
+-                        "ffi_prep_cif failed");
+-        return -1;
++
++#if HAVE_FFI_PREP_CIF_VAR
++    /* Everyone SHOULD set f.variadic=True on variadic function pointers, but
++     * lots of existing code will not.  If there's at least one arg and more
++     * args are passed than are defined in the prototype, then it must be a
++     * variadic function. */
++    if ((flags & FUNCFLAG_VARIADIC) ||
++        (argtypecount != 0 && argcount > argtypecount))
++    {
++        if (FFI_OK != ffi_prep_cif_var(&cif,
++                                       cc,
++                                       argtypecount,
++                                       argcount,
++                                       restype,
++                                       atypes)) {
++            PyErr_SetString(PyExc_RuntimeError,
++                            "ffi_prep_cif_var failed");
++            return -1;
++        }
++    } else {
++#endif
++        if (FFI_OK != ffi_prep_cif(&cif,
++                                   cc,
++                                   argcount,
++                                   restype,
++                                   atypes)) {
++            PyErr_SetString(PyExc_RuntimeError,
++                            "ffi_prep_cif failed");
++            return -1;
++        }
++#if HAVE_FFI_PREP_CIF_VAR
+     }
++#endif
+ 
+     if (flags & (FUNCFLAG_USE_ERRNO | FUNCFLAG_USE_LASTERROR)) {
+         error_object = _ctypes_get_errobj(&space);
+@@ -1181,9 +1209,8 @@ PyObject *_ctypes_callproc(PPROC pProc,
+ 
+     if (-1 == _call_function_pointer(flags, pProc, avalues, atypes,
+                                      rtype, resbuf,
+-                                     Py_SAFE_DOWNCAST(argcount,
+-                                                      Py_ssize_t,
+-                                                      int)))
++                                     Py_SAFE_DOWNCAST(argcount, Py_ssize_t, int),
++                                     Py_SAFE_DOWNCAST(argtype_count, Py_ssize_t, int)))
+         goto cleanup;
+ 
+ #ifdef WORDS_BIGENDIAN
+diff --git a/Modules/_ctypes/ctypes.h b/Modules/_ctypes/ctypes.h
+index 12b56c4342..8aec3d1ade 100644
+--- a/Modules/_ctypes/ctypes.h
++++ b/Modules/_ctypes/ctypes.h
+@@ -325,6 +325,7 @@ PyObject *_ctypes_callproc(PPROC pProc,
+ #define FUNCFLAG_PYTHONAPI 0x4
+ #define FUNCFLAG_USE_ERRNO 0x8
+ #define FUNCFLAG_USE_LASTERROR 0x10
++#define FUNCFLAG_VARIADIC 0x20
+ 
+ #define TYPEFLAG_ISPOINTER 0x100
+ #define TYPEFLAG_HASPOINTER 0x200
+-- 
+2.30.1
+

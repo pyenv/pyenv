@@ -1,0 +1,34 @@
+From d93a26fee21a5f91c51d8cb14ecaf29122f1b222 Mon Sep 17 00:00:00 2001
+From: Takumi Sueda <puhitaku@gmail.com>
+Date: Sat, 11 Sep 2021 17:25:00 +0900
+Subject: [PATCH 3/7] Support "arm64" in Mac/Tools/pythonw
+
+Imported from: https://github.com/Homebrew/formula-patches/blob/master/python/3.8.7.patch
+---
+ Mac/Tools/pythonw.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Mac/Tools/pythonw.c b/Mac/Tools/pythonw.c
+index 76734c1063..ebe5e8d975 100644
+--- a/Mac/Tools/pythonw.c
++++ b/Mac/Tools/pythonw.c
+@@ -116,10 +116,16 @@ setup_spawnattr(posix_spawnattr_t* spawnattr)
+ 
+ #elif defined(__ppc__)
+     cpu_types[0] = CPU_TYPE_POWERPC;
++
+ #elif defined(__i386__)
+     cpu_types[0] = CPU_TYPE_X86;
++
++#elif defined(__arm64__)
++    cpu_types[0] = CPU_TYPE_ARM64;
++
+ #else
+ #       error "Unknown CPU"
++
+ #endif
+ 
+     if (posix_spawnattr_setbinpref_np(spawnattr, count,
+-- 
+2.30.1
+
