@@ -160,17 +160,15 @@ OUT
   brew_libdir="$TMP/homebrew-yaml"
   mkdir -p "$brew_libdir"
 
-  # pyenv/pyenv#1026
-  stub uname false false
-
-  stub uname '-s : echo Linux'
-  stub uname '-s : echo Darwin'
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew "--prefix libyaml : echo '$brew_libdir'" false false
   stub_make_install
 
   install_fixture definitions/needs-yaml
   assert_success
 
+  unstub sw_vers
   unstub uname
   unstub brew
   unstub make

@@ -136,7 +136,7 @@ OUT
 @test "apply built-in python patches should be sorted by its name" {
   cached_tarball "Python-3.6.2"
 
-  stub brew false
+  for i in {1..2}; do stub brew '* : false'; done
   stub_make_install
   stub patch ' : for arg; do [[ "$arg" == "-"* ]] || sed -e "s/^/patch: /" "$arg"; done >> build.log'
 
@@ -144,9 +144,7 @@ OUT
   echo "bar" | install_patch definitions/vanilla-python "Python-3.6.2/bar.patch"
   echo "baz" | install_patch definitions/vanilla-python "Python-3.6.2/baz.patch"
 
-  # yyuu/pyenv#257
-  stub uname '-s : echo Linux'
-  stub uname '-s : echo Linux'
+  for i in {1..2}; do stub uname '-s : echo Linux'; done
 
   TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
@@ -173,9 +171,7 @@ OUT
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
 
-  # yyuu/pyenv#257
-  stub uname '-s : echo Linux'
-  stub uname '-s : echo Linux'
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
 
   PYTHON_MAKE_INSTALL_TARGET="altinstall" TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
@@ -259,10 +255,7 @@ OUT
   touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4-config"
   chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4-config"
 
-  # yyuu/pyenv#257
-  stub uname '-s : echo Darwin'
-
-  stub uname '-s : echo Darwin'
+  for i in {1..3}; do stub uname '-s : echo Darwin'; done
 
   PYTHON_CONFIGURE_OPTS="--enable-framework" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
@@ -278,10 +271,8 @@ EOS
 }
 
 @test "enable universalsdk" {
-  # yyuu/pyenv#257
-  stub uname '-s : echo Darwin'
-
-  stub uname '-s : echo Darwin'
+  
+  for i in {1..3}; do stub uname '-s : echo Darwin'; done
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
@@ -295,7 +286,8 @@ EOS
 @test "enable custom unicode configuration" {
   cached_tarball "Python-3.6.2"
 
-  stub brew false
+  for i in {1..2}; do stub brew '* : false'; done
+  for i in {1..3}; do stub uname '-s : echo Linux'; done
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
@@ -311,6 +303,8 @@ make install
 OUT
 
   unstub make
+  unstub uname
+  unstub brew
 }
 
 @test "default MACOSX_DEPLOYMENT_TARGET" {

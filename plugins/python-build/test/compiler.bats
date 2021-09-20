@@ -63,13 +63,9 @@ DEF
   mkdir -p "$INSTALL_ROOT"
   cd "$INSTALL_ROOT"
 
-  # pyenv/pyenv#1026
-  stub uname false '-s : echo Darwin' false '-s : echo Darwin' '-s : echo Darwin'
-  stub sw_vers '-productVersion : echo 10.10'
+  for i in {1..5}; do stub uname '-s : echo Darwin'; done
+  for i in {1..4}; do stub sw_vers '-productVersion : echo 10.10'; done
 
-  stub sw_vers '-productVersion : echo 10.10'
-  stub sw_vers '-productVersion : echo 10.10'
-  stub sw_vers '-productVersion : echo 10.10'
   stub cc 'false'
   stub brew 'false'
   stub make \
