@@ -239,7 +239,7 @@ easy to fork and contribute any changes back upstream.
          ~~~bash
          # the sed invocation inserts the lines at the start of the file
          # after any initial comment lines
-         sed -iEe '/^([^#]|$)/ {a \
+         sed -Ei -e '/^([^#]|$)/ {a \
          export PYENV_ROOT="$HOME/.pyenv"
          a \
          export PATH="$PYENV_ROOT/bin:$PATH"
@@ -253,7 +253,7 @@ easy to fork and contribute any changes back upstream.
       - **If your `~/.bash_profile` sources `~/.bashrc` (Red Hat, Fedora, CentOS):**
 
          ~~~ bash
-         sed -iEe '/^([^#]|$)/ {a \
+         sed -Ei -e '/^([^#]|$)/ {a \
          export PYENV_ROOT="$HOME/.pyenv"
          a \
          export PATH="$PYENV_ROOT/bin:$PATH"
