@@ -44,7 +44,7 @@ esac
 
 install_line_fmt = """
 "{os}-{arch}" )
-  install_script "Miniconda{suffix}-{version_str}-{os}-{arch}" "{repo}/Miniconda{suffix}-{version_str}-{os}-{arch}.sh#{md5}" "miniconda" verify_{py_version}
+  install_script "Miniconda{suffix}-{version_py_version}{version_str}-{os}-{arch}" "{repo}/Miniconda{suffix}-{version_py_version}{version_str}-{os}-{arch}.sh#{md5}" "miniconda" verify_{py_version}
   ;;
 """.strip()
 
@@ -126,17 +126,29 @@ class VersionStr(str):
 class MinicondaVersion(NamedTuple):
     suffix: Suffix
     version_str: VersionStr
+    py_version: Optional[PyVersion]
 
     @classmethod
     def from_str(cls, s):
-        miniconda_n, ver = s.split("-")
-        return MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver))
+        components = s.split("-")
+        if len(components) == 3:
+            miniconda_n, py_ver, ver = components
+            py_ver = PyVersion(f"py{py_ver.replace('.', '')}")
+        else:
+            miniconda_n, ver = components
+            py_ver = None
+        return MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver), py_ver)
 
     def to_filename(self):
-        return f"miniconda{self.suffix}-{self.version_str}"
+        if self.py_version:
+            return f"miniconda{self.suffix}-{self.py_version.version()}-{self.version_str}"
+        else:
+            return f"miniconda{self.suffix}-{self.version_str}"
 
     def default_py_version(self):
-        if self.suffix == Suffix.TWO:
+        if self.py_version:
+            return self.py_version
+        elif self.suffix == Suffix.TWO:
             return PyVersion.PY27
         elif self.version_str.info() < (4, 7):
             # https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-python.html
@@ -146,7 +158,7 @@ class MinicondaVersion(NamedTuple):
 
     def with_version_triple(self):
         return MinicondaVersion(
-            self.suffix, VersionStr.from_info(self.version_str.info()[:3])
+            self.suffix, VersionStr.from_info(self.version_str.info()[:3]), self.py_version
         )
 
 
@@ -160,8 +172,13 @@ class MinicondaSpec(NamedTuple):
     @classmethod
     def from_filestem(cls, stem, md5, py_version=None):
         miniconda_n, ver, os, arch = stem.split("-")
+        if ver.startswith("py"):
+            py_ver, ver = ver.split("_", maxsplit=1)
+            py_ver = PyVersion(py_ver)
+        else:
+            py_ver = None
         spec = MinicondaSpec(
-            MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver)),
+            MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver), py_ver),
             SupportedOS(os),
             SupportedArch(arch),
             md5,
@@ -175,6 +192,7 @@ class MinicondaSpec(NamedTuple):
             repo=MINICONDA_REPO,
             suffix=self.version.suffix,
             version_str=self.version.version_str,
+            version_py_version=f"{self.version.py_version}_" if self.version.py_version else "",
             os=self.os,
             arch=self.arch,
             md5=self.md5,
@@ -250,7 +268,7 @@ if __name__ == "__main__":
         help="Do not write scripts, just report them to stdout",
     )
     parser.add_argument(
-        "-v", "--verbose", action="count",
+        "-v", "--verbose", action="count", default=0,
         help="Increase verbosity of logging",
     )
     parsed = parser.parse_args()
