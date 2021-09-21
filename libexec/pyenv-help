@@ -44,8 +44,9 @@ extract_initial_comment_block() {
 }
 
 collect_documentation() {
-  # shellcheck disable=SC2016
-  $(type -P gawk awk | head -1) '
+  # `tail` prevents "broken pipe" errors due to `head` closing thge pipe without reading everything
+  # https://superuser.com/questions/554855/how-can-i-fix-a-broken-pipe-error/642932#642932
+  $(type -P gawk awk | tail -n +1 | head -1) '
     /^Summary:/ {
       summary = substr($0, 10)
       next

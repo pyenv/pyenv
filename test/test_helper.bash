@@ -44,7 +44,8 @@ flunk() {
 
 assert_success() {
   if [ "$status" -ne 0 ]; then
-    flunk "command failed with exit status $status"
+    flunk "command failed with exit status $status" $'\n'\
+    "output: $output"
   elif [ "$#" -gt 0 ]; then
     assert_output "$1"
   fi
@@ -52,7 +53,8 @@ assert_success() {
 
 assert_failure() {
   if [ "$status" -eq 0 ]; then
-    flunk "expected failed exit status"
+    flunk "expected failed exit status" $'\n'\
+    "output: $output"
   elif [ "$#" -gt 0 ]; then
     assert_output "$1"
   fi
@@ -111,24 +113,26 @@ assert() {
 # Output a modified PATH that ensures that the given executable is not present,
 # but in which system utils necessary for pyenv operation are still available.
 path_without() {
-  local exe="$1"
   local path=":${PATH}:"
-  local found alt util
-  for found in $(which -a "$exe"); do
-    found="${found%/*}"
-    if [ "$found" != "${PYENV_ROOT}/shims" ]; then
-      alt="${PYENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
-      mkdir -p "$alt"
-      for util in bash head cut readlink greadlink; do
-        if [ -x "${found}/$util" ]; then
-          ln -s "${found}/$util" "${alt}/$util"
-        fi
-      done
-      path="${path/:${found}:/:${alt}:}"
-    fi
+  for exe; do 
+    local found alt util
+    for found in $(PATH="$path" which -a "$exe"); do
+      found="${found%/*}"
+      if [ "$found" != "${PYENV_ROOT}/shims" ]; then
+        alt="${PYENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
+        mkdir -p "$alt"
+        for util in bash head cut readlink greadlink which; do
+          if [ -x "${found}/$util" ]; then
+            ln -s "${found}/$util" "${alt}/$util"
+          fi
+        done
+        path="${path/:${found}:/:${alt}:}"
+      fi
+    done
   done
   path="${path#:}"
-  echo "${path%:}"
+  path="${path%:}"
+  echo "$path"
 }
 
 create_hook() {

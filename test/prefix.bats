@@ -25,7 +25,7 @@ load test_helper
 }
 
 #Arch has Python at sbin as well as bin
-@test "prefix for sbin system" {
+@test "prefix for system in sbin" {
   mkdir -p "${PYENV_TEST_DIR}/sbin"
   touch "${PYENV_TEST_DIR}/sbin/python"
   chmod +x "${PYENV_TEST_DIR}/sbin/python"
@@ -46,6 +46,6 @@ OUT
 }
 
 @test "prefix for invalid system" {
-  PATH="$(path_without python)" run pyenv-prefix system
+  PATH="$(path_without python python2 python3)" run pyenv-prefix system
   assert_failure "pyenv: system version not found in PATH"
 }
