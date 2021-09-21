@@ -25,6 +25,7 @@ stub() {
 
   export "${prefix}_STUB_PLAN"="${TMP}/${program}-stub-plan"
   export "${prefix}_STUB_RUN"="${TMP}/${program}-stub-run"
+  export "${prefix}_STUB_LOG"="${TMP}/${program}-stub-log"
   export "${prefix}_STUB_END"=
 
   mkdir -p "${TMP}/bin"
