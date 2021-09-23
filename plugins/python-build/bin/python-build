@@ -1041,10 +1041,20 @@ anaconda_architecture() {
   esac
 }
 
-build_package_anaconda() {
+build_package_anaconda_autoupdate() {
   local package_name="$1"
-  { bash "${package_name}.sh" -f -b -p "${PREFIX_PATH}"
+  { bash "${package_name}.sh" -x -f -b -p "${PREFIX_PATH}"
   } >&4 2>&1
+}
+
+build_package_anaconda() {
+  build_package_anaconda_autoupdate "$@"
+  "${PREFIX_PATH}/bin/conda" config --set auto_update_conda False
+}
+
+build_package_miniconda_autoupdate() {
+  build_package_anaconda_autoupdate "$@"
+  "${PREFIX_PATH}/bin/conda" install --yes "pip"
 }
 
 build_package_miniconda() {

@@ -20,6 +20,14 @@ executable() {
   chmod +x "$file"
 }
 
+cached_script() {
+  mkdir -p "$PYTHON_BUILD_CACHE_PATH"
+  pushd "$PYTHON_BUILD_CACHE_PATH" >/dev/null
+  cat >"$1"
+  cat "$1"
+  popd >/dev/null
+}
+
 cached_tarball() {
   mkdir -p "$PYTHON_BUILD_CACHE_PATH"
   pushd "$PYTHON_BUILD_CACHE_PATH" >/dev/null
@@ -552,6 +560,25 @@ OUT
 
   run "$INSTALL_ROOT/bin/package" "world"
   assert_success "hello world"
+}
+
+@test "anaconda disables autoupdate" {
+
+  cached_script anaconda_dummy.sh <<!
+f="\$INSTALL_ROOT/bin/conda"
+mkdir -p "\${f%/*}"
+echo 'conda "\$@"' >"\$f"
+chmod a+x "\$f"
+!
+
+  stub conda 'config --set auto_update_conda False : true'
+  
+  PYENV_DEBUG=1 run_inline_definition <<DEF
+install_script "anaconda_dummy" "anaconda.sh" anaconda
+DEF
+  assert_success
+  
+  unstub conda
 }
 
 @test "mruby strategy overwrites non-writable files" {
