@@ -1042,7 +1042,9 @@ build_package_anaconda() {
 
 build_package_miniconda() {
   build_package_anaconda "$@"
-  "${PREFIX_PATH}/bin/conda" install --yes "pip"
+  # Workaround to not upgrade conda when installing pip
+  # see https://github.com/pyenv/pyenv/issues/2070
+  "${PREFIX_PATH}/bin/conda" install --yes "pip" "conda=$(${PREFIX_PATH}/bin/conda --version | cut -d ' ' -f 2)
 }
 
 build_package_copy() {
