@@ -858,8 +858,8 @@ build_package_jython_builder() {
   ( cd "dist" && build_package_jython )
 }
 
-build_package_pyston() {
-  # currently supported version 2.2 and upper
+build_package_pyston2.2() {
+  # currently supported version 2.2 and 2.3
   build_package_copy
   mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
   local bin
@@ -869,6 +869,25 @@ build_package_pyston() {
       case "${bin##*/}" in
       "pyston"* )
         ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
+        ;;
+      esac
+    fi
+  done
+  shopt -u nullglob
+}
+
+build_package_pyston() {
+  # currently supported version 2.3.1 and higher
+  build_package_copy
+  mv "${PREFIX_PATH}/usr/bin" "${PREFIX_PATH}/bin"
+  mv "${PREFIX_PATH}/usr/lib" "${PREFIX_PATH}/lib"
+  local bin
+  shopt -s nullglob
+  for bin in "usr/bin/"*; do
+    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
+      case "${bin##*/}" in
+      "python"* )
+        ( cd "${PREFIX_PATH}/bin" && ln -fs ../usr/bin/"${bin##*/}" "python" )
         ;;
       esac
     fi
