@@ -881,18 +881,6 @@ build_package_pyston() {
   build_package_copy
   mv "${PREFIX_PATH}/usr/bin" "${PREFIX_PATH}/bin"
   mv "${PREFIX_PATH}/usr/lib" "${PREFIX_PATH}/lib"
-  local bin
-  shopt -s nullglob
-  for bin in "usr/bin/"*; do
-    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
-      case "${bin##*/}" in
-      "python"* )
-        ( cd "${PREFIX_PATH}/bin" && ln -fs ../usr/bin/"${bin##*/}" "python" )
-        ;;
-      esac
-    fi
-  done
-  shopt -u nullglob
 }
 
 build_package_ironpython() {
