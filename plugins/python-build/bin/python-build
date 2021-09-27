@@ -1059,9 +1059,7 @@ build_package_miniconda_autoupdate() {
 
 build_package_miniconda() {
   build_package_anaconda "$@"
-  # Workaround to not upgrade conda when installing pip
-  # see https://github.com/pyenv/pyenv/issues/2070
-  "${PREFIX_PATH}/bin/conda" install --yes "pip" "conda=$(${PREFIX_PATH}/bin/conda --version | cut -d ' ' -f 2)"
+  "${PREFIX_PATH}/bin/conda" install --yes "pip"
 }
 
 build_package_copy() {
