@@ -97,21 +97,19 @@ make_shims() {
   local file shim
   for file; do
     shim="${file##*/}"
-    register_shim "$shim"
+    registered_shims+=("$shim")
   done
 }
 
-registered_shims=" "
-
 # Registers the name of a shim to be generated.
 register_shim() {
-  registered_shims="${registered_shims}${1} "
+  registered_shims+=("$1")
 }
 
 # Install all the shims registered via `make_shims` or `register_shim` directly.
 install_registered_shims() {
   local shim file
-  for shim in $registered_shims; do
+  for shim in "${registered_shims[@]}"; do
     file="${SHIM_PATH}/${shim}"
     [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
   done
@@ -123,8 +121,9 @@ install_registered_shims() {
 # removed.
 remove_stale_shims() {
   local shim
+  local known_shims=" ${registered_shims[*]} "
   for shim in "$SHIM_PATH"/*; do
-    if [[ "$registered_shims" != *" ${shim##*/} "* ]]; then
+    if [[ "$known_shims" != *" ${shim##*/} "* ]]; then
       rm -f "$shim"
     fi
   done
@@ -136,9 +135,8 @@ shopt -s nullglob
 # executables.
 create_prototype_shim
 remove_outdated_shims
-# shellcheck disable=SC2046
-make_shims $(list_executable_names | sort -u)
-
+# shellcheck disable=SC2207
+registered_shims=( $(list_executable_names | sort -u) )
 
 # Allow plugins to register shims.
 OLDIFS="$IFS"
