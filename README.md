@@ -31,35 +31,6 @@ bulletproof deployments.
 [**Why choose rbenv over
 RVM?**](https://github.com/rbenv/rbenv/wiki/Why-rbenv%3F)
 
-## Table of Contents
-
-* [How It Works](#how-it-works)
-  * [Understanding PATH](#understanding-path)
-  * [Understanding Shims](#understanding-shims)
-  * [Choosing the Ruby Version](#choosing-the-ruby-version)
-  * [Locating the Ruby Installation](#locating-the-ruby-installation)
-* [Installation](#installation)
-  * [Using Package Managers](#using-package-managers)
-  * [Basic GitHub Checkout](#basic-github-checkout)
-    * [Upgrading with Git](#upgrading-with-git)
-    * [Updating the list of available Ruby versions](#updating-the-list-of-available-ruby-versions)
-  * [How rbenv hooks into your shell](#how-rbenv-hooks-into-your-shell)
-  * [Installing Ruby versions](#installing-ruby-versions)
-    * [Installing Ruby gems](#installing-ruby-gems)
-  * [Uninstalling Ruby versions](#uninstalling-ruby-versions)
-  * [Uninstalling rbenv](#uninstalling-rbenv)
-* [Command Reference](#command-reference)
-  * [rbenv local](#rbenv-local)
-  * [rbenv global](#rbenv-global)
-  * [rbenv shell](#rbenv-shell)
-  * [rbenv versions](#rbenv-versions)
-  * [rbenv version](#rbenv-version)
-  * [rbenv rehash](#rbenv-rehash)
-  * [rbenv which](#rbenv-which)
-  * [rbenv whence](#rbenv-whence)
-* [Environment variables](#environment-variables)
-* [Development](#development)
-
 ## How It Works
 
 At a high level, rbenv intercepts Ruby commands using shim
