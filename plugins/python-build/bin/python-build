@@ -877,10 +877,8 @@ build_package_pyston2.2() {
 }
 
 build_package_pyston() {
-  # currently supported version 2.3.1 and higher
+  # currently supported version 2.3.1v2 and higher
   build_package_copy
-  mv "${PREFIX_PATH}/usr/bin" "${PREFIX_PATH}/bin"
-  mv "${PREFIX_PATH}/usr/lib" "${PREFIX_PATH}/lib"
 }
 
 build_package_ironpython() {
