@@ -68,6 +68,7 @@ else
 fi
 export RBENV_DIR
 
+[ -n "$RBENV_ORIG_PATH" ] || export RBENV_ORIG_PATH="$PATH"
 
 shopt -s nullglob
 
