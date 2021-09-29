@@ -209,19 +209,16 @@ a systemwide install.
    command-line utility.
 
    * For **bash**:
+     
+     Ubuntu Desktop users should configure `~/.bashrc`:
+     ~~~ bash
+     $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+     ~~~
+
+     On other platforms, bash is usually configured via `~/.bash_profile`:
      ~~~ bash
      $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bash_profile
      ~~~
-     
-   * For **Ubuntu Desktop**:
-   
-     In Ubuntu ~/.bash_profile is only sourced by bash when started in interactive login mode. 
-     That is typically only when you login at the console (Ctrl+Alt+F1..F6), or connecting via ssh.
-     This issue is explained in detail 
-     [here](https://askubuntu.com/questions/121073/why-bash-profile-is-not-getting-sourced-when-opening-a-terminal#121075).
-       ~~~ bash
-       $ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
-       ~~~
      
    * For **Zsh**:
      ~~~ zsh
