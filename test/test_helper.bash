@@ -119,7 +119,7 @@ path_without() {
     if [ "$found" != "${RBENV_ROOT}/shims" ]; then
       alt="${RBENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
       mkdir -p "$alt"
-      for util in bash head cut readlink greadlink; do
+      for util in bash head cut readlink greadlink sed sort awk; do
         if [ -x "${found}/$util" ]; then
           ln -s "${found}/$util" "${alt}/$util"
         fi

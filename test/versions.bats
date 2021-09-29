@@ -56,15 +56,21 @@ OUT
 @test "multiple versions" {
   stub_system_ruby
   create_version "1.8.7"
-  create_version "1.9.3"
-  create_version "2.0.0"
+  create_version "1.9.3-p13"
+  create_version "1.9.3-p2"
+  create_version "2.2.10"
+  create_version "2.2.3"
+  create_version "2.2.3-pre.2"
   run rbenv-versions
   assert_success
   assert_output <<OUT
 * system
   1.8.7
-  1.9.3
-  2.0.0
+  1.9.3-p2
+  1.9.3-p13
+  2.2.3-pre.2
+  2.2.3
+  2.2.10
 OUT
 }
 

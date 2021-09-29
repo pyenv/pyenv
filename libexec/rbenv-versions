@@ -63,47 +63,47 @@ if [ -d "$versions_dir" ]; then
   versions_dir="$(realpath "$versions_dir")"
 fi
 
-if [ -n "$bare" ]; then
-  hit_prefix=""
-  miss_prefix=""
-  current_version=""
-  include_system=""
-else
-  hit_prefix="* "
-  miss_prefix="  "
-  current_version="$(rbenv-version-name || true)"
-  include_system="1"
-fi
-
-num_versions=0
-
-print_version() {
-  if [ "$1" == "$current_version" ]; then
-    echo "${hit_prefix}$(rbenv-version 2>/dev/null)"
-  else
-    echo "${miss_prefix}$1"
-  fi
-  num_versions=$((num_versions + 1))
+list_versions() {
+  shopt -s nullglob
+  for path in "$versions_dir"/*; do
+    if [ -d "$path" ]; then
+      if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
+        target="$(realpath "$path")"
+        [ "${target%/*}" != "$versions_dir" ] || continue
+      fi
+      echo "${path##*/}"
+    fi
+  done
+  shopt -u nullglob
 }
 
-# Include "system" in the non-bare output, if it exists
-if [ -n "$include_system" ] && RBENV_VERSION=system rbenv-which ruby >/dev/null 2>&1; then
-  print_version system
+if [ -n "$bare" ]; then
+  list_versions
+  exit 0
 fi
 
-shopt -s nullglob
-for path in "$versions_dir"/*; do
-  if [ -d "$path" ]; then
-    if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
-      target="$(realpath "$path")"
-      [ "${target%/*}" != "$versions_dir" ] || continue
-    fi
-    print_version "${path##*/}"
-  fi
-done
-shopt -u nullglob
+sort_versions() {
+  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z.\1/; s/$/.z/; G; s/\n/ /' | \
+    LC_ALL=C sort -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
+}
 
-if [ "$num_versions" -eq 0 ] && [ -n "$include_system" ]; then
+versions="$(
+  if RBENV_VERSION=system rbenv-which ruby >/dev/null 2>&1; then
+    echo system
+  fi
+  list_versions | sort_versions
+)"
+
+if [ -z "$versions" ]; then
   echo "Warning: no Ruby detected on the system" >&2
   exit 1
 fi
+
+current_version="$(rbenv-version-name || true)"
+while read -r version; do
+  if [ "$version" == "$current_version" ]; then
+    echo "* $(rbenv-version 2>/dev/null)"
+  else
+    echo "  $version"
+  fi
+done <<<"$versions"
