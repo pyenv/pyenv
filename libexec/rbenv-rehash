@@ -34,6 +34,22 @@ remove_prototype_shim() {
   rm -f "$PROTOTYPE_SHIM_PATH"
 }
 
+# Locates rbenv as found in the user's PATH. Otherwise, returns an
+# absolute path to the rbenv executable itself.
+rbenv_path() {
+  local found
+  found="$(PATH="$RBENV_ORIG_PATH" command -v rbenv)"
+  if [[ $found == /* ]]; then
+    echo "$found"
+  elif [[ -n "$found" ]]; then
+    echo "$PWD/${found#./}"
+  else
+    # Assume rbenv isn't in PATH.
+    local here="${BASH_SOURCE%/*}"
+    echo "${here%/*}/bin/rbenv"
+  fi
+}
+
 # The prototype shim file is a script that re-execs itself, passing
 # its filename and any arguments to `rbenv exec`. This file is
 # hard-linked for every executable and then removed. The linking
@@ -61,7 +77,7 @@ if [ "\$program" = "ruby" ]; then
 fi
 
 export RBENV_ROOT="$RBENV_ROOT"
-exec "$(command -v rbenv)" exec "\$program" "\$@"
+exec "$(rbenv_path)" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
 }
