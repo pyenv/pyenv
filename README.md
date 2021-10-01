@@ -244,7 +244,7 @@ easy to fork and contribute any changes back upstream.
          a \
          export PATH="$PYENV_ROOT/bin:$PATH"
          a \
-         ' -e ':a' -e '$!{n;ba};}' ~/.profile
+         ' -e ':a' -e '$!{n;ba};}' ~/.bashrc
          echo 'eval "$(pyenv init --path)"' >>~/.profile
 
          echo 'eval "$(pyenv init -)"' >> ~/.bashrc
