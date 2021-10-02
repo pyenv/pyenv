@@ -282,7 +282,7 @@ Lists all Python versions with the given command installed.
 
 ## `pyenv root`
 
-Display the root directory where versions and shims are kept.
+Displays the root directory where versions and shims are kept.
 
     $ pyenv root
     /home/user/.pyenv
