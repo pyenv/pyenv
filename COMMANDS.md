@@ -16,6 +16,7 @@ The most common subcommands are:
 * [`pyenv versions`](#pyenv-versions)
 * [`pyenv which`](#pyenv-which)
 * [`pyenv whence`](#pyenv-whence)
+* [`pyenv prefix`](#pyenv-prefix)
 
 
 ## `pyenv commands`
@@ -278,3 +279,12 @@ Lists all Python versions with the given command installed.
     2.6.8
     2.7.6
     3.3.3
+
+## `pyenv prefix`
+
+Displays the directory where a Python version is installed. If no
+version is given, `pyenv prefix` displays the location of the
+currently selected version.
+
+    $ pyenv prefix 3.9.7
+    /home/user/.pyenv/versions/3.9.7
