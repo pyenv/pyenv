@@ -19,6 +19,7 @@ The most common subcommands are:
 * [`pyenv root`](#pyenv-root)
 * [`pyenv prefix`](#pyenv-prefix)
 * [`pyenv hooks`](#pyenv-hooks)
+* [`pyenv shims`](#pyenv-shims)
 
 ## `pyenv commands`
 
@@ -299,6 +300,12 @@ currently selected version.
 
 ## `pyenv hooks`
 
-    Usage: $ pyenv hooks <command>
-
 Lists installed hook scripts for a given pyenv command.
+
+    Usage: pyenv hooks <command>
+
+## `pyenv shims`
+
+List existing pyenv shims.
+
+    Usage: pyenv shims [--short]
