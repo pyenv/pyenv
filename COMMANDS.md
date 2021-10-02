@@ -19,6 +19,7 @@ The most common subcommands are:
 * [`pyenv root`](#pyenv-root)
 * [`pyenv prefix`](#pyenv-prefix)
 * [`pyenv hooks`](#pyenv-hooks)
+* [`pyenv shims`](#pyenv-shims)
 
 ## `pyenv commands`
 
@@ -299,6 +300,32 @@ currently selected version.
 
 ## `pyenv hooks`
 
-    Usage: $ pyenv hooks <command>
-
 Lists installed hook scripts for a given pyenv command.
+
+    Usage: pyenv hooks <command>
+
+## `pyenv shims`
+
+List existing pyenv shims.
+
+    Usage: pyenv shims [--short]
+
+    $ pyenv shims
+    /home/user/.pyenv/shims/2to3
+    /home/user/.pyenv/shims/2to3-3.9
+    /home/user/.pyenv/shims/idle
+    /home/user/.pyenv/shims/idle3
+    /home/user/.pyenv/shims/idle3.9
+    /home/user/.pyenv/shims/pip
+    /home/user/.pyenv/shims/pip3
+    /home/user/.pyenv/shims/pip3.9
+    /home/user/.pyenv/shims/pydoc
+    /home/user/.pyenv/shims/pydoc3
+    /home/user/.pyenv/shims/pydoc3.9
+    /home/user/.pyenv/shims/python
+    /home/user/.pyenv/shims/python3
+    /home/user/.pyenv/shims/python3.9
+    /home/user/.pyenv/shims/python3.9-config
+    /home/user/.pyenv/shims/python3.9-gdb.py
+    /home/user/.pyenv/shims/python3-config
+    /home/user/.pyenv/shims/python-config
