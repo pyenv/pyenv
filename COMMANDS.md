@@ -16,6 +16,8 @@ The most common subcommands are:
 * [`pyenv versions`](#pyenv-versions)
 * [`pyenv which`](#pyenv-which)
 * [`pyenv whence`](#pyenv-whence)
+* [`pyenv root`](#pyenv-root)
+* [`pyenv prefix`](#pyenv-prefix)
 * [`pyenv hooks`](#pyenv-hooks)
 
 ## `pyenv commands`
@@ -279,10 +281,24 @@ Lists all Python versions with the given command installed.
     2.7.6
     3.3.3
 
+## `pyenv root`
+
+Displays the root directory where versions and shims are kept.
+
+    $ pyenv root
+    /home/user/.pyenv
+
+## `pyenv prefix`
+
+Displays the directory where a Python version is installed. If no
+version is given, `pyenv prefix` displays the location of the
+currently selected version.
+
+    $ pyenv prefix 3.9.7
+    /home/user/.pyenv/versions/3.9.7
+
 ## `pyenv hooks`
 
     Usage: $ pyenv hooks <command>
 
-List hook scripts for a given pyenv command.
-
-
+Lists installed hook scripts for a given pyenv command.
