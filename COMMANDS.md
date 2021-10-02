@@ -18,7 +18,7 @@ The most common subcommands are:
 * [`pyenv whence`](#pyenv-whence)
 * [`pyenv root`](#pyenv-root)
 * [`pyenv prefix`](#pyenv-prefix)
-
+* [`pyenv hooks`](#pyenv-hooks)
 
 ## `pyenv commands`
 
@@ -296,3 +296,9 @@ currently selected version.
 
     $ pyenv prefix 3.9.7
     /home/user/.pyenv/versions/3.9.7
+
+## `pyenv hooks`
+
+    Usage: $ pyenv hooks <command>
+
+Lists installed hook scripts for a given pyenv command.
