@@ -16,6 +16,7 @@ The most common subcommands are:
 * [`pyenv versions`](#pyenv-versions)
 * [`pyenv which`](#pyenv-which)
 * [`pyenv whence`](#pyenv-whence)
+* [`pyenv exec`](#pyenv-exec)
 * [`pyenv root`](#pyenv-root)
 * [`pyenv prefix`](#pyenv-prefix)
 * [`pyenv hooks`](#pyenv-hooks)
@@ -281,6 +282,21 @@ Lists all Python versions with the given command installed.
     2.6.8
     2.7.6
     3.3.3
+
+## `pyenv exec`
+
+    `Usage: pyenv exec <command> [arg1 arg2...]`
+
+Runs an executable by first preparing PATH so that the selected Python
+version's `bin` directory is at the front.
+
+For example, if the currently selected Python version is 3.9.7:
+
+    `pyenv exec pip install -r requirements.txt`
+    
+is equivalent to:
+
+    `PATH="$PYENV_ROOT/versions/3.9.7/bin:$PATH" pip install -r requirements.txt`
 
 ## `pyenv root`
 
