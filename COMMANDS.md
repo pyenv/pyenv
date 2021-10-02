@@ -16,7 +16,7 @@ The most common subcommands are:
 * [`pyenv versions`](#pyenv-versions)
 * [`pyenv which`](#pyenv-which)
 * [`pyenv whence`](#pyenv-whence)
-
+* [`pyenv hooks`](#pyenv-hooks)
 
 ## `pyenv commands`
 
@@ -278,3 +278,11 @@ Lists all Python versions with the given command installed.
     2.6.8
     2.7.6
     3.3.3
+
+## `pyenv hooks`
+
+    Usage: $ pyenv hooks <command>
+
+List hook scripts for a given pyenv command.
+
+
