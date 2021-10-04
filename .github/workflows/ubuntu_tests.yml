@@ -12,7 +12,7 @@ jobs:
           - 3.7.10
           - 3.8.10
           - 3.9.5
-          - 3.10.0rc2
+          - 3.10.0
     runs-on: Ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
