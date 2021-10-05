@@ -877,10 +877,8 @@ build_package_pyston2.2() {
 }
 
 build_package_pyston() {
-  # currently supported version 2.3.1 and higher
+  # currently supported version 2.3.1v2 and higher
   build_package_copy
-  mv "${PREFIX_PATH}/usr/bin" "${PREFIX_PATH}/bin"
-  mv "${PREFIX_PATH}/usr/lib" "${PREFIX_PATH}/lib"
 }
 
 build_package_ironpython() {
@@ -1664,7 +1662,7 @@ apply_python_patch() {
 }
 
 build_package_symlink_version_suffix() {
-  if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+  if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
     if [ -e "${PREFIX_PATH}/bin" ]; then
       # Always create `bin` as symlink to framework path if the version was built with `--enable-frameowrk` (#590)
       rm -rf "${PREFIX_PATH}/bin.orig"
@@ -2113,7 +2111,7 @@ fi
 package_option python configure --libdir="${PREFIX_PATH}/lib"
 
 # python-build: Set `RPATH` if `--enable-shared` was given (#65, #66, #82)
-if [[ "$CONFIGURE_OPTS" == *"--enable-shared"* ]] || [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]]; then
+if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]]; then
   # The ld on Darwin embeds the full paths to each dylib by default
   if [[ "$LDFLAGS" != *"-rpath="* ]] && ! is_mac; then
     export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
@@ -2126,7 +2124,7 @@ if [[ "$PYPY_OPTS" == *"--shared"* ]]; then
 fi
 
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
-if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   if ! is_mac; then
     echo "python-build: framework installation is not supported." >&2
     exit 1
@@ -2147,7 +2145,7 @@ if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
 fi
 
 # Build against universal SDK (#219, #220)
-if [[ "$PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
+if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
   if ! is_mac; then
     echo "python-build: universal installation is not supported." >&2
     exit 1
