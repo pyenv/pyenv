@@ -1,5 +1,21 @@
 ## Version History
 
+## Release 2.1.0
+* Fix mambaforge-pypy3 build (#2096)
+* Add Python 3.10.0 (#2093)
+* Add documentation for exec command (#2090)
+* Add documentation for shims command (#2091)
+* Add documentation for hooks command (#2089)
+* Add documentation for root command (#2088)
+* Add documentaion for prefix command (#2087)
+* Update to Pyston's v2 package of the 2.3.1 release (#2078)
+* Add pyston-2.3.1 support (#2075)
+* Don't update conda when installing pip (#2074)
+* Improve `add_miniconda.py` (#2072)
+* GitHub actions tests (#2073)
+* Fix sed commands (#2071)
+* macOS: fix the build of Python 2.7.18 on macOS 11.5.2 (Big Sur) + Apple Silicon (#2061)
+
 ## Release 2.0.7
 * Update setup instructions in the Readme (#2067)
 * Allow tcl-tk as argument or try with homebrew by default (#1646)
