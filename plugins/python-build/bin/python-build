@@ -858,7 +858,7 @@ build_package_jython_builder() {
   ( cd "dist" && build_package_jython )
 }
 
-build_package_pyston2.2() {
+build_package_pyston2_2() {
   # currently supported version 2.2 and 2.3
   build_package_copy
   mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
