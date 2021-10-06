@@ -16,7 +16,11 @@ The most common subcommands are:
 * [`pyenv versions`](#pyenv-versions)
 * [`pyenv which`](#pyenv-which)
 * [`pyenv whence`](#pyenv-whence)
-
+* [`pyenv exec`](#pyenv-exec)
+* [`pyenv root`](#pyenv-root)
+* [`pyenv prefix`](#pyenv-prefix)
+* [`pyenv hooks`](#pyenv-hooks)
+* [`pyenv shims`](#pyenv-shims)
 
 ## `pyenv commands`
 
@@ -278,3 +282,66 @@ Lists all Python versions with the given command installed.
     2.6.8
     2.7.6
     3.3.3
+
+## `pyenv exec`
+
+    `Usage: pyenv exec <command> [arg1 arg2...]`
+
+Runs an executable by first preparing PATH so that the selected Python
+version's `bin` directory is at the front.
+
+For example, if the currently selected Python version is 3.9.7:
+
+    `pyenv exec pip install -r requirements.txt`
+    
+is equivalent to:
+
+    `PATH="$PYENV_ROOT/versions/3.9.7/bin:$PATH" pip install -r requirements.txt`
+
+## `pyenv root`
+
+Displays the root directory where versions and shims are kept.
+
+    $ pyenv root
+    /home/user/.pyenv
+
+## `pyenv prefix`
+
+Displays the directory where a Python version is installed. If no
+version is given, `pyenv prefix` displays the location of the
+currently selected version.
+
+    $ pyenv prefix 3.9.7
+    /home/user/.pyenv/versions/3.9.7
+
+## `pyenv hooks`
+
+Lists installed hook scripts for a given pyenv command.
+
+    Usage: pyenv hooks <command>
+
+## `pyenv shims`
+
+List existing pyenv shims.
+
+    Usage: pyenv shims [--short]
+
+    $ pyenv shims
+    /home/user/.pyenv/shims/2to3
+    /home/user/.pyenv/shims/2to3-3.9
+    /home/user/.pyenv/shims/idle
+    /home/user/.pyenv/shims/idle3
+    /home/user/.pyenv/shims/idle3.9
+    /home/user/.pyenv/shims/pip
+    /home/user/.pyenv/shims/pip3
+    /home/user/.pyenv/shims/pip3.9
+    /home/user/.pyenv/shims/pydoc
+    /home/user/.pyenv/shims/pydoc3
+    /home/user/.pyenv/shims/pydoc3.9
+    /home/user/.pyenv/shims/python
+    /home/user/.pyenv/shims/python3
+    /home/user/.pyenv/shims/python3.9
+    /home/user/.pyenv/shims/python3.9-config
+    /home/user/.pyenv/shims/python3.9-gdb.py
+    /home/user/.pyenv/shims/python3-config
+    /home/user/.pyenv/shims/python-config

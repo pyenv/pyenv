@@ -1,4 +1,4 @@
-ase "$(anaconda_architecture 2>/dev/null || true)" in
+case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-ppc64le" )
   install_script "Mambaforge-pypy3-Linux-ppc64le" "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-ppc64le.sh" "miniconda" verify_py3_latest
   ;;
