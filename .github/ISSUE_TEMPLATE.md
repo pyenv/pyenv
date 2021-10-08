@@ -18,4 +18,11 @@ Make sure you have checked all steps below.
 - [ ] Python version:
 - [ ] C Compiler information (e.g. gcc 7.3): 
 - [ ] Please attach verbose build log as gist
-  * You can turn on verbose debug logging using by setting `PYENV_DEBUG=1`, e.g. `env PYENV_DEBUG=1 pyenv install -v 3.6.4`
+  * If the problem happens in a Pyenv invocation, you can turn on debug logging by setting `PYENV_DEBUG=1`, e.g. `env PYENV_DEBUG=1 pyenv install -v 3.6.4`
+  * If the problem happens outside of a Pyenv invocation, get the debug log like this:
+     ```
+     export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+     set -x
+     <reproduce the problem>
+     set +x
+     ```
