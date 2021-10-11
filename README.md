@@ -347,7 +347,7 @@ easy to fork and contribute any changes back upstream.
          echo 'eval "$(pyenv init -)"' >> ~/.zshrc
          ~~~
         
-      - For **Fish shell**:
+    - For **Fish shell**:
 
         Execute this interactively:
         
