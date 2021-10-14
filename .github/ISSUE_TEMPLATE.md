@@ -17,7 +17,7 @@ Make sure you have checked all steps below.
 - [ ] pyenv version:
 - [ ] Python version:
 - [ ] C Compiler information (e.g. gcc 7.3): 
-- [ ] Please attach verbose build log as gist
+- [ ] Please attach a debug trace log as gist
   * If the problem happens in a Pyenv invocation, you can turn on debug logging by setting `PYENV_DEBUG=1`, e.g. `env PYENV_DEBUG=1 pyenv install -v 3.6.4`
   * If the problem happens outside of a Pyenv invocation, get the debug log like this:
      ```
