@@ -183,7 +183,7 @@ For pyenv to install python correctly you should [**install the Python build dep
       ```
    2. Then follow the rest of the post-installation steps under [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout), starting with #2 ("Configure your shell's environment for Pyenv").
 
-   3. **OPTIONAL. To fix `brew doctor`'s warning _""config" scripts exist outside your system or Homebrew directories"_**
+   3. OPTIONAL. To fix `brew doctor`'s warning _""config" scripts exist outside your system or Homebrew directories"_
    
       If you're going to build Homebrew formulae from source that link against `libpython`
       like Tkinter or NumPy
