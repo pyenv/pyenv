@@ -1533,12 +1533,13 @@ use_xcode_sdk_zlib() {
 
 use_homebrew_tcltk() {
   # get the version from the folder that homebrew versions
-  local tcltk_version_long="$(ls "$(brew --cellar tcl-tk)")"
-  local tcltk_version="${tcltk_version_long%.*}"
-  local tcltk_flags="--with-tcltk-includes=-I$tcltk_libdir/include --with-tcltk-libs=-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
-  echo "python-build: use tcl-tk from homebrew"
-  package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
-  package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+  local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
+  if [ -d "$tcltk_libdir" ]; then
+    echo "python-build: use tcl-tk from homebrew"
+    local tcltk_version="$(sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo $TCL_VERSION')"
+    package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+    package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+  fi
 }
 
 # FIXME: this function is a workaround for #1125

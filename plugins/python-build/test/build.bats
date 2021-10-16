@@ -242,18 +242,15 @@ OUT
 
 @test "tcl-tk is linked from Homebrew" {
   cached_tarball "Python-3.6.2"
-
-  # python build
+  tcl_tk_version=8.6
   tcl_tk_libdir="$TMP/homebrew-tcl-tk"
-  tcl_tk_version_long="8.6.10"
-  tcl_tk_version="${tcl_tk_version_long%.*}"
-  mkdir -p "$tcl_tk_libdir"
-  mkdir -p "$tcl_tk_libdir/$tcl_tk_version_long"
+  mkdir -p "$tcl_tk_libdir/lib"
+  echo "TCL_VERSION='$tcl_tk_version'" >>"$tcl_tk_libdir/lib/tclConfig.sh"
 
-  # pyenv/pyenv#1026
-  stub uname false false
+  stub uname false
 
-  stub brew "--prefix tcl-tk : echo '$tcl_tk_libdir'" "--cellar tcl-tk : echo '$TMP/homebrew-tcl-tk'" false
+  for i in {1..2}; do stub brew "--prefix tcl-tk : echo '$tcl_tk_libdir'"; done
+  stub brew false
   stub_make_install
 
   run_inline_definition <<DEF
