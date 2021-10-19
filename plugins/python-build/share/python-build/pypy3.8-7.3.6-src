@@ -1,0 +1,8 @@
+VERSION='7.3.6'
+PYVER='3.8'
+# https://www.pypy.org/checksums.html
+
+#require_gcc
+prefer_openssl11
+install_package "openssl-1.1.1f" "https://www.openssl.org/source/openssl-1.1.1f.tar.gz#186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35" mac_openssl --if has_broken_mac_openssl
+install_package "pypy${PYVER}-v${VERSION}-src" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-src.tar.bz2#f234c56eb0d4ab0afb196232fb38cd1ca8e19b1c65cf7b65eb691695499be259" "pypy_builder" "verify_py${PYVER//./}" ensurepip
