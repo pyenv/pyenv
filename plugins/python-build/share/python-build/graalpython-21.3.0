@@ -1,0 +1,48 @@
+# Copyright (c) 2021, Oracle and/or its affiliates. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is furnished to do
+# so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+VERSION='21.3.0'
+BUILD=''
+
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux64" )
+  graalpython_arch="linux"
+  checksum="b17bbc9753fb04f03290660952acfd212020676603970323780f190509b061b9"
+  ;;
+"osx64" )
+  graalpython_arch="macos"
+  checksum="feecbd2567a43aeaeb5ca6a7385ef3d5bd2c94e563b64afee7dcce0c8f87a1c9"
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": No binary distribution of GraalPython is available for $(pypy_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
+
+if [ -n "${BUILD}" ]; then
+  urlprefix="https://github.com/graalvm/graalvm-ce-dev-builds/releases/download/${VERSION}-${BUILD}"
+else
+  urlprefix="https://github.com/oracle/graalpython/releases/download/vm-${VERSION}"
+fi
+
+install_package "graalpython-${VERSION}${BUILD}" "${urlprefix}/graalpython-${VERSION}-${graalpython_arch}-amd64.tar.gz#${checksum}" "graalpython" ensurepip
