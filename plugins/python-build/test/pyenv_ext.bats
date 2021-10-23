@@ -273,13 +273,41 @@ EOS
 @test "enable universalsdk" {
   
   for i in {1..3}; do stub uname '-s : echo Darwin'; done
+  stub arch "echo x86_64"
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/ --with-universal-archs=intel)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/)
+EOS
+}
+
+@test "enable universalsdk on Apple Silicon" {
+
+  for i in {1..3}; do stub uname '-s : echo Darwin'; done
+  stub arch "echo arm64"
+
+  PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
+echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
+OUT
+  assert_success
+  assert_output <<EOS
+PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/ --with-universal-archs=universal2)
+EOS
+}
+
+@test "enable universalsdk with explicit archs argument" {
+
+  for i in {1..3}; do stub uname '-s : echo Darwin'; done
+
+  PYTHON_CONFIGURE_OPTS="--enable-universalsdk --with-universal-archs=foo" TMPDIR="$TMP" run_inline_definition <<OUT
+echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
+OUT
+  assert_success
+  assert_output <<EOS
+PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/)
 EOS
 }
 
