@@ -12,13 +12,13 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 ![Terminal output example](/terminal_output.png)
 
 
-### pyenv _does..._
+### what pyenv _does..._
 
-* Let you **change the global Python version** on a per-user basis.
-* Provide support for **per-project Python versions**.
-* Allow you to **override the Python version** with an environment
+* Lets you **change the global Python version** on a per-user basis.
+* Provides support for **per-project Python versions**.
+* Allows you to **override the Python version** with an environment
   variable.
-* Search commands from **multiple versions of Python at a time**.
+* Searches for commands from **multiple versions of Python at a time**.
   This may be helpful to test across Python versions with [tox](https://pypi.python.org/pypi/tox).
 
 
