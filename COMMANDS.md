@@ -6,6 +6,8 @@ first argument.
 The most common subcommands are:
 
 * [`pyenv commands`](#pyenv-commands)
+* [`pyenv activate`](#pyenv-activate)
+* [`pyenv deactivate`](#pyenv-deactivate)
 * [`pyenv local`](#pyenv-local)
 * [`pyenv global`](#pyenv-global)
 * [`pyenv shell`](#pyenv-shell)
@@ -25,6 +27,24 @@ The most common subcommands are:
 ## `pyenv commands`
 
 Lists all available pyenv commands.
+
+## `pyenv activate`
+
+    Usage: pyenv activate <virtualenv>
+           pyenv activate --unset
+
+
+Activate a Python virtualenv environment in current shell.
+This acts almost as same as `pyenv shell`, but this invokes the `activate`
+script in your shell.
+
+`<virtualenv>` should be a string matching a Python version known to pyenv.
+
+## `pyenv deactivate`
+
+Usage: pyenv deactivate
+
+Deactivate a Python virtual environment.
 
 
 ## `pyenv local`
