@@ -2137,13 +2137,21 @@ if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; the
   package_option python configure --enable-framework="${PREFIX_PATH}/Library/Frameworks"
 fi
 
-# Build against universal SDK (#219, #220)
+# Build against universal SDK
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
   if ! is_mac; then
     echo "python-build: universal installation is not supported." >&2
     exit 1
   fi
-  package_option python configure --enable-universalsdk=/ --with-universal-archs=intel
+  package_option python configure --enable-universalsdk=/
+  if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--enable-universal-archs"* ]]; then
+    # in CPython's configure.ac, --with-universal-archs defaults to 'intel' which means i386 + x86_64
+    # since 2.7.5 and 3.3.0 -- i.e. in all non-EOL versions
+    # Apple Silicon cannot build these, in it, it rather makes sense to default to Universal2 binaries
+    if [[ $(arch) == "arm64" ]]; then
+      package_option python configure --with-universal-archs=universal2
+    fi
+  fi
 fi
 
 # Compile with `--enable-unicode=ucs4` by default (#257)
