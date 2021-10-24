@@ -1,3 +1,4 @@
+on: [pull_request, push]
 jobs:
   lint:
     name: Lint markdown files
