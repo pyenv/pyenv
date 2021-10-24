@@ -21,6 +21,7 @@ The most common subcommands are:
 * [`pyenv prefix`](#pyenv-prefix)
 * [`pyenv hooks`](#pyenv-hooks)
 * [`pyenv shims`](#pyenv-shims)
+* [`pyenv init`](#pyenv-init)
 
 ## `pyenv commands`
 
@@ -345,3 +346,9 @@ List existing pyenv shims.
     /home/user/.pyenv/shims/python3.9-gdb.py
     /home/user/.pyenv/shims/python3-config
     /home/user/.pyenv/shims/python-config
+
+## `pyenv init`
+
+Configure the shell environment for pyenv
+
+    Usage: eval "$(pyenv init [-|--path] [--no-rehash] [<shell>])"
