@@ -1,3 +1,4 @@
+name: lint
 on: [pull_request, push]
 jobs:
   lint:
