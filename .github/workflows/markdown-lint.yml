@@ -1,2 +1,14 @@
-- name: Markdown Lint
-  uses: avto-dev/markdown-lint@v1.5.0
+jobs:
+  lint:
+    name: Lint markdown files
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out
+      uses: actions/checkout@v2
+
+    - name: Lint
+      uses: avto-dev/markdown-lint@v1.5.0
+      with:
+        #rules: '/lint/rules/changelog.js'
+        #config: '/lint/config/changelog.yml'
+        args: '.'
