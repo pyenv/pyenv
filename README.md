@@ -311,7 +311,7 @@ easy to fork and contribute any changes back upstream.
 
          In MacOS, make sure that your terminal app runs the shell as a login shell.
 
-      - **Temporary environments (CI, batch jobs):**
+      - **Temporary environments (CI, Docker, batch jobs):**
 
          In CI/build environments, paths and the environment are usually already set up for you
          in one of the above ways.
@@ -322,6 +322,18 @@ easy to fork and contribute any changes back upstream.
          ~~~bash
          echo 'eval "$(pyenv init -)"'
          ~~~
+         
+         If you are installing Pyenv yourself as part of the batch job,
+         after installing the files, run the following in the job's shell
+         to be able to use it.
+         
+         ~~~bash
+         export PYENV_ROOT="$HOME/.pyenv"
+         export PATH="$PYENV_ROOT/bin:$PATH"    # if `pyenv` is not already on PATH
+         eval "$(pyenv init --path)"
+         eval "$(pyenv init -)"
+         ~~~
+
          
       **General Bash warning**: There are some systems where the `BASH_ENV` variable is configured
       to point to `.bashrc`. On such systems, you should almost certainly put the
