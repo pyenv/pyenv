@@ -22,6 +22,7 @@ The most common subcommands are:
 * [`pyenv hooks`](#pyenv-hooks)
 * [`pyenv shims`](#pyenv-shims)
 * [`pyenv init`](#pyenv-init)
+* [`pyenv completions`](#pyenv-completions)
 
 ## `pyenv commands`
 
@@ -357,3 +358,9 @@ Configure the shell environment for pyenv
                            and shell function
       --path               Print shims path
       --no-rehash          Add no rehash command to output     
+
+## `pyenv completions`
+
+Lists available completions for a given pyenv command.
+
+    Usage: pyenv completions <command> [arg1 arg2...]
