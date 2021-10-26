@@ -252,6 +252,12 @@ easy to fork and contribute any changes back upstream.
    (especially if you're using an alternative terminal app and/or shell).
    The configuration samples for MacOS are written under this assumption and won't work otherwise.
    
+   In zsh, this can be checked using this line of code:
+   ~~~ zsh
+         if [[ -o login ]]; then echo "login shell"; else echo "not login shell"; fi
+   ~~~
+
+   
    - For **Bash**:
 
       - **If your `~/.profile` sources `~/.bashrc` (Debian, Ubuntu, Mint):**
