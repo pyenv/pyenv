@@ -155,6 +155,7 @@ OUT
   mkdir -p "$BREW_PREFIX"
 
   for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew "--prefix : echo '$BREW_PREFIX'" false
   stub_make_install
 
@@ -163,6 +164,7 @@ install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.
 DEF
   assert_success
 
+  unstub sw_vers
   unstub uname
   unstub make
 
