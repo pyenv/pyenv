@@ -248,7 +248,7 @@ easy to fork and contribute any changes back upstream.
    section below to figure out what you need to do in your specific case.
    
    **General MacOS note:**
-   Make sure that your terminal app is configured to run the shell as a login shell
+   [Make sure that your terminal app is configured to run the shell as a login shell](https://github.com/pyenv/pyenv/wiki/MacOS-login-shell)
    (especially if you're using an alternative terminal app and/or shell).
    The configuration samples for MacOS are written under this assumption and won't work otherwise.
    
