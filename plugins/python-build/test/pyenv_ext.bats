@@ -314,7 +314,7 @@ EOS
 @test "enable custom unicode configuration" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..2}; do stub brew '* : false'; done
+  for i in {1..4}; do stub brew false; done
   for i in {1..3}; do stub uname '-s : echo Linux'; done
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \

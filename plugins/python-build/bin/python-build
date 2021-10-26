@@ -773,10 +773,13 @@ build_package_standard_build() {
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
-      use_tcltk || true
-      use_homebrew_readline || use_freebsd_pkg || true
+    use_homebrew || true
+    use_tcltk || true
+    use_homebrew_readline || use_freebsd_pkg || true
     if is_mac -ge 1014; then
       use_xcode_sdk_zlib || use_homebrew_zlib || true
+    else
+      use_homebrew_zlib || true
     fi
   fi
 
@@ -1323,6 +1326,19 @@ configured_with_package_dir() {
     fi
   done
   return 1
+}
+
+use_homebrew() {
+  # unless Homebrew is at the default /usr/local, need to add its paths to
+  # compiler search to be able to use non-keg-only deps from there
+  if command -v brew &>/dev/null; then
+    local brew_prefix="$(brew --prefix 2>/dev/null || true)"
+    # /usr/local/lib:/usr/lib is the default library search path
+    if [[ -n $brew_prefix && $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ]]; then
+      export CPPFLAGS="${CPPFLAGS:+${CPPFLAGS% } }-I${brew_prefix}/include"
+      export LDFLAGS="${LDFLAGS:+${LDFLAGS% } }-L${brew_prefix}/lib"
+    fi
+  fi
 }
 
 needs_yaml() {
