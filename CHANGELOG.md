@@ -1,5 +1,19 @@
 ## Version History
 
+## Release 2.2.0
+* Adding PyPy release 7.3.7 (Python 3.7 and 3.8). (#2132)
+* Append Homebrew custom prefix to search path (#1957)
+* Add documentation for init command (#2125) 
+* Add setup instructions for the case when one installs Pyenv as part of a batch job (#2127) 
+* Add documentation for completions command (#2126)
+* Default --with-universal-archs to universal2 on Apple Silicon (#2122)
+* Update README.md (#2120)
+* Add GraalPython 21.3.0 (#2117) 
+* Pypy ver 7.3.6 - python 3.7 and python 3.8 (#2111)
+* Discover Tcl/Tk reliably and use active version (#2106)
+* Fish installation instructions (#2104)
+* Add CPython 3.11.0a1 (#2099)
+
 ## Release 2.1.0
 * Fix mambaforge-pypy3 build (#2096)
 * Add Python 3.10.0 (#2093)
