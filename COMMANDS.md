@@ -24,6 +24,7 @@ The most common subcommands are:
 * [`pyenv shims`](#pyenv-shims)
 * [`pyenv init`](#pyenv-init)
 * [`pyenv completions`](#pyenv-completions)
+* [`pyenv doctor`](#pyenv-doctor)
 
 ## `pyenv help`
 
@@ -370,3 +371,16 @@ Configure the shell environment for pyenv
 Lists available completions for a given pyenv command.
 
     Usage: pyenv completions <command> [arg1 arg2...]
+
+
+## `pyenv doctor`
+
+Verify pyenv installation and development tools to build pythons.
+
+    Usage: pyenv doctor [OPTIONS]
+    -a/--all       Check all
+    -c/--cpython   Check for CPython
+    -j/--jython    Check for Jython
+    -p/--pypy      Check for PyPy
+    -s/--stackless Check for Stackless Python
+    -v/--verbose   Increase verbosity
