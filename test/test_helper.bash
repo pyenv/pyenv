@@ -116,7 +116,7 @@ path_without() {
   local path=":${PATH}:"
   for exe; do 
     local found alt util
-    for found in $(PATH="$path" which -a "$exe"); do
+    for found in $(PATH="$path" whereis -b "$exe" | sed -e "s/.*://"); do
       found="${found%/*}"
       if [ "$found" != "${PYENV_ROOT}/shims" ]; then
         alt="${PYENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
