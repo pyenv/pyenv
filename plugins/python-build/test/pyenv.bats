@@ -183,7 +183,7 @@ OUT
 }
 
 @test "pyenv-install has usage help preface" {
-  run head "$(which pyenv-install)"
+  run head "$(command -v pyenv-install)"
   assert_output_contains 'Usage: pyenv install'
 }
 
@@ -212,6 +212,6 @@ OUT
 }
 
 @test "pyenv-uninstall has usage help preface" {
-  run head "$(which pyenv-uninstall)"
+  run head "$(command -v pyenv-uninstall)"
   assert_output_contains 'Usage: pyenv uninstall'
 }
