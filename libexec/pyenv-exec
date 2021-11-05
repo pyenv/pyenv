@@ -11,7 +11,7 @@
 #   pyenv exec pip install -r requirements.txt
 #
 # is equivalent to:
-#   PATH="$PYENV_ROOT/versions/2.7.6/bin:$PATH" pip install -rrequirements.txt
+#   PATH="$PYENV_ROOT/versions/2.7.6/bin:$PATH" pip install -r requirements.txt
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
