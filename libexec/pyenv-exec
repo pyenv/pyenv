@@ -8,10 +8,10 @@
 # version's `bin' directory is at the front.
 #
 # For example, if the currently selected Python version is 2.7.6:
-#   pyenv exec pip install -rrequirements.txt
+#   pyenv exec pip install -r requirements.txt
 #
 # is equivalent to:
-#   PATH="$PYENV_ROOT/versions/2.7.6/bin:$PATH" pip install -rrequirements.txt
+#   PATH="$PYENV_ROOT/versions/2.7.6/bin:$PATH" pip install -r requirements.txt
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
