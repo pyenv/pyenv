@@ -110,28 +110,13 @@ assert() {
   fi
 }
 
-which_a() {
-    if command -v which; then
-        # which -a is portable
-        which -a "$@"
-    elif command -v whereis; then
-        local where
-        # -b to whereis is not portable, not available e.g. in macOS 11
-        where=$(whereis -b "$@") || return $?
-        [ -z "$where" ] && return 1
-    else
-        echo "which -a or whereis -b required" >&2
-        return 127
-    fi
-}
-
 # Output a modified PATH that ensures that the given executable is not present,
 # but in which system utils necessary for pyenv operation are still available.
 path_without() {
   local path=":${PATH}:"
   for exe; do 
     local found alt util
-    for found in $(PATH="$path" which_a "$exe"); do
+    for found in $(PATH="$path" type -aP "$exe"); do
       found="${found%/*}"
       if [ "$found" != "${PYENV_ROOT}/shims" ]; then
         alt="${PYENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
