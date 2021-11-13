@@ -1,0 +1,38 @@
+From 88a8e34c7eb48dcb80d8c2717e6f3fa5ed049819 Mon Sep 17 00:00:00 2001
+From: Christian Hammond <christian@beanbaginc.com>
+Date: Fri, 12 Nov 2021 23:20:35 -0800
+Subject: [PATCH] Support "arm64" identifier from brew coreutils' uname for
+ Python 2.7.18.
+
+Python 2.7.18's `config.sub` attempts to determine whether the OS and
+machine identifier type returned by `uname` is a valid target for
+compilation. On M1 Macs, the system-default `uname` returns a value
+that's eventually parsed as "arm-apple-darwin21.0.1", which passes the
+pattern matching.
+
+However, if the coreutils Homebrew target is installed and its version
+of `uname` is in the path, the result is "arm64-apple-darwin21.0.1".
+This isn't handled by the existing patterns, and fails the build.
+
+This change adds `arm64-*` to the list of patterns, alongside `arm-*`,
+allowing compilation to proceed.
+---
+ config.sub | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config.sub b/config.sub
+index 40ea5dfe11..6fa6fe879a 100755
+--- a/config.sub
++++ b/config.sub
+@@ -376,7 +376,7 @@ case $basic_machine in
+ 	| alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* | arceb-* \
+-	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \
++	| arm-* | arm64-* | armbe-* | armle-* | armeb-* | armv*-* \
+ 	| avr-* | avr32-* \
+ 	| ba-* \
+ 	| be32-* | be64-* \
+-- 
+2.30.1 (Apple Git-130)
+
