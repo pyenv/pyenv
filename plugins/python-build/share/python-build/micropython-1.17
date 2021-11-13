@@ -1,0 +1,4 @@
+has_tar_xz_support \
+  && { install=install_package; src="https://micropython.org/resources/source/micropython-1.17.tar.xz#e322f915cee784de0f8614779cdb88fce175956975b3864e2d1898a53638a2f7"; } \
+  || { install=install_zip; src="https://micropython.org/resources/source/micropython-1.17.zip#4dfc60e2ba67e89c0b794c0533bb4e43a10d4e38095d0640b64b4faa9160f244"; }
+$install micropython-1.17 "$src" micropython
