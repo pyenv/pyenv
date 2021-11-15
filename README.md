@@ -267,7 +267,7 @@ easy to fork and contribute any changes back upstream.
          ' -e ':a' -e '$!{n;ba};}' ~/.profile
          echo 'eval "$(pyenv init --path)"' >>~/.profile
 
-         echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+         echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
          ~~~
 
       - **If your `~/.bash_profile` sources `~/.bashrc` (Red Hat, Fedora, CentOS):**
