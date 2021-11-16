@@ -327,13 +327,13 @@ should be able to:
 
 ```sh
 # list latest stable versions:
-$ rbenv install -l
+rbenv install -l
 
 # list all local versions:
-$ rbenv install -L
+rbenv install -L
 
 # install a Ruby version:
-$ rbenv install 2.0.0-p247
+rbenv install 2.0.0-p247
 ```
 
 Set a Ruby version to finish installation and start using commands `rbenv global 2.0.0-p247` or `rbenv local 2.0.0-p247`
@@ -353,7 +353,7 @@ another version using `rbenv local 2.0.0-p247`, for example. Then, proceed to
 install gems as you normally would:
 
 ```sh
-$ gem install bundler
+gem install bundler
 ```
 
 **You don't need sudo** to install gems. Typically, the Ruby versions will be
@@ -363,7 +363,7 @@ install gems.
 Check the location where gems are being installed with `gem env`:
 
 ```sh
-$ gem env home
+gem env home
 # => ~/.rbenv/versions/<ruby-version>/lib/ruby/gems/...
 ```
 
@@ -419,12 +419,12 @@ overrides the global version, and can be overridden itself by setting
 the `RBENV_VERSION` environment variable or with the `rbenv shell`
 command.
 
-    $ rbenv local 1.9.3-p327
+    rbenv local 1.9.3-p327
 
 When run without a version number, `rbenv local` reports the currently
 configured local version. You can also unset the local version:
 
-    $ rbenv local --unset
+    rbenv local --unset
 
 ### rbenv global
 
@@ -433,7 +433,7 @@ the version name to the `~/.rbenv/version` file. This version can be
 overridden by an application-specific `.ruby-version` file, or by
 setting the `RBENV_VERSION` environment variable.
 
-    $ rbenv global 1.8.7-p352
+    rbenv global 1.8.7-p352
 
 The special version name `system` tells rbenv to use the system Ruby
 (detected by searching your `$PATH`).
@@ -447,19 +447,19 @@ Sets a shell-specific Ruby version by setting the `RBENV_VERSION`
 environment variable in your shell. This version overrides
 application-specific versions and the global version.
 
-    $ rbenv shell jruby-1.7.1
+    rbenv shell jruby-1.7.1
 
 When run without a version number, `rbenv shell` reports the current
 value of `RBENV_VERSION`. You can also unset the shell version:
 
-    $ rbenv shell --unset
+    rbenv shell --unset
 
 Note that you'll need rbenv's shell integration enabled (step 3 of
 the installation instructions) in order to use this command. If you
 prefer not to use shell integration, you may simply set the
 `RBENV_VERSION` variable yourself:
 
-    $ export RBENV_VERSION=jruby-1.7.1
+    export RBENV_VERSION=jruby-1.7.1
 
 ### rbenv versions
 
