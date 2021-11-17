@@ -1,4 +1,4 @@
-# Groom your app’s Ruby environment with rbenv.
+# Seamlessly manage your app’s Ruby environment with rbenv.
 
 Use rbenv to pick a Ruby version for your application and guarantee
 that your development environment matches production. Put rbenv to work
