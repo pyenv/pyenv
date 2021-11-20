@@ -8,6 +8,9 @@ case "$(anaconda_architecture 2>/dev/null || true)" in
 "MacOSX-x86_64" )
   install_script "Miniconda3-latest-MacOSX-x86_64" "https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh" "miniconda" verify_py3_latest
   ;;
+"MacOSX-arm64" )
+  install_script "Miniconda3-latest-MacOSX-arm64" "https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-arm64.sh" "miniconda" verify_py3_latest
+  ;;
 * )
   { echo
     colorize 1 "ERROR"
