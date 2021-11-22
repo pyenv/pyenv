@@ -1,5 +1,9 @@
 ## Version History
 
+## Release 2.2.2
+
+* Add support for macOS Apple M1 (#2164)
+
 ## Release 2.2.1
 
 * Add CPython 3.9.9 (#2162)
