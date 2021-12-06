@@ -22,7 +22,7 @@ jobs:
       #    python-version: ${{ matrix.python-version }}
       # ... but in the repo, we want to test pyenv builds on macOS
       - run: |
-          brew install autoconf openssl@1.1 pkg-config readline
+          brew install openssl readline sqlite3 xz zlib
       # https://github.com/pyenv/pyenv#installation
       - run: pwd
       - env:
