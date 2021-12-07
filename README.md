@@ -320,7 +320,7 @@ easy to fork and contribute any changes back upstream.
          to be a shell function (e.g. `shell` and Pyenv-Virtualenv's `activate`).
 
          ~~~bash
-         echo 'eval "$(pyenv init -)"'
+         eval "$(pyenv init -)"
          ~~~
          
          If you are installing Pyenv yourself as part of the batch job,
