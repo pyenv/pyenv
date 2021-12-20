@@ -1,0 +1,93 @@
+From c7302116573d853d3181133477d9d0e4d4d3abfd Mon Sep 17 00:00:00 2001
+From: Ned Deily <nad@python.org>
+Date: Tue, 18 Jun 2019 16:28:13 -0400
+Subject: [PATCH] bpo-36231:  Support building on macOS without /usr/include
+ (GH-13773) (GH-14208)
+
+---
+ .../2019-06-03-05-49-49.bpo-36231.RfmW_p.rst  |  3 ++
+ setup.py                                      | 53 ++++++++++++++++---
+ 2 files changed, 49 insertions(+), 7 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/macOS/2019-06-03-05-49-49.bpo-36231.RfmW_p.rst
+
+diff --git a/Misc/NEWS.d/next/macOS/2019-06-03-05-49-49.bpo-36231.RfmW_p.rst b/Misc/NEWS.d/next/macOS/2019-06-03-05-49-49.bpo-36231.RfmW_p.rst
+new file mode 100644
+index 0000000000..c82e54c12c
+--- /dev/null
++++ b/Misc/NEWS.d/next/macOS/2019-06-03-05-49-49.bpo-36231.RfmW_p.rst
+@@ -0,0 +1,3 @@
++Support building Python on macOS without /usr/include installed. As of macOS
++10.14, system header files are only available within an SDK provided by
++either the Command Line Tools or the Xcode app.
+diff --git a/setup.py b/setup.py
+index bcc4bfa89d..5e0cd02430 100644
+--- a/setup.py
++++ b/setup.py
+@@ -90,18 +90,57 @@ def sysroot_paths(make_vars, subdirs):
+                 break
+     return dirs
+ 
++MACOS_SDK_ROOT = None
++
+ def macosx_sdk_root():
++    """Return the directory of the current macOS SDK.
++
++    If no SDK was explicitly configured, call the compiler to find which
++    include files paths are being searched by default.  Use '/' if the
++    compiler is searching /usr/include (meaning system header files are
++    installed) or use the root of an SDK if that is being searched.
++    (The SDK may be supplied via Xcode or via the Command Line Tools).
++    The SDK paths used by Apple-supplied tool chains depend on the
++    setting of various variables; see the xcrun man page for more info.
+     """
+-    Return the directory of the current OSX SDK,
+-    or '/' if no SDK was specified.
+-    """
++    global MACOS_SDK_ROOT
++
++    # If already called, return cached result.
++    if MACOS_SDK_ROOT:
++        return MACOS_SDK_ROOT
++
+     cflags = sysconfig.get_config_var('CFLAGS')
+     m = re.search(r'-isysroot\s+(\S+)', cflags)
+-    if m is None:
+-        sysroot = '/'
++    if m is not None:
++        MACOS_SDK_ROOT = m.group(1)
+     else:
+-        sysroot = m.group(1)
+-    return sysroot
++        MACOS_SDK_ROOT = '/'
++        cc = sysconfig.get_config_var('CC')
++        tmpfile = '/tmp/setup_sdk_root.%d' % os.getpid()
++        try:
++            os.unlink(tmpfile)
++        except:
++            pass
++        ret = os.system('%s -E -v - </dev/null 2>%s 1>/dev/null' % (cc, tmpfile))
++        in_incdirs = False
++        try:
++            if ret >> 8 == 0:
++                with open(tmpfile) as fp:
++                    for line in fp.readlines():
++                        if line.startswith("#include <...>"):
++                            in_incdirs = True
++                        elif line.startswith("End of search list"):
++                            in_incdirs = False
++                        elif in_incdirs:
++                            line = line.strip()
++                            if line == '/usr/include':
++                                MACOS_SDK_ROOT = '/'
++                            elif line.endswith(".sdk/usr/include"):
++                                MACOS_SDK_ROOT = line[:-12]
++        finally:
++            os.unlink(tmpfile)
++
++    return MACOS_SDK_ROOT
+ 
+ def is_macosx_sdk_path(path):
+     """
+-- 
+2.30.1 (Apple Git-130)
+
