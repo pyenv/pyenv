@@ -6,7 +6,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   install_package "pypy${PYVER}-v${VERSION}-linux32" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-linux32.tar.bz2#bfbc81874b137837a8ba8c517b97de29f5a336f7ec500c52f2bfdbd3580d1703" "pypy" "verify_py${PYVER//./}" ensurepip
   ;;
 "linux64" )
-  install_package "pypy${PYVER}-v${VERSION}-linux64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-linux64.tar.bz2#f412b602ccd6912ddee0e7523e0e38f4b2c7a144449c2cad078cffbdb66fd7b1${PYVER//./}" ensurepip
+  install_package "pypy${PYVER}-v${VERSION}-linux64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-linux64.tar.bz2#f412b602ccd6912ddee0e7523e0e38f4b2c7a144449c2cad078cffbdb66fd7b1" "pypy" "verify_py${PYVER//./}" ensurepip
   ;;
 "linux-aarch64" )
   install_package "pypy${PYVER}-v${VERSION}-aarch64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-aarch64.tar.bz2#23b145b7cfbaeefb6ee76fc8216c83b652ab1daffac490558718edbbd60082d8" "pypy" "verify_py${PYVER//./}" ensurepip
