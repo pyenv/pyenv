@@ -130,6 +130,9 @@ class MinicondaVersion(NamedTuple):
 
     @classmethod
     def from_str(cls, s):
+        """
+        Convert a string of the form "miniconda_n-ver" or "miniconda_n-py_ver-ver" to a :class:`MinicondaVersion` object.
+        """
         components = s.split("-")
         if len(components) == 3:
             miniconda_n, py_ver, ver = components
@@ -146,6 +149,9 @@ class MinicondaVersion(NamedTuple):
             return f"miniconda{self.suffix}-{self.version_str}"
 
     def default_py_version(self):
+        """
+        :class:`PyVersion` of Python used with this Miniconda version
+        """
         if self.py_version:
             return self.py_version
         elif self.suffix == Suffix.TWO:
@@ -188,6 +194,9 @@ class MinicondaSpec(NamedTuple):
         return spec
 
     def to_install_lines(self):
+        """
+        Installation command for this version of Miniconda for use in a Pyenv installation script
+        """
         return install_line_fmt.format(
             repo=MINICONDA_REPO,
             suffix=self.version.suffix,
@@ -213,6 +222,11 @@ def make_script(specs: List[MinicondaSpec]):
 
 
 def get_existing_minicondas():
+    """
+    Enumerate existing Miniconda installation scripts in share/python-build/ except rolling releases.
+
+    :returns: A generator of :class:`MinicondaVersion` objects.
+    """
     logger.info("Getting known miniconda versions")
     for p in out_dir.iterdir():
         name = p.name
@@ -228,6 +242,12 @@ def get_existing_minicondas():
 
 
 def get_available_minicondas():
+    """
+    Fetch remote miniconda versions.
+
+    :returns: A generator of :class:`MinicondaSpec` objects for each release available for download
+    except rolling releases.
+    """
     logger.info("Fetching remote miniconda versions")
     session = requests_html.HTMLSession()
     response = session.get(MINICONDA_REPO)
