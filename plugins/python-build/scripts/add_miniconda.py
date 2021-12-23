@@ -148,19 +148,7 @@ class MinicondaVersion(NamedTuple):
 
     def to_filename(self):
         """
-        Convert a conda version string to a filename.
-
-        Parameters:
-            self (CondaVersion): A CondaVersion object.
-
-            Returns:
-                str: The filename of
-        the given conda version, e.g., 'miniconda3-4.5.12-py37_0'.
-
-            Raises: None
-
-            Example Usage:  my_conda_ver = CondaVersion('4.5')  # 4 is the major
-        version number and 5 is the minor version number; no patch or build versions are included in this example.
+        Convert a miniconda version string to a filename.
         """
         if self.py_version:
             return f"miniconda{self.suffix}-{self.py_version.version()}-{self.version_str}"
@@ -268,14 +256,6 @@ def get_existing_minicondas():
 
     This function returns a generator of :class:`MinicondaVersion` objects for all files in the
     output directory that start with ``miniconda`` and are not named ``latest``. The returned values are sorted by version number.
-
-        .. note :: This
-    function is used internally to get the list of existing miniconda versions when checking if a new one should be downloaded or not. It is also exposed
-    as an API so that it can be used to check for existing minicondas without having to download them first (e.g., when running on CI).
-
-        .. warning ::
-    This function does not check if the files actually contain valid Minconda installers, only that their names match what we expect from our downloads!
-    If you use this method directly, make sure you manually inspect any newly downloaded file before relying on its existence!
     """
     logger.info("Getting known miniconda versions")
     for p in out_dir.iterdir():
