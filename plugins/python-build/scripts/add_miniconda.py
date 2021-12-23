@@ -111,9 +111,6 @@ class VersionStr(str):
         return str(self) == str(other)
 
     def __lt__(self, other):
-        """
-        This function checks whether the current version is less than the provided VersionStr.
-        """
         if isinstance(other, VersionStr):
             return self.info() < other.info()
         raise ValueError("VersionStr can only be compared to other VersionStr")
@@ -134,7 +131,7 @@ class MinicondaVersion(NamedTuple):
     @classmethod
     def from_str(cls, s):
         """
-        Convert a string of the form "miniconda_n-ver" or "miniconda_n-py_ver-ver" to a MinicondaVersion object.
+        Convert a string of the form "miniconda_n-ver" or "miniconda_n-py_ver-ver" to a :class:`MinicondaVersion` object.
         """
         components = s.split("-")
         if len(components) == 3:
@@ -153,7 +150,7 @@ class MinicondaVersion(NamedTuple):
 
     def default_py_version(self):
         """
-        Returns the Python version to use for a given conda environment.
+        :class:`PyVersion` of Python used with this Miniconda version
         """
         if self.py_version:
             return self.py_version
@@ -198,7 +195,7 @@ class MinicondaSpec(NamedTuple):
 
     def to_install_lines(self):
         """
-        Return a string containing the install line for this version of Miniconda.
+        Installation command for this version of Miniconda for use in a Pyenv installation script
         """
         return install_line_fmt.format(
             repo=MINICONDA_REPO,
@@ -226,10 +223,9 @@ def make_script(specs: List[MinicondaSpec]):
 
 def get_existing_minicondas():
     """
-    Fetch existing miniconda versions.
+    Enumerate existing Miniconda installation scripts in share/python-build/ except rolling releases.
 
-    This function returns a generator of :class:`MinicondaVersion` objects for all files in the
-    output directory (../share/python-build/) that start with ``miniconda`` and are not named ``latest``.
+    :returns: A generator of :class:`MinicondaVersion` objects.
     """
     logger.info("Getting known miniconda versions")
     for p in out_dir.iterdir():
@@ -249,7 +245,8 @@ def get_available_minicondas():
     """
     Fetch remote miniconda versions.
 
-    :returns: A generator of :class:`MinicondaSpec` objects for each available version.
+    :returns: A generator of :class:`MinicondaSpec` objects for each release available for download
+    except rolling releases.
     """
     logger.info("Fetching remote miniconda versions")
     session = requests_html.HTMLSession()
