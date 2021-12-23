@@ -208,22 +208,6 @@ class MinicondaSpec(NamedTuple):
     def to_install_lines(self):
         """
         Return a string containing the install line for this version of Miniconda.
-
-        Parameters:
-
-            repo (str): The repository URL.
-
-            suffix (str): The
-        suffix to use for the version number, e.g., ``-Linux`` or ``-OSX-x86_64``.
-
-            version_str (str): A string representation of the full Miniconda
-        version number, e.g., ``4.3`` or ``4.2``; this is used to construct a download URL and MD5 hash value that can be verified by an end user before
-        installing Miniconda on their system; see :func:`miniforge3._get_urls`.
-
-            os (Optional[str]): One of "Linux", "MacOSX", or None if unknown;
-        defaults to None if not specified in constructor call signature; used only when generating URLs and MD5 hash values from :attr:`miniforge3._VERSION`,
-        which is always based on OS type information provided by conda's package manager API calls during installation time, so it will never match your local
-        OS type unless you are developing miniforge itself locally with Docker/VirtualBox/VMWare Fusion etc.; see :
         """
         return install_line_fmt.format(
             repo=MINICONDA_REPO,
