@@ -229,7 +229,7 @@ def get_existing_minicondas():
     Fetch existing miniconda versions.
 
     This function returns a generator of :class:`MinicondaVersion` objects for all files in the
-    output directory that start with ``miniconda`` and are not named ``latest``.
+    output directory (../share/python-build/) that start with ``miniconda`` and are not named ``latest``.
     """
     logger.info("Getting known miniconda versions")
     for p in out_dir.iterdir():
