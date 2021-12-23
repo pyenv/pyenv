@@ -112,8 +112,7 @@ class VersionStr(str):
 
     def __lt__(self, other):
         """
-        This function compares two VersionStr objects.
-        It returns True if the first object is less than the second, False otherwise.
+        This function checks whether the current version is less than the provided VersionStr.
         """
         if isinstance(other, VersionStr):
             return self.info() < other.info()
@@ -147,9 +146,6 @@ class MinicondaVersion(NamedTuple):
         return MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver), py_ver)
 
     def to_filename(self):
-        """
-        Convert a miniconda version string to a filename.
-        """
         if self.py_version:
             return f"miniconda{self.suffix}-{self.py_version.version()}-{self.version_str}"
         else:
@@ -158,11 +154,6 @@ class MinicondaVersion(NamedTuple):
     def default_py_version(self):
         """
         Returns the Python version to use for a given conda environment.
-
-        If `py_ver` is provided, it will be used as the Python version. Otherwise, if
-        `suffix` is provided and ends with '27', then Python 2.7 will be used; otherwise, if `conda_info` indicates that Conda 4.7 or later is installed
-        (i.e., its info() method returns an int >= 4), then Python 3.6+ will be returned; otherwise, 3<=Python<3.<8> will be returned (2 and <3 are both
-        interpreted as 2.*).
         """
         if self.py_version:
             return self.py_version
@@ -235,11 +226,10 @@ def make_script(specs: List[MinicondaSpec]):
 
 def get_existing_minicondas():
     """
-    Get known miniconda versions
-    -----------------------
+    Fetch existing miniconda versions.
 
     This function returns a generator of :class:`MinicondaVersion` objects for all files in the
-    output directory that start with ``miniconda`` and are not named ``latest``. The returned values are sorted by version number.
+    output directory that start with ``miniconda`` and are not named ``latest``.
     """
     logger.info("Getting known miniconda versions")
     for p in out_dir.iterdir():
