@@ -111,6 +111,10 @@ class VersionStr(str):
         return str(self) == str(other)
 
     def __lt__(self, other):
+        """
+        This function compares two VersionStr objects.
+        It returns True if the first object is less than the second, False otherwise.
+        """
         if isinstance(other, VersionStr):
             return self.info() < other.info()
         raise ValueError("VersionStr can only be compared to other VersionStr")
@@ -130,6 +134,9 @@ class MinicondaVersion(NamedTuple):
 
     @classmethod
     def from_str(cls, s):
+        """
+        Convert a string of the form "miniconda_n-ver" or "miniconda_n-py_ver-ver" to a MinicondaVersion object.
+        """
         components = s.split("-")
         if len(components) == 3:
             miniconda_n, py_ver, ver = components
@@ -140,12 +147,35 @@ class MinicondaVersion(NamedTuple):
         return MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver), py_ver)
 
     def to_filename(self):
+        """
+        Convert a conda version string to a filename.
+
+        Parameters:
+            self (CondaVersion): A CondaVersion object.
+
+            Returns:
+                str: The filename of
+        the given conda version, e.g., 'miniconda3-4.5.12-py37_0'.
+
+            Raises: None
+
+            Example Usage:  my_conda_ver = CondaVersion('4.5')  # 4 is the major
+        version number and 5 is the minor version number; no patch or build versions are included in this example.
+        """
         if self.py_version:
             return f"miniconda{self.suffix}-{self.py_version.version()}-{self.version_str}"
         else:
             return f"miniconda{self.suffix}-{self.version_str}"
 
     def default_py_version(self):
+        """
+        Returns the Python version to use for a given conda environment.
+
+        If `py_ver` is provided, it will be used as the Python version. Otherwise, if
+        `suffix` is provided and ends with '27', then Python 2.7 will be used; otherwise, if `conda_info` indicates that Conda 4.7 or later is installed
+        (i.e., its info() method returns an int >= 4), then Python 3.6+ will be returned; otherwise, 3<=Python<3.<8> will be returned (2 and <3 are both
+        interpreted as 2.*).
+        """
         if self.py_version:
             return self.py_version
         elif self.suffix == Suffix.TWO:
@@ -188,6 +218,25 @@ class MinicondaSpec(NamedTuple):
         return spec
 
     def to_install_lines(self):
+        """
+        Return a string containing the install line for this version of Miniconda.
+
+        Parameters:
+
+            repo (str): The repository URL.
+
+            suffix (str): The
+        suffix to use for the version number, e.g., ``-Linux`` or ``-OSX-x86_64``.
+
+            version_str (str): A string representation of the full Miniconda
+        version number, e.g., ``4.3`` or ``4.2``; this is used to construct a download URL and MD5 hash value that can be verified by an end user before
+        installing Miniconda on their system; see :func:`miniforge3._get_urls`.
+
+            os (Optional[str]): One of "Linux", "MacOSX", or None if unknown;
+        defaults to None if not specified in constructor call signature; used only when generating URLs and MD5 hash values from :attr:`miniforge3._VERSION`,
+        which is always based on OS type information provided by conda's package manager API calls during installation time, so it will never match your local
+        OS type unless you are developing miniforge itself locally with Docker/VirtualBox/VMWare Fusion etc.; see :
+        """
         return install_line_fmt.format(
             repo=MINICONDA_REPO,
             suffix=self.version.suffix,
@@ -213,6 +262,21 @@ def make_script(specs: List[MinicondaSpec]):
 
 
 def get_existing_minicondas():
+    """
+    Get known miniconda versions
+    -----------------------
+
+    This function returns a generator of :class:`MinicondaVersion` objects for all files in the
+    output directory that start with ``miniconda`` and are not named ``latest``. The returned values are sorted by version number.
+
+        .. note :: This
+    function is used internally to get the list of existing miniconda versions when checking if a new one should be downloaded or not. It is also exposed
+    as an API so that it can be used to check for existing minicondas without having to download them first (e.g., when running on CI).
+
+        .. warning ::
+    This function does not check if the files actually contain valid Minconda installers, only that their names match what we expect from our downloads!
+    If you use this method directly, make sure you manually inspect any newly downloaded file before relying on its existence!
+    """
     logger.info("Getting known miniconda versions")
     for p in out_dir.iterdir():
         name = p.name
@@ -228,6 +292,11 @@ def get_existing_minicondas():
 
 
 def get_available_minicondas():
+    """
+    Fetch remote miniconda versions.
+
+    :returns: A generator of :class:`MinicondaSpec` objects for each available version.
+    """
     logger.info("Fetching remote miniconda versions")
     session = requests_html.HTMLSession()
     response = session.get(MINICONDA_REPO)
