@@ -243,15 +243,13 @@ index bf90600eaa..48ff120e9a 100644
          include_dirs = []
          extra_compile_args = []
          extra_link_args = []
-@@ -2018,30 +2036,49 @@ class PyBuildExt(build_ext):
+@@ -2018,30 +2036,47 @@ class PyBuildExt(build_ext):
                       libraries=['m'])
          self.extensions.extend([ext, ext_test])
  
 +        ffi_inc = sysconfig.get_config_var("LIBFFI_INCLUDEDIR")
 +        ffi_lib = None
 +
-+        #inc_dirs = self.inc_dirs.copy()
-+        inc_dirs = self.compiler.include_dirs[:]
          if host_platform == 'darwin':
 -            if '--with-system-ffi' not in sysconfig.get_config_var("CONFIG_ARGS"):
 +            if not self.use_system_libffi:

@@ -243,13 +243,12 @@ index 8e03c77997..3b124c4b7b 100644
          include_dirs = []
          extra_compile_args = []
          extra_link_args = []
-@@ -2162,20 +2180,30 @@ class PyBuildExt(build_ext):
+@@ -2162,20 +2180,29 @@ class PyBuildExt(build_ext):
                       libraries=math_libs)
          self.extensions.extend([ext, ext_test])
  
 +        ffi_inc = sysconfig.get_config_var("LIBFFI_INCLUDEDIR")
 +        ffi_lib = None
-+        inc_dirs = self.compiler.include_dirs[:]
 +
          if host_platform == 'darwin':
 -            if '--with-system-ffi' not in sysconfig.get_config_var("CONFIG_ARGS"):
@@ -284,7 +283,7 @@ index 8e03c77997..3b124c4b7b 100644
              with open(ffi_h) as f:
                  for line in f:
                      line = line.strip()
-@@ -2186,15 +2214,22 @@ class PyBuildExt(build_ext):
+@@ -2186,15 +2213,22 @@ class PyBuildExt(build_ext):
                      ffi_inc = None
                      print('Header file {} does not define LIBFFI_H or '
                            'ffi_wrapper_h'.format(ffi_h))
