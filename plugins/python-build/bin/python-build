@@ -112,13 +112,6 @@ is_mac() {
   [ $# -eq 0 ] || [ "$(osx_version)" "$@" ]
 }
 
-is_arm64_apple() {
-  if [ "$(uname -s)" = "Darwin" ] && [ "$(uname -m)" = "arm64" ]; then
-    return 0
-  fi
-  return 1
-}
-
 #  9.1  -> 901
 # 10.9  -> 1009
 # 10.10 -> 1010
@@ -1614,29 +1607,6 @@ use_tcltk() {
     use_custom_tcltk "$tcl_tk_libs"
   elif [ -d "$tcltk_libdir" ]; then
     use_homebrew_tcltk
-  fi
-}
-
-# CPython 3.9.1+ and 3.8.10+ have old config.sub that doesn't support "arm64" arch
-# which is what Gnu uname (but not Apple uname) produces on Apple M1
-# (https://github.com/pyenv/pyenv/pull/2020#issuecomment-891911842)
-build_package_arm64_apple_disable_homebrew_coreutils() {
-  if is_arm64_apple; then
-    local brew_coreutils="$(brew --prefix coreutils 2>/dev/null || true)"
-    if [ -d "$brew_coreutils" ]; then
-      local after_list=()
-      # Bash 3 ignores IFS set for command when doing expansions so have to set it separately
-      IFS=':'; local -a list=(${PATH}); IFS="$OLDIFS"
-      for str in "${list[@]}"; do
-        if [[ "$str" != "$brew_coreutils"/* ]]; then
-          after_list+=("$str")
-        else
-          echo "python-build: excluding \`$str' from PATH"
-        fi
-      done
-      # Bash 3 ignores IFS set for command when doing expansions so have to set it separately
-      IFS=':'; export PATH="${after_list[*]}"; IFS="$OLDIFS"
-    fi
   fi
 }
 
