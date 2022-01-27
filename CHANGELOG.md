@@ -1,5 +1,17 @@
 ## Version History
 
+## Release 2.2.4
+
+* Added docstrings to several undocumented functions (#2197)
+* Fix incorrect pypy 2.7-7.3.6 sha256 hashes (#2208)
+* Fix a regression in include paths when compiling ctypes in 3.6.15/3.7.12 (#2209)
+* Revert "Disable coreutils on M1 Apple Silicon with arm64 (#2020)" (#2212)
+* CPython 3.11.0a4 (#2217)
+* CPython 3.9.10 and 3.10.2 (#2219)
+* miniconda3-latest: added Linux-aarch64 (#2221)
+* Add GraalPython 22.0.0 (#2226)
+
+
 ## Release 2.2.3
 
 * Add new pypy versions (pypy2.7-7.3.2~7.3.5) to the version list (#2194)
