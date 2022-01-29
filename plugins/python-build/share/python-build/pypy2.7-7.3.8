@@ -1,0 +1,44 @@
+VERSION='7.3.8'
+PYVER='2.7'
+# https://www.pypy.org/checksums.html
+# https://downloads.python.org/pypy
+
+case "$(pypy_architecture 2>/dev/null || true)" in
+"linux" )
+  install_package "pypy${PYVER}-v${VERSION}linux32" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}linux32.tar.bz2#7c84f173bbcd73d0eb10909259d11b5cc253d4c6ea4492e6da8f2532df9b3da5" "pypy" "verify_py${PYVER//./}" ensurepip
+  ;;
+"linux64" )
+  install_package "pypy${PYVER}-v${VERSION}linux64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}linux64.tar.bz2#ca1f8d3146c83002ee97615906b0930e821297dcce3063b5b28933a0690ef298" "pypy" "verify_py${PYVER//./}" ensurepip
+  ;;
+"linux-aarch64" )
+  install_package "pypy${PYVER}-v${VERSION}-aarch64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-aarch64.tar.bz2#ca1f8d3146c83002ee97615906b0930e821297dcce3063b5b28933a0690ef298" "pypy" "verify_py${PYVER//./}" ensurepip
+  ;;
+"s390x" )
+  install_package "pypy${PYVER}-v${VERSION}-s390x" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}-s390x.tar.bz2#b4ae4e708ba84602d976ad6ae391ef2eef4b1896d831b8f2b2ec69927dd92014" "pypy" "verify_py${PYVER//./}" ensurepip
+  ;;
+"osx64" )
+  if require_osx_version "10.13"; then
+    install_package "pypy${PYVER}-v${VERSION}osx64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}osx64.tar.bz2#e5c1ff39ad9916ea23e3deb8012fe42367b6b19284cf13b1a1ea2b2f53a43add" "pypy" "verify_py${PYVER//./}" ensurepip
+  else
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
+      echo "try 'pypy${PYVER}-${VERSION}src' to build from source."
+      echo
+    } >&2
+    exit 1
+  fi
+  ;;
+"win64" )
+  install_zip "pypy${PYVER}-v${VERSION}win64" "https://downloads.python.org/pypy/pypy${PYVER}-v${VERSION}win64.zip#806a29a6c5550b1e669d8870683d3379138d3d43eb1e07bdf26d65a0691265f2" "pypy" "verify_py${PYVER//./}" ensurepip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+    echo "try 'pypy${PYVER}-${VERSION}src' to build from source."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
