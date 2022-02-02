@@ -2204,6 +2204,9 @@ if [ -z "${GET_PIP_URL}" ]; then
     3.5 | 3.5.* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.5/get-pip.py"
       ;;
+    3.6 | 3.6.* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.6/get-pip.py"
+      ;;
     * )
       GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
       ;;
