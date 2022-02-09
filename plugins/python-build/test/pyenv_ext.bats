@@ -315,7 +315,7 @@ EOS
   cached_tarball "Python-3.6.2"
 
   for i in {1..4}; do stub brew false; done
-  for i in {1..3}; do stub uname '-s : echo Linux'; done
+  for i in {1..7}; do stub uname '-s : echo Linux'; done
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
@@ -332,7 +332,6 @@ OUT
 
   unstub make
   unstub uname
-  unstub brew
 }
 
 @test "default MACOSX_DEPLOYMENT_TARGET" {
