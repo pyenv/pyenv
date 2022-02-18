@@ -122,40 +122,31 @@ Version names to rbenv are simply the names of the directories in
 
 ### Using Package Managers
 
-1. Install rbenv.
-- **macOS**
-If you're on macOS, we recommend installing rbenv with
-[Homebrew](https://brew.sh).
+1. Install rbenv using one of the following approaches.
 
-    ```sh
-    brew install rbenv
-    ```
-    
-   Note that this also installs `ruby-build`, so you'll be ready to
-   install other Ruby versions out of the box.
+   #### Homebrew
    
-  - **Upgrading with Homebrew**
-
-    To upgrade to the latest rbenv and update ruby-build with newly released
-    Ruby versions, upgrade the Homebrew packages:
-
-    ```sh
-    brew upgrade rbenv ruby-build
-    ```
-- **Debian, Ubuntu and their derivatives**
-    
-    Note that the version of rbenv that is packaged and maintained in the
-    Debian and Ubuntu repositories is out of date. To install the latest
-    version, it is recommended to [install rbenv using git](#basic-github-checkout).
-    
-    ```sh
-    sudo apt install rbenv
-    ```
-- **Arch Linux and its derivatives**
-
-  Archlinux has an [AUR Package](https://aur.archlinux.org/packages/rbenv/) for
-  rbenv and you can install it from the AUR using the instructions from this
-  [wiki page](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages).
+   On macOS or Linux, we recommend installing rbenv with [Homebrew](https://brew.sh).
+   
+   ```sh
+   brew install rbenv ruby-build
+   ```
+   
+   #### Debian, Ubuntu, and their derivatives
+       
+   Note that the version of rbenv that is packaged and maintained in the
+   Debian and Ubuntu repositories is _out of date_. To install the latest
+   version, it is recommended to [install rbenv using git](#basic-github-checkout).
+   
+   ```sh
+   sudo apt install rbenv
+   ```
+   
+   #### Arch Linux and its derivatives
+   
+   Archlinux has an [AUR Package](https://aur.archlinux.org/packages/rbenv/) for
+   rbenv and you can install it from the AUR using the instructions from this
+   [wiki page](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages).
 
 2. Set up rbenv in your shell.
 
@@ -187,7 +178,7 @@ If you're on macOS, we recommend installing rbenv with
     ```
 
 5. That's it! Installing rbenv includes ruby-build, so now you're ready to
-   [install some other Ruby versions](#installing-ruby-versions) using
+   [install some Ruby versions](#installing-ruby-versions) using
    `rbenv install`.
 
 
