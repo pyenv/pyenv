@@ -144,6 +144,10 @@ If you're on macOS, we recommend installing rbenv with
     ```
 - **Debian, Ubuntu and their derivatives**
     
+    Note that the version of rbenv that is packaged and maintained in the
+    Debian and Ubuntu repositories is out of date. To install the latest
+    version, it is recommended to [install rbenv using git](#basic-github-checkout).
+    
     ```sh
     sudo apt install rbenv
     ```
