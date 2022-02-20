@@ -1,4 +1,4 @@
-## Version History
+# Version History
 
 ## Release 2.2.4
 
@@ -11,13 +11,12 @@
 * miniconda3-latest: added Linux-aarch64 (#2221)
 * Add GraalPython 22.0.0 (#2226)
 
-
 ## Release 2.2.3
 
 * Add new pypy versions (pypy2.7-7.3.2~7.3.5) to the version list (#2194)
 * Fix Python 3.7.12 compilation on macOS arm64/M1. (#2190)
-* Fix Python 3.6.15 compilation on macOS arm64/M1. (#2189) 
-* Add Anaconda3-2021.11 (#2193) 
+* Fix Python 3.6.15 compilation on macOS arm64/M1. (#2189)
+* Add Anaconda3-2021.11 (#2193)
 * CPython 3.11.0a3 (#2187)
 * Fix errant "echo" in README install instructions (#2185)
 * Add Miniforge and Mambaforge 4.10.3-10 (#2184)
@@ -34,12 +33,13 @@
 * Add CPython 3.9.8 (#2152)
 * Add Add micropython 1.17 (#2158)
 * Add Add micropython 1.16 (#2158)
-* Patch 3.10.0 configure, fixes https://bugs.python.org/issue45350 (#2155)
+* Patch 3.10.0 configure, fixes <https://bugs.python.org/issue45350> (#2155)
 * Use command and type instead of which (#2144)
 * Add definition of pyenv help in COMMANDS.md #2139
 * Use OpenSSL 1.0 for CPython 2.7.18
 
 ## Release 2.2.0
+
 * Adding PyPy release 7.3.7 (Python 3.7 and 3.8). (#2132)
 * Append Homebrew custom prefix to search path (#1957)
 * Add documentation for init command (#2125)
@@ -54,6 +54,7 @@
 * Add CPython 3.11.0a1 (#2099)
 
 ## Release 2.1.0
+
 * Fix mambaforge-pypy3 build (#2096)
 * Add Python 3.10.0 (#2093)
 * Add documentation for exec command (#2090)
@@ -70,6 +71,7 @@
 * macOS: fix the build of Python 2.7.18 on macOS 11.5.2 (Big Sur) + Apple Silicon (#2061)
 
 ## Release 2.0.7
+
 * Update setup instructions in the Readme (#2067)
 * Allow tcl-tk as argument or try with homebrew by default (#1646)
 * Allow system Python in sbin (#2065)
@@ -83,6 +85,7 @@
 * Fix build of ossaudiodev in Linux/FreeBSD for Python 3.1 (#2047)
 
 ## Release 2.0.6
+
 * Add CPython 3.9.7 (#2044)
 * Add CPython v3.8.12 (#2043)
 * Adapt conda.bash for bash associative array (#2037)
@@ -96,11 +99,11 @@
 
 ## Release 2.0.4
 
-- Added scripts for rolling releases of Miniforge (#2019)
-- Update pyston-2.3 (#2017)
-- Add GraalPython 21.2.0 (#2018)
-- Add CPython  3.10.0b4 (#2013), (#2005)
-- Add Pyston 2.3 (#2012)
+* Added scripts for rolling releases of Miniforge (#2019)
+* Update pyston-2.3 (#2017)
+* Add GraalPython 21.2.0 (#2018)
+* Add CPython  3.10.0b4 (#2013), (#2005)
+* Add Pyston 2.3 (#2012)
 
 ## Release 2.0.3
 
@@ -150,7 +153,8 @@
 * Correct URLs for Stackless builds and add Stackless 2.7.16
 
 ## Breaking changes
-* Split startup logic into PATH and everything else (https://github.com/pyenv/pyenv/issues/1649#issuecomment-694388530)
+
+* Split startup logic into PATH and everything else (<https://github.com/pyenv/pyenv/issues/1649#issuecomment-694388530>)
 
 ## 1.2.27
 
@@ -197,8 +201,9 @@
 
 ## 1.2.23
 
-+ python-build: Add CPython v3.7.10 (#1818)
-+ python-build: Add CPython v3.6.13 (#1817)
+* python-build: Add CPython v3.7.10 (#1818)
+* python-build: Add CPython v3.6.13 (#1817)
+
 * python-build: Add PyPy 3.7-c-jit-latest (#1812)
 * python-build: Add PyPy 3.7 (#1718, #1726, #1780)
 * python-build: Add miniconda3 4.9.2 (#1763)
@@ -218,15 +223,15 @@
 
 ## 1.2.22
 
-+ python-build: Add LDFLAGS for zlib on macOS >= 1100 (#1711)
-+ python-build: Add the CPython 3.9.1 (#1752)
-+ python-build: Change order of LDFLAGS paths (#1754)
-+ python-build: Docker config for testing python-build (#1548)
-+ python-build: Put prerequisite for installation before install (#1750)
-+ python-build: Add GraalPython 20.3 (#1736)
-+ python-build: Add CPython 3.8.7
-+ python-build: Added anaconda3-2020.11 (#1774)
-+ python-build: Added arm64 architecture support in python-build for macOS  (#1775)
+* python-build: Add LDFLAGS for zlib on macOS >= 1100 (#1711)
+* python-build: Add the CPython 3.9.1 (#1752)
+* python-build: Change order of LDFLAGS paths (#1754)
+* python-build: Docker config for testing python-build (#1548)
+* python-build: Put prerequisite for installation before install (#1750)
+* python-build: Add GraalPython 20.3 (#1736)
+* python-build: Add CPython 3.8.7
+* python-build: Added anaconda3-2020.11 (#1774)
+* python-build: Added arm64 architecture support in python-build for macOS  (#1775)
 
 ## 1.2.21
 
@@ -384,6 +389,7 @@
 * python-build: Add Anaconda[23]-5.1.0 (#1100)
 * python-build: Fix checksum issue for CPython 3.4.8 (#1094)
 * python-build: Prevent Anaconda from installing a `clear` shim (#1084)
+
 ## 1.2.1
 
 * python-build: Add CPython 3.6.4
@@ -442,12 +448,12 @@
 
 ## 1.0.9
 
-* pyenv: Migrate project site from https://github.com/yyuu/pyenv to https://github.com/pyenv/pyenv
+* pyenv: Migrate project site from <https://github.com/yyuu/pyenv> to <https://github.com/pyenv/pyenv>
 * python-build: Add PyPy2 5.7.0 (#872, #868)
 * python-build: Add PyPy3 5.7.0-beta (#871, #869)
 * python-build: Add CPython 3.6.1 (#873)
 * python-build: Add Pyston 0.6.1 (#859)
-* python-build: Change default mirror site URL from https://yyuu.github.io/pythons to https://pyenv.github.io/pythons
+* python-build: Change default mirror site URL from <https://yyuu.github.io/pythons> to <https://pyenv.github.io/pythons>
 * python-build: Upgrade OpenSSL from 1.0.2g to 1.0.2k (#850)
 
 ## 1.0.8
@@ -493,7 +499,7 @@
 * python-build: Add PyPy3.3 5.5-alpha (#734, #736)
 * python-build: Stop specifying `--enable-unicode=ucs4` on OS X (#257, #726)
 * python-build: Fix 3.6-dev and add 3.7-dev (#729, #730)
-* python-build: Add a patch for https://bugs.python.org/issue26664 (#725)
+* python-build: Add a patch for <https://bugs.python.org/issue26664> (#725)
 * python-build: Add Pyston 0.5.1 (#718)
 * python-build: Add Stackless 3.4.2 (#720)
 * python-build: Add IronPython 2.7.6.3 (#716)
@@ -587,7 +593,7 @@
 
 * pyenv: Merge recent changes from rbenv as of 2015-12-14 (#504)
 * python-build: Add a `OPENSSL_NO_SSL3` patch for CPython 2.6, 2.7, 3.0, 3.1, 3.2 and 3.3 series (#507, #511)
-* python-build: Stopped using mirror at pyenv.github.io for CPython since http://www.python.org is on fast.ly
+* python-build: Stopped using mirror at pyenv.github.io for CPython since <http://www.python.org> is on fast.ly
 
 ### 20151210
 
@@ -677,7 +683,7 @@
 
 #### 20150326
 
-* python-build: Add Portable PyPy binaries from https://github.com/squeaky-pl/portable-pypy (#329)
+* python-build: Add Portable PyPy binaries from <https://github.com/squeaky-pl/portable-pypy> (#329)
 * python-build: Add CPython alpha release; 3.5.0a2 (#328)
 * python-build: Add pypy-2.5.1 (fixes #338)
 * pyenv: Import recent changes from rbenv 4d72eefffc548081f6eee2e54d3b9116b9f9ee8e
@@ -839,7 +845,7 @@
 
 * python-build: Add new CPython release candidates; 3.3.4, 3.4.0b3
 * python-build: Add [Anaconda](https://store.continuum.io/cshop/anaconda/) and [Miniconda](http://repo.continuum.io/miniconda/) binary distributions
-* python-build: Display error if the wget does not support Server Name Indication (SNI) to avoid SSL verification error when downloading from https://pypi.python.org. (#60)
+* python-build: Display error if the wget does not support Server Name Indication (SNI) to avoid SSL verification error when downloading from <https://pypi.python.org>. (#60)
 * python-build: Update default setuptools version (2.1 -> 2.2)
 * python-build: Update default pip version (1.5.1 -> 1.5.2)
 * python-build: Import recent changes from ruby-build v20140204

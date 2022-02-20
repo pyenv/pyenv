@@ -2,6 +2,7 @@ Too many issues will kill our team's development velocity, drastically.
 Make sure you have checked all steps below.
 
 ### Prerequisite
+
 * [ ] Make sure your problem is not listed in [the common build problems](https://github.com/pyenv/pyenv/wiki/Common-build-problems).
 * [ ] Make sure no duplicated issue has already been reported in [the pyenv issues](https://github.com/pyenv/pyenv/issues). You should look for closed issues, too.
 * [ ] Make sure you are not asking us to help solving your specific issue.
@@ -12,10 +13,11 @@ Make sure you have checked all steps below.
   * This repository is maintaining `pyenv` and the default `python-build` plugin only. Please refrain from reporting issues of other plugins here.
 
 ### Description
+
 - [ ] Platform information (e.g. Ubuntu Linux 16.04):
-- [ ] OS architecture (e.g. amd64):
-- [ ] pyenv version:
-- [ ] Python version:
-- [ ] C Compiler information (e.g. gcc 7.3): 
-- [ ] Please attach the debug trace of the failing command as a gist:
+* [ ] OS architecture (e.g. amd64):
+* [ ] pyenv version:
+* [ ] Python version:
+* [ ] C Compiler information (e.g. gcc 7.3):
+* [ ] Please attach the debug trace of the failing command as a gist:
   * Run `env PYENV_DEBUG=1 <faulty command> 2>&1 | tee trace.log` and attach `trace.log`. E.g. if you have a problem with installing Python, run `env PYENV_DEBUG=1 pyenv install -v <version> 2>&1 | tee trace.log` (note the `-v` option to `pyenv install`).

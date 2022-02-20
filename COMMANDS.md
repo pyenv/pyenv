@@ -5,35 +5,37 @@ first argument.
 
 The most common subcommands are:
 
-* [`pyenv help`](#pyenv-help)
-* [`pyenv commands`](#pyenv-commands)
-* [`pyenv local`](#pyenv-local)
-* [`pyenv global`](#pyenv-global)
-* [`pyenv shell`](#pyenv-shell)
-* [`pyenv install`](#pyenv-install)
-* [`pyenv uninstall`](#pyenv-uninstall)
-* [`pyenv rehash`](#pyenv-rehash)
-* [`pyenv version`](#pyenv-version)
-* [`pyenv versions`](#pyenv-versions)
-* [`pyenv which`](#pyenv-which)
-* [`pyenv whence`](#pyenv-whence)
-* [`pyenv exec`](#pyenv-exec)
-* [`pyenv root`](#pyenv-root)
-* [`pyenv prefix`](#pyenv-prefix)
-* [`pyenv hooks`](#pyenv-hooks)
-* [`pyenv shims`](#pyenv-shims)
-* [`pyenv init`](#pyenv-init)
-* [`pyenv completions`](#pyenv-completions)
+- [Command Reference](#command-reference)
+  - [`pyenv help`](#pyenv-help)
+  - [`pyenv commands`](#pyenv-commands)
+  - [`pyenv local`](#pyenv-local)
+    - [`pyenv local` (advanced)](#pyenv-local-advanced)
+  - [`pyenv global`](#pyenv-global)
+    - [`pyenv global` (advanced)](#pyenv-global-advanced)
+  - [`pyenv shell`](#pyenv-shell)
+    - [`pyenv shell` (advanced)](#pyenv-shell-advanced)
+  - [`pyenv install`](#pyenv-install)
+  - [`pyenv uninstall`](#pyenv-uninstall)
+  - [`pyenv rehash`](#pyenv-rehash)
+  - [`pyenv version`](#pyenv-version)
+  - [`pyenv versions`](#pyenv-versions)
+  - [`pyenv which`](#pyenv-which)
+  - [`pyenv whence`](#pyenv-whence)
+  - [`pyenv exec`](#pyenv-exec)
+  - [`pyenv root`](#pyenv-root)
+  - [`pyenv prefix`](#pyenv-prefix)
+  - [`pyenv hooks`](#pyenv-hooks)
+  - [`pyenv shims`](#pyenv-shims)
+  - [`pyenv init`](#pyenv-init)
+  - [`pyenv completions`](#pyenv-completions)
 
 ## `pyenv help`
 
-List all available pyenv commands along with a brief description of what they do. Run `pyenv help <command>` for information on a specific command. For full documentation, see: https://github.com/pyenv/pyenv#readme
-
+List all available pyenv commands along with a brief description of what they do. Run `pyenv help <command>` for information on a specific command. For full documentation, see: <https://github.com/pyenv/pyenv#readme>
 
 ## `pyenv commands`
 
 Lists all available pyenv commands.
-
 
 ## `pyenv local`
 
@@ -43,18 +45,17 @@ overrides the global version, and can be overridden itself by setting
 the `PYENV_VERSION` environment variable or with the `pyenv shell`
 command.
 
-    $ pyenv local 2.7.6
+    pyenv local 2.7.6
 
 When run without a version number, `pyenv local` reports the currently
 configured local version. You can also unset the local version:
 
-    $ pyenv local --unset
+    pyenv local --unset
 
 Previous versions of pyenv stored local version specifications in a
 file named `.pyenv-version`. For backwards compatibility, pyenv will
 read a local version specified in an `.pyenv-version` file, but a
 `.python-version` file in the same directory will take precedence.
-
 
 ### `pyenv local` (advanced)
 
@@ -89,7 +90,6 @@ or, if you prefer 3.3.3 over 2.7.6,
     $ python3.3 --version
     Python 3.3.3
 
-
 ## `pyenv global`
 
 Sets the global version of Python to be used in all shells by writing
@@ -97,14 +97,13 @@ the version name to the `~/.pyenv/version` file. This version can be
 overridden by an application-specific `.python-version` file, or by
 setting the `PYENV_VERSION` environment variable.
 
-    $ pyenv global 2.7.6
+    pyenv global 2.7.6
 
 The special version name `system` tells pyenv to use the system Python
 (detected by searching your `$PATH`).
 
 When run without a version number, `pyenv global` reports the
 currently configured global version.
-
 
 ### `pyenv global` (advanced)
 
@@ -139,27 +138,25 @@ or, if you prefer 3.3.3 over 2.7.6,
     $ python3.3 --version
     Python 3.3.3
 
-
 ## `pyenv shell`
 
 Sets a shell-specific Python version by setting the `PYENV_VERSION`
 environment variable in your shell. This version overrides
 application-specific versions and the global version.
 
-    $ pyenv shell pypy-2.2.1
+    pyenv shell pypy-2.2.1
 
 When run without a version number, `pyenv shell` reports the current
 value of `PYENV_VERSION`. You can also unset the shell version:
 
-    $ pyenv shell --unset
+    pyenv shell --unset
 
 Note that you'll need pyenv's shell integration enabled (step 3 of
 the installation instructions) in order to use this command. If you
 prefer not to use shell integration, you may simply set the
 `PYENV_VERSION` variable yourself:
 
-    $ export PYENV_VERSION=pypy-2.2.1
-
+    export PYENV_VERSION=pypy-2.2.1
 
 ### `pyenv shell` (advanced)
 
@@ -194,7 +191,6 @@ or, if you prefer 3.3.3 over 2.7.6,
     $ python3.3 --version
     Python 3.3.3
 
-
 ## `pyenv install`
 
 Install a Python version (using [`python-build`](https://github.com/pyenv/pyenv/tree/master/plugins/python-build)).
@@ -217,7 +213,7 @@ Install a Python version (using [`python-build`](https://github.com/pyenv/pyenv/
 
 To list the all available versions of Python, including Anaconda, Jython, pypy, and stackless, use:
 
-    $ pyenv install --list
+    pyenv install --list
 
 Then install the desired versions:
 
@@ -238,15 +234,13 @@ Uninstall a specific Python version.
            for confirmation. If the version does not exist, do not
            display an error message.
 
-
 ## `pyenv rehash`
 
 Installs shims for all Python binaries known to pyenv (i.e.,
 `~/.pyenv/versions/*/bin/*`). Run this command after you install a new
 version of Python, or install a package that provides binaries.
 
-    $ pyenv rehash
-
+    pyenv rehash
 
 ## `pyenv version`
 
@@ -255,7 +249,6 @@ how it was set.
 
     $ pyenv version
     2.7.6 (set by /home/yyuu/.pyenv/version)
-
 
 ## `pyenv versions`
 
@@ -270,7 +263,6 @@ the currently active version.
       jython-2.5.3
       pypy-2.2.1
 
-
 ## `pyenv which`
 
 Displays the full path to the executable that pyenv will invoke when
@@ -279,7 +271,7 @@ you run the given command.
     $ pyenv which python3.3
     /home/yyuu/.pyenv/versions/3.3.3/bin/python3.3
 
-Use --nosystem argument in case when you don't need to search command in the 
+Use --nosystem argument in case when you don't need to search command in the
 system environment.
 
 ## `pyenv whence`
@@ -301,7 +293,7 @@ version's `bin` directory is at the front.
 For example, if the currently selected Python version is 3.9.7:
 
     pyenv exec pip install -r requirements.txt
-    
+
 is equivalent to:
 
     PATH="$PYENV_ROOT/versions/3.9.7/bin:$PATH" pip install -r requirements.txt
