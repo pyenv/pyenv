@@ -8,3 +8,4 @@
 /src/*.o
 /bats/
 /default-packages
+.vscode
