@@ -11,60 +11,8 @@ win64_hash=96df67492bc8d62b2e71dddf5f6c58965a26cac9799c5f4081401af0494b3bcc
 
 ### end of manual settings - following lines same for every download
 
-basesrc="pypy${PYVER}-${VERSION}-src"
-basever="pypy${PYVER}-v${VERSION}"
-baseurl="https://downloads.python.org/pypy/${basever}"
-
-# defaults
-cmd='install_package'  # use bz2
-pkg="$(pypy_architecture 2>/dev/null || true)" # assume matches
-url="${baseurl}-${pkg}.tar.bz2" # use bz2
-hash='' # undefined
-
-case "${pkg}" in
-'linux-aarch64' )
-  hash="${aarch64_hash}"
-  url="${baseurl}-aarch64.tar.bz2" # diff url
-  ;;
-'linux' )
-  hash="${linux32_hash}"
-  pkg='linux32'  # package name revised
-  url="${baseurl}-${pkg}.tar.bz2"  # new url
-  ;;
-'linux64' )
-  hash="${linux64_hash}"
-  ;;
-'osx64' )
-  if require_osx_version "10.13"; then
-    hash="${osx64_hash}"
-  else
-    { echo
-      colorize 1 "ERROR"
-      echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
-      echo "try '${basesrc}' to build from source."
-      echo
-    } >&2
-    exit 1
-  fi
-  ;;
-'s390x' )
-  hash="${s390x_hash}"
-  ;;
-'win64' )
-  hash="${win64_hash}"
-  cmd='install_zip'  # diff command
-  url="${baseurl}-${pkg}.zip"  # zip rather than bz2
-  ;;
-* )
-  { echo
-    colorize 1 "ERROR"
-    echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
-    echo "try '${basesrc}' to build from source."
-    echo
-  } >&2
-  exit 1
-  ;;
-esac
+# determine command, package directory, url+hash
+declare -ar pd="$(pypy_pkg_data "$(pypy_architecture 2>/dev/null || true)")"
 
 # install
-"${cmd}" "${basever}-${pkg}" "${url}#${hash}" 'pypy' "verify_py${PYVER//./}" 'ensurepip'
+${pd[0]} "${pd[1]}" "${pd[2]}" 'pypy' "verify_py${PYVER//./}" 'ensurepip'
