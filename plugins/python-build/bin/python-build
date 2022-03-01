@@ -2130,7 +2130,7 @@ if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; 
     exit 1
   fi
   package_option python configure --enable-universalsdk=/
-  if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--enable-universal-archs"* ]]; then
+  if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--with-universal-archs"* ]]; then
     # in CPython's configure.ac, --with-universal-archs defaults to 'intel' which means i386 + x86_64
     # since 2.7.5 and 3.3.0 -- i.e. in all non-EOL versions
     # Apple Silicon cannot build these, in it, it rather makes sense to default to Universal2 binaries
