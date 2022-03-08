@@ -315,9 +315,9 @@ Displays the root directory where versions and shims are kept.
 
 ## `pyenv prefix`
 
-Displays the directory where a Python version is installed. If no
-version is given, `pyenv prefix` displays the location of the
-currently selected version.
+Displays the directories where the given Python versions are installed,
+separated by colons. If no version is given, `pyenv prefix` displays the
+locations of the currently selected versions.
 
     $ pyenv prefix 3.9.7
     /home/user/.pyenv/versions/3.9.7
