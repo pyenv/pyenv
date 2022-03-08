@@ -5,7 +5,7 @@ set -e
 
 VERSION_FILE="$1"
 
-if [ -e "$VERSION_FILE" ]; then
+if [ -s "$VERSION_FILE" ]; then
   # Read the first word from the specified version file. Avoid reading it whole.
   IFS="${IFS}"$'\r'
   words=( $(cut -b 1-1024 "$VERSION_FILE") )
