@@ -1,0 +1,310 @@
+From: Christian Hammond <christian@beanbaginc.com>
+Date: Wed, 15 Dec 2021 23:12:36 -0800
+Subject: Port ctypes and system libffi patches for arm64/macOS 10.15+ to Python 3.7.12
+
+This ports the following ctypes and libffi pyenv patches for Python
+2.7.18 to Python 3.7.12:
+
+* `0004-Use-system-libffi-for-Mac-OS-10.15-and-up.patch`
+* `0005-ctypes-use-the-correct-ABI-for-variadic-functions.patch`
+* `0006-ctypes-probe-libffi-for-ffi_closure_alloc-and-ffi_pr.patch`
+
+These patches enable use of system libffi (fixing a broken `ctypes`
+module on arm64 targets) and enable calling variadic functions on arm64.
+They've been combined from patches port from Homebrew to pyenv by Takumi
+Sueda, updated to work on the Python 3.7.12 codebase.
+
+The Homebrew patches are themselves backports of changes in Python 3.9
+and 3.10. That patch can be found at:
+
+https://github.com/Homebrew/formula-patches/blob/master/python/3.8.7.patch
+
+diff --git a/Doc/library/ctypes.rst b/Doc/library/ctypes.rst
+index 715d595b24..7743144978 100644
+--- a/Doc/library/ctypes.rst
++++ b/Doc/library/ctypes.rst
+@@ -1551,6 +1551,13 @@ They are instances of a private class:
+       value usable as argument (integer, string, ctypes instance).  This allows
+       defining adapters that can adapt custom objects as function parameters.
+ 
++   .. attribute:: variadic
++
++      Assign a boolean to specify that the function takes a variable number of
++      arguments.   This does not matter on most platforms, but for Apple arm64
++      platforms variadic functions have a different calling convention than
++      normal functions.
++
+    .. attribute:: errcheck
+ 
+       Assign a Python function or another callable to this attribute. The
+diff --git a/Lib/test/test_unicode.py b/Lib/test/test_unicode.py
+index 4ebd82d3e0..7b73c190b6 100644
+--- a/Lib/test/test_unicode.py
++++ b/Lib/test/test_unicode.py
+@@ -2458,11 +2458,14 @@ class CAPITest(unittest.TestCase):
+     def test_from_format(self):
+         support.import_module('ctypes')
+         from ctypes import (
++            c_char_p,
+             pythonapi, py_object, sizeof,
+             c_int, c_long, c_longlong, c_ssize_t,
+             c_uint, c_ulong, c_ulonglong, c_size_t, c_void_p)
+         name = "PyUnicode_FromFormat"
+         _PyUnicode_FromFormat = getattr(pythonapi, name)
++        _PyUnicode_FromFormat.argtypes = (c_char_p,)
++        _PyUnicode_FromFormat.variadic = True
+         _PyUnicode_FromFormat.restype = py_object
+ 
+         def PyUnicode_FromFormat(format, *args):
+diff --git a/Modules/_ctypes/_ctypes.c b/Modules/_ctypes/_ctypes.c
+index dd0c61fd8a..79137e1dc7 100644
+--- a/Modules/_ctypes/_ctypes.c
++++ b/Modules/_ctypes/_ctypes.c
+@@ -3174,6 +3174,34 @@ PyCFuncPtr_get_restype(PyCFuncPtrObject *self, void *Py_UNUSED(ignored))
+     }
+ }
+ 
++static int
++PyCFuncPtr_set_variadic(PyCFuncPtrObject *self, PyObject *ob)
++{
++    StgDictObject *dict = PyObject_stgdict((PyObject *)self);
++    assert(dict);
++    int r = PyObject_IsTrue(ob);
++    if (r == 1) {
++        dict->flags |= FUNCFLAG_VARIADIC;
++        return 0;
++    } else if (r == 0) {
++        dict->flags &= ~FUNCFLAG_VARIADIC;
++        return 0;
++    } else {
++        return -1;
++    }
++}
++
++static PyObject *
++PyCFuncPtr_get_variadic(PyCFuncPtrObject *self)
++{
++    StgDictObject *dict = PyObject_stgdict((PyObject *)self);
++    assert(dict); /* Cannot be NULL for PyCFuncPtrObject instances */
++    if (dict->flags & FUNCFLAG_VARIADIC)
++        Py_RETURN_TRUE;
++    else
++        Py_RETURN_FALSE;
++}
++
+ static int
+ PyCFuncPtr_set_argtypes(PyCFuncPtrObject *self, PyObject *ob, void *Py_UNUSED(ignored))
+ {
+@@ -3219,6 +3247,8 @@ static PyGetSetDef PyCFuncPtr_getsets[] = {
+     { "argtypes", (getter)PyCFuncPtr_get_argtypes,
+       (setter)PyCFuncPtr_set_argtypes,
+       "specify the argument types", NULL },
++    { "variadic", (getter)PyCFuncPtr_get_variadic, (setter)PyCFuncPtr_set_variadic,
++      "specify if function takes variable number of arguments", NULL },
+     { NULL, NULL }
+ };
+ 
+@@ -5632,6 +5662,7 @@ PyInit__ctypes(void)
+     PyModule_AddObject(m, "FUNCFLAG_USE_ERRNO", PyLong_FromLong(FUNCFLAG_USE_ERRNO));
+     PyModule_AddObject(m, "FUNCFLAG_USE_LASTERROR", PyLong_FromLong(FUNCFLAG_USE_LASTERROR));
+     PyModule_AddObject(m, "FUNCFLAG_PYTHONAPI", PyLong_FromLong(FUNCFLAG_PYTHONAPI));
++    PyModule_AddObject(m, "FUNCFLAG_VARIADIC", PyLong_FromLong(FUNCFLAG_VARIADIC));
+     PyModule_AddStringConstant(m, "__version__", "1.1.0");
+ 
+     PyModule_AddObject(m, "_memmove_addr", PyLong_FromVoidPtr(memmove));
+diff --git a/Modules/_ctypes/callproc.c b/Modules/_ctypes/callproc.c
+index 9cbf9801ad..e7fe11176b 100644
+--- a/Modules/_ctypes/callproc.c
++++ b/Modules/_ctypes/callproc.c
+@@ -754,7 +756,8 @@ static int _call_function_pointer(int flags,
+                                   ffi_type **atypes,
+                                   ffi_type *restype,
+                                   void *resmem,
+-                                  int argcount)
++                                  int argcount,
++                                  int argtypecount)
+ {
+     PyThreadState *_save = NULL; /* For Py_BLOCK_THREADS and Py_UNBLOCK_THREADS */
+     PyObject *error_object = NULL;
+@@ -780,15 +783,39 @@ static int _call_function_pointer(int flags,
+     if ((flags & FUNCFLAG_CDECL) == 0)
+         cc = FFI_STDCALL;
+ #endif
+-    if (FFI_OK != ffi_prep_cif(&cif,
+-                               cc,
+-                               argcount,
+-                               restype,
+-                               atypes)) {
+-        PyErr_SetString(PyExc_RuntimeError,
+-                        "ffi_prep_cif failed");
+-        return -1;
++
++#if HAVE_FFI_PREP_CIF_VAR
++    /* Everyone SHOULD set f.variadic=True on variadic function pointers, but
++     * lots of existing code will not.  If there's at least one arg and more
++     * args are passed than are defined in the prototype, then it must be a
++     * variadic function. */
++    if ((flags & FUNCFLAG_VARIADIC) ||
++        (argtypecount != 0 && argcount > argtypecount))
++    {
++        if (FFI_OK != ffi_prep_cif_var(&cif,
++                                       cc,
++                                       argtypecount,
++                                       argcount,
++                                       restype,
++                                       atypes)) {
++            PyErr_SetString(PyExc_RuntimeError,
++                            "ffi_prep_cif_var failed");
++            return -1;
++        }
++    } else {
++#endif
++        if (FFI_OK != ffi_prep_cif(&cif,
++                                   cc,
++                                   argcount,
++                                   restype,
++                                   atypes)) {
++            PyErr_SetString(PyExc_RuntimeError,
++                            "ffi_prep_cif failed");
++            return -1;
++        }
++#if HAVE_FFI_PREP_CIF_VAR
+     }
++#endif
+ 
+     if (flags & (FUNCFLAG_USE_ERRNO | FUNCFLAG_USE_LASTERROR)) {
+         error_object = _ctypes_get_errobj(&space);
+@@ -1187,9 +1214,8 @@ PyObject *_ctypes_callproc(PPROC pProc,
+ 
+     if (-1 == _call_function_pointer(flags, pProc, avalues, atypes,
+                                      rtype, resbuf,
+-                                     Py_SAFE_DOWNCAST(argcount,
+-                                                      Py_ssize_t,
+-                                                      int)))
++                                     Py_SAFE_DOWNCAST(argcount, Py_ssize_t, int),
++                                     Py_SAFE_DOWNCAST(argtype_count, Py_ssize_t, int)))
+         goto cleanup;
+ 
+ #ifdef WORDS_BIGENDIAN
+diff --git a/Modules/_ctypes/ctypes.h b/Modules/_ctypes/ctypes.h
+index e58f85233c..e45975f6ad 100644
+--- a/Modules/_ctypes/ctypes.h
++++ b/Modules/_ctypes/ctypes.h
+@@ -285,6 +285,7 @@ PyObject *_ctypes_callproc(PPROC pProc,
+ #define FUNCFLAG_PYTHONAPI 0x4
+ #define FUNCFLAG_USE_ERRNO 0x8
+ #define FUNCFLAG_USE_LASTERROR 0x10
++#define FUNCFLAG_VARIADIC 0x20
+ 
+ #define TYPEFLAG_ISPOINTER 0x100
+ #define TYPEFLAG_HASPOINTER 0x200
+diff --git a/setup.py b/setup.py
+index bf90600eaa..48ff120e9a 100644
+--- a/setup.py
++++ b/setup.py
+@@ -142,6 +142,13 @@ def macosx_sdk_root():
+ 
+     return MACOS_SDK_ROOT
+ 
++def is_macosx_at_least(vers):
++    if host_platform == 'darwin':
++        dep_target = sysconfig.get_config_var('MACOSX_DEPLOYMENT_TARGET')
++        if dep_target:
++            return tuple(map(int, str(dep_target).split('.'))) >= vers
++    return False
++
+ def is_macosx_sdk_path(path):
+     """
+     Returns True if 'path' can be located in an OSX SDK
+@@ -150,6 +157,13 @@ def is_macosx_sdk_path(path):
+                 or path.startswith('/System/')
+                 or path.startswith('/Library/') )
+ 
++def grep_headers_for(function, headers):
++    for header in headers:
++        with open(header, 'r') as f:
++            if function in f.read():
++                return True
++    return False
++
+ def find_file(filename, std_dirs, paths):
+     """Searches for the directory where a given file is located,
+     and returns a possibly-empty list of additional directories, or None
+@@ -1972,7 +1986,11 @@ class PyBuildExt(build_ext):
+         return True
+ 
+     def detect_ctypes(self, inc_dirs, lib_dirs):
+-        self.use_system_libffi = False
++        if not sysconfig.get_config_var("LIBFFI_INCLUDEDIR") and is_macosx_at_least((10,15)):
++            self.use_system_libffi = True
++        else:
++            self.use_system_libffi = '--with-system-ffi' in sysconfig.get_config_var("CONFIG_ARGS")
++
+         include_dirs = []
+         extra_compile_args = []
+         extra_link_args = []
+@@ -2018,30 +2036,47 @@ class PyBuildExt(build_ext):
+                      libraries=['m'])
+         self.extensions.extend([ext, ext_test])
+ 
++        ffi_inc = sysconfig.get_config_var("LIBFFI_INCLUDEDIR")
++        ffi_lib = None
++
+         if host_platform == 'darwin':
+-            if '--with-system-ffi' not in sysconfig.get_config_var("CONFIG_ARGS"):
++            if not self.use_system_libffi:
+                 return
+-            # OS X 10.5 comes with libffi.dylib; the include files are
+-            # in /usr/include/ffi
+-            inc_dirs.append('/usr/include/ffi')
+-
+-        ffi_inc = [sysconfig.get_config_var("LIBFFI_INCLUDEDIR")]
+-        if not ffi_inc or ffi_inc[0] == '':
+-            ffi_inc = find_file('ffi.h', [], inc_dirs)
+-        if ffi_inc is not None:
+-            ffi_h = ffi_inc[0] + '/ffi.h'
++            ffi_in_sdk = os.path.join(macosx_sdk_root(), "usr/include/ffi")
++            if os.path.exists(ffi_in_sdk):
++                ffi_inc = ffi_in_sdk
++                ffi_lib = 'ffi'
++            else:
++                # OS X 10.5 comes with libffi.dylib; the include files are
++                # in /usr/include/ffi
++                inc_dirs.append('/usr/include/ffi')
++
++        if not ffi_inc:
++            found = find_file('ffi.h', [], inc_dirs)
++            if found:
++                ffi_inc = found[0]
++        if ffi_inc:
++            ffi_h = ffi_inc + '/ffi.h'
+             if not os.path.exists(ffi_h):
+                 ffi_inc = None
+                 print('Header file {} does not exist'.format(ffi_h))
+-        ffi_lib = None
+-        if ffi_inc is not None:
+-            for lib_name in ('ffi', 'ffi_pic'):
++
++        if ffi_lib is None and ffi_inc:
++            for lib_name in ('ffi_convenience', 'ffi_pic', 'ffi'):
+                 if (self.compiler.find_library_file(lib_dirs, lib_name)):
+                     ffi_lib = lib_name
+                     break
+ 
+         if ffi_inc and ffi_lib:
+-            ext.include_dirs.extend(ffi_inc)
++            ffi_headers = glob(os.path.join(ffi_inc, '*.h'))
++            if grep_headers_for('ffi_closure_alloc', ffi_headers):
++                try:
++                    sources.remove('_ctypes/malloc_closure.c')
++                except ValueError:
++                    pass
++            if grep_headers_for('ffi_prep_cif_var', ffi_headers):
++                ext.extra_compile_args.append("-DHAVE_FFI_PREP_CIF_VAR=1")
++            ext.include_dirs.append(ffi_inc)
+             ext.libraries.append(ffi_lib)
+             self.use_system_libffi = True
+ 
+-- 
+2.30.1 (Apple Git-130)
+

@@ -1,0 +1,36 @@
+From 604d95e235d86465b8c17f02095edcaf18464d4c Mon Sep 17 00:00:00 2001
+From: Lawrence D'Anna <64555057+lawrence-danna-apple@users.noreply.github.com>
+Date: Tue, 30 Jun 2020 02:15:46 -0700
+Subject: [PATCH] bpo-41100: fix _decimal for arm64 Mac OS (GH-21228)
+
+Patch by Lawrence Danna.
+---
+ .../Core and Builtins/2020-06-30-04-44-29.bpo-41100.PJwA6F.rst | 1 +
+ Modules/_decimal/libmpdec/mpdecimal.h                          | 3 +++
+ 2 files changed, 4 insertions(+)
+ create mode 100644 Misc/NEWS.d/next/Core and Builtins/2020-06-30-04-44-29.bpo-41100.PJwA6F.rst
+
+diff --git a/Misc/NEWS.d/next/Core and Builtins/2020-06-30-04-44-29.bpo-41100.PJwA6F.rst b/Misc/NEWS.d/next/Core and Builtins/2020-06-30-04-44-29.bpo-41100.PJwA6F.rst
+new file mode 100644
+index 0000000000..d6176d69f0
+--- /dev/null
++++ b/Misc/NEWS.d/next/Core and Builtins/2020-06-30-04-44-29.bpo-41100.PJwA6F.rst	
+@@ -0,0 +1 @@
++add arm64 to the allowable Mac OS arches in mpdecimal.h
+\ No newline at end of file
+diff --git a/Modules/_decimal/libmpdec/mpdecimal.h b/Modules/_decimal/libmpdec/mpdecimal.h
+index 108b76efa8..35ce429f60 100644
+--- a/Modules/_decimal/libmpdec/mpdecimal.h
++++ b/Modules/_decimal/libmpdec/mpdecimal.h
+@@ -135,6 +135,9 @@ const char *mpd_version(void);
+   #elif defined(__x86_64__)
+     #define CONFIG_64
+     #define ASM
++  #elif defined(__arm64__)
++    #define CONFIG_64
++    #define ANSI
+   #else
+     #error "unknown architecture for universal build."
+   #endif
+-- 
+2.30.1 (Apple Git-130)
