@@ -75,7 +75,7 @@ function pypy_pkg_data {
 }
 
 # determine command, package directory, url+hash
-declare -ar pd="$(pypy_pkg_data "$(pypy_architecture 2>/dev/null || true)")"
+declare -a pd="$(pypy_pkg_data "$(pypy_architecture 2>/dev/null || true)")"
 
 # install
 ${pd[0]} "${pd[1]}" "${pd[2]}" 'pypy' "verify_py${PYVER//./}" 'ensurepip'
