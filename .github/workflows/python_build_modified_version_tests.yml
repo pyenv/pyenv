@@ -1,0 +1,112 @@
+name: python_build_modified_version_tests
+on: [pull_request, push]
+jobs:
+  setup_tests:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{steps.modified-versions.outputs.versions}}
+    steps:
+      - uses: actions/checkout@v2
+      # Normally, we would use the superbly maintained...
+      # - uses: actions/setup-python@v2
+      #   with:
+      #    python-version: ${{ matrix.python-version }}
+      # ... but in the repo, we want to test pyenv builds on Ubuntu
+      - run: pwd
+      - env:
+          PYENV_ROOT: /home/runner/work/pyenv/pyenv
+        run: |
+          echo $PYENV_ROOT
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+      - run: git fetch origin
+      - id: modified-versions
+        run: |
+          versions=`git diff --name-only origin/master \
+          | grep '^plugins/python-build/share/python-build/' \
+          | awk -F '/' '{print $NF}' \
+          | xargs`
+          echo $versions
+          echo "::set-output name=versions::$versions"
+
+  setup_matrix:
+    needs: setup_tests
+    if: needs.setup_tests.outputs.versions != ''
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{steps.version_matrix.outputs.versions}}
+    steps:
+      - id: version_matrix
+        env: 
+          VERSIONS: ${{needs.setup_tests.outputs.versions}}
+        run: echo "::set-output name=versions::`echo $VERSIONS | xargs -n1 | jq -R . | jq -sc .`"
+
+  macos_tests:
+    needs: setup_matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ${{fromJson(needs.setup_matrix.outputs.versions)}}
+        os: ["macos-10.15", "macos-11"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      # Normally, we would use the superbly maintained...
+      # - uses: actions/setup-python@v2
+      #   with:
+      #    python-version: ${{ matrix.python-version }}
+      # ... but in the repo, we want to test pyenv builds on macOS
+      - run: |
+          brew install openssl openssl@1.1 readline sqlite3 xz zlib
+      # https://github.com/pyenv/pyenv#installation
+      - run: pwd
+      - env:
+          PYENV_ROOT: /Users/runner/work/pyenv/pyenv
+        run: |
+          echo $PYENV_ROOT
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+          bin/pyenv install ${{ matrix.python-version }}
+          bin/pyenv global ${{ matrix.python-version }}
+          bin/pyenv rehash
+      - run: python --version
+      - run: python -m pip --version
+      - shell: python  # Prove that actual Python == expected Python
+        env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
+
+  ubuntu_tests:
+    needs: setup_matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ${{fromJson(needs.setup_matrix.outputs.versions)}}
+        os: ["ubuntu-18.04", "ubuntu-20.04"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      # Normally, we would use the superbly maintained...
+      # - uses: actions/setup-python@v2
+      #   with:
+      #    python-version: ${{ matrix.python-version }}
+      # ... but in the repo, we want to test pyenv builds on macOS
+      - run: |
+          sudo apt-get update; sudo apt-get install -y build-essential \
+            libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
+            wget curl llvm libncurses5-dev libncursesw5-dev \
+            xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+      # https://github.com/pyenv/pyenv#installation
+      - run: pwd
+      - env:
+          PYENV_ROOT: /home/runner/work/pyenv/pyenv
+        run: |
+          echo $PYENV_ROOT
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+          bin/pyenv install ${{ matrix.python-version }}
+          bin/pyenv global ${{ matrix.python-version }}
+          bin/pyenv rehash
+      - run: python --version
+      - run: python -m pip --version
+      - shell: python  # Prove that actual Python == expected Python
+        env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
