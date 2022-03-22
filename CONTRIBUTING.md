@@ -4,11 +4,6 @@ General guidance
 The usual principes of respecting existing conventions and making sure that your changes
 are in line with the overall product design apply when contributing code to Pyenv.
 
-**MacOS warning:** As of this writing, we cannot test things on the Apple Silicon platform because
-neither Github Actions supports it nor any of the maintainers have the necessary hardware.
-So be extra careful when adding logic for these environments since we won't be able to test it
-and will have to take your word for it.
-
 Formatting PRs
 ==============
 
