@@ -1,0 +1,86 @@
+From 655f26bb742d6bd32c388e9fea14b64eb25fd4de Mon Sep 17 00:00:00 2001
+From: Ned Deily <nad@python.org>
+Date: Tue, 15 Mar 2022 03:18:39 -0400
+Subject: [PATCH] bpo-45405: Prevent internal configure error when running
+ configure with recent versions of clang. (GH-28845) (GH-31890)
+
+Change the configure logic to function properly on macOS when the compiler
+outputs a platform triplet for option --print-multiarch.
+The Apple Clang included with Xcode 13.3 now supports --print-multiarch
+causing configure to fail without this change.
+
+Co-authored-by: Ned Deily <nad@python.org>
+(cherry picked from commit 9c4766772cda67648184f8ddba546a5fc0167f91)
+
+Co-authored-by: David Bohman <debohman@gmail.com>
+(cherry picked from commit 720bb456dc711b0776bae837d1f9a0b10c28ddf2)
+---
+ .../next/Build/2021-10-11-16-27-38.bpo-45405.iSfdW5.rst   | 2 ++
+ configure                                                 | 8 +++++---
+ configure.ac                                              | 8 +++++---
+ 3 files changed, 12 insertions(+), 6 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Build/2021-10-11-16-27-38.bpo-45405.iSfdW5.rst
+
+diff --git a/Misc/NEWS.d/next/Build/2021-10-11-16-27-38.bpo-45405.iSfdW5.rst b/Misc/NEWS.d/next/Build/2021-10-11-16-27-38.bpo-45405.iSfdW5.rst
+new file mode 100644
+index 0000000000..13c93d1b8a
+--- /dev/null
++++ b/Misc/NEWS.d/next/Build/2021-10-11-16-27-38.bpo-45405.iSfdW5.rst
+@@ -0,0 +1,2 @@
++Prevent ``internal configure error`` when running ``configure``
++with recent versions of clang.  Patch by David Bohman.
+diff --git a/configure b/configure
+index fb0a499145..67e6e69b5f 100755
+--- a/configure
++++ b/configure
+@@ -5203,9 +5203,6 @@ $as_echo "$as_me:
+ fi
+ 
+ 
+-MULTIARCH=$($CC --print-multiarch 2>/dev/null)
+-
+-
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the platform triplet based on compiler characteristics" >&5
+ $as_echo_n "checking for the platform triplet based on compiler characteristics... " >&6; }
+ cat >> conftest.c <<EOF
+@@ -5334,6 +5331,11 @@ $as_echo "none" >&6; }
+ fi
+ rm -f conftest.c conftest.out
+ 
++if test x$PLATFORM_TRIPLET != xdarwin; then
++  MULTIARCH=$($CC --print-multiarch 2>/dev/null)
++fi
++
++
+ if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
+   if test x$PLATFORM_TRIPLET != x$MULTIARCH; then
+     as_fn_error $? "internal configure error for the platform triplet, please file a bug report" "$LINENO" 5
+diff --git a/configure.ac b/configure.ac
+index d86dad9a7c..468ad6070f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -747,9 +747,6 @@ then
+ fi
+ 
+ 
+-MULTIARCH=$($CC --print-multiarch 2>/dev/null)
+-AC_SUBST(MULTIARCH)
+-
+ AC_MSG_CHECKING([for the platform triplet based on compiler characteristics])
+ cat >> conftest.c <<EOF
+ #undef bfin
+@@ -875,6 +872,11 @@ else
+ fi
+ rm -f conftest.c conftest.out
+ 
++if test x$PLATFORM_TRIPLET != xdarwin; then
++  MULTIARCH=$($CC --print-multiarch 2>/dev/null)
++fi
++AC_SUBST(MULTIARCH)
++
+ if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
+   if test x$PLATFORM_TRIPLET != x$MULTIARCH; then
+     AC_MSG_ERROR([internal configure error for the platform triplet, please file a bug report])
+-- 
+2.32.0 (Apple Git-132)
+
