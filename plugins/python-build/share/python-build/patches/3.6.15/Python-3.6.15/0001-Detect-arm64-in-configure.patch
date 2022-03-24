@@ -1,37 +1,18 @@
+From 002501946bad91a308f37a09204393c172f03c3e Mon Sep 17 00:00:00 2001
+From: Takumi Sueda <puhitaku@gmail.com>
+Date: Sat, 11 Sep 2021 16:50:14 +0900
+Subject: [PATCH 2/6] Detect arm64 in configure
+
+---
+ configure    | 3 +++
+ configure.ac | 3 +++
+ 2 files changed, 6 insertions(+)
+
 diff --git a/configure b/configure
-index e39c16eee2..e67ac40214 100755
+index e39c16eee2..8dc1fc7595 100755
 --- a/configure
 +++ b/configure
-@@ -5203,7 +5203,6 @@ $as_echo "$as_me:
- fi
- 
- 
--MULTIARCH=$($CC --print-multiarch 2>/dev/null)
- 
- 
- { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the platform triplet based on compiler characteristics" >&5
-@@ -5334,6 +5333,10 @@ $as_echo "none" >&6; }
- fi
- rm -f conftest.c conftest.out
- 
-+if test x$PLATFORM_TRIPLET != xdarwin; then
-+  MULTIARCH=$($CC --print-multiarch 2>/dev/null)
-+fi
-+
- if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
-   if test x$PLATFORM_TRIPLET != x$MULTIARCH; then
-     as_fn_error $? "internal configure error for the platform triplet, please file a bug report" "$LINENO" 5
-@@ -9218,6 +9221,9 @@ fi
-     	ppc)
-     		MACOSX_DEFAULT_ARCH="ppc"
-     		;;
-+    	arm64)
-+    		MACOSX_DEFAULT_ARCH="arm64"
-+    		;;
-     	*)
-     		as_fn_error $? "Unexpected output of 'arch' on OSX" "$LINENO" 5
-     		;;
-@@ -9230,6 +9236,9 @@ fi
+@@ -9230,6 +9230,9 @@ fi
      	ppc)
      		MACOSX_DEFAULT_ARCH="ppc64"
      		;;
@@ -41,3 +22,20 @@ index e39c16eee2..e67ac40214 100755
      	*)
      		as_fn_error $? "Unexpected output of 'arch' on OSX" "$LINENO" 5
      		;;
+diff --git a/configure.ac b/configure.ac
+index cf280506bd..34846a7df3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -2435,6 +2435,9 @@ case $ac_sys_system/$ac_sys_release in
+     	ppc)
+     		MACOSX_DEFAULT_ARCH="ppc64"
+     		;;
++    	arm64) 
++    		MACOSX_DEFAULT_ARCH="arm64" 
++    		;;
+     	*)
+     		AC_MSG_ERROR([Unexpected output of 'arch' on OSX])
+     		;;
+-- 
+2.30.1 (Apple Git-130)
+
