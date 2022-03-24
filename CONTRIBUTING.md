@@ -1,8 +1,20 @@
 General guidance
 ================
 
-The usual principes of respecting existing conventions and making sure that your changes
-are in line with the overall product design apply when contributing code to Pyenv.
+* The usual principes of respecting existing conventions and making sure that your changes
+  are in line with the overall product design apply when contributing code to Pyenv.
+
+* We are limited to Bash 3.2 features.
+
+  That's because that's the version shipped with MacOS.
+  <small>(They didn't upgrade past it and switched to Zsh as the default shell because later versions
+  are covered by GPLv3 which has additional restrictions that are unacceptable for Apple.)</small>
+
+* Be extra careful when submitting code for the Apple Silicon platform.
+
+  As of this writing, Github Actions do not support it and only one team member has the necessary hardware.
+  So we may be unable to test your changes and may have to take your word for it.
+
 
 Formatting PRs
 ==============
