@@ -1,0 +1,10 @@
+#require_gcc
+prefer_openssl11
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+install_package "openssl-1.1.1n" "https://www.openssl.org/source/openssl-1.1.1n.tar.gz#40dceb51a4f6a5275bde0e6bf20ef4b91bfc32ed57c0552e2e8e15463372b17a" mac_openssl --if has_broken_mac_openssl
+install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
+if has_tar_xz_support; then
+    install_package "Python-3.10.4" "https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tar.xz#80bf925f571da436b35210886cf79f6eb5fa5d6c571316b73568343451f77a19" standard verify_py310 copy_python_gdb ensurepip
+else
+    install_package "Python-3.10.4" "https://www.python.org/ftp/python/3.10.4/Python-3.10.4.tgz#f3bcc65b1d5f1dc78675c746c98fcee823c038168fc629c5935b044d0911ad28" standard verify_py310 copy_python_gdb ensurepip
+fi
