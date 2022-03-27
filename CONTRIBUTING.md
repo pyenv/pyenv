@@ -7,8 +7,8 @@ General guidance
 * We are limited to Bash 3.2 features.
 
   That's because that's the version shipped with MacOS.
-  <small>(They didn't upgrade past it and switched to Zsh as the default shell because later versions
-  are covered by GPLv3 which has additional restrictions that are unacceptable for Apple.)</small>
+  (They didn't upgrade past it and switched to Zsh because later versions
+  are covered by GPLv3 which has additional restrictions unacceptable for Apple.)
 
 * Be extra careful when submitting code for the Apple Silicon platform.
 
@@ -25,8 +25,10 @@ from it together when merging so its commit history doesn't matter.
 If however a PR addresses multiple separate concerns, each of them should be presented as a separate commit.
 Adding new Python releases of the same flavor is okay with either single or multiple commits.
 
+
 Authoring installation scripts
 ==============================
+
 
 Adding new Python version support
 ---------------------------------
@@ -38,6 +40,7 @@ e.g. the set of architectures and OS versions supported by a release -- since th
 
 Make sure to also copy any patches for the previous release that still apply to the new one.
 Typically, a patch no longer applies if it addresses a problem that's already fixed in the new release.
+
 
 Adding version-specific fixes/patches
 -------------------------------------
@@ -56,6 +59,18 @@ As such, any such fixes:
 
 Generally, version-specific fixes belong in the scripts for the affected releases and/or patches for them -- this guarantees that their effect is limited to only those releases.
 
+
+<h3>Backporting upstream patches</h3>
+
+Usually, this is the easiest way to backport a fix for a problem fixed in a newer release.
+
+* Clone Python, check out the tag for the appropriate release and create a branch
+* Apply existing patches, if any, and commit (with either `patch` or `git am`)
+* cherry-pick the upstream commit that fixes the problem in a newer release
+* commit and `git format-patch`
+* Submit the generated patch file in a PR
+
+
 Deprecation policy
 ------------------
 
@@ -64,9 +79,10 @@ We do not provide official support for EOL releases and environments or otherwis
 We do however accept fixes from interested parties that would allow running older, including EOL, releases in newer environments.
 In addition to the above general requirements for release-specific fixes,
 
-* Such a fix must not add maintenance burden (e.g. add logic to `python-build` that has to be kept there indefinitely)
+* Such a fix must not add maintenance burden (e.g. add new logic to `python-build` that has to be kept there indefinitely)
   * Unless the added logic is useful for both EOL and non-EOL releases. In this case, it will be considered through the prism of being primarily an improvement for non-EOL releases.
 * We do not provide any guarantees from our side that any such fix works or will continue working going forward. It's up to the interested parties to maintain it.
+
 
 Advanced changes / adding new Python flavor support
 ---------------------------------------------------
@@ -81,4 +97,4 @@ An installation script is sourced from `python-build`. All installation scripts 
 
 Each of them accepts a couple of function-specific arguments which are followed by arguments that constitute the build sequence. Each `<argument>` in the build sequence corresponds to the `install_*_<argument>` function in `python-build`. Check what's available and add any functions with logic specific to your flavor if needed.
 
-We strive to keep out of `python-build` parts of build logic that are release-specific and tend to change abruptly between releases -- e.g. sets of supported archtectures and other software's versions. This results in logic duplication between installation scripts -- but since old releases never change once released, this doesn't really add to the maintenance burden. As a rule of thumb, `python-build` can host parts of logic that are expected to stay the same for an indefinite amount of time -- for an entire Python flavor or at least a long-running version line.
+We strive to keep out of `python-build` parts of build logic that are release-specific and/or tend to change abruptly between releases -- e.g. sets of supported architectures and other software's versions. This results in logic duplication between installation scripts -- but since old releases never change once released, this doesn't really add to the maintenance burden. As a rule of thumb, `python-build` can host parts of logic that are expected to stay the same for an indefinite amount of time -- for an entire Python flavor or at least a long-running version line.
