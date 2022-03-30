@@ -4,13 +4,13 @@ General guidance
 * The usual principes of respecting existing conventions and making sure that your changes
   are in line with the overall product design apply when contributing code to Pyenv.
 
-* We are limited to Bash 3.2 features.
+* We are limited to Bash 3.2 features
 
   That's because that's the version shipped with MacOS.
   (They didn't upgrade past it and switched to Zsh because later versions
   are covered by GPLv3 which has additional restrictions unacceptable for Apple.)
 
-* Be extra careful when submitting code for the Apple Silicon platform.
+* Be extra careful when submitting logic specific for the Apple Silicon platform
 
   As of this writing, Github Actions do not support it and only one team member has the necessary hardware.
   So we may be unable to test your changes and may have to take your word for it.
@@ -23,14 +23,13 @@ We strive to keep commit history one-concern-per-commit to keep it meaningful an
 If a pull request (PR) addresses a single concern (the typical case), we usually squash commits
 from it together when merging so its commit history doesn't matter.
 If however a PR addresses multiple separate concerns, each of them should be presented as a separate commit.
-Adding new Python releases of the same flavor is okay with either single or multiple commits.
+Adding multiple new Python releases of the same flavor is okay with either a single or multiple commits.
 
 
 Authoring installation scripts
 ==============================
 
-
-Adding new Python version support
+Adding new Python release support
 ---------------------------------
 
 The easiest way to add support for a new Python release is to copy the script from the previous one
@@ -40,6 +39,9 @@ e.g. the set of architectures and OS versions supported by a release -- since th
 
 Make sure to also copy any patches for the previous release that still apply to the new one.
 Typically, a patch no longer applies if it addresses a problem that's already fixed in the new release.
+
+For prereleases, we only create an entry for the latest prerelease in a specific version line.
+When submitting a newer prerelease, replace the older one.
 
 
 Adding version-specific fixes/patches
@@ -59,16 +61,15 @@ As such, any such fixes:
 
 Generally, version-specific fixes belong in the scripts for the affected releases and/or patches for them -- this guarantees that their effect is limited to only those releases.
 
-
 <h3>Backporting upstream patches</h3>
 
-Usually, this is the easiest way to backport a fix for a problem fixed in a newer release.
+Usually, this is the easiest way to backport a fix for a problem that is fixed in a newer release.
 
 * Clone Python, check out the tag for the appropriate release and create a branch
-* Apply existing patches, if any, and commit (with either `patch` or `git am`)
-* cherry-pick the upstream commit that fixes the problem in a newer release
-* commit and `git format-patch`
-* Submit the generated patch file in a PR
+* Apply existing patches if there are any (with either `patch` or `git am`) and commit
+* Cherry-pick the upstream commit that fixes the problem in a newer release
+* Commit and `git format-patch`
+* Commit the generated patch file into Pyenv, test your changes and submit a PR
 
 
 Deprecation policy
@@ -80,7 +81,7 @@ We do however accept fixes from interested parties that would allow running olde
 In addition to the above general requirements for release-specific fixes,
 
 * Such a fix must not add maintenance burden (e.g. add new logic to `python-build` that has to be kept there indefinitely)
-  * Unless the added logic is useful for both EOL and non-EOL releases. In this case, it will be considered through the prism of being primarily an improvement for non-EOL releases.
+  * Unless the added logic is useful for both EOL and non-EOL releases. In this case, it will be considered as being primarily an improvement for non-EOL releases.
 * We do not provide any guarantees from our side that any such fix works or will continue working going forward. It's up to the interested parties to maintain it.
 
 
