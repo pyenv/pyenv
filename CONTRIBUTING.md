@@ -90,7 +90,11 @@ Advanced changes / adding new Python flavor support
 An installation script is sourced from `python-build`. All installation scripts are based on the same logic:
 
 1. Select the source to download and other variable parameters as needed.
-  * This includes showing an error (and quitting) or a warning if the user's environment is not supported by the release.
+
+    * This includes showing an error if the user's environment (OS, architecture) is not supported by the release.
+    
+      Binary releases that only officially support specific distro(s) typically show a warning in other distros instead.
+
 2. Run one of the `install_*` shell functions
 
 `install_*` shell functions defined in `python-build` install Python from different kinds of sources -- compressed package (binary or source), upstream installation script, VCS checkout. Pick one that's the most appropriate for your packaging.
