@@ -1,0 +1,81 @@
+VERSION='7.3.9'
+PYVER='2.7'
+
+# https://www.pypy.org/checksums.html
+aarch64_hash=aff4e4dbab53448f662cd01acb2251571d60f836d2f48382a7d8da54ca5b3442
+linux32_hash=bbf4e7343d43c8217099a9bffeed6a1781f4b5a3e186ed1a0befca65e647aeb9
+linux64_hash=172a928b0096a7e00b7d58f523f57300c35c3de7f822491e2a7bc845375c23f8
+osx64_hash=77314f5a6b2cc35d24e6f952bef89f5da612b90e4127a8034aed708d9ae483c4
+s390x_hash=62481dd3c6472393ca05eb3a0880c96e4f5921747157607dbaa772a7369cab77
+win64_hash=ca7b0f4c576995b388cfb4c796e3f6f20b037e5314571bf267daa068a3a2af31
+
+### end of manual settings - following lines same for every download
+
+function pypy_pkg_data {
+    # pypy architecture
+    local ARCH="${1}"
+
+    local basesrc="pypy${PYVER}-${VERSION}-src"
+    local basever="pypy${PYVER}-v${VERSION}"
+    local baseurl="https://downloads.python.org/pypy/${basever}"
+
+    # defaults
+    local cmd='install_package'  # use bz2
+    local pkg="${ARCH}" # assume matches
+    local url="${baseurl}-${pkg}.tar.bz2" # use bz2
+    local hash='' # undefined
+
+    case "${pkg}" in
+    'linux-aarch64' )
+      hash="${aarch64_hash}"
+      url="${baseurl}-aarch64.tar.bz2" # diff url
+      ;;
+    'linux' )
+      hash="${linux32_hash}"
+      pkg='linux32'  # package name revised
+      url="${baseurl}-${pkg}.tar.bz2"  # new url
+      ;;
+    'linux64' )
+      hash="${linux64_hash}"
+      ;;
+    'osx64' )
+      if require_osx_version "10.13"; then
+        hash="${osx64_hash}"
+      else
+        { echo
+          colorize 1 "ERROR"
+          echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
+          echo "try '${basesrc}' to build from source."
+          echo
+        } >&2
+        exit 1
+      fi
+      ;;
+    's390x' )
+      hash="${s390x_hash}"
+      ;;
+    'win64' )
+      hash="${win64_hash}"
+      cmd='install_zip'  # diff command
+      url="${baseurl}-${pkg}.zip"  # zip rather than bz2
+      ;;
+    * )
+      { echo
+        colorize 1 "ERROR"
+        echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
+        echo "try '${basesrc}' to build from source."
+        echo
+      } >&2
+      exit 1
+      ;;
+    esac
+
+    # result - command, package dir, url+hash
+    echo "${cmd}" "${basever}-${pkg}" "${url}#${hash}"
+}
+
+# determine command, package directory, url+hash
+declare -a pd="$(pypy_pkg_data "$(pypy_architecture 2>/dev/null || true)")"
+
+# install
+${pd[0]} "${pd[1]}" "${pd[2]}" 'pypy' "verify_py${PYVER//./}" 'ensurepip'
