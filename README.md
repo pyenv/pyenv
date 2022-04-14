@@ -362,7 +362,7 @@ easy to fork and contribute any changes back upstream.
          echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zprofile
          echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
       
-         echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+         echo 'eval "$(pyenv init --path)"' >> ~/.zshrc
          ~~~
 
          Make sure that your terminal app runs the shell as a login shell.
@@ -372,13 +372,9 @@ easy to fork and contribute any changes back upstream.
          ~~~ zsh
          echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zprofile
          echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zprofile
-         echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
-         
-         echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
-         echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
-         echo 'eval "$(pyenv init --path)"' >> ~/.profile
+         echo 'eval "$(pyenv init --path)"' >> ~/.zprofile               
 
-         echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+         echo 'eval "$(pyenv init --path)"' >> ~/.zshrc
          ~~~
         
     - For **Fish shell**:
