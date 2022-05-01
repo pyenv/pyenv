@@ -57,6 +57,7 @@ function main() {
     ;;
   "path")
     print_path
+    print_rehash
     exit 0
     ;;
   "print")
@@ -64,6 +65,7 @@ function main() {
     print_path
     print_env
     print_completion
+    print_rehash
     print_shell_function
     exit 0
     ;;
@@ -168,7 +170,9 @@ function print_completion() {
   if [ -r "$completion" ]; then
     echo "source '$completion'"
   fi
+}
 
+function print_rehash() {
   if [ -z "$no_rehash" ]; then
     echo 'command pyenv rehash 2>/dev/null'
   fi

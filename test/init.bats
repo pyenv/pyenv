@@ -17,6 +17,13 @@ load test_helper
   assert_line "command pyenv rehash 2>/dev/null"
 }
 
+@test "auto rehash for --path" {
+  run pyenv-init --path
+  assert_success
+  assert_line "command pyenv rehash 2>/dev/null"
+}
+
+
 @test "setup shell completions" {
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - bash

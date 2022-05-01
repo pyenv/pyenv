@@ -528,7 +528,7 @@ opposed to this idea. Here's what `eval "$(pyenv init -)"` actually does:
    for some reason you need `pyenv` to be a real script rather than a
    shell function, you can safely skip it.
 
-`eval "$(pyenv init --path)"` only does item 1.
+`eval "$(pyenv init --path)"` only does items 1 and 3.
 
 To see exactly what happens under the hood for yourself, run `pyenv init -`
 or `pyenv init --path`.
