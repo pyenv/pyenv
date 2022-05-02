@@ -17,6 +17,13 @@ load test_helper
   assert_line "command pyenv rehash 2>/dev/null"
 }
 
+@test "auto rehash for --path" {
+  run pyenv-init --path
+  assert_success
+  assert_line "command pyenv rehash 2>/dev/null"
+}
+
+
 @test "setup shell completions" {
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - bash
@@ -53,7 +60,7 @@ OUT
 @test "fish instructions" {
   run pyenv-init fish
   assert [ "$status" -eq 1 ]
-  assert_line '# See the README for instructions on how to set up'
+  assert_line 'pyenv init - | source'
 }
 
 @test "option to skip rehash" {
@@ -64,30 +71,41 @@ OUT
 
 @test "adds shims to PATH" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
-  run pyenv-init --path bash
+  run pyenv-init - bash
   assert_success
-  assert_line 0 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
 }
 
 @test "adds shims to PATH (fish)" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
-  run pyenv-init --path fish
+  run pyenv-init - fish
   assert_success
-  assert_line 0 "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+  assert_line "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
 }
 
-@test "can add shims to PATH more than once" {
-  export PATH="${PYENV_ROOT}/shims:$PATH"
-  run pyenv-init --path bash
+@test "removes existing shims from PATH" {
+  OLDPATH="$PATH"
+  export PATH="${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:$PATH"
+  run bash -e <<!
+eval "\$(pyenv-init -)"
+echo "\$PATH"
+!
   assert_success
-  assert_line 0 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH//${PYENV_ROOT}\/shims:/}"
 }
 
-@test "can add shims to PATH more than once (fish)" {
-  export PATH="${PYENV_ROOT}/shims:$PATH"
-  run pyenv-init --path fish
+@test "removes existing shims from PATH (fish)" {
+  command -v fish >/dev/null || skip "-- fish not installed"
+  OLDPATH="$PATH"
+  export PATH="${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:$PATH"
+  # fish 2 (Ubuntu Bionic) adds spurious messages when setting PATH, messing up the output
+  run fish <<!
+set -x PATH "$PATH"
+pyenv init - | source
+echo "\$PATH"
+!
   assert_success
-  assert_line 0 "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+  assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH//${PYENV_ROOT}\/shims:/}"
 }
 
 @test "outputs sh-compatible syntax" {

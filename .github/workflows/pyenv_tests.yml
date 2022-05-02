@@ -24,7 +24,12 @@ jobs:
               # xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
       # https://github.com/pyenv/pyenv#installation
       - run: |
-          if test "$RUNNER_OS" == "macOS"; then brew install coreutils; fi
+          if test "$RUNNER_OS" == "macOS"; then
+            brew install coreutils fish
+          elif [[ $(lsb_release -sr | awk -F. '{print $1}') -ge 20 ]]; then
+            # Ubuntu 18 has fish 2 which lacks many features that facilitate testing
+            sudo apt install fish -yq
+          fi
       - run: pwd
       - env:
           PYENV_ROOT: /home/runner/work/pyenv/pyenv
