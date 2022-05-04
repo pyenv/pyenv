@@ -1,7 +1,7 @@
-name: macos_tests
+name: macos_build
 on: [pull_request, push]
 jobs:
-  macos_tests:
+  macos_build:
     strategy:
       fail-fast: false
       matrix:
