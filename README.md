@@ -275,7 +275,7 @@ The previous, more complicated configuration scheme for 2.0.0-2.2.5 still works.
 * run `eval "$(pyenv init -)"` to install `pyenv` into your shell as a shell function, enable shims and autocompletion
   * You may run `eval "$(pyenv init --path)"` instead to just enable shims, without shell integration
 
-The below setup should work for the vast majority of users for commmon use cases.
+The below setup should work for the vast majority of users for common use cases.
 See [Advanvced configuration](#advanced-configuration) for details and more configuration options.
 
   - For **bash**:
@@ -567,11 +567,11 @@ to `PATH` in the `<command>`'s environment, the same as what e.g. RVM does.
 
 ### Environment variables
 
-You can affect how Pyenv operates with the following settings:
+You can affect how Pyenv operates with the following environment variables:
 
 name | default | description
 -----|---------|------------
-`PYENV_VERSION` | | Specifies the Python version to be used.<br>Also see [`pyenv shell`]COMMANDS.md#pyenv-shell)
+`PYENV_VERSION` | | Specifies the Python version to be used.<br>Also see [`pyenv shell`](COMMANDS.md#pyenv-shell)
 `PYENV_ROOT` | `~/.pyenv` | Defines the directory under which Python versions and shims reside.<br>Also see [`pyenv root`](COMMANDS.md#pyenv-root)
 `PYENV_DEBUG` | | Outputs debug information.<br>Also as: `pyenv --debug <subcommand>`
 `PYENV_HOOK_PATH` | [_see wiki_][hooks] | Colon-separated list of paths searched for pyenv hooks.
