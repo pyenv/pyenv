@@ -83,15 +83,6 @@ if [ -n "${!_STUB_END}" ]; then
   # the requested index, we failed.
   if [ $index -ge "${!_STUB_INDEX}" ]; then
     eval "${_STUB_RESULT}"=1
-    {
-      echo "index: $index; stub index: ${!_STUB_INDEX}"
-      echo "plan:"
-      cat "${!_STUB_PLAN}"
-      echo "run:"
-      cat "${!_STUB_RUN}"
-      echo "log:"
-      cat "${!_STUB_LOG}"
-    } >&2
   fi
   if [ "${!_STUB_RESULT}" -ne 0 ]; then
     {

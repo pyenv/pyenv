@@ -63,8 +63,8 @@ DEF
   mkdir -p "$INSTALL_ROOT"
   cd "$INSTALL_ROOT"
 
-  for i in {1..5}; do stub uname '-s : echo Darwin'; done
-  for i in {1..4}; do stub sw_vers '-productVersion : echo 10.10'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
+  for i in {1..3}; do stub sw_vers '-productVersion : echo 10.10'; done
 
   stub cc 'false'
   stub brew 'false'
@@ -85,6 +85,10 @@ exec 4<&1
 build_package_standard python
 DEF
   assert_success
+
+  unstub uname
+  unstub sw_vers
+
   assert_output <<OUT
 ./configure --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib
 CC=clang

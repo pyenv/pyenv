@@ -1,7 +1,7 @@
-name: ubuntu_tests
+name: ubuntu_build
 on: [pull_request, push]
 jobs:
-  ubuntu_tests:
+  ubuntu_build:
     strategy:
       fail-fast: false
       matrix:
