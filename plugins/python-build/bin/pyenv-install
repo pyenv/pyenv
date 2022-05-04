@@ -73,6 +73,8 @@ unset VERBOSE
 unset HAS_PATCH
 unset DEBUG
 
+[ -n "$PYENV_DEBUG" ] && VERBOSE="-v"
+
 parse_options "$@"
 for option in "${OPTIONS[@]}"; do
   case "$option" in
