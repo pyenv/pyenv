@@ -1788,9 +1788,12 @@ build_package_verify_py27() {
 build_package_verify_py30() {
   verify_python "${2:-3.0}"
   try_python_module "bz2" "bzip2 lib"
+  try_python_module "curses" "ncurses lib"
+  try_python_module "ctypes" "libffi lib"
   try_python_module "readline" "GNU readline lib"
   verify_python_module "ssl" "OpenSSL lib"
   try_python_module "sqlite3" "SQLite3 lib"
+  try_python_module "tkinter" "Tk toolkit"
   verify_python_module "zlib" "zlib"
 }
 
@@ -1807,6 +1810,7 @@ build_package_verify_py32() {
 # Post-install check for Python 3.3.x
 build_package_verify_py33() {
   build_package_verify_py32 "$1" "${2:-3.3}"
+  try_python_module "lzma" "lzma lib"
 }
 
 # Post-install check for Python 3.4.x
