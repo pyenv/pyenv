@@ -276,7 +276,7 @@ The previous, more complicated configuration scheme for 2.0.0-2.2.5 still works.
   * You may run `eval "$(pyenv init --path)"` instead to just enable shims, without shell integration
 
 The below setup should work for the vast majority of users for common use cases.
-See [Advanvced configuration](#advanced-configuration) for details and more configuration options.
+See [Advanced configuration](#advanced-configuration) for details and more configuration options.
 
   - For **bash**:
 
