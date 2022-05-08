@@ -94,7 +94,7 @@
 * Add documentation for shims command (#2091)
 * Add documentation for hooks command (#2089)
 * Add documentation for root command (#2088)
-* Add documentaion for prefix command (#2087)
+* Add documentation for prefix command (#2087)
 * Update to Pyston's v2 package of the 2.3.1 release (#2078)
 * Add pyston-2.3.1 support (#2075)
 * Don't update conda when installing pip (#2074)
