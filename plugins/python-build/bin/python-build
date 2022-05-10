@@ -1849,6 +1849,11 @@ build_package_verify_py311() {
   build_package_verify_py310 "$1" "${2:-3.11}"
 }
 
+# Post-install check for Python 3.12.x
+build_package_verify_py312() {
+  build_package_verify_py311 "$1" "${2:-3.12}"
+}
+
 # Post-install check for Python 3.x rolling release scripts
 # XXX: Will need splitting into project-specific ones if there emerge
 # multiple rolling-release scripts with different checks needed
