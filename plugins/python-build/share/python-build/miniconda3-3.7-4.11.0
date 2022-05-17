@@ -1,6 +1,12 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Miniconda3-py37_4.11.0-Linux-aarch64" "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.11.0-Linux-aarch64.sh#07e8dfaf467e5432d402a79b11085783" "miniconda" verify_py37
+  ;;
 "Linux-ppc64le" )
   install_script "Miniconda3-py37_4.11.0-Linux-ppc64le" "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.11.0-Linux-ppc64le.sh#cf7cbccc16bf82365bbf0129f646ff45" "miniconda" verify_py37
+  ;;
+"Linux-s390x" )
+  install_script "Miniconda3-py37_4.11.0-Linux-s390x" "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.11.0-Linux-s390x.sh#1dc6dbf1951e65217d07cf30887360a8" "miniconda" verify_py37
   ;;
 "Linux-x86_64" )
   install_script "Miniconda3-py37_4.11.0-Linux-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py37_4.11.0-Linux-x86_64.sh#7675bd23411179956bcc4692f16ef27d" "miniconda" verify_py37
