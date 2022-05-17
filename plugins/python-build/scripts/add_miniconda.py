@@ -77,7 +77,10 @@ class SupportedOS(StrEnum):
 
 
 class SupportedArch(StrEnum):
+    AARCH64 = "aarch64"
+    ARM64 = "arm64"
     PPC64LE = "ppc64le"
+    S390X = "s390x"
     X86_64 = "x86_64"
     X86 = "x86"
 
