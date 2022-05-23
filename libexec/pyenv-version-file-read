@@ -5,18 +5,17 @@ set -e
 
 VERSION_FILE="$1"
 
-if [ -e "$VERSION_FILE" ]; then
+if [ -s "$VERSION_FILE" ]; then
   # Read the first non-whitespace word from the specified version file.
   # Be careful not to load it whole in case there's something crazy in it.
   IFS="${IFS}"$'\r'
-  words=($(cut -b 1-1024 "$VERSION_FILE" | sed -n 's/^[[:space:]]*\([^[:space:]#][^[:space:]]*\).*/\1/p'))
-  versions=("${words[@]}")
-
-  if [ -n "$versions" ]; then
-    IFS=":"
-    echo "${versions[*]}"
-    exit
-  fi
+  sep=
+  while read -n 1024 -r version _ || [[ $version ]]; do
+      [[ -z $version || $version == \#* ]] && continue
+      printf "%s%s" "$sep" "$version"
+      sep=:
+  done <"$VERSION_FILE"
+  [[ $sep ]] && { echo; exit; }
 fi
 
 exit 1

@@ -1,0 +1,43 @@
+From 720bb456dc711b0776bae837d1f9a0b10c28ddf2 Mon Sep 17 00:00:00 2001
+From: Ned Deily <nad@python.org>
+Date: Tue, 15 Mar 2022 03:18:39 -0400
+Subject: [PATCH] bpo-45405: Prevent internal configure error when running
+ configure with recent versions of clang. (GH-28845) (GH-31890)
+
+Change the configure logic to function properly on macOS when the compiler
+outputs a platform triplet for option --print-multiarch.
+The Apple Clang included with Xcode 13.3 now supports --print-multiarch
+causing configure to fail without this change.
+---
+ configure | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git configure configure
+index 829dd69bb8..455481bc50 100755
+--- a/configure
++++ b/configure
+@@ -5183,9 +5183,6 @@ $as_echo "$as_me:
+ fi
+
+
+-MULTIARCH=$($CC --print-multiarch 2>/dev/null)
+-
+-
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the platform triplet based on compiler characteristics" >&5
+ $as_echo_n "checking for the platform triplet based on compiler characteristics... " >&6; }
+ cat >> conftest.c <<EOF
+@@ -5342,6 +5339,11 @@ $as_echo "none" >&6; }
+ fi
+ rm -f conftest.c conftest.out
+
++if test x$PLATFORM_TRIPLET != xdarwin; then
++  MULTIARCH=$($CC --print-multiarch 2>/dev/null)
++fi
++
++
+ if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
+   if test x$PLATFORM_TRIPLET != x$MULTIARCH; then
+     as_fn_error $? "internal configure error for the platform triplet, please file a bug report" "$LINENO" 5
+--
+2.35.1
+

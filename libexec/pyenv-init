@@ -57,12 +57,15 @@ function main() {
     ;;
   "path")
     print_path
+    print_rehash
     exit 0
     ;;
   "print")
     init_dirs
+    print_path
     print_env
     print_completion
+    print_rehash
     print_shell_function
     exit 0
     ;;
@@ -74,7 +77,12 @@ function main() {
 function help_() {
   case "$shell" in
   bash )
-    profile='~/.bash_profile'
+    if [ -e '~/.bash_profile' ]; then
+      profile='~/.bash_profile'
+    else
+      profile='~/.profile'
+    fi
+    profile_explain="~/.bash_profile if it exists, otherwise ~/.profile"
     rc='~/.bashrc'
     ;;
   zsh )
@@ -92,10 +100,39 @@ function help_() {
   esac
 
   {
+    case "$shell" in
+    fish )
+      echo "# Add pyenv executable to PATH by running"
+      echo "# the following interactively:"
+      echo
+      echo 'set -Ux PYENV_ROOT $HOME/.pyenv'
+      echo 'set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths'
+      echo
+      echo "# Load pyenv automatically by appending"
+      echo "# the following to ~/.config/fish/config.fish:"
+      echo
+      echo 'pyenv init - | source'
+      echo
+      ;;
+    * )
+      echo '# Load pyenv automatically by appending'
+      echo -n "# the following to "
+      if [ "$profile" == "$rc" ]; then
+        echo "$profile :"
+      else
+        echo
+        echo "${profile_explain:-$profile} (for login shells)"
+        echo "and $rc (for interactive shells) :"
+      fi
+      echo
+      echo 'export PYENV_ROOT="$HOME/.pyenv"'
+      echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"'
+      echo 'eval "$(pyenv init -)"'
+      ;;
+    esac
     echo
-    echo '# See the README for instructions on how to set up'
-    echo '# your shell environment for Pyenv.'
-    echo 
+    echo '# Restart your shell for the changes to take effect.'
+    echo
   } >&2
 }
 
@@ -104,13 +141,22 @@ function init_dirs() {
 }
 
 function print_path() {
-  # Need to use the login shell rather than the current one
   case "$shell" in
     fish )
-      echo "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+      echo 'while set index (contains -i -- '\'"${PYENV_ROOT}/shims"\'' $PATH)'
+      echo 'set -eg PATH[$index]; end; set -e index'
+      echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
       ;;
     * )
-      echo 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+      # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
+      # that makes it source `bashrc` under SSH even when not interactive.
+      # This is inhibited by a guard in Debian's stock `bashrc` but some people remove it
+      # in order to get proper environment for noninteractive remote commands
+      # (SSH provides /etc/ssh/sshrc and ~/.ssh/rc for that but no-one seems to use them for some reason).
+      # This has caused an infinite `bashrc` execution loop for those people in the below nested Bash invocation (#2367).
+      # --norc negates this behavior of such a customized Bash.
+      echo 'PATH="$(bash --norc -ec '\''IFS=:; paths=($PATH); for i in ${!paths[@]}; do if [[ ${paths[i]} == "'\'"${PYENV_ROOT}/shims"\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; fi; done; echo "${paths[*]}"'\'')"'
+      echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
       ;;
   esac
 }
@@ -131,7 +177,9 @@ function print_completion() {
   if [ -r "$completion" ]; then
     echo "source '$completion'"
   fi
+}
 
+function print_rehash() {
   if [ -z "$no_rehash" ]; then
     echo 'command pyenv rehash 2>/dev/null'
   fi

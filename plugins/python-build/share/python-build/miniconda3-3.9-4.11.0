@@ -1,9 +1,18 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Miniconda3-py39_4.11.0-Linux-aarch64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-aarch64.sh#f25b8ff2dbebe0285360ef1b4c883da6" "miniconda" verify_py39
+  ;;
 "Linux-ppc64le" )
   install_script "Miniconda3-py39_4.11.0-Linux-ppc64le" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-ppc64le.sh#305e55110a3ad9384230e5fe396ccd89" "miniconda" verify_py39
   ;;
+"Linux-s390x" )
+  install_script "Miniconda3-py39_4.11.0-Linux-s390x" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-s390x.sh#26e904d1f42bf8cece2b99a698c10a46" "miniconda" verify_py39
+  ;;
 "Linux-x86_64" )
   install_script "Miniconda3-py39_4.11.0-Linux-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-x86_64.sh#4e2f31e0b2598634c80daa12e4981647" "miniconda" verify_py39
+  ;;
+"MacOSX-arm64" )
+  install_script "Miniconda3-py39_4.11.0-MacOSX-arm64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-MacOSX-arm64.sh#c19959eafcb84a26e00af5d9f55826eb" "miniconda" verify_py39
   ;;
 "MacOSX-x86_64" )
   install_script "Miniconda3-py39_4.11.0-MacOSX-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-MacOSX-x86_64.sh#d1303e5c7510b2ef444b9ba474551733" "miniconda" verify_py39

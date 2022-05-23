@@ -1,5 +1,25 @@
 ## Version History
 
+## Release 2.3.0
+
+* Bump openssl 1.1 to 1.1.1n for CPython 3.7 3.8 3.9 (#2276)
+* Doc Fix: Escape a hash character causing unwanted GitHub Issue linking (#2282)
+* Add CPython 3.9.12 (#2296)
+* Add CPython 3.10.4 (#2295)
+* Add patch for 3.6.15 to support Xcode 13.3 (#2288)
+* Add patch for 3.7.12 to support Xcode 13.3 (#2292)
+* Add CONTRIBUTING.md (#2287)
+* Add PyPy 7.3.9 release 2022-03-30 (#2308)
+* Add Pyston 2.3.3 (#2316)
+* Add CPython 3.11.0a7 (#2315)
+* Add "nogil" Python v3.9.10 (#2342)
+* Support XCode 13.3 in all releases that officially support MacOS 11 (#2344)
+* Add GraalPython 22.1.0 (#2346)
+* Make PYENV_DEBUG imply -v for `pyenv install` (#2347)
+* Simplify init scheme (#2310)
+* Don't use Homebrew outside of MacOS (#2349)
+* Add `:latest` syntax to documentation for the `install` command (#2351)
+
 ## Release 2.2.5
 
 * Add CPython 3.10.3
@@ -74,7 +94,7 @@
 * Add documentation for shims command (#2091)
 * Add documentation for hooks command (#2089)
 * Add documentation for root command (#2088)
-* Add documentaion for prefix command (#2087)
+* Add documentation for prefix command (#2087)
 * Update to Pyston's v2 package of the 2.3.1 release (#2078)
 * Add pyston-2.3.1 support (#2075)
 * Don't update conda when installing pip (#2074)

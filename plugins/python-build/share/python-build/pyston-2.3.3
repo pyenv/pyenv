@@ -1,0 +1,16 @@
+case "$(pyston_architecture 2>/dev/null || true)" in
+"linux64" )
+  install_package "pyston_2.3.3_portable_amd64" "https://github.com/pyston/pyston/releases/download/pyston_2.3.3/pyston_2.3.3_portable_amd64.tar.gz#7a38e2bd2fed38e6daba4d513bae32af0d5ba6185cadf37cb1af6bcc4de0cb57" "pyston" verify_py38 get_pip
+  ;;
+"linux-aarch64" )
+  install_package "pyston_2.3.3_portable_arm64" "https://github.com/pyston/pyston/releases/download/pyston_2.3.3/pyston_2.3.3_portable_arm64.tar.gz#f93f55b59120f576e5755bd8f86fa38361a30ca5389dbadc68450051ee2dccb1" "pyston" verify_py38 get_pip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": A Pyston 2.3.3 binary is not available for $(pyston_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
