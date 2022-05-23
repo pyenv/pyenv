@@ -52,7 +52,7 @@ jobs:
 
   ubuntu_build:
     needs: discover_modified_scripts
-    if: needs.discover_modified_scripts.outputs.versions != ''
+    if: needs.discover_modified_scripts.outputs.versions != '[""]'
     strategy:
       fail-fast: false
       matrix:
