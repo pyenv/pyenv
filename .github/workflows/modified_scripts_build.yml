@@ -1,0 +1,84 @@
+name: modified_scripts
+on: [pull_request]
+jobs:
+  discover_modified_scripts:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{steps.modified-versions.outputs.versions}}
+    steps:
+      - uses: actions/checkout@v2
+      - run: git fetch origin "$GITHUB_BASE_REF"
+      - shell: bash
+        run: >
+          versions=$(git diff "origin/$GITHUB_BASE_REF" --name-only -z
+          | perl -ne 'BEGIN {$\="\n";$/="\0";} chomp;
+            if (/^plugins\/python-build\/share\/python-build\/(?:([^\/]+)|patches\/([^\/]+)\/.*)$/)
+                { print $1.$2; }' \
+          | sort -u);
+          echo -e "versions<<!\\n$versions\\n!" >> $GITHUB_ENV
+      - id: modified-versions
+        run: |
+          echo -n "::set-output name=versions::"
+          echo "${{ env.versions }}" | jq -R . | jq -sc .
+  macos_build:
+    needs: discover_modified_scripts
+    if: needs.discover_modified_scripts.outputs.versions != '[""]'
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
+        os: ["macos-10.15", "macos-11"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          brew install openssl openssl@1.1 readline sqlite3 xz zlib
+      # https://github.com/pyenv/pyenv#installation
+      - run: pwd
+      - env:
+          PYENV_ROOT: /Users/runner/work/pyenv/pyenv
+        run: |
+          echo $PYENV_ROOT
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+          bin/pyenv install ${{ matrix.python-version }}
+          bin/pyenv global ${{ matrix.python-version }}
+          bin/pyenv rehash
+      - run: python --version
+      - run: python -m pip --version
+      - shell: python  # Prove that actual Python == expected Python
+        env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
+
+  ubuntu_build:
+    needs: discover_modified_scripts
+    if: needs.discover_modified_scripts.outputs.versions != '[""]'
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
+        os: ["ubuntu-18.04", "ubuntu-20.04"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          sudo apt-get update -q; sudo apt-get install -yq build-essential \
+            libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
+            wget curl llvm libncurses5-dev libncursesw5-dev \
+            xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+      # https://github.com/pyenv/pyenv#installation
+      - run: pwd
+      - env:
+          PYENV_ROOT: /home/runner/work/pyenv/pyenv
+        run: |
+          echo $PYENV_ROOT
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+          bin/pyenv install ${{ matrix.python-version }}
+          bin/pyenv global ${{ matrix.python-version }}
+          bin/pyenv rehash
+      - run: python --version
+      - run: python -m pip --version
+      - shell: python  # Prove that actual Python == expected Python
+        env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
