@@ -1,5 +1,15 @@
 ## Version History
 
+## Release 2.3.1
+
+* Version file read improvements (#2269)
+* Add CPython 3.11.0b1 (#2358)
+* Update 3.11-dev and add 3.12-dev (#2361)
+* Add CPython 3.9.13 (#2372)
+* Add miniconda 4.12.0 (#2371)
+* Fix endless loop in `pyenv init -` under SSH in some shell setups (#2374)
+* CI: Add tests for modified Python build scripts (#2286)
+
 ## Release 2.3.0
 
 * Bump openssl 1.1 to 1.1.1n for CPython 3.7 3.8 3.9 (#2276)
