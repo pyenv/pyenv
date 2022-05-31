@@ -887,16 +887,11 @@ build_package_micropython() {
     MAKE_OPTS="-j $(num_cpu_cores)"
   fi
   { cd mpy-cross
-    #echo "MPY MAKE"
     "$MAKE" $MAKE_OPTS
     cd ../ports/unix
-    #echo "UNIX MAKE AXTLS"
     "$MAKE" $MAKE_OPTS axtls
-    #echo "UNIX MAKE"
     "$MAKE" $MAKE_OPTS CFLAGS_EXTRA="-DMICROPY_PY_SYS_PATH_DEFAULT='\"${PREFIX_PATH}/lib/micropython\"' $CFLAGS_EXTRA"
-    #echo "UNIX MAKE INSTALL"
     "$MAKE" install $MAKE_INSTALL_OPTS PREFIX="${PREFIX_PATH}"
-    #echo "END"
     ln -fs micropython "${PREFIX_PATH}/bin/python"
     mkdir -p "${PREFIX_PATH}/lib/micropython"
   }>&4 2>&1
