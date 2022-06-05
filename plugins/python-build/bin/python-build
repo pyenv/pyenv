@@ -1331,6 +1331,8 @@ use_homebrew() {
     if [[ -n $brew_prefix && $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ]]; then
       export CPPFLAGS="${CPPFLAGS:+${CPPFLAGS% } }-I${brew_prefix}/include"
       export LDFLAGS="${LDFLAGS:+${LDFLAGS% } }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
+      # `python-config` ignores LDFLAGS envvar. Adding to LIBS is the only way to add extra stuff
+      # to `python-config --ldflags` output
       export LIBS="${LIBS:+${LIBS% } }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
     fi
   fi
