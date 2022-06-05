@@ -33,22 +33,27 @@ jobs:
       - uses: actions/checkout@v2
       - run: |
           brew install openssl openssl@1.1 readline sqlite3 xz zlib
-      # https://github.com/pyenv/pyenv#installation
-      - run: pwd
-      - env:
-          PYENV_ROOT: /Users/runner/work/pyenv/pyenv
-        run: |
+      - run: |
+          echo "PYENV_ROOT=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+      - run: |
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
-          bin/pyenv install ${{ matrix.python-version }}
-          bin/pyenv global ${{ matrix.python-version }}
-          bin/pyenv rehash
+      - run: |
+          pyenv install ${{ matrix.python-version }}
+          pyenv global ${{ matrix.python-version }}
       - run: python --version
       - run: python -m pip --version
       - shell: python  # Prove that actual Python == expected Python
         env:
           EXPECTED_PYTHON: ${{ matrix.python-version }}
-        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
+        run: |
+          import os, sys, os.path
+          correct_dir = os.path.join(
+              os.environ['PYENV_ROOT'],
+              'versions',
+              os.environ['EXPECTED_PYTHON'],
+              'bin')
+          assert os.path.dirname(sys.executable) == correct_dir
 
   ubuntu_build:
     needs: discover_modified_scripts
@@ -66,19 +71,24 @@ jobs:
             libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
             wget curl llvm libncurses5-dev libncursesw5-dev \
             xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-      # https://github.com/pyenv/pyenv#installation
-      - run: pwd
-      - env:
-          PYENV_ROOT: /home/runner/work/pyenv/pyenv
-        run: |
+      - run: |
+          echo "PYENV_ROOT=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+      - run: |
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
-          bin/pyenv install ${{ matrix.python-version }}
-          bin/pyenv global ${{ matrix.python-version }}
-          bin/pyenv rehash
+      - run: |
+          pyenv install ${{ matrix.python-version }}
+          pyenv global ${{ matrix.python-version }}
       - run: python --version
       - run: python -m pip --version
       - shell: python  # Prove that actual Python == expected Python
         env:
           EXPECTED_PYTHON: ${{ matrix.python-version }}
-        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
+        run: |
+          import os, sys, os.path
+          correct_dir = os.path.join(
+              os.environ['PYENV_ROOT'],
+              'versions',
+              os.environ['EXPECTED_PYTHON'],
+              'bin')
+          assert os.path.dirname(sys.executable) == correct_dir

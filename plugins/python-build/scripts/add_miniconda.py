@@ -19,6 +19,7 @@ from functools import total_ordering
 from pathlib import Path
 from typing import NamedTuple, List, Optional, DefaultDict, Dict
 import logging
+import string
 
 import requests_html
 
@@ -26,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 CONDA_REPO = "https://repo.anaconda.com"
 MINICONDA_REPO = CONDA_REPO + "/miniconda"
-# ANACONDA_REPO = CONDA_REPO + "/archive"
+ANACONDA_REPO = CONDA_REPO + "/archive"
 
 install_script_fmt = """
 case "$(anaconda_architecture 2>/dev/null || true)" in
@@ -34,7 +35,7 @@ case "$(anaconda_architecture 2>/dev/null || true)" in
 * )
   {{ echo
     colorize 1 "ERROR"
-    echo ": The binary distribution of Miniconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo ": The binary distribution of {tflavor} is not available for $(anaconda_architecture 2>/dev/null || true)."
     echo
   }} >&2
   exit 1
@@ -44,7 +45,7 @@ esac
 
 install_line_fmt = """
 "{os}-{arch}" )
-  install_script "Miniconda{suffix}-{version_py_version}{version_str}-{os}-{arch}" "{repo}/Miniconda{suffix}-{version_py_version}{version_str}-{os}-{arch}.sh#{md5}" "miniconda" verify_{py_version}
+  install_script "{tflavor}{suffix}-{version_py_version}{version_str}-{os}-{arch}" "{repo}/{tflavor}{suffix}-{version_py_version}{version_str}-{os}-{arch}.sh#{md5}" "{flavor}" verify_{py_version}
   ;;
 """.strip()
 
@@ -85,9 +86,20 @@ class SupportedArch(StrEnum):
     X86 = "x86"
 
 
+class Flavor(StrEnum):
+    ANACONDA = "anaconda"
+    MINICONDA = "miniconda"
+
+    
+class TFlavor(StrEnum):
+    ANACONDA = "Anaconda"
+    MINICONDA = "Miniconda"
+
+
 class Suffix(StrEnum):
     TWO = "2"
     THREE = "3"
+    NONE = ""
 
 
 class PyVersion(StrEnum):
@@ -126,7 +138,8 @@ class VersionStr(str):
         return hash(str(self))
 
 
-class MinicondaVersion(NamedTuple):
+class CondaVersion(NamedTuple):
+    flavor: Flavor
     suffix: Suffix
     version_str: VersionStr
     py_version: Optional[PyVersion]
@@ -134,7 +147,7 @@ class MinicondaVersion(NamedTuple):
     @classmethod
     def from_str(cls, s):
         """
-        Convert a string of the form "miniconda_n-ver" or "miniconda_n-py_ver-ver" to a :class:`MinicondaVersion` object.
+        Convert a string of the form "miniconda_n-ver" or "miniconda_n-py_ver-ver" to a :class:`CondaVersion` object.
         """
         components = s.split("-")
         if len(components) == 3:
@@ -143,13 +156,20 @@ class MinicondaVersion(NamedTuple):
         else:
             miniconda_n, ver = components
             py_ver = None
-        return MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver), py_ver)
+
+        suffix = miniconda_n[-1]
+        if suffix in string.digits:
+            flavor = miniconda_n[:-1]
+        else:
+            flavor = miniconda_n
+            suffix = ""
+        return CondaVersion(Flavor(flavor), Suffix(suffix), VersionStr(ver), py_ver)
 
     def to_filename(self):
         if self.py_version:
-            return f"miniconda{self.suffix}-{self.py_version.version()}-{self.version_str}"
+            return f"{self.flavor}{self.suffix}-{self.py_version.version()}-{self.version_str}"
         else:
-            return f"miniconda{self.suffix}-{self.version_str}"
+            return f"{self.flavor}{self.suffix}-{self.version_str}"
 
     def default_py_version(self):
         """
@@ -159,38 +179,61 @@ class MinicondaVersion(NamedTuple):
             return self.py_version
         elif self.suffix == Suffix.TWO:
             return PyVersion.PY27
-        elif self.version_str.info() < (4, 7):
+
+        v = self.version_str.info()
+        if self.flavor == "miniconda":
             # https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-python.html
+            if v < (4, 7):
+                return PyVersion.PY36
+            else:
+                return PyVersion.PY37
+        if self.flavor == "anaconda":
+            # https://docs.anaconda.com/anaconda/reference/release-notes/
+            if v >= (2021,11):
+                return PyVersion.PY39
+            if v >= (2020,7):
+                return PyVersion.PY38
+            if v >= (2020,2):
+                return PyVersion.PY37
+            if v >= (5,3,0):
+                return PyVersion.PY37
             return PyVersion.PY36
-        else:
-            return PyVersion.PY37
 
-    def with_version_triple(self):
-        return MinicondaVersion(
-            self.suffix, VersionStr.from_info(self.version_str.info()[:3]), self.py_version
-        )
+        raise ValueError(flavor)
 
 
-class MinicondaSpec(NamedTuple):
-    version: MinicondaVersion
+class CondaSpec(NamedTuple):
+    tflavor: TFlavor
+    version: CondaVersion
     os: SupportedOS
     arch: SupportedArch
     md5: str
+    repo: str
     py_version: Optional[PyVersion] = None
 
     @classmethod
-    def from_filestem(cls, stem, md5, py_version=None):
+    def from_filestem(cls, stem, md5, repo, py_version=None):
         miniconda_n, ver, os, arch = stem.split("-")
+        suffix = miniconda_n[-1]
+        if suffix in string.digits:
+            tflavor = miniconda_n[:-1]
+        else:
+            tflavor = miniconda_n
+            suffix = ""
+        flavor = tflavor.lower()
+
         if ver.startswith("py"):
             py_ver, ver = ver.split("_", maxsplit=1)
             py_ver = PyVersion(py_ver)
         else:
             py_ver = None
-        spec = MinicondaSpec(
-            MinicondaVersion(Suffix(miniconda_n[-1]), VersionStr(ver), py_ver),
+        spec = CondaSpec(
+            TFlavor(tflavor),
+            CondaVersion(Flavor(flavor), Suffix(suffix), VersionStr(ver), py_ver),
             SupportedOS(os),
             SupportedArch(arch),
             md5,
+            repo,
         )
         if py_version is None:
             spec = spec.with_py_version(spec.version.default_py_version())
@@ -201,7 +244,9 @@ class MinicondaSpec(NamedTuple):
         Installation command for this version of Miniconda for use in a Pyenv installation script
         """
         return install_line_fmt.format(
-            repo=MINICONDA_REPO,
+            tflavor=self.tflavor,
+            flavor=self.version.flavor,
+            repo=self.repo,
             suffix=self.version.suffix,
             version_str=self.version.version_str,
             version_py_version=f"{self.version.py_version}_" if self.version.py_version else "",
@@ -212,48 +257,47 @@ class MinicondaSpec(NamedTuple):
         )
 
     def with_py_version(self, py_version: PyVersion):
-        return MinicondaSpec(*self[:-1], py_version=py_version)
-
-    def with_version_triple(self):
-        version, *others = self
-        return MinicondaSpec(version.with_version_triple(), *others)
+        return CondaSpec(*self[:-1], py_version=py_version)
 
 
-def make_script(specs: List[MinicondaSpec]):
+def make_script(specs: List[CondaSpec]):
     install_lines = [s.to_install_lines() for s in specs]
-    return install_script_fmt.format(install_lines="\n".join(install_lines))
+    return install_script_fmt.format(
+        install_lines="\n".join(install_lines),
+        tflavor=specs[0].tflavor,
+    )
 
 
-def get_existing_minicondas():
+def get_existing_condas(name):
     """
     Enumerate existing Miniconda installation scripts in share/python-build/ except rolling releases.
 
-    :returns: A generator of :class:`MinicondaVersion` objects.
+    :returns: A generator of :class:`CondaVersion` objects.
     """
-    logger.info("Getting known miniconda versions")
+    logger.info("Getting known %(name)s versions",locals())
     for p in out_dir.iterdir():
-        name = p.name
-        if not p.is_file() or not name.startswith("miniconda"):
+        entry_name = p.name
+        if not p.is_file() or not entry_name.startswith(name):
             continue
         try:
-            v = MinicondaVersion.from_str(name)
+            v = CondaVersion.from_str(entry_name)
             if v.version_str != "latest":
-                logger.debug("Found existing miniconda version %s", v)
+                logger.debug("Found existing %(name)s version %(v)s", locals())
                 yield v
         except ValueError:
             pass
 
 
-def get_available_minicondas():
+def get_available_condas(name, repo):
     """
     Fetch remote miniconda versions.
 
-    :returns: A generator of :class:`MinicondaSpec` objects for each release available for download
+    :returns: A generator of :class:`CondaSpec` objects for each release available for download
     except rolling releases.
     """
-    logger.info("Fetching remote miniconda versions")
+    logger.info("Fetching remote %(name)s versions",locals())
     session = requests_html.HTMLSession()
-    response = session.get(MINICONDA_REPO)
+    response = session.get(repo)
     page: requests_html.HTML = response.html
     table = page.find("table", first=True)
     rows = table.find("tr")[1:]
@@ -267,16 +311,17 @@ def get_available_minicondas():
         stem = fname[:-3]
 
         try:
-            s = MinicondaSpec.from_filestem(stem, md5)
+            s = CondaSpec.from_filestem(stem, md5, repo)
             if s.version.version_str != "latest":
-                logger.debug("Found remote miniconda version %s", s)
+                logger.debug("Found remote %(name)s version %(s)s", locals())
                 yield s
         except ValueError:
             pass
 
 
-def key_fn(spec: MinicondaSpec):
+def key_fn(spec: CondaSpec):
     return (
+        spec.tflavor,
         spec.version.version_str.info(),
         spec.version.suffix.value,
         spec.os.value,
@@ -305,29 +350,42 @@ if __name__ == "__main__":
     if parsed.verbose < 3:
         logging.getLogger("requests").setLevel(logging.WARNING)
 
-    existing_versions = set(get_existing_minicondas())
-    available_specs = set(get_available_minicondas())
+    existing_versions = set()
+    available_specs = set()
+    for name,repo in ("miniconda",MINICONDA_REPO),("anaconda",ANACONDA_REPO):
+        existing_versions |= set(get_existing_condas(name))
+        available_specs |= set(get_available_condas(name, repo))
 
     # version triple to triple-ified spec to raw spec
     to_add: DefaultDict[
-        MinicondaVersion, Dict[MinicondaSpec, MinicondaSpec]
+        CondaVersion, Dict[CondaSpec, CondaSpec]
     ] = defaultdict(dict)
 
     logger.info("Checking for new versions")
     for s in sorted(available_specs, key=key_fn):
-        key = s.version.with_version_triple()
-        if key in existing_versions or key.version_str.info() <= (4, 3, 30):
-            logger.debug("Ignoring version %s (too old or already exists)", s)
+        key = s.version
+        vv = key.version_str.info()
+        
+        reason = None
+        if key in existing_versions:
+            reason = "already exists"
+        elif key.version_str.info() <= (4, 3, 30):
+            reason = "too old"
+        elif len(key.version_str.info()) >= 4:
+            reason = "ignoring hotfix releases"
+        
+        if reason:
+            logger.debug("Ignoring version %(s)s (%(reason)s)", locals())
             continue
 
-        to_add[key][s.with_version_triple()] = s
+        to_add[key][s] = s
 
     logger.info("Writing %s scripts", len(to_add))
     for ver, d in to_add.items():
         specs = list(d.values())
         fpath = out_dir / ver.to_filename()
         script_str = make_script(specs)
-        logger.debug("Writing script for %s", ver)
+        logger.info("Writing script for %s", ver)
         if parsed.dry_run:
             print(f"Would write spec to {fpath}:\n" + textwrap.indent(script_str, "  "))
         else:
