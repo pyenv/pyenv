@@ -166,7 +166,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -L$BREW_PREFIX/lib  -Wl,-rpath,$BREW_PREFIX/lib"
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib"
 Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
