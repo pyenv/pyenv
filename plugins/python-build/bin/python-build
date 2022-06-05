@@ -1300,7 +1300,7 @@ require_osx_version() {
 
 configured_with_package_dir() {
   local package_var_name="$(capitalize "$1")"
-  shift 1
+  shift 3
   local PACKAGE_CONFIGURE_OPTS="${package_var_name}_CONFIGURE_OPTS"
   local PACKAGE_CONFIGURE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
   local arg flag
@@ -1330,7 +1330,8 @@ use_homebrew() {
     # /usr/local/lib:/usr/lib is the default library search path
     if [[ -n $brew_prefix && $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ]]; then
       export CPPFLAGS="${CPPFLAGS:+${CPPFLAGS% } }-I${brew_prefix}/include"
-      export LDFLAGS="${LDFLAGS:+${LDFLAGS% } }-L${brew_prefix}/lib"
+      export LDFLAGS="${LDFLAGS:+${LDFLAGS% } }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
+      export LIBS="${LIBS:+${LIBS% } }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
     fi
   fi
 }
