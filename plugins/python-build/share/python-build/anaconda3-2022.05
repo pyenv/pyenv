@@ -1,0 +1,28 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Anaconda3-2022.05-Linux-aarch64" "https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-aarch64.sh#7e822f5622fa306c0aa42430ba884454" "anaconda" verify_py39
+  ;;
+"Linux-ppc64le" )
+  install_script "Anaconda3-2022.05-Linux-ppc64le" "https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-ppc64le.sh#166b576c7e9d438b0a80840f94b44827" "anaconda" verify_py39
+  ;;
+"Linux-s390x" )
+  install_script "Anaconda3-2022.05-Linux-s390x" "https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-s390x.sh#00ba3bf29ac51db5e0954b6f217fa468" "anaconda" verify_py39
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda3-2022.05-Linux-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh#a01150aff48fcb6fcd6472381652de04" "anaconda" verify_py39
+  ;;
+"MacOSX-arm64" )
+  install_script "Anaconda3-2022.05-MacOSX-arm64" "https://repo.anaconda.com/archive/Anaconda3-2022.05-MacOSX-arm64.sh#c35c8bdbeeda5e5ffa5b79d1f5ee8082" "anaconda" verify_py39
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda3-2022.05-MacOSX-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2022.05-MacOSX-x86_64.sh#5319de6536212892dd2da8b70d602ee1" "anaconda" verify_py39
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Anaconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

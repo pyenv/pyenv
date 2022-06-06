@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-ppc64le" )
+  install_script "Anaconda2-2019.10-Linux-ppc64le" "https://repo.anaconda.com/archive/Anaconda2-2019.10-Linux-ppc64le.sh#6b9809bf5d36782bfa1e35b791d983a0" "anaconda" verify_py27
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda2-2019.10-Linux-x86_64" "https://repo.anaconda.com/archive/Anaconda2-2019.10-Linux-x86_64.sh#69c64167b8cf3a8fc6b50d12d8476337" "anaconda" verify_py27
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda2-2019.10-MacOSX-x86_64" "https://repo.anaconda.com/archive/Anaconda2-2019.10-MacOSX-x86_64.sh#311aeb49cbe6d296f499efcd01a73f5e" "anaconda" verify_py27
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Anaconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
