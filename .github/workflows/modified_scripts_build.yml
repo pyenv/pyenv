@@ -34,15 +34,15 @@ jobs:
       - run: |
           brew install openssl openssl@1.1 readline sqlite3 xz zlib
       - run: |
-          echo "PYENV_ROOT=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-      - run: |
-          echo $PYENV_ROOT
+          export PYENV_ROOT="$GITHUB_WORKSPACE"
+          echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
       - run: |
           pyenv install ${{ matrix.python-version }}
           pyenv global ${{ matrix.python-version }}
-      - run: python --version
-      - run: python -m pip --version
+      - run: |
+          python --version
+          python -m pip --version
       - shell: python  # Prove that actual Python == expected Python
         env:
           EXPECTED_PYTHON: ${{ matrix.python-version }}
@@ -54,6 +54,10 @@ jobs:
               os.environ['EXPECTED_PYTHON'],
               'bin')
           assert os.path.dirname(sys.executable) == correct_dir
+      # bundled executables in some Anaconda releases cause the post-run step to hang in MacOS
+      - run: |
+          pyenv global system
+          rm -f "$(pyenv root)"/shims/*
 
   ubuntu_build:
     needs: discover_modified_scripts
@@ -72,9 +76,8 @@ jobs:
             wget curl llvm libncurses5-dev libncursesw5-dev \
             xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
       - run: |
-          echo "PYENV_ROOT=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-      - run: |
-          echo $PYENV_ROOT
+          export PYENV_ROOT="$GITHUB_WORKSPACE"
+          echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
       - run: |
           pyenv install ${{ matrix.python-version }}
