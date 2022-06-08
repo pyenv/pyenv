@@ -1300,7 +1300,7 @@ require_osx_version() {
 
 configured_with_package_dir() {
   local package_var_name="$(capitalize "$1")"
-  shift 3
+  shift 1
   local PACKAGE_CONFIGURE_OPTS="${package_var_name}_CONFIGURE_OPTS"
   local PACKAGE_CONFIGURE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
   local arg flag
