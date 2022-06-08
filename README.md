@@ -578,6 +578,9 @@ name | default | description
 `PYENV_DIR` | `$PWD` | Directory to start searching for `.python-version` files.
 `PYTHON_BUILD_ARIA2_OPTS` | | Used to pass additional parameters to [`aria2`](https://aria2.github.io/).<br>If the `aria2c` binary is available on `PATH`, pyenv uses `aria2c` instead of `curl` or `wget` to download the Python Source code. If you have an unstable internet connection, you can use this variable to instruct `aria2` to accelerate the download.<br>In most cases, you will only need to use `-x 10 -k 1M` as value to `PYTHON_BUILD_ARIA2_OPTS` environment variable
 
+See also [_Special environment variables_ in Python-Build's README](plugins/python-build/README.md#special-environment-variables)
+for environment variables that can be used to customize the build.
+
 ----
 
 
@@ -592,13 +595,19 @@ Tests are executed using [Bats](https://github.com/bats-core/bats-core):
     bats test
     bats/test/<file>.bats
 
-Please feel free to submit pull requests and file bugs on the [issue
+
+### Contributing
+
+Feel free to submit pull requests and file bugs on the [issue
 tracker](https://github.com/pyenv/pyenv/issues).
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details on submitting changes.
 
 
 ### Version History
 
 See [CHANGELOG.md](CHANGELOG.md).
+
 
 ### License
 
