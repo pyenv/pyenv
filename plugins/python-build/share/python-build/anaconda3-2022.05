@@ -12,7 +12,7 @@ case "$(anaconda_architecture 2>/dev/null || true)" in
   install_script "Anaconda3-2022.05-Linux-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2022.05-Linux-x86_64.sh#a01150aff48fcb6fcd6472381652de04" "anaconda" verify_py39
   ;;
 "MacOSX-arm64" )
-  install_script "Anaconda3-2022.05-MacOSX-arm64" "https://repo.anaconda.com/archive/Anaconda3-2022.05-MacOSX-arm64.sh#c35c8bdbeeda5e5ffa5b79d1f5ee8082" "anaconda" verify_py39
+  install_script "Anaconda3-2022.05-MacOSX-arm64" "https://repo.anaconda.com/archive/Anaconda3-2022.05-MacOSX-arm64.sh#24d985d2d380c51364d4793eb1840d29" "anaconda" verify_py39
   ;;
 "MacOSX-x86_64" )
   install_script "Anaconda3-2022.05-MacOSX-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2022.05-MacOSX-x86_64.sh#5319de6536212892dd2da8b70d602ee1" "anaconda" verify_py39
