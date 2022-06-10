@@ -62,6 +62,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Using Pyenv without shims](#using-pyenv-without-shims)
   * [Environment variables](#environment-variables)
 * **[Development](#development)**
+  * [Contributing](#contributing)**
   * [Version History](#version-history)
   * [License](#license)
 
@@ -386,6 +387,18 @@ environment variables.
 **NOTE:** If you are having trouble installing a Python version,
 please visit the wiki page about
 [Common Build Problems](https://github.com/pyenv/pyenv/wiki/Common-build-problems).
+
+
+#### Python versions with user-backed extended support
+
+For the following Python releases, Pyenv applies user-provided patches that add support for some newer environments.
+Though we don't actively maintain those patches, since existing releases never change,
+it's safe to assume that they will continue working until there are further incompatible changes
+in some later version of those environments.
+
+* *3.7.8-3.7.13, 3.8.4-3.8.12, 3.9.0-3.9.7* : XCode 13.3
+* *3.6.15* : MacOS 11+ and XCode 13.3
+* *2.7.18* : MacOS 10.15+ and Apple Silicon
 
 
 ### Switch between Python versions
