@@ -53,6 +53,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Install Python build dependencies](#install-python-build-dependencies)
 * **[Usage](#usage)**
   * [Install additional Python versions](#install-additional-python-versions)
+    * [Python versions with extended support](#python-versions-with-extended-support)
   * [Switch between Python versions](#switch-between-python-versions)
   * [Uninstall Python versions](#uninstall-python-versions)
   * [Other operations](#other-operations)
@@ -389,12 +390,12 @@ please visit the wiki page about
 [Common Build Problems](https://github.com/pyenv/pyenv/wiki/Common-build-problems).
 
 
-#### Python versions with user-backed extended support
+#### Python versions with extended support
 
 For the following Python releases, Pyenv applies user-provided patches that add support for some newer environments.
 Though we don't actively maintain those patches, since existing releases never change,
 it's safe to assume that they will continue working until there are further incompatible changes
-in some later version of those environments.
+in a later version of those environments.
 
 * *3.7.8-3.7.13, 3.8.4-3.8.12, 3.9.0-3.9.7* : XCode 13.3
 * *3.6.15* : MacOS 11+ and XCode 13.3
