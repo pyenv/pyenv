@@ -1,5 +1,17 @@
 ## Version History
 
+## Release 2.3.2
+
+* Add CPython 3.11.0b2 (#2380)
+* Honor CFLAGS_EXTRA for MicroPython #2006 (#2007)
+* Add post-install checks for curses, ctypes, lzma, and tkinter (#2353)
+* Add CPython 3.11.0b3 (#2382)
+* Add flags for Homebrew into `python-config --ldflags` (#2384)
+* Add CPython 3.10.5 (#2386)
+* Add Anaconda 2019.10, 2021.04, 2022.05; support Anaconda in add_miniconda.py (#2385)
+* Add Pyston-2.3.4 (#2390)
+* Update anaconda3-2022.05 MacOSX arm64 md5 (#2391)
+
 ## Release 2.3.1
 
 * Version file read improvements (#2269)
