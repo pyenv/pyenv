@@ -16,7 +16,12 @@
 # Example: To enable the python2.7 and python3.7 shims to find their
 #          respective executables you could set both versions with:
 #
-# 'pyenv global 3.7.0 2.7.15'
+#     $ pyenv global 3.7.0 2.7.15
+#
+# Example: To enable all shims and the system installed version,
+#          write "system" first.
+#
+#     $ pyenv global system `pyenv versions --bare`
 #
 
 
