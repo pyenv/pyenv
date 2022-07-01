@@ -122,8 +122,21 @@ if [ -n "$include_system" ] && \
   print_version system
 fi
 
+# List entries in the versions directory and try to version-sort them
 shopt -s dotglob nullglob
-for path in "$versions_dir"/*; do
+versions_dir_entries=("$versions_dir"/*)
+if sort --version-sort </dev/null >/dev/null 2>&1; then
+    # system supports version sort -- let's use it
+    OLDIFS="$IFS"
+    IFS=$'\n'
+    versions_dir_entries=($(
+        printf "%s\n" "${versions_dir_entries[@]}" |
+        sort --version-sort
+    ))
+    IFS="$OLDIFS"
+fi
+
+for path in "${versions_dir_entries[@]}"; do
   if [ -d "$path" ]; then
     if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
       target="$(realpath "$path")"
