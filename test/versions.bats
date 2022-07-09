@@ -17,6 +17,14 @@ stub_system_python() {
   touch "$stub" && chmod +x "$stub"
 }
 
+create_executable() {
+  local name="$1"
+  local bin="${PYENV_TEST_DIR}/bin"
+  mkdir -p "$bin"
+  sed -Ee '1s/^ +//' > "${bin}/$name"
+  chmod +x "${bin}/$name"
+}
+
 @test "no versions installed" {
   stub_system_python
   assert [ ! -d "${PYENV_ROOT}/versions" ]
@@ -160,4 +168,35 @@ OUT
 
   run pyenv-versions --bare
   assert_success ".venv"
+}
+
+@test "uses version sort when available" {
+  create_version "1.9.0"
+  create_version "1.53.0"
+  create_version "1.218.0"
+
+  correct_versions_file="$(mktemp)"
+  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.9.0" >>"$correct_versions_file"
+  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.53.0" >>"$correct_versions_file"
+  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.218.0" >>"$correct_versions_file"
+
+  wrong_versions_file="$(mktemp)"
+  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.218.0" >>"$wrong_versions_file"
+  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.53.0" >>"$wrong_versions_file"
+  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.9.0" >>"$wrong_versions_file"
+
+  create_executable sort <<SH
+#!$BASH
+if [ "\$1" == "--version-sort" ]; then cat $(printf %q "$correct_versions_file")
+else cat $(printf %q "$wrong_versions_file")
+fi
+SH
+
+  run pyenv-versions --bare
+  assert_success
+  assert_output <<OUT
+1.9.0
+1.53.0
+1.218.0
+OUT
 }
