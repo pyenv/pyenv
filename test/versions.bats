@@ -170,25 +170,17 @@ OUT
   assert_success ".venv"
 }
 
-@test "uses version sort when available" {
+@test "system sort supports version sort" {
   create_version "1.9.0"
   create_version "1.53.0"
   create_version "1.218.0"
-
-  correct_versions_file="$(mktemp "${PYENV_TEST_DIR}/tmp.XXXXXXXXXX")"
-  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.9.0" >>"$correct_versions_file"
-  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.53.0" >>"$correct_versions_file"
-  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.218.0" >>"$correct_versions_file"
-
-  wrong_versions_file="$(mktemp "${PYENV_TEST_DIR}/tmp.XXXXXXXXXX")"
-  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.218.0" >>"$wrong_versions_file"
-  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.53.0" >>"$wrong_versions_file"
-  printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.9.0" >>"$wrong_versions_file"
-
   create_executable sort <<SH
 #!$BASH
-if [ "\$1" == "--version-sort" ]; then cat $(printf %q "$correct_versions_file")
-else cat $(printf %q "$wrong_versions_file")
+if [ "\$1" == "--version-sort" ]; then
+  echo "${PYENV_ROOT}/versions/1.9.0"
+  echo "${PYENV_ROOT}/versions/1.53.0"
+  echo "${PYENV_ROOT}/versions/1.218.0"
+else exit 1
 fi
 SH
 
@@ -201,7 +193,7 @@ SH
 OUT
 }
 
-@test "always sorts versions at least alphabetically" {
+@test "system sort doesn't support version sort" {
   create_version "c"
   create_version "b"
   create_version "a"
