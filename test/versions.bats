@@ -175,12 +175,12 @@ OUT
   create_version "1.53.0"
   create_version "1.218.0"
 
-  correct_versions_file="$(mktemp)"
+  correct_versions_file="$(mktemp "${PYENV_TEST_DIR}/tmp.XXXXXXXXXX")"
   printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.9.0" >>"$correct_versions_file"
   printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.53.0" >>"$correct_versions_file"
   printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.218.0" >>"$correct_versions_file"
 
-  wrong_versions_file="$(mktemp)"
+  wrong_versions_file="$(mktemp "${PYENV_TEST_DIR}/tmp.XXXXXXXXXX")"
   printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.218.0" >>"$wrong_versions_file"
   printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.53.0" >>"$wrong_versions_file"
   printf '%s/versions/%s\n' "${PYENV_ROOT}" "1.9.0" >>"$wrong_versions_file"
