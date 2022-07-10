@@ -194,10 +194,9 @@ OUT
 }
 
 @test "system sort doesn't support version sort" {
-  create_version "c"
-  create_version "b"
-  create_version "a"
-
+  create_version "1.9.0"
+  create_version "1.53.0"
+  create_version "1.218.0"
   create_executable sort <<SH
 #!$BASH
 exit 1
@@ -206,8 +205,8 @@ SH
   run pyenv-versions --bare
   assert_success
   assert_output <<OUT
-a
-b
-c
+1.218.0
+1.53.0
+1.9.0
 OUT
 }
