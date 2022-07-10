@@ -200,3 +200,22 @@ SH
 1.218.0
 OUT
 }
+
+@test "always sorts versions at least alphabetically" {
+  create_version "c"
+  create_version "b"
+  create_version "a"
+
+  create_executable sort <<SH
+#!$BASH
+exit 1
+SH
+
+  run pyenv-versions --bare
+  assert_success
+  assert_output <<OUT
+a
+b
+c
+OUT
+}
