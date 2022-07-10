@@ -122,11 +122,10 @@ if [ -n "$include_system" ] && \
   print_version system
 fi
 
-# List entries in the versions directory and try to version-sort them
 shopt -s dotglob nullglob
 versions_dir_entries=("$versions_dir"/*)
 if sort --version-sort </dev/null >/dev/null 2>&1; then
-    # system supports version sort -- let's use it
+    # system sort supports version sorting
     OLDIFS="$IFS"
     IFS=$'\n'
     versions_dir_entries=($(

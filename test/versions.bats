@@ -170,7 +170,7 @@ OUT
   assert_success ".venv"
 }
 
-@test "system sort supports version sort" {
+@test "sort supports version sorting" {
   create_version "1.9.0"
   create_version "1.53.0"
   create_version "1.218.0"
@@ -193,7 +193,7 @@ SH
 OUT
 }
 
-@test "system sort doesn't support version sort" {
+@test "sort doesn't support version sorting" {
   create_version "1.9.0"
   create_version "1.53.0"
   create_version "1.218.0"
