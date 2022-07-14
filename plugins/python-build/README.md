@@ -24,7 +24,7 @@ Installing python-build as a standalone program will give you access to the
 `python-build` command for precise control over Python version installation. If you
 have pyenv installed, you will also be able to use the `pyenv install` command.
 
-    git clone git://github.com/pyenv/pyenv.git
+    git clone https://github.com/pyenv/pyenv.git
     cd pyenv/plugins/python-build
     ./install.sh
 
