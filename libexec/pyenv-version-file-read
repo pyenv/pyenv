@@ -11,9 +11,16 @@ if [ -s "$VERSION_FILE" ]; then
   IFS="${IFS}"$'\r'
   sep=
   while read -n 1024 -r version _ || [[ $version ]]; do
-      [[ -z $version || $version == \#* ]] && continue
-      printf "%s%s" "$sep" "$version"
-      sep=:
+    if [[ -z $version || $version == \#* ]]; then
+      # Skip empty lines and comments
+      continue
+    elif [ "$version" = ".." ] || [[ $version == */* ]]; then
+      # The version string is used to construct a path and we skip dubious values.
+      # This prevents issues such as path traversal (CVE-2022-35861).
+      continue
+    fi
+    printf "%s%s" "$sep" "$version"
+    sep=:
   done <"$VERSION_FILE"
   [[ $sep ]] && { echo; exit; }
 fi
