@@ -8,7 +8,7 @@ bulletproof deployments.
 **Powerful in development.** Specify your app's Ruby version once,
   in a single file. Keep all your teammates on the same page. No
   headaches running apps on different versions of Ruby. Just Works™
-  from the command line and with app servers like [Pow](http://pow.cx).
+  from the command line and with app servers like [Pow](https://github.com/basecamp/pow).
   Override the Ruby version anytime: just set an environment variable.
 
 **Rock-solid in production.** Your application's executables are its
