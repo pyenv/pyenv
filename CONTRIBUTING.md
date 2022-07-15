@@ -1,7 +1,7 @@
 General guidance
 ================
 
-* The usual principes of respecting existing conventions and making sure that your changes
+* The usual principles of respecting existing conventions and making sure that your changes
   are in line with the overall product design apply when contributing code to Pyenv.
 
 * We are limited to Bash 3.2 features
