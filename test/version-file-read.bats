@@ -82,3 +82,15 @@ IN
   run pyenv-version-file-read my-version
   assert_success "3.9.3:3.8.9:2.7.16"
 }
+
+@test "skips relative path traversal" {
+  cat > my-version <<IN
+3.9.3
+3.8.9
+  ..
+./*
+2.7.16
+IN
+  run pyenv-version-file-read my-version
+  assert_success "3.9.3:3.8.9:2.7.16"
+}
