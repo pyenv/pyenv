@@ -1639,8 +1639,10 @@ build_package_auto_tcltk() {
 
 apply_python_patch() {
   local patchfile
+  local prev_extglob="$(shopt -p extglob)"
+  shopt -s extglob
   case "$1" in
-  Python-* | jython-* | pypy-* | pypy2.?-* | pypy3.?-* | pypy3.??-* | stackless-* )
+  Python-* | jython-* | pypy-* | pypy[:digit:].+([:digit:])-* | stackless-* )
     patchfile="$(mktemp "${TMP}/python-patch.XXXXXX")"
     cat "${2:--}" >"$patchfile"
 
@@ -1649,6 +1651,7 @@ apply_python_patch() {
     patch -p$striplevel --force -i "$patchfile"
     ;;
   esac
+  eval "$prev_extglob"
 }
 
 build_package_symlink_version_suffix() {
