@@ -1640,7 +1640,7 @@ build_package_auto_tcltk() {
 apply_python_patch() {
   local patchfile
   case "$1" in
-  Python-* | jython-* | pypy-* | stackless-* )
+  Python-* | jython-* | pypy-* | pypy2.?-* | pypy3.?-* | pypy3.??-* | stackless-* )
     patchfile="$(mktemp "${TMP}/python-patch.XXXXXX")"
     cat "${2:--}" >"$patchfile"
 
