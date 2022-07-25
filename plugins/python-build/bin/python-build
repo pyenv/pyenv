@@ -1637,10 +1637,11 @@ build_package_auto_tcltk() {
   fi
 }
 
+# extglob must be set at parse time, not at runtime
+# https://stackoverflow.com/questions/49283740/bash-script-throws-syntax-errors-when-the-extglob-option-is-set-inside-a-subsh
+shopt -s extglob
 apply_python_patch() {
   local patchfile
-  local prev_extglob="$(shopt -p extglob)"
-  shopt -s extglob
   case "$1" in
   Python-* | jython-* | pypy-* | pypy[:digit:].+([:digit:])-* | stackless-* )
     patchfile="$(mktemp "${TMP}/python-patch.XXXXXX")"
@@ -1651,8 +1652,8 @@ apply_python_patch() {
     patch -p$striplevel --force -i "$patchfile"
     ;;
   esac
-  eval "$prev_extglob"
 }
+shopt -u extglob
 
 build_package_symlink_version_suffix() {
   if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
