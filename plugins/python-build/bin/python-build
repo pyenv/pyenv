@@ -1639,11 +1639,17 @@ build_package_auto_tcltk() {
 
 # extglob must be set at parse time, not at runtime
 # https://stackoverflow.com/questions/49283740/bash-script-throws-syntax-errors-when-the-extglob-option-is-set-inside-a-subsh
+#
+# The function is *parsed* with "extglob" only if an outer `shopt -s exglob`
+# exists; at *runtime* you still need to activate it *within* the function.
+#
 shopt -s extglob
 apply_python_patch() {
   local patchfile
+  # needed at runtime
+  shopt -s extglob
   case "$1" in
-  Python-* | jython-* | pypy-* | pypy[:digit:].+([:digit:])-* | stackless-* )
+  Python-* | jython-* | pypy-* | pypy[0-9].+([0-9])-* | stackless-* )
     patchfile="$(mktemp "${TMP}/python-patch.XXXXXX")"
     cat "${2:--}" >"$patchfile"
 
@@ -1652,6 +1658,7 @@ apply_python_patch() {
     patch -p$striplevel --force -i "$patchfile"
     ;;
   esac
+  shopt -u extglob
 }
 shopt -u extglob
 
