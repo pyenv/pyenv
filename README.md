@@ -60,6 +60,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 * [Upgrading](#upgrading)
 * [Uninstalling pyenv](#uninstalling-pyenv)
 * [Advanced Configuration](#advanced-configuration)
+  * [Autocomplete](#autocomplete)
   * [Using Pyenv without shims](#using-pyenv-without-shims)
   * [Environment variables](#environment-variables)
 * **[Development](#development)**
@@ -562,6 +563,15 @@ that may shadow Pyenv's shims.
   in these distributions because the system's Pip places executables for
   modules installed by a non-root user into those per-user `bin` directories.
 
+### Autocomplete
+
+<a href="https://fig.io/" target="_blank"><img src="https://fig.io/badges/Logo.svg" width="15" height="15"/></a> [Fig](https://fig.io/) provides IDE-style autocompletions for pyenv. It works in bash, zsh, and fish.
+
+To install, run:
+
+```shell
+brew install fig
+```
 
 ### Using Pyenv without shims
 
