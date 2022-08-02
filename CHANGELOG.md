@@ -1,5 +1,16 @@
 ## Version History
 
+## Release 2.3.3
+
+* Use version sort in `pyenv versions` (#2405)
+* Add CPython 3.11.0b4 (#2411)
+* Python-build: Replace deprecated git protocol use with https in docs (#2413)
+* Fix relative path traversal due to using version string in path (#2412)
+* Allow pypy2 and pypy3 patching (#2421, #2419)
+* Add CPython 3.11.0b5 (#2420)
+* Add GraalPython 22.2.0 (#2425)
+* Add CPython 3.10.6 (#2428)
+
 ## Release 2.3.2
 
 * Add CPython 3.11.0b2 (#2380)
