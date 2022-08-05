@@ -288,7 +288,7 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
     configuration commands to both `.bashrc` (for interactive shells)
     and the profile file that Bash would use (for login shells).
 
-    First, add the commands to `~/.bashrc`:
+    First, add the commands to `~/.bashrc` by running the following in your terminal:
 
     ~~~ bash
     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
