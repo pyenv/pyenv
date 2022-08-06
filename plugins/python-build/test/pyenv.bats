@@ -195,12 +195,14 @@ OUT
   unstub pyenv-help
 }
 
-@test "too many arguments for pyenv-uninstall" {
-  stub pyenv-help 'uninstall : true'
+@test "more than one argument for pyenv-uninstall" {
+  mkdir -p "${PYENV_ROOT}/versions/3.4.1"
+  mkdir -p "${PYENV_ROOT}/versions/3.4.2"
+  run pyenv-uninstall -f 3.4.1 3.4.2
 
-  run pyenv-uninstall 3.4.1 3.4.2
-  assert_failure
-  unstub pyenv-help
+  assert_success
+  refute [ -d "${PYENV_ROOT}/versions/3.4.1" ]
+  refute [ -d "${PYENV_ROOT}/versions/3.4.2" ]
 }
 
 @test "show help for pyenv-uninstall" {
