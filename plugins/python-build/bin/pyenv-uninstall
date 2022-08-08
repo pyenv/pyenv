@@ -35,6 +35,16 @@ fi
 
 [ "$#" -gt 0 ] || usage 1 >&2
 
+versions=("$@")
+
+for version in "${versions[@]}"; do
+  case "$version" in
+  "" | -* )
+    usage 1 >&2
+    ;;
+  esac
+done
+
 declare -a before_hooks after_hooks
 
 before_uninstall() {
@@ -54,11 +64,6 @@ for script in "${scripts[@]}"; do source "$script"; done
 
 uninstall-python() {
   local DEFINITION="$1"
-  case "$DEFINITION" in
-  "" | -* )
-    usage 1 >&2
-    ;;
-  esac
 
   local VERSION_NAME="${DEFINITION##*/}"
   local PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
@@ -86,8 +91,6 @@ uninstall-python() {
 
   for hook in "${after_hooks[@]}"; do eval "$hook"; done
 }
-
-versions=("$@")
 
 for version in "${versions[@]}"; do
   uninstall-python "$version"

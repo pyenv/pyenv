@@ -205,6 +205,20 @@ OUT
   refute [ -d "${PYENV_ROOT}/versions/3.4.2" ]
 }
 
+@test "invalid arguments for pyenv-uninstall" {
+  mkdir -p "${PYENV_ROOT}/versions/3.10.3"
+  mkdir -p "${PYENV_ROOT}/versions/3.10.4"
+
+  run pyenv-uninstall -f 3.10.3 --invalid-option 3.10.4
+  assert_failure
+
+  assert [ -d "${PYENV_ROOT}/versions/3.10.3" ]
+  assert [ -d "${PYENV_ROOT}/versions/3.10.4" ]
+
+  rmdir "${PYENV_ROOT}/versions/3.10.3"
+  rmdir "${PYENV_ROOT}/versions/3.10.4"
+}
+
 @test "show help for pyenv-uninstall" {
   stub pyenv-help 'uninstall : true'
 
