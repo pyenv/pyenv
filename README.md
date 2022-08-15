@@ -297,23 +297,23 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
     ~~~
 
     Then, if you have `~/.profile`, `~/.bash_profile` or `~/.bash_login`, add the commands there as well.
-    If you have none of these, add them to `~/.profile`.
+    If you have none of these, add them to `~/.profile`. To do this, execute the following in your terminal, interactively or otherwise:
 
-    * to add to `~/.profile`:
+    * to add to `~/.profile`, execute:
       ~~~ bash
       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
       echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
       echo 'eval "$(pyenv init -)"' >> ~/.profile
       ~~~
 
-    * to add to `~/.bash_profile`:
+    * to add to `~/.bash_profile`, execute:
       ~~~ bash
       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
       echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
       echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
       ~~~
 
-  - For **Zsh**:
+  - For **Zsh**, execute:
     ~~~ zsh
     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
     echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
