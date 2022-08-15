@@ -432,7 +432,7 @@ for more details on how the selection works and more information on its usage.
 As time goes on, you will accumulate Python versions in your
 `$(pyenv root)/versions` directory.
 
-To remove old Python versions, use [`pyenv uninstall <version>`](COMMANDS.md#pyenv-uninstall).
+To remove old Python versions, use [`pyenv uninstall <versions>`](COMMANDS.md#pyenv-uninstall).
 
 Alternatively, you can simply `rm -rf` the directory of the version you want
 to remove. You can find the directory of a particular Python version

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Summary: Uninstall a specific Python version
+# Summary: Uninstall Python versions
 #
-# Usage: pyenv uninstall [-f|--force] <version>
+# Usage: pyenv uninstall [-f|--force] <version> ...
 #
 #    -f  Attempt to remove the specified version without prompting
 #        for confirmation. If the version does not exist, do not
@@ -33,14 +33,17 @@ if [ "$1" = "-f" ] || [ "$1" = "--force" ]; then
   shift
 fi
 
-[ "$#" -eq 1 ] || usage 1 >&2
+[ "$#" -gt 0 ] || usage 1 >&2
 
-DEFINITION="$1"
-case "$DEFINITION" in
-"" | -* )
-  usage 1 >&2
-  ;;
-esac
+versions=("$@")
+
+for version in "${versions[@]}"; do
+  case "$version" in
+  "" | -* )
+    usage 1 >&2
+    ;;
+  esac
+done
 
 declare -a before_hooks after_hooks
 
@@ -59,29 +62,36 @@ IFS=$'\n' scripts=(`pyenv-hooks uninstall`)
 IFS="$OLDIFS"
 for script in "${scripts[@]}"; do source "$script"; done
 
+uninstall-python() {
+  local DEFINITION="$1"
 
-VERSION_NAME="${DEFINITION##*/}"
-PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
+  local VERSION_NAME="${DEFINITION##*/}"
+  local PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
 
-if [ -z "$FORCE" ]; then
-  if [ ! -d "$PREFIX" ]; then
-    echo "pyenv: version \`$VERSION_NAME' not installed" >&2
-    exit 1
+  if [ -z "$FORCE" ]; then
+    if [ ! -d "$PREFIX" ]; then
+      echo "pyenv: version \`$VERSION_NAME' not installed" >&2
+      exit 1
+    fi
+
+    read -p "pyenv: remove $PREFIX? [y|N] "
+    case "$REPLY" in
+    y | Y | yes | YES ) ;;
+    * ) exit 1 ;;
+    esac
   fi
 
-  read -p "pyenv: remove $PREFIX? [y|N] "
-  case "$REPLY" in
-  y | Y | yes | YES ) ;;
-  * ) exit 1 ;;
-  esac
-fi
+  for hook in "${before_hooks[@]}"; do eval "$hook"; done
 
-for hook in "${before_hooks[@]}"; do eval "$hook"; done
+  if [ -d "$PREFIX" ]; then
+    rm -rf "$PREFIX"
+    pyenv-rehash
+    echo "pyenv: $VERSION_NAME uninstalled"
+  fi
 
-if [ -d "$PREFIX" ]; then
-  rm -rf "$PREFIX"
-  pyenv-rehash
-  echo "pyenv: $VERSION_NAME uninstalled"
-fi
+  for hook in "${after_hooks[@]}"; do eval "$hook"; done
+}
 
-for hook in "${after_hooks[@]}"; do eval "$hook"; done
+for version in "${versions[@]}"; do
+  uninstall-python "$version"
+done

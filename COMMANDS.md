@@ -238,9 +238,9 @@ To install the latest major release for Python 3 try:
 
 ## `pyenv uninstall`
 
-Uninstall a specific Python version.
+Uninstall Python versions.
 
-    Usage: pyenv uninstall [-f|--force] <version>
+    Usage: pyenv uninstall [-f|--force] <version> ...
 
        -f  Attempt to remove the specified version without prompting
            for confirmation. If the version does not exist, do not
