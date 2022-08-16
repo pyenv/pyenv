@@ -10,7 +10,7 @@ General guidance
   (They didn't upgrade past it and switched to Zsh because later versions
   are covered by GPLv3 which has additional restrictions unacceptable for Apple.)
   
-  You can still add performance optimizations and such that take advantage of newer Bash features
+  You can still add performance optimizations etc that take advantage of newer Bash features
   as long as there is a fallback execution route for Bash 3.
 
 * Be extra careful when submitting logic specific for the Apple Silicon platform
