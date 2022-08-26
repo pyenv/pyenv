@@ -5,18 +5,38 @@ set -e
 
 VERSION_FILE="$1"
 
+
+function is_version_safe() {
+  # Check if version string is safe.
+  version="$1"
+  # Only perform extra version string checks as needed
+  if [[ "$version" == ".." || "$version" == */* ]]; then
+    # Some users may wish to use child paths of PYENV_ROOT/versions for their venv (#2430). So,
+    # versions that match path-traversal patterns MUST be a child path of PYENV_ROOT/versions.
+    (
+      # Validate version string constructs a valid path
+      cd "$PYENV_ROOT/versions/$version" &>/dev/null || exit 1
+      # Check present-working-directory is a child paths of versions and set exit code
+      [[ "$PWD" == "$PYENV_ROOT/versions/"* ]]
+    )
+    return $?
+  else
+    # No extra checking required since version does not equal '..' or contain '/'
+    return 0
+  fi
+}
+
 if [ -s "$VERSION_FILE" ]; then
   # Read the first non-whitespace word from the specified version file.
   # Be careful not to load it whole in case there's something crazy in it.
-  IFS="${IFS}"$'\r'
+  IFS="$IFS"$'\r'
   sep=
   while read -n 1024 -r version _ || [[ $version ]]; do
-    if [[ -z $version || $version == \#* ]]; then
+    if [[ -z "$version" || "$version" == \#* ]]; then
       # Skip empty lines and comments
       continue
-    elif [ "$version" = ".." ] || [[ $version == */* ]]; then
-      # The version string is used to construct a path and we skip dubious values.
-      # This prevents issues such as path traversal (CVE-2022-35861).
+    elif ! is_version_safe "$version"; then
+      # CVE-2022-35861 allowed arbitrary code execution in some contexts and is mitigated by is_version_safe.
       continue
     fi
     printf "%s%s" "$sep" "$version"
