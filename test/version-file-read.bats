@@ -94,3 +94,19 @@ IN
   run pyenv-version-file-read my-version
   assert_success "3.9.3:3.8.9:2.7.16"
 }
+
+@test "allows venv within versions" {
+  venv=3.10.3/envs/test
+  mkdir -p "${PYENV_ROOT}/versions/${venv}"
+  echo -n "${venv}" > my-version
+  run pyenv-version-file-read my-version
+  assert_success "${venv}"
+}
+
+@test "skips venv outside of versions" {
+  venv=../3.10.3/envs/test
+  mkdir -p "${PYENV_ROOT}/versions/${venv}"
+  echo -n "${venv}" > my-version
+  run pyenv-version-file-read my-version
+  assert_failure
+}
