@@ -5,23 +5,17 @@ set -e
 
 VERSION_FILE="$1"
 
-
 function is_version_safe() {
-  # Check if version string is safe.
+  # As needed, check that the constructed path exists as a child path of PYENV_ROOT/versions
   version="$1"
-  # Only perform extra version string checks as needed
   if [[ "$version" == ".." || "$version" == */* ]]; then
-    # Some users may wish to use child paths of PYENV_ROOT/versions for their venv (#2430). So,
-    # versions that match path-traversal patterns MUST be a child path of PYENV_ROOT/versions.
+    # Sanity check the value of version to prevent malicious path-traversal
     (
-      # Validate version string constructs a valid path
       cd "$PYENV_ROOT/versions/$version" &>/dev/null || exit 1
-      # Check present-working-directory is a child paths of versions and set exit code
       [[ "$PWD" == "$PYENV_ROOT/versions/"* ]]
     )
     return $?
   else
-    # No extra checking required since version does not equal '..' or contain '/'
     return 0
   fi
 }
