@@ -84,15 +84,21 @@ IN
 }
 
 @test "skips relative path traversal" {
+  echo '..' > my-version
+  run pyenv-version-file-read my-version
+  assert_failure "pyenv: unsafe version name found in \`my-version'"
+}
+
+@test "skips glob path traversal" {
   cat > my-version <<IN
+../*
 3.9.3
-3.8.9
-  ..
-./*
-2.7.16
 IN
   run pyenv-version-file-read my-version
-  assert_success "3.9.3:3.8.9:2.7.16"
+  assert_success <<OUT
+pyenv: unsafe version name found in \`my-version'
+3.9.3
+OUT
 }
 
 @test "allows venv within versions" {
