@@ -115,6 +115,6 @@ DEF
 
     #assert_success
     assert_output <<OUT
-CFLAGS_EXTRA=-DMICROPY_PY_SYS_PATH_DEFAULT='"${TMP}/install/lib/micropython"' -Wno-floating-conversion
+CFLAGS_EXTRA=-DMICROPY_PY_SYS_PATH_DEFAULT='".frozen:${TMP}/install/lib/micropython"' -Wno-floating-conversion
 OUT
 }
