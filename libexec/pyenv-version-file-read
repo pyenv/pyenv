@@ -31,7 +31,7 @@ if [ -s "$VERSION_FILE" ]; then
       continue
     elif ! is_version_safe "$version"; then
       # CVE-2022-35861 allowed arbitrary code execution in some contexts and is mitigated by is_version_safe.
-      echo "pyenv: unsafe version name found in \`$VERSION_FILE'" >&2
+      echo "pyenv: invalid version \`$version' ignored in \`$VERSION_FILE'" >&2
       continue
     fi
     printf "%s%s" "$sep" "$version"
