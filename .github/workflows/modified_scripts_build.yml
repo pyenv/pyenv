@@ -12,7 +12,7 @@ jobs:
         run: >
           versions=$(git diff "origin/$GITHUB_BASE_REF" --name-only -z
           | perl -ne 'BEGIN {$\="\n";$/="\0";} chomp;
-            if (/^plugins\/python-build\/share\/python-build\/(?:([^\/]+)|patches\/([^\/]+)\/.*)$/)
+            if (/^plugins\/python-build\/share\/python-build\/(?:([^\/]+)|patches\/([^\/]+)\/.*)$/ and -e $& )
                 { print $1.$2; }' \
           | sort -u);
           echo -e "versions<<!\\n$versions\\n!" >> $GITHUB_ENV
