@@ -38,7 +38,7 @@ jobs:
           echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
       - run: |
-          pyenv install ${{ matrix.python-version }}
+          pyenv install -v ${{ matrix.python-version }}
           pyenv global ${{ matrix.python-version }}
       # Micropython doesn't support --version
       - run: >
@@ -91,7 +91,7 @@ jobs:
           echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
       - run: |
-          pyenv install ${{ matrix.python-version }}
+          pyenv install -v ${{ matrix.python-version }}
           pyenv global ${{ matrix.python-version }}
       # Micropython doesn't support --version
       - run: >
