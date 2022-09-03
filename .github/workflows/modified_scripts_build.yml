@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
-        os: ["macos-10.15", "macos-11"]
+        os: ["macos-11", "macos-12"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -77,15 +77,15 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
-        os: ["ubuntu-18.04", "ubuntu-20.04"]
+        os: ["ubuntu-20.04", "ubuntu-22.04"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - run: |
-          sudo apt-get update -q; sudo apt-get install -yq build-essential \
+          sudo apt-get update -q; sudo apt-get install -yq make build-essential \
             libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
-            wget curl llvm libncurses5-dev libncursesw5-dev \
-            xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+            curl llvm libncurses5-dev libncursesw5-dev \
+            xz-utils tk-dev libffi-dev liblzma-dev
       - run: |
           export PYENV_ROOT="$GITHUB_WORKSPACE"
           echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
