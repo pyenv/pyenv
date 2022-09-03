@@ -1,5 +1,15 @@
 ## Version History
 
+## Release 2.3.4
+
+* Add CPython 3.11.0rc1 (#2434)
+* Add support for multiple versions in `pyenv uninstall` (#2432)
+* Add micropython 1.18 and 1.19.1 (#2443)
+* CI: support Micropython, deleted scripts; build with -v (#2447)
+* Re-allow paths in .python-version while still preventing CVE-2022-35861 (#2442)
+* CI: Bump OS versions (#2448)
+* Add Cinder 3.8 (#2433)
+
 ## Release 2.3.3
 
 * Use version sort in `pyenv versions` (#2405)
