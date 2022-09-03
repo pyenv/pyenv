@@ -1,0 +1,31 @@
+require_distro Fedora 32 &>/dev/null || \
+{ echo
+  colorize 1 "WARNING"
+  cat >&2 <<!
+: The Cinder compiler only officially supports
+Facebook's Docker images which are Fedora 32 - based.
+It may fail to build on a system
+with a different GCC and/or Glibc version.
+!
+  echo
+}
+
+[[ $(${CC:-gcc} -dumpversion 2>/dev/null) == 10 ]] || \
+{ command -v "gcc-10" >/dev/null && \
+  export CC="gcc-10" && \
+  echo "python-build: setting the compiler to \`gcc-10'"; } || \
+{
+  echo
+  colorize 1 WARNING
+  cat >&2 <<!
+: GCC 10 is not found on PATH.
+The build may fail.
+!
+  echo
+}
+
+prefer_openssl11
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+install_package "openssl-1.1.1k" "https://www.openssl.org/source/openssl-1.1.1k.tar.gz#892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5" mac_openssl --if has_broken_mac_openssl
+install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
+install_git "Cinder-3.8-dev" "https://github.com/facebookincubator/cinder" "cinder/3.8" standard verify_py38 copy_python_gdb ensurepip
