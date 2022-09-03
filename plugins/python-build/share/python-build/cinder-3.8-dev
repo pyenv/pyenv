@@ -1,3 +1,18 @@
+require_distro Fedora 32 &>/dev/null || \
+  echo >&2 <<!
+Warning! The Cinder compiler only officially supports
+Facebook's Docker images which are Fedora 32 - based.
+It is likely to fail to build on a system
+with a different GCC and/or Glibc version.
+!
+
+[[ $(gcc --dumpversion) == 10 ]] || \
+{ command -v "gcc-10" && export CC=gcc-10; } || \
+echo >&2 <<!
+Warning! GCC 10 is not found on PATH.
+The build will likely fail.
+!
+
 prefer_openssl11
 export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
 install_package "openssl-1.1.1k" "https://www.openssl.org/source/openssl-1.1.1k.tar.gz#892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5" mac_openssl --if has_broken_mac_openssl
