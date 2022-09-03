@@ -2,15 +2,15 @@ require_distro Fedora 32 &>/dev/null || \
   cat >&2 <<!
 Warning! The Cinder compiler only officially supports
 Facebook's Docker images which are Fedora 32 - based.
-It is likely to fail to build on a system
+It may fail to build on a system
 with a different GCC and/or Glibc version.
 !
 
-[[ $(gcc -dumpversion) == 10 ]] || \
-{ command -v "gcc-10" && export CC=gcc-10; } || \
+[[ $(${CC:-gcc} -dumpversion 2>/dev/null) == 10 ]] || \
+{ command -v "gcc-10" >/dev/null && export CC="gcc-10"; } || \
 cat >&2 <<!
 Warning! GCC 10 is not found on PATH.
-The build will likely fail.
+The build may fail.
 !
 
 prefer_openssl11
