@@ -324,18 +324,18 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 
   - For **Fish shell**:
 
-    For Fish older than 3.2.0, execute this interactively:
+    If you have Fish 3.2.0 or newer, execute this interactively:
 
     ~~~ fish
     set -Ux PYENV_ROOT $HOME/.pyenv
-    set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+    fish_add_path $PYENV_ROOT/bin
     ~~~
 
     Otherwise, execute the snippet below:
 
     ~~~ fish
     set -Ux PYENV_ROOT $HOME/.pyenv
-    fish_add_path $PYENV_ROOT/bin
+    set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
     ~~~
 
     Now, add this to `~/.config/fish/config.fish`:
