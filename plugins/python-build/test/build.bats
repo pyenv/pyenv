@@ -283,6 +283,32 @@ make install
 OUT
 }
 
+@test "no library searches performed during normal operation touch homebrew if envvar is set" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub brew true; brew
+  stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
 @test "readline is not linked from Homebrew when explicitly defined" {
   cached_tarball "Python-3.6.2"
 

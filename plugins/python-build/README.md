@@ -113,6 +113,7 @@ You can set certain environment variables to control the build process.
   checksum of the file to the mirror URL.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
+* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew on macOS.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
   in `share/python-build/` are looked up.
 * `PYTHON_BUILD_DEFINITIONS` can be a list of colon-separated paths that get
@@ -231,7 +232,7 @@ the full build log for build failures.
 
 ### Testing new python versions
 
-If you are contributing a new python version for python-build, 
+If you are contributing a new python version for python-build,
 you can test the build in a [docker](https://www.docker.com/) container based on Ubuntu 18.04.
 
 With docker installed:
@@ -249,7 +250,7 @@ docker run -it my_container
 ```
 
 The container will need to be rebuilt whenever you change the repo,
-but after the first build, this will be very fast, 
+but after the first build, this will be very fast,
 as the layer including the build dependencies will be cached.
 
 Changes made inside the container will not be persisted.

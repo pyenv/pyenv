@@ -112,6 +112,11 @@ is_mac() {
   [ $# -eq 0 ] || [ "$(osx_version)" "$@" ]
 }
 
+can_use_homebrew() {
+    [ -z "$PYTHON_BUILD_SKIP_HOMEBREW" ] || return 1
+    is_mac || return 1
+}
+
 #  9.1  -> 901
 # 10.9  -> 1009
 # 10.10 -> 1010
@@ -1322,7 +1327,7 @@ configured_with_package_dir() {
 }
 
 use_homebrew() {
-  is_mac || return 1
+  can_use_homebrew || return 1
   # unless Homebrew is at the default /usr/local, need to add its paths to
   # compiler search to be able to use non-keg-only deps from there
   if is_mac && command -v brew &>/dev/null; then
@@ -1344,7 +1349,7 @@ needs_yaml() {
 }
 
 use_homebrew_yaml() {
-  is_mac || return 1
+  can_use_homebrew || return 1
   local libdir="$(brew --prefix libyaml 2>/dev/null || true)"
   if [ -d "$libdir" ]; then
     echo "python-build: use libyaml from homebrew"
@@ -1388,7 +1393,7 @@ has_broken_mac_readline() {
 }
 
 use_homebrew_readline() {
-  is_mac || return 1
+  can_use_homebrew || return 1
   if ! configured_with_package_dir "python" "readline/rlconf.h"; then
     local libdir="$(brew --prefix readline 2>/dev/null || true)"
     if [ -d "$libdir" ]; then
@@ -1429,7 +1434,7 @@ has_broken_mac_openssl() {
 }
 
 use_homebrew_openssl() {
-  is_mac || return 1
+  can_use_homebrew || return 1
   command -v brew >/dev/null || return 1
   for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
     local ssldir="$(brew --prefix "${openssl}" || true)"
@@ -1529,7 +1534,7 @@ build_package_verify_openssl() {
 }
 
 use_homebrew_zlib() {
-  is_mac || return 1
+  can_use_homebrew || return 1
   local brew_zlib="$(brew --prefix zlib 2>/dev/null || true)"
   if [ -d "$brew_zlib" ]; then
     echo "python-build: use zlib from homebrew"
@@ -1549,7 +1554,7 @@ use_xcode_sdk_zlib() {
 }
 
 use_homebrew_tcltk() {
-  is_mac || return 1
+  can_use_homebrew || return 1
   # get the version from the folder that homebrew versions
   local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
   if [ -d "$tcltk_libdir" ]; then
@@ -1591,13 +1596,13 @@ use_custom_tcltk() {
 get_tcltk_flag_from() {
   IFS=$'\n'
   # parse input string into array
-  local opts_arr=( $(xargs -n1 <<<"$1") ) 
+  local opts_arr=( $(xargs -n1 <<<"$1") )
 
   # iterate through `opts_arr`, break if `--with-tcltk-libs=` was found.
   for opts in ${opts_arr[@]}; do
     # `--with-tcltk-libs=` must be the prefix.
     if [[ "$opts" == "--with-tcltk-libs="* ]]; then
-      # return 
+      # return
       echo "$opts"
       break
     fi
@@ -1607,7 +1612,7 @@ get_tcltk_flag_from() {
 }
 
 use_tcltk() {
-  if is_mac; then
+  if can_use_homebrew; then
     local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
   fi
   local tcl_tk_libs="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
