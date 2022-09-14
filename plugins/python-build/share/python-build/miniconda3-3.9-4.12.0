@@ -12,7 +12,7 @@ case "$(anaconda_architecture 2>/dev/null || true)" in
   install_script "Miniconda3-py39_4.12.0-Linux-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh#7843dd7d0a2c53b0df37ca8189672992" "miniconda" verify_py39
   ;;
 "MacOSX-arm64" )
-  install_script "Miniconda3-py39_4.12.0-MacOSX-arm64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-MacOSX-arm64.sh#31251793539cf952ee99c18e34c30c7f" "miniconda" verify_py39
+  install_script "Miniconda3-py39_4.12.0-MacOSX-arm64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-MacOSX-arm64.sh#f7448cfeb278f2a84ed903db02d5525c" "miniconda" verify_py39
   ;;
 "MacOSX-x86_64" )
   install_script "Miniconda3-py39_4.12.0-MacOSX-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-MacOSX-x86_64.sh#143b9bb03b6e4865be4ebbf40b108772" "miniconda" verify_py39
