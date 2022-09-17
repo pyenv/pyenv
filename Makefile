@@ -1,11 +1,15 @@
-.PHONY: test test-build
+.PHONY: test test-build test-unit test-plugin
 
 # Do not pass in user flags to build tests.
 unexport PYTHON_CFLAGS
 unexport PYTHON_CONFIGURE_OPTS
 
-test: bats
+test: test-unit test-plugin
+
+test-unit: bats
 	PATH="./bats/bin:$$PATH" test/run
+	
+test-plugin: bats
 	cd plugins/python-build && $(PWD)/bats/bin/bats $${CI:+--tap} test
 
 PYTHON_BUILD_ROOT := $(CURDIR)/plugins/python-build
