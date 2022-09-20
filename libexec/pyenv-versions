@@ -26,43 +26,14 @@ for arg; do
   esac
 done
 
+canonicalize_dir() {
+  { cd "$1" && pwd -P
+  } 2>/dev/null || echo "$1"
+}
+
 versions_dir="${PYENV_ROOT}/versions"
-
-if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; then
-  if [ -n "$PYENV_NATIVE_EXT" ]; then
-    echo "pyenv: failed to load \`realpath' builtin" >&2
-    exit 1
-  fi
-
-  READLINK=$(type -P readlink)
-  if [ -z "$READLINK" ]; then
-    echo "pyenv: cannot find readlink - are you missing GNU coreutils?" >&2
-    exit 1
-  fi
-
-  resolve_link() {
-    $READLINK "$1"
-  }
-
-  realpath() {
-    local path="$1"
-    local name
-
-    # Use a subshell to avoid changing the current path
-    (
-    while [ -n "$path" ]; do
-      name="${path##*/}"
-      [ "$name" = "$path" ] || cd "${path%/*}"
-      path="$(resolve_link "$name" || true)"
-    done
-
-    echo "${PWD}/$name"
-    )
-  }
-fi
-
 if [ -d "$versions_dir" ]; then
-  versions_dir="$(realpath "$versions_dir")"
+  versions_dir="$(canonicalize_dir "$versions_dir")"
 fi
 
 if ((${BASH_VERSINFO[0]} > 3)); then
@@ -150,7 +121,7 @@ fi
 for path in "${versions_dir_entries[@]}"; do
   if [ -d "$path" ]; then
     if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
-      target="$(realpath "$path")"
+      target="$(canonicalize_dir "$path")"
       [ "${target%/*}" == "$versions_dir" ] && continue
       [ "${target%/*/envs/*}" == "$versions_dir" ] && continue
     fi
