@@ -25,50 +25,24 @@ for arg; do
   esac
 done
 
+canonicalize_dir() {
+  { cd "$1" && pwd -P
+  } 2>/dev/null || echo "$1"
+}
+
 versions_dir="${RBENV_ROOT}/versions"
-
-if ! enable -f "${BASH_SOURCE%/*}"/rbenv-realpath.dylib realpath 2>/dev/null; then
-  if [ -n "$RBENV_NATIVE_EXT" ]; then
-    echo "rbenv: failed to load \`realpath' builtin" >&2
-    exit 1
-  fi
-
-  READLINK=$(type -p greadlink readlink 2>/dev/null | head -n1)
-  if [ -z "$READLINK" ]; then
-    echo "rbenv: cannot find readlink - are you missing GNU coreutils?" >&2
-    exit 1
-  fi
-
-  resolve_link() {
-    $READLINK "$1"
-  }
-
-  realpath() {
-    local cwd="$PWD"
-    local path="$1"
-    local name
-
-    while [ -n "$path" ]; do
-      name="${path##*/}"
-      [ "$name" = "$path" ] || cd "${path%/*}"
-      path="$(resolve_link "$name" || true)"
-    done
-
-    echo "${PWD}/$name"
-    cd "$cwd"
-  }
-fi
-
-if [ -d "$versions_dir" ]; then
-  versions_dir="$(realpath "$versions_dir")"
+if [ -n "$skip_aliases" ]; then
+  versions_dir="$(canonicalize_dir "$versions_dir")"
 fi
 
 list_versions() {
+  local path
+  local target
   shopt -s nullglob
   for path in "$versions_dir"/*; do
     if [ -d "$path" ]; then
       if [ -n "$skip_aliases" ] && [ -L "$path" ]; then
-        target="$(realpath "$path")"
+        target="$(canonicalize_dir "$path")"
         [ "${target%/*}" != "$versions_dir" ] || continue
       fi
       echo "${path##*/}"

@@ -1,25 +1,8 @@
-CC = @CC@
-
-CFLAGS = @CFLAGS@
-LOCAL_CFLAGS = @LOCAL_CFLAGS@
-DEFS = @DEFS@
-LOCAL_DEFS = @LOCAL_DEFS@
-
-CCFLAGS = $(DEFS) $(LOCAL_DEFS) $(LOCAL_CFLAGS) $(CFLAGS)
-
-SHOBJ_CC = @SHOBJ_CC@
-SHOBJ_CFLAGS = @SHOBJ_CFLAGS@
-SHOBJ_LD = @SHOBJ_LD@
-SHOBJ_LDFLAGS = @SHOBJ_LDFLAGS@
-SHOBJ_XLDFLAGS = @SHOBJ_XLDFLAGS@
-SHOBJ_LIBS = @SHOBJ_LIBS@
-SHOBJ_STATUS = @SHOBJ_STATUS@
-
-.c.o:
-	$(SHOBJ_CC) $(SHOBJ_CFLAGS) $(CCFLAGS) -c -o $@ $<
-
-../libexec/rbenv-realpath.dylib: realpath.o
-	$(SHOBJ_LD) $(SHOBJ_LDFLAGS) $(SHOBJ_XLDFLAGS) -o $@ realpath.o $(SHOBJ_LIBS)
+../libexec/rbenv-realpath.dylib:
+	@echo "Warning: this Makefile is obsolete and kept only for backwards compatibility." >&2
+	@echo "You can remove the \`configure && make ...' step from your rbenv setup." >&2
 
 clean:
 	rm -f *.o ../libexec/*.dylib
+
+.PHONY: ../libexec/rbenv-realpath.dylib clean

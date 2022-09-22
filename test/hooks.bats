@@ -43,16 +43,16 @@ ${RBENV_TEST_DIR}/etc/rbenv hooks/exec/ahoy.bash
 OUT
 }
 
-@test "resolves relative paths" {
+@test "does not canonicalize paths" {
   RBENV_HOOK_PATH="${RBENV_TEST_DIR}/rbenv.d"
   create_hook exec "hello.bash"
   mkdir -p "$HOME"
 
   RBENV_HOOK_PATH="${HOME}/../rbenv.d" run rbenv-hooks exec
-  assert_success "${RBENV_TEST_DIR}/rbenv.d/exec/hello.bash"
+  assert_success "${RBENV_TEST_DIR}/home/../rbenv.d/exec/hello.bash"
 }
 
-@test "resolves symlinks" {
+@test "does not resolve symlinks" {
   path="${RBENV_TEST_DIR}/rbenv.d"
   mkdir -p "${path}/exec"
   mkdir -p "$HOME"
@@ -64,7 +64,7 @@ OUT
   RBENV_HOOK_PATH="$path" run rbenv-hooks exec
   assert_success
   assert_output <<OUT
-${HOME}/hola.bash
-${RBENV_TEST_DIR}/rbenv.d/exec/bright.sh
+${RBENV_TEST_DIR}/rbenv.d/exec/hello.bash
+${RBENV_TEST_DIR}/rbenv.d/exec/world.bash
 OUT
 }

@@ -20,37 +20,6 @@ abort() {
   exit 1
 }
 
-if enable -f "${BASH_SOURCE%/*}"/../libexec/rbenv-realpath.dylib realpath 2>/dev/null; then
-  abs_dirname() {
-    local path
-    path="$(realpath "$1")"
-    echo "${path%/*}"
-  }
-else
-  [ -z "$RBENV_NATIVE_EXT" ] || abort "failed to load \`realpath' builtin"
-
-  READLINK=$(type -p greadlink readlink 2>/dev/null | head -n1)
-  [ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
-
-  resolve_link() {
-    $READLINK "$1"
-  }
-
-  abs_dirname() {
-    local cwd="$PWD"
-    local path="$1"
-
-    while [ -n "$path" ]; do
-      cd "${path%/*}"
-      local name="${path##*/}"
-      path="$(resolve_link "$name" || true)"
-    done
-
-    pwd
-    cd "$cwd"
-  }
-fi
-
 if [ -z "${RBENV_ROOT}" ]; then
   RBENV_ROOT="${HOME}/.rbenv"
 else
@@ -72,7 +41,8 @@ export RBENV_DIR
 
 shopt -s nullglob
 
-bin_path="$(abs_dirname "$0")"
+rbenv_bin="${BASH_SOURCE:-$0}"
+bin_path="$(cd "${rbenv_bin%/*}"/../libexec && pwd -P)"
 for plugin_bin in "${RBENV_ROOT}/plugins/"*/bin; do
   PATH="${plugin_bin}:${PATH}"
 done

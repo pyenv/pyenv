@@ -197,13 +197,6 @@ a systemwide install.
     git clone https://github.com/rbenv/rbenv.git ~/.rbenv
     ```
 
-    Optionally, try to compile dynamic bash extension to speed up rbenv. Don't
-    worry if it fails; rbenv will still work normally:
-
-    ```sh
-    cd ~/.rbenv && src/configure && make -C src
-    ```
-
 2. Add `~/.rbenv/bin` to your `$PATH` for access to the `rbenv`
    command-line utility.
 
