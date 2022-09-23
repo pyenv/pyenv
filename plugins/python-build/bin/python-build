@@ -779,6 +779,7 @@ build_package_standard_build() {
     else
       use_homebrew_zlib || true
     fi
+    use_dsymutil || true
   fi
 
   ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
@@ -1623,6 +1624,16 @@ use_tcltk() {
     use_custom_tcltk "$tcl_tk_libs"
   elif [ -d "$tcltk_libdir" ]; then
     use_homebrew_tcltk
+  fi
+}
+
+# Since 3.12, CPython can add DWARF debug information in MacOS
+# using Apple's nonstandard way, `dsymutil', that creates a "dSYM bundle"
+# that's supposed to be installed alongside executables
+# (https://github.com/python/cpython/issues/95973).
+use_dsymutil() {
+  if [[ -n "$PYTHON_BUILD_CONFIGURE_WITH_DSYMUTIL" ]] && is_mac; then
+    package_option python configure --with-dsymutil
   fi
 }
 
