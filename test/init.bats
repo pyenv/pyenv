@@ -21,7 +21,7 @@ load test_helper
   root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run rbenv-init - bash
   assert_success
-  assert_line "source '${root}/test/../libexec/../completions/rbenv.bash'"
+  assert_line "source '${root}/test/../completions/rbenv.bash'"
 }
 
 @test "detect parent shell" {
