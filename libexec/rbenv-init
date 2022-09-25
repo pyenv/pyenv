@@ -45,6 +45,11 @@ root="${BASH_SOURCE:-$0}"
 root="${root%/*}"
 root="${root%/*}"
 
+rbenv_in_path=true
+if [ -n "$RBENV_ORIG_PATH" ]; then
+  PATH="$RBENV_ORIG_PATH" command -v rbenv >/dev/null || rbenv_in_path=""
+fi
+
 if [ -z "$print" ]; then
   case "$shell" in
   bash )
@@ -68,18 +73,27 @@ if [ -z "$print" ]; then
     ;;
   esac
 
-  { echo "# Load rbenv automatically by appending"
-    echo "# the following to ${profile}:"
+  rbenv_command=rbenv
+  if [ -z "$rbenv_in_path" ]; then
+    rbenv_command="$root/bin/rbenv"
+    rbenv_command="${rbenv_command/$HOME\//~/}"
+  fi
+
+  { echo "# Please add the following line to your \`${profile}' file,"
+    echo "# then restart your terminal."
     echo
+    [ -t 2 ] && printf '\e[33;1m'
     case "$shell" in
     fish )
-      echo 'status --is-interactive; and rbenv init - fish | source'
+      printf 'status --is-interactive; and %s init - fish | source' "$rbenv_command"
       ;;
     * )
       # shellcheck disable=SC2016
-      printf 'eval "$(rbenv init - %s)"\n' "$shell"
+      printf 'eval "$(%s init - %s)"' "$rbenv_command" "$shell"
       ;;
     esac
+    [ -t 2 ] && printf '\e[m'
+    echo
     echo
   } >&2
 
@@ -87,11 +101,6 @@ if [ -z "$print" ]; then
 fi
 
 mkdir -p "${RBENV_ROOT}/"{shims,versions}
-
-rbenv_in_path=true
-if [ -n "$RBENV_ORIG_PATH" ]; then
-  PATH="$RBENV_ORIG_PATH" command -v rbenv >/dev/null || rbenv_in_path=""
-fi
 
 case "$shell" in
 fish )
