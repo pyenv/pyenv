@@ -23,12 +23,7 @@ The simplicity of rbenv has its benefits, but also some downsides. See the [comp
 
 On systems with Homebrew package manager, the “Using Package Managers” method is recommended. On other systems, “Basic Git Checkout” might be the easiest way of ensuring that you are always installing the latest version of rbenv.
 
-<details>
-<summary>
-
 ### Using Package Managers
-
-</summary>
 
 1. Install rbenv using one of the following approaches.
 
@@ -67,14 +62,7 @@ On systems with Homebrew package manager, the “Using Package Managers” metho
 
 That's it! You are now ready to [install some Ruby versions](#installing-ruby-versions).
 
-</details>
-
-<details>
-<summary>
-
 ### Basic Git Checkout
-
-</summary>
 
 > **Note**  
 > For a more automated install, you can use [rbenv-installer](https://github.com/rbenv/rbenv-installer#rbenv-installer). If you do not want to execute scripts downloaded from a web URL or simply prefer a manual approach, follow the steps below.
@@ -114,8 +102,6 @@ This will get you going with the latest version of rbenv without needing a syste
    If you are curious, see here to [understand what `init` does](#how-rbenv-hooks-into-your-shell).
 
 3. Restart your shell so that these changes take effect. (Opening a new terminal tab will usually do it.)
-
-</details>
 
 ### Installing Ruby versions
 
