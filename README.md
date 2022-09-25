@@ -15,6 +15,8 @@ rbenv local 3.1.2
 
 Doing so will create or update the `.ruby-version` file in the current directory with the version that you've chosen. A different project of yours that is another directory might be using a different version of Ruby altogether—rbenv will seamlessly transition from one Ruby version to another when you switch projects.
 
+Finally, almost every aspect of rbenv's mechanism is [customizable via plugins][plugins] written in bash.
+
 The simplicity of rbenv has its benefits, but also some downsides. See the [comparison of version managers][alternatives] for more details and some alternatives.
 
 ## Installation
@@ -336,4 +338,5 @@ tracker](https://github.com/rbenv/rbenv/issues).
 
   [ruby-build]: https://github.com/rbenv/ruby-build#readme
   [hooks]: https://github.com/rbenv/rbenv/wiki/Authoring-plugins#rbenv-hooks
-  [alternatives]: https://github.com/rbenv/rbenv/wiki/Other-version-managers
+  [alternatives]: https://github.com/rbenv/rbenv/wiki/Comparison-of-version-managers
+  [plugins]: https://github.com/rbenv/rbenv/wiki/Plugins
