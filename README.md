@@ -120,6 +120,8 @@ rbenv install -L
 rbenv install 3.1.2
 ```
 
+For troubleshooting `BUILD FAILED` scenarios, check the [ruby-build Discussions section](https://github.com/rbenv/ruby-build/discussions/categories/build-failures).
+
 > **Note**  
 > If the `rbenv install` command wasn't found, you can install ruby-build as a plugin:
 > ```sh
