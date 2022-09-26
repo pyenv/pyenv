@@ -37,6 +37,15 @@ else
   begin
     Gem.post_install(&hook)
     Gem.post_uninstall(&hook)
+
+    # Silence the warning that would be printed for --user-install'ed gems:
+    #
+    #   WARNING: You don't have ~/.gem/ruby/<version>/bin in your PATH,
+    #            gem executables will not run.
+    #
+    # This warning isn't accurate in the context of rbenv because the executables
+    # at this location will automatically be available for running through rbenv.
+    Gem::Installer.path_warning = true if Gem::Installer.respond_to?(:path_warning=)
   rescue
     warn "rbenv: error installing gem-rehash hooks (#{$!.class.name}: #{$!.message})"
   end

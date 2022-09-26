@@ -41,6 +41,17 @@ if [ "$RBENV_VERSION" = "system" ]; then
     RBENV_COMMAND_PATH="$(command -v "$RBENV_COMMAND" || true)"
 else
   RBENV_COMMAND_PATH="${RBENV_ROOT}/versions/${RBENV_VERSION}/bin/${RBENV_COMMAND}"
+  if [ ! -x "$RBENV_COMMAND_PATH" ]; then
+    # discover user-install'ed gem executables
+    if [ -n "$GEM_HOME" ]; then
+      user_install_path="${GEM_HOME}/bin/${RBENV_COMMAND}"
+    else
+      # FIXME: guessing this path is very fragile and works only for C Ruby
+      user_install_path="${HOME}/.gem/ruby/${RBENV_VERSION%.*}.0/bin/${RBENV_COMMAND}"
+    fi
+    [ -x "$user_install_path" ] && RBENV_COMMAND_PATH="$user_install_path"
+    unset user_install_path
+  fi
 fi
 
 OLDIFS="$IFS"

@@ -3,10 +3,11 @@
 load test_helper
 
 create_executable() {
-  local bin="${RBENV_ROOT}/versions/${1}/bin"
-  mkdir -p "$bin"
-  touch "${bin}/$2"
-  chmod +x "${bin}/$2"
+  local exe="${RBENV_ROOT}/versions/${1}/bin/${2}"
+  [ -n "$2" ] || exe="$1"
+  mkdir -p "${exe%/*}"
+  touch "$exe"
+  chmod +x "$exe"
 }
 
 @test "empty rehash" {
@@ -101,6 +102,42 @@ OUT
   assert_output <<OUT
 rspec
 ruby
+OUT
+}
+
+@test "user-install" {
+  create_executable "${HOME}/.gem/ruby/3.0.0/bin/lolcat"
+  create_executable "${HOME}/.gem/ruby/3.1.0/bin/pinecone"
+
+  assert [ ! -e "${RBENV_ROOT}/shims/lolcat" ]
+  assert [ ! -e "${RBENV_ROOT}/shims/pinecone" ]
+
+  run rbenv-rehash
+  assert_success ""
+
+  run ls "${RBENV_ROOT}/shims"
+  assert_success
+  assert_output <<OUT
+lolcat
+pinecone
+OUT
+}
+
+@test "explicit gem home" {
+  create_executable "${HOME}/mygems/bin/lolcat"
+  create_executable "${HOME}/mygems/bin/pinecone"
+
+  assert [ ! -e "${RBENV_ROOT}/shims/lolcat" ]
+  assert [ ! -e "${RBENV_ROOT}/shims/pinecone" ]
+
+  GEM_HOME="${HOME}/mygems" run rbenv-rehash
+  assert_success ""
+
+  run ls "${RBENV_ROOT}/shims"
+  assert_success
+  assert_output <<OUT
+lolcat
+pinecone
 OUT
 }
 

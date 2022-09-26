@@ -104,6 +104,15 @@ list_executable_names() {
       echo "${file##*/}"
     done
   done
+  # list user-install'ed executables
+  for file in ~/.gem/ruby/*/bin/*; do
+    echo "${file##*/}"
+  done
+  if [ -n "$GEM_HOME" ]; then
+    for file in "$GEM_HOME"/bin/*; do
+      echo "${file##*/}"
+    done
+  fi
 }
 
 # The basename of each argument passed to `make_shims` will be
