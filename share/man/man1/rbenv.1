@@ -1,0 +1,163 @@
+'\" t
+.\"     Title: rbenv
+.\"    Author: Mislav Marohnić
+.\" Generator: Asciidoctor 2.0.17
+.\"      Date: 2022-09-26
+.\"    Manual: Rbenv Manual
+.\"    Source: rbenv 1.2.0-29-g7c7c4dc
+.\"  Language: English
+.\"
+.TH "RBENV" "1" "2022-09-26" "rbenv 1.2.0\-29\-g7c7c4dc" "Rbenv Manual"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+rbenv \- manage your application\*(Aqs Ruby environment
+.SH "SYNOPSIS"
+.sp
+\fBrbenv\fP \fI<command>\fP [\fI<args>\fP...]
+.SH "DESCRIPTION"
+.sp
+rbenv respects the \fI.ruby\-version\fP file in a project directory by making sure that any \fBruby\fP, \fBgem\fP, \fBbundle\fP, or other Ruby command invocation automatically invokes the Ruby version configured for that project.
+.sp
+It does so by generating shims for all Ruby executables. As long as rbenv shims directory is prepended to PATH, rbenv automatically ensures transparent switching between Ruby versions.
+.sp
+rbenv looks for available Ruby versions in the \fI{RBENV_ROOT}/versions/\fP directory.
+.SH "COMMANDS"
+.sp
+\fBrbenv global\fP [\fI<version>\fP]
+.RS 4
+View or change the global Ruby version
+.RE
+.sp
+\fBrbenv local\fP [\fI<version>\fP]
+.RS 4
+View or change the local Ruby version
+.RE
+.sp
+\fBrbenv shell\fP [\fI<version>\fP]
+.RS 4
+View or change the Ruby version for the current shell session
+.RE
+.sp
+\fBrbenv version\fP
+.RS 4
+View the currently active Ruby version and where it is set from
+.RE
+.sp
+\fBrbenv versions\fP
+.RS 4
+List all locally installed Ruby versions known to rbenv
+.RE
+.sp
+\fBrbenv install\fP [\fI<version>\fP]
+.RS 4
+(Provided by the \fBruby\-build\fP plugin) Download and install a new Ruby version
+.RE
+.sp
+\fBrbenv rehash\fP
+.RS 4
+Regenerate shims for all known Ruby executables
+.RE
+.sp
+\fBrbenv which\fP [\fI<command>\fP]
+.RS 4
+View the executable path that a command resolves to
+.RE
+.sp
+\fBrbenv init\fP
+.RS 4
+Help bootstrap rbenv into the current shell environment
+.RE
+.sp
+\fBrbenv help\fP [\fI<command>\fP]
+.RS 4
+View help text for any rbenv command
+.RE
+.SH "ENVIRONMENT VARIABLES"
+.sp
+\fBRBENV_VERSION\fP (default: read from \fI.ruby\-version\fP file)
+.RS 4
+The Ruby version name to be used
+.RE
+.sp
+\fBRBENV_ROOT\fP (default: \fI~/.rbenv\fP)
+.RS 4
+The location where rbenv discovers Ruby versions, plugins, and other configuration
+.RE
+.sp
+\fBRBENV_DEBUG\fP
+.RS 4
+Activates printing debug information about rbenv internals to standard error
+.RE
+.sp
+\fBRBENV_HOOK_PATH\fP
+.RS 4
+Colon\-separated list of paths searched for rbenv plugin scripts
+.RE
+.sp
+\fBRBENV_DIR\fP (default: \fI{PWD}\fP)
+.RS 4
+Directory to traverse bottom\-up to locate the \fI.ruby\-version\fP file
+.RE
+.SH "PLUGINS"
+.sp
+rbenv only performs Ruby version switching as its core functionality, but offers a plugin mechanism to hook into and override almost any aspect of its functionality.
+.sp
+The most common plugin for rbenv is \fBruby\-build\fP which facilitates installing new Ruby versions into the \fI{RBENV_ROOT}/versions/\fP directory.
+.sp
+Read more at \c
+.URL "https://github.com/rbenv/rbenv/wiki/Plugins" "" ""
+.SH "NOTES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+.URL "https://github.com/rbenv/rbenv/discussions" "" ""
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+.URL "https://github.com/rbenv/rbenv/wiki" "" ""
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+.URL "https://github.com/rbenv/ruby\-build#readme" "" ""
+.RE
+.SH "AUTHOR"
+.sp
+Mislav Marohnić

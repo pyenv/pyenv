@@ -1,0 +1,87 @@
+= rbenv(1)
+Mislav Marohnić
+:doctype: manpage
+:man manual: Rbenv Manual
+:man source: rbenv {version}
+:man-linkstyle: pass:[blue R < >]
+
+== Name
+
+rbenv - manage your application's Ruby environment
+
+== Synopsis
+
+*rbenv* _<command>_ [_<args>_...]
+
+== Description
+
+rbenv respects the _.ruby-version_ file in a project directory by making sure that any *ruby*, *gem*, *bundle*, or other Ruby command invocation automatically invokes the Ruby version configured for that project.
+
+It does so by generating shims for all Ruby executables. As long as rbenv shims directory is prepended to PATH, rbenv automatically ensures transparent switching between Ruby versions.
+
+rbenv looks for available Ruby versions in the _{RBENV_ROOT}/versions/_ directory.
+
+== Commands
+
+*rbenv global* [_<version>_]::
+  View or change the global Ruby version
+
+*rbenv local* [_<version>_]::
+  View or change the local Ruby version
+
+*rbenv shell* [_<version>_]::
+  View or change the Ruby version for the current shell session
+
+*rbenv version*::
+  View the currently active Ruby version and where it is set from
+
+*rbenv versions*::
+  List all locally installed Ruby versions known to rbenv
+
+*rbenv install* [_<version>_]::
+  (Provided by the *ruby-build* plugin) Download and install a new Ruby version
+
+*rbenv rehash*::
+  Regenerate shims for all known Ruby executables
+
+*rbenv which* [_<command>_]::
+  View the executable path that a command resolves to
+
+*rbenv init*::
+  Help bootstrap rbenv into the current shell environment
+
+*rbenv help* [_<command>_]::
+  View help text for any rbenv command
+
+== Environment Variables
+
+*RBENV_VERSION* (default: read from _.ruby-version_ file)::
+  The Ruby version name to be used
+
+*RBENV_ROOT* (default: _~/.rbenv_)::
+  The location where rbenv discovers Ruby versions, plugins, and other configuration
+
+*RBENV_DEBUG*::
+  Activates printing debug information about rbenv internals to standard error
+
+*RBENV_HOOK_PATH*::
+  Colon-separated list of paths searched for rbenv plugin scripts
+
+*RBENV_DIR* (default: _{PWD}_)::
+  Directory to traverse bottom-up to locate the _.ruby-version_ file
+
+== Plugins
+
+rbenv only performs Ruby version switching as its core functionality, but offers a plugin mechanism to hook into and override almost any aspect of its functionality.
+
+The most common plugin for rbenv is *ruby-build* which facilitates installing new Ruby versions into the _{RBENV_ROOT}/versions/_ directory.
+
+Read more at https://github.com/rbenv/rbenv/wiki/Plugins
+
+== Notes
+
+* https://github.com/rbenv/rbenv/discussions
+
+* https://github.com/rbenv/rbenv/wiki
+
+* https://github.com/rbenv/ruby-build#readme

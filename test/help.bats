@@ -9,6 +9,12 @@ load test_helper
   assert_line "Some useful rbenv commands are:"
 }
 
+@test "usage flag" {
+  run rbenv-help --usage
+  assert_success
+  assert_output "Usage: rbenv <command> [<args>]"
+}
+
 @test "invalid command" {
   run rbenv-help hello
   assert_failure "rbenv: no such command \`hello'"

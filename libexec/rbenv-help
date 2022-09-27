@@ -154,8 +154,11 @@ if [ "$1" = "--usage" ]; then
 fi
 
 if [ -z "$1" ] || [ "$1" == "rbenv" ]; then
+  if [ -z "$usage" ] && [ -t 1 ] && type -p man >/dev/null; then
+    MANPATH="${BASH_SOURCE%/*}/../share/man:$MANPATH" exec man rbenv
+  fi
   echo "Usage: rbenv <command> [<args>]"
-  [ -z "$usage" ] || exit
+  [ -n "$usage" ] && exit
   echo
   echo "Some useful rbenv commands are:"
   print_summaries commands local global shell install uninstall rehash version versions which whence
