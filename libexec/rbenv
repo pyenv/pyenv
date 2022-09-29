@@ -42,16 +42,38 @@ export RBENV_DIR
 shopt -s nullglob
 
 rbenv_bin="${BASH_SOURCE:-$0}"
-bin_path="$(cd "${rbenv_bin%/*}"/../libexec && pwd -P)"
+if [ -L "$rbenv_bin" ]; then
+  # resolve rbenv symlink to find out where the actual libexec directory is
+  if readlink="$(type -p greadlink)" || readlink="$(type -p readlink)"; then
+    resolved="$("$readlink" "$rbenv_bin" 2>/dev/null)"
+    if [[ $resolved == /* ]]; then
+      libexec_dir="${resolved%/*}"
+    else
+      libexec_dir="$(cd "${rbenv_bin%/*}/${resolved%/*}" && pwd)"
+    fi
+  else
+    # no readlink available; assume rbenv project layout
+    libexec_dir="${rbenv_bin%/*}"
+    if [[ $libexec_dir == */* ]]; then
+      libexec_dir="${libexec_dir%/*}/libexec"
+    else
+      libexec_dir="${PWD}/libexec"
+    fi
+  fi
+else
+  libexec_dir="${rbenv_bin%/*}"
+  [[ $libexec_dir != "." ]] || libexec_dir="$PWD"
+fi
+
 for plugin_bin in "${RBENV_ROOT}/plugins/"*/bin; do
   PATH="${plugin_bin}:${PATH}"
 done
-export PATH="${bin_path}:${PATH}"
+export PATH="${libexec_dir}:${PATH}"
 
 RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${RBENV_ROOT}/rbenv.d"
-if [ "${bin_path%/*}" != "$RBENV_ROOT" ]; then
+if [ ! "${libexec_dir%/*}"/rbenv.d -ef "$RBENV_ROOT"/rbenv.d ]; then
   # Add rbenv's own `rbenv.d` unless rbenv was cloned to RBENV_ROOT
-  RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${bin_path%/*}/rbenv.d"
+  RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${libexec_dir%/*}/rbenv.d"
 fi
 RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 for plugin_hook in "${RBENV_ROOT}/plugins/"*/etc/rbenv.d; do
