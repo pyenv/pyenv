@@ -44,7 +44,7 @@ shopt -s nullglob
 rbenv_bin="${BASH_SOURCE:-$0}"
 if [ -L "$rbenv_bin" ]; then
   # resolve rbenv symlink to find out where the actual libexec directory is
-  if readlink="$(type -p greadlink)" || readlink="$(type -p readlink)"; then
+  if readlink="$(type -P greadlink)" || readlink="$(type -P readlink)"; then
     resolved="$("$readlink" "$rbenv_bin" 2>/dev/null)"
     if [[ $resolved == /* ]]; then
       libexec_dir="${resolved%/*}"
