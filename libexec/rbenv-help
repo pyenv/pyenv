@@ -43,7 +43,7 @@ extract_initial_comment_block() {
 
 collect_documentation() {
   local awk
-  awk="$(type -p gawk awk 2>/dev/null | head -n1)"
+  awk="$(type -P gawk)" || awk="$(type -P awk)" || true
   if [ -z "$awk" ]; then
     echo "rbenv: cannot find awk" >&2
     return 1
@@ -154,7 +154,7 @@ if [ "$1" = "--usage" ]; then
 fi
 
 if [ -z "$1" ] || [ "$1" == "rbenv" ]; then
-  if [ -z "$usage" ] && [ -t 1 ] && type -p man >/dev/null; then
+  if [ -z "$usage" ] && [ -t 1 ] && type -P man >/dev/null; then
     MANPATH="${BASH_SOURCE%/*}/../share/man:$MANPATH" exec man rbenv
   fi
   echo "Usage: rbenv <command> [<args>]"
