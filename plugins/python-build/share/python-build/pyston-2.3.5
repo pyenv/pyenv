@@ -1,0 +1,23 @@
+# sha256sum used for checksum values
+
+# version of pyston
+VER='2.3.5'
+# alias for download location
+DOWNLOAD='https://github.com/pyston/pyston/releases/download'
+
+case "$(pyston_architecture 2>/dev/null || true)" in
+"linux64" )
+  install_package "pyston_${VER}_portable_amd64" "${DOWNLOAD}/pyston_${VER}/pyston_${VER}_portable_amd64.tar.gz#c71c711d60a9c18f243a9e30fd35e0818674ae96f534c67c27b0cdfbc9132ef8" "pyston" verify_py38 get_pip
+  ;;
+"linux-aarch64" )
+  install_package "pyston_${VER}_portable_arm64" "${DOWNLOAD}/pyston_${VER}/pyston_${VER}_portable_arm64.tar.gz#c578cb806c62d9dca8728f190a87e172305bd80887e206df42c4c5658ab469c1" "pyston" verify_py38 get_pip
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": A Pyston ${VER} binary is not available for $(pyston_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
