@@ -45,8 +45,7 @@ rbenv_path() {
     echo "$PWD/${found#./}"
   else
     # Assume rbenv isn't in PATH.
-    local here="${BASH_SOURCE%/*}"
-    echo "${here%/*}/bin/rbenv"
+    echo "${BASH_SOURCE%/*}/rbenv"
   fi
 }
 
