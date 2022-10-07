@@ -47,7 +47,7 @@ root="${root%/*}"
 
 rbenv_in_path=true
 if [ -n "$RBENV_ORIG_PATH" ]; then
-  PATH="$RBENV_ORIG_PATH" command -v rbenv >/dev/null || rbenv_in_path=""
+  PATH="$RBENV_ORIG_PATH" type -P rbenv >/dev/null || rbenv_in_path=""
 fi
 
 if [ -z "$print" ]; then

@@ -23,7 +23,7 @@ fi
 
 command_path() {
   local command="$1"
-  command -v rbenv-"$command" || command -v rbenv-sh-"$command" || true
+  type -P rbenv-"$command" rbenv-sh-"$command" | head -n1
 }
 
 extract_initial_comment_block() {
