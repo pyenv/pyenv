@@ -105,22 +105,17 @@ ruby
 OUT
 }
 
-@test "user-install" {
-  create_executable "${HOME}/.gem/ruby/3.0.0/bin/lolcat"
+@test "no shims for user-installed gems" {
+  create_executable "2.7.5" "ruby"
+  create_executable "3.1.2" "ruby"
+  create_executable "${HOME}/.gem/ruby/2.7.0/bin/lolcat"
   create_executable "${HOME}/.gem/ruby/3.1.0/bin/pinecone"
-
-  assert [ ! -e "${RBENV_ROOT}/shims/lolcat" ]
-  assert [ ! -e "${RBENV_ROOT}/shims/pinecone" ]
 
   run rbenv-rehash
   assert_success ""
 
-  run ls "${RBENV_ROOT}/shims"
-  assert_success
-  assert_output <<OUT
-lolcat
-pinecone
-OUT
+  assert [ ! -e "${RBENV_ROOT}/shims/lolcat" ]
+  assert [ ! -e "${RBENV_ROOT}/shims/pinecone" ]
 }
 
 @test "explicit gem home" {
