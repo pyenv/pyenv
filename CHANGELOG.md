@@ -1,5 +1,18 @@
 ## Version History
 
+## Release 2.3.5
+
+* Add CPython 3.10.7 (#2454)
+* Docs: update Fish PATH update (#2449)
+* Add CPython 3.7.14, 3.8.14 and 3.9.14 (#2456)
+* Update miniconda3-3.9-4.12.0 (#2460)
+* Add CPython 3.11.0rc2 (#2459)
+* Add patches for 3.7.14 to support Apple Silicon (#2463)
+* Add ability to skip all use of Homebrew (#2464)
+* Drop Travis integration (#2468)
+* Build CPython 3.12+ with --with-dsymutil in MacOS (#2471)
+* Add Pyston 2.3.5 (#2476)
+
 ## Release 2.3.4
 
 * Add CPython 3.11.0rc1 (#2434)
