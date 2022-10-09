@@ -99,7 +99,7 @@ case "$command" in
   exec rbenv-help
   ;;
 * )
-  command_path="$(command -v "rbenv-$command" || true)"
+  command_path="$(type -P "rbenv-$command" || true)"
   if [ -z "$command_path" ]; then
     if [ "$command" == "shell" ]; then
       abort "shell integration not enabled. Run \`rbenv init' for instructions."

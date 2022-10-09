@@ -38,7 +38,7 @@ remove_prototype_shim() {
 # absolute path to the rbenv executable itself.
 rbenv_path() {
   local found
-  found="$(PATH="$RBENV_ORIG_PATH" command -v rbenv)"
+  found="$(PATH="$RBENV_ORIG_PATH" type -P rbenv)"
   if [[ $found == /* ]]; then
     echo "$found"
   elif [[ -n "$found" ]]; then
