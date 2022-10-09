@@ -19,7 +19,7 @@ rbenv respects the _.ruby-version_ file in a project directory by making sure th
 
 It does so by generating shims for all Ruby executables. As long as rbenv shims directory is prepended to PATH, rbenv automatically ensures transparent switching between Ruby versions.
 
-rbenv looks for available Ruby versions in the _{RBENV_ROOT}/versions/_ directory.
+rbenv looks for available Ruby versions in the _$RBENV_ROOT/versions_ directory.
 
 == Commands
 
@@ -67,14 +67,14 @@ rbenv looks for available Ruby versions in the _{RBENV_ROOT}/versions/_ director
 *RBENV_HOOK_PATH*::
   Colon-separated list of paths searched for rbenv plugin scripts
 
-*RBENV_DIR* (default: _{PWD}_)::
+*RBENV_DIR* (default: _$PWD_)::
   Directory to traverse bottom-up to locate the _.ruby-version_ file
 
 == Plugins
 
-rbenv only performs Ruby version switching as its core functionality, but offers a plugin mechanism to hook into and override almost any aspect of its functionality.
+As its core functionality, rbenv only switches between Ruby versions and does nothing else, but offers a plugin mechanism to hook into and override almost any aspect of its default behavior.
 
-The most common plugin for rbenv is *ruby-build* which facilitates installing new Ruby versions into the _{RBENV_ROOT}/versions/_ directory.
+The most common plugin for rbenv is *ruby-build* which facilitates installing new Ruby versions into the _$RBENV_ROOT/versions_ directory.
 
 Read more at https://github.com/rbenv/rbenv/wiki/Plugins
 
