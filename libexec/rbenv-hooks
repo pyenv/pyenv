@@ -21,7 +21,7 @@ if [ -z "$RBENV_COMMAND" ]; then
   exit 1
 fi
 
-IFS=: hook_paths=($RBENV_HOOK_PATH)
+IFS=: read -r -a hook_paths <<<"$RBENV_HOOK_PATH"
 
 shopt -s nullglob
 for path in "${hook_paths[@]}"; do

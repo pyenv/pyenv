@@ -47,10 +47,9 @@ if [[ ! -x "$RBENV_COMMAND_PATH" && -n "$GEM_HOME" && -x "${GEM_HOME}/bin/${RBEN
   RBENV_COMMAND_PATH="${GEM_HOME}/bin/${RBENV_COMMAND}"
 fi
 
-OLDIFS="$IFS"
-IFS=$'\n' scripts=(`rbenv-hooks which`)
-IFS="$OLDIFS"
+IFS=$'\n' read -d '' -r -a scripts <<<"$(rbenv-hooks which)" || true
 for script in "${scripts[@]}"; do
+  # shellcheck disable=SC1090
   source "$script"
 done
 

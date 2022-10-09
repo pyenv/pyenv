@@ -8,10 +8,9 @@ if [ -z "$RBENV_VERSION" ]; then
   RBENV_VERSION="$(rbenv-version-file-read "$RBENV_VERSION_FILE" || true)"
 fi
 
-OLDIFS="$IFS"
-IFS=$'\n' scripts=(`rbenv-hooks version-name`)
-IFS="$OLDIFS"
+IFS=$'\n' read -d '' -r -a scripts <<<"$(rbenv-hooks version-name)" || true
 for script in "${scripts[@]}"; do
+  # shellcheck disable=SC1090
   source "$script"
 done
 

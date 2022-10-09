@@ -20,7 +20,7 @@ elif [ "$1" = "--no-sh" ]; then
   shift
 fi
 
-IFS=: paths=($PATH)
+IFS=: read -d '' -r -a paths <<<"$PATH" || true
 
 shopt -s nullglob
 

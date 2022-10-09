@@ -160,11 +160,9 @@ remove_outdated_shims
 registered_shims=( $(list_executable_names | sort -u) )
 
 # Allow plugins to register shims.
-OLDIFS="$IFS"
-IFS=$'\n' scripts=(`rbenv-hooks rehash`)
-IFS="$OLDIFS"
-
+IFS=$'\n' read -d '' -r -a scripts <<<"$(rbenv-hooks rehash)" || true
 for script in "${scripts[@]}"; do
+  # shellcheck disable=SC1090
   source "$script"
 done
 
