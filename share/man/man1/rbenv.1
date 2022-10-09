@@ -2,12 +2,12 @@
 .\"     Title: rbenv
 .\"    Author: Mislav Marohnić
 .\" Generator: Asciidoctor 2.0.17
-.\"      Date: 2022-09-26
+.\"      Date: 2022-10-09
 .\"    Manual: Rbenv Manual
-.\"    Source: rbenv 1.2.0-29-g7c7c4dc
+.\"    Source: rbenv 1.2.0-36-g6b1cc34
 .\"  Language: English
 .\"
-.TH "RBENV" "1" "2022-09-26" "rbenv 1.2.0\-29\-g7c7c4dc" "Rbenv Manual"
+.TH "RBENV" "1" "2022-10-09" "rbenv 1.2.0\-36\-g6b1cc34" "Rbenv Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -38,7 +38,7 @@ rbenv respects the \fI.ruby\-version\fP file in a project directory by making su
 .sp
 It does so by generating shims for all Ruby executables. As long as rbenv shims directory is prepended to PATH, rbenv automatically ensures transparent switching between Ruby versions.
 .sp
-rbenv looks for available Ruby versions in the \fI{RBENV_ROOT}/versions/\fP directory.
+rbenv looks for available Ruby versions in the \fI$RBENV_ROOT/versions/\fP directory.
 .SH "COMMANDS"
 .sp
 \fBrbenv global\fP [\fI<version>\fP]
@@ -112,15 +112,15 @@ Activates printing debug information about rbenv internals to standard error
 Colon\-separated list of paths searched for rbenv plugin scripts
 .RE
 .sp
-\fBRBENV_DIR\fP (default: \fI{PWD}\fP)
+\fBRBENV_DIR\fP (default: \fI$PWD\fP)
 .RS 4
 Directory to traverse bottom\-up to locate the \fI.ruby\-version\fP file
 .RE
 .SH "PLUGINS"
 .sp
-rbenv only performs Ruby version switching as its core functionality, but offers a plugin mechanism to hook into and override almost any aspect of its functionality.
+As its core functionality, rbenv only switches between Ruby versions and does nothing else, but offers a plugin mechanism to hook into and override almost any aspect of its default behavior.
 .sp
-The most common plugin for rbenv is \fBruby\-build\fP which facilitates installing new Ruby versions into the \fI{RBENV_ROOT}/versions/\fP directory.
+The most common plugin for rbenv is \fBruby\-build\fP which facilitates installing new Ruby versions into the \fI$RBENV_ROOT/versions/\fP directory.
 .sp
 Read more at \c
 .URL "https://github.com/rbenv/rbenv/wiki/Plugins" "" ""
