@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Usage: rbenv completions <command> [arg1 arg2...]
+# Usage: rbenv completions <command> [<args>...]
 
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x

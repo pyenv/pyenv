@@ -157,7 +157,7 @@ if [ -z "$1" ] || [ "$1" == "rbenv" ]; then
   if [ -z "$usage" ] && [ -t 1 ] && type -P man >/dev/null; then
     MANPATH="${BASH_SOURCE%/*}/../share/man:$MANPATH" exec man rbenv
   fi
-  echo "Usage: rbenv <command> [<args>]"
+  echo "Usage: rbenv <command> [<args>...]"
   [ -n "$usage" ] && exit
   echo
   echo "Some useful rbenv commands are:"
