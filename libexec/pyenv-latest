@@ -33,30 +33,45 @@ do
     fi
 
     if [[ -z $FROM_KNOWN ]]; then
-        set -o nullglob
+        shopt -s nullglob
         pushd "$PYENV_ROOT/versions" &>/dev/null
         DEFINITION_CANDIDATES=( "$prefix"-* "$prefix".* )
         popd &>/dev/null
-        set +o nullglob
+        shopt -u nullglob
     else
-        IFS=$'\n' DEFINITION_CANDIDATES=( $(python-build --definitions | grep "^$prefix[.-]") )
+        # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
+        prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
+        IFS=$'\n' DEFINITION_CANDIDATES=( $(python-build --definitions | grep "^$prefix_re[-.]" || true) )
     fi
 
     OLDIFS="$IFS"
     IFS=$'\n'
 
     DEFINITION_CANDIDATES=(\
-        echo "${DEFINITION_CANDIDATES[@]}" | \
-          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/(b|rc)[0-9]+$/d' | \
-          sort -t. -k1,1r -k 2,2nr -k 3,3nr \
+        $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
+          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(b|rc)[0-9]+$/d'));
+
+    DEFINITION_CANDIDATES=(\
+        $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
+          awk \
+            '{ if (match($0,"^[[:alnum:]]+-"))
+               { print substr($0,0,RLENGTH-1) "." substr($0,RLENGTH+1) "..|" $0; }
+             else
+               { print $0 "...|" $0; }
+             }'))
+    DEFINITION_CANDIDATES=(\
+        $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" \
+          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr \
+          | cut -f2 -d $'|' \
         || true))
     DEFINITION="${DEFINITION_CANDIDATES}"
-    VERSION_NAME="${DEFINITION##*/}"
+
+    IFS="$OLDIFS"
 
     if [[ -n "$DEFINITION" ]]; then
         echo "$DEFINITION"
     else
-        echo "pyenv-latest: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match prefix \`$prefix'" >&2
+        echo "pyenv-latest: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
         exitcode=1
     fi
 done
