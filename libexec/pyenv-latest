@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Summary: Print the latest installed version with the given prefix
+# Usage: pyenv latest [-k|--known] <prefix> ...
+#
+#   -k/--known      Select from all known versions instead of installed
+#   -u/--unstable   Include prereleases
+
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+while [[ $# -gt 0 ]]
+do
+    case "$1" in
+        -k|--known)
+            FROM_KNOWN=1
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+prefixes=("$@")
+
+exitcode=0
+for prefix in "${prefixes[@]}"
+do
+    # An existing version only matches itself
+    if [[ -e $PYENV_ROOT/versions/$prefix ]]; then
+        echo "$prefix"
+        continue
+    fi
+
+    if [[ -z $FROM_KNOWN ]]; then
+        set -o nullglob
+        pushd "$PYENV_ROOT/versions" &>/dev/null
+        DEFINITION_CANDIDATES=( "$prefix"-* "$prefix".* )
+        popd &>/dev/null
+        set +o nullglob
+    else
+        IFS=$'\n' DEFINITION_CANDIDATES=( $(python-build --definitions | grep "^$prefix[.-]") )
+    fi
+
+    OLDIFS="$IFS"
+    IFS=$'\n'
+
+    DEFINITION_CANDIDATES=(\
+        echo "${DEFINITION_CANDIDATES[@]}" | \
+          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/(b|rc)[0-9]+$/d' | \
+          sort -t. -k1,1r -k 2,2nr -k 3,3nr \
+        || true))
+    DEFINITION="${DEFINITION_CANDIDATES}"
+    VERSION_NAME="${DEFINITION##*/}"
+
+    if [[ -n "$DEFINITION" ]]; then
+        echo "$DEFINITION"
+    else
+        echo "pyenv-latest: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match prefix \`$prefix'" >&2
+        exitcode=1
+    fi
+done
+
+exit $exitcode
