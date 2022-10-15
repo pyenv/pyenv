@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # Summary: Print the latest installed version with the given prefix
-# Usage: pyenv latest [-k|--known] <prefix> ...
+# Usage: pyenv latest [-k|--known] <prefix>
 #
 #   -k/--known      Select from all known versions instead of installed
-#   -u/--unstable   Include prereleases
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -21,31 +20,25 @@ do
     esac
 done
 
-prefixes=("$@")
-
+prefix=$1
 exitcode=0
-for prefix in "${prefixes[@]}"
-do
-    # An existing version only matches itself
-    if [[ -e $PYENV_ROOT/versions/$prefix ]]; then
-        echo "$prefix"
-        continue
-    fi
+
+IFS=$'\n'
 
     if [[ -z $FROM_KNOWN ]]; then
-        shopt -s nullglob
-        pushd "$PYENV_ROOT/versions" &>/dev/null
-        DEFINITION_CANDIDATES=( "$prefix"-* "$prefix".* )
-        popd &>/dev/null
-        shopt -u nullglob
+        DEFINITION_CANDIDATES=( $(pyenv-versions --bare) )
     else
-        # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
-        prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
-        IFS=$'\n' DEFINITION_CANDIDATES=( $(python-build --definitions | grep "^$prefix_re[-.]" || true) )
+        DEFINITION_CANDIDATES=( $(python-build --definitions ) )
     fi
-
-    OLDIFS="$IFS"
-    IFS=$'\n'
+    if grep -xFe "$prefix" <<<"${DEFINITION_CANDIDATES[@]}"; then
+        echo "$prefix"
+        exit $exitcode
+    fi
+    # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
+    prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
+    DEFINITION_CANDIDATES=(\
+      $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
+      grep -Ee "$prefix_re[-.]" || true))
 
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
@@ -64,9 +57,7 @@ do
           | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr \
           | cut -f2 -d $'|' \
         || true))
-    DEFINITION="${DEFINITION_CANDIDATES}"
-
-    IFS="$OLDIFS"
+    DEFINITION="${DEFINITION_CANDIDATES[0]}"
 
     if [[ -n "$DEFINITION" ]]; then
         echo "$DEFINITION"
@@ -74,6 +65,5 @@ do
         echo "pyenv-latest: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
         exitcode=1
     fi
-done
 
 exit $exitcode
