@@ -60,6 +60,7 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
 }
 
 @test "installing nonexistent definition" {
+  stub pyenv-latest
   run python-build "nonexistent" "${TMP}/install"
   assert [ "$status" -eq 2 ]
   assert_output "python-build: definition not found: nonexistent"
