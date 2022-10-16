@@ -2,6 +2,10 @@
 
 load test_helper
 
+setup() {
+  export PATH="${PYENV_TEST_DIR}/bin:$PATH"
+}
+
 create_executable() {
   local name="$1"
   local bin="${PYENV_TEST_DIR}/bin"
