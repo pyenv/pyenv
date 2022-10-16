@@ -57,7 +57,7 @@ pyenv: no installed versions match the prefix \`3.8'
 echo 3.5.6
 echo 3.10.8
 !
-  run pyenv-latest 3.8
+  run pyenv-latest -k 3.8
   assert_failure
   assert_output <<!
 pyenv: no known versions match the prefix \`3.8'
