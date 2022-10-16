@@ -113,3 +113,10 @@ OUT
   assert_success
   assert_output "2.7.11"
 }
+
+@test "falls back to pyenv-latest" {
+  create_version "2.7.11"
+  PYENV_VERSION="2.7" run pyenv-version-name
+  assert_success
+  assert_output "2.7.11"
+}

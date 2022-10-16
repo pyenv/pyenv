@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Summary: Print the latest installed version with the given prefix
-# Usage: pyenv latest [-k|--known] <prefix>
+# Usage: pyenv latest [-k|--known] [-q|--quiet] <prefix>
 #
 #   -k/--known      Select from all known versions instead of installed
+#   -q/--quiet      Do not print a 
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -12,6 +13,10 @@ do
     case "$1" in
         -k|--known)
             FROM_KNOWN=1
+            shift
+            ;;
+        -q|--quiet)
+            QUIET=1
             shift
             ;;
         *)
@@ -30,10 +35,10 @@ IFS=$'\n'
     else
         DEFINITION_CANDIDATES=( $(python-build --definitions ) )
     fi
-    if grep -xFe "$prefix" <<<"${DEFINITION_CANDIDATES[@]}"; then
-        echo "$prefix"
-        exit $exitcode
-    fi
+    # if grep -xFe "$prefix" <<<"${DEFINITION_CANDIDATES[@]}"; then
+        # echo "$prefix"
+        # exit $exitcode
+    # fi
     # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
     prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
     DEFINITION_CANDIDATES=(\
@@ -62,7 +67,9 @@ IFS=$'\n'
     if [[ -n "$DEFINITION" ]]; then
         echo "$DEFINITION"
     else
-        echo "pyenv-latest: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
+        if [[ -z $QUIET ]]; then
+            echo "pyenv: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
+        fi
         exitcode=1
     fi
 

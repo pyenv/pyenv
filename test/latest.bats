@@ -38,6 +38,32 @@ echo 4.5.6
 !
 }
 
+@test "installed version not found" {
+  create_executable pyenv-versions <<!
+#!$BASH
+echo 3.5.6
+echo 3.10.8
+!
+  run pyenv-latest 3.8
+  assert_failure
+  assert_output <<!
+pyenv: no installed versions match the prefix \`3.8'
+!
+}
+
+@test "known version not found" {
+  create_executable python-build <<!
+#!$BASH
+echo 3.5.6
+echo 3.10.8
+!
+  run pyenv-latest 3.8
+  assert_failure
+  assert_output <<!
+pyenv: no known versions match the prefix \`3.8'
+!
+}
+
 @test "sort CPython" {
   create_executable pyenv-versions <<!
 #!$BASH
