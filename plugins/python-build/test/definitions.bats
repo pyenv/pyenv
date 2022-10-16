@@ -65,6 +65,15 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
   assert_output "python-build: definition not found: nonexistent"
 }
 
+@test "falls back pyenv-latest" {
+  export PYTHON_BUILD_ROOT="$TMP"
+  mkdir -p "${PYTHON_BUILD_ROOT}/share/python-build"
+  touch "${PYTHON_BUILD_ROOT}/share/python-build/2.7.8"
+  run python-build "2.7" "${TMP}/install"
+  assert_success "2.7.8"
+}
+
+
 @test "sorting Python versions" {
   export PYTHON_BUILD_ROOT="$TMP"
   mkdir -p "${PYTHON_BUILD_ROOT}/share/python-build"
