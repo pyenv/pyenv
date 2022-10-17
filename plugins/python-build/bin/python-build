@@ -2054,8 +2054,11 @@ elif [ ! -f "$DEFINITION_PATH" ]; then
   
   search_definitions
   if [ ! -f "$DEFINITION_PATH" ]; then
-    DEFINITION_PATH="$(pyenv-latest -k -q "$DEFINITION_PATH")"
-    search_definitions
+    if RESOLVED_DEFINITION_PATH="$(pyenv-latest -k -q "$DEFINITION_PATH")"; then
+      DEFINITION_PATH="$RESOLVED_DEFINITION_PATH"
+      unset RESOLVED_DEFINITION_PATH
+      search_definitions
+    fi
   fi
   unset search_definitions
 
