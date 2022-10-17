@@ -6,10 +6,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - 3.7.13
-          - 3.8.13
-          - 3.9.13
-          - 3.10.6
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
