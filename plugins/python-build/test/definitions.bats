@@ -70,10 +70,9 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
   stub pyenv-latest "echo 2.7.8"
   export PYTHON_BUILD_ROOT="$TMP"
   mkdir -p "${PYTHON_BUILD_ROOT}/share/python-build"
-  echo true > "${PYTHON_BUILD_ROOT}/share/python-build/2.7.8"
+  echo 'echo 2.7.8' > "${PYTHON_BUILD_ROOT}/share/python-build/2.7.8"
   run python-build "2.7" "${TMP}/install"
-  assert_success
-  assert_output_contains "2.7.8"
+  assert_success "2.7.8"
 }
 
 
