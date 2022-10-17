@@ -43,7 +43,7 @@ IFS=$'\n'
     prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
     DEFINITION_CANDIDATES=(\
       $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
-      grep -Ee "$prefix_re[-.]" || true))
+      grep -Ee "^$prefix_re[-.]" || true))
 
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
