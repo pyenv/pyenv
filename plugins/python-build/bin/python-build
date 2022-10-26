@@ -714,7 +714,7 @@ build_package() {
 
   echo "Installing ${package_name}..." >&2
 
-  [ -n "$HAS_PATCH" ] && apply_python_patch "$package_name"
+  [ -n "$HAS_PATCH" ] && apply_patch "$package_name" <(cat "${package_name}.patch")
 
   for command in $commands; do
     "build_package_${command}" "$package_name"
@@ -1071,13 +1071,13 @@ setup_builtin_patches() {
   local package_name="$1"
   local package_patch_path="${DEFINITION_PATH%/*}/patches/${DEFINITION_PATH##*/}/${package_name}"
 
-  ORIG_HAS_PATCH="$HAS_PATCH"
 # Apply built-in patches if patch was not given from stdin
-  if [ -z "$HAS_PATCH" ] && [ -d "${package_patch_path}" ]; then
+  if [[ -n "$HAS_STDIN_PATCH" ]] && package_is_python "${package_name}"; then
+    cat >"${package_name}.patch"
+    HAS_PATCH=true
+  elif [[ -d "${package_patch_path}" ]]; then
     { find "${package_patch_path}" -maxdepth 1 -type f
     } 2>/dev/null | sort | xargs cat 1>"${package_name}.patch"
-    exec <&-
-    exec <"${package_name}.patch"
     HAS_PATCH=true
   fi
 }
@@ -1085,7 +1085,7 @@ setup_builtin_patches() {
 cleanup_builtin_patches() {
   local package_name="$1"
   rm -f "${package_name}.patch"
-  HAS_PATCH="$ORIG_HAS_PATCH"
+  unset HAS_PATCH
 }
 
 fix_directory_permissions() {
@@ -1653,30 +1653,32 @@ build_package_auto_tcltk() {
   fi
 }
 
-# extglob must be set at parse time, not at runtime
+# extglob must be set at both parse time and runtime
 # https://stackoverflow.com/questions/49283740/bash-script-throws-syntax-errors-when-the-extglob-option-is-set-inside-a-subsh
-#
-# The function is *parsed* with "extglob" only if an outer `shopt -s exglob`
-# exists; at *runtime* you still need to activate it *within* the function.
-#
 shopt -s extglob
-apply_python_patch() {
-  local patchfile
-  # needed at runtime
+package_is_python() {
   shopt -s extglob
   case "$1" in
-  Python-* | jython-* | pypy-* | pypy[0-9].+([0-9])-* | stackless-* )
-    patchfile="$(mktemp "${TMP}/python-patch.XXXXXX")"
-    cat "${2:--}" >"$patchfile"
-
-    local striplevel=0
-    grep -q '^diff --git a/' "$patchfile" && striplevel=1
-    patch -p$striplevel --force -i "$patchfile"
-    ;;
+    Python-* | jython-* | pypy-* | pypy[0-9].+([0-9])-* | stackless-* )
+      return 0
+      ;;
   esac
+  return 1
   shopt -u extglob
 }
 shopt -u extglob
+
+apply_patch() {
+  local package_name="$1"
+  local patchfile
+  patchfile="$(mktemp "${TMP}/python-patch.XXXXXX")"
+  cat "${2:--}" >"$patchfile"
+
+  local striplevel=0
+  grep -q '^diff --git a/' "$patchfile" && striplevel=1
+  patch -p$striplevel --force -i "$patchfile"
+}
+
 
 build_package_symlink_version_suffix() {
   if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
@@ -2016,7 +2018,7 @@ for option in "${OPTIONS[@]}"; do
     VERBOSE=true
     ;;
   "p" | "patch" )
-    HAS_PATCH=true
+    HAS_STDIN_PATCH=true
     ;;
   "g" | "debug" )
     DEBUG=true
