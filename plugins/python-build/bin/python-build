@@ -938,10 +938,30 @@ pypy_architecture() {
   esac
 }
 
+graalpy_architecture() {
+  case "$(uname -s)" in
+  "Darwin" )
+    case "$(uname -m)" in
+    "x86_64" ) echo "macos-amd64" ;;
+    "arm64" ) echo "macos-aarch64" ;;
+    * ) return 1 ;;
+    esac
+    ;;
+  "Linux" )
+    case "$(uname -m)" in
+    "x86_64" ) echo "linux-amd64" ;;
+    "aarch64" ) echo "linux-aarch64" ;;
+    * ) return 1 ;;
+    esac
+    ;;
+  esac
+}
+
 pyston_architecture() {
   pypy_architecture
 }
 
+# Note: not used by graalpy >= 23.3.0 anymore
 build_package_graalpython() {
     build_package_copy
     ln -fs "${PREFIX_PATH}/bin/graalpython" "${PREFIX_PATH}/bin/python"
