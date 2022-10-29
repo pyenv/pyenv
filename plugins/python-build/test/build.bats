@@ -415,7 +415,7 @@ OUT
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
   stub brew false
-  for i in {1..2}; do stub brew "--prefix tcl-tk : echo '$tcl_tk_libdir'"; done
+  stub brew "--prefix tcl-tk : echo '$tcl_tk_libdir'"
   for i in {1..2}; do stub brew false; done
 
   stub_make_install
