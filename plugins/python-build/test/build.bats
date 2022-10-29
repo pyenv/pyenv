@@ -35,7 +35,7 @@ tarball() {
 
   executable "$configure" <<OUT
 #!$BASH
-echo "$name: CPPFLAGS=\\"\$CPPFLAGS\\" LDFLAGS=\\"\$LDFLAGS\\"" PKG_CONFIG_PATH=\\"\$PKG_CONFIG_PATH\\"" >> build.log
+echo "$name: CPPFLAGS=\\"\$CPPFLAGS\\" LDFLAGS=\\"\$LDFLAGS\\" PKG_CONFIG_PATH=\\"\$PKG_CONFIG_PATH\\"" >> build.log
 echo "$name: \$@" \${PYTHONOPT:+PYTHONOPT=\$PYTHONOPT} >> build.log
 OUT
 
