@@ -10,6 +10,7 @@ setup() {
 
 stub_python_build() {
   stub python-build "--lib : $BATS_TEST_DIRNAME/../bin/python-build --lib" "$@"
+  stub pyenv-latest " : false"
 }
 
 @test "install proper" {
@@ -25,7 +26,8 @@ stub_python_build() {
 
 @test "install resolves a prefix" {
   stub_python_build 'echo python-build "$@"'
-  stub pyenv-latest '3.4 : 3.4.2'
+  stub pyenv-latest '-q -k 3.4 : echo 3.4.2'
+  pyenv-latest || true  # pass through the stub entry added by stub_python_build
 
   run pyenv-install 3.4
   assert_success "python-build 3.4.2 ${PYENV_ROOT}/versions/3.4.2"
