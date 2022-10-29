@@ -10,7 +10,6 @@ setup() {
 
 stub_python_build() {
   stub python-build "--lib : $BATS_TEST_DIRNAME/../bin/python-build --lib" "$@"
-  stub pyenv-latest " : false"
 }
 
 @test "install proper" {
