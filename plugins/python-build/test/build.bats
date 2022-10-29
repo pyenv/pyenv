@@ -411,11 +411,14 @@ OUT
 @test "tcl-tk is linked from Homebrew via pkgconfig only when envvar is set" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..8}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
+  tcl_tk_libdir="$TMP/homebrew-tcl-tk"
+  mkdir -p "$tcl_tk_libdir/lib"
+
   stub brew false
-  stub brew "--prefix tcl-tk : echo '$tcl_tk_libdir'"
+  for i in {1..2}; do stub brew "--prefix tcl-tk : echo '${tcl_tk_libdir}'"; done
   for i in {1..2}; do stub brew false; done
 
   stub_make_install
