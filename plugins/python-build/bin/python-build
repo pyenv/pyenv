@@ -1560,6 +1560,11 @@ use_homebrew_tcltk() {
   local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
   if [ -d "$tcltk_libdir" ]; then
     echo "python-build: use tcl-tk from homebrew"
+    if [[ -z "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
+      local tcltk_version="$(sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo $TCL_VERSION')"
+      package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+      package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+    fi
     export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
   fi
 }
