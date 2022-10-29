@@ -411,17 +411,15 @@ OUT
 @test "tcl-tk is linked from Homebrew via pkgconfig only when envvar is set" {
   cached_tarball "Python-3.6.2"
 
-  # python build
-  tcl_tk_version_long="8.6.10"
-  tcl_tk_version="${tcl_tk_version_long%.*}"
-
-  for i in {1..8}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
-  for i in {1..4}; do stub brew false; done
+  stub brew false
+  for i in {1..2}; do stub brew "--prefix tcl-tk : echo '$tcl_tk_libdir'"; done
+  for i in {1..2}; do stub brew false; done
+
   stub_make_install
 
-  export PYTHON_CONFIGURE_OPTS="--with-tcltk-libs='-L${TMP}/custom-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version'"
   run_inline_definition <<DEF
 export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
 install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
@@ -434,14 +432,12 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH="${TMP}/homebrew-tcl-tk/lib/pkgconfig"
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=${TMP}/install --libdir=${TMP}/install/lib
 make -j 2
 make install
 OUT
 }
-
 @test "number of CPU cores defaults to 2" {
   cached_tarball "Python-3.6.2"
 
