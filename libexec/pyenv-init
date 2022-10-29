@@ -155,7 +155,11 @@ function print_path() {
       # (SSH provides /etc/ssh/sshrc and ~/.ssh/rc for that but no-one seems to use them for some reason).
       # This has caused an infinite `bashrc` execution loop for those people in the below nested Bash invocation (#2367).
       # --norc negates this behavior of such a customized Bash.
-      echo 'PATH="$(bash --norc -ec '\''IFS=:; paths=($PATH); for i in ${!paths[@]}; do if [[ ${paths[i]} == "'\'"${PYENV_ROOT}/shims"\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; fi; done; echo "${paths[*]}"'\'')"'
+      echo 'PATH="$(bash --norc -ec '\''IFS=:; paths=($PATH); '
+      echo 'for i in ${!paths[@]}; do '
+      echo 'if [[ ${paths[i]} == "'\'\'"${PYENV_ROOT}/shims"\'\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; '
+      echo 'fi; done; '
+      echo 'echo "${paths[*]}"'\'')"'
       echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
       ;;
   esac
