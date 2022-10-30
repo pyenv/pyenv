@@ -229,7 +229,13 @@ Then install the desired versions:
       2.6.8
     * 2.7.6 (set by /home/yyuu/.pyenv/version)
 
-To install the latest version of Python without giving a specific version use the `:latest` syntax. For example, to install the latest patch version for Python 3.8 you could do:
+You can also install the latest version of Python in a specific version line by supplying a prefix instead of a complete name:
+
+    $ pyenv install 3.10
+
+See the [`pyenv latest` documentation](#pyenv-latest) for details on prefix resolution.
+
+An older option is to use the `:latest` syntax. For example, to install the latest patch version for Python 3.8 you could do:
 
     pyenv install 3.8:latest
 

@@ -418,6 +418,8 @@ while switching -- the latest installed version.
 You can run [`pyenv latest <prefix>`](COMMANDS.md#pyenv-latest) to see
 what a specific prefix would be resolved to.
 
+See the [`pyenv latest` documentation](COMMANDS.md#pyenv-latest) for details on the resolution process.
+
 
 #### Python versions with extended support
 
