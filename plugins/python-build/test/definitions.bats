@@ -60,9 +60,28 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
 }
 
 @test "installing nonexistent definition" {
+  stub pyenv-latest false
   run python-build "nonexistent" "${TMP}/install"
   assert [ "$status" -eq 2 ]
   assert_output "python-build: definition not found: nonexistent"
+}
+
+@test "resolves prefixes via pyenv-latest" {
+  stub pyenv-latest "echo 2.7.8"
+  export PYTHON_BUILD_ROOT="$TMP"
+  mkdir -p "${PYTHON_BUILD_ROOT}/share/python-build"
+  echo 'echo 2.7.8' > "${PYTHON_BUILD_ROOT}/share/python-build/2.7.8"
+  run python-build "2.7" "${TMP}/install"
+  assert_success "2.7.8"
+}
+
+@test "doesn't resolve prefixes if pyenv-latest is unavailable" {
+  export PATH="$(path_without pyenv-latest)"
+  export PYTHON_BUILD_ROOT="$TMP"
+  mkdir -p "${PYTHON_BUILD_ROOT}/share/python-build"
+  echo 'echo 2.7.8' > "${PYTHON_BUILD_ROOT}/share/python-build/2.7.8"
+  run python-build "2.7" "${TMP}/install"
+  assert_failure "python-build: definition not found: 2.7"
 }
 
 @test "sorting Python versions" {

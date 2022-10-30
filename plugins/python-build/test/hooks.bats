@@ -15,6 +15,7 @@ after_install 'echo after: \$STATUS'
 OUT
   stub pyenv-hooks "install : echo '$HOOK_PATH'/install.bash"
   stub pyenv-rehash "echo rehashed"
+  stub pyenv-latest false
 
   definition="${TMP}/3.6.2"
   cat > "$definition" <<<"echo python-build"

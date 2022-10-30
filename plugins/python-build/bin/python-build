@@ -2067,12 +2067,25 @@ DEFINITION_PATH="${ARGUMENTS[0]}"
 if [ -z "$DEFINITION_PATH" ]; then
   usage 1 >&2
 elif [ ! -f "$DEFINITION_PATH" ]; then
-  for DEFINITION_DIR in "${PYTHON_BUILD_DEFINITIONS[@]}"; do
-    if [ -f "${DEFINITION_DIR}/${DEFINITION_PATH}" ]; then
-      DEFINITION_PATH="${DEFINITION_DIR}/${DEFINITION_PATH}"
-      break
+
+  search_definitions() {
+    for DEFINITION_DIR in "${PYTHON_BUILD_DEFINITIONS[@]}"; do
+      if [ -f "${DEFINITION_DIR}/${DEFINITION_PATH}" ]; then
+        DEFINITION_PATH="${DEFINITION_DIR}/${DEFINITION_PATH}"
+        break
+      fi
+    done
+  }
+  
+  search_definitions
+  if [ ! -f "$DEFINITION_PATH" ]; then
+    if RESOLVED_DEFINITION_PATH="$(command -v pyenv-latest >/dev/null && pyenv-latest -k -q "$DEFINITION_PATH")"; then
+      DEFINITION_PATH="$RESOLVED_DEFINITION_PATH"
+      unset RESOLVED_DEFINITION_PATH
+      search_definitions
     fi
-  done
+  fi
+  unset search_definitions
 
   if [ ! -f "$DEFINITION_PATH" ]; then
     echo "python-build: definition not found: ${DEFINITION_PATH}" >&2

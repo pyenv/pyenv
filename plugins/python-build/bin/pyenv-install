@@ -145,6 +145,10 @@ IFS=$'\n' scripts=(`pyenv-hooks install`)
 IFS="$OLDIFS"
 for script in "${scripts[@]}"; do source "$script"; done
 
+# Try to resolve a prefix if user indeed gave a prefix.
+# We install the version under the resolved name
+# and hooks also see the resolved name
+DEFINITION="$(pyenv-latest -q -k "$DEFINITION" || echo "$DEFINITION")"
 
 # Set VERSION_NAME from $DEFINITION, if it is not already set. Then
 # compute the installation prefix.
