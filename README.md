@@ -53,17 +53,20 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Install Python build dependencies](#install-python-build-dependencies)
 * **[Usage](#usage)**
   * [Install additional Python versions](#install-additional-python-versions)
+    * [Prefix auto-resolution](#prefix-auto-resolution)
     * [Python versions with extended support](#python-versions-with-extended-support)
   * [Switch between Python versions](#switch-between-python-versions)
   * [Uninstall Python versions](#uninstall-python-versions)
   * [Other operations](#other-operations)
 * [Upgrading](#upgrading)
+  * [Upgrading with Homebrew](#upgrading-with-homebrew)
+  * [Upgrading with Installer or Git checkout](#upgrading-with-installer-or-git-checkout)
 * [Uninstalling pyenv](#uninstalling-pyenv)
 * [Advanced Configuration](#advanced-configuration)
   * [Using Pyenv without shims](#using-pyenv-without-shims)
   * [Environment variables](#environment-variables)
 * **[Development](#development)**
-  * [Contributing](#contributing)**
+  * [Contributing](#contributing)
   * [Version History](#version-history)
   * [License](#license)
 
@@ -383,6 +386,8 @@ For example, to download and install Python 3.10.4, run:
 pyenv install 3.10.4
 ```
 
+Running `pyenv install -l` gives the list of all available versions.
+
 **NOTE:** Most Pyenv-provided Python releases are source releases and are built
 from source as part of installation (that's why you need Python build dependencies preinstalled).
 You can pass options to Python's `configure` and compiler flags to customize the build,
@@ -397,6 +402,23 @@ please visit the wiki page about
 [Common Build Problems](https://github.com/pyenv/pyenv/wiki/Common-build-problems).
 
 
+#### Prefix auto-resolution
+
+Pyenv automatically resolves full prefixes to the latest version in the corresponding version line.
+E.g. to install the latest 3.10 release:
+
+```sh
+pyenv install 3.10
+```
+
+The same happens whenever Pyenv selects a version to use.
+Installation selects the latest version known to Pyenv
+while switching -- the latest installed version.
+
+You can run [`pyenv latest <prefix>`](COMMANDS.md#pyenv-latest) to see
+what a specific prefix would be resolved to.
+
+
 #### Python versions with extended support
 
 For the following Python releases, Pyenv applies user-provided patches that add support for some newer environments.
@@ -404,7 +426,7 @@ Though we don't actively maintain those patches, since existing releases never c
 it's safe to assume that they will continue working until there are further incompatible changes
 in a later version of those environments.
 
-* *3.7.8-3.7.14, 3.8.4-3.8.12, 3.9.0-3.9.7* : XCode 13.3
+* *3.7.8-3.7.15, 3.8.4-3.8.12, 3.9.0-3.9.7* : XCode 13.3
 * *3.6.15* : MacOS 11+ and XCode 13.3
 * *2.7.18* : MacOS 10.15+ and Apple Silicon
 
@@ -459,12 +481,34 @@ Note that Pyenv plugins that you install may add their own subcommands.
 
 ## Upgrading
 
+### Upgrading with Homebrew
+
 If you've installed Pyenv using Homebrew, upgrade using:
 ```sh
 brew upgrade pyenv
 ```
 
-If you've installed Pyenv using Pyenv-installer or Git checkout, you can
+To switch from a release to the latest development version of Pyenv, use:
+
+```sh
+brew uninstall pyenv
+brew install pyenv --head
+```
+
+then you can upgrade it with `brew upgrade pyenv` as usual.
+
+
+### Upgrading with Installer or Git checkout
+
+If you've installed Pyenv with Pyenv-installer, you likely have the
+[Pyenv-Update](https://github.com/pyenv/pyenv-update) plugin that would
+upgrade Pyenv and all installed plugins:
+
+```sh
+pyenv update
+```
+
+If you've installed Pyenv using Pyenv-installer or Git checkout, you can also
 upgrade your installation at any time using Git.
 
 To upgrade to the latest development version of pyenv, use `git pull`:

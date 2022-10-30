@@ -3,7 +3,7 @@
 # Usage: pyenv latest [-k|--known] [-q|--quiet] <prefix>
 #
 #   -k/--known      Select from all known versions instead of installed
-#   -q/--quiet      Do not print a 
+#   -q/--quiet      Do not print an error message on resolution failure
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -35,10 +35,6 @@ IFS=$'\n'
     else
         DEFINITION_CANDIDATES=( $(python-build --definitions ) )
     fi
-    # if grep -xFe "$prefix" <<<"${DEFINITION_CANDIDATES[@]}"; then
-        # echo "$prefix"
-        # exit $exitcode
-    # fi
     # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
     prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
     # FIXME: more reliable and readable would probably be to loop over them and transform in pure Bash

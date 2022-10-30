@@ -20,6 +20,7 @@ The most common subcommands are:
 * [`pyenv exec`](#pyenv-exec)
 * [`pyenv root`](#pyenv-root)
 * [`pyenv prefix`](#pyenv-prefix)
+* [`pyenv latest`](#pyenv-latest)
 * [`pyenv hooks`](#pyenv-hooks)
 * [`pyenv shims`](#pyenv-shims)
 * [`pyenv init`](#pyenv-init)
@@ -329,6 +330,19 @@ locations of the currently selected versions.
 
     $ pyenv prefix 3.9.7
     /home/user/.pyenv/versions/3.9.7
+
+## `pyenv latest`
+
+Displays the latest installed or known version with the given prefix
+
+    Usage: pyenv latest [-k|--known] [-q|--quiet] <prefix>
+
+     -k/--known      Select from all known versions instead of installed
+     -q/--quiet      Do not print an error message on resolution failure
+
+Only full prefixes are searched: in the actual name, the given prefix must be followed by a dot or a dash.
+
+Prereleases and versions with specific suffixes (e.g. `-src`) are ignored.
 
 ## `pyenv hooks`
 
