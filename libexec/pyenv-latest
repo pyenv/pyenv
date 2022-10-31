@@ -66,7 +66,7 @@ IFS=$'\n'
         echo "$DEFINITION"
     else
         if [[ -z $QUIET ]]; then
-            echo "pyenv: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
+            echo "pyenv: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix '$prefix'" >&2
         fi
         exitcode=1
     fi
