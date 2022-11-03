@@ -9,8 +9,12 @@ on:
     # Schedule for ten minutes after the hour, every hour
     - cron: '10 * * * *'
 
+permissions: {}
 jobs:
   noResponse:
+    permissions:
+      issues: write  #  to update issues (lee-dohm/no-response)
+
     runs-on: ubuntu-latest
     steps:
       - uses: lee-dohm/no-response@v0.5.0
