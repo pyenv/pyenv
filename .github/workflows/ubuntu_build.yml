@@ -1,5 +1,9 @@
 name: ubuntu_build
 on: [pull_request, push]
+
+permissions:
+  contents: read  #  to fetch code (actions/checkout)
+
 jobs:
   ubuntu_build:
     strategy:
