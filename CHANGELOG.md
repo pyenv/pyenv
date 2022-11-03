@@ -1,5 +1,21 @@
 ## Version History
 
+## Release 2.3.6
+
+* Add CPython 3.10.8 (#2480)
+* Add CPython 3.7.15, 3.8.15, and 3.9.15 (#2482)
+* Add CPython 3.11.0 (#2493)
+* Add CPython 3.12.0a1 (#2495)
+* Add graalpy-22.3.0 (#2497)
+* Auto-resolve prefixes to the latest version (#2487)
+  * It must be a full prefix -- the actual searched prefix is `<prefix>[-.]`
+  * Other flavors are likely sorted incorrectly atm
+  * Prereleases and versions with some suffixes (`-dev`, `-src`, `-latest`) are not searched
+  * `pyenv uninstall` has been excluded from the resolution feature: deleting a dynamically selected installation could be problematic
+* Fix OpenSSL 1.1.1q compilation error in MacOS 11+ (#2500)
+* Link to Tcl/Tk from Homebrew via pkgconfig for 3.11+ (#2501)
+* Fix syntax error in `pyenv init -` if PYENV_ROOT has spaces (#2506)
+
 ## Release 2.3.5
 
 * Add CPython 3.10.7 (#2454)
