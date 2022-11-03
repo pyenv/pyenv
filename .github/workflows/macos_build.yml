@@ -1,5 +1,9 @@
 name: macos_build
 on: [pull_request, push]
+
+permissions:
+  contents: read  #  to fetch code (actions/checkout)
+
 jobs:
   macos_build:
     strategy:
