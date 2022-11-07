@@ -404,21 +404,21 @@ please visit the wiki page about
 
 #### Prefix auto-resolution
 
-Pyenv automatically resolves full prefixes to the latest version in the corresponding version line.
-E.g. to install the latest 3.10 release:
+All Pyenv subcommands except `uninstall` automatically resolve full prefixes to the latest version in the corresponding version line.
+
+`pyenv install` picks the latest known version while other subcommands -- the latest installed version.
+
+E.g. to install and then switch to the latest 3.10 release:
 
 ```sh
 pyenv install 3.10
+pyenv global 3.10
 ```
-
-The same happens whenever Pyenv selects a version to use.
-Installation selects the latest version known to Pyenv
-while switching -- the latest installed version.
 
 You can run [`pyenv latest <prefix>`](COMMANDS.md#pyenv-latest) to see
 what a specific prefix would be resolved to.
 
-See the [`pyenv latest` documentation](COMMANDS.md#pyenv-latest) for details on the resolution process.
+See the [`pyenv latest` documentation](COMMANDS.md#pyenv-latest) for details.
 
 
 #### Python versions with extended support
