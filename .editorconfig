@@ -1,0 +1,11 @@
+# Editor configuration, see https://editorconfig.org
+root = true
+
+[*]
+end_of_line = lf
+charset = utf-8
+
+# Makefiles always use tabs for indentation
+[Makefile]
+indent_style = tab
+indent_size = unset # Allow user-defined tab width
