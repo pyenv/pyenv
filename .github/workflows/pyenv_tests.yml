@@ -1,5 +1,9 @@
 name: pyenv_tests
 on: [pull_request, push]
+
+permissions:
+  contents: read  #  to fetch code (actions/checkout)
+
 jobs:
   pyenv_tests:
     strategy:
