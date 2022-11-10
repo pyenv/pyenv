@@ -2,5 +2,6 @@
 activate
 activate.csh
 activate.fish
+activate.nu
 # gettext (#688)
 gettext.sh
