@@ -9,7 +9,7 @@ General guidance
   That's because that's the version shipped with MacOS.
   (They didn't upgrade past it and switched to Zsh because later versions
   are covered by GPLv3 which has additional restrictions unacceptable for Apple.)
-  
+
   You can still add performance optimizations etc that take advantage of newer Bash features
   as long as there is a fallback execution route for Bash 3.
 
