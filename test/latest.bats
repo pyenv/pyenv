@@ -64,6 +64,21 @@ pyenv: no known versions match the prefix \`3.8'
 !
 }
 
+@test "complete name resolves to itself" {
+  create_executable pyenv-versions <<!
+#!$BASH
+echo foo
+echo foo.bar
+!
+
+run pyenv-latest foo
+assert_success
+assert_output <<!
+foo
+!
+
+}
+
 @test "sort CPython" {
   create_executable pyenv-versions <<!
 #!$BASH

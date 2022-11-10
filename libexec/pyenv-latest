@@ -35,6 +35,12 @@ IFS=$'\n'
     else
         DEFINITION_CANDIDATES=( $(python-build --definitions ) )
     fi
+    
+    if printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | grep -qxFe "$prefix"; then
+        echo "$prefix"
+        exit $exitcode;
+    fi
+    
     # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
     prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
     # FIXME: more reliable and readable would probably be to loop over them and transform in pure Bash
