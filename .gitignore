@@ -8,3 +8,5 @@
 /src/*.o
 /bats/
 /default-packages
+.idea
+*.un~
