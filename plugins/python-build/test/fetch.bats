@@ -21,7 +21,7 @@ setup() {
 @test "using aria2c if available" {
   export PYTHON_BUILD_ARIA2_OPTS=
   export -n PYTHON_BUILD_HTTP_CLIENT
-  stub aria2c "--allow-overwrite=true --no-conf=true -o * http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$4"
+  stub aria2c "--allow-overwrite=true --no-conf=true -d * -o * http://example.com/* : cp $FIXTURE_ROOT/\${7##*/} \$6"
 
   install_fixture definitions/without-checksum
   assert_success

@@ -360,12 +360,38 @@ http_head_aria2c() {
 }
 
 http_get_aria2c() {
-  local out="${2:-$(mktemp "out.XXXXXX")}"
-  if aria2c --allow-overwrite=true --no-conf=true -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
+  # aria2c always treats -o argument as a relative path
+  local out dir_out;
+  if [[ -n "$2" ]]; then
+    out="$(basename $2)";
+    dir_out="$(dirname $2)";
+  else
+    out="$(mktemp "out.XXXXXX")";
+    dir_out="$TMPDIR";
+  fi
+
+  # In Ubuntu, aria2c is only available as a snap. Snaps cannot read or write /tmp
+  # (files cannot be found, any write result is silently discarded).
+  local aria2c_is_snap;
+  if [[ $(command -v aria2c) == "/snap/"* ]]; then aria2c_is_snap=1; fi
+
+  if [[ -n $aria2c_is_snap ]]; then
+    local real_dir_out="$dir_out"
+    # presumably, snaps can always write to under $HOME
+    dir_out="$HOME"
+  fi
+
+  if aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
     [ -n "$2" ] || cat "${out}"
   else
     false
   fi
+  ret=$?
+
+  if [[ -n "$2" && -n $aria2c_is_snap ]]; then
+      mv "$dir_out/$out" "$real_dir_out/$out"
+  fi
+  return "$ret"
 }
 
 http_head_curl() {
