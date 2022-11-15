@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
-# Usage: eval "$(pyenv init [-|--path] [--no-rehash] [<shell>])"
+# Usage: eval "$(pyenv init [-|--path] [--no-path-update] [--no-rehash] [<shell>])"
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -9,6 +9,7 @@ set -e
 if [ "$1" = "--complete" ]; then
   echo -
   echo --path
+  echo --no-path-update
   echo --no-rehash
   echo bash
   echo fish
@@ -19,6 +20,7 @@ fi
 
 mode="help"
 no_rehash=""
+no_path_update=""
 for args in "$@"
 do
   if [ "$args" = "-" ]; then
@@ -28,6 +30,11 @@ do
 
   if [ "$args" = "--path" ]; then
     mode="path"
+    shift
+  fi
+
+  if [ "$args" = "--no-path-update" ]; then
+    no_path_update=1
     shift
   fi
   
@@ -141,6 +148,8 @@ function init_dirs() {
 }
 
 function print_path() {
+  if [ -n "$no_path_update" ]; then return; fi
+
   case "$shell" in
     fish )
       echo 'while set index (contains -i -- '\'"${PYENV_ROOT}/shims"\'' $PATH)'

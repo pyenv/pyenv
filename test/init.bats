@@ -66,7 +66,13 @@ OUT
 @test "option to skip rehash" {
   run pyenv-init - --no-rehash
   assert_success
-  refute_line "pyenv rehash 2>/dev/null"
+  refute_line "pyenv rehash"
+}
+
+@test "option to skip path manipulation" {
+  run pyenv-init - --no-path-update
+  assert_success
+  refute_line "PATH"
 }
 
 @test "adds shims to PATH" {
