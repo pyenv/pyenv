@@ -13,7 +13,6 @@ load test_helper
 
 @test "auto rehash" {
   run pyenv-init -
-  assert_success
   assert_line "command pyenv rehash 2>/dev/null"
 }
 
@@ -73,7 +72,7 @@ OUT
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run pyenv-init - --no-push-path bash
   assert_success
-  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${pyenv_new_path}"'
 }
 
 @test "--no-push-path still path when doesn't exist (fish)" {
@@ -101,7 +100,7 @@ OUT
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run pyenv-init - bash
   assert_success
-  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${pyenv_new_path}"'
 }
 
 @test "adds shims to PATH (fish)" {

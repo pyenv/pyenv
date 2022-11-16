@@ -150,17 +150,17 @@ function init_dirs() {
 function print_path() {
   case "$shell" in
     fish )
-      echo 'while set index (contains -i -- '\'"${PYENV_ROOT}/shims"\'' $PATH)'
+      echo 'while set pyenv_index (contains -i -- '\'"${PYENV_ROOT}/shims"\'' $PATH)'
       if [ -n "$no_push_path" ]; then
         echo 'set found_pyenv_shim 1; break; end';
         echo 'if test -z "$found_pyenv_shim"'
         echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
         echo 'else; set -e found_pyenv_shim; end'
       else
-        echo 'set -eg PATH[$index]; end;'
+        echo 'set -eg PATH[$pyenv_index]; end;'
         echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
       fi
-      echo 'set -e index'
+      echo 'set -e pyenv_index'
       ;;
     * )
       # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
@@ -170,7 +170,7 @@ function print_path() {
       # (SSH provides /etc/ssh/sshrc and ~/.ssh/rc for that but no-one seems to use them for some reason).
       # This has caused an infinite `bashrc` execution loop for those people in the below nested Bash invocation (#2367).
       # --norc negates this behavior of such a customized Bash.
-      echo 'local pyenv_new_path="$(bash --norc -ec '\''IFS=:; paths=($PATH); '
+      echo 'pyenv_new_path="$(bash --norc -ec '\''IFS=:; paths=($PATH); '
       echo 'for i in ${!paths[@]}; do '
       echo 'if [[ ${paths[i]} == "'\'\'"${PYENV_ROOT}/shims"\'\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; '
       echo 'fi; done; '
