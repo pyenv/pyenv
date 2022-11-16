@@ -69,10 +69,32 @@ OUT
   refute_line "pyenv rehash"
 }
 
-@test "option to skip path manipulation" {
-  run pyenv-init - --no-path-update
+@test "--no-push-path still path when doesn't exist" {
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
+  run pyenv-init - --no-push-path bash
   assert_success
-  refute_line "PATH"
+  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
+}
+
+@test "--no-push-path still path when doesn't exist (fish)" {
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
+  run pyenv-init - --no-push-path fish
+  assert_success
+  assert_line "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+}
+
+@test "--no-push-path does not push path when already in path" {
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:${PYENV_ROOT}/shims:/usr/bin:/bin:/usr/local/bin"
+  run pyenv-init - --no-push-path bash
+  assert_success
+  refute_line 'export PATH'
+}
+
+@test "--no-push-path does not push path when already in path (fish)" {
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:${PYENV_ROOT}/shims:/bin:/usr/local/bin"
+  run pyenv-init - --no-push-path fish
+  assert_success
+  refute_line "set -gx PATH"
 }
 
 @test "adds shims to PATH" {

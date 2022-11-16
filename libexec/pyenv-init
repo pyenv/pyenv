@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
-# Usage: eval "$(pyenv init [-|--path] [--no-path-update] [--no-rehash] [<shell>])"
+# Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--no-rehash] [<shell>])"
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -9,7 +9,7 @@ set -e
 if [ "$1" = "--complete" ]; then
   echo -
   echo --path
-  echo --no-path-update
+  echo --no-push-path
   echo --no-rehash
   echo bash
   echo fish
@@ -20,7 +20,7 @@ fi
 
 mode="help"
 no_rehash=""
-no_path_update=""
+no_push_path=""
 for args in "$@"
 do
   if [ "$args" = "-" ]; then
@@ -33,8 +33,8 @@ do
     shift
   fi
 
-  if [ "$args" = "--no-path-update" ]; then
-    no_path_update=1
+  if [ "$args" = "--no-push-path" ]; then
+    no_push_path=1
     shift
   fi
   
@@ -148,13 +148,13 @@ function init_dirs() {
 }
 
 function print_path() {
-  if [ -n "$no_path_update" ]; then return; fi
-
   case "$shell" in
     fish )
       echo 'while set index (contains -i -- '\'"${PYENV_ROOT}/shims"\'' $PATH)'
+      if [ -n "$no_push_path" ]; then echo 'if test -z "$index"'; fi
       echo 'set -eg PATH[$index]; end; set -e index'
       echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
+      if [ -n "$no_push_path" ]; then echo 'end'; fi
       ;;
     * )
       # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
@@ -164,12 +164,15 @@ function print_path() {
       # (SSH provides /etc/ssh/sshrc and ~/.ssh/rc for that but no-one seems to use them for some reason).
       # This has caused an infinite `bashrc` execution loop for those people in the below nested Bash invocation (#2367).
       # --norc negates this behavior of such a customized Bash.
-      echo 'PATH="$(bash --norc -ec '\''IFS=:; paths=($PATH); '
+      echo 'local pyenv_new_path="$(bash --norc -ec '\''IFS=:; paths=($PATH); '
       echo 'for i in ${!paths[@]}; do '
       echo 'if [[ ${paths[i]} == "'\'\'"${PYENV_ROOT}/shims"\'\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; '
       echo 'fi; done; '
       echo 'echo "${paths[*]}"'\'')"'
-      echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
+      if [ -z "$no_push_path" -o "$PATH" = "$pyenv_new_path" ]; then
+        echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
+      fi
+      echo 'unset pyenv_new_path'
       ;;
   esac
 }
