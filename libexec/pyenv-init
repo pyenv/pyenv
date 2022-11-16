@@ -151,10 +151,16 @@ function print_path() {
   case "$shell" in
     fish )
       echo 'while set index (contains -i -- '\'"${PYENV_ROOT}/shims"\'' $PATH)'
-      if [ -n "$no_push_path" ]; then echo 'if test -z "$index"'; fi
-      echo 'set -eg PATH[$index]; end; set -e index'
-      echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
-      if [ -n "$no_push_path" ]; then echo 'end'; fi
+      if [ -n "$no_push_path" ]; then
+        echo 'set found_pyenv_shim 1; break; end';
+        echo 'if test -z "$found_pyenv_shim"'
+        echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
+        echo 'else; set -e found_pyenv_shim; end'
+      else
+        echo 'set -eg PATH[$index]; end;'
+        echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
+      fi
+      echo 'set -e index'
       ;;
     * )
       # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
