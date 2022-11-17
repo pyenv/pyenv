@@ -175,7 +175,7 @@ function print_path() {
       echo 'if [[ ${paths[i]} == "'\'\'"${PYENV_ROOT}/shims"\'\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; '
       echo 'fi; done; '
       echo 'echo "${paths[*]}"'\'')"'
-      if [ -z "$no_push_path" -o "$PATH" = "$pyenv_new_path" ]; then
+      if [ -z "$no_push_path" -o "x${PATH//[^:]/}" = "x${pyenv_new_path//[^:]/}" ]; then
         echo 'export PATH="'"${PYENV_ROOT}"'/shims:${pyenv_new_path}"'
       fi
       echo 'unset pyenv_new_path'
