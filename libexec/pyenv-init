@@ -151,11 +151,11 @@ function print_path() {
   case "$shell" in
     fish )
       if [ -n "$no_push_path" ]; then
-        echo 'if not contains -- "'"$PYENV_ROOT/shims"'" $PATH'
+        echo 'if not contains -- "'"${PYENV_ROOT}/shims"'" $PATH'
       fi
-      echo 'while set pyenv_index (contains -i -- "'"$PYENV_ROOT/shims"'" $PATH)'
+      echo 'while set pyenv_index (contains -i -- "'"${PYENV_ROOT}/shims"'" $PATH)'
       echo 'set -eg PATH[$pyenv_index]; end; set -e pyenv_index'
-      echo 'set -gx PATH "'"$PYENV_ROOT/shims"'" $PATH'
+      echo 'set -gx PATH "'"${PYENV_ROOT}/shims"'" $PATH'
       if [ -n "$no_push_path" ]; then
         echo 'end'
       fi
