@@ -175,6 +175,11 @@ function print_path() {
       echo 'if [[ ${paths[i]} == "'\'\'"${PYENV_ROOT}/shims"\'\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; '
       echo 'fi; done; '
       echo 'echo "${paths[*]}"'\'')"'
+      # if no_push_path is unset, always update path.
+      # else, check for differences between the PATH variable and our proposed path var (pyenv_new_path)
+      # we check for differences by using bash string substitution to remove all chars but ":"
+      # and checking for equality -- i.e. ensuring old and new paths have same number of components.
+      # If they are equal, it means pyenv shims were NOT found, and therefore need to be added.
       if [ -z "$no_push_path" -o "x${PATH//[^:]/}" = "x${pyenv_new_path//[^:]/}" ]; then
         echo 'export PATH="'"${PYENV_ROOT}"'/shims:${pyenv_new_path}"'
       fi
