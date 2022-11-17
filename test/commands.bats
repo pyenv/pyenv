@@ -8,14 +8,14 @@ load test_helper
   assert_line "init"
   assert_line "rehash"
   assert_line "shell"
-  refute_line "sh-shell"
+  refute_line_contains "sh-shell"
   assert_line "echo"
 }
 
 @test "commands --sh" {
   run pyenv-commands --sh
   assert_success
-  refute_line "init"
+  refute_line_contains "init"
   assert_line "shell"
 }
 
@@ -35,5 +35,5 @@ load test_helper
   run pyenv-commands --no-sh
   assert_success
   assert_line "init"
-  refute_line "shell"
+  refute_line_contains "shell"
 }

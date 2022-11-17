@@ -89,7 +89,7 @@ assert_line() {
   fi
 }
 
-refute_line() {
+refute_line_contains() {
   if [ "$1" -ge 0 ] 2>/dev/null; then
     local num_lines="${#lines[@]}"
     if [ "$1" -lt "$num_lines" ]; then
@@ -98,12 +98,10 @@ refute_line() {
   else
     local line
     for line in "${lines[@]}"; do
-      case "$line" in
-        *"$1"*)
-          flunk "expected to not find line \`$line'" $'\n'\
-          "output: $output"
-          ;;
-      esac
+      if [[ "$line" = *"$1"* ]]; then
+        flunk "expected to not find line \`$line'" $'\n'\
+        "output: $output"
+      fi
     done
   fi
 }

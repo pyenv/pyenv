@@ -66,7 +66,7 @@ OUT
 @test "option to skip rehash" {
   run pyenv-init - --no-rehash
   assert_success
-  refute_line "pyenv rehash"
+  refute_line_contains "pyenv rehash"
 }
 
 @test "--no-push-path still path when doesn't exist" {
@@ -87,14 +87,14 @@ OUT
   export PATH="${BATS_TEST_DIRNAME}/../libexec:${PYENV_ROOT}/shims:/usr/bin:/bin:/usr/local/bin"
   run pyenv-init - --no-push-path bash
   assert_success
-  refute_line 'export PATH'
+  refute_line_contains 'export PATH'
 }
 
 @test "--no-push-path does not push path when already in path (fish)" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:${PYENV_ROOT}/shims:/bin:/usr/local/bin"
   run pyenv-init - --no-push-path fish
   assert_success
-  refute_line "set -gx PATH"
+  refute_line_contains "set -gx PATH"
 }
 
 @test "adds shims to PATH" {
@@ -150,5 +150,5 @@ echo "\$PATH"
   run pyenv-init - fish
   assert_success
   assert_line '  switch "$command"'
-  refute_line '  case "$command" in'
+  refute_line_contains '  case "$command" in'
 }
