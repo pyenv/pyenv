@@ -72,7 +72,7 @@ OUT
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run pyenv-init - --no-push-path bash
   assert_success
-  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${pyenv_new_path}"'
+  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
 }
 
 @test "--no-push-path still path when doesn't exist (fish)" {
@@ -100,7 +100,7 @@ OUT
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run pyenv-init - bash
   assert_success
-  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${pyenv_new_path}"'
+  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
 }
 
 @test "adds shims to PATH (fish)" {
