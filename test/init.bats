@@ -135,7 +135,7 @@ echo "path: \$PATH"
   # fish 2 (Ubuntu Bionic) adds spurious messages when setting PATH, messing up the output
   run fish <<!
 set -x PATH "$PATH"
-pyenv init - | source
+pyenv init - --no-push-path | source
 echo "path: \$PATH"
 !
   assert_success
