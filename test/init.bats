@@ -69,34 +69,6 @@ OUT
   refute_line_contains "pyenv rehash"
 }
 
-@test "--no-push-path still path when doesn't exist" {
-  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
-  run pyenv-init - --no-push-path bash
-  assert_success
-  assert_line 'export PATH="'${PYENV_ROOT}'/shims:${PATH}"'
-}
-
-@test "--no-push-path still path when doesn't exist (fish)" {
-  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
-  run pyenv-init - --no-push-path fish
-  assert_success
-  assert_line "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
-}
-
-@test "--no-push-path does not push path when already in path" {
-  export PATH="${BATS_TEST_DIRNAME}/../libexec:${PYENV_ROOT}/shims:/usr/bin:/bin:/usr/local/bin"
-  run pyenv-init - --no-push-path bash
-  assert_success
-  refute_line_contains 'export PATH'
-}
-
-@test "--no-push-path does not push path when already in path (fish)" {
-  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:${PYENV_ROOT}/shims:/bin:/usr/local/bin"
-  run pyenv-init - --no-push-path fish
-  assert_success
-  refute_line_contains "set -gx PATH"
-}
-
 @test "adds shims to PATH" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run pyenv-init - bash
@@ -126,7 +98,6 @@ echo "\$PATH"
   command -v fish >/dev/null || skip "-- fish not installed"
   OLDPATH="$PATH"
   export PATH="${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:$PATH"
-  # fish 2 (Ubuntu Bionic) adds spurious messages when setting PATH, messing up the output
   run fish <<!
 set -x PATH "$PATH"
 pyenv init - | source
@@ -135,6 +106,53 @@ echo "\$PATH"
   assert_success
   assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH//${PYENV_ROOT}\/shims:/}"
 }
+
+@test "adds shims to PATH with --no-push-path if they're not on PATH" {
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
+  run bash -c <<!
+eval "$(pyenv-init - --no-push-path)"
+echo "$PATH"
+!
+  assert_success
+  assert_output "${PYENV_ROOT}/shims:${PATH}"
+}
+
+@test "adds shims to PATH with --no-push-path if they're not on PATH (fish)" {
+  command -v fish >/dev/null || skip "-- fish not installed"
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
+  run fish <<!
+set -x PATH "$PATH"
+pyenv init - | source
+echo "\$PATH"
+!
+  assert_success
+  assert_output "${PYENV_ROOT}/shims:${PATH}"
+}
+
+@test "doesn't change PATH with --no-push-path if shims are already on PATH" {
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:${PYENV_ROOT}/shims:/usr/bin:/bin:/usr/local/bin"
+  run bash -c <<!
+eval "$(pyenv-init - --no-push-path)"
+echo "$PATH"
+!
+  assert_success
+  assert_output "${PATH}"
+}
+
+@test "doesn't change PATH with --no-push-path if shims are already on PATH (fish)" {
+  command -v fish >/dev/null || skip "-- fish not installed"
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:${PYENV_ROOT}/shims:/bin:/usr/local/bin"
+  run fish <<!
+set -x PATH "$PATH"
+pyenv init - | source
+echo "\$PATH"
+!
+  assert_success
+  assert_output "${PATH}"
+}
+
+
+
 
 @test "outputs sh-compatible syntax" {
   run pyenv-init - bash
