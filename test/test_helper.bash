@@ -98,12 +98,10 @@ refute_line() {
   else
     local line
     for line in "${lines[@]}"; do
-      case "$line" in
-        *"$1"*)
-          flunk "expected to not find line \`$line'" $'\n'\
-          "output: $output"
-          ;;
-      esac
+      if [ "$line" = "$1" ]; then
+        flunk "expected to not find line \`$line'" $'\n'\
+        "output: $output"
+      fi
     done
   fi
 }
