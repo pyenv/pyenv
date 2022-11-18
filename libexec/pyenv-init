@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
-# Usage: eval "$(pyenv init [-|--path] [--no-rehash] [<shell>])"
+# Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--no-rehash] [<shell>])"
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -9,6 +9,7 @@ set -e
 if [ "$1" = "--complete" ]; then
   echo -
   echo --path
+  echo --no-push-path
   echo --no-rehash
   echo bash
   echo fish
@@ -19,6 +20,7 @@ fi
 
 mode="help"
 no_rehash=""
+no_push_path=""
 for args in "$@"
 do
   if [ "$args" = "-" ]; then
@@ -28,6 +30,11 @@ do
 
   if [ "$args" = "--path" ]; then
     mode="path"
+    shift
+  fi
+
+  if [ "$args" = "--no-push-path" ]; then
+    no_push_path=1
     shift
   fi
   
@@ -141,28 +148,56 @@ function init_dirs() {
 }
 
 function print_path() {
-  case "$shell" in
-    fish )
-      echo 'while set index (contains -i -- '\'"${PYENV_ROOT}/shims"\'' $PATH)'
-      echo 'set -eg PATH[$index]; end; set -e index'
-      echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
-      ;;
-    * )
-      # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
-      # that makes it source `bashrc` under SSH even when not interactive.
-      # This is inhibited by a guard in Debian's stock `bashrc` but some people remove it
-      # in order to get proper environment for noninteractive remote commands
-      # (SSH provides /etc/ssh/sshrc and ~/.ssh/rc for that but no-one seems to use them for some reason).
-      # This has caused an infinite `bashrc` execution loop for those people in the below nested Bash invocation (#2367).
-      # --norc negates this behavior of such a customized Bash.
-      echo 'PATH="$(bash --norc -ec '\''IFS=:; paths=($PATH); '
-      echo 'for i in ${!paths[@]}; do '
-      echo 'if [[ ${paths[i]} == "'\'\'"${PYENV_ROOT}/shims"\'\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; '
-      echo 'fi; done; '
-      echo 'echo "${paths[*]}"'\'')"'
-      echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
-      ;;
-  esac
+  # if no_push_path is set, guard the PATH manipulation with a check on whether
+  # the shim is already in the PATH.
+  if [ -n "$no_push_path" ]; then
+    case "$shell" in
+      fish )
+          echo 'if not contains -- "'"${PYENV_ROOT}/shims"'" $PATH'
+          print_path_prepend_shims
+          echo 'end'
+          ;;
+      * )
+          echo 'if [[ ":$PATH:" != *'\':"${PYENV_ROOT}"/shims:\''* ]]; then'
+          print_path_prepend_shims
+          echo 'fi'
+          ;;
+    esac
+  else
+    case "$shell" in
+      fish )
+        echo 'while set pyenv_index (contains -i -- "'"${PYENV_ROOT}/shims"'" $PATH)'
+        echo 'set -eg PATH[$pyenv_index]; end; set -e pyenv_index'
+        print_path_prepend_shims
+        ;;
+      * )
+        # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
+        # that makes it source `bashrc` under SSH even when not interactive.
+        # This is inhibited by a guard in Debian's stock `bashrc` but some people remove it
+        # in order to get proper environment for noninteractive remote commands
+        # (SSH provides /etc/ssh/sshrc and ~/.ssh/rc for that but no-one seems to use them for some reason).
+        # This has caused an infinite `bashrc` execution loop for those people in the below nested Bash invocation (#2367).
+        # --norc negates this behavior of such a customized Bash.
+        echo 'PATH="$(bash --norc -ec '\''IFS=:; paths=($PATH); '
+        echo 'for i in ${!paths[@]}; do '
+        echo 'if [[ ${paths[i]} == "'\'\'"${PYENV_ROOT}/shims"\'\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; '
+        echo 'fi; done; '
+        echo 'echo "${paths[*]}"'\'')"'
+        print_path_prepend_shims
+        ;;
+    esac
+  fi
+}
+
+function print_path_prepend_shims() {
+    case "$shell" in
+      fish )
+          echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
+          ;;
+      * )
+          echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
+          ;;
+    esac
 }
 
 function print_env() {

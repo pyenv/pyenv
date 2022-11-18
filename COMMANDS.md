@@ -386,11 +386,12 @@ List existing pyenv shims.
 
 Configure the shell environment for pyenv
 
-    Usage: eval "$(pyenv init [-|--path] [--no-rehash] [<shell>])"
+    Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--no-rehash] [<shell>])"
 
       -                    Initialize shims directory, print PYENV_SHELL variable, completions path
                            and shell function
       --path               Print shims path
+      --no-push-path       Do not push shim to the start of PATH if they're already there
       --no-rehash          Add no rehash command to output     
 
 ## `pyenv completions`
