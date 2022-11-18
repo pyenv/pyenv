@@ -154,12 +154,12 @@ function print_path() {
     case "$shell" in
       fish )
           echo 'if not contains -- "'"${PYENV_ROOT}/shims"'" $PATH'
-          echo '  set -gx PATH '\'"${PYENV_ROOT}/shims"\''" $PATH'
+          print_path_prepend_shims
           echo 'end'
           ;;
       * )
           echo 'if [[ ":$PATH:" != *'\':"${PYENV_ROOT}"/shims:\''* ]]; then'
-          echo '  export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
+          print_path_prepend_shims
           echo 'fi'
           ;;
     esac
@@ -168,7 +168,7 @@ function print_path() {
       fish )
         echo 'while set pyenv_index (contains -i -- "'"${PYENV_ROOT}/shims"'" $PATH)'
         echo 'set -eg PATH[$pyenv_index]; end; set -e pyenv_index'
-        echo 'set -gx PATH "'"${PYENV_ROOT}/shims"'" $PATH'
+        print_path_prepend_shims
         ;;
       * )
         # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
@@ -183,10 +183,21 @@ function print_path() {
         echo 'if [[ ${paths[i]} == "'\'\'"${PYENV_ROOT}/shims"\'\''" ]]; then unset '\'\\\'\''paths[i]'\'\\\'\''; '
         echo 'fi; done; '
         echo 'echo "${paths[*]}"'\'')"'
-        echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
+        print_path_prepend_shims
         ;;
     esac
   fi
+}
+
+function print_path_prepend_shims() {
+    case "$shell" in
+      fish )
+          echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
+          ;;
+      * )
+          echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
+          ;;
+    esac
 }
 
 function print_env() {
