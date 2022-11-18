@@ -80,7 +80,7 @@ OUT
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run pyenv-init - fish
   assert_success
-  assert_line "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
+  assert_line "set -gx PATH \"${PYENV_ROOT}/shims\" \$PATH"
 }
 
 @test "removes existing shims from PATH" {
@@ -92,6 +92,54 @@ echo "\$PATH"
 !
   assert_success
   assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH//${PYENV_ROOT}\/shims:/}"
+}
+
+@test "--no-push-path does not modify path when shim exists" {
+  export PATH="${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:$PATH"
+  run bash -e <<!
+eval "\$(pyenv-init - --no-push-path)"
+echo "path: \$PATH"
+!
+  assert_success
+  assert_output "path: $PATH"
+}
+
+@test "--no-push-path adds path when shim does not exist" {
+  OLDPATH="${PATH//${PYENV_ROOT}\/shims:/}"
+  export PATH="${BATS_TEST_DIRNAME}/nonexistent:$OLDPATH"
+  run bash -e <<!
+eval "\$(pyenv-init - --no-push-path)"
+echo "path: \$PATH"
+!
+  assert_success
+  assert_output "path: ${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:$OLDPATH"
+}
+
+@test "--no-push-path does not modify path when shim exists (fish)" {
+  command -v fish >/dev/null || skip "-- fish not installed"
+  export PATH="${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:$PATH"
+  # fish 2 (Ubuntu Bionic) adds spurious messages when setting PATH, messing up the output
+  run fish <<!
+set -x PATH "$PATH"
+pyenv init - --no-push-path | source
+echo "path: \$PATH"
+!
+  assert_success
+  assert_output "path: $PATH"
+}
+
+@test "--no-push-path adds path when shim does not exist (fish)" {
+  command -v fish >/dev/null || skip "-- fish not installed"
+  OLDPATH="${PATH//${PYENV_ROOT}\/shims:/}"
+  export PATH="${BATS_TEST_DIRNAME}/nonexistent:$OLDPATH"
+  # fish 2 (Ubuntu Bionic) adds spurious messages when setting PATH, messing up the output
+  run fish <<!
+set -x PATH "$PATH"
+pyenv init - --no-push-path | source
+echo "path: \$PATH"
+!
+  assert_success
+  assert_output "path: ${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:$OLDPATH"
 }
 
 @test "removes existing shims from PATH (fish)" {
