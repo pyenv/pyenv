@@ -220,7 +220,7 @@ function print_completion() {
 
 function print_rehash() {
   if [ -z "$no_rehash" ]; then
-    echo 'command pyenv rehash'
+    echo 'command pyenv rehash 2>/dev/null'
   fi
 }
 
