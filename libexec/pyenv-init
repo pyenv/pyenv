@@ -154,11 +154,11 @@ function print_path() {
     case "$shell" in
       fish )
           echo 'if not contains -- "'"${PYENV_ROOT}/shims"'" $PATH'
-          echo '  set -gx PATH "'"${PYENV_ROOT}/shims"'" $PATH'
+          echo '  set -gx PATH '\'"${PYENV_ROOT}/shims"\''" $PATH'
           echo 'end'
           ;;
       * )
-          echo 'if [[ ":$PATH:" != *":'"${PYENV_ROOT}"/shims':"* ]]; then'
+          echo 'if [[ ":$PATH:" != *'\':"${PYENV_ROOT}"/shims:\''* ]]; then'
           echo '  export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
           echo 'fi'
           ;;
