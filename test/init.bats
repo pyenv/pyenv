@@ -109,7 +109,7 @@ echo "\$PATH"
 
 @test "adds shims to PATH with --no-push-path if they're not on PATH" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
-  run bash -c - <<!
+  run bash <<!
 eval "$(pyenv-init - --no-push-path)"
 echo "$PATH"
 !
@@ -131,7 +131,7 @@ echo "\$PATH"
 
 @test "doesn't change PATH with --no-push-path if shims are already on PATH" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:${PYENV_ROOT}/shims:/usr/bin:/bin:/usr/local/bin"
-  run bash -c - <<!
+  run bash <<!
 eval "$(pyenv-init - --no-push-path)"
 echo "$PATH"
 !
