@@ -148,24 +148,34 @@ function init_dirs() {
 }
 
 function print_path() {
+  # if no_push_path is set, guard the PATH manipulation with a check on whether
+  # the shim is already in the PATH.
+  if [ -n "$no_push_path" ]; then
+    case "$shell" in
+      fish )
+          echo 'if not contains -- "'"${PYENV_ROOT}/shims"'" $PATH'
+          print_path_real
+          echo 'end'
+          ;;
+      * )
+          echo 'if [[ ":$PATH:" != *":'"${PYENV_ROOT}"/shims':"* ]]; then'
+          print_path_real
+          echo 'fi'
+          ;;
+    esac
+  else
+    print_path_real
+  fi
+}
+
+function print_path_real() {
   case "$shell" in
     fish )
-      if [ -n "$no_push_path" ]; then
-        echo 'if not contains -- "'"${PYENV_ROOT}/shims"'" $PATH'
-      fi
       echo 'while set pyenv_index (contains -i -- "'"${PYENV_ROOT}/shims"'" $PATH)'
       echo 'set -eg PATH[$pyenv_index]; end; set -e pyenv_index'
       echo 'set -gx PATH "'"${PYENV_ROOT}/shims"'" $PATH'
-      if [ -n "$no_push_path" ]; then
-        echo 'end'
-      fi
       ;;
     * )
-      # if no_push_path is set, guard the PATH manipulation with a check on whether
-      # the shim is already in the PATH.
-      if [[ -n "$no_push_path" ]]; then
-        echo 'if [[ ":$PATH:" != *":'"${PYENV_ROOT}"/shims':"* ]]; then'
-      fi
       # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
       # that makes it source `bashrc` under SSH even when not interactive.
       # This is inhibited by a guard in Debian's stock `bashrc` but some people remove it
@@ -179,9 +189,6 @@ function print_path() {
       echo 'fi; done; '
       echo 'echo "${paths[*]}"'\'')"'
       echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
-      if [[ -n "$no_push_path" ]]; then
-        echo 'fi'
-      fi
       ;;
   esac
 }
