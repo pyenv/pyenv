@@ -66,7 +66,7 @@ OUT
 @test "option to skip rehash" {
   run pyenv-init - --no-rehash
   assert_success
-  refute_line_contains "pyenv rehash"
+  refute_line "pyenv rehash"
 }
 
 @test "adds shims to PATH" {
@@ -165,5 +165,5 @@ echo "\$PATH"
   run pyenv-init - fish
   assert_success
   assert_line '  switch "$command"'
-  refute_line_contains '  case "$command" in'
+  refute_line '  case "$command" in'
 }
