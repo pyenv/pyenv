@@ -45,4 +45,5 @@ if [ "${PYENV_BIN_PATH#${PYENV_ROOT}}" != "${PYENV_BIN_PATH}" ]; then
   # Only add to $PATH for non-system version.
   export PATH="${PYENV_BIN_PATH}:${PATH}"
 fi
+unset PYENV_VERSION
 exec "$PYENV_COMMAND_PATH" "$@"
