@@ -21,6 +21,11 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-shims --short
 fi
 
+declare pyenv_version_set_by_envvar;
+if [[ $(declare -p PYENV_VERSION) =~ ^declare\ -[^[:space:]]*x[^[:space:]]*\  ]]; then
+  pyenv_version_set_by_envvar=1;
+fi
+
 PYENV_VERSION="$(pyenv-version-name)"
 PYENV_COMMAND="$1"
 
@@ -44,6 +49,13 @@ shift 1
 if [ "${PYENV_BIN_PATH#${PYENV_ROOT}}" != "${PYENV_BIN_PATH}" ]; then
   # Only add to $PATH for non-system version.
   export PATH="${PYENV_BIN_PATH}:${PATH}"
+  # Keeping PYENV_VERSION set would undesirably lock into current Python
+  # if the program launches a nested shell.
+  # For the program itself and non-shell subprocesses,
+  # setting PATH already ensures that executables from the selected
+  # version prevail over shims
+  if [[ -z $pyenv_version_set_by_envvar ]]; then
+    unset PYENV_VERSION
+  fi
 fi
-unset PYENV_VERSION
 exec "$PYENV_COMMAND_PATH" "$@"
