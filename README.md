@@ -247,7 +247,9 @@ which does install native Windows Python versions.
 
 #### Automatic installer
 
-Visit our other project:
+`curl https://pyenv.run | bash`
+
+For more details visit our other project:
 https://github.com/pyenv/pyenv-installer
 
 
