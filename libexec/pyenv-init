@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
-# Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--no-rehash] [<shell>])"
+# Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--detect-shell] [--no-rehash] [<shell>])"
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -11,6 +11,7 @@ if [ "$1" = "--complete" ]; then
   echo --path
   echo --no-push-path
   echo --no-rehash
+  echo --detect-shell
   echo bash
   echo fish
   echo ksh
@@ -30,6 +31,11 @@ do
 
   if [ "$args" = "--path" ]; then
     mode="path"
+    shift
+  fi
+
+  if [ "$args" = "--detect-shell" ]; then
+    mode="detect-shell"
     shift
   fi
 
@@ -76,12 +82,17 @@ function main() {
     print_shell_function
     exit 0
     ;;
+  "detect-shell")
+    detect_profile
+    print_detect_shell
+    exit 0
+    ;;
   esac
   # should never get here
   exit 2
 }
 
-function help_() {
+function detect_profile() {
   case "$shell" in
   bash )
     if [ -e '~/.bash_profile' ]; then
@@ -105,7 +116,16 @@ function help_() {
     rc='your shell'\''s interactive startup file'
     ;;
   esac
+}
 
+function print_detect_shell() {
+  echo "PYENV_SHELL_DETECT=$shell"
+  echo "PYENV_PROFILE_DETECT=$profile"
+  echo "PYENV_RC_DETECT=$rc"
+}
+
+function help_() {
+  detect_profile
   {
     case "$shell" in
     fish )
