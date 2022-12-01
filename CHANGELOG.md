@@ -1,5 +1,21 @@
 ## Version History
 
+## Release 2.3.7
+
+* Add Python version 3.11 to the macOS build by @jbkkd in https://github.com/pyenv/pyenv/pull/2510
+* Don't use Zlib from XCode SDK if a custom compiler is used by @native-api in https://github.com/pyenv/pyenv/pull/2516
+* Change line endings from CRLF to LF by @hoang-himself in https://github.com/pyenv/pyenv/pull/2517
+* Fix resolution of a name that's a prefix of another name by @native-api in https://github.com/pyenv/pyenv/pull/2521
+* GitHub Workflows security hardening by @sashashura in https://github.com/pyenv/pyenv/pull/2511
+* Add nushell to activate list by @theref in https://github.com/pyenv/pyenv/pull/2524
+* Fix compilation error when building OpenSSL 1.1.1q in MacOS 11+ for 3.9.15 and 3.8.15 by @twangboy in https://github.com/pyenv/pyenv/pull/2520
+* Add simple `.editorconfig` file by @aphedges in https://github.com/pyenv/pyenv/pull/2518
+* Support `aria2c` being a snap by @native-api in https://github.com/pyenv/pyenv/pull/2528
+* Add CPython 3.12.0a2 by @saaketp in https://github.com/pyenv/pyenv/pull/2527
+* Add --no-push-path option by @isaacl in https://github.com/pyenv/pyenv/pull/2526
+* Fix typo in README.md by @weensy in https://github.com/pyenv/pyenv/pull/2535
+* Copy auto installer oneliner to readme by @spookyuser in https://github.com/pyenv/pyenv/pull/2538
+
 ## Release 2.3.6
 
 * Add CPython 3.10.8 (#2480)
