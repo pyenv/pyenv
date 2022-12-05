@@ -11,29 +11,38 @@ win64_hash=ca7b0f4c576995b388cfb4c796e3f6f20b037e5314571bf267daa068a3a2af31
 
 ### end of manual settings - following lines same for every download
 
-function pypy_pkg_data {
-    # pypy architecture
-    local ARCH="${1}"
+function err_no_binary {
+    local archmsg="${1}"
+    local ver="pypy${PYVER}-v${VERSION}-src"
+    local url="https://downloads.python.org/pypy/${ver}.tar.bz2"
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for ${archmsg}."
+      echo "try '${url}' to build from source."
+      echo
+    } >&2
+    exit 1
+}
 
-    local basesrc="pypy${PYVER}-${VERSION}-src"
-    local basever="pypy${PYVER}-v${VERSION}"
-    local baseurl="https://downloads.python.org/pypy/${basever}"
+function pypy_pkg_data {
+    # pypy architecture tag
+    local ARCH="${1}"
 
     # defaults
     local cmd='install_package'  # use bz2
     local pkg="${ARCH}" # assume matches
-    local url="${baseurl}-${pkg}.tar.bz2" # use bz2
+    local ext='tar.bz2' # windows is always diff...
     local hash='' # undefined
 
-    case "${pkg}" in
+    # select the hash, fix pkg if not match ARCH, windows has ext of zip
+    case "${ARCH}" in
     'linux-aarch64' )
       hash="${aarch64_hash}"
-      url="${baseurl}-aarch64.tar.bz2" # diff url
+      pkg='aarch64'
       ;;
     'linux' )
       hash="${linux32_hash}"
-      pkg='linux32'  # package name revised
-      url="${baseurl}-${pkg}.tar.bz2"  # new url
+      pkg='linux32'
       ;;
     'linux64' )
       hash="${linux64_hash}"
@@ -42,13 +51,7 @@ function pypy_pkg_data {
       if require_osx_version "10.13"; then
         hash="${osx64_hash}"
       else
-        { echo
-          colorize 1 "ERROR"
-          echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
-          echo "try '${basesrc}' to build from source."
-          echo
-        } >&2
-        exit 1
+        err_no_binary "${ARCH}, OS X < 10.13"
       fi
       ;;
     's390x' )
@@ -57,21 +60,18 @@ function pypy_pkg_data {
     'win64' )
       hash="${win64_hash}"
       cmd='install_zip'  # diff command
-      url="${baseurl}-${pkg}.zip"  # zip rather than bz2
+      ext='zip' # zip rather than bz2
       ;;
     * )
-      { echo
-        colorize 1 "ERROR"
-        echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true)."
-        echo "try '${basesrc}' to build from source."
-        echo
-      } >&2
-      exit 1
+      err_no_binary "${ARCH}"
       ;;
     esac
 
+    local basever="pypy${PYVER}-v${VERSION}"
+    local baseurl="https://downloads.python.org/pypy/${basever}"
+
     # result - command, package dir, url+hash
-    echo "${cmd}" "${basever}-${pkg}" "${url}#${hash}"
+    echo "${cmd}" "${basever}-${pkg}" "${baseurl}-${pkg}.${ext}#${hash}"
 }
 
 # determine command, package directory, url+hash
