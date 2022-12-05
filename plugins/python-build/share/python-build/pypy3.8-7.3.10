@@ -1,0 +1,87 @@
+VERSION='7.3.10'
+PYVER='3.8'
+
+# https://www.pypy.org/checksums.html
+aarch64_hash=e4caa1a545f22cfee87d5b9aa6f8852347f223643ad7d2562e0b2a2f4663ad98
+linux32_hash=b70ed7fdc73a74ebdc04f07439f7bad1a849aaca95e26b4a74049d0e483f071c
+linux64_hash=ceef6496fd4ab1c99e3ec22ce657b8f10f8bb77a32427fadfb5e1dd943806011
+osarm64_hash=6cb1429371e4854b718148a509d80143f801e3abfc72fef58d88aeeee1e98f9e
+osx64_hash=399eb1ce4c65f62f6a096b7c273536601b7695e3c0dc0457393a659b95b7615b
+s390x_hash=c294f8e815158388628fe77ac5b8ad6cd93c8db1359091fa02d41cf6da4d61a1
+win64_hash=362dd624d95bd64743190ea2539b97452ecb3d53ea92ceb2fbe9f48dc60e6b8f
+
+### end of manual settings - following lines same for every download
+
+function err_no_binary {
+    local archmsg="${1}"
+    local ver="pypy${PYVER}-v${VERSION}-src"
+    local url="https://downloads.python.org/pypy/${ver}.tar.bz2"
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for ${archmsg}."
+      echo "try '${url}' to build from source."
+      echo
+    } >&2
+    exit 1
+}
+
+function pypy_pkg_data {
+    # pypy architecture tag
+    local ARCH="${1}"
+
+    # defaults
+    local cmd='install_package'  # use bz2
+    local pkg="${ARCH}" # assume matches
+    local ext='tar.bz2' # windows is always diff...
+    local hash='' # undefined
+
+    # select the hash, fix pkg if not match ARCH, windows has ext of zip
+    case "${ARCH}" in
+    'linux-aarch64' )
+      hash="${aarch64_hash}"
+      pkg='aarch64'
+      ;;
+    'linux' )
+      hash="${linux32_hash}"
+      pkg='linux32'
+      ;;
+    'linux64' )
+      hash="${linux64_hash}"
+      ;;
+    'osarm64' )
+      hash="${osarm64_hash}"
+      pkg='macos_arm64'
+      ;;
+    'osx64' )
+      if require_osx_version "10.13"; then
+        hash="${osx64_hash}"
+        pkg='macos_x86_64'
+      else
+        err_no_binary "${ARCH}, OS X < 10.13"
+      fi
+      ;;
+    's390x' )
+      hash="${s390x_hash}"
+      ;;
+    'win64' )
+      hash="${win64_hash}"
+      cmd='install_zip'  # diff command
+      ext='zip' # zip rather than bz2
+      ;;
+    * )
+      err_no_binary "${ARCH}"
+      ;;
+    esac
+
+    local basever="pypy${PYVER}-v${VERSION}"
+    local baseurl="https://downloads.python.org/pypy/${basever}"
+
+    # result - command, package dir, url+hash
+    echo "${cmd}" "${basever}-${pkg}" "${baseurl}-${pkg}.${ext}#${hash}"
+}
+
+# determine command, package directory, url+hash
+declare -a pd="$(pypy_pkg_data "$(pypy_architecture 2>/dev/null || true)")"
+
+# install
+${pd[0]} "${pd[1]}" "${pd[2]}" 'pypy' "verify_py${PYVER//./}" 'ensurepip'
