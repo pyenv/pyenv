@@ -1,4 +1,12 @@
-## Version History
+# Version History
+
+## Release 2.3.8
+
+* Export detected shell environment in pyenv-init by @ianchen-tw in https://github.com/pyenv/pyenv/pull/2540
+* Add CPython 3.12.0a3 by @saaketp in https://github.com/pyenv/pyenv/pull/2545
+* Add CPython 3.11.1 by @anton-petrov in https://github.com/pyenv/pyenv/pull/2549
+* Add CPython 3.10.9 by @rudisimo in https://github.com/pyenv/pyenv/pull/2544
+* Add 3.7.16, 3.8.16, 3.9.16 by @chadac in https://github.com/pyenv/pyenv/pull/2550
 
 ## Release 2.3.7
 
