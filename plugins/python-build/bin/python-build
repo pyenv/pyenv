@@ -806,6 +806,9 @@ build_package_standard_build() {
       use_homebrew_zlib || true
     fi
     use_dsymutil || true
+    if ! is_mac; then
+      build_package_enable_shared || true
+    fi
   fi
 
   ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
