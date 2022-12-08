@@ -8,7 +8,6 @@ linux64_hash=461fb6df524208af9e94ffb16989f628b585bdb4b9e97d81e668899fc3a064a3
 osarm64_hash=14b178f005603e3df6db7574b77b9c65ae79feda1a629214cafcb4eee7da679d
 osx64_hash=188551185ee945d5e42a3a619205d02ac31db77bdd5d98b6c11469e125c3bdb5
 s390x_hash=0fac1ec1e05c70941f758be05d40ce7ffe6a42c0416e70b55d40a7523e3e70ae
-win64_hash=2915b5201a5f71546951bc41efd80f40b2ed709511bc526219a70f3ae37b918e
 
 ### end of manual settings - following lines same for every download
 
@@ -32,10 +31,10 @@ function pypy_pkg_data {
     # defaults
     local cmd='install_package'  # use bz2
     local pkg="${ARCH}" # assume matches
-    local ext='tar.bz2' # windows is always diff...
+    local ext='tar.bz2'
     local hash='' # undefined
 
-    # select the hash, fix pkg if not match ARCH, windows has ext of zip
+    # select the hash, fix pkg if not match ARCH
     case "${ARCH}" in
     'linux-aarch64' )
       hash="${aarch64_hash}"
@@ -62,11 +61,6 @@ function pypy_pkg_data {
       ;;
     's390x' )
       hash="${s390x_hash}"
-      ;;
-    'win64' )
-      hash="${win64_hash}"
-      cmd='install_zip'  # diff command
-      ext='zip' # zip rather than bz2
       ;;
     * )
       err_no_binary "${ARCH}"
