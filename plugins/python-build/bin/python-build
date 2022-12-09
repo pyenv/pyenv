@@ -2211,7 +2211,7 @@ fi
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   if ! is_mac; then
-    echo "python-build: framework installation is not supported." >&2
+    echo "python-build: framework installation is not supported outside of MacOS." >&2
     exit 1
   fi
   create_framework_dirs() {
@@ -2232,7 +2232,7 @@ fi
 # Build against universal SDK
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
   if ! is_mac; then
-    echo "python-build: universal installation is not supported." >&2
+    echo "python-build: universal installation is not supported outside of MacOS." >&2
     exit 1
   fi
   package_option python configure --enable-universalsdk=/
