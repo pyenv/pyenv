@@ -1791,7 +1791,7 @@ verify_python() {
 }
 
 try_python_module() {
-  if ! "$PYTHON_BIN" -c "import $1" 1>/dev/null 2>&1; then
+  if ! "$PYTHON_BIN" -c "import $1"; then
     { colorize 1 "WARNING"
       echo ": The Python $1 extension was not compiled${3:+ $3}. Missing the ${2:-$1}?"
       return 0
@@ -1800,7 +1800,7 @@ try_python_module() {
 }
 
 verify_python_module() {
-  if ! "$PYTHON_BIN" -c "import $1" 1>/dev/null 2>&1; then
+  if ! "$PYTHON_BIN" -c "import $1"; then
     { colorize 1 "ERROR"
       echo ": The Python $1 extension was not compiled. Missing the ${2:-$1}?"
       echo
