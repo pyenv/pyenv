@@ -806,9 +806,6 @@ build_package_standard_build() {
       use_homebrew_zlib || true
     fi
     use_dsymutil || true
-    if ! is_mac; then
-      build_package_enable_shared || true
-    fi
   fi
 
   ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
@@ -2191,11 +2188,15 @@ if [ -n "$DEBUG" ]; then
   package_option python configure --with-pydebug
 fi
 
+if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--enable-framework"* ]]; then
+  package_option python configure --enable-shared
+fi
+
 # python-build: Specify `--libdir` on configure to fix build on openSUSE (#36)
 package_option python configure --libdir="${PREFIX_PATH}/lib"
 
 # python-build: Set `RPATH` if `--enable-shared` was given (#65, #66, #82)
-if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]]; then
+if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS ${PYTHON_CONFIGURE_OPTS_ARRAY[@]}" == *"--enable-shared"* ]]; then
   # The ld on Darwin embeds the full paths to each dylib by default
   if [[ "$LDFLAGS" != *"-rpath="* ]] && ! is_mac; then
     export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
