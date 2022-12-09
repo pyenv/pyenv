@@ -207,19 +207,32 @@ if [ -z "${PYENV_BOOTSTRAP_VERSION}" ]; then
     done
     ;;
   "pypy"*"-dev" | "pypy"*"-src" )
+    declare -a pypy_build_req_pkgs=('genc' 'pycparser')
     # PyPy/PyPy3 requires existing Python 2.7 to build
     if [ -n "${PYENV_RPYTHON_VERSION}" ]; then
       PYENV_BOOTSTRAP_VERSION="${PYENV_RPYTHON_VERSION}"
     else
+      # already installed into pyenv?
       for version in $(pyenv-versions --bare | sort -r); do
         if [[ "${version}" == "2.7"* ]]; then
           PYENV_BOOTSTRAP_VERSION="$version"
           break
         fi
       done
+      if [ -z "$PYENV_BOOTSTRAP_VERSION" ]; then
+        # last ditch install python 2.7 ourselves
+	# this enables the ci tests for source build
+        declare pypy_build_req_vers='2.7.18'
+        pyenv install "${pypy_build_req_vers}"
+        PYENV_VERSION="${pypy_build_req_vers}" python -m pip install --upgrade pip
+        for dep in "${pypy_build_req_pkgs[@]}"; do
+            PYENV_VERSION="${pypy_build_req_vers}" python -m pip install "${dep}"
+	done
+        PYENV_BOOTSTRAP_VERSION="${pypy_build_req_vers}"
+      fi
     fi
     if [ -n "$PYENV_BOOTSTRAP_VERSION" ]; then
-      for dep in curses genc pycparser; do
+      for dep in "${pypy_build_req_pkgs[@]}"; do
         if ! PYENV_VERSION="$PYENV_BOOTSTRAP_VERSION" pyenv-exec python -c "import ${dep}" 1>/dev/null 2>&1; then
           echo "pyenv-install: $VERSION_NAME: PyPy requires \`${dep}' in $PYENV_BOOTSTRAP_VERSION to build from source." >&2
           exit 1
