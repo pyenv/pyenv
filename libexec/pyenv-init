@@ -22,6 +22,7 @@ fi
 mode="help"
 no_rehash=""
 no_push_path=""
+no_config_place_holder=""
 for args in "$@"
 do
   if [ "$args" = "-" ]; then
@@ -36,6 +37,7 @@ do
 
   if [ "$args" = "--detect-shell" ]; then
     mode="detect-shell"
+    no_config_place_holder=1
     shift
   fi
 
@@ -112,8 +114,15 @@ function detect_profile() {
     rc='~/.profile'
     ;;
   * )
-    profile='your shell'\''s login startup file'
-    rc='your shell'\''s interactive startup file'
+    # if no_config_place_holder is set,
+    # do not filled in any placehodler for config file
+    if [ -n "$no_config_place_holder" ]; then
+      profile='""'
+      rc='""'
+    else
+      profile='your shell'\''s login startup file'
+      rc='your shell'\''s interactive startup file'
+    fi
     ;;
   esac
 }
