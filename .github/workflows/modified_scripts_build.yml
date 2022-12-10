@@ -41,7 +41,8 @@ jobs:
           brew install openssl openssl@1.1 readline sqlite3 xz zlib
           if [[ "${{ matrix.python-version }}" =~ pypy.*-(src|dev) ]]; then
             pyenv install 2.7.18
-            PYENV_VERSION=2.7.18 pip install curses genc pycparser
+            PYENV_VERSION=2.7.18 pip install pycparser
+            # brew install expat
           fi
       - run: |
           #build
@@ -103,7 +104,8 @@ jobs:
             xz-utils tk-dev libffi-dev liblzma-dev
           if [[ "${{ matrix.python-version }}" =~ pypy.*-(src|dev) ]]; then
             pyenv install 2.7.18
-            PYENV_VERSION=2.7.18 pip install curses genc pycparser
+            PYENV_VERSION=2.7.18 pip install pycparser
+            # sudo apt install -yq libexpat1-dev
           fi
       - run: |
           #build
