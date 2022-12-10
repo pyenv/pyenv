@@ -2,7 +2,7 @@ VERSION='7.3.10'
 PYVER='3.8'
 
 # https://www.pypy.org/checksums.html
-hash=5284dfba00f4ffcdf29b732cf7f2e63f29d1f33295f826a2caefb1f782cedaef
+hash=218a1e062f17aba89f61bc398e8498f13c048b9fcf294343f5d9d56c3ac9b882
 
 ### end of manual settings - following lines same for every download
 
