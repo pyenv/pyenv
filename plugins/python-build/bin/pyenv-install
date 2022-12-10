@@ -207,7 +207,7 @@ if [ -z "${PYENV_BOOTSTRAP_VERSION}" ]; then
     done
     ;;
   "pypy"*"-dev" | "pypy"*"-src" )
-    declare -a pypy_build_req_pkgs=('genc' 'pycparser')
+    declare -a pypy_build_req_pkgs=()
     # PyPy/PyPy3 requires existing Python 2.7 to build
     if [ -n "${PYENV_RPYTHON_VERSION}" ]; then
       PYENV_BOOTSTRAP_VERSION="${PYENV_RPYTHON_VERSION}"
