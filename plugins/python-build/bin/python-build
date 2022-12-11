@@ -940,7 +940,13 @@ build_package_micropython() {
 
 pypy_architecture() {
   case "$(uname -s)" in
-  "Darwin" ) echo "osx64" ;;
+  "Darwin" )
+    case "$(uname -m)" in
+    "arm64" ) echo "osarm64" ;;
+    "x86_64" ) echo "osx64" ;;
+    * ) return 1 ;;
+    esac
+    ;;
   "Linux" )
     case "$(uname -m)" in
     "armel" ) echo "linux-armel" ;;
