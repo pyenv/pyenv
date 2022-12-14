@@ -1,13 +1,13 @@
-VERSION='7.3.9'
-PYVER='3.8'
+VERSION='7.3.10'
+PYVER='3.9'
 
 # https://www.pypy.org/checksums.html
-aarch64_hash=5e124455e207425e80731dff317f0432fa0aba1f025845ffca813770e2447e32
-linux32_hash=4b261516c6c59078ab0c8bd7207327a1b97057b4ec1714ed5e79a026f9efd492
-linux64_hash=08be25ec82fc5d23b78563eda144923517daba481a90af0ace7a047c9c9a3c34
-osx64_hash=91a5c2c1facd5a4931a8682b7d792f7cf4f2ba25cd2e7e44e982139a6d5e4840
-s390x_hash=c6177a0016c9145c7b99fddb5d74cc2e518ccdb216a6deb51ef6a377510cc930
-win64_hash=05022baaa55db2b60880f2422312d9e4025e1267303ac57f33e8253559d0be88
+aarch64_hash=657a04fd9a5a992a2f116a9e7e9132ea0c578721f59139c9fb2083775f71e514
+linux32_hash=b6db59613b9a1c0c1ab87bc103f52ee95193423882dc8a848b68850b8ba59cc5
+linux64_hash=95cf99406179460d63ddbfe1ec870f889d05f7767ce81cef14b88a3a9e127266
+osarm64_hash=e2a6bec7408e6497c7de8165aa4a1b15e2416aec4a72f2578f793fb06859ccba
+osx64_hash=f90c8619b41e68ec9ffd7d5e913fe02e60843da43d3735b1c1bc75bcfe638d97
+s390x_hash=ca6525a540cf0c682d1592ae35d3fbc97559a97260e4b789255cc76dde7a14f0
 
 ### end of manual settings - following lines same for every download
 
@@ -31,10 +31,10 @@ function pypy_pkg_data {
     # defaults
     local cmd='install_package'  # use bz2
     local pkg="${ARCH}" # assume matches
-    local ext='tar.bz2' # windows is always diff...
+    local ext='tar.bz2'
     local hash='' # undefined
 
-    # select the hash, fix pkg if not match ARCH, windows has ext of zip
+    # select the hash, fix pkg if not match ARCH
     case "${ARCH}" in
     'linux-aarch64' )
       hash="${aarch64_hash}"
@@ -47,20 +47,20 @@ function pypy_pkg_data {
     'linux64' )
       hash="${linux64_hash}"
       ;;
+    'osarm64' )
+      hash="${osarm64_hash}"
+      pkg='macos_arm64'
+      ;;
     'osx64' )
       if require_osx_version "10.13"; then
         hash="${osx64_hash}"
+        pkg='macos_x86_64'
       else
         err_no_binary "${ARCH}, OS X < 10.13"
       fi
       ;;
     's390x' )
       hash="${s390x_hash}"
-      ;;
-    'win64' )
-      hash="${win64_hash}"
-      cmd='install_zip'  # diff command
-      ext='zip' # zip rather than bz2
       ;;
     * )
       err_no_binary "${ARCH}"
