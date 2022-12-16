@@ -299,7 +299,7 @@ You can run `rbenv init -` for yourself to inspect the generated script.
 The simplicity of rbenv makes it easy to temporarily disable it, or
 uninstall from the system.
 
-1. To **disable** rbenv managing your Ruby versions, simply remove the `rbenv init` line from your shell startup configuration. This will remove rbenv shims directory from PATH, and future invocations like `ruby` will execute the system Ruby version, bypassing rbenv completely.
+1. To **disable** rbenv managing your Ruby versions, simply comment or remove the `rbenv init` line from your shell startup configuration. This will remove rbenv shims directory from PATH, and future invocations like `ruby` will execute the system Ruby version, bypassing rbenv completely.
 
    While disabled, `rbenv` will still be accessible on the command line, but your Ruby apps won't be affected by version switching.
 
