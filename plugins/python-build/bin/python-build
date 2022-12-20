@@ -233,9 +233,7 @@ install_package_using() {
   make_package "${make_args[@]}"
   popd >&4
 
-  { echo "Installed ${package_name} to ${PREFIX_PATH}"
-    echo
-  } >&2
+  echo "Installed ${package_name} to ${PREFIX_PATH}" >&2
 }
 
 make_package() {
