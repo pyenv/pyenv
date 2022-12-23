@@ -62,7 +62,7 @@ assert_build_log() {
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub brew false
   stub_make_install
   stub_make_install
@@ -74,12 +74,12 @@ assert_build_log() {
   unstub make
 
   assert_build_log <<OUT
-yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
+yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
 yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -89,7 +89,7 @@ OUT
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub brew false
   stub_make_install
   stub_make_install
@@ -103,13 +103,13 @@ OUT
   unstub patch
 
   assert_build_log <<OUT
-yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
+yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
 yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
 patch -p0 --force -i $TMP/python-patch.XXX
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -119,7 +119,7 @@ OUT
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub brew false
   stub_make_install
   stub_make_install
@@ -133,13 +133,13 @@ OUT
   unstub patch
 
   assert_build_log <<OUT
-yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
+yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
 yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
 patch -p1 --force -i $TMP/python-patch.XXX
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -151,7 +151,7 @@ OUT
   BREW_PREFIX="$TMP/homebrew-prefix"
   mkdir -p "$BREW_PREFIX"
 
-  for i in {1..8}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew "--prefix : echo '$BREW_PREFIX'" false
   stub_make_install
@@ -167,7 +167,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -179,7 +179,7 @@ OUT
   brew_libdir="$TMP/homebrew-yaml"
   mkdir -p "$brew_libdir"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew "--prefix libyaml : echo '$brew_libdir'"
   for i in {1..4}; do stub brew false; done
@@ -195,7 +195,7 @@ OUT
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I$brew_libdir/include -I${TMP}/install/include " LDFLAGS="-L$brew_libdir/lib -L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -205,7 +205,7 @@ OUT
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub brew true; brew
   stub_make_install
   stub_make_install
@@ -218,12 +218,12 @@ OUT
   unstub make
 
   assert_build_log <<OUT
-yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
+yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
 yaml-0.1.6: --prefix=${TMP}/install
 make -j 2
 make install
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -234,7 +234,7 @@ OUT
 
   readline_libdir="$TMP/homebrew-readline"
   mkdir -p "$readline_libdir"
-  for i in {1..7}; do stub uname '-s : echo Darwin'; done
+  for i in {1..8}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   for i in {1..2}; do stub brew false; done
   stub brew "--prefix readline : echo '$readline_libdir'"
@@ -253,7 +253,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I$readline_libdir/include -I${TMP}/install/include " LDFLAGS="-L$readline_libdir/lib -L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -262,7 +262,7 @@ OUT
 @test "no library searches performed during normal operation touch homebrew in non-MacOS" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..8}; do stub uname '-s : echo Linux'; done
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
   stub brew true; brew
   stub_make_install
 
@@ -276,8 +276,8 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -286,7 +286,7 @@ OUT
 @test "no library searches performed during normal operation touch homebrew if envvar is set" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..5}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew true; brew
   stub_make_install
@@ -303,7 +303,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -317,7 +317,7 @@ OUT
   mkdir -p "$readline_libdir/include/readline"
   touch "$readline_libdir/include/readline/rlconf.h"
 
-  for i in {1..7}; do stub uname '-s : echo Darwin'; done
+  for i in {1..8}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
   for i in {1..3}; do stub brew false; done
@@ -336,7 +336,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -349,7 +349,7 @@ OUT
   mkdir -p "$tcl_tk_libdir/lib"
   echo "TCL_VERSION='$tcl_tk_version'" >>"$tcl_tk_libdir/lib/tclConfig.sh"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
   stub brew false
@@ -370,7 +370,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH="${TMP}/homebrew-tcl-tk/lib/pkgconfig"
-Python-3.6.2: --prefix=${TMP}/install --libdir=${TMP}/install/lib --with-tcltk-libs=-L${TMP}/homebrew-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version --with-tcltk-includes=-I${TMP}/homebrew-tcl-tk/include
+Python-3.6.2: --prefix=${TMP}/install --enable-shared --libdir=${TMP}/install/lib --with-tcltk-libs=-L${TMP}/homebrew-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version --with-tcltk-includes=-I${TMP}/homebrew-tcl-tk/include
 make -j 2
 make install
 OUT
@@ -383,7 +383,7 @@ OUT
   tcl_tk_version_long="8.6.10"
   tcl_tk_version="${tcl_tk_version_long%.*}"
 
-  for i in {1..8}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
   for i in {1..4}; do stub brew false; done
@@ -402,7 +402,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --with-tcltk-libs=-L${TMP}/custom-tcl-tk/lib -ltcl8.6 -ltk8.6
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib --with-tcltk-libs=-L${TMP}/custom-tcl-tk/lib -ltcl8.6 -ltk8.6
 make -j 2
 make install
 OUT
@@ -411,7 +411,7 @@ OUT
 @test "tcl-tk is linked from Homebrew via pkgconfig only when envvar is set" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
   tcl_tk_libdir="$TMP/homebrew-tcl-tk"
@@ -436,7 +436,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH="${TMP}/homebrew-tcl-tk/lib/pkgconfig"
-Python-3.6.2: --prefix=${TMP}/install --libdir=${TMP}/install/lib
+Python-3.6.2: --prefix=${TMP}/install --enable-shared --libdir=${TMP}/install/lib
 make -j 2
 make install
 OUT
@@ -444,7 +444,7 @@ OUT
 @test "number of CPU cores defaults to 2" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
 
   stub sysctl false
@@ -462,7 +462,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -471,7 +471,7 @@ OUT
 @test "number of CPU cores is detected on Mac" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
 
   stub sysctl '-n hw.ncpu : echo 4'
@@ -490,7 +490,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 4
 make install
 OUT
@@ -499,7 +499,7 @@ OUT
 @test "number of CPU cores is detected on FreeBSD" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..7}; do stub uname '-s : echo FreeBSD'; done
+  for i in {1..8}; do stub uname '-s : echo FreeBSD'; done
   stub uname '-r : echo 11.0-RELEASE'
   for i in {1..2}; do stub uname '-s : echo FreeBSD'; done
 
@@ -517,8 +517,8 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 1
 make install
 OUT
@@ -527,7 +527,7 @@ OUT
 @test "setting PYTHON_MAKE_INSTALL_OPTS to a multi-word string" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..8}; do stub uname '-s : echo Linux'; done
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
 
   stub_make_install
 
@@ -541,8 +541,8 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install DOGE="such wow"
 OUT
@@ -551,7 +551,7 @@ OUT
 @test "configuring with dSYM in MacOS" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   for i in {1..4}; do stub brew false; done
   stub_make_install
@@ -569,7 +569,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib --with-dsymutil
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=${TMP}/install/lib --with-dsymutil
 make -j 2
 make install
 OUT
@@ -578,7 +578,7 @@ OUT
 @test "configuring with dSYM has no effect in non-MacOS" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub_make_install
 
   run_inline_definition <<DEF
@@ -591,8 +591,8 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=${TMP}/install/lib
 make -j 2
 make install
 OUT
@@ -611,7 +611,7 @@ OUT
   cached_tarball "Python-3.6.2"
 
   stub uname "-s : echo FreeBSD" "-r : echo 9.1"
-  for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
+  for i in {1..7}; do stub uname "-s : echo FreeBSD"; done
   stub uname "-r : echo 9.1"
   for i in {1..2}; do stub uname "-s : echo FreeBSD"; done
 
@@ -628,7 +628,7 @@ OUT
   cached_tarball "Python-3.6.2"
 
   stub uname "-s : echo FreeBSD" "-r : echo 10.0-RELEASE"
-  for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
+  for i in {1..7}; do stub uname "-s : echo FreeBSD"; done
   stub uname "-r : echo 10.0-RELEASE"
   for i in {1..2}; do stub uname "-s : echo FreeBSD"; done
 
@@ -644,7 +644,7 @@ OUT
   cached_tarball "Python-3.6.2"
 
   stub uname "-s : echo FreeBSD" "-r : echo 11.0-RELEASE"
-  for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
+  for i in {1..7}; do stub uname "-s : echo FreeBSD"; done
   stub uname "-r : echo 11.0-RELEASE"
   for i in {1..2}; do stub uname "-s : echo FreeBSD"; done
 
@@ -665,7 +665,7 @@ apply -p1 -i /my/patch.diff
 exec ./configure "\$@"
 CONF
 
-  for i in {1..8}; do stub uname '-s : echo Linux'; done
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
   stub apply 'echo apply "$@" >> build.log'
   stub_make_install
 
@@ -681,8 +681,8 @@ DEF
 
   assert_build_log <<OUT
 apply -p1 -i /my/patch.diff
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib " PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib " PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT

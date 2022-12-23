@@ -45,7 +45,7 @@ DEF
   assert_success
   assert_output <<OUT
 CC=${TMP}/bin/gcc
-MACOSX_DEPLOYMENT_TARGET=10.9
+MACOSX_DEPLOYMENT_TARGET=10.10
 OUT
 }
 
@@ -63,7 +63,7 @@ DEF
   mkdir -p "$INSTALL_ROOT"
   cd "$INSTALL_ROOT"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..3}; do stub sw_vers '-productVersion : echo 10.10'; done
 
   stub cc 'false'
@@ -90,7 +90,7 @@ DEF
   unstub sw_vers
 
   assert_output <<OUT
-./configure --prefix=$INSTALL_ROOT --libdir=${TMP}/install/lib
+./configure --prefix=$INSTALL_ROOT --enable-shared --libdir=${TMP}/install/lib
 CC=clang
 CFLAGS=no
 make -j 2
