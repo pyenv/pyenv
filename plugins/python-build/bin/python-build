@@ -1792,7 +1792,7 @@ verify_python() {
 }
 
 try_python_module() {
-  if ! "$PYTHON_BIN" -c "import $1" 1>/dev/null 2>&1; then
+  if ! "$PYTHON_BIN" -c "import $1"; then
     { colorize 1 "WARNING"
       echo ": The Python $1 extension was not compiled${3:+ $3}. Missing the ${2:-$1}?"
       return 0
@@ -1801,7 +1801,7 @@ try_python_module() {
 }
 
 verify_python_module() {
-  if ! "$PYTHON_BIN" -c "import $1" 1>/dev/null 2>&1; then
+  if ! "$PYTHON_BIN" -c "import $1"; then
     { colorize 1 "ERROR"
       echo ": The Python $1 extension was not compiled. Missing the ${2:-$1}?"
       echo
@@ -2192,11 +2192,15 @@ if [ -n "$DEBUG" ]; then
   package_option python configure --with-pydebug
 fi
 
+if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--enable-framework"* ]]; then
+  package_option python configure --enable-shared
+fi
+
 # python-build: Specify `--libdir` on configure to fix build on openSUSE (#36)
 package_option python configure --libdir="${PREFIX_PATH}/lib"
 
 # python-build: Set `RPATH` if `--enable-shared` was given (#65, #66, #82)
-if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-shared"* ]]; then
+if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS ${PYTHON_CONFIGURE_OPTS_ARRAY[@]}" == *"--enable-shared"* ]]; then
   # The ld on Darwin embeds the full paths to each dylib by default
   if [[ "$LDFLAGS" != *"-rpath="* ]] && ! is_mac; then
     export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
@@ -2211,7 +2215,7 @@ fi
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   if ! is_mac; then
-    echo "python-build: framework installation is not supported." >&2
+    echo "python-build: framework installation is not supported outside of MacOS." >&2
     exit 1
   fi
   create_framework_dirs() {
@@ -2232,7 +2236,7 @@ fi
 # Build against universal SDK
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
   if ! is_mac; then
-    echo "python-build: universal installation is not supported." >&2
+    echo "python-build: universal installation is not supported outside of MacOS." >&2
     exit 1
   fi
   package_option python configure --enable-universalsdk=/

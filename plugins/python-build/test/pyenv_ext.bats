@@ -123,8 +123,8 @@ run_inline_definition_with_name() {
 
   assert_build_log <<OUT
 patch -p0 --force -i $TMP/python-patch.XXX
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -153,8 +153,8 @@ OUT
 patch: bar
 patch: baz
 patch: foo
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -178,7 +178,7 @@ OUT
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make altinstall
 OUT
@@ -280,7 +280,7 @@ echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-shared --libdir=${TMP}/install/lib --enable-universalsdk=/)
 EOS
 }
 
@@ -294,7 +294,7 @@ echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/ --with-universal-archs=universal2)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-shared --libdir=${TMP}/install/lib --enable-universalsdk=/ --with-universal-archs=universal2)
 EOS
 }
 
@@ -307,7 +307,7 @@ echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 OUT
   assert_success
   assert_output <<EOS
-PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-universalsdk=/)
+PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-shared --libdir=${TMP}/install/lib --enable-universalsdk=/)
 EOS
 }
 
@@ -315,7 +315,7 @@ EOS
   cached_tarball "Python-3.6.2"
 
   for i in {1..4}; do stub brew false; done
-  for i in {1..7}; do stub uname '-s : echo Linux'; done
+  for i in {1..8}; do stub uname '-s : echo Linux'; done
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
@@ -324,8 +324,8 @@ EOS
   assert_success
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib "
-Python-3.6.2: --prefix=$INSTALL_ROOT --enable-unicode=ucs2 --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include " LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib "
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-unicode=ucs2 --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
@@ -336,10 +336,8 @@ OUT
 
 @test "default MACOSX_DEPLOYMENT_TARGET" {
   # yyuu/pyenv#257
-  stub uname '-s : echo Darwin'
-
-  stub uname '-s : echo Darwin'
-  stub sw_vers '-productVersion : echo 10.10'
+  for i in {1..3}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
 
   TMPDIR="$TMP" run_inline_definition <<OUT
 echo "\${MACOSX_DEPLOYMENT_TARGET}"
