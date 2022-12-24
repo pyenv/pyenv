@@ -63,6 +63,12 @@ OUT
   assert_line 'pyenv init - | source'
 }
 
+@test "shell detection for installer" {
+  run pyenv-init --detect-shell
+  assert_success
+  assert_line "PYENV_SHELL_DETECT=bash"
+}
+
 @test "option to skip rehash" {
   run pyenv-init - --no-rehash
   assert_success
