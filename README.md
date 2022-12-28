@@ -357,6 +357,8 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 
    **Proxy note**: If you use a proxy, export `http_proxy` and `https_proxy`, too.
 
+   **Autocomplete** You might also want to install [Fig](https://fig.io/) which provides alternative shell completions with an IDE-like popup interface on your existing terminal/shell. 
+
 
 ### Restart your shell
 
