@@ -414,6 +414,7 @@ E.g. to install and then switch to the latest 3.10 release:
 
 ```sh
 pyenv install 3.10
+pyenv rehash
 pyenv global 3.10
 ```
 
