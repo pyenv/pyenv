@@ -164,6 +164,21 @@ the version(s) installed with `--enable-shared`.
 $ env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 2.7.9
 ```
 
+### Building for maximum performance
+
+Building CPython with `--enable-optimizations` will result in a faster
+interpreter at the cost of significantly longer build times. Most notably, this
+enables PGO (profile guided optimization). While your mileage may vary, it is
+common for performance improvement from this to be in the ballpark of 30%.
+
+```sh
+env PYTHON_CONFIGURE_OPTS='--enable-optimizations --with-lto' PYTHON_CFLAGS='-march=native -mtune=native' pyenv install 3.6.0
+```
+
+You can also customize the task used for profile guided optimization by setting
+the `PROFILE_TASK` environment variable, for instance, `PROFILE_TASK='-m
+test.regrtest --pgo -j0'` will run much faster than the default task.
+
 ### Checksum verification
 
 If you have the `shasum`, `openssl`, or `sha256sum` tool installed, python-build will

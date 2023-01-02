@@ -396,6 +396,9 @@ You can pass options to Python's `configure` and compiler flags to customize the
 see [_Special environment variables_ in Python-Build's README](plugins/python-build/README.md#special-environment-variables)
 for details.
 
+**NOTE:** If you'd like a faster interpreter at the cost of longer build times,
+see [_Building for maximum performance_ in Python-Build's README](plugins/python-build/README.md#building-for-maximum-performance).
+
 **NOTE:** If you want to use proxy for download, please set the `http_proxy` and `https_proxy`
 environment variables.
 
