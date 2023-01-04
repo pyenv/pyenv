@@ -108,6 +108,7 @@ class PyVersion(StrEnum):
     PY37 = "py37"
     PY38 = "py38"
     PY39 = "py39"
+    PY310 = "py310"
 
     def version(self):
         first, *others = self.value[2:]
