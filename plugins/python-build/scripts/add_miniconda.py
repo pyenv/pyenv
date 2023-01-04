@@ -121,7 +121,7 @@ class PyVersion(StrEnum):
 @total_ordering
 class VersionStr(str):
     def info(self):
-        return tuple(int(n) for n in self.split("."))
+        return tuple(int(n) for n in self.replace("-", ".").split("."))
 
     def __eq__(self, other):
         return str(self) == str(other)
@@ -214,7 +214,10 @@ class CondaSpec(NamedTuple):
 
     @classmethod
     def from_filestem(cls, stem, md5, repo, py_version=None):
-        miniconda_n, ver, os, arch = stem.split("-")
+        # The `*vers` captures the new trailing `-1` in some file names (a build number?)
+        # so they can be processed properly.
+        miniconda_n, *vers, os, arch = stem.split("-")
+        ver = "-".join(vers)
         suffix = miniconda_n[-1]
         if suffix in string.digits:
             tflavor = miniconda_n[:-1]
@@ -372,7 +375,7 @@ if __name__ == "__main__":
             reason = "already exists"
         elif key.version_str.info() <= (4, 3, 30):
             reason = "too old"
-        elif len(key.version_str.info()) >= 4:
+        elif len(key.version_str.info()) >= 4 and "-" not in key.version_str:
             reason = "ignoring hotfix releases"
         
         if reason:
