@@ -363,7 +363,6 @@ IDE-like popup interface in the terminal window.
 (Note that their completions are independent from Pyenv's codebase
 so they might be slightly out of sync for bleeding-edge interface changes.)
 
-
 ### Restart your shell
 
   for the `PATH` changes to take effect.
