@@ -1416,20 +1416,17 @@ use_freebsd_pkg() {
   if [ "FreeBSD" = "$(uname -s)" ]; then
     # use openssl if installed from Ports Collection
     if [ -f /usr/local/include/openssl/ssl.h ]; then
-      package_option ruby configure --with-openssl-dir="/usr/local"
+      package_option python configure --with-openssl="/usr/local"
     fi
 
     # check if 11-R or later
     release="$(uname -r)"
     if [ "${release%%.*}" -ge 11 ]; then
-      # prefers readline to compile most of ruby versions
-      if pkg info -e readline > /dev/null; then
+      if pkg info -e readline > /dev/null && ! command -v pkg-config > /dev/null ; then
         # use readline from Ports Collection
-        package_option ruby configure --with-readline-dir="/usr/local"
-      elif pkg info -e libedit > /dev/null; then
-        # use libedit from Ports Collection
-        package_option ruby configure --enable-libedit
-        package_option ruby configure --with-libedit-dir="/usr/local"
+	# unlike Linux, BSD's cc does not look in /usr/local by default
+        export CPPFLAGS="${CPPFLAGS:+${CPPFLAGS% } }-I/usr/local/include"
+        export LDFLAGS="${LDFLAGS:+${LDFLAGS% } }-L/usr/local/lib -Wl,-rpath,/usr/local/lib"
       fi
     fi
   fi
