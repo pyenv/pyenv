@@ -1,5 +1,17 @@
 # Version History
 
+## Release 2.3.10
+
+* Remove stray newline after python-build installation by @tklauser in https://github.com/pyenv/pyenv/pull/2566
+* Allow multiple versions for pyenv-install by @rockandska in https://github.com/pyenv/pyenv/pull/2568
+* --enable-shared by default by @anton-petrov in https://github.com/pyenv/pyenv/pull/2554
+* Fix non-bash output while detecting shell by @ianchen-tw in https://github.com/pyenv/pyenv/pull/2561
+* add pypy 7.3.11 release by @dand-oss in https://github.com/pyenv/pyenv/pull/2576
+* Mention how to build for maximum performance by @hauntsaninja in https://github.com/pyenv/pyenv/pull/2579
+* Add miniconda 22.11.1-1 by @aphedges in https://github.com/pyenv/pyenv/pull/2583
+* Add Fig as autocomplete suggestion  by @brendanfalk in https://github.com/pyenv/pyenv/pull/2574
+* Fix using dependencies from Ports in BSD with no pkg-config by @native-api in https://github.com/pyenv/pyenv/pull/2586
+
 ## Release 2.3.9
 
 * Add -latest suffix to miniforge3 by @nwh in https://github.com/pyenv/pyenv/pull/2551
