@@ -1,0 +1,25 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Mambaforge-4.10.3-1-Linux-aarch64.sh" "https://github.com/conda-forge/miniforge/releases/download/4.10.3-1/Mambaforge-4.10.3-1-Linux-aarch64.sh#e830d626bcf8fccde1e64567fa9974d87fa45026c3baa73c889bab9a7fa60647" "miniconda" verify_py310
+  ;;
+"Linux-ppc64le" )
+  install_script "Mambaforge-4.10.3-1-Linux-ppc64le.sh" "https://github.com/conda-forge/miniforge/releases/download/4.10.3-1/Mambaforge-4.10.3-1-Linux-ppc64le.sh#ade3331e4946dc149c97346941c635ddef1b99d63ec0781027a0ae0d156f62d7" "miniconda" verify_py310
+  ;;
+"Linux-x86_64" )
+  install_script "Mambaforge-4.10.3-1-Linux-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/4.10.3-1/Mambaforge-4.10.3-1-Linux-x86_64.sh#72c623cc9ce300c5ad54e0b383e428b13e5c640e74529295ab61fbbfa1a8acaa" "miniconda" verify_py310
+  ;;
+"MacOSX-arm64" )
+  install_script "Mambaforge-4.10.3-1-MacOSX-arm64.sh" "https://github.com/conda-forge/miniforge/releases/download/4.10.3-1/Mambaforge-4.10.3-1-MacOSX-arm64.sh#5d1e6ae4eb424290271fe25e7f8c3e8165ba5730a4817f92a157566f44c7e363" "miniconda" verify_py310
+  ;;
+"MacOSX-x86_64" )
+  install_script "Mambaforge-4.10.3-1-MacOSX-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/4.10.3-1/Mambaforge-4.10.3-1-MacOSX-x86_64.sh#a8b0e666c893eb21769c00ab4ba603d28590f4c92d1fafe6ca2eb959cecf76ce" "miniconda" verify_py310
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Mambaforge is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
