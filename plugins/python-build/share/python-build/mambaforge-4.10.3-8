@@ -1,0 +1,16 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"MacOSX-arm64" )
+  install_script "Mambaforge-4.10.3-8-MacOSX-arm64.sh" "https://github.com/conda-forge/miniforge/releases/download/4.10.3-8/Mambaforge-4.10.3-8-MacOSX-arm64.sh#f40271609a59bad71e7b1c6fa61a36065ea35222a9497614bc970572594e1f5a" "miniconda" verify_py310
+  ;;
+"MacOSX-x86_64" )
+  install_script "Mambaforge-4.10.3-8-MacOSX-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/4.10.3-8/Mambaforge-4.10.3-8-MacOSX-x86_64.sh#4f3dfd9475ed226f6a4478fe5c0585117528700557fe06fb9db054a354f07951" "miniconda" verify_py310
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Mambaforge is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

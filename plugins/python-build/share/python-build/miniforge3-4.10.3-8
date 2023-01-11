@@ -1,0 +1,16 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"MacOSX-arm64" )
+  install_script "Miniforge3-4.10.3-8-MacOSX-arm64.sh" "https://github.com/conda-forge/miniforge/releases/download/4.10.3-8/Miniforge3-4.10.3-8-MacOSX-arm64.sh#ed1f245d8effb463c9bd5d1cde034e7e291684e0668885a87deb34303dafced5" "miniconda" verify_py310
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniforge3-4.10.3-8-MacOSX-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/4.10.3-8/Miniforge3-4.10.3-8-MacOSX-x86_64.sh#9c123f45da81878b3b3f221dcb7595f6420cac0310235316a7deba93cf12bbe3" "miniconda" verify_py310
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniforge is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
