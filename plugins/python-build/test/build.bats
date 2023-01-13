@@ -372,7 +372,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib" PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib --enable-shared --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib
 make -j 2
 make install
 OUT
@@ -582,6 +582,58 @@ Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib 
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install DOGE="such wow"
+OUT
+}
+
+@test "(PYTHON_)CONFIGURE_OPTS and (PYTHON_)MAKE_OPTS take priority over automatically added options" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
+
+  stub_make_install
+
+  export CONFIGURE_OPTS="--custom-configure"
+  export PYTHON_CONFIGURE_OPTS='--custom-python-configure'
+  export MAKE_OPTS="${MAKE_OPTS:+$MAKE_OPTS }--custom-make"
+  export PYTHON_MAKE_OPTS="--custom-python-make"
+  export PYTHON_MAKE_INSTALL_OPTS="--custom-make-install"
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib --custom-configure --custom-python-configure
+make -j 2 --custom-make --custom-python-make
+make install --custom-make-install
+OUT
+}
+
+@test "--enable-shared is not added if --disable-shared is passed" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..8}; do stub uname '-s : echo Linux'; done
+
+  stub_make_install
+
+  export PYTHON_CONFIGURE_OPTS='--disable-shared'
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --disable-shared
+make -j 2
+make install
 OUT
 }
 

@@ -813,10 +813,10 @@ build_package_standard_build() {
       export CC=clang
     fi
     ${!PACKAGE_CONFIGURE:-./configure} --prefix="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}" \
-      $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}" || return 1
+      "${!PACKAGE_CONFIGURE_OPTS_ARRAY}" $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} || return 1
   ) >&4 2>&1
 
-  { "$MAKE" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS} "${!PACKAGE_MAKE_OPTS_ARRAY}"
+  { "$MAKE" "${!PACKAGE_MAKE_OPTS_ARRAY}" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS}
   } >&4 2>&1
 }
 
@@ -2198,7 +2198,7 @@ if [ -n "$DEBUG" ]; then
   package_option python configure --with-pydebug
 fi
 
-if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--enable-framework"* ]]; then
+if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--enable-framework"* && "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--disable-shared"* ]]; then
   package_option python configure --enable-shared
 fi
 

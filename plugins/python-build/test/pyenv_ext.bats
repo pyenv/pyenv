@@ -325,7 +325,7 @@ EOS
 
   assert_build_log <<OUT
 Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib"
-Python-3.6.2: --prefix=$INSTALL_ROOT --enable-unicode=ucs2 --enable-shared --libdir=$INSTALL_ROOT/lib
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib --enable-unicode=ucs2
 make -j 2
 make install
 OUT
