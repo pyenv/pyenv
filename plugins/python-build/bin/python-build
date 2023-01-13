@@ -1422,9 +1422,18 @@ use_freebsd_pkg() {
     # check if 11-R or later
     release="$(uname -r)"
     if [ "${release%%.*}" -ge 11 ]; then
-      if pkg info -e readline > /dev/null && ! command -v pkg-config > /dev/null ; then
-        # use readline from Ports Collection
-	# unlike Linux, BSD's cc does not look in /usr/local by default
+      # Use packages from Ports Collection.
+      #
+      # Unlike Linux, BSD's cc does not look in /usr/local by default
+      # where Ports-installed packages are, but they are available via pkg-config.
+      # Surprisingly, CPython's Configure only uses pkg-config
+      # to locate some of the dependencies and not others.
+      # Here we detect those that are (as of this writing) known
+      # to not be searched via pkg-config.
+      #
+      # XXX: As a side effect, this would pick up any other libs from Ports
+      # that are searched via compiler
+      if pkg info -e readline || pkg info -e sqlite3; then
         export CPPFLAGS="${CPPFLAGS:+${CPPFLAGS% } }-I/usr/local/include"
         export LDFLAGS="${LDFLAGS:+${LDFLAGS% } }-L/usr/local/lib -Wl,-rpath,/usr/local/lib"
       fi

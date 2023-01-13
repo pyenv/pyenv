@@ -259,6 +259,42 @@ make install
 OUT
 }
 
+@test "readline and sqlite3 are linked from Ports in FreeBSD" {
+  cached_tarball "Python-3.6.2"
+
+  for lib in readline sqlite3; do
+
+    for i in {1..8}; do stub uname '-s : echo FreeBSD'; done
+    stub uname '-r : echo 11.0-RELEASE'
+    for i in {1..2}; do stub uname '-s : echo FreeBSD'; done
+    stub sysctl '-n hw.ncpu : echo 1'
+
+    stub pkg "$([[ $lib == readline ]] && echo "info -e $lib : true" || echo false)"
+    if [[ $lib == sqlite3 ]]; then stub pkg echo "info -e $lib : true"; fi
+
+    stub_make_install
+
+    export -n MAKE_OPTS
+    run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+    assert_success
+
+    unstub uname
+    unstub make
+    unstub pkg
+    unstub sysctl
+
+    assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include  -I/usr/local/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath=${TMP}/install/lib -L/usr/local/lib -Wl,-rpath,/usr/local/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 1
+make install
+OUT
+    rm "$INSTALL_ROOT/build.log"
+  done
+}
+
 @test "no library searches performed during normal operation touch homebrew in non-MacOS" {
   cached_tarball "Python-3.6.2"
 
@@ -502,6 +538,7 @@ OUT
   for i in {1..8}; do stub uname '-s : echo FreeBSD'; done
   stub uname '-r : echo 11.0-RELEASE'
   for i in {1..2}; do stub uname '-s : echo FreeBSD'; done
+  for i in {1..2}; do stub pkg false; done
 
   stub sysctl '-n hw.ncpu : echo 1'
   stub_make_install
