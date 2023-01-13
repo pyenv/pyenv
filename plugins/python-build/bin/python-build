@@ -1385,8 +1385,8 @@ use_homebrew() {
     local brew_prefix="$(brew --prefix 2>/dev/null || true)"
     # /usr/local/lib:/usr/lib is the default library search path
     if [[ -n $brew_prefix && $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ]]; then
-      export CPPFLAGS="${CPPFLAGS:+${CPPFLAGS% } }-I${brew_prefix}/include"
-      export LDFLAGS="${LDFLAGS:+${LDFLAGS% } }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
+      export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${brew_prefix}/include"
+      export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
       # `python-config` ignores LDFLAGS envvar. Adding to LIBS is the only way to add extra stuff
       # to `python-config --ldflags` output
       export LIBS="${LIBS:+${LIBS% } }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
@@ -1404,8 +1404,8 @@ use_homebrew_yaml() {
   local libdir="$(brew --prefix libyaml 2>/dev/null || true)"
   if [ -d "$libdir" ]; then
     echo "python-build: use libyaml from homebrew"
-    export CPPFLAGS="-I$libdir/include ${CPPFLAGS}"
-    export LDFLAGS="-L$libdir/lib ${LDFLAGS}"
+    export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+    export LDFLAGS="-L$libdir/lib${LDFLAGS:+ ${LDFLAGS% }}"
   else
     return 1
   fi
@@ -1422,11 +1422,20 @@ use_freebsd_pkg() {
     # check if 11-R or later
     release="$(uname -r)"
     if [ "${release%%.*}" -ge 11 ]; then
-      if pkg info -e readline > /dev/null && ! command -v pkg-config > /dev/null ; then
-        # use readline from Ports Collection
-	# unlike Linux, BSD's cc does not look in /usr/local by default
-        export CPPFLAGS="${CPPFLAGS:+${CPPFLAGS% } }-I/usr/local/include"
-        export LDFLAGS="${LDFLAGS:+${LDFLAGS% } }-L/usr/local/lib -Wl,-rpath,/usr/local/lib"
+      # Use packages from Ports Collection.
+      #
+      # Unlike Linux, BSD's cc does not look in /usr/local by default
+      # where Ports-installed packages are, but they are available via pkg-config.
+      # Surprisingly, CPython's Configure only uses pkg-config
+      # to locate some of the dependencies and not others.
+      # Here we detect those that are (as of this writing) known
+      # to not be searched via pkg-config.
+      #
+      # XXX: As a side effect, this would pick up any other libs from Ports
+      # that are searched via compiler
+      if pkg info -e readline || pkg info -e sqlite3; then
+        export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I/usr/local/include"
+        export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L/usr/local/lib -Wl,-rpath,/usr/local/lib"
       fi
     fi
   fi
@@ -1446,8 +1455,8 @@ use_homebrew_readline() {
     local libdir="$(brew --prefix readline 2>/dev/null || true)"
     if [ -d "$libdir" ]; then
       echo "python-build: use readline from homebrew"
-      export CPPFLAGS="-I$libdir/include ${CPPFLAGS}"
-      export LDFLAGS="-L$libdir/lib ${LDFLAGS}"
+      export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+      export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
     else
       return 1
     fi
@@ -1465,8 +1474,8 @@ build_package_mac_readline() {
   READLINE_PREFIX_PATH="${PREFIX_PATH}/readline"
 
   # Tell Python to use this readline for its extension.
-  export CPPFLAGS="-I${READLINE_PREFIX_PATH}/include ${CPPFLAGS}"
-  export LDFLAGS="-L${READLINE_PREFIX_PATH}/lib ${LDFLAGS}"
+  export CPPFLAGS="-I${READLINE_PREFIX_PATH}/include${CPPFLAGS:+ $CPPFLAGS}"
+  export LDFLAGS="-L${READLINE_PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
 
   # Make sure pkg-config finds our build first.
   export PKG_CONFIG_PATH="${READLINE_PREFIX_PATH}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
@@ -1493,8 +1502,8 @@ use_homebrew_openssl() {
         # https://bugs.python.org/issue21541
         package_option python configure --with-openssl="${ssldir}"
       else
-        export CPPFLAGS="-I$ssldir/include ${CPPFLAGS}"
-        export LDFLAGS="-L$ssldir/lib ${LDFLAGS}"
+        export CPPFLAGS="-I$ssldir/include ${CPPFLAGS:+ $CPPFLAGS}"
+        export LDFLAGS="-L$ssldir/lib${LDFLAGS:+ $LDFLAGS}"
       fi
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
       return
@@ -1516,8 +1525,8 @@ build_package_mac_openssl() {
     # https://bugs.python.org/issue21541
     package_option python configure --with-openssl="${OPENSSL_PREFIX_PATH}"
   else
-    export CPPFLAGS="-I${OPENSSL_PREFIX_PATH}/include ${CPPFLAGS}"
-    export LDFLAGS="-L${OPENSSL_PREFIX_PATH}/lib ${LDFLAGS}"
+    export CPPFLAGS="-I${OPENSSL_PREFIX_PATH}/include ${CPPFLAGS:+ $CPPFLAGS}"
+    export LDFLAGS="-L${OPENSSL_PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
   fi
 
   # Make sure pkg-config finds our build first.
@@ -1596,9 +1605,9 @@ use_xcode_sdk_zlib() {
   local xc_sdk_path="$(xcrun --show-sdk-path 2>/dev/null || true)"
   if [ -d "$xc_sdk_path" ]; then
     echo "python-build: use zlib from xcode sdk"
-    export CFLAGS="-I${xc_sdk_path}/usr/include ${CFLAGS}"
+    export CFLAGS="${CFLAGS:+$CFLAGS }-I${xc_sdk_path}/usr/include"
     if is_mac -ge 1100; then
-      export LDFLAGS="${LDFLAGS} -L${xc_sdk_path}/usr/lib"
+      export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${xc_sdk_path}/usr/lib"
     fi
   fi
 }
@@ -1697,7 +1706,7 @@ build_package_auto_tcltk() {
   if is_mac && [ ! -d /usr/include/X11 ]; then
     if [ -d /opt/X11/include ]; then
       if [[ "$CPPFLAGS" != *-I/opt/X11/include* ]]; then
-        export CPPFLAGS="-I/opt/X11/include $CPPFLAGS"
+        export CPPFLAGS="-I/opt/X11/include${CPPFLAGS:+ $CPPFLAGS}"
       fi
     else
       package_option python configure --without-tk
@@ -2200,13 +2209,13 @@ package_option python configure --libdir="${PREFIX_PATH}/lib"
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS ${PYTHON_CONFIGURE_OPTS_ARRAY[@]}" == *"--enable-shared"* ]]; then
   # The ld on Darwin embeds the full paths to each dylib by default
   if [[ "$LDFLAGS" != *"-rpath="* ]] && ! is_mac; then
-    export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
+    export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
   fi
 fi
 
 # python-build: Set `RPATH` if --shared` was given for PyPy (#244)
 if [[ "$PYPY_OPTS" == *"--shared"* ]]; then
-  export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib ${LDFLAGS}"
+  export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
 fi
 
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
@@ -2372,8 +2381,8 @@ if [ -n "$VERBOSE" ]; then
   trap "kill $TAIL_PID" SIGINT SIGTERM EXIT
 fi
 
-export LDFLAGS="-L${PREFIX_PATH}/lib ${LDFLAGS}"
-export CPPFLAGS="-I${PREFIX_PATH}/include ${CPPFLAGS}"
+export LDFLAGS="-L${PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
+export CPPFLAGS="-I${PREFIX_PATH}/include${CPPFLAGS:+ $CPPFLAGS}"
 
 unset PYTHONHOME
 unset PYTHONPATH
