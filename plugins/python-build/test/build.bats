@@ -613,6 +613,30 @@ make install --custom-make-install
 OUT
 }
 
+@test "--enable-shared is not added if --disable-shared is passed" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..8}; do stub uname '-s : echo Linux'; done
+
+  stub_make_install
+
+  export PYTHON_CONFIGURE_OPTS='--disable-shared'
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --disable-shared
+make -j 2
+make install
+OUT
+}
+
 @test "configuring with dSYM in MacOS" {
   cached_tarball "Python-3.6.2"
 

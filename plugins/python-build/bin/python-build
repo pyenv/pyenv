@@ -2198,7 +2198,7 @@ if [ -n "$DEBUG" ]; then
   package_option python configure --with-pydebug
 fi
 
-if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--enable-framework"* ]]; then
+if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--enable-framework"* && "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--disable-shared"* ]]; then
   package_option python configure --enable-shared
 fi
 
