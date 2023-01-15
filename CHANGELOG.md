@@ -1,5 +1,14 @@
 # Version History
 
+## Release 2.3.11
+
+* Add CPython 3.12.0a4 by @Afront in https://github.com/pyenv/pyenv/pull/2590
+* Add a script to add the latest miniforge and mambaforge versions by @smcgivern in https://github.com/pyenv/pyenv/pull/2560
+* Add missing Miniforge/Mambaforge versions (4.10.2-0 - 22.9.0-3) by @smcgivern in https://github.com/pyenv/pyenv/pull/2591
+* Fix using dependencies from Ports in FreeBSD that are not searched with pkg-config by @native-api in https://github.com/pyenv/pyenv/pull/2593
+* Fix priority for user-supplied configure and make flags by (**_only set --enable-shared if user hasn't supplied --disable-shared_**) @native-api in https://github.com/pyenv/pyenv/pull/2592
+* Fix a compilation error in 3.8.10+ and 3.9.5+ when linking against Op… by @native-api in https://github.com/pyenv/pyenv/pull/2594
+
 ## Release 2.3.10
 
 * Remove stray newline after python-build installation by @tklauser in https://github.com/pyenv/pyenv/pull/2566
