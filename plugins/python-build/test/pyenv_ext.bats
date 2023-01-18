@@ -177,7 +177,7 @@ OUT
   assert_success
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib"
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib"
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make altinstall
@@ -315,7 +315,7 @@ EOS
   cached_tarball "Python-3.6.2"
 
   for i in {1..4}; do stub brew false; done
-  for i in {1..8}; do stub uname '-s : echo Linux'; done
+  for i in {1..7}; do stub uname '-s : echo Linux'; done
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
