@@ -1199,7 +1199,7 @@ require_gcc() {
 
   export CC="$gcc"
   if is_mac -ge 1010; then
-    export MACOSX_DEPLOYMENT_TARGET=10.9
+    export MACOSX_DEPLOYMENT_TARGET=${MACOSX_DEPLOYMENT_TARGET:-10.9}
   fi
 }
 
