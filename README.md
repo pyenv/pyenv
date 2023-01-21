@@ -53,7 +53,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Install Python build dependencies](#install-python-build-dependencies)
 * **[Usage](#usage)**
   * [Install additional Python versions](#install-additional-python-versions)
-    * [Prefix auto-resolution](#prefix-auto-resolution)
+    * [Prefix auto-resolution to the latest version](#prefix-auto-resolution-to-the-latest-version)
     * [Python versions with extended support](#python-versions-with-extended-support)
   * [Switch between Python versions](#switch-between-python-versions)
   * [Uninstall Python versions](#uninstall-python-versions)
@@ -412,7 +412,7 @@ please visit the wiki page about
 [Common Build Problems](https://github.com/pyenv/pyenv/wiki/Common-build-problems).
 
 
-#### Prefix auto-resolution
+#### Prefix auto-resolution to the latest version
 
 All Pyenv subcommands except `uninstall` automatically resolve full prefixes to the latest version in the corresponding version line.
 
