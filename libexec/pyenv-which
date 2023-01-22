@@ -57,6 +57,8 @@ for version in "${versions[@]}" "$system"; do
     # $version may be a prefix to be resolved by pyenv-latest
     version_path="$(pyenv-prefix "${version}" 2>/dev/null)" || \
         { nonexistent_versions+=("$version"); continue; }
+    # resolve $version for hooks
+    version="$(basenane "$version_path")"
     PYENV_COMMAND_PATH="$version_path/bin/${PYENV_COMMAND}"
     unset version_path
   fi

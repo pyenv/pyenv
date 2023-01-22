@@ -144,3 +144,14 @@ SH
   assert_success "${PYENV_ROOT}/versions/3.4.2/bin/python"
 }
 
+@test "hooks get resolved version name" {
+  create_hook which echo.bash <<!
+echo version=\$version
+exit
+!
+
+  create_executable "3.4.2" "python"
+
+  PYENV_VERSION=3.4 run pyenv-which python
+  assert_success "version=3.4.2"
+}
