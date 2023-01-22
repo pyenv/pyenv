@@ -86,9 +86,14 @@ OUT
   stub_python_build '--definitions : echo 3.4.2 3.5.1'
   stub_python_build
   stub pyenv-latest false
+  
+  pyenv-hooks install; unstub pyenv-hooks
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  export PYENV_HOOK_PATH="$PYENV_INSTALL_ROOT/pyenv.d"
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
 
-  run pyenv-install 3.4
-  unstub python-build
+  run pyenv-install 3.4:latest
   assert_success "python-build 3.4.2 ${PYENV_ROOT}/versions/3.4.2"
 
   unstub python-build
