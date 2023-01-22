@@ -120,8 +120,8 @@ unset VERSION_NAME
 # version is specified by pyenv. Show usage instructions if a local
 # version is not specified.
 DEFINITIONS=("${ARGUMENTS[@]}")
-[[ "${#DEFINITIONS[*]}" -eq 0 ] && DEFINITIONS=($(pyenv-local 2>/dev/null || true))
-[[ "${#DEFINITIONS[*]}" -eq 0 ] && usage 1 >&2
+[[ "${#DEFINITIONS[*]}" -eq 0 ]] && DEFINITIONS=($(pyenv-local 2>/dev/null || true))
+[[ "${#DEFINITIONS[*]}" -eq 0 ]] && usage 1 >&2
 
 # Define `before_install` and `after_install` functions that allow
 # plugin hooks to register a string of code for execution before or
@@ -176,7 +176,7 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
 
       case "$REPLY" in
       y | Y | yes | YES ) ;;
-      * ) { STATUS=1; [[ $STATUS -gt $COMBINED_STATUS ]] && COMBINED_STATUS=STATUS; }; continue ;;
+      * ) { STATUS=1; [[ $STATUS -gt $COMBINED_STATUS ]] && COMBINED_STATUS=$STATUS; }; continue ;;
       esac
     elif [ -n "$SKIP_EXISTING" ]; then
       # Since we know the python version is already installed, and are opting to
@@ -251,7 +251,7 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
 
   # Invoke `python-build` and record the exit status in $STATUS.
   python-build $KEEP $VERBOSE $HAS_PATCH $DEBUG "$DEFINITION" "$PREFIX" || \
-      { STATUS="$?"; [[ $STATUS -gt $COMBINED_STATUS ]] && COMBINED_STATUS=STATUS; }
+      { STATUS=$?; [[ $STATUS -gt $COMBINED_STATUS ]] && COMBINED_STATUS=$STATUS; }
 
   # Display a more helpful message if the definition wasn't found.
   if [ "$STATUS" == "2" ]; then
@@ -282,7 +282,7 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
   for hook in "${after_hooks[@]}"; do eval "$hook"; done
 
   # Run `pyenv-rehash` after a successful installation.
-  if [ "$STATUS" == "0" ]; then
+  if [[ $STATUS -eq 0 ]]; then
     pyenv-rehash
   else
     cleanup

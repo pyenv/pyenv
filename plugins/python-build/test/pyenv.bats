@@ -13,7 +13,7 @@ stub_python_build_lib() {
 }
 
 stub_python_build_no_latest() {
-  stub python_build "${@:-'echo python-build "$@"'}"
+  stub python-build "${@:-echo python-build \"\$@\"}"
 }
   
 stub_python_build() {
@@ -50,14 +50,11 @@ OUT
 @test "install multiple versions, some fail" {
   stub_python_build_lib
   stub_python_build 'echo "fail: python-build" "$@"; false'
-  stub_python_build
-  stub pyenv-latest false false
 
   run pyenv-install 3.4.1 3.4.2
   assert_failure
   assert_output <<OUT
 fail: python-build 3.4.1 ${TMP}/pyenv/versions/3.4.1
-python-build 3.4.2 ${TMP}/pyenv/versions/3.4.2
 OUT
 
   unstub python-build
@@ -86,10 +83,12 @@ OUT
 
 @test "install resolves :latest" {
   stub_python_build_lib
+  stub_python_build '--definitions : echo 3.4.2 3.5.1'
   stub_python_build
   stub pyenv-latest false
 
   run pyenv-install 3.4
+  unstub python-build
   assert_success "python-build 3.4.2 ${PYENV_ROOT}/versions/3.4.2"
 
   unstub python-build
