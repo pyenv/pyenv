@@ -47,12 +47,20 @@ OLDIFS="$IFS"
 IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name)})
 IFS="$OLDIFS"
 
+declare -a nonexistent_versions
+
 for version in "${versions[@]}" "$system"; do
   if [ "$version" = "system" ]; then
     PATH="$(remove_from_path "${PYENV_ROOT}/shims")"
     PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
   else
-    PYENV_COMMAND_PATH="${PYENV_ROOT}/versions/${version}/bin/${PYENV_COMMAND}"
+    # $version may be a prefix to be resolved by pyenv-latest
+    version_path="$(pyenv-prefix "${version}" 2>/dev/null)" || \
+        { nonexistent_versions+=("$version"); continue; }
+    # resolve $version for hooks
+    version="$(basename "$version_path")"
+    PYENV_COMMAND_PATH="$version_path/bin/${PYENV_COMMAND}"
+    unset version_path
   fi
   if [ -x "$PYENV_COMMAND_PATH" ]; then
     break
@@ -69,17 +77,10 @@ done
 if [ -x "$PYENV_COMMAND_PATH" ]; then
   echo "$PYENV_COMMAND_PATH"
 else
-  any_not_installed=0
-  for version in "${versions[@]}"; do
-    if [ "$version" = "system" ]; then
-      continue
-    fi
-    if ! [ -d "${PYENV_ROOT}/versions/${version}" ]; then
+  if (( ${#nonexistent_versions[@]} )); then
+    for version in "${nonexistent_versions[@]}"; do
       echo "pyenv: version \`$version' is not installed (set by $(pyenv-version-origin))" >&2
-      any_not_installed=1
-    fi
-  done
-  if [ "$any_not_installed" = 1 ]; then
+    done
     exit 1
   fi
 
