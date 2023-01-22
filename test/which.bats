@@ -136,3 +136,10 @@ SH
   PYENV_VERSION= run pyenv-which python
   assert_success "${PYENV_ROOT}/versions/3.4/bin/python"
 }
+
+@test "resolves pyenv-latest prefixes" {
+  create_executable "3.4.2" "python"
+  
+  PYENV_VERSION=3.4 run pyenv-which python
+  assert_success "${PYENV_ROOT}/versions/3.4.2/bin/python"
+}
