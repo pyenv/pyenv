@@ -113,4 +113,3 @@ OUT
   PYENV_VERSION=system:custom run pyenv-exec python3 -c 'import os; print(os.getenv("PATH"))'
   assert_success "$PATH"
 }
-
