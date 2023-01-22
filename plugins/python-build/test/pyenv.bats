@@ -83,8 +83,10 @@ OUT
 
 @test "install resolves :latest" {
   stub_python_build_lib
-  stub_python_build '--definitions : echo 3.4.2 3.5.1'
-  stub_python_build
+  for i in {1..3}; do
+    stub_python_build '--definitions : echo 3.4.2 3.5.1 3.5.2'
+    stub_python_build
+  done
   stub pyenv-latest false
   
   pyenv-hooks install; unstub pyenv-hooks
@@ -93,8 +95,10 @@ OUT
   [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
   export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
 
-  run pyenv-install 3.4:latest
+  run pyenv-install 3.4:latest 3.5.1:latest 3:latest
   assert_success "python-build 3.4.2 ${PYENV_ROOT}/versions/3.4.2"
+  assert_success "python-build 3.5.1 ${PYENV_ROOT}/versions/3.5.1"
+  assert_success "python-build 3.5.2 ${PYENV_ROOT}/versions/3.5.2"
 
   unstub python-build
 }
