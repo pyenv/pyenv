@@ -55,7 +55,7 @@ for version in "${versions[@]}" "$system"; do
     PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
   else
     # $version may be a prefix to be resolved by pyenv-latest
-    version_path="$(pyenv-prefix "${version} 2>/dev/null")" || \
+    version_path="$(pyenv-prefix "${version}" 2>/dev/null)" || \
         { nonexistent_versions+=("$version"); continue; }
     PYENV_COMMAND_PATH="$version_path/bin/${PYENV_COMMAND}"
     unset version_path
@@ -76,7 +76,7 @@ if [ -x "$PYENV_COMMAND_PATH" ]; then
   echo "$PYENV_COMMAND_PATH"
 else
   if (( ${#nonexistent_versions[@]} )); then
-    for version in "${#nonexistent_versions[@]}"; do
+    for version in "${nonexistent_versions[@]}"; do
       echo "pyenv: version \`$version' is not installed (set by $(pyenv-version-origin))" >&2
     done
     exit 1
