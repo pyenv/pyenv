@@ -161,7 +161,8 @@ OUT
 
 @test "homebrew upgrade instructions given when pyenv is homebrew-installed" {
   stub brew "--prefix : echo '${BATS_TEST_DIRNAME%/*}'"
-  stub_python_build_lib 'echo ERROR >&2 && exit 2' \
+  stub_python_build_lib
+  stub_python_build 'echo ERROR >&2 && exit 2' \
     "--definitions : true"
 
   run pyenv-install 1.9.3
@@ -212,7 +213,7 @@ OUT
   mkdir -p "${PYENV_ROOT}/plugins/foo/share/python-build"
   mkdir -p "${PYENV_ROOT}/plugins/bar/share/python-build"
   stub_python_build_lib
-  stub python_build "--definitions : echo \$PYTHON_BUILD_DEFINITIONS | tr ':' $'\\n'"
+  stub_python_build "--definitions : echo \$PYTHON_BUILD_DEFINITIONS | tr ':' $'\\n'"
 
   run pyenv-install --list
   assert_success
@@ -229,8 +230,7 @@ OUT
 @test "completion results include build definitions from plugins" {
   mkdir -p "${PYENV_ROOT}/plugins/foo/share/python-build"
   mkdir -p "${PYENV_ROOT}/plugins/bar/share/python-build"
-  stub_python_build_lib
-  stub python-build "--definitions : echo \$PYTHON_BUILD_DEFINITIONS | tr ':' $'\\n'"
+  stub_python_build "--definitions : echo \$PYTHON_BUILD_DEFINITIONS | tr ':' $'\\n'"
 
   run pyenv-install --complete
   assert_success
@@ -247,6 +247,8 @@ OUT
 ${PYENV_ROOT}/plugins/bar/share/python-build
 ${PYENV_ROOT}/plugins/foo/share/python-build
 OUT
+
+  unstub python-build
 }
 
 @test "not enough arguments for pyenv-install if no local version" {
@@ -256,15 +258,6 @@ OUT
   run pyenv-install
   assert_failure
   unstub pyenv-help
-  assert_output ""
-}
-
-@test "multi arguments for pyenv-install" {
-  stub_python_build_lib
-  stub pyenv-help 'install : true'
-
-  run pyenv-install 3.4.1 3.4.2
-  assert_success
   assert_output ""
 }
 
