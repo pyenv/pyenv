@@ -1,0 +1,5 @@
+prefer_openssl11
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+install_package "openssl-1.1.1l" "https://www.openssl.org/source/openssl-1.1.1l.tar.gz#0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1" mac_openssl --if has_broken_mac_openssl
+install_package "readline-8.1" "https://ftpmirror.gnu.org/readline/readline-8.1.tar.gz#f8ceb4ee131e3232226a17f51b164afc46cd0b9e6cef344be87c65962cb82b02" mac_readline --if has_broken_mac_readline
+install_package "nogil-3.9.10-1" "https://github.com/colesbury/nogil/archive/refs/tags/v3.9.10-nogil-2023-01-22.tar.gz#cbda308c7586745573d665cd53d71b50707fd6f85c1c5d7a9f5b092e869cc757" standard verify_py39 copy_python_gdb ensurepip
