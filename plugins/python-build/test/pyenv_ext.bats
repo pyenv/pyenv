@@ -245,25 +245,27 @@ OUT
 }
 
 @test "enable framework" {
-  mkdir -p "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin"
-  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3"
-  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3"
-  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4"
-  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4"
-  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3-config"
-  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3-config"
-  touch "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4-config"
-  chmod +x "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python3.4-config"
+  framework_path="${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin"
+  mkdir -p "$framework_path"
+  for executable in python3{,.4}{,-config}; do 
+    touch "$framework_path/$executable"
+    chmod +x "$framework_path/$executable"
+  done
+  unset framework_path executable
 
   for i in {1..3}; do stub uname '-s : echo Darwin'; done
 
   PYTHON_CONFIGURE_OPTS="--enable-framework" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
+echo "PYTHON_CONFIGURE_OPTS=(\${PYTHON_CONFIGURE_OPTS})"
+echo "CONFIGURE_OPTS=(\${CONFIGURE_OPTS})"
 verify_python python3.4
 OUT
   assert_success
   assert_output <<EOS
 PYTHON_CONFIGURE_OPTS_ARRAY=(--libdir=${TMP}/install/lib --enable-framework=${TMP}/install/Library/Frameworks)
+PYTHON_CONFIGURE_OPTS=()
+CONFIGURE_OPTS=()
 EOS
 
   [ -L "${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin/python" ]
@@ -277,10 +279,14 @@ EOS
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
+echo "PYTHON_CONFIGURE_OPTS=(\${PYTHON_CONFIGURE_OPTS})"
+echo "CONFIGURE_OPTS=(\${CONFIGURE_OPTS})"
 OUT
   assert_success
   assert_output <<EOS
 PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-shared --libdir=${TMP}/install/lib --enable-universalsdk=/)
+PYTHON_CONFIGURE_OPTS=()
+CONFIGURE_OPTS=()
 EOS
 }
 
@@ -291,10 +297,14 @@ EOS
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
+echo "PYTHON_CONFIGURE_OPTS=(\${PYTHON_CONFIGURE_OPTS})"
+echo "CONFIGURE_OPTS=(\${CONFIGURE_OPTS})"
 OUT
   assert_success
   assert_output <<EOS
 PYTHON_CONFIGURE_OPTS_ARRAY=(--enable-shared --libdir=${TMP}/install/lib --enable-universalsdk=/ --with-universal-archs=universal2)
+PYTHON_CONFIGURE_OPTS=()
+CONFIGURE_OPTS=()
 EOS
 }
 
