@@ -1742,9 +1742,9 @@ apply_patch() {
 
 
 build_package_symlink_version_suffix() {
-  if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
+  if [[ "${PYTHON_CONFIGURE_OPTS_ARRAY[*]} $CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
     if [ -e "${PREFIX_PATH}/bin" ]; then
-      # Always create `bin` as symlink to framework path if the version was built with `--enable-frameowrk` (#590)
+      # Always create `bin` as symlink to framework path if the version was built with `--enable-framework` (#590)
       rm -rf "${PREFIX_PATH}/bin.orig"
       mv -f "${PREFIX_PATH}/bin" "${PREFIX_PATH}/bin.orig"
     fi
@@ -2219,6 +2219,7 @@ if [[ "$PYPY_OPTS" == *"--shared"* ]]; then
 fi
 
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
+shopt -s extglob
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   if ! is_mac; then
     echo "python-build: framework installation is not supported outside of MacOS." >&2
@@ -2237,15 +2238,29 @@ if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; the
   create_framework_dirs "${DEFINITION_PATH##*/}"
   # the `/Library/Frameworks` suffix makes CPython build install apps under prefix rather than into /Applications (#1003)
   package_option python configure --enable-framework="${PREFIX_PATH}/Library/Frameworks"
+  
+  #FIXME: doesn't properly handle paths with spaces. Fix by parsing *OPTS into arrays.
+  CONFIGURE_OPTS="${CONFIGURE_OPTS//--enable-framework?(=*([^ ]))?( )/}";
+  CONFIGURE_OPTS="${CONFIGURE_OPTS% }"
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//--enable-framework?(=*([^ ]))?( )/}";
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS% }"
 fi
+shopt -u extglob
 
 # Build against universal SDK
+shopt -s extglob
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
   if ! is_mac; then
     echo "python-build: universal installation is not supported outside of MacOS." >&2
     exit 1
   fi
   package_option python configure --enable-universalsdk=/
+  #FIXME: doesn't properly handle paths with spaces. Fix by parsing *OPTS into arrays.
+  CONFIGURE_OPTS="${CONFIGURE_OPTS//--enable-universalsdk?(=*([^ ]))?( )/}"
+  CONFIGURE_OPTS="${CONFIGURE_OPTS% }"
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//--enable-universalsdk?(=*([^ ]))?( )/}"
+  PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS% }"
+
   if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" != *"--with-universal-archs"* ]]; then
     # in CPython's configure.ac, --with-universal-archs defaults to 'intel' which means i386 + x86_64
     # since 2.7.5 and 3.3.0 -- i.e. in all non-EOL versions
@@ -2255,6 +2270,7 @@ if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; 
     fi
   fi
 fi
+shopt -u extglob
 
 # Compile with `--enable-unicode=ucs4` by default (#257)
 if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
