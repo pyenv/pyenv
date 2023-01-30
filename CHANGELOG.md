@@ -1,5 +1,13 @@
 # Version History
 
+## Release 2.3.12
+
+* Undefined name: do not forget self when accessing flavor by @cclauss in https://github.com/pyenv/pyenv/pull/2595
+* Fix wrong libpython being linked to in MacOS by @native-api in https://github.com/pyenv/pyenv/pull/2596
+* Fix `:latest` by @native-api in https://github.com/pyenv/pyenv/pull/2599
+* Fix `pyenv which` to support auto-resolved prefixes by @native-api in https://github.com/pyenv/pyenv/pull/2601
+* Add more recent build of nogil Python. by @colesbury in https://github.com/pyenv/pyenv/pull/2602
+
 ## Release 2.3.11
 
 * Add CPython 3.12.0a4 by @Afront in https://github.com/pyenv/pyenv/pull/2590
