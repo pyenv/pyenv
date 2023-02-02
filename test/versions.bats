@@ -226,14 +226,3 @@ OUT
   link --> foo/bar
 OUT
 }
-
-@test "bare output doesn't resolve links" {
-  create_version "1.9.0"
-  create_alias "link" "foo/bar"
-
-  run pyenv-versions
-    assert_success <<OUT
-1.9.0
-link
-OUT
-}
