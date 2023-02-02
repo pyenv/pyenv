@@ -128,7 +128,7 @@ if [ -n "$include_system" ] && \
     (PYENV_VERSION=system pyenv-which python >/dev/null 2>&1 || \
      PYENV_VERSION=system pyenv-which python3 >/dev/null 2>&1 || \
      PYENV_VERSION=system pyenv-which python2 >/dev/null 2>&1) ; then
-  print_version system
+  print_version system "/"
 fi
 
 shopt -s dotglob nullglob
