@@ -66,18 +66,38 @@ OUT
   assert_success "3.3"
 }
 
-@test "multiple versions" {
+@test "multiple versions and envs" {
   stub_system_python
   create_version "2.7.6"
-  create_version "3.3.3"
   create_version "3.4.0"
+  create_version "3.4.0/envs/foo"
+  create_version "3.4.0/envs/bar"
+  create_version "3.5.2"
   run pyenv-versions
   assert_success
   assert_output <<OUT
 * system (set by ${PYENV_ROOT}/version)
   2.7.6
+  3.4.0
+  3.4.0/envs/bar
+  3.4.0/envs/foo
+  3.5.2
+OUT
+}
+
+@test "skips envs with --skip-envs" {
+  create_version "3.3.3"
+  create_version "3.4.0"
+  create_version "3.4.0/envs/foo"
+  create_version "3.4.0/envs/bar"
+  create_version "3.5.0"
+
+  run pyenv-versions --skip-envs
+    assert_success <<OUT
+* system (set by ${PYENV_ROOT}/version)
   3.3.3
   3.4.0
+  3.5.0
 OUT
 }
 
@@ -216,7 +236,7 @@ SH
 OUT
 }
 
-@test "non-bare output resolves links" {
+@test "non-bare output shows symlink contents" {
   create_version "1.9.0"
   create_alias "link" "foo/bar"
 
