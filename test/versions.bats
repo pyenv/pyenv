@@ -216,21 +216,24 @@ SH
 OUT
 }
 
-@test "prints resolves links" {
+@test "non-bare output resolves links" {
   create_version "1.9.0"
-  create_version "1.53.0"
-  create_version "1.218.0"
-  create_executable sort <<SH
-#!$BASH
-exit 1
-SH
+  create_alias "link" "foo/bar"
 
-  run pyenv-versions --bare
-  assert_success
-  assert_output <<OUT
-1.218.0
-1.53.0
-1.9.0
+  run pyenv-versions
+    assert_success <<OUT
+  1.9.0
+  link --> foo/bar
 OUT
 }
 
+@test "bare output doesn't resolve links" {
+  create_version "1.9.0"
+  create_alias "link" "foo/bar"
+
+  run pyenv-versions
+    assert_success <<OUT
+1.9.0
+link
+OUT
+}
