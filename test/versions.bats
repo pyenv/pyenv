@@ -6,6 +6,11 @@ create_version() {
   mkdir -p "${PYENV_ROOT}/versions/$1"
 }
 
+create_alias() {
+  mkdir -p "${PYENV_ROOT}/versions"
+  ln -s "$2" "${PYENV_ROOT}/versions/$1"
+}
+
 setup() {
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
@@ -210,3 +215,22 @@ SH
 1.9.0
 OUT
 }
+
+@test "prints resolves links" {
+  create_version "1.9.0"
+  create_version "1.53.0"
+  create_version "1.218.0"
+  create_executable sort <<SH
+#!$BASH
+exit 1
+SH
+
+  run pyenv-versions --bare
+  assert_success
+  assert_output <<OUT
+1.218.0
+1.53.0
+1.9.0
+OUT
+}
+
