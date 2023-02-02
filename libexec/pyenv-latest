@@ -48,9 +48,10 @@ IFS=$'\n'
       $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
       grep -Ee "^$prefix_re[-.]" || true))
 
+    #FIXME: <version>/envs/<virtualenv> should be excluded in Pyenv-Virtualenv via a hook
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
-          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(b|rc)[0-9]+$/d'));
+          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+$/d' -e '/\/envs\//d'));
 
     # Compose a sorting key, followed by | and original value
     DEFINITION_CANDIDATES=(\
