@@ -6,6 +6,11 @@ create_version() {
   mkdir -p "${PYENV_ROOT}/versions/$1"
 }
 
+create_alias() {
+  mkdir -p "${PYENV_ROOT}/versions"
+  ln -s "$2" "${PYENV_ROOT}/versions/$1"
+}
+
 setup() {
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
@@ -138,7 +143,7 @@ OUT
 
 @test "lists symlinks under versions" {
   create_version "2.7.8"
-  ln -s "2.7.8" "${PYENV_ROOT}/versions/2.7"
+  create_alias "2.7" "2.7.8"
 
   run pyenv-versions --bare
   assert_success
@@ -150,9 +155,9 @@ OUT
 
 @test "doesn't list symlink aliases when --skip-aliases" {
   create_version "1.8.7"
-  ln -s "1.8.7" "${PYENV_ROOT}/versions/1.8"
+  create_alias "1.8" "1.8.7"
   mkdir moo
-  ln -s "${PWD}/moo" "${PYENV_ROOT}/versions/1.9"
+  create_alias "1.9" "${PWD}/moo"
 
   run pyenv-versions --bare --skip-aliases
   assert_success
@@ -208,5 +213,16 @@ SH
 1.218.0
 1.53.0
 1.9.0
+OUT
+}
+
+@test "non-bare output resolves links" {
+  create_version "1.9.0"
+  create_alias "link" "foo/bar"
+
+  run pyenv-versions
+    assert_success <<OUT
+  1.9.0
+  link --> foo/bar
 OUT
 }
