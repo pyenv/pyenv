@@ -71,8 +71,6 @@ else
   current_versions=()
 fi
 if [ -n "$bare" ]; then
-  hit_prefix=""
-  miss_prefix=""
   include_system=""
 else
   hit_prefix="* "
@@ -106,8 +104,12 @@ exists() {
 
 print_version() {
   local version="${1:?}"
+  if [[ -n $bare ]]; then
+    echo "$version"
+    return
+  fi
   local path="${2:?}"
-  if [[ -z "$bare" && -L "$path" ]]; then
+  if [[ -L "$path" ]]; then
     # Only resolve the link itself for printing, do not resolve further.
     # Doing otherwise would misinform the user of what the link contains.
     version_repr="$version --> $(resolve_link "$path")"
