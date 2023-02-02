@@ -1,23 +1,24 @@
 #!/usr/bin/env bash
 # Summary: List all Python versions available to pyenv
-# Usage: pyenv versions [--bare] [--skip-aliases]
+# Usage: pyenv versions [--bare] [--skip-aliases] [--skip-envs]
 #
 # Lists all Python versions found in `$PYENV_ROOT/versions/*'.
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-unset bare
-unset skip_aliases
+unset bare skip_aliases skip_envs
 # Provide pyenv completions
 for arg; do
   case "$arg" in
   --complete )
     echo --bare
     echo --skip-aliases
+    echo --skip-envs
     exit ;;
   --bare ) bare=1 ;;
   --skip-aliases ) skip_aliases=1 ;;
+  --skip-envs ) skip_envs=1 ;;
   * )
     pyenv-help --usage versions >&2
     exit 1
@@ -70,8 +71,6 @@ else
   current_versions=()
 fi
 if [ -n "$bare" ]; then
-  hit_prefix=""
-  miss_prefix=""
   include_system=""
 else
   hit_prefix="* "
@@ -105,11 +104,15 @@ exists() {
 
 print_version() {
   local version="${1:?}"
+  if [[ -n $bare ]]; then
+    echo "$version"
+    return
+  fi
   local path="${2:?}"
-  if [[ -z "$bare" && -L "$path" ]]; then
+  if [[ -L "$path" ]]; then
     # Only resolve the link itself for printing, do not resolve further.
     # Doing otherwise would misinform the user of what the link contains.
-    version_repr="$version --> $(resolve_link "$version")"
+    version_repr="$version --> $(resolve_link "$path")"
   else
     version_repr="$version"
   fi
@@ -152,12 +155,14 @@ for path in "${versions_dir_entries[@]}"; do
       [ "${target%/*/envs/*}" == "$versions_dir" ] && continue
     fi
     print_version "${path##*/}" "$path"
-    # virtual environments created by anaconda/miniconda
-    for env_path in "${path}/envs/"*; do
-      if [ -d "${env_path}" ]; then
-        print_version "${env_path#${PYENV_ROOT}/versions/}" "${env_path}"
-      fi
-    done
+    # virtual environments created by anaconda/miniconda/pyenv-virtualenv
+    if [[ -z $skip_envs ]]; then
+      for env_path in "${path}/envs/"*; do
+        if [ -d "${env_path}" ]; then
+          print_version "${env_path#${PYENV_ROOT}/versions/}" "${env_path}"
+        fi
+      done
+    fi
   fi
 done
 shopt -u dotglob nullglob
