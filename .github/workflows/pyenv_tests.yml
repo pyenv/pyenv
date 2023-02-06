@@ -16,7 +16,7 @@ jobs:
           - macos-11
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       # Normally, we would use the superbly maintained...
       # - uses: actions/setup-python@v2
       #   with:
@@ -42,3 +42,8 @@ jobs:
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
       - run: |
           make test
+      - env:
+          PYENV_NATIVE_EXT: 1
+        run: |
+          (cd src; ./configure; make)
+          bats/bin/bats test/{pyenv,hooks,versions}.bats
