@@ -17,7 +17,7 @@ jobs:
           - "3.11"
     runs-on: macos-11
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       # Normally, we would use the superbly maintained...
       # - uses: actions/setup-python@v2
       #   with:
