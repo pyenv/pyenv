@@ -42,3 +42,8 @@ jobs:
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
       - run: |
           make test
+      - env:
+          PYENV_NATIVE_EXT: 1
+        run: |
+          (cd src; ./configure; make)
+          bats/bin/bats test/{pyenv,hooks,versions}.bats
