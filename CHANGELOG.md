@@ -1,5 +1,15 @@
 # Version History
 
+## Release 2.3.13
+
+* Fix pyenv-latest to ignore virtualenvs by @native-api in https://github.com/pyenv/pyenv/pull/2608
+* Show symlink contents in non-bare `pyenv versions' by @native-api in https://github.com/pyenv/pyenv/pull/2609
+* Ignore virtualenvs in `pyenv latest' in a clean way by @native-api in https://github.com/pyenv/pyenv/pull/2610
+* Fix link resolving in pyenv-versions by @laggardkernel in https://github.com/pyenv/pyenv/pull/2612
+* Add CPython 3.11.2 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2615
+* Add CPython 3.10.10 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2616
+* Add CPython 3.12.0a5 by @Afront in https://github.com/pyenv/pyenv/pull/2614
+
 ## Release 2.3.12
 
 * Undefined name: do not forget self when accessing flavor by @cclauss in https://github.com/pyenv/pyenv/pull/2595
