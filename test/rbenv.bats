@@ -48,7 +48,7 @@ load test_helper
 
 @test "adds its own libexec to PATH" {
   run rbenv echo "PATH"
-  assert_success "${BATS_TEST_DIRNAME}/../libexec:$PATH"
+  assert_success "${BATS_TEST_DIRNAME%/*}/libexec:$PATH"
 }
 
 @test "adds plugin bin dirs to PATH" {
@@ -56,7 +56,7 @@ load test_helper
   mkdir -p "$RBENV_ROOT"/plugins/rbenv-each/bin
   run rbenv echo -F: "PATH"
   assert_success
-  assert_line 0 "${BATS_TEST_DIRNAME}/../libexec"
+  assert_line 0 "${BATS_TEST_DIRNAME%/*}/libexec"
   assert_line 1 "${RBENV_ROOT}/plugins/ruby-build/bin"
   assert_line 2 "${RBENV_ROOT}/plugins/rbenv-each/bin"
 }
@@ -72,5 +72,5 @@ load test_helper
 @test "RBENV_HOOK_PATH includes rbenv built-in plugins" {
   unset RBENV_HOOK_PATH
   run rbenv echo "RBENV_HOOK_PATH"
-  assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME}/../rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+  assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 }

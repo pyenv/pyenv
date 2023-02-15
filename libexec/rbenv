@@ -39,30 +39,37 @@ export RBENV_DIR
 
 [ -n "$RBENV_ORIG_PATH" ] || export RBENV_ORIG_PATH="$PATH"
 
+canonicalize() {
+  local readlink resolved_path
+  if readlink="$(type -P greadlink)" || readlink="$(type -P readlink)"; then
+    # happy path: GNU & BSD readlink, macOS 12.3+
+    if resolved_path="$("$readlink" -f "$1" 2>/dev/null)"; then
+      printf "%s\n" "$resolved_path"
+      return 0
+    fi
+    # likely macOS < 12.3 with old readlink
+    local path="$1"
+    while [ -L "$path" ]; do
+      resolved_path="$("$readlink" "$path" 2>/dev/null)"
+      [[ $resolved_path == /* ]] || resolved_path="$(cd "${path%/*}/${resolved_path%/*}" && pwd)/${resolved_path##*/}"
+      path="$resolved_path"
+    done
+    printf "%s\n" "$path"
+    return 0
+  fi
+  # fail if the argument is a symlink and was not canonicalized
+  [ ! -L "$1" ] || return 1
+}
+
 shopt -s nullglob
 
+# all this trouble just to find out where rbenv's executables live
 rbenv_bin="${BASH_SOURCE:-$0}"
-if [ -L "$rbenv_bin" ]; then
-  # resolve rbenv symlink to find out where the actual libexec directory is
-  if readlink="$(type -P greadlink)" || readlink="$(type -P readlink)"; then
-    resolved="$("$readlink" "$rbenv_bin" 2>/dev/null)"
-    if [[ $resolved == /* ]]; then
-      libexec_dir="${resolved%/*}"
-    else
-      libexec_dir="$(cd "${rbenv_bin%/*}/${resolved%/*}" && pwd)"
-    fi
-  else
-    # no readlink available; assume rbenv project layout
-    libexec_dir="${rbenv_bin%/*}"
-    if [[ $libexec_dir == */* ]]; then
-      libexec_dir="${libexec_dir%/*}/libexec"
-    else
-      libexec_dir="${PWD}/libexec"
-    fi
-  fi
+if libexec_dir="$(canonicalize "$rbenv_bin")"; then
+  libexec_dir="${libexec_dir%/*}"
 else
   libexec_dir="${rbenv_bin%/*}"
-  [[ $libexec_dir != "." ]] || libexec_dir="$PWD"
+  [ "$libexec_dir" != "." ] || libexec_dir="$PWD"
 fi
 
 for plugin_bin in "${RBENV_ROOT}/plugins/"*/bin; do
