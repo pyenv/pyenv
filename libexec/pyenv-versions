@@ -157,12 +157,12 @@ for path in "${versions_dir_entries[@]}"; do
     print_version "${path##*/}" "$path"
     # virtual environments created by anaconda/miniconda/pyenv-virtualenv
     if [[ -z $skip_envs ]]; then
-    for env_path in "${path}/envs/"*; do
-      if [ -d "${env_path}" ]; then
-        print_version "${env_path#${PYENV_ROOT}/versions/}" "${env_path}"
-      fi
-    done
-  fi
+      for env_path in "${path}/envs/"*; do
+        if [ -d "${env_path}" ]; then
+          print_version "${env_path#${PYENV_ROOT}/versions/}" "${env_path}"
+        fi
+      done
+    fi
   fi
 done
 shopt -u dotglob nullglob
