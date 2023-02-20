@@ -175,6 +175,15 @@ common for performance improvement from this to be in the ballpark of 30%.
 env PYTHON_CONFIGURE_OPTS='--enable-optimizations --with-lto' PYTHON_CFLAGS='-march=native -mtune=native' pyenv install 3.6.0
 ```
 
+If you are using a Mac computer with Apple silicon (e.g. M1), you must install
+`clang` 15+ before running the command above, and choose a recent minor version
+of Python. If you use Homebrew to update `clang` (`brew install llvm`), you must
+make sure the correct version is used:
+
+```sh
+env PATH="/opt/homebrew/opt/llvm/bin:$PATH" PYTHON_CONFIGURE_OPTS='--enable-optimizations --with-lto' PYTHON_CFLAGS='-march=native -mtune=native' pyenv install 3.10
+```
+
 You can also customize the task used for profile guided optimization by setting
 the `PROFILE_TASK` environment variable, for instance, `PROFILE_TASK='-m
 test.regrtest --pgo -j0'` will run much faster than the default task.
