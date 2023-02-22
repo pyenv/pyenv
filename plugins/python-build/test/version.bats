@@ -3,7 +3,7 @@
 load test_helper
 
 bats_bin="${BATS_TEST_DIRNAME}/../bin/python-build"
-static_version="$(grep VERSION "$bats_bin" | head -1 | cut -d'"' -f 2)"
+static_version="$(grep VERSION "$bats_bin" | head -n1 | cut -d'"' -f 2)"
 
 @test "python-build static version" {
   stub git 'echo "ASPLODE" >&2; exit 1'

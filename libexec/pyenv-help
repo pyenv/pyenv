@@ -46,7 +46,7 @@ extract_initial_comment_block() {
 collect_documentation() {
   # `tail` prevents "broken pipe" errors due to `head` closing the pipe without reading everything
   # https://superuser.com/questions/554855/how-can-i-fix-a-broken-pipe-error/642932#642932
-  $(type -P gawk awk | tail -n +1 | head -1) '
+  $(type -P gawk awk | tail -n +1 | head -n1) '
     /^Summary:/ {
       summary = substr($0, 10)
       next
