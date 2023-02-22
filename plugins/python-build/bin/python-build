@@ -58,7 +58,7 @@ lib "$1"
 
 
 resolve_link() {
-  $(type -P greadlink readlink | head -1) "$1"
+  $(type -P greadlink readlink | head -n1) "$1"
 }
 
 abs_dirname() {
@@ -102,7 +102,7 @@ os_information() {
     source /etc/os-release
     echo "$NAME" $VERSION_ID
   else
-    local os="$(cat /etc/{centos,redhat,fedora,system}-release /etc/debian_version 2>/dev/null | head -1)"
+    local os="$(cat /etc/{centos,redhat,fedora,system}-release /etc/debian_version 2>/dev/null | head -n1)"
     echo "${os:-$(uname -sr)}"
   fi
 }
@@ -256,7 +256,7 @@ compute_sha2() {
     output="$(shasum -a 256 -b)" || return 1
     echo "${output% *}"
   elif type openssl &>/dev/null; then
-    local openssl="$(command -v "$(brew --prefix openssl 2>/dev/null || true)"/bin/openssl openssl | head -1)"
+    local openssl="$(command -v "$(brew --prefix openssl 2>/dev/null || true)"/bin/openssl openssl | head -n1)"
     output="$("$openssl" dgst -sha256 2>/dev/null)" || return 1
     echo "${output##* }"
   elif type sha256sum &>/dev/null; then
@@ -867,7 +867,7 @@ build_package_jython() {
 fix_jython_shebangs() {
   # Workaround for Jython 2.7+ (#458)
   for file in "${PREFIX_PATH}/bin"/*; do
-    case "$(head -1 "${file}")" in
+    case "$(head -n1 "${file}")" in
     "#!"*"/bin/jython" )
       sed -i.bak "1 s:.*:#\!${PREFIX_PATH}\/bin\/jython:" "${file}"
       ;;
@@ -1144,7 +1144,7 @@ fix_directory_permissions() {
 }
 
 require_java7() {
-  local version="$(java -version 2>&1 | grep '\(java\|openjdk\) version' | head -1)"
+  local version="$(java -version 2>&1 | grep '\(java\|openjdk\) version' | head -n1)"
   if [[ $version != *[789]* ]]; then
     colorize 1 "ERROR" >&3
     echo ": Java 7 required. Please install a 1.7-compatible JRE." >&3
@@ -1587,7 +1587,7 @@ build_package_verify_openssl() {
       RbConfig::CONFIG.fetch("configure_args").shellsplit.each { |arg| $stderr.puts "  #{arg}" }
       exit 1
     end
-  ' "$(basename "$(type -P yum apt-get | head -1)")" >&4 2>&1
+  ' "$(basename "$(type -P yum apt-get | head -n1)")" >&4 2>&1
 }
 
 use_homebrew_zlib() {
