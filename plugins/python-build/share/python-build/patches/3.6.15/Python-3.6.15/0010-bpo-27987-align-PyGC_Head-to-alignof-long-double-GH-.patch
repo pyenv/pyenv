@@ -1,0 +1,40 @@
+From e68ff170dc6764b22886e703f583fb53e90367ef Mon Sep 17 00:00:00 2001
+From: Inada Naoki <songofacandy@gmail.com>
+Date: Sat, 25 May 2019 21:13:33 +0900
+Subject: [PATCH 10/10] bpo-27987: align PyGC_Head to alignof(long double)
+ (GH-13335)
+
+---
+ Include/objimpl.h                                           | 6 +++++-
+ .../2019-05-15-18-28-43.bpo-27987.FaxuLy.rst                | 2 ++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+ create mode 100644 Misc/NEWS.d/next/Core and Builtins/2019-05-15-18-28-43.bpo-27987.FaxuLy.rst
+
+diff --git a/Include/objimpl.h b/Include/objimpl.h
+index e7a3696d7a..90d71b87ea 100644
+--- a/Include/objimpl.h
++++ b/Include/objimpl.h
+@@ -255,7 +255,11 @@ typedef union _gc_head {
+         union _gc_head *gc_prev;
+         Py_ssize_t gc_refs;
+     } gc;
+-    double dummy;  /* force worst-case alignment */
++    long double dummy;  /* force worst-case alignment */
++    // malloc returns memory block aligned for any built-in types and
++    // long double is the largest standard C type.
++    // On amd64 linux, long double requires 16 byte alignment.
++    // See bpo-27987 for more discussion.
+ } PyGC_Head;
+ 
+ extern PyGC_Head *_PyGC_generation0;
+diff --git a/Misc/NEWS.d/next/Core and Builtins/2019-05-15-18-28-43.bpo-27987.FaxuLy.rst b/Misc/NEWS.d/next/Core and Builtins/2019-05-15-18-28-43.bpo-27987.FaxuLy.rst
+new file mode 100644
+index 0000000000..97ca37b262
+--- /dev/null
++++ b/Misc/NEWS.d/next/Core and Builtins/2019-05-15-18-28-43.bpo-27987.FaxuLy.rst	
+@@ -0,0 +1,2 @@
++``PyGC_Head`` structure is aligned to ``long double``.  This is needed to
++GC-ed objects are aligned properly.  Patch by Inada Naoki.
+-- 
+2.38.4
+
