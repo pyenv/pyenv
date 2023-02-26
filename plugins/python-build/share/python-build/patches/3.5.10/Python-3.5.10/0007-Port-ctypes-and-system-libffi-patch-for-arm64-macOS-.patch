@@ -1,0 +1,132 @@
+From 409b4ecef88643996ce00482b650c0246a977a4b Mon Sep 17 00:00:00 2001
+From: Chaim Halbert <chaim.leib.halbert@gmail.com>
+Date: Sun, 26 Feb 2023 06:21:54 -0700
+Subject: [PATCH] Port ctypes and system libffi patch for arm64/macOS 10.15+ to
+ Python 3.5.10
+
+This backports the following ctypes and libffi pyenv patch for Python
+3.6.15 to Python 3.5.10:
+
+* `0004-Port-ctypes-and-system-libffi-patches-for-arm64-macO.patch`
+
+This patch enables use of system libffi (fixing a broken `ctypes` module
+on arm64 targets) and enables calling variadic functions on arm64.
+---
+ setup.py | 65 +++++++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 50 insertions(+), 15 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 2944c9dd6f..ab8065866f 100644
+--- a/setup.py
++++ b/setup.py
+@@ -73,6 +73,13 @@ def macosx_sdk_root():
+         sysroot = m.group(1)
+     return sysroot
+ 
++def is_macosx_at_least(vers):
++    if host_platform == 'darwin':
++        dep_target = sysconfig.get_config_var('MACOSX_DEPLOYMENT_TARGET')
++        if dep_target:
++            return tuple(map(int, str(dep_target).split('.'))) >= vers
++    return False
++
+ def is_macosx_sdk_path(path):
+     """
+     Returns True if 'path' can be located in an OSX SDK
+@@ -81,6 +88,13 @@ def is_macosx_sdk_path(path):
+                 or path.startswith('/System/')
+                 or path.startswith('/Library/') )
+ 
++def grep_headers_for(function, headers):
++    for header in headers:
++        with open(header, 'r') as f:
++            if function in f.read():
++                return True
++    return False
++
+ def find_file(filename, std_dirs, paths):
+     """Searches for the directory where a given file is located,
+     and returns a possibly-empty list of additional directories, or None
+@@ -1939,7 +1953,11 @@ class PyBuildExt(build_ext):
+         return True
+ 
+     def detect_ctypes(self, inc_dirs, lib_dirs):
+-        self.use_system_libffi = False
++        if not sysconfig.get_config_var("LIBFFI_INCLUDEDIR") and is_macosx_at_least((10,15)):
++            self.use_system_libffi = True
++        else:
++            self.use_system_libffi = '--with-system-ffi' in sysconfig.get_config_var("CONFIG_ARGS")
++
+         include_dirs = []
+         extra_compile_args = []
+         extra_link_args = []
+@@ -1986,19 +2004,29 @@ class PyBuildExt(build_ext):
+                      libraries=math_libs)
+         self.extensions.extend([ext, ext_test])
+ 
+-        if not '--with-system-ffi' in sysconfig.get_config_var("CONFIG_ARGS"):
+-            return
++        ffi_inc = sysconfig.get_config_var("LIBFFI_INCLUDEDIR")
++        ffi_lib = None
+ 
+         if host_platform == 'darwin':
+-            # OS X 10.5 comes with libffi.dylib; the include files are
+-            # in /usr/include/ffi
+-            inc_dirs.append('/usr/include/ffi')
+-
+-        ffi_inc = [sysconfig.get_config_var("LIBFFI_INCLUDEDIR")]
+-        if not ffi_inc or ffi_inc[0] == '':
+-            ffi_inc = find_file('ffi.h', [], inc_dirs)
+-        if ffi_inc is not None:
+-            ffi_h = ffi_inc[0] + '/ffi.h'
++             if not self.use_system_libffi:
++                 return
++             ffi_in_sdk = os.path.join(macosx_sdk_root(), "usr/include/ffi")
++             if os.path.exists(ffi_in_sdk):
++                 ffi_inc = ffi_in_sdk
++                 ffi_lib = 'ffi'
++             else:
++                 # OS X 10.5 comes with libffi.dylib; the include files are
++                 # in /usr/include/ffi
++                 inc_dirs.append('/usr/include/ffi')
++        elif '--without-system-ffi' in sysconfig.get_config_var("CONFIG_ARGS"):
++             return
++
++        if not ffi_inc:
++            found = find_file('ffi.h', [], inc_dirs)
++            if found:
++                ffi_inc = found[0]
++        if ffi_inc:
++            ffi_h = ffi_inc + '/ffi.h'
+             with open(ffi_h) as f:
+                 for line in f:
+                     line = line.strip()
+@@ -2009,15 +2037,22 @@ class PyBuildExt(build_ext):
+                     ffi_inc = None
+                     print('Header file {} does not define LIBFFI_H or '
+                           'ffi_wrapper_h'.format(ffi_h))
+-        ffi_lib = None
+-        if ffi_inc is not None:
++        if ffi_lib is None and ffi_inc is not None:
+             for lib_name in ('ffi_convenience', 'ffi_pic', 'ffi'):
+                 if (self.compiler.find_library_file(lib_dirs, lib_name)):
+                     ffi_lib = lib_name
+                     break
+ 
+         if ffi_inc and ffi_lib:
+-            ext.include_dirs.extend(ffi_inc)
++            ffi_headers = glob(os.path.join(ffi_inc, '*.h'))
++            if grep_headers_for('ffi_closure_alloc', ffi_headers):
++                try:
++                    sources.remove('_ctypes/malloc_closure.c')
++                except ValueError:
++                    pass
++            if grep_headers_for('ffi_prep_cif_var', ffi_headers):
++                ext.extra_compile_args.append("-DHAVE_FFI_PREP_CIF_VAR=1")
++            ext.include_dirs.append(ffi_inc)
+             ext.libraries.append(ffi_lib)
+             self.use_system_libffi = True
+ 
+-- 
+2.39.2
+
