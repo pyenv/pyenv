@@ -1,0 +1,43 @@
+From 54dc627769bf112b0181972a52c4b45e4a02da57 Mon Sep 17 00:00:00 2001
+From: Inada Naoki <songofacandy@gmail.com>
+Date: Tue, 14 May 2019 18:51:15 +0900
+Subject: [PATCH 09/10] bpo-27987: pymalloc: align by 16bytes on 64bit platform
+ (GH-12850)
+
+---
+ .../2019-04-16-11-52-21.bpo-27987.n2_DcQ.rst                | 3 +++
+ Objects/obmalloc.c                                          | 6 ++++++
+ 2 files changed, 9 insertions(+)
+ create mode 100644 Misc/NEWS.d/next/Core and Builtins/2019-04-16-11-52-21.bpo-27987.n2_DcQ.rst
+
+diff --git a/Misc/NEWS.d/next/Core and Builtins/2019-04-16-11-52-21.bpo-27987.n2_DcQ.rst b/Misc/NEWS.d/next/Core and Builtins/2019-04-16-11-52-21.bpo-27987.n2_DcQ.rst
+new file mode 100644
+index 0000000000..b0f32a5c6c
+--- /dev/null
++++ b/Misc/NEWS.d/next/Core and Builtins/2019-04-16-11-52-21.bpo-27987.n2_DcQ.rst	
+@@ -0,0 +1,3 @@
++pymalloc returns memory blocks aligned by 16 bytes, instead of 8 bytes, on
++64-bit platforms to conform x86-64 ABI. Recent compilers assume this alignment
++more often. Patch by Inada Naoki.
+diff --git a/Objects/obmalloc.c b/Objects/obmalloc.c
+index d46d149311..47283354f4 100644
+--- a/Objects/obmalloc.c
++++ b/Objects/obmalloc.c
+@@ -650,8 +650,14 @@ static int running_on_valgrind = -1;
+  *
+  * You shouldn't change this unless you know what you are doing.
+  */
++
++#if SIZEOF_VOID_P > 4
++#define ALIGNMENT              16               /* must be 2^N */
++#define ALIGNMENT_SHIFT         4
++#else
+ #define ALIGNMENT               8               /* must be 2^N */
+ #define ALIGNMENT_SHIFT         3
++#endif
+ 
+ /* Return the number of bytes in size class I, as a uint. */
+ #define INDEX2SIZE(I) (((uint)(I) + 1) << ALIGNMENT_SHIFT)
+-- 
+2.38.4
+
