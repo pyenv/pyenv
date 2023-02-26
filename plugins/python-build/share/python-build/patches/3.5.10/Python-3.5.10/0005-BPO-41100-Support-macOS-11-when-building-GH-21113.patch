@@ -1,0 +1,48 @@
+From 8ea6353f60625c96ce96588c70ff24a77f8c71f9 Mon Sep 17 00:00:00 2001
+From: Ronald Oussoren <ronaldoussoren@mac.com>
+Date: Thu, 25 Jun 2020 16:55:48 +0200
+Subject: [PATCH] BPO-41100: Support macOS 11 when building (GH-21113)
+
+---
+ Misc/NEWS.d/next/macOS/2020-06-24-13-51-57.bpo-41100.mcHdc5.rst | 1 +
+ configure                                                       | 2 +-
+ configure.ac                                                    | 2 +-
+ 3 files changed, 3 insertions(+), 2 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/macOS/2020-06-24-13-51-57.bpo-41100.mcHdc5.rst
+
+diff --git a/Misc/NEWS.d/next/macOS/2020-06-24-13-51-57.bpo-41100.mcHdc5.rst b/Misc/NEWS.d/next/macOS/2020-06-24-13-51-57.bpo-41100.mcHdc5.rst
+new file mode 100644
+index 0000000000..ded66b567a
+--- /dev/null
++++ b/Misc/NEWS.d/next/macOS/2020-06-24-13-51-57.bpo-41100.mcHdc5.rst
+@@ -0,0 +1 @@
++Support macOS 11 when building.
+diff --git a/configure b/configure
+index c51f396824..5024860ca4 100755
+--- a/configure
++++ b/configure
+@@ -3375,7 +3375,7 @@ $as_echo "#define _BSD_SOURCE 1" >>confdefs.h
+   # has no effect, don't bother defining them
+   Darwin/[6789].*)
+     define_xopen_source=no;;
+-  Darwin/1[0-9].*)
++  Darwin/[12][0-9].*)
+     define_xopen_source=no;;
+   # On AIX 4 and 5.1, mbstate_t is defined only when _XOPEN_SOURCE == 500 but
+   # used in wcsnrtombs() and mbsnrtowcs() even if _XOPEN_SOURCE is not defined
+diff --git a/configure.ac b/configure.ac
+index 70deefb6b9..5a3e340aa3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -495,7 +495,7 @@ case $ac_sys_system/$ac_sys_release in
+   # has no effect, don't bother defining them
+   Darwin/@<:@6789@:>@.*)
+     define_xopen_source=no;;
+-  Darwin/1@<:@0-9@:>@.*)
++  Darwin/@<:@[12]@:>@@<:@0-9@:>@.*)
+     define_xopen_source=no;;
+   # On AIX 4 and 5.1, mbstate_t is defined only when _XOPEN_SOURCE == 500 but
+   # used in wcsnrtombs() and mbsnrtowcs() even if _XOPEN_SOURCE is not defined
+-- 
+2.30.1 (Apple Git-130)
+
