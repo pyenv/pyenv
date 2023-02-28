@@ -416,7 +416,7 @@ please visit the wiki page about
 
 All Pyenv subcommands except `uninstall` automatically resolve full prefixes to the latest version in the corresponding version line.
 
-`pyenv install` picks the latest known version while other subcommands -- the latest installed version.
+`pyenv install` picks the latest known version, while other subcommands pick the latest installed version.
 
 E.g. to install and then switch to the latest 3.10 release:
 
@@ -425,8 +425,7 @@ pyenv install 3.10
 pyenv global 3.10
 ```
 
-You can run [`pyenv latest <prefix>`](COMMANDS.md#pyenv-latest) to see
-what a specific prefix would be resolved to.
+You can run [`pyenv latest -k <prefix>`](COMMANDS.md#pyenv-latest) to see how `pyenv install` would resolve a specific prefix, or [`pyenv latest <prefix>`](COMMANDS.md#pyenv-latest) to see how other subcommands would resolve it.
 
 See the [`pyenv latest` documentation](COMMANDS.md#pyenv-latest) for details.
 
