@@ -1,5 +1,13 @@
 # Version History
 
+## Release 2.3.14
+
+* Fix indentation by @rafrafek in https://github.com/pyenv/pyenv/pull/2620
+* Support for "BusyBox version" of "head" by @schuellerf in https://github.com/pyenv/pyenv/pull/2629
+* bpo-27987 for v3.5.10 and v3.6.15: align by 16bytes on 64bit platforms by @chaimleib in https://github.com/pyenv/pyenv/pull/2630
+* bpo-36231 for v3.5.10: fix Unsupported MacOS X CPU type in ffi.h by @chaimleib in https://github.com/pyenv/pyenv/pull/2633
+* README: clarify behavior of `pyenv latest` by @mrienstra in https://github.com/pyenv/pyenv/pull/2634
+
 ## Release 2.3.13
 
 * Fix pyenv-latest to ignore virtualenvs by @native-api in https://github.com/pyenv/pyenv/pull/2608
