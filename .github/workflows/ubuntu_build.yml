@@ -24,7 +24,7 @@ jobs:
       #    python-version: ${{ matrix.python-version }}
       # ... but in the repo, we want to test pyenv builds on Ubuntu
       - run: |
-          sudo apt-get install -yq make build-essential libssl-dev zlib1g-dev \
+          sudo apt-get update -q; sudo apt install -yq make build-essential libssl-dev zlib1g-dev \
           libbz2-dev libreadline-dev libsqlite3-dev curl \
           libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
       # https://github.com/pyenv/pyenv#installation
