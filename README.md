@@ -438,7 +438,7 @@ it's safe to assume that they will continue working until there are further inco
 in a later version of those environments.
 
 * *3.7.8-3.7.15, 3.8.4-3.8.12, 3.9.0-3.9.7* : XCode 13.3
-* *3.6.15* : MacOS 11+ and XCode 13.3
+* *3.5.10, 3.6.15* : MacOS 11+ and XCode 13.3
 * *2.7.18* : MacOS 10.15+ and Apple Silicon
 
 
