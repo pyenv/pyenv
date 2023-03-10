@@ -1,5 +1,10 @@
 # Version History
 
+## Release 2.3.15
+
+* Add miniconda 23.1.0-1 by @aphedges in https://github.com/pyenv/pyenv/pull/2635
+* Add CPython 3.12.0a6 by @saaketp in https://github.com/pyenv/pyenv/pull/2638
+
 ## Release 2.3.14
 
 * Fix indentation by @rafrafek in https://github.com/pyenv/pyenv/pull/2620
