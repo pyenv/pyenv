@@ -393,7 +393,7 @@ For example, to download and install Python 3.10.4, run:
 pyenv install 3.10.4
 ```
 
-Running `pyenv install -l` gives the list of all available versions.
+Running `pyenv install -list` gives the list of all available versions.
 
 **NOTE:** Most Pyenv-provided Python releases are source releases and are built
 from source as part of installation (that's why you need Python build dependencies preinstalled).
