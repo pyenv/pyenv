@@ -1,21 +1,21 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-aarch64" )
-  install_script "Anaconda3-2023.03-Linux-aarch64" "https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-aarch64.sh#SHA1" "anaconda" verify_py310
+  install_script "Anaconda3-2023.03-Linux-aarch64" "https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-aarch64.sh#2EDA8F6D0FCEBDA3526487293C3CE4B0BCAF5464" "anaconda" verify_py310
   ;;
 "Linux-ppc64le" )
-  install_script "Anaconda3-2023.03-Linux-ppc64le" "https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-ppc64le.sh#SHA1" "anaconda" verify_py310
+  install_script "Anaconda3-2023.03-Linux-ppc64le" "https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-ppc64le.sh#6FFEAE344D88925641BAE5F07D96A9829E49FC97" "anaconda" verify_py310
   ;;
 "Linux-s390x" )
-  install_script "Anaconda3-2023.03-Linux-s390x" "https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-s390x.sh#SHA1" "anaconda" verify_py310
+  install_script "Anaconda3-2023.03-Linux-s390x" "https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-s390x.sh#6A89BAA462B8594B865DAF6A09FC4D268E5273FF" "anaconda" verify_py310
   ;;
 "Linux-x86_64" )
-  install_script "Anaconda3-2023.03-Linux-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-x86_64.sh#SHA1" "anaconda" verify_py310
+  install_script "Anaconda3-2023.03-Linux-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2023.03-Linux-x86_64.sh#9B59B76805D5C95D0C9802E2FDB74253A3AF6D87" "anaconda" verify_py310
   ;;
 "MacOSX-arm64" )
-  install_script "Anaconda3-2023.03-MacOSX-arm64" "https://repo.anaconda.com/archive/Anaconda3-2023.03-MacOSX-arm64.sh#SHA1" "anaconda" verify_py310
+  install_script "Anaconda3-2023.03-MacOSX-arm64" "https://repo.anaconda.com/archive/Anaconda3-2023.03-MacOSX-arm64.sh#075F7B446BF85E6D9EC653F8BCB21978B3C62C4B" "anaconda" verify_py310
   ;;
 "MacOSX-x86_64" )
-  install_script "Anaconda3-2023.03-MacOSX-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2023.03-MacOSX-x86_64.sh#SHA1" "anaconda" verify_py310
+  install_script "Anaconda3-2023.03-MacOSX-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2023.03-MacOSX-x86_64.sh#88DD27921CE836F1E0805B2A3E2DACF706B92246" "anaconda" verify_py310
   ;;
 * )
   { echo
