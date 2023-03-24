@@ -1,5 +1,10 @@
 # Version History
 
+## Release 2.3.16
+
+* Add Miniforge3-22.11.1-4 by @jlec in https://github.com/pyenv/pyenv/pull/2642
+* Add Anaconda3-2023.03 by @anton-petrov in https://github.com/pyenv/pyenv/pull/2648
+
 ## Release 2.3.15
 
 * Add miniconda 23.1.0-1 by @aphedges in https://github.com/pyenv/pyenv/pull/2635
