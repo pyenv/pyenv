@@ -29,7 +29,7 @@ if enable -f "${BASH_SOURCE%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev
 else
   [ -z "$PYENV_NATIVE_EXT" ] || abort "failed to load \`realpath' builtin"
 
-  READLINK=$(type -P greadlink readlink | head -n1)
+  READLINK=$(type -P readlink)
   [ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
 
   resolve_link() {
