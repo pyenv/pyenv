@@ -56,9 +56,14 @@ lib() {
 }
 lib "$1"
 
+READLINK=$(type -P readlink)
+if [ -z "$READLINK" ]; then
+  echo "pyenv: cannot find readlink - are you missing GNU coreutils?" >&2
+  exit 1
+fi
 
 resolve_link() {
-  $(type -P greadlink readlink | head -n1) "$1"
+  $READLINK "$1"
 }
 
 abs_dirname() {
