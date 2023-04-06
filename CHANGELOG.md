@@ -1,5 +1,12 @@
 # Version History
 
+## Release 2.3.17
+
+* Try locate `readlink` first in pyenv-hooks, fix #2654 by @Harry-Chen in https://github.com/pyenv/pyenv/pull/2655
+* Add CPython 3.12.0a7 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2668
+* Add CPython 3.11.3 by @mirekdlugosz in https://github.com/pyenv/pyenv/pull/2671
+* Add CPython 3.10.11 by @mirekdlugosz in https://github.com/pyenv/pyenv/pull/2670
+
 ## Release 2.3.16
 
 * Add Miniforge3-22.11.1-4 by @jlec in https://github.com/pyenv/pyenv/pull/2642
