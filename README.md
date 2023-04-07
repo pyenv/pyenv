@@ -62,6 +62,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Upgrading with Homebrew](#upgrading-with-homebrew)
   * [Upgrading with Installer or Git checkout](#upgrading-with-installer-or-git-checkout)
 * [Uninstalling pyenv](#uninstalling-pyenv)
+* [Pyenv plugins](#pyenv-plugins)
 * [Advanced Configuration](#advanced-configuration)
   * [Using Pyenv without shims](#using-pyenv-without-shims)
   * [Environment variables](#environment-variables)
@@ -567,6 +568,19 @@ uninstall from the system.
     brew uninstall pyenv
     ```
 
+
+## Pyenv plugins
+
+Pyenv provides a simple, flexible and maintainable way to extend and customize its functionalty with plugins --
+as simple as creating a plugin directory and dropping a shell script on a certain subpath of it
+with whatever extra logic you need to be run at certain moments.
+
+See [_Plugins_ on the wiki](https://github.com/pyenv/pyenv/wiki/Plugins) on how to install and use plugins
+as well as a catalog of some useful existing plugins for common needs.
+
+See [_Authoring plugins_ on the wiki](https://github.com/pyenv/pyenv/wiki/Authoring-plugins) on writing your own plugins.
+
+
 ## Advanced Configuration
 
 Skip this section unless you must know what every line in your shell
@@ -658,7 +672,6 @@ See also [_Special environment variables_ in Python-Build's README](plugins/pyth
 for environment variables that can be used to customize the build.
 
 ----
-
 
 ## Development
 
