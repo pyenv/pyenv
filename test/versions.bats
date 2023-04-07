@@ -240,8 +240,11 @@ OUT
   create_version "1.9.0"
   create_alias "link" "foo/bar"
 
+  export PYENV_DEBUG=1 PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
   run pyenv-versions
-    assert_success <<OUT
+  assert_success
+  assert_output <<OUT
+* system (set by ${PYENV_ROOT}/version)
   1.9.0
   link --> foo/bar
 OUT
