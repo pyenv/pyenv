@@ -121,7 +121,7 @@ print_version() {
   elif (( ${BASH_VERSINFO[0]} <= 3 )) && exists "$1" "${current_versions[@]}"; then
     echo "${hit_prefix}${version_repr} (set by $(pyenv-version-origin))"
   else
-    echo "${miss_prefix}$1"
+    echo "${miss_prefix}${version_repr}"
   fi
   num_versions=$((num_versions + 1))
 }
