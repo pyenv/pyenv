@@ -271,7 +271,7 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
         echo "  brew update && brew upgrade pyenv"
       elif [ -d "${here}/.git" ]; then
         printf ":\n\n"
-        echo "  cd ${here} && git pull && cd -"
+        echo "  git -C \"$(realpath "${here}")\" pull"
       else
         printf ".\n"
       fi
