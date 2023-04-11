@@ -6,5 +6,5 @@ install_package "readline-8.2" "https://ftpmirror.gnu.org/readline/readline-8.2.
 if has_tar_xz_support; then
     install_package "Python-3.11.3" "https://www.python.org/ftp/python/3.11.3/Python-3.11.3.tar.xz#8a5db99c961a7ecf27c75956189c9602c968751f11dbeae2b900dbff1c085b5e" standard verify_py311 copy_python_gdb ensurepip
 else
-    install_package "Python-3.11.3" "https://www.python.org/ftp/python/3.11.3/Python-3.11.3.tar.xz#8a5db99c961a7ecf27c75956189c9602c968751f11dbeae2b900dbff1c085b5e" standard verify_py311 copy_python_gdb ensurepip
+    install_package "Python-3.11.3" "https://www.python.org/ftp/python/3.11.3/Python-3.11.3.tgz#1a79f3df32265d9e6625f1a0b31c28eb1594df911403d11f3320ee1da1b3e048" standard verify_py311 copy_python_gdb ensurepip
 fi
