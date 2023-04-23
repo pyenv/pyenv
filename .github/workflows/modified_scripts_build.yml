@@ -15,7 +15,10 @@ jobs:
             if (/^plugins\/python-build\/share\/python-build\/(?:([^\/]+)|patches\/([^\/]+)\/.*)$/ and -e $& )
                 { print $1.$2; }' \
           | sort -u);
-          echo -e "versions<<!\\n$versions\\n!" >> $GITHUB_ENV
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64);
+          echo "versions<<$EOF" >> $GITHUB_ENV;
+          echo "$versions" >> $GITHUB_ENV;
+          echo "$EOF" >> $GITHUB_ENV;
       - id: modified-versions
         run: |
           echo -n "::set-output name=versions::"
