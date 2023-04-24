@@ -1,4 +1,4 @@
-.TH PYENV 1 "12 Dec 2020" "PYENV"
+.TH PYENV 1 "24 Apr 2023" "PYENV"
 .SH NAME
 pyenv \- Simple Python version management
 .SH SYNOPSIS
@@ -12,10 +12,12 @@ pyenv lets you easily switch between multiple versions of Python\. It's simple, 
 \fBAppend\fR the following to \fB$HOME/.bashrc\fR
 .P
 .RS 15
-source /usr/share/pyenv/pyenv_user_setup.bash
+.nf
+if command -v pyenv 1>/dev/null 2>&1; then\n
+   eval "$(pyenv init -)" \n
+fi
+.fi
 .RE
-.\"OR
-.\"\fBsh echo \-e \if command \-v pyenv 1>/dev/null 2>&1; then\en eval "$(pyenv init \-)"\enfi' >> ~/\.bashrc\fR
 .RS 3
 .P
 .nh
