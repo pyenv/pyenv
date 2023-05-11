@@ -62,7 +62,7 @@ if [ -z "$print" ]; then
   zsh )
     profile='~/.zshrc'
     ;;
-  ksh )
+  ksh | ksh93 | ksh88 | pdksh | mksh )
     profile='~/.profile'
     ;;
   fish )
@@ -144,7 +144,7 @@ function rbenv
 end
 EOS
   ;;
-ksh )
+ksh | ksh93 | ksh88 | pdksh | mksh )
   cat <<EOS
 function rbenv {
   typeset command
