@@ -109,7 +109,7 @@ function detect_profile() {
     profile='~/.zprofile'
     rc='~/.zshrc'
     ;;
-  ksh )
+  ksh | ksh93 | ksh88 | pdksh | mksh )
     profile='~/.profile'
     rc='~/.profile'
     ;;
@@ -269,7 +269,7 @@ function pyenv
 end
 EOS
     ;;
-  ksh )
+  ksh | ksh93 | ksh88 | pdksh | mksh )
     cat <<EOS
 function pyenv {
   typeset command
