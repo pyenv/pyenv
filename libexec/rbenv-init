@@ -62,7 +62,12 @@ if [ -z "$print" ]; then
   zsh )
     profile='~/.zshrc'
     ;;
-  ksh | ksh93 | ksh88 | pdksh | mksh )
+  ksh | ksh93 | mksh )
+    # There are two implementations of Korn shell: AT&T (ksh93) and Mir (mksh).
+    # Systems may have them installed under those names, or as ksh, so those
+    # are recognized here. The obsolete ksh88 (subsumed by ksh93) and pdksh
+    # (subsumed by mksh) are not included, since they are unlikely to still
+    # be in use as interactive shells anywhere.
     profile='~/.profile'
     ;;
   fish )
@@ -144,7 +149,7 @@ function rbenv
 end
 EOS
   ;;
-ksh | ksh93 | ksh88 | pdksh | mksh )
+ksh | ksh93 | mksh )
   cat <<EOS
 function rbenv {
   typeset command
