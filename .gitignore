@@ -10,3 +10,4 @@
 /default-packages
 .idea
 *.un~
+man/_build/
