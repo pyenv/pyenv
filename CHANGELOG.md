@@ -1,5 +1,15 @@
 # Version History
 
+## Release 2.3.18
+
+* Fix not showing symlink contents for unselected versions in `pyenv versions` by @native-api in https://github.com/pyenv/pyenv/pull/2675
+* Correct link in has_tar_xz_support else branch of 3.10.11 and 3.11.3 by @mirekdlugosz in https://github.com/pyenv/pyenv/pull/2677
+* Fix #2682: Correct pyenv_user_setup.bash file by @tomschr in https://github.com/pyenv/pyenv/pull/2687
+* fix: updating heredoc delimiter to be random and unique by @aviadhahami in https://github.com/pyenv/pyenv/pull/2691
+* Support ksh alternative names by @kpschoedel in https://github.com/pyenv/pyenv/pull/2697
+* Add CPython 3.12.0b1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2701
+* Update 3.12-dev and add 3.13-dev by @t0b3 in https://github.com/pyenv/pyenv/pull/2703
+
 ## Release 2.3.17
 
 * Try locate `readlink` first in pyenv-hooks, fix #2654 by @Harry-Chen in https://github.com/pyenv/pyenv/pull/2655
