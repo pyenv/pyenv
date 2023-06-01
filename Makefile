@@ -1,4 +1,4 @@
-.PHONY: test test-build test-unit test-plugin man
+.PHONY: test test-build test-unit test-plugin man html
 
 # Do not pass in user flags to build tests.
 unexport PYTHON_CFLAGS
@@ -30,3 +30,6 @@ bats:
 
 man:
 	$(MAKE) -C man/ man
+
+html:
+	$(MAKE) -C man/ html
