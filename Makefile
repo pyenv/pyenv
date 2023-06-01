@@ -1,4 +1,4 @@
-.PHONY: test test-build test-unit test-plugin
+.PHONY: test test-build test-unit test-plugin man
 
 # Do not pass in user flags to build tests.
 unexport PYTHON_CFLAGS
@@ -27,3 +27,6 @@ test-build:
 
 bats:
 	git clone --depth 1 --branch v1.2.0 https://github.com/bats-core/bats-core.git bats
+
+man:
+	$(MAKE) -C man/ man

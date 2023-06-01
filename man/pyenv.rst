@@ -11,7 +11,7 @@ Synopsis
 
 .. code:: bash
 
-   pyenv <command> [<args>]
+   pyenv <COMMAND> [<args>]
 
 
 Description
@@ -99,76 +99,77 @@ subcommands based on its first argument.
 Some useful pyenv commands
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-:command:`commands`
+:ref:`pyenv_commands`
    List all available pyenv commands
 
-:command:`exec`
+:ref:`pyenv_exec`
    Run an executable with the selected Python version
 
-:command:`global`
+:ref:`pyenv_global`
    Set or show the global Python version(s)
 
-:command:`help`
+:ref:`pyenv_help`
    Display help for a command
 
-:command:`hooks`
+:ref:`pyenv_hooks`
    List hook scripts for a given pyenv command
 
-:command:`init`
+:ref:`pyenv_init`
    Configure the shell environment for pyenv
 
-:command:`install`
+:ref:`pyenv_install`
    Install a Python version using python-build
 
-:command:`local`
+:ref:`pyenv_local`
    Set or show the local application-specific Python version(s)
 
-:command:`prefix`
+:ref:`pyenv_prefix`
    Display prefix for a Python version
 
-:command:`rehash`
+:ref:`pyenv_rehash`
    Rehash pyenv shims (run this after installing executables)
 
-:command:`root`
+:ref:`pyenv_root`
    Display the root directory where versions and shims are kept
 
-:command:`shell`
+:ref:`pyenv_shell`
    Set or show the shell-specific Python version
 
-:command:`shims`
+:ref:`pyenv_shims`
    List existing pyenv shims
 
-:command:`uninstall`
+:ref:`pyenv_uninstall`
    Uninstall Python versions
 
-:command:`version`
+:ref:`pyenv_version`
    Show the current Python version(s) and its origin
 
-:command:`version-file`
+:ref:`pyenv_version-file`
    Detect the file that sets the current pyenv version
 
-:command:`version-name`
+:ref:`pyenv_version-name`
    Show the current Python version
 
-:command:`version-origin`
+:ref:`pyenv_version-origin`
    Explain how the current Python version is set
 
-:command:`versions`
+:ref:`pyenv_versions`
    List all Python versions available to pyenv
 
-:command:`whence`
+:ref:`pyenv_whence`
    List all Python versions that contain the given executable
 
-:command:`which`
+:ref:`pyenv_which`
    Display the full path to an executable
 
-See :command:`pyenv help <command>` for information on a specific command. For
+Use :command:`pyenv help <COMMAND>` for information on a specific command. For
 full documentation, see :ref:`command-ref` section.
 
 
 Options
 =======
 
+.. program:: pyenv
 .. option:: -h, --help
 
    Show summary of options.
@@ -323,7 +324,7 @@ in :file:`$(pyenv root)/versions`.
 Managing Virtual Environments
 -----------------------------
 
-There is a pyenv plugin named pyenv-virtualenv which comes with various
+There is a pyenv plugin named ``pyenv-virtualenv`` which comes with various
 features to help pyenv users to manage virtual environments created by
 virtualenv or Anaconda. Because the *activate* script of those virtual
 environments are relying on mutating :envvar:`PATH` variable of user's
@@ -377,388 +378,12 @@ with the :command:`pyenv prefix` command, for example::
    pyenv prefix 2.6.8
 
 
-.. _command-ref:
-
-Command Reference
-=================
-
-The most common subcommands are:
-
-pyenv commands
---------------
-
-Lists all available pyenv commands.
-
-pyenv local
------------
-
-Sets a local application-specific Python version by writing the version
-name to a :file:`.python-version` file in the current directory. This
-version overrides the global version, and can be overridden itself by
-setting the :envvar:`PYENV_VERSION` environment variable or with the
-:command:`pyenv shell` command.
-
-::
-
-   $ pyenv local 2.7.6
-
-When run without a version number, :command:`pyenv local` reports the currently
-configured local version. You can also unset the local version::
-
-   $ pyenv local --unset
-
-Previous versions of pyenv stored local version specifications in a file
-named **.pyenv-version**. For backwards compatibility, pyenv will read a
-local version specified in an **.pyenv-version** file, but a
-:file:`.python-version` file in the same directory will take precedence.
-
-You can specify multiple versions as local Python at once.
-
-Let's say if you have two versions of 2.7.6 and 3.3.3. If you prefer
-2.7.6 over 3.3.3,
-
-::
-
-   $ pyenv local 2.7.6 3.3.3
-   $ pyenv versions
-     system
-   * 2.7.6 (set by /Users/yyuu/path/to/project/.python-version)
-   * 3.3.3 (set by /Users/yyuu/path/to/project/.python-version)
-   $ python --version
-   Python 2.7.6
-   $ python2.7 --version
-   Python 2.7.6
-   $ python3.3 --version
-   Python 3.3.3
-
-or, if you prefer 3.3.3 over 2.7.6,
-
-::
-
-   $ pyenv local 3.3.3 2.7.6
-   $ pyenv versions
-     system
-   * 2.7.6 (set by /Users/yyuu/path/to/project/.python-version)
-   * 3.3.3 (set by /Users/yyuu/path/to/project/.python-version)
-     venv27
-   $ python --version
-   Python 3.3.3
-   $ python2.7 --version
-   Python 2.7.6
-   $ python3.3 --version
-   Python 3.3.3
-
-pyenv global
-------------
-
-Sets the global version of Python to be used in all shells by writing
-the version name to the :file:`~/.pyenv/version` file. This version can be
-overridden by an application-specific :file:`.python-version` file, or by
-setting the :envvar:`PYENV_VERSION` environment variable.
-
-::
-
-   $ pyenv global 2.7.6
-
-The special version name *system* tells pyenv to use the system Python
-(detected by searching your :envvar:`PATH`).
-
-When run without a version number, :command:`pyenv global` reports the
-currently configured global version.
-
-You can specify multiple versions as global Python at once.
-
-Let's say if you have two versions of 2.7.6 and 3.3.3. If you prefer
-2.7.6 over 3.3.3,
-
-::
-
-   $ pyenv global 2.7.6 3.3.3
-   $ pyenv versions
-     system
-   * 2.7.6 (set by /Users/yyuu/.pyenv/version)
-   * 3.3.3 (set by /Users/yyuu/.pyenv/version)
-   $ python --version
-   Python 2.7.6
-   $ python2.7 --version
-   Python 2.7.6
-   $ python3.3 --version
-   Python 3.3.3
-
-or, if you prefer 3.3.3 over 2.7.6,
-
-::
-
-   $ pyenv global 3.3.3 2.7.6
-   $ pyenv versions
-     system
-   * 2.7.6 (set by /Users/yyuu/.pyenv/version)
-   * 3.3.3 (set by /Users/yyuu/.pyenv/version)
-     venv27
-   $ python --version
-   Python 3.3.3
-   $ python2.7 --version
-   Python 2.7.6
-   $ python3.3 --version
-   Python 3.3.3
-
-pyenv shell
------------
-
-Sets a shell-specific Python version by setting the :envvar:`PYENV_VERSION`
-environment variable in your shell. This version overrides
-application-specific versions and the global version.
-
-::
-
-   $ pyenv shell pypy-2.2.1
-
-When run without a version number, :command:`pyenv shell` reports the current
-value of :envvar:`PYENV_VERSION`. You can also unset the shell version::
-
-   $ pyenv shell --unset
-
-Note that you'll need pyenv's shell integration enabled (step 3 of the
-installation instructions) in order to use this command. If you prefer
-not to use shell integration, you may simply set the :envvar:`PYENV_VERSION`
-variable yourself::
-
-   $ export PYENV_VERSION=pypy-2.2.1
-
-You can specify multiple versions via :envvar:`PYENV_VERSION` at once.
-
-Let's say if you have two versions of 2.7.6 and 3.3.3. If you prefer
-2.7.6 over 3.3.3,
-
-::
-
-   $ pyenv shell 2.7.6 3.3.3
-   $ pyenv versions
-     system
-   * 2.7.6 (set by PYENV_VERSION environment variable)
-   * 3.3.3 (set by PYENV_VERSION environment variable)
-   $ python --version
-   Python 2.7.6
-   $ python2.7 --version
-   Python 2.7.6
-   $ python3.3 --version
-   Python 3.3.3
-
-or, if you prefer 3.3.3 over 2.7.6,
-
-::
-
-   $ pyenv shell 3.3.3 2.7.6
-   $ pyenv versions
-     system
-   * 2.7.6 (set by PYENV_VERSION environment variable)
-   * 3.3.3 (set by PYENV_VERSION environment variable)
-     venv27
-   $ python --version
-   Python 3.3.3
-   $ python2.7 --version
-   Python 2.7.6
-   $ python3.3 --version
-   Python 3.3.3
-
-pyenv install
--------------
-
-Install a Python version
-
-.. program:: pyenv install
-
-.. option:: -f, --force
-
-   Install even if the version appears to be installed already
-
-.. option:: -l, --list
-
-   List all available versions
-
-.. option:: -s, --skip-existing
-
-   Skip if the version appears to be installed already
-
-Python build options:
-
-.. option:: -k, --keep
-
-   Keep source tree in :envvar:`PYENV_BUILD_ROOT` after installation
-   (defaults to :file:`$PYENV_ROOT/sources`)
-
-.. option:: -p, --patch
-
-   Apply a patch from stdin before building
-
-.. option:: -v, --verbose
-
-   Verbose mode: print compilation status to stdout
-
-.. option:: --version
-
-   Show version of python-build
-
-.. option:: -g, --debug
-
-   Build a debug version
-
-.. option:: <version>...
-
-   The Python version to install
-
-.. option:: <definition-file>
-
-   A definition file TODO
-
-
-::
-
-   Usage: pyenv install [-f] [-kvp] <version>
-          pyenv install [-f] [-kvp] <definition-file>
-          pyenv install -l|--list
-
-     -l, --list             List all available versions
-     -f, --force            Install even if the version appears to be installed 
-     					already
-     -s, --skip-existing    Skip the installation if the version appears to be
-     					installed already
-
-     python-build options:
-
-     -k, --keep        Keep source tree in $PYENV_BUILD_ROOT after installation
-                       (defaults to $PYENV_ROOT/sources)
-     -v, --verbose     Verbose mode: print compilation status to stdout
-     -p, --patch       Apply a patch from stdin before building
-     -g, --debug       Build a debug version
-
-To list the all available versions of Python, including Anaconda,
-Jython, pypy, and stackless, use::
-
-   $ pyenv install --list
-
-Then install the desired versions::
-
-   $ pyenv install 2.7.6
-   $ pyenv install 2.6.8
-   $ pyenv versions
-     system
-     2.6.8
-   * 2.7.6 (set by /home/yyuu/.pyenv/version)
-
-pyenv uninstall
----------------
-
-Uninstall Python versions.
-
-::
-
-   Usage: pyenv uninstall [-f|--force] <version> ...
-
-      -f  Attempt to remove the specified version without prompting
-          for confirmation. If the version does not exist, do not
-          display an error message.
-
-pyenv rehash
-------------
-
-Installs shims for all Python binaries known to pyenv (i.e.,
-:file:`~/.pyenv/versions/*/bin/*`). Run this command after you install a
-new version of Python, or install a package that provides binaries.
-
-::
-
-   $ pyenv rehash
-
-pyenv version
--------------
-
-Displays the currently active Python version, along with information on
-how it was set.
-
-::
-
-   $ pyenv version
-   2.7.6 (set by /home/yyuu/.pyenv/version)
-
-pyenv versions
---------------
-
-Lists all Python versions known to pyenv, and shows an asterisk next to
-the currently active version.
-
-::
-
-   $ pyenv versions
-     2.5.6
-     2.6.8
-   * 2.7.6 (set by /home/yyuu/.pyenv/version)
-     3.3.3
-     jython-2.5.3
-     pypy-2.2.1
-
-pyenv which
------------
-
-Displays the full path to the executable that pyenv will invoke when you
-run the given command.
-
-::
-
-   $ pyenv which python3.3
-   /home/yyuu/.pyenv/versions/3.3.3/bin/python3.3
-
-pyenv whence
-------------
-
-Lists all Python versions with the given command installed.
-
-::
-
-   $ pyenv whence 2to3
-   2.6.8
-   2.7.6
-   3.3.3
-
-
-Environment variables
-=====================
-
-You can affect how pyenv operates with the following settings:
-
-:envvar:`PYENV_VERSION`
-   Specifies the Python version to be used. Also see :command:`pyenv shell`
-
-:envvar:`PYENV_ROOT` (:file:`~/.pyenv`)
-   Defines the directory under which Python versions and shims reside.
-   Also see :command:`pyenv root`
-
-:envvar:`PYENV_DEBUG`
-   | Outputs debug information.
-   | Also as: **pyenv --debug <subcommand>**
-
-:envvar:`PYENV_HOOK_PATH`
-   Colon-separated list of paths searched for pyenv hooks.
-
-:envvar:`PYENV_DIR ($PWD)`
-   Directory to start searching for :file:`.python-version` files.
-
-:envvar:`HTTP_PROXY`, :envvar:`HTTPS_PROXY`
-   Proxy Variables
-
-:envvar:`CONFIGURE_OPTS`
-   Pass configure options to build.
-
-:envvar:`PYTHON_BUILD_ARIA2_OPTS`
-   Used to pass additional parameters to `aria2
-   <https://aria2.github.io/>`__ If the :command:`aria2c` binary is available
-   on :envvar:`PATH`, pyenv uses :command:`aria2c` instead of :command:`curl`
-   or :command:`wget` to
-   download the Python source code. If you have an unstable internet
-   connection, you can use this variable to instruct :program:`aria2` to
-   accelerate the download. In most cases, you will only need to use
-   **-x 10 -k 1M** as value to :envvar:`PYTHON_BUILD_ARIA2_OPTS` environment
-   variable
+.. toctree::
+    :maxdepth: 1
+    :caption: References
+
+    command-reference
+    environment-reference
 
 
 License
