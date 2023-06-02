@@ -13,8 +13,8 @@ You can affect how pyenv operates with the following settings:
    See also :command:`pyenv root`
 
 :envvar:`PYENV_DEBUG`
-   | Outputs debug information.
-   | Also as: :command:`pyenv --debug <subcommand>`
+   Outputs debug information.
+   Also as: :command:`pyenv --debug <SUBCOMMAND>`
 
 :envvar:`PYENV_HOOK_PATH`
    Colon-separated list of paths searched for pyenv hooks.
@@ -36,5 +36,5 @@ You can affect how pyenv operates with the following settings:
    download the Python source code. If you have an unstable internet
    connection, you can use this variable to instruct :program:`aria2` to
    accelerate the download. In most cases, you will only need to use
-   **-x 10 -k 1M** as value to :envvar:`PYTHON_BUILD_ARIA2_OPTS` environment
+   ``-x 10 -k 1M`` as value to :envvar:`PYTHON_BUILD_ARIA2_OPTS` environment
    variable

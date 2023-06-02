@@ -61,9 +61,9 @@ To start using pyenv
 3. **Install Python versions into $(pyenv root)/versions**.
    For example, to download and install Python 3.6.12, run:
 
-   .. code:: bash
+   .. code:: shell-session
 
-      pyenv install 3.6.12
+      $ pyenv install 3.6.12
 
 .. note::
 
@@ -359,9 +359,11 @@ opposed to this idea. Here's what :command:`pyenv init` actually does:
    for some reason you need :program:`pyenv` to be a real script rather than a
    shell function, you can safely skip it.
 
-To see exactly what happens under the hood for yourself, run::
+To see exactly what happens under the hood for yourself, run:
 
-   pyenv init -
+.. code:: shell-session
+
+   $ pyenv init -
 
 
 Uninstalling Python Versions
@@ -374,10 +376,12 @@ the removal process.
 
 Alternatively, simply :command:`rm -rf` the directory of the version you want
 to remove. You can find the directory of a particular Python version
-with the :command:`pyenv prefix` command, for example::
+with the :command:`pyenv prefix` command, for example:
 
-   pyenv prefix 2.6.8
+.. code:: shell-session
 
+   $ pyenv prefix 2.6.8
+   /home/yyuu/.pyenv/versions/2.6.8
 
 .. toctree::
     :maxdepth: 1
