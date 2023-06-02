@@ -1,7 +1,8 @@
 :orphan:
 
+###############
 pyenv |version|
-===============
+###############
 
 :program:`pyenv` - Simple Python version management
 
@@ -167,7 +168,7 @@ full documentation, see :ref:`command-ref` section.
 
 
 Options
-=======
+-------
 
 .. program:: pyenv
 .. option:: -h, --help
@@ -180,7 +181,7 @@ Options
 
 
 Comparison
-==========
+----------
 
 :program:`pyenv` does...:
 
@@ -208,7 +209,7 @@ In contrast with :program:`pythonbrew` and :program:`pythonz`,
 
 
 How It Works
-============
+------------
 
 At a high level, pyenv intercepts Python commands using shim executables
 injected into your :envvar:`PATH`, determines which Python version has been
@@ -217,7 +218,7 @@ correct Python installation.
 
 
 Understanding PATH
-------------------
+^^^^^^^^^^^^^^^^^^
 
 When you run a command like :command:`python` or :command:`pip`, your
 operating system searches through a list of directories to find an
@@ -234,7 +235,7 @@ directory will be searched first, then :file:`/usr/bin`, then :file:`/bin`.
 
 
 Understanding Shims
--------------------
+^^^^^^^^^^^^^^^^^^^
 
 pyenv works by inserting a directory of *shims* at the front of your
 :envvar:`PATH`::
@@ -259,7 +260,7 @@ operating system will do the following:
 
 
 Choosing the Python Version
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When you execute a shim, pyenv determines which Python version to use by
 reading it from the following sources, in this order:
@@ -299,7 +300,7 @@ whitespace.
 
 
 Locating the Python Installation
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Once pyenv has determined which version of Python your application has
 specified, it passes the command along to the corresponding Python
@@ -322,7 +323,7 @@ in :file:`$(pyenv root)/versions`.
 
 
 Managing Virtual Environments
------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 There is a pyenv plugin named ``pyenv-virtualenv`` which comes with various
 features to help pyenv users to manage virtual environments created by
@@ -334,7 +335,7 @@ you have some plan to play with those virtual environments.
 
 
 Advanced Configuration
-======================
+----------------------
 
 Skip this section unless you must know what every line in your shell
 profile is doing.
@@ -364,7 +365,7 @@ To see exactly what happens under the hood for yourself, run::
 
 
 Uninstalling Python Versions
-============================
+----------------------------
 
 As time goes on, you will accumulate Python versions in your :file:`$(pyenv root)/versions` directory.
 
@@ -387,6 +388,6 @@ with the :command:`pyenv prefix` command, for example::
 
 
 License
-=======
+-------
 
 The MIT License
