@@ -19,6 +19,8 @@ Options
 
 .. program:: pyenv prefix
 
+not available
+
 
 Description
 -----------

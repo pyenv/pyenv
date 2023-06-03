@@ -18,7 +18,6 @@ Options
 -------
 
 .. program:: pyenv shell
-
 .. option:: --unset
 
     Unsets the current shell version from :envvar:`PYENV_VERSION`.

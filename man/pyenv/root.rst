@@ -19,10 +19,15 @@ Options
 
 .. program:: pyenv root
 
+not available
+
 
 Description
 -----------
 
-TODO
+.. code-block:: shell-session
+
+    $ pyenv root
+    /home/yyuu/.pyenv
 
 

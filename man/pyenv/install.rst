@@ -20,7 +20,6 @@ Options
 -------
 
 .. program:: pyenv install
-
 .. option:: -l, --list
 
     List all available versions.

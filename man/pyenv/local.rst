@@ -11,7 +11,7 @@ Synopsis
 
 .. code-block:: shell
 
-    pyenv local <VERSION> <VERSION2>...
+    pyenv local [--unset] <VERSION> <VERSION2>...
 
 
 Options

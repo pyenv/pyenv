@@ -18,12 +18,11 @@ Options
 -------
 
 .. program:: pyenv exec
-
 .. option:: COMMAND
 
     The command to execute.
 
-.. option:: arg1, arg2
+.. option:: arg1
 
     The arguments to pass to command.
 
@@ -34,7 +33,7 @@ Description
 Runs an executable by first preparing PATH so that the selected Python
 version's :file:`bin` directory is at the front.
 
-For example, if the currently selected Python version is 2.7.6:
+For example, if the currently selected Python version is 3.7.16:
 
 .. code-block:: shell-session
 
@@ -44,4 +43,4 @@ is equivalent to:
 
 .. code-block:: shell-session
 
-    PATH="$PYENV_ROOT/versions/2.7.6/bin:$PATH" pip install -r requirements.txt
+    $ PATH="$PYENV_ROOT/versions/3.7.16/bin:$PATH" pip install -r requirements.txt

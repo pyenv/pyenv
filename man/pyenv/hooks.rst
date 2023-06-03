@@ -18,7 +18,6 @@ Options
 -------
 
 .. program:: pyenv hooks
-
 .. option:: COMMAND
 
     The command to list hook scripts

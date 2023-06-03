@@ -18,8 +18,7 @@ Options
 -------
 
 .. program:: pyenv global
-
-.. option:: <VERSION>
+.. option:: VERSION
 
     The version to install. Can be specified multiple times
     and should be a version tag known to pyenv.
@@ -40,7 +39,7 @@ environment variable.
 To enable the python2.7 and python3.7 shims to find their
 respective executables you could set both versions with:
 
-.. code-block:: shell
+.. code-block:: shell-session
 
-    pyenv global 3.7.0 2.7.15
+    $ pyenv global 3.7.0 2.7.15
 

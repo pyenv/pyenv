@@ -18,7 +18,6 @@ Options
 -------
 
 .. program:: pyenv help
-
 .. option:: --usage
 
     Shows only the usage (synopsis) of the command.
