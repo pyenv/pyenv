@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.3.19
+
+* Add CPython 3.7.17, 3.8.17 and 3.9.17 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2711
+* Add CPython 3.11.4 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2715
+* Add CPython 3.10.12 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2714
+* Add CPython 3.12.0b2 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2713
+
 ## Release 2.3.18
 
 * Fix not showing symlink contents for unselected versions in `pyenv versions` by @native-api in https://github.com/pyenv/pyenv/pull/2675
