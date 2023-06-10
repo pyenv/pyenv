@@ -1,6 +1,6 @@
-From c7302116573d853d3181133477d9d0e4d4d3abfd Mon Sep 17 00:00:00 2001
-From: Ned Deily <nad@python.org>
-Date: Tue, 18 Jun 2019 16:28:13 -0400
+From 2ad0bb719f5ce416d3bfa366814ebcf3b654f081 Mon Sep 17 00:00:00 2001
+From: Ivan Pozdeev <vano@mail.mipt.ru>
+Date: Sat, 10 Jun 2023 20:17:25 +0300
 Subject: [PATCH] bpo-36231:  Support building on macOS without /usr/include
  (GH-13773) (GH-14208)
 
@@ -20,12 +20,12 @@ index 0000000000..c82e54c12c
 +10.14, system header files are only available within an SDK provided by
 +either the Command Line Tools or the Xcode app.
 diff --git a/setup.py b/setup.py
-index bcc4bfa89d..5e0cd02430 100644
+index ab8065866f..28dc801845 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -90,18 +90,57 @@ def sysroot_paths(make_vars, subdirs):
-                 break
-     return dirs
+@@ -60,18 +60,57 @@ def add_dir_to_list(dirlist, dir):
+             return
+     dirlist.insert(0, dir)
  
 +MACOS_SDK_ROOT = None
 +
@@ -86,8 +86,8 @@ index bcc4bfa89d..5e0cd02430 100644
 +
 +    return MACOS_SDK_ROOT
  
- def is_macosx_sdk_path(path):
-     """
+ def is_macosx_at_least(vers):
+     if host_platform == 'darwin':
 -- 
-2.30.1 (Apple Git-130)
+2.36.1.windows.1
 
