@@ -1,0 +1,28 @@
+From 3cc28dc409d0db3752278379e7a8d4c23e0f2e29 Mon Sep 17 00:00:00 2001
+From: Ronald Oussoren <ronaldoussoren@mac.com>
+Date: Sat, 14 Nov 2020 16:07:47 +0100
+Subject: [PATCH] bpo-42351: Avoid error when opening header with non-UTF8
+ encoding (GH-23279)
+
+grep_headers_for() would error out when a header contained
+text that cannot be interpreted as UTF-8.
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 28dc801845..dd50485213 100644
+--- a/setup.py
++++ b/setup.py
+@@ -129,7 +129,7 @@ def is_macosx_sdk_path(path):
+ 
+ def grep_headers_for(function, headers):
+     for header in headers:
+-        with open(header, 'r') as f:
++        with open(header, 'r', errors='surrogateescape') as f:
+             if function in f.read():
+                 return True
+     return False
+-- 
+2.36.1.windows.1
+
