@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.3.20
+
+* Backport bpo-42351 to 3.5.10 by @native-api in https://github.com/pyenv/pyenv/pull/2717
+* Add missing patches for Python 3.7/3.8/3.9 by @tomkins in https://github.com/pyenv/pyenv/pull/2718
+
 ## Release v2.3.19
 
 * Add CPython 3.7.17, 3.8.17 and 3.9.17 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2711
