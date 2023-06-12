@@ -80,12 +80,12 @@ Deprecation policy
 
 We do not provide official support for EOL releases and environments or otherwise provide any kind of extended support for old Python releases.
 
-We do however accept fixes from interested parties that would allow running older, including EOL, releases in newer environments.
+We do however accept fixes from interested parties that would allow running older, including EOL, releases in environments that they do not officially support.
 In addition to the above requirements for release-specific fixes,
 
 * Such a fix must not add maintenance burden (e.g. add new logic to `python-build` that has to be kept there indefinitely)
   * Unless the added logic is useful for both EOL and non-EOL releases. In this case, it will be considered as being primarily an improvement for non-EOL releases.
-* Support is provided on a "best effort" basis: we do not maintain these fixes but won't actively break them, either, and accept any corrections.
+* Support is provided on a "best effort" basis: we do not actively maintain these fixes but won't actively break them, either, and will accept any corrections.
   Since old releases never change, it's pretty safe to assume that the fixes will continue to work until a later version
   of an environment introduces further incompatible changes.
 
