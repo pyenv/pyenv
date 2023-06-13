@@ -557,10 +557,18 @@ uninstall from the system.
   its root directory. This will **delete all Python versions** that were
   installed under the `` $(pyenv root)/versions/ `` directory:
 
-    ```sh
-    rm -rf $(pyenv root)
-    ```
+    - For **shell**
 
+      ```sh
+      rm -rf $(pyenv root)
+      ```
+
+    - For **Fish shell**:
+
+      ~~~ fish
+      rm -rf $PYENV_ROOT
+      ~~~
+    
     If you've installed Pyenv using a package manager, as a final step,
     perform the Pyenv package removal. For instance, for Homebrew:
 
