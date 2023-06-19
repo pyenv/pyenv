@@ -36,7 +36,7 @@ IFS=$'\n'
         DEFINITION_CANDIDATES=( $(python-build --definitions ) )
     fi
     
-    if printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | grep -qxFe "$prefix"; then
+    if printf '%s\n' "${DEFINITION_CANDIDATES[@]}" 2>/dev/null | grep -qxFe "$prefix"; then
         echo "$prefix"
         exit $exitcode;
     fi
