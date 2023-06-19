@@ -557,7 +557,7 @@ uninstall from the system.
   its root directory. This will **delete all Python versions** that were
   installed under the `` $(pyenv root)/versions/ `` directory:
 
-    - For **shell**
+    - For **Bash/Zsh**:
 
       ```sh
       rm -rf $(pyenv root)
@@ -566,7 +566,7 @@ uninstall from the system.
     - For **Fish shell**:
 
       ~~~ fish
-      rm -rf $PYENV_ROOT
+      rm -rf (pyenv root)
       ~~~
     
     If you've installed Pyenv using a package manager, as a final step,
