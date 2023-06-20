@@ -1,5 +1,11 @@
 # Version History
 
+## Release v2.3.21
+
+* Add graalpy-23.0.0 by @msimacek in https://github.com/pyenv/pyenv/pull/2724
+* Add PyPy 7.3.12 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2726
+* Fix occasional 'libexec/pyenv-latest: line 39: printf: write error: Broken pipe' by @native-api in https://github.com/pyenv/pyenv/pull/2729
+
 ## Release v2.3.20
 
 * Backport bpo-42351 to 3.5.10 by @native-api in https://github.com/pyenv/pyenv/pull/2717
