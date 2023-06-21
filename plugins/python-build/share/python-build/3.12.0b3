@@ -3,7 +3,7 @@ export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
 install_package "openssl-1.1.1s" "https://www.openssl.org/source/openssl-1.1.1s.tar.gz#c5ac01e760ee6ff0dab61d6b2bbd30146724d063eb322180c6f18a6f74e4b6aa" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.2" "https://ftpmirror.gnu.org/readline/readline-8.2.tar.gz#3feb7171f16a84ee82ca18a36d7b9be109a52c04f492a053331d7d1095007c35" mac_readline --if has_broken_mac_readline
 if has_tar_xz_support; then
-    install_package "Python-3.12.0b2" "https://www.python.org/ftp/python/3.12.0/Python-3.12.0b2.tar.xz#8dfc42dda6e4d0647cf8a6f7cd900704dea9fd866402a282829bd2e6e271b818" standard verify_py312 copy_python_gdb ensurepip
+    install_package "Python-3.12.0b3" "https://www.python.org/ftp/python/3.12.0/Python-3.12.0b3.tar.xz#9160c6065e9885b37c2e57865d0bb27fc7e54aaa9c186c761da30d2bddbcc9ee" standard verify_py312 copy_python_gdb ensurepip
 else
-    install_package "Python-3.12.0b2" "https://www.python.org/ftp/python/3.12.0/Python-3.12.0b2.tgz#ad5f0d88824de3240928433efe427ce8aeb0f88928eb3f44e43647000cce599b" standard verify_py312 copy_python_gdb ensurepip
+    install_package "Python-3.12.0b3" "https://www.python.org/ftp/python/3.12.0/Python-3.12.0b3.tgz#ef50ddb9e55d7ac25f8fa2130e6cc52247556167c5be51081fe2c7c1a67476f4" standard verify_py312 copy_python_gdb ensurepip
 fi
