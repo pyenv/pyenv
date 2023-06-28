@@ -1,0 +1,30 @@
+diff --git a/configure b/configure
+index 5c74f00a..8bb51f40 100755
+--- a/configure
++++ b/configure
+@@ -7057,8 +7057,8 @@ $as_echo "$ac_cv_extra_warnings" >&6; }
+ 
+     if test $ac_cv_extra_warnings = yes
+     then
+-      CFLAGS_NODIST="$CFLAGS_NODIST -Wextra -Werror"
+-      CXXFLAGS_NODIST="$CXXFLAGS_NODIST -Wextra -Werror -Wno-implicit-fallthrough"
++      CFLAGS_NODIST="$CFLAGS_NODIST -Wextra"
++      CXXFLAGS_NODIST="$CXXFLAGS_NODIST -Wextra -Wno-implicit-fallthrough"
+     fi
+ 
+     # Python doesn't violate C99 aliasing rules, but older versions of
+diff --git a/configure.ac b/configure.ac
+index c06b992d..6dee6632 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1622,8 +1622,8 @@ yes)
+ 
+     if test $ac_cv_extra_warnings = yes
+     then
+-      CFLAGS_NODIST="$CFLAGS_NODIST -Wextra -Werror"
+-      CXXFLAGS_NODIST="$CXXFLAGS_NODIST -Wextra -Werror -Wno-implicit-fallthrough"
++      CFLAGS_NODIST="$CFLAGS_NODIST -Wextra"
++      CXXFLAGS_NODIST="$CXXFLAGS_NODIST -Wextra -Wno-implicit-fallthrough"
+     fi
+ 
+     # Python doesn't violate C99 aliasing rules, but older versions of
