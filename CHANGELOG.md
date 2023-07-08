@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.3.22
+
+* Add CPython 3.12.0b3 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2730
+* Add Cinder 3.10 and Cinder configure patches by @filips123 in https://github.com/pyenv/pyenv/pull/2739
+
 ## Release v2.3.21
 
 * Add graalpy-23.0.0 by @msimacek in https://github.com/pyenv/pyenv/pull/2724
