@@ -289,7 +289,7 @@ def get_existing_condas(name):
                 logger.debug("Found existing %(name)s version %(v)s", locals())
                 yield v
         except ValueError:
-            pass
+            logger.error("Unable to parse existing version %s", entry_name)
 
 
 def get_available_condas(name, repo):
