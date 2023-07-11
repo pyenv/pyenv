@@ -1,0 +1,28 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Miniconda3-py39_23.3.1-0-Linux-aarch64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_23.3.1-0-Linux-aarch64.sh#e93ccab720b57f821e0d758f54e9aee9bd2f0ea931ebb26b78d866704437a296" "miniconda" verify_py39
+  ;;
+"Linux-ppc64le" )
+  install_script "Miniconda3-py39_23.3.1-0-Linux-ppc64le" "https://repo.anaconda.com/miniconda/Miniconda3-py39_23.3.1-0-Linux-ppc64le.sh#d2bcef86812863adaf11fcda6df829aa508760cbde4a19174cf0fec03e8498f5" "miniconda" verify_py39
+  ;;
+"Linux-s390x" )
+  install_script "Miniconda3-py39_23.3.1-0-Linux-s390x" "https://repo.anaconda.com/miniconda/Miniconda3-py39_23.3.1-0-Linux-s390x.sh#d0b658566edd239dd50fc28ab1d3a57b8b0da707481b3b18c27d11273c4fdb5a" "miniconda" verify_py39
+  ;;
+"Linux-x86_64" )
+  install_script "Miniconda3-py39_23.3.1-0-Linux-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_23.3.1-0-Linux-x86_64.sh#1564571a6a06a9999a75a6c65d63cb82911fc647e96ba5b729f904bf00c177d3" "miniconda" verify_py39
+  ;;
+"MacOSX-arm64" )
+  install_script "Miniconda3-py39_23.3.1-0-MacOSX-arm64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_23.3.1-0-MacOSX-arm64.sh#c74474bab188b8b3dcaf0f0ca52f5e0743591dbe171766016023d052acf96502" "miniconda" verify_py39
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniconda3-py39_23.3.1-0-MacOSX-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py39_23.3.1-0-MacOSX-x86_64.sh#54d739715feb0cd5c127865215cc9f50697709d71e9ee7da430576c5a1c8010d" "miniconda" verify_py39
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
