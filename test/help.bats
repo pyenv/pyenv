@@ -71,6 +71,18 @@ SH
   assert_success "Usage: rbenv hello <world>"
 }
 
+@test "empty usage section" {
+  mkdir -p "${RBENV_TEST_DIR}/bin"
+  cat > "${RBENV_TEST_DIR}/bin/rbenv-hello" <<SH
+#!shebang
+# Summary: Says "hello" to you, from rbenv
+echo hello
+SH
+
+  run rbenv-help --usage hello
+  assert_success "Usage: rbenv hello"
+}
+
 @test "multiline usage section" {
   mkdir -p "${RBENV_TEST_DIR}/bin"
   cat > "${RBENV_TEST_DIR}/bin/rbenv-hello" <<SH

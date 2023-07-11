@@ -144,7 +144,11 @@ print_usage() {
   local command="$1"
   local summary usage help
   eval "$(documentation_for "$command")"
-  [ -z "$usage" ] || echo "$usage"
+  if [ -n "$usage" ]; then
+    echo "$usage"
+  else
+    echo "Usage: rbenv ${command}"
+  fi
 }
 
 unset usage
