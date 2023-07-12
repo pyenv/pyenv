@@ -109,6 +109,7 @@ class PyVersion(StrEnum):
     PY38 = "py38"
     PY39 = "py39"
     PY310 = "py310"
+    PY311 = "py311"
 
     def version(self):
         first, *others = self.value[2:]
@@ -150,20 +151,23 @@ class CondaVersion(NamedTuple):
         """
         Convert a string of the form "miniconda_n-ver" or "miniconda_n-py_ver-ver" to a :class:`CondaVersion` object.
         """
-        components = s.split("-")
-        if len(components) == 3:
-            miniconda_n, py_ver, ver = components
-            py_ver = PyVersion(f"py{py_ver.replace('.', '')}")
-        else:
-            miniconda_n, ver = components
-            py_ver = None
-
+        miniconda_n, _, remainder = s.partition("-")
         suffix = miniconda_n[-1]
         if suffix in string.digits:
             flavor = miniconda_n[:-1]
         else:
             flavor = miniconda_n
             suffix = ""
+
+        components = remainder.split("-")
+        if flavor == Flavor.MINICONDA and len(components) >= 2:
+            py_ver, *ver_parts = components
+            py_ver = PyVersion(f"py{py_ver.replace('.', '')}")
+            ver = "-".join(ver_parts)
+        else:
+            ver = "-".join(components)
+            py_ver = None
+
         return CondaVersion(Flavor(flavor), Suffix(suffix), VersionStr(ver), py_ver)
 
     def to_filename(self):
@@ -289,7 +293,7 @@ def get_existing_condas(name):
                 logger.debug("Found existing %(name)s version %(v)s", locals())
                 yield v
         except ValueError:
-            pass
+            logger.error("Unable to parse existing version %s", entry_name)
 
 
 def get_available_condas(name, repo):
