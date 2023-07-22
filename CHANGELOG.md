@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.3.23
+
+* Add CPython 3.12.0b4 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2741
+* Add new anaconda and miniconda definitions by @aphedges in https://github.com/pyenv/pyenv/pull/2742
+
 ## Release v2.3.22
 
 * Add CPython 3.12.0b3 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2730
