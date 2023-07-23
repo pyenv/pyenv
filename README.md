@@ -44,10 +44,11 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Locating Pyenv-provided Python Installations](#locating-pyenv-provided-python-installations)
 * **[Installation](#installation)**
   * [Getting Pyenv](#getting-pyenv)
-    * [Homebrew in macOS](#homebrew-in-macos)
+    * [UNIX/MacOS](#unixmacos)
+      * [Homebrew in macOS](#homebrew-in-macos)
+      * [Automatic installer](#automatic-installer)
+      * [Basic GitHub Checkout](#basic-github-checkout)
     * [Windows](#windows)
-    * [Automatic installer](#automatic-installer)
-    * [Basic GitHub Checkout](#basic-github-checkout)
   * [Set up your shell environment for Pyenv](#set-up-your-shell-environment-for-pyenv)
   * [Restart your shell](#restart-your-shell)
   * [Install Python build dependencies](#install-python-build-dependencies)
@@ -200,7 +201,6 @@ As far as Pyenv is concerned, version names are simply directories under
 ## Installation
 
 ### Getting Pyenv
-
 #### UNIX/MacOS
 ##### Homebrew in macOS
 
