@@ -1420,7 +1420,7 @@ use_freebsd_pkg() {
   # check if FreeBSD
   if [ "FreeBSD" = "$(uname -s)" ]; then
     # use openssl if installed from Ports Collection
-    if [ -f /usr/local/include/openssl/ssl.h ]; then
+    if pkg info -e openssl; then
       package_option python configure --with-openssl="/usr/local"
     fi
 
