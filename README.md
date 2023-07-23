@@ -200,7 +200,9 @@ As far as Pyenv is concerned, version names are simply directories under
 ## Installation
 
 ### Getting Pyenv
-#### Homebrew in macOS
+
+#### UNIX/MacOS
+##### Homebrew in macOS
 
    1. Consider installing with [Homebrew](https://brew.sh):
       ```sh
@@ -234,19 +236,7 @@ As far as Pyenv is concerned, version names are simply directories under
         ~~~
 
 
-#### Windows
-
-Pyenv does not officially support Windows and does not work in Windows outside
-the Windows Subsystem for Linux.
-Moreover, even there, the Pythons it installs are not native Windows versions
-but rather Linux versions running in a virtual machine --
-so you won't get Windows-specific functionality.
-
-If you're in Windows, we recommend using @kirankotari's [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) fork --
-which does install native Windows Python versions.
-
-
-#### Automatic installer (for UNIX systems)
+##### Automatic installer
 
 `curl https://pyenv.run | bash`
 
@@ -254,7 +244,7 @@ For more details visit our other project:
 https://github.com/pyenv/pyenv-installer
 
 
-#### Basic GitHub Checkout
+##### Basic GitHub Checkout
 
 This will get you going with the latest version of Pyenv and make it
 easy to fork and contribute any changes back upstream.
@@ -269,6 +259,18 @@ easy to fork and contribute any changes back upstream.
     ```
     cd ~/.pyenv && src/configure && make -C src
     ```
+
+#### Windows
+
+Pyenv does not officially support Windows and does not work in Windows outside
+the Windows Subsystem for Linux.
+Moreover, even there, the Pythons it installs are not native Windows versions
+but rather Linux versions running in a virtual machine --
+so you won't get Windows-specific functionality.
+
+If you're in Windows, we recommend using @kirankotari's [`pyenv-win`](https://github.com/pyenv-win/pyenv-win) fork --
+which does install native Windows Python versions.
+
 
 ### Set up your shell environment for Pyenv
 
