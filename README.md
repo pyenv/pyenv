@@ -246,7 +246,7 @@ If you're in Windows, we recommend using @kirankotari's [`pyenv-win`](https://gi
 which does install native Windows Python versions.
 
 
-#### Automatic installer
+#### Automatic installer (for UNIX systems)
 
 `curl https://pyenv.run | bash`
 
