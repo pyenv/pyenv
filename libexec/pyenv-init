@@ -281,7 +281,14 @@ function print_env() {
 function print_completion() {
   completion="${root}/completions/pyenv.${shell}"
   if [ -r "$completion" ]; then
-    echo "source '$completion'"
+    case "$shell" in
+    pwsh )
+      echo "iex (gc $completion -Raw)"
+      ;;
+    * )
+      echo "source '$completion'"
+      ;;
+    esac
   fi
 }
 
@@ -292,7 +299,7 @@ function print_rehash() {
       echo '& pyenv rehash 2>/dev/null'
       ;;
     * )
-    echo 'command pyenv rehash 2>/dev/null'
+      echo 'command pyenv rehash 2>/dev/null'
       ;;
     esac
   fi
@@ -348,7 +355,7 @@ pyenv() {
 EOS
     ;;
   esac
-
+  
   if [ "$shell" != "fish" ] && [ "$shell" != "pwsh" ]; then
     IFS="|"
     cat <<EOS
