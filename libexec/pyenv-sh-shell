@@ -48,6 +48,9 @@ if [ "$versions" = "--unset" ]; then
     echo 'set -gu PYENV_VERSION_OLD "$PYENV_VERSION"'
     echo "set -e PYENV_VERSION"
     ;;
+  pwsh )
+    echo '$Env:PYENV_VERSION, $Env:PYENV_VERSION_OLD = $null, $Env:PYENV_VERSION'
+    ;;
   * )
     echo 'PYENV_VERSION_OLD="${PYENV_VERSION-}"'
     echo "unset PYENV_VERSION"
@@ -74,6 +77,16 @@ else
   echo "pyenv: PYENV_VERSION_OLD is not set" >&2
   false
 end
+EOS
+    ;;
+  pwsh )
+    cat <<EOS
+if ( Get-Item -Path Env:\PYENV_VERSION* ) {
+  \$Env:PYENV_VERSION, \$Env:PYENV_VERSION_OLD = \$Env:PYENV_VERSION_OLD, \$Env:PYENV_VERSION
+} else {
+  Write-Error "pyenv: Env:PYENV_VERSION_OLD is not set"
+  return \$false
+} 
 EOS
     ;;
   * )
@@ -108,6 +121,9 @@ if pyenv-prefix "${versions[@]}" >/dev/null; then
     fish )
       echo 'set -gu PYENV_VERSION_OLD "$PYENV_VERSION"'
       echo "set -gx PYENV_VERSION \"$version\""
+      ;;
+    pwsh )
+      echo '$Env:PYENV_VERSION, $Env:PYENV_VERSION_OLD = "'"${version}"'", $Env:PYENV_VERSION'
       ;;
     * )
       echo 'PYENV_VERSION_OLD="${PYENV_VERSION-}"'

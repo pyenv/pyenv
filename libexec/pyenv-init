@@ -15,6 +15,7 @@ if [ "$1" = "--complete" ]; then
   echo bash
   echo fish
   echo ksh
+  echo pwsh
   echo zsh
   exit
 fi
@@ -105,6 +106,10 @@ function detect_profile() {
     profile_explain="~/.bash_profile if it exists, otherwise ~/.profile"
     rc='~/.bashrc'
     ;;
+  pwsh )
+    profile='~/.config/powershell/profile.ps1'
+    rc='~/.config/powershell/profile.ps1'
+    ;;
   zsh )
     profile='~/.zprofile'
     rc='~/.zshrc'
@@ -153,6 +158,21 @@ function help_() {
       echo 'pyenv init - | source'
       echo
       ;;
+    pwsh )
+      echo '# Load pyenv automatically by appending'
+      echo -n "# the following to "
+      if [ "$profile" == "$rc" ]; then
+        echo "$profile :"
+      else
+        echo
+        echo "${profile_explain:-$profile} (for login shells)"
+        echo "and $rc (for interactive shells) :"
+      fi
+      echo
+      echo '$Env:PYENV_ROOT="$HOME/.pyenv"'
+      echo '$Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH"'
+      echo 'iex ((pyenv init -) -join "`n")'
+      ;;
     * )
       echo '# Load pyenv automatically by appending'
       echo -n "# the following to "
@@ -189,6 +209,11 @@ function print_path() {
           print_path_prepend_shims
           echo 'end'
           ;;
+      pwsh )
+          echo 'if ( $Env:PATH -match "'"${PYENV_ROOT}/shims"'" ) {'
+          print_path_prepend_shims
+          echo '}'
+          ;;
       * )
           echo 'if [[ ":$PATH:" != *'\':"${PYENV_ROOT}"/shims:\''* ]]; then'
           print_path_prepend_shims
@@ -200,6 +225,10 @@ function print_path() {
       fish )
         echo 'while set pyenv_index (contains -i -- "'"${PYENV_ROOT}/shims"'" $PATH)'
         echo 'set -eg PATH[$pyenv_index]; end; set -e pyenv_index'
+        print_path_prepend_shims
+        ;;
+      pwsh )
+        echo '$Env:PATH="$(($Env:PATH -split '"':'"' | where { -not ($_ -match '"'${PYENV_ROOT}/shims'"') }) -join '"':'"')"'
         print_path_prepend_shims
         ;;
       * )
@@ -226,6 +255,9 @@ function print_path_prepend_shims() {
       fish )
           echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
           ;;
+      pwsh )
+          echo '$Env:PATH="'"${PYENV_ROOT}"'/shims:$Env:PATH"'
+          ;;
       * )
           echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
           ;;
@@ -236,6 +268,9 @@ function print_env() {
   case "$shell" in
   fish )
     echo "set -gx PYENV_SHELL $shell"
+    ;;
+  pwsh )
+    echo '$Env:PYENV_SHELL="'"$shell"'"'
     ;;
   * )
     echo "export PYENV_SHELL=$shell"
@@ -252,7 +287,14 @@ function print_completion() {
 
 function print_rehash() {
   if [ -z "$no_rehash" ]; then
+    case "$shell" in
+    pwsh )
+      echo '& pyenv rehash 2>/dev/null'
+      ;;
+    * )
     echo 'command pyenv rehash 2>/dev/null'
+      ;;
+    esac
   fi
 }
 
@@ -274,6 +316,25 @@ function pyenv
 end
 EOS
     ;;
+  pwsh )
+    cat <<EOS
+function pyenv {
+  \$command=""
+  if ( \$args.Count -gt 0 ) {
+    \$command, \$args = \$args
+  }
+
+  if ( ("${commands[*]}" -split ' ') -contains \$command ) {
+    \$shell_cmds = & \$Env:PYENV_ROOT/bin/pyenv sh-\$command \$args
+    if ( \$shell_cmds.Count -gt 0 ) {
+      iex (\$shell_cmds -join "\`n")
+    }
+  } else {
+    & \$Env:PYENV_ROOT/bin/pyenv \$command \$args
+  }
+}
+EOS
+    ;;
   ksh | ksh93 | mksh )
     cat <<EOS
 function pyenv {
@@ -288,7 +349,7 @@ EOS
     ;;
   esac
 
-  if [ "$shell" != "fish" ]; then
+  if [ "$shell" != "fish" ] && [ "$shell" != "pwsh" ]; then
     IFS="|"
     cat <<EOS
   command="\${1:-}"
