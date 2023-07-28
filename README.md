@@ -352,6 +352,16 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
     pyenv init - | source
     ~~~
 
+  - For **Microsoft PowerShell**:
+
+    Add the commands to `$profile.CurrentUserAllHosts` by running the following in your terminal:
+
+    ~~~ pwsh
+    echo '$Env:PYENV_ROOT="$HOME/.pyenv"' >> $profile.CurrentUserAllHosts
+    echo '$Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH"' >> $profile.CurrentUserAllHosts
+    echo 'iex ((pyenv init -) -join "`n")' >> $profile.CurrentUserAllHosts
+    ~~~
+
    **Bash warning**: There are some systems where the `BASH_ENV` variable is configured
    to point to `.bashrc`. On such systems, you should almost certainly put the
    `eval "$(pyenv init -)"` line into `.bash_profile`, and **not** into `.bashrc`. Otherwise, you
