@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.3.24
+
+* README update: Added UNIX reference near Automatic installer by @VictorieeMan in https://github.com/pyenv/pyenv/pull/2744
+* Fix FreeBSD tests in MacOS CI by @native-api in https://github.com/pyenv/pyenv/pull/2748
+* Add CPython 3.12.0rc1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2752
+* [Add an updated Anaconda and Miniconda installers](https://github.com/pyenv/pyenv/commit/db871427c7a232e18ee7a6dc0182989a646ccca9)
+
 ## Release v2.3.23
 
 * Add CPython 3.12.0b4 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2741
