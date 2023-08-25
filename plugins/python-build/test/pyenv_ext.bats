@@ -200,7 +200,7 @@ OUT
   assert_success
 
   assert_build_log <<OUT
-python -s -m ensurepip
+python -I -m ensurepip
 OUT
 }
 
@@ -218,7 +218,7 @@ OUT
   assert_success
 
   assert_build_log <<OUT
-python -s -m ensurepip --altinstall
+python -I -m ensurepip --altinstall
 OUT
 }
 
