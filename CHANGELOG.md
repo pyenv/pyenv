@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.3.25
+
+* Add CPython 3.8.18, 3.9.18, 3.10.13, 3.11.5 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2763
+ 
 ## Release v2.3.24
 
 * README update: Added UNIX reference near Automatic installer by @VictorieeMan in https://github.com/pyenv/pyenv/pull/2744
