@@ -573,7 +573,7 @@ uninstall from the system.
 
 ## Pyenv plugins
 
-Pyenv provides a simple, flexible and maintainable way to extend and customize its functionalty with plugins --
+Pyenv provides a simple, flexible and maintainable way to extend and customize its functionality with plugins --
 as simple as creating a plugin directory and dropping a shell script on a certain subpath of it
 with whatever extra logic you need to be run at certain moments.
 
