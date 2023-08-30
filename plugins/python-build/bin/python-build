@@ -2025,7 +2025,7 @@ build_package_ensurepip() {
     ensurepip_opts="--altinstall"
   fi
   # FIXME: `--altinstall` with `get-pip.py`
-  "$PYTHON_BIN" -s -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
+  "$PYTHON_BIN" -I -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
   build_package_symlink_version_suffix
 }
 
