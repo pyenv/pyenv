@@ -1474,6 +1474,12 @@ prefer_openssl11() {
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
 }
 
+prefer_openssl3() {
+  # Allow overriding the preference of OpenSSL version per definition basis (#1302, #1325, #1326)
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@1.1 openssl}"
+  export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
+}
+
 build_package_mac_readline() {
   # Install to a subdirectory since we don't want shims for bin/readline.
   READLINE_PREFIX_PATH="${PREFIX_PATH}/readline"
