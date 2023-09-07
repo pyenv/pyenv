@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.3.26
+
+* Prevent `grep` warning in `conda.bash` by @aphedges in https://github.com/pyenv/pyenv/pull/2768
+* fix a typo in README.md by @xzmeng in https://github.com/pyenv/pyenv/pull/2769
+* use -I with ensurepip by @xaocon in https://github.com/pyenv/pyenv/pull/2764
+* Add CPython 3.12.0rc2 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2778
+
 ## Release v2.3.25
 
 * Add CPython 3.8.18, 3.9.18, 3.10.13, 3.11.5 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2763
