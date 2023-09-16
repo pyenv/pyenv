@@ -2337,7 +2337,7 @@ if [ -z "${GET_PIP_URL}" ]; then
     2.6 | 2.6.* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/2.6/get-pip.py"
       ;;
-    2.7 | 2.7.* )
+    2.7 | 2.7.* | pypy2.7 | pypy2.7-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/2.7/get-pip.py"
       ;;
     3.2 | 3.2.* )
@@ -2349,10 +2349,10 @@ if [ -z "${GET_PIP_URL}" ]; then
     3.4 | 3.4.* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.4/get-pip.py"
       ;;
-    3.5 | 3.5.* )
+    3.5 | 3.5.* | pypy3.5 | pypy3.5-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.5/get-pip.py"
       ;;
-    3.6 | 3.6.* )
+    3.6 | 3.6.* | pypy3.6 | pypy3.6-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.6/get-pip.py"
       ;;
     * )
