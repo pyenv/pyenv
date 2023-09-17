@@ -1,5 +1,11 @@
 # Version History
 
+# Release v2.3.27
+
+* Prefer OpenSSL 3 in Homebrew since 3.12 by @native-api in https://github.com/pyenv/pyenv/pull/2781
+* Fix get-pip urls for older pypy versions by @TimPansino in https://github.com/pyenv/pyenv/pull/2788
+* Update openssl url for 3.12.0rc2 by @zsol in https://github.com/pyenv/pyenv/pull/2789
+  
 ## Release v2.3.26
 
 * Prevent `grep` warning in `conda.bash` by @aphedges in https://github.com/pyenv/pyenv/pull/2768
