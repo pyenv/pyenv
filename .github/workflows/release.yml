@@ -8,7 +8,7 @@ jobs:
     name: Bump Homebrew formula
     runs-on: ubuntu-latest
     steps:
-      - uses: mislav/bump-homebrew-formula-action@v2.3
+      - uses: mislav/bump-homebrew-formula-action@v3.0
         if: "!contains(github.ref, '-')" # skip prereleases
         with:
           formula-name: rbenv
