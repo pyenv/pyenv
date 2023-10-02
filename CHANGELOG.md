@@ -1,5 +1,14 @@
 # Version History
 
+# Release v2.3.28
+
+* Prioritize 'zlib from xcode sdk' flag correctly by @native-api in https://github.com/pyenv/pyenv/pull/2791
+* Prefer OpenSSL 3 in Homebrew in 3.13-dev by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2793
+* Add CPython 3.12.0rc3 by @saaketp in https://github.com/pyenv/pyenv/pull/2795
+* Add graalpy-23.1.0 and split between graalpy and graalpy-community by @msimacek in https://github.com/pyenv/pyenv/pull/2796
+* Update the OpenSSL dependency for Python 2.7.18 by @lpapp-foundry in https://github.com/pyenv/pyenv/pull/2797
+* Add CPython 3.12.0 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2804
+
 # Release v2.3.27
 
 * Prefer OpenSSL 3 in Homebrew since 3.12 by @native-api in https://github.com/pyenv/pyenv/pull/2781
