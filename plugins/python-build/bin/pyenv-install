@@ -19,6 +19,7 @@
 #   -v/--verbose       Verbose mode: print compilation status to stdout
 #   --version          Show version of python-build
 #   -g/--debug         Build a debug version
+#   -n/--name <name>   Build named version as <version>-<name> (name: cannot contain spaces)
 #
 # For detailed information on installing Python versions with
 # python-build, including a list of environment variables for adjusting
@@ -46,6 +47,7 @@ if [ "$1" = "--complete" ]; then
   echo --verbose
   echo --version
   echo --debug
+  echo --name
   exec python-build --definitions
 fi
 
@@ -104,6 +106,11 @@ for option in "${OPTIONS[@]}"; do
   "g" | "debug" )
     DEBUG="-g"
     ;;
+  "n" | "name" )
+    [[ "${#ARGUMENTS[*]}" -eq 0 ]] && echo -e "Error: Expected argument for --name\n" >&2 && usage 1 >&2
+    NAME=${ARGUMENTS[0]}
+    unset ARGUMENTS[0]
+    ;;
   "version" )
     exec python-build --version
     ;;
@@ -122,6 +129,12 @@ unset VERSION_NAME
 DEFINITIONS=("${ARGUMENTS[@]}")
 [[ "${#DEFINITIONS[*]}" -eq 0 ]] && DEFINITIONS=($(pyenv-local 2>/dev/null || true))
 [[ "${#DEFINITIONS[*]}" -eq 0 ]] && usage 1 >&2
+
+# If the `name` argument has been used, validate the name given is valid
+if [ ! $(grep '^[-0-9a-zA-Z_]*$' <<< $NAME) ]; then
+  echo -e "Error: --name argument can only contain alpha-numeric, '-', and '_' characters\n" >&2
+  usage 1 >&2
+fi
 
 # Define `before_install` and `after_install` functions that allow
 # plugin hooks to register a string of code for execution before or
@@ -163,6 +176,7 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
   # Set VERSION_NAME from $DEFINITION. Then compute the installation prefix.
   VERSION_NAME="${DEFINITION##*/}"
   [ -n "$DEBUG" ] && VERSION_NAME="${VERSION_NAME}-debug"
+  [ -n "$NAME" ] && VERSION_NAME="${VERSION_NAME}-${NAME}"
   PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
 
   [ -d "${PREFIX}" ] && PREFIX_EXISTS=1

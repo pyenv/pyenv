@@ -56,6 +56,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Install additional Python versions](#install-additional-python-versions)
     * [Prefix auto-resolution to the latest version](#prefix-auto-resolution-to-the-latest-version)
     * [Python versions with extended support](#python-versions-with-extended-support)
+    * [Install a named python version](#intstall-a-named-python-version)
   * [Switch between Python versions](#switch-between-python-versions)
   * [Uninstall Python versions](#uninstall-python-versions)
   * [Other operations](#other-operations)
@@ -443,6 +444,20 @@ in a later version of those environments.
 * *3.7.8-3.7.15, 3.8.4-3.8.12, 3.9.0-3.9.7* : XCode 13.3
 * *3.5.10, 3.6.15* : MacOS 11+ and XCode 13.3
 * *2.7.18* : MacOS 10.15+ and Apple Silicon
+
+
+#### Install a named python version
+
+To install a named python version, the `--name <name>` argument can be given when installing a new version. This will
+append a `-<name>` string to the end of the version being installed. The `name` argument can only contain alpha-numeric,
+`-`, and `_` characters.
+
+E.g. to install and switch to a 3.11.3 version named `test-environment`
+
+```sh
+pyenv install --name test-environment 3.11.3
+pyenv global 3.11.3-test-environment
+```
 
 
 ### Switch between Python versions
