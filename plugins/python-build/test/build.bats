@@ -259,6 +259,36 @@ make install
 OUT
 }
 
+@test "ncurses is linked from Homebrew" {
+  cached_tarball "Python-3.6.2"
+
+  ncurses_libdir="$TMP/homebrew-ncurses"
+  mkdir -p "$ncurses_libdir"
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  for i in {1..3}; do stub brew false; done
+  stub brew "--prefix ncurses : echo '$ncurses_libdir'"
+  stub brew false
+  stub_make_install
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I$ncurses_libdir/include -I${TMP}/install/include" LDFLAGS="-L$ncurses_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
 @test "openssl is linked from Ports in FreeBSD if present" {
   cached_tarball "Python-3.6.2"
 
