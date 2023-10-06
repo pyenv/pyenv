@@ -803,6 +803,7 @@ build_package_standard_build() {
     use_homebrew || true
     use_tcltk || true
     use_homebrew_readline || use_freebsd_pkg || true
+    use_homebrew_ncurses || true
     if is_mac -ge 1014; then
       use_xcode_sdk_zlib || use_homebrew_zlib || true
     else
@@ -1465,6 +1466,18 @@ use_homebrew_readline() {
     else
       return 1
     fi
+  fi
+}
+
+use_homebrew_ncurses() {
+  can_use_homebrew || return 1
+  local libdir="$(brew --prefix ncurses 2>/dev/null || true)"
+  if [ -d "$libdir" ]; then
+    echo "python-build: use ncurses from homebrew"
+    export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+    export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+  else
+    return 1
   fi
 }
 

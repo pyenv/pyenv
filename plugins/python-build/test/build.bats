@@ -62,7 +62,7 @@ assert_build_log() {
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub brew false
   stub_make_install
   stub_make_install
@@ -89,7 +89,7 @@ OUT
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub brew false
   stub_make_install
   stub_make_install
@@ -119,7 +119,7 @@ OUT
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub brew false
   stub_make_install
   stub_make_install
@@ -151,7 +151,7 @@ OUT
   BREW_PREFIX="$TMP/homebrew-prefix"
   mkdir -p "$BREW_PREFIX"
 
-  for i in {1..8}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew "--prefix : echo '$BREW_PREFIX'" false
   stub_make_install
@@ -179,10 +179,10 @@ OUT
   brew_libdir="$TMP/homebrew-yaml"
   mkdir -p "$brew_libdir"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew "--prefix libyaml : echo '$brew_libdir'"
-  for i in {1..4}; do stub brew false; done
+  for i in {1..5}; do stub brew false; done
   stub_make_install
 
   install_fixture definitions/needs-yaml
@@ -205,7 +205,7 @@ OUT
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub brew true; brew
   stub_make_install
   stub_make_install
@@ -234,11 +234,11 @@ OUT
 
   readline_libdir="$TMP/homebrew-readline"
   mkdir -p "$readline_libdir"
-  for i in {1..7}; do stub uname '-s : echo Darwin'; done
+  for i in {1..8}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   for i in {1..2}; do stub brew false; done
   stub brew "--prefix readline : echo '$readline_libdir'"
-  stub brew false
+  for i in {1..2}; do stub brew false; done
   stub_make_install
 
   run_inline_definition <<DEF
@@ -259,12 +259,42 @@ make install
 OUT
 }
 
+@test "ncurses is linked from Homebrew" {
+  cached_tarball "Python-3.6.2"
+
+  ncurses_libdir="$TMP/homebrew-ncurses"
+  mkdir -p "$ncurses_libdir"
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  for i in {1..3}; do stub brew false; done
+  stub brew "--prefix ncurses : echo '$ncurses_libdir'"
+  stub brew false
+  stub_make_install
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I$ncurses_libdir/include -I${TMP}/install/include" LDFLAGS="-L$ncurses_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
 @test "openssl is linked from Ports in FreeBSD if present" {
   cached_tarball "Python-3.6.2"
 
   for i in {1..7}; do stub uname '-s : echo FreeBSD'; done
   stub uname '-r : echo 11.0-RELEASE'
-  for i in {1..2}; do stub uname '-s : echo FreeBSD'; done
+  for i in {1..3}; do stub uname '-s : echo FreeBSD'; done
   stub sysctl '-n hw.ncpu : echo 1'
 
   stub pkg "info -e openssl : true"
@@ -298,7 +328,7 @@ OUT
 
     for i in {1..7}; do stub uname '-s : echo FreeBSD'; done
     stub uname '-r : echo 11.0-RELEASE'
-    for i in {1..2}; do stub uname '-s : echo FreeBSD'; done
+    for i in {1..3}; do stub uname '-s : echo FreeBSD'; done
     stub sysctl '-n hw.ncpu : echo 1'
 
     stub pkg false
@@ -331,7 +361,7 @@ OUT
 @test "no library searches performed during normal operation touch homebrew in non-MacOS" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..8}; do stub uname '-s : echo Linux'; done
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
   stub brew true; brew
   stub_make_install
 
@@ -386,10 +416,10 @@ OUT
   mkdir -p "$readline_libdir/include/readline"
   touch "$readline_libdir/include/readline/rlconf.h"
 
-  for i in {1..7}; do stub uname '-s : echo Darwin'; done
+  for i in {1..8}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
-  for i in {1..3}; do stub brew false; done
+  for i in {1..4}; do stub brew false; done
   stub_make_install
 
   export PYTHON_CONFIGURE_OPTS="CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib"
@@ -418,12 +448,12 @@ OUT
   mkdir -p "$tcl_tk_libdir/lib"
   echo "TCL_VERSION='$tcl_tk_version'" >>"$tcl_tk_libdir/lib/tclConfig.sh"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
   stub brew false
   for i in {1..2}; do stub brew "--prefix tcl-tk : echo '$tcl_tk_libdir'"; done
-  for i in {1..2}; do stub brew false; done
+  for i in {1..3}; do stub brew false; done
 
   stub_make_install
 
@@ -452,10 +482,10 @@ OUT
   tcl_tk_version_long="8.6.10"
   tcl_tk_version="${tcl_tk_version_long%.*}"
 
-  for i in {1..8}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
-  for i in {1..4}; do stub brew false; done
+  for i in {1..5}; do stub brew false; done
   stub_make_install
 
   export PYTHON_CONFIGURE_OPTS="--with-tcltk-libs='-L${TMP}/custom-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version'"
@@ -480,7 +510,7 @@ OUT
 @test "tcl-tk is linked from Homebrew via pkgconfig only when envvar is set" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
   tcl_tk_libdir="$TMP/homebrew-tcl-tk"
@@ -488,7 +518,7 @@ OUT
 
   stub brew false
   for i in {1..2}; do stub brew "--prefix tcl-tk : echo '${tcl_tk_libdir}'"; done
-  for i in {1..2}; do stub brew false; done
+  for i in {1..3}; do stub brew false; done
 
   stub_make_install
 
@@ -513,7 +543,7 @@ OUT
 @test "number of CPU cores defaults to 2" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
 
   stub sysctl false
@@ -540,7 +570,7 @@ OUT
 @test "number of CPU cores is detected on Mac" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
 
   stub sysctl '-n hw.ncpu : echo 4'
@@ -570,7 +600,7 @@ OUT
 
   for i in {1..7}; do stub uname '-s : echo FreeBSD'; done
   stub uname '-r : echo 11.0-RELEASE'
-  for i in {1..2}; do stub uname '-s : echo FreeBSD'; done
+  for i in {1..3}; do stub uname '-s : echo FreeBSD'; done
   for i in {1..3}; do stub pkg false; done
 
   stub sysctl '-n hw.ncpu : echo 1'
@@ -597,7 +627,7 @@ OUT
 @test "setting PYTHON_MAKE_INSTALL_OPTS to a multi-word string" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..8}; do stub uname '-s : echo Linux'; done
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
 
   stub_make_install
 
@@ -621,7 +651,7 @@ OUT
 @test "(PYTHON_)CONFIGURE_OPTS and (PYTHON_)MAKE_OPTS take priority over automatically added options" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..8}; do stub uname '-s : echo Linux'; done
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
 
   stub_make_install
 
@@ -649,7 +679,7 @@ OUT
 @test "--enable-shared is not added if --disable-shared is passed" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..8}; do stub uname '-s : echo Linux'; done
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
 
   stub_make_install
 
@@ -673,9 +703,9 @@ OUT
 @test "configuring with dSYM in MacOS" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
-  for i in {1..4}; do stub brew false; done
+  for i in {1..5}; do stub brew false; done
   stub_make_install
 
   run_inline_definition <<DEF
@@ -700,7 +730,7 @@ OUT
 @test "configuring with dSYM has no effect in non-MacOS" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
   stub_make_install
 
   run_inline_definition <<DEF
@@ -735,7 +765,7 @@ OUT
   stub uname "-s : echo FreeBSD" "-r : echo 9.1"
   for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
   stub uname "-r : echo 9.1"
-  for i in {1..2}; do stub uname "-s : echo FreeBSD"; done
+  for i in {1..3}; do stub uname "-s : echo FreeBSD"; done
 
   MAKE=gmake stub_make_install
 
@@ -752,7 +782,7 @@ OUT
   stub uname "-s : echo FreeBSD" "-r : echo 10.0-RELEASE"
   for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
   stub uname "-r : echo 10.0-RELEASE"
-  for i in {1..2}; do stub uname "-s : echo FreeBSD"; done
+  for i in {1..3}; do stub uname "-s : echo FreeBSD"; done
 
   stub_make_install
 
@@ -768,7 +798,7 @@ OUT
   stub uname "-s : echo FreeBSD" "-r : echo 11.0-RELEASE"
   for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
   stub uname "-r : echo 11.0-RELEASE"
-  for i in {1..2}; do stub uname "-s : echo FreeBSD"; done
+  for i in {1..3}; do stub uname "-s : echo FreeBSD"; done
 
   stub_make_install
 
@@ -787,7 +817,7 @@ apply -p1 -i /my/patch.diff
 exec ./configure "\$@"
 CONF
 
-  for i in {1..8}; do stub uname '-s : echo Linux'; done
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
   stub apply 'echo apply "$@" >> build.log'
   stub_make_install
 
