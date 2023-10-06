@@ -1,5 +1,11 @@
 # Version History
 
+## Release v2.3.29
+
+* Add CPython 3.11.6 by @thecesrom in https://github.com/pyenv/pyenv/pull/2806
+* Add GraalPy 23.1.0 definition using the faster Oracle GraalVM distribution by @eregon in https://github.com/pyenv/pyenv/pull/2812
+* Install ncurses from Homebrew, if available by @aphedges in https://github.com/pyenv/pyenv/pull/2813
+
 ## Release v2.3.28
 
 * Prioritize 'zlib from xcode sdk' flag correctly by @native-api in https://github.com/pyenv/pyenv/pull/2791
