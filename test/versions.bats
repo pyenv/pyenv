@@ -201,6 +201,7 @@ OUT
   create_version "1.218.0"
   create_executable sort <<SH
 #!$BASH
+cat >/dev/null
 if [ "\$1" == "--version-sort" ]; then
   echo "${PYENV_ROOT}/versions/1.9.0"
   echo "${PYENV_ROOT}/versions/1.53.0"
