@@ -2037,14 +2037,23 @@ build_package_get_pip() {
   build_package_symlink_version_suffix
 }
 
+# Pip <21 (in 2.7 and derivatives like PyPy-2.7) doesn't support -I
+build_package_ensurepip_lt21() {
+  build_package_ensurepip lt21
+}
+
 build_package_ensurepip() {
+  local mode="$1"
   local ensurepip_opts
   # Install as `--altinstall` if the Python is installed as `altinstall` (#255)
   if [[ "$PYTHON_MAKE_INSTALL_TARGET" == *"altinstall"* ]]; then
     ensurepip_opts="--altinstall"
   fi
+  local python_opts="-I"
+  if [[ $mode == "lt21" ]]; then python_opts="-s"; fi
+  
   # FIXME: `--altinstall` with `get-pip.py`
-  "$PYTHON_BIN" -I -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
+  "$PYTHON_BIN" $python_opts -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
   build_package_symlink_version_suffix
 }
 
