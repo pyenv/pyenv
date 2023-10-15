@@ -1629,6 +1629,9 @@ use_xcode_sdk_zlib() {
   local xc_sdk_path="$(xcrun --show-sdk-path 2>/dev/null || true)"
   if [ -d "$xc_sdk_path" ]; then
     echo "python-build: use zlib from xcode sdk"
+    # Even though SDK's compiler uses the SDK dirs implicitly,
+    # CPython's setup.py has to have nonstandard paths specified explicitly
+    # to search for zlib.h in them
     export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${xc_sdk_path}/usr/include"
     if is_mac -ge 1100; then
       export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${xc_sdk_path}/usr/lib"
@@ -1645,7 +1648,15 @@ use_homebrew_tcltk() {
     if [[ -z "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
       local tcltk_version="$(sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo $TCL_VERSION')"
       package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
-      package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+      # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
+      # We're not using tclConfig.sh here 'cuz it produces the version-specific path to <brew prefix>/Cellar
+      # and we'd rather have rpath set to <brew prefix>/opt/<...> to allow micro release upgrades without rebuilding
+      # XXX: do use tclConfig.sh and translate the paths if more path shenanigans appear in later releases
+      if [ -d "$tcltk_libdir/include/tcl-tk" ]; then
+        package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include/tcl-tk"
+      else
+        package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+      fi
     fi
     export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
   fi
