@@ -1651,7 +1651,7 @@ use_homebrew_tcltk() {
       # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
       # We're not using tclConfig.sh here 'cuz it produces the version-specific path to <brew prefix>/Cellar
       # and we'd rather have rpath set to <brew prefix>/opt/<...> to allow micro release upgrades without rebuilding
-      # XXX: do use tclConfig.h and translate the paths if more path shenanigans appear in later releases
+      # XXX: do use tclConfig.sh and translate the paths if more path shenanigans appear in later releases
       if [ -d "$tcltk_libdir/include/tcl-tk" ]; then
         package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include/tcl-tk"
       else
