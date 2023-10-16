@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.3.30
+
+* Fix intermittent "broken pipe" in tests by @native-api in https://github.com/pyenv/pyenv/pull/2817
+* Add CPython 3.13.0a1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2818
+* Add PyPy 7.3.13 by @dand-oss in https://github.com/pyenv/pyenv/pull/2807
+* Fix linking against Homebrew's Tcl/Tk 8.6.13 in MacOS by @startergo in https://github.com/pyenv/pyenv/pull/2820
+
 ## Release v2.3.29
 
 * Add CPython 3.11.6 by @thecesrom in https://github.com/pyenv/pyenv/pull/2806
