@@ -193,7 +193,11 @@ class CondaVersion(NamedTuple):
             else:
                 return PyVersion.PY37
         if self.flavor == "anaconda":
-            # https://docs.anaconda.com/anaconda/reference/release-notes/
+            # https://docs.anaconda.com/free/anaconda/reference/release-notes/
+            if v >= (2023,7):
+                return PyVersion.PY311
+            if v >= (2023,3):
+                return PyVersion.PY310
             if v >= (2021,11):
                 return PyVersion.PY39
             if v >= (2020,7):
