@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.3.31
+* Add new anaconda and miniconda definitions by @aphedges in https://github.com/pyenv/pyenv/pull/2824
+
 ## Release v2.3.30
 
 * Fix intermittent "broken pipe" in tests by @native-api in https://github.com/pyenv/pyenv/pull/2817
