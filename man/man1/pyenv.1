@@ -234,6 +234,7 @@ Skip this section unless you must know what every line in your shell profile is 
 \fBSets up your shims path\.\fR This is the only requirement for pyenv to function properly\. You can do this by hand by prepending \fB$(pyenv root)/shims\fR to your \fB$PATH\fR\.
 .IP "2." 4
 \fBRehashes shims\.\fR From time to time you'll need to rebuild your shim files\. Doing this on init makes sure everything is up to date\. You can always run \fBpyenv rehash\fR manually\.
+You can disable this functionality by adding \fB--no-rehash\fR to the end of your \fBpyenv init\fR command line.
 .IP "3." 4
 \fBInstalls the sh dispatcher\.\fR This bit is also optional, but allows pyenv and plugins to change variables in your current shell, making commands like \fBpyenv shell\fR possible\. The sh dispatcher doesn't do anything crazy like override \fBcd\fR or hack your shell prompt, but if for some reason you need \fBpyenv\fR to be a real script rather than a shell function, you can safely skip it\.
 .IP "" 0
