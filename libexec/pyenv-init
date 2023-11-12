@@ -160,8 +160,8 @@ function help_() {
         echo "$profile :"
       else
         echo
-        echo "${profile_explain:-$profile} (for login shells)"
-        echo "and $rc (for interactive shells) :"
+        echo "# ${profile_explain:-$profile} (for login shells)"
+        echo "# and $rc (for interactive shells) :"
       fi
       echo
       echo 'export PYENV_ROOT="$HOME/.pyenv"'
