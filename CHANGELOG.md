@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.3.32
+* Describe --no-rehash option in the manpage by @fsc-eriker in https://github.com/pyenv/pyenv/pull/2832
+* Make adding $PYENV_ROOT/bin to PATH independent of other software by @native-api in https://github.com/pyenv/pyenv/pull/2837
+* Make `pyenv init` output insertable to startup files by @native-api in https://github.com/pyenv/pyenv/pull/2838
+
 ## Release v2.3.31
 * Add new anaconda and miniconda definitions by @aphedges in https://github.com/pyenv/pyenv/pull/2824
 
