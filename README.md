@@ -64,7 +64,7 @@ That's it! You are now ready to [install some Ruby versions](#installing-ruby-ve
 
 ### Basic Git Checkout
 
-> **Note**  
+> [!NOTE]   
 > For a more automated install, you can use [rbenv-installer](https://github.com/rbenv/rbenv-installer#rbenv-installer). If you do not want to execute scripts downloaded from a web URL or simply prefer a manual approach, follow the steps below.
 
 This will get you going with the latest version of rbenv without needing a system-wide install.
@@ -122,7 +122,7 @@ rbenv install 3.1.2
 
 For troubleshooting `BUILD FAILED` scenarios, check the [ruby-build Discussions section](https://github.com/rbenv/ruby-build/discussions/categories/build-failures).
 
-> **Note**  
+> [!NOTE]  
 > If the `rbenv install` command wasn't found, you can install ruby-build as a plugin:
 > ```sh
 > git clone https://github.com/rbenv/ruby-build.git "$(rbenv root)"/plugins/ruby-build
@@ -145,7 +145,7 @@ Select a Ruby version for your project using `rbenv local 3.1.2`, for example. T
 gem install bundler
 ```
 
-> **Warning**  
+> [!WARNING]  
 > You _should not use sudo_ to install gems. Typically, the Ruby versions will be installed under your home directory and thus writeable by your user. If you get the “you don't have write permissions” error when installing gems, it's likely that your "system" Ruby version is still a global default. Change that with `rbenv global <version>` and try again.
 
 Check the location where gems are being installed with `gem env`:
