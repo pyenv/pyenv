@@ -113,7 +113,9 @@ You can set certain environment variables to control the build process.
   checksum of the file to the mirror URL.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
-* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew on macOS.
+* `PYTHON_BUILD_HTTP_CLIENT`, explicitly specify the HTTP client type to use. `aria2`, `curl` and `wget` are the supported values and by default, are searched in that order.
+* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew in macOS.
+* `PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA`, override the Homebrew OpenSSL formula to use.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
   in `share/python-build/` are looked up.
 * `PYTHON_BUILD_DEFINITIONS` can be a list of colon-separated paths that get
