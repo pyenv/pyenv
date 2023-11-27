@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.3.33
+* Add miniforge3-23.3.1-1 by @goerz in https://github.com/pyenv/pyenv/pull/2839
+* Add support for miniconda3-3.11-23.10.0-1 by @binbjz in https://github.com/pyenv/pyenv/pull/2843
+* Add support for miniconda3 23.10.0-1 with py3.10、py3.9、py3.8 by @binbjz in https://github.com/pyenv/pyenv/pull/2844
+* Add CPython 3.13.0a2 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2849
+* python-build: Document PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA and PYTHON_BUILD_HTTP_CLIENT by @native-api in https://github.com/pyenv/pyenv/pull/2853
+
 ## Release v2.3.32
 * Describe --no-rehash option in the manpage by @fsc-eriker in https://github.com/pyenv/pyenv/pull/2832
 * Make adding $PYENV_ROOT/bin to PATH independent of other software by @native-api in https://github.com/pyenv/pyenv/pull/2837
