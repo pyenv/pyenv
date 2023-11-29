@@ -51,4 +51,4 @@ else
   url="https://github.com/oracle/graalpython/releases/download/graal-${VERSION}/graalpy-community-${VERSION}-${graalpy_arch}.tar.gz#${checksum}"
 fi
 
-install_package "graalpy-${VERSION}${BUILD}" "${url}" "copy" ensurepip
+install_package "graalpy-community-${VERSION}${BUILD}" "${url}" "copy" ensurepip
