@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.3.34
+* Fix graalpy-community to use a separate package name by @native-api in https://github.com/pyenv/pyenv/pull/2855
+* Move 3.11.5+ to OpenSSL 3 by default by @native-api in https://github.com/pyenv/pyenv/pull/2858
+* Add CPython 3.11.7 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2860
+
 ## Release v2.3.33
 * Add miniforge3-23.3.1-1 by @goerz in https://github.com/pyenv/pyenv/pull/2839
 * Add support for miniconda3-3.11-23.10.0-1 by @binbjz in https://github.com/pyenv/pyenv/pull/2843
