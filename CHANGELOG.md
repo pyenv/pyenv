@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.3.35
+* Add CPython 3.12.1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2861
+
 ## Release v2.3.34
 * Fix graalpy-community to use a separate package name by @native-api in https://github.com/pyenv/pyenv/pull/2855
 * Move 3.11.5+ to OpenSSL 3 by default by @native-api in https://github.com/pyenv/pyenv/pull/2858
