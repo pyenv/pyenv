@@ -16,7 +16,7 @@ jobs:
           - macos-11
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # Normally, we would use the superbly maintained...
       # - uses: actions/setup-python@v2
       #   with:
