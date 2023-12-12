@@ -6,7 +6,7 @@ jobs:
     outputs:
       versions: ${{steps.modified-versions.outputs.versions}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: git fetch origin "$GITHUB_BASE_REF"
       - shell: bash
         run: >
@@ -33,7 +33,7 @@ jobs:
         os: ["macos-11", "macos-12"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"
@@ -93,7 +93,7 @@ jobs:
         os: ["ubuntu-20.04", "ubuntu-22.04"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"
