@@ -1383,6 +1383,19 @@ configured_with_package_dir() {
   return 1
 }
 
+# `python-config` ignores LDFLAGS envvar. Adding to LIBS is the only way to add extra stuff
+# to `python-config --ldflags` output
+append_ldflags_libs() {
+  local args="$1"
+  export LDFLAGS="${LDFLAGS:+$LDFLAGS }$args"
+  export LIBS="${LIBS:+${LIBS% } }$args"
+}
+prepend_ldflags_libs() {
+  local args="$1"
+  export LDFLAGS="$args${LDFLAGS:+ $LDFLAGS}"
+  export LIBS="$args${LIBS:+ $LIBS}"
+}
+
 use_homebrew() {
   can_use_homebrew || return 1
   # unless Homebrew is at the default /usr/local, need to add its paths to
@@ -1392,10 +1405,7 @@ use_homebrew() {
     # /usr/local/lib:/usr/lib is the default library search path
     if [[ -n $brew_prefix && $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ]]; then
       export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${brew_prefix}/include"
-      export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
-      # `python-config` ignores LDFLAGS envvar. Adding to LIBS is the only way to add extra stuff
-      # to `python-config --ldflags` output
-      export LIBS="${LIBS:+${LIBS% } }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
+      append_ldflags_libs "-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
     fi
   fi
 }
@@ -2258,13 +2268,13 @@ package_option python configure --libdir="${PREFIX_PATH}/lib"
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS ${PYTHON_CONFIGURE_OPTS_ARRAY[@]}" == *"--enable-shared"* ]]; then
   # The ld on Darwin embeds the full paths to each dylib by default
   if [[ "$LDFLAGS" != *"-rpath="* ]] ; then
-    export LDFLAGS="-Wl,-rpath,${PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
+    prepend_ldflags_libs "-Wl,-rpath,${PREFIX_PATH}/lib"
   fi
 fi
 
 # python-build: Set `RPATH` if --shared` was given for PyPy (#244)
 if [[ "$PYPY_OPTS" == *"--shared"* ]]; then
-  export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
+  prepend_ldflags_libs "-Wl,-rpath=${PREFIX_PATH}/lib"
 fi
 
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
@@ -2446,7 +2456,7 @@ if [ -n "$VERBOSE" ]; then
   trap "kill $TAIL_PID" SIGINT SIGTERM EXIT
 fi
 
-export LDFLAGS="-L${PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
+prepend_ldflags_libs "-L${PREFIX_PATH}/lib"
 export CPPFLAGS="-I${PREFIX_PATH}/include${CPPFLAGS:+ $CPPFLAGS}"
 
 unset PYTHONHOME
