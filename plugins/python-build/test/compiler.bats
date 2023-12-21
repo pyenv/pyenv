@@ -110,7 +110,7 @@ OUT
     mkdir -p "$INSTALL_ROOT/bin"
     cd "$INSTALL_ROOT"
 
-    stub make true true '(for a in "$@"; do echo $a; done)|grep -E "^CFLAGS_EXTRA="' true
+    stub make true '(for a in "$@"; do echo $a; done)|grep -E "^CFLAGS_EXTRA="' true
     stub ln true
     stub mkdir true
     run_inline_definition <<DEF
