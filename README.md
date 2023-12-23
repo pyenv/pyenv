@@ -315,7 +315,7 @@ uninstall from the system.
 
 ## Development
 
-Tests are executed using [Bats](https://github.com/sstephenson/bats):
+Tests are executed using [Bats](https://github.com/bats-core/bats-core):
 
     $ bats test
     $ bats test/<file>.bats
