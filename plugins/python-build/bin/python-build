@@ -925,7 +925,13 @@ build_package_ironpython_builder() {
   ( cd "Stage/Release/IronPython-"* && build_package_ironpython )
 }
 
+build_package_micropython_1_9() {
+  # supported version 1.9.3 and 1.9.4
+  build_package_micropython "with_axtls"
+}
+
 build_package_micropython() {
+  # supported version 1.10 and higher
   if [ "${MAKEOPTS+defined}" ]; then
     MAKE_OPTS="$MAKEOPTS"
   elif [ -z "${MAKE_OPTS+defined}" ]; then
@@ -934,7 +940,7 @@ build_package_micropython() {
   { cd mpy-cross
     "$MAKE" $MAKE_OPTS
     cd ../ports/unix
-    "$MAKE" $MAKE_OPTS axtls
+    [ "$1" = "with_axtls" ] && "$MAKE" $MAKE_OPTS axtls
     "$MAKE" $MAKE_OPTS CFLAGS_EXTRA="-DMICROPY_PY_SYS_PATH_DEFAULT='\".frozen:${PREFIX_PATH}/lib/micropython\"' $CFLAGS_EXTRA"
     "$MAKE" install $MAKE_INSTALL_OPTS PREFIX="${PREFIX_PATH}"
     ln -fs micropython "${PREFIX_PATH}/bin/python"
