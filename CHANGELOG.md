@@ -1,5 +1,20 @@
 # Version History
 
+## Release v2.3.36
+* Add a Dependabot config to auto-update GitHub action versions by @kurtmckee in https://github.com/pyenv/pyenv/pull/2863
+* Bump the github-actions group with 1 update by @dependabot in https://github.com/pyenv/pyenv/pull/2864
+* Add installation prefix to `python-config --ldflags` output by @mhaeuser in https://github.com/pyenv/pyenv/pull/2865
+* Add support for miniconda3 23.11.0-1, 23.11.0-2 with py3.11, py3.10, py3.9, py3.8 by @binbjz in https://github.com/pyenv/pyenv/pull/2870
+* Add micropython 1.20.0 and 1.21.0 by @cpzt in https://github.com/pyenv/pyenv/pull/2869
+* Make "Automatic installer" command in the README a copy-able code block by @ryan-williams in https://github.com/pyenv/pyenv/pull/2874
+* Add PyPy 7.3.14 by @dand-oss in https://github.com/pyenv/pyenv/pull/2876
+* Add graalpy-23.1.2 by @msimacek in https://github.com/pyenv/pyenv/pull/2884
+* Add CPython 3.13.0a3 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2885
+* Add PyPy v7.3.15 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2886
+* Update pypy3.9-7.3.13 checksums by @ecerulm in https://github.com/pyenv/pyenv/pull/2887
+* Add CPython 3.12.2 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2899
+* Add CPython 3.11.8 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2898
+
 ## Release v2.3.35
 * Add CPython 3.12.1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2861
 
