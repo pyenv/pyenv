@@ -209,10 +209,15 @@ As far as Pyenv is concerned, version names are simply directories under
       brew update
       brew install pyenv
       ```
-   2. Then follow the rest of the post-installation steps, starting with
+      If you want to install (and update to) the latest development head of Pyenv
+      rather than the latest release, instead run:
+      ```sh
+      brew install pyenv --head
+      ```
+   3. Then follow the rest of the post-installation steps, starting with
       [Set up your shell environment for Pyenv](#set-up-your-shell-environment-for-pyenv).
 
-   3. OPTIONAL. To fix `brew doctor`'s warning _""config" scripts exist outside your system or Homebrew directories"_
+   4. OPTIONAL. To fix `brew doctor`'s warning _""config" scripts exist outside your system or Homebrew directories"_
 
       If you're going to build Homebrew formulae from source that link against Python
       like Tkinter or NumPy
@@ -504,7 +509,7 @@ If you've installed Pyenv using Homebrew, upgrade using:
 brew upgrade pyenv
 ```
 
-To switch from a release to the latest development version of Pyenv, use:
+To switch from a release to the latest development head of Pyenv, use:
 
 ```sh
 brew uninstall pyenv
