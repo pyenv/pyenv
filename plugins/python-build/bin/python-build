@@ -118,8 +118,17 @@ is_mac() {
 }
 
 can_use_homebrew() {
-    [ -z "$PYTHON_BUILD_SKIP_HOMEBREW" ] || return 1
-    is_mac || return 1
+  [[ -n "$PYTHON_BUILD_USE_HOMEBREW" && -n "$PYTHON_BUILD_SKIP_HOMEBREW" ]] && {
+    echo "error: mutually exclusive environment variables PYTHON_BUILD_USE_HOMEBREW and PYTHON_BUILD_SKIP_HOMEBREW are set" >&3
+    exit 1
+  }
+  [[ -n "$PYTHON_BUILD_USE_HOMEBREW" ]] && return 0
+  [[ -n "$PYTHON_BUILD_SKIP_HOMEBREW" ]] && return 1
+  is_mac && return 0
+  # In Linux, if Pyenv itself is installed with Homebrew,
+  # we assume the user wants to take dependencies from there as well by default
+  command -v brew &>/dev/null && [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "$(brew --prefix 2>/dev/null ||true)")"/* ]] && return 0
+  return 1
 }
 
 #  9.1  -> 901
