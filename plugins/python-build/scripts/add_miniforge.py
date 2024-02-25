@@ -100,6 +100,6 @@ for release in requests.get(f'https://api.github.com/repos/{MINIFORGE_REPO}/rele
 
     logger.info('Looking for %(version)s in %(out_dir)s', locals())
 
-    if not list(out_dir.glob(f'*-{version}')):
+    if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in DISTRIBUTIONS):
         logger.info('Downloading %(version)s', locals())
         add_version(release)
