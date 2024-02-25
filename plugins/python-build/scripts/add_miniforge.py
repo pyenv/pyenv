@@ -71,8 +71,9 @@ def supported(filename):
     return ('pypy' not in filename) and ('Windows' not in filename)
 
 def add_version(release):
+    tag_name = release['tag_name']
     download_urls = { f['name']: f['browser_download_url'] for f in release['assets'] }
-    shas = dict([download_sha(url) for (name, url) in download_urls.items() if name.endswith('.sha256')])
+    shas = dict([download_sha(url) for (name, url) in download_urls.items() if name.endswith('.sha256') and tag_name in name])
     specs = [create_spec(filename, sha, download_urls[filename]) for (filename, sha) in shas.items() if supported(filename)]
 
     for distribution in DISTRIBUTIONS:
