@@ -100,6 +100,11 @@ for release in requests.get(f'https://api.github.com/repos/{MINIFORGE_REPO}/rele
 
     logger.info('Looking for %(version)s in %(out_dir)s', locals())
 
+    # Release has no mambaforge artifacts, which causes the next check to always trigger
+    # Build scripts have already been generated, so safe to skip this version
+    if version == '4.13.0-0':
+        continue
+
     if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in DISTRIBUTIONS):
         logger.info('Downloading %(version)s', locals())
         add_version(release)
