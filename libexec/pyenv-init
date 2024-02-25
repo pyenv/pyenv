@@ -297,7 +297,7 @@ EOS
   fi
 
   case "\$command" in
-  ${commands[*]})
+  ${commands[*]:-/})
     eval "\$(pyenv "sh-\$command" "\$@")"
     ;;
   *)
