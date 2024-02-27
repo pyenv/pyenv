@@ -100,8 +100,10 @@ for release in requests.get(f'https://api.github.com/repos/{MINIFORGE_REPO}/rele
 
     logger.info('Looking for %(version)s in %(out_dir)s', locals())
 
-    # Release has no mambaforge artifacts, which causes the next check to always trigger
-    # Build scripts have already been generated, so safe to skip this version
+    # This release has no mambaforge artifacts which causes the next check to always trigger.
+    # Build scripts for miniforge3-4.13.0-0 have already been generated.
+    # Assuming this was a fluke, we don't yet need to implement proactively checking all releases for contents
+    # or ignoring a release if _any_ of the flavors is already present in Pyenv.
     if version == '4.13.0-0':
         continue
 
