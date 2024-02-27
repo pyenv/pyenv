@@ -71,8 +71,9 @@ def supported(filename):
     return ('pypy' not in filename) and ('Windows' not in filename)
 
 def add_version(release):
+    tag_name = release['tag_name']
     download_urls = { f['name']: f['browser_download_url'] for f in release['assets'] }
-    shas = dict([download_sha(url) for (name, url) in download_urls.items() if name.endswith('.sha256')])
+    shas = dict([download_sha(url) for (name, url) in download_urls.items() if name.endswith('.sha256') and tag_name in name])
     specs = [create_spec(filename, sha, download_urls[filename]) for (filename, sha) in shas.items() if supported(filename)]
 
     for distribution in DISTRIBUTIONS:
@@ -99,6 +100,13 @@ for release in requests.get(f'https://api.github.com/repos/{MINIFORGE_REPO}/rele
 
     logger.info('Looking for %(version)s in %(out_dir)s', locals())
 
-    if not list(out_dir.glob(f'*-{version}')):
+    # This release has no mambaforge artifacts which causes the next check to always trigger.
+    # Build scripts for miniforge3-4.13.0-0 have already been generated.
+    # Assuming this was a fluke, we don't yet need to implement proactively checking all releases for contents
+    # or ignoring a release if _any_ of the flavors is already present in Pyenv.
+    if version == '4.13.0-0':
+        continue
+
+    if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in DISTRIBUTIONS):
         logger.info('Downloading %(version)s', locals())
         add_version(release)
