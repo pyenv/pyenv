@@ -19,7 +19,10 @@ PYTHON_BUILD_VERSION="20180424"
 OLDIFS="$IFS"
 
 set -E
-[ -n "$PYENV_DEBUG" ] && set -x
+[ -n "$PYENV_DEBUG" ] && {
+  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+  set -x
+}
 
 exec 3<&2 # preserve original stderr at fd 3
 
