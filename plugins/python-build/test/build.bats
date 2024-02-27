@@ -201,34 +201,6 @@ make install
 OUT
 }
 
-@test "yaml is not linked from Homebrew in non-MacOS" {
-  cached_tarball "yaml-0.1.6"
-  cached_tarball "Python-3.6.2"
-
-  for i in {1..10}; do stub uname '-s : echo Linux'; done
-  stub brew true; brew
-  stub_make_install
-  stub_make_install
-
-  install_fixture definitions/needs-yaml
-  assert_success
-
-  unstub uname
-  unstub brew
-  unstub make
-
-  assert_build_log <<OUT
-yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
-yaml-0.1.6: --prefix=${TMP}/install
-make -j 2
-make install
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
-make -j 2
-make install
-OUT
-}
-
 @test "readline is linked from Homebrew" {
   cached_tarball "Python-3.6.2"
 
@@ -358,12 +330,14 @@ OUT
   done
 }
 
-@test "no library searches performed during normal operation touch homebrew in non-MacOS" {
+@test "homebrew is not touched if PYTHON_BUILD_SKIP_HOMEBREW is set" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew true; brew
   stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
 
   run_inline_definition <<DEF
 install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
@@ -382,14 +356,74 @@ make install
 OUT
 }
 
-@test "no library searches performed during normal operation touch homebrew if envvar is set" {
+@test "homebrew is used in Linux if PYTHON_BUILD_USE_HOMEBREW is set" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..4}; do stub uname '-s : echo Darwin'; done
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
-  stub brew true; brew
+  BREW_PREFIX="$TMP/homebrew-prefix"
+  mkdir -p "$BREW_PREFIX"
+
+  for i in {1..4}; do stub uname '-s : echo Linux'; done
+  stub brew "--prefix : echo '$BREW_PREFIX'"
+  for i in {1..4}; do stub brew false; done
   stub_make_install
-  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  export PYTHON_BUILD_USE_HOMEBREW=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "homebrew is used in Linux if Pyenv is installed with Homebrew" {
+  cached_tarball "Python-3.6.2"
+
+  BREW_PREFIX="$(type -p python-build)"
+  BREW_PREFIX="${BREW_PREFIX%/*}"
+  BREW_PREFIX="${BREW_PREFIX%/*}"
+
+  for i in {1..4}; do stub uname '-s : echo Linux'; done
+  stub brew "--prefix : echo '$BREW_PREFIX'"
+  for i in {1..4}; do stub brew false; done
+  stub_make_install
+  export PYTHON_BUILD_USE_HOMEBREW=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "homebrew is not used in Linux if Pyenv is not installed with Homebrew" {
+  cached_tarball "Python-3.6.2"
+
+  BREW_PREFIX="$TMP/homebrew-prefix"
+  mkdir -p "$BREW_PREFIX"
+
+  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..5}; do stub brew "--prefix : echo '$BREW_PREFIX'"; done
+  stub_make_install
 
   run_inline_definition <<DEF
 install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"

@@ -120,9 +120,11 @@ The exceptions -- non-default options that are set by default -- are listed belo
 
 ##### Homebrew
 
-In MacOS, Homebrew is used to find dependency packages if `brew` is found on `PATH`.
+Homebrew is used to find dependency packages if `brew` is found on `PATH`:
+* In MacOS, or
+* If the running Pyenv itself is installed with Homebrew
 
-Set `PYTHON_BUILD_SKIP_HOMEBREW` to avoid using it.
+Set `PYTHON_BUILD_USE_HOMEBREW` or `PYTHON_BUILD_SKIP_HOMEBREW` to override this default.
 
 When Homebrew is used, its `include` and `lib` paths are added to compiler search path (the latter is also set as `rpath`),
 and also Python dependencies that are typically keg-only are searched for in the Homebrew installation and added individually.
@@ -155,7 +157,8 @@ You can set certain environment variables to control the build process.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
 * `PYTHON_BUILD_HTTP_CLIENT`, explicitly specify the HTTP client type to use. `aria2`, `curl` and `wget` are the supported values and by default, are searched in that order.
-* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew in macOS.
+* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it would normally will.
+* `PYTHON_BUILD_USE_HOMEBREW`, if set, will search for libraries installed by Homebrew when it would normally not.
 * `PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA`, override the Homebrew OpenSSL formula to use.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
   in `share/python-build/` are looked up.
