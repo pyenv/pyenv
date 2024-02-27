@@ -124,16 +124,14 @@ In MacOS, Homebrew is used to find dependency packages if `brew` is found on `PA
 
 Set `PYTHON_BUILD_SKIP_HOMEBREW` to avoid using it.
 
----
-
-Homebrew is NOT used in Linux by default because it's rolling-release which causes a problem.
-Upgrading a Python dependency in Homebrew to a new major version (that `brew` does without warning)
-would break all Pyenv-managed installations that depend on it.
-You can use a community plugin [fix-version](https://github.com/pyenv/pyenv/wiki/Plugins#community-plugins)
-to fix installations in such a case.
-
 When Homebrew is used, its `include` and `lib` paths are added to compiler search path (the latter is also set as `rpath`),
 and also Python dependencies that are typically keg-only are searched for in the Homebrew installation and added individually.
+
+**NOTE:** Homebrew is not used in Linux by default because it's rolling-release which causes a problem.
+Upgrading a Python dependency in Homebrew to a new major version (that `brew` does without warning)
+would break all Pyenv-managed installations that depend on it.
+You can use a [community plugin `fix-version`](https://github.com/pyenv/pyenv/wiki/Plugins#community-plugins)
+to fix installations in such a case.
 
 ##### Portage
 
