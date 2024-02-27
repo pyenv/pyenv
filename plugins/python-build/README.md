@@ -107,7 +107,7 @@ to maintain the principle of the least surprise.
 The exceptions -- non-default options that are set by default -- are listed below:
 
 | Option/Behavior | Rationale |
--------------------------------
+|-----------------|-----------|
 | `--enable-shared` is on by default. Pass `--disable-shared` to Configure options to override | The official CPython Docker image uses it. It's required to embed CPython. |
 | argument to `--enable-universalsdk` is ignored and set to `/` | 
 | `--with-universal-archs` defaults to `universal2` on ARM64 architecture | the only dual-architecture Macs in use today are Apple Silicon which can only build that one |
