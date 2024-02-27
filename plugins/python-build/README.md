@@ -98,6 +98,47 @@ custom definition files.
 
 [definitions]: https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build
 
+### Default build configuration
+
+Without the user customizing the build with environment variables (see below),
+`python-build` builds Python with mostly default Configure options
+to maintain the principle of the least surprise.
+
+The exceptions -- non-default options that are set by default -- are listed below:
+
+| Option/Behavior | Rationale |
+|-----------------|-----------|
+| `--enable-shared` is on by default. Pass `--disable-shared` to Configure options to override | The official CPython Docker image uses it. It's required to embed CPython. |
+| argument to `--enable-universalsdk` is ignored and set to `/` | 
+| `--with-universal-archs` defaults to `universal2` on ARM64 architecture | the only dual-architecture Macs in use today are Apple Silicon which can only build that one |
+| argument to `--enable-framework` is ignored and set to a specific value | CPython's build logic requires a very specific argument to avoid installing the `Applications` part globally |
+| argument to `--enable-unicode` in non-MacOS is overridden to `ucs4` for 2.x-3.3 |
+| `MACOSX_DEPLOYMENT_TARGET` defaults to the running MacOS version |
+
+
+#### Integration with 3rd-party package ecosystems
+
+##### Homebrew
+
+In MacOS, Homebrew is used to find dependency packages if `brew` is found on `PATH`.
+
+Set `PYTHON_BUILD_SKIP_HOMEBREW` to avoid using it.
+
+When Homebrew is used, its `include` and `lib` paths are added to compiler search path (the latter is also set as `rpath`),
+and also Python dependencies that are typically keg-only are searched for in the Homebrew installation and added individually.
+
+**NOTE:** Homebrew is not used in Linux by default because it's rolling-release which causes a problem.
+Upgrading a Python dependency in Homebrew to a new major version (that `brew` does without warning)
+would break all Pyenv-managed installations that depend on it.
+You can use a [community plugin `fix-version`](https://github.com/pyenv/pyenv/wiki/Plugins#community-plugins)
+to fix installations in such a case.
+
+##### Portage
+
+In FreeBSD, if `pkg` is on PATH, Ports are searched for some dependencies that Configure is known to not search for via `pkg-config`.
+(Later versions of CPython search for more packages via `pkg-config` so this may eventually become redundant.)
+
+
 ### Special environment variables
 
 You can set certain environment variables to control the build process.
