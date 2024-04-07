@@ -1,6 +1,6 @@
 # Version History
 
-## Release v2.3.37
+## Release v2.4.0
 * Add CPython 3.13.0a4 by @saaketp in https://github.com/pyenv/pyenv/pull/2903
 * Handle the case where `pyenv-commands --sh` returns nothing by @aphedges in https://github.com/pyenv/pyenv/pull/2908
 * Document default build configuration customizations by @native-api in https://github.com/pyenv/pyenv/pull/2911
@@ -14,6 +14,7 @@
 * Add CPython 3.10.14 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2930
 * Add Jython 2.7.3 by @cesarcoatl in https://github.com/pyenv/pyenv/pull/2936
 * Add CPython 3.11.9 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2938
+* Add anaconda 2024.02 by @native-api in https://github.com/pyenv/pyenv/pull/2939
 
 ## Release v2.3.36
 * Add a Dependabot config to auto-update GitHub action versions by @kurtmckee in https://github.com/pyenv/pyenv/pull/2863
