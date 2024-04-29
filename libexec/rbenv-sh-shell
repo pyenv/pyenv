@@ -48,6 +48,10 @@ if [ "$version" = "--unset" ]; then
     echo 'set -gu RBENV_VERSION_OLD "$RBENV_VERSION"'
     echo "set -e RBENV_VERSION"
     ;;
+  zsh )
+    echo "typeset -g RBENV_VERSION_OLD=\"\${RBENV_VERSION-}\""
+    echo "unset RBENV_VERSION"
+    ;;
   * )
     echo 'RBENV_VERSION_OLD="${RBENV_VERSION-}"'
     echo "unset RBENV_VERSION"
@@ -74,6 +78,24 @@ else
   echo "rbenv: RBENV_VERSION_OLD is not set" >&2
   false
 end
+EOS
+    ;;
+  zsh )
+    cat <<EOS
+if [ -n "\${RBENV_VERSION_OLD+x}" ]; then
+  if [ -n "\$RBENV_VERSION_OLD" ]; then
+    local RBENV_VERSION_OLD_="\$RBENV_VERSION"
+    export RBENV_VERSION="\$RBENV_VERSION_OLD"
+    RBENV_VERSION_OLD="\$RBENV_VERSION_OLD_"
+    unset RBENV_VERSION_OLD_
+  else
+    typeset -g RBENV_VERSION_OLD="\$RBENV_VERSION"
+    unset RBENV_VERSION
+  fi
+else
+  echo "rbenv: RBENV_VERSION_OLD is not set" >&2
+  false
+fi
 EOS
     ;;
   * )
@@ -105,6 +127,10 @@ if rbenv-prefix "$version" >/dev/null; then
     fish )
       echo 'set -gu RBENV_VERSION_OLD "$RBENV_VERSION"'
       echo "set -gx RBENV_VERSION \"$version\""
+      ;;
+    zsh )
+      echo "typeset -g RBENV_VERSION_OLD=\"\${RBENV_VERSION-}\""
+      echo "export RBENV_VERSION=\"$version\""
       ;;
     * )
       echo 'RBENV_VERSION_OLD="${RBENV_VERSION-}"'

@@ -80,6 +80,16 @@ export RBENV_VERSION="1.2.3"
 OUT
 }
 
+@test "shell change version (zsh)" {
+  mkdir -p "${RBENV_ROOT}/versions/1.2.3"
+  RBENV_SHELL=zsh run rbenv-sh-shell 1.2.3
+  assert_success
+  assert_output <<OUT
+typeset -g RBENV_VERSION_OLD="\${RBENV_VERSION-}"
+export RBENV_VERSION="1.2.3"
+OUT
+}
+
 @test "shell change version (fish)" {
   mkdir -p "${RBENV_ROOT}/versions/1.2.3"
   RBENV_SHELL=fish run rbenv-sh-shell 1.2.3
