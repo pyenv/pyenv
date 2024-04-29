@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Summary: List all available rbenv commands
 # Usage: rbenv commands [--sh|--no-sh]
+#
+# List names of all rbenv commands, including 3rd-party ones found in the
+# PATH or in rbenv plugins. With `--sh`, list only shell commands.
+#
+# This functionality is mainly meant for scripting. To see usage help for
+# rbenv, run `rbenv help`.
 
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x

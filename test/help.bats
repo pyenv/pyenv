@@ -6,7 +6,7 @@ load test_helper
   run rbenv-help
   assert_success
   assert_line "Usage: rbenv <command> [<args>...]"
-  assert_line "Some useful rbenv commands are:"
+  assert_line "Commands to manage available Ruby versions:"
 }
 
 @test "usage flag" {

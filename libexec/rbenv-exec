@@ -2,7 +2,7 @@
 #
 # Summary: Run an executable with the selected Ruby version
 #
-# Usage: rbenv exec <command> [arg1 arg2...]
+# Usage: rbenv exec <command> [<args>...]
 #
 # Runs an executable by first preparing PATH so that the selected Ruby
 # version's `bin' directory is at the front.

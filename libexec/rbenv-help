@@ -164,8 +164,11 @@ if [ -z "$1" ] || [ "$1" == "rbenv" ]; then
   echo "Usage: rbenv <command> [<args>...]"
   [ -n "$usage" ] && exit
   echo
-  echo "Some useful rbenv commands are:"
-  print_summaries commands local global shell install uninstall rehash version versions which whence
+  echo "Commands to manage available Ruby versions:"
+  print_summaries versions install uninstall rehash
+  echo
+  echo "Commands to view or change the current Ruby version:"
+  print_summaries version local global shell
   echo
   echo "See \`rbenv help <command>' for information on a specific command."
   echo "For full documentation, see: https://github.com/rbenv/rbenv#readme"

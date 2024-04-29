@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
-# Summary: Rehash rbenv shims (run this after installing executables)
+# Summary: Regenerate rbenv shims
+#
+# Regenerate shims for every Ruby executable in `$RBENV_ROOT/versions/*/bin'
+# and write them to the `$RBENV_ROOT/shims' directory. A shell environment
+# properly set up for rbenv will have this shims directory in PATH, which is
+# the core mechanism for Ruby version switching.
+#
+# Running rbenv rehash should only be necessary after installing new Ruby
+# versions or gems. Note that this is sometimes done automatically: the
+# `rbenv install' command from the ruby-build plugin runs rehash after
+# every successful installation, and a RubyGems plugin that ships with
+# rbenv runs rehash after every `gem install' command.
 
 set -e
 [ -n "$RBENV_DEBUG" ] && set -x
