@@ -103,6 +103,24 @@ This will get you going with the latest version of rbenv without needing a syste
 
 3. Restart your shell so that these changes take effect. (Opening a new terminal tab will usually do it.)
 
+#### Shell completions
+
+When _manually_ installing rbenv, it might be useful to note how completion scripts for various shells work. Completion scripts help with typing rbenv commands by expanding partially entered rbenv command names and option flags; typically this is invoked by pressing <kbd>Tab</kbd> key in an interactive shell.
+
+- The **bash** completion script for rbenv ships with the project and gets [loaded by the `rbenv init` mechanism](#how-rbenv-hooks-into-your-shell).
+
+- The **zsh** completion script ships with the project, but needs to be added to FPATH in zsh before it can be discovered by the shell. One way to do this would be to edit `~/.zshrc`:
+
+  ```sh
+  # assuming that rbenv was installed to `~/.rbenv`
+  FPATH=~/.rbenv/completions:"$FPATH"
+
+  autoload -U compinit
+  compinit
+  ```
+
+- The **fish** completion script for rbenv ships with the fish shell itself and is not maintained by the rbenv project.
+
 ### Installing Ruby versions
 
 The `rbenv install` command does not ship with rbenv out-of-the-box, but is provided by the [ruby-build][] plugin.
@@ -286,7 +304,7 @@ name | default | description
 
 1. Prepends `~/.rbenv/shims` directory to PATH. This is basically the only requirement for rbenv to function properly.
 
-2. Installs shell completion for rbenv commands.
+2. Installs bash shell completion for rbenv commands.
 
 3. Regenerates rbenv shims. If this step slows down your shell startup, you can invoke `rbenv init -` with the `--no-rehash` flag.
 

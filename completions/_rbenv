@@ -1,0 +1,13 @@
+#compdef rbenv
+
+_rbenv() {
+  local completions
+
+  if [ "${#words}" -eq 2 ]; then
+    completions=(${(f)"$(rbenv help --complete-commands "${words[2]}")"})
+    _describe 'rbenv commands' completions
+  else
+    completions="$(rbenv completions ${words[2,-2]})"
+    compadd - "${(ps:\n:)completions}"
+  fi
+}

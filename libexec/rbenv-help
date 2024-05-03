@@ -151,6 +151,27 @@ print_usage() {
   fi
 }
 
+if [ "$1" = "--complete-commands" ]; then
+  command_prefix="${2:-}"
+  seen=()
+  IFS=: read -d '' -r -a paths <<<"$PATH" || true
+  shopt -s nullglob
+  for path in "${paths[@]}"; do
+    for command in "${path}/rbenv-${command_prefix}"*; do
+      command_name="${command##*/}"
+      command_name="${command_name#rbenv-}"
+      command_name="${command_name#sh-}"
+      [[ " ${seen[*]} " != *" ${command_name} "* ]] || continue
+      seen+=("$command_name")
+      summary=""
+      eval "$(extract_initial_comment_block < "$command" | collect_documentation)"
+      [ -n "$summary" ] || continue
+      printf "%s:%s\n" "$command_name" "$summary"
+    done
+  done
+  exit 0
+fi
+
 unset usage
 if [ "$1" = "--usage" ]; then
   usage="1"
