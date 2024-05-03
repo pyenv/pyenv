@@ -51,10 +51,9 @@ On systems with Homebrew package manager, the “Using Package Managers” metho
    rbenv and you can install it from the AUR using the instructions from this
    [wiki page](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages).
 
-2. Learn how to load rbenv in your shell.
+2. Set up your shell to load rbenv.
 
     ```sh
-    # run this and follow the printed instructions:
     rbenv init
     ```
 
@@ -75,29 +74,11 @@ This will get you going with the latest version of rbenv without needing a syste
     git clone https://github.com/rbenv/rbenv.git ~/.rbenv
     ```
 
-2. Configure your shell to load rbenv:
+2. Set up your shell to load rbenv.
 
-   * For **bash**:
-     
-     _Ubuntu Desktop_ users should configure `~/.bashrc`:
-     ```bash
-     echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bashrc
-     ```
-
-     On _other platforms_, bash is usually configured via `~/.bash_profile`:
-     ```bash
-     echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bash_profile
-     ```
-     
-   * For **Zsh**:
-     ```zsh
-     echo 'eval "$(~/.rbenv/bin/rbenv init - zsh)"' >> ~/.zshrc
-     ```
-   
-   * For **Fish shell**:
-     ```fish
-     echo 'status --is-interactive; and ~/.rbenv/bin/rbenv init - fish | source' >> ~/.config/fish/config.fish
-     ```
+    ```sh
+    ~/.rbenv/bin/rbenv init
+    ```
 
    If you are curious, see here to [understand what `init` does](#how-rbenv-hooks-into-your-shell).
 
@@ -298,7 +279,7 @@ name | default | description
 
 ### How rbenv hooks into your shell
 
-`rbenv init` is a helper command to bootstrap rbenv into a shell. This helper is part of the recommended installation instructions, but optional, as an advanced user can set up the following tasks manually. Here is what the command does when its output is `eval`'d:
+`rbenv init` is a helper command to bootstrap rbenv into a shell. This helper is part of the recommended installation instructions, but optional, as an advanced user can set up the following tasks manually. Here is what the command does when its output is `eval`'d by a shell during its startup:
 
 0. Adds `rbenv` executable to PATH if necessary.
 

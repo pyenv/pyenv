@@ -51,16 +51,65 @@ OUT
   [ -z "$line" ] || flunk "did not expect line: $line"
 }
 
-@test "posix shell instructions" {
+@test "set up bash" {
+  assert [ ! -e ~/.bash_profile ]
   run rbenv-init bash
-  assert [ "$status" -eq 1 ]
+  assert_success "writing ~/.bash_profile: now configured for rbenv."
+  run cat ~/.bash_profile
+  # shellcheck disable=SC2016
   assert_line 'eval "$(rbenv init - bash)"'
 }
 
-@test "fish instructions" {
+@test "set up bash (bashrc)" {
+  mkdir -p "$HOME"
+  touch ~/.bashrc
+  assert [ ! -e ~/.bash_profile ]
+  run rbenv-init bash
+  assert_success "writing ~/.bashrc: now configured for rbenv."
+  run cat ~/.bashrc
+  # shellcheck disable=SC2016
+  assert_line 'eval "$(rbenv init - bash)"'
+}
+
+@test "set up zsh" {
+  unset ZDOTDIR
+  assert [ ! -e ~/.zprofile ]
+  run rbenv-init zsh
+  assert_success "writing ~/.zprofile: now configured for rbenv."
+  run cat ~/.zprofile
+  # shellcheck disable=SC2016
+  assert_line 'eval "$(rbenv init - zsh)"'
+}
+
+@test "set up zsh (zshrc)" {
+  unset ZDOTDIR
+  mkdir -p "$HOME"
+  cat > ~/.zshrc <<<"# rbenv"
+  run rbenv-init zsh
+  assert_success "writing ~/.zshrc: now configured for rbenv."
+  run cat ~/.zshrc
+  # shellcheck disable=SC2016
+  assert_line 'eval "$(rbenv init - zsh)"'
+}
+
+@test "set up fish" {
+  unset XDG_CONFIG_HOME
   run rbenv-init fish
-  assert [ "$status" -eq 1 ]
+  assert_success "writing ~/.config/fish/config.fish: now configured for rbenv."
+  run cat ~/.config/fish/config.fish
   assert_line 'status --is-interactive; and rbenv init - fish | source'
+}
+
+@test "set up multiple shells at once" {
+  unset ZDOTDIR
+  unset XDG_CONFIG_HOME
+  run rbenv-init bash zsh fish
+  assert_success
+  assert_output <<OUT
+writing ~/.bash_profile: now configured for rbenv.
+writing ~/.zprofile: now configured for rbenv.
+writing ~/.config/fish/config.fish: now configured for rbenv.
+OUT
 }
 
 @test "option to skip rehash" {
