@@ -4,4 +4,4 @@ export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
 export PYTHON_BUILD_CONFIGURE_WITH_DSYMUTIL=1
 install_package "openssl-3.3.0" "https://www.openssl.org/source/openssl-3.3.0.tar.gz#53e66b043322a606abf0087e7699a0e033a37fa13feb9742df35c3a33b18fb02" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.0" "https://ftpmirror.gnu.org/readline/readline-8.0.tar.gz#e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461" mac_readline --if has_broken_mac_readline
-install_git "Python-3.13-dev" "https://github.com/python/cpython" 3.13 standard verify_py313 copy_python_gdb ensurepip
+install_git "Python-3.14-dev" "https://github.com/python/cpython" main standard verify_py314 copy_python_gdb ensurepip

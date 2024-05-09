@@ -2021,6 +2021,11 @@ build_package_verify_py313() {
   build_package_verify_py312 "$1" "${2:-3.13}"
 }
 
+# Post-install check for Python 3.14.x
+build_package_verify_py314() {
+  build_package_verify_py313 "$1" "${2:-3.13}"
+}
+
 # Post-install check for Python 3.x rolling release scripts
 # XXX: Will need splitting into project-specific ones if there emerge
 # multiple rolling-release scripts with different checks needed
