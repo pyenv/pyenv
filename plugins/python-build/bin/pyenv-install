@@ -123,6 +123,36 @@ DEFINITIONS=("${ARGUMENTS[@]}")
 [[ "${#DEFINITIONS[*]}" -eq 0 ]] && DEFINITIONS=($(pyenv-local 2>/dev/null || true))
 [[ "${#DEFINITIONS[*]}" -eq 0 ]] && usage 1 >&2
 
+is_array() {
+    # no argument passed
+    [[ $# -ne 1 ]] && echo 'Supply a variable name as an argument'>&2 && return 2
+    local var=$1
+    # use a variable to avoid having to escape spaces
+    local regex="^declare -[aA] ${var}(=|$)"
+    [[ $(declare -p "$var" 2> /dev/null) =~ $regex ]] && return 0
+}
+
+# If VERSION_ALIAS exists, create a 1-element array, VERSION_ALIASES, from VERSION_ALIAS
+if [ -n "${VERSION_ALIAS}" ]; then
+  # Make sure VERSION_ALIASES doesn't already exist
+  # If it does, print an error about defining only one of VERSION_ALIAS or VERSION_ALIASES
+  if is_array VERSION_ALIASES; then
+    echo "Define only one of VERSION_ALIAS or VERSION_ALIASES" >&2
+    exit 1
+  fi
+
+  VERSION_ALIASES=("${VERSION_ALIAS}")
+fi
+
+# If VERSION_ALIASES exists, make sure it has the same number of elements as DEFINITIONS
+
+if is_array VERSION_ALIASES; then
+  if [[ "${#VERSION_ALIASES[@]}" -ne "${#DEFINITIONS[@]}" ]]; then
+    echo "VERSION_ALIASES must have the same number of elements as DEFINITIONS" >&2
+    exit 1
+  fi
+fi
+
 # Define `before_install` and `after_install` functions that allow
 # plugin hooks to register a string of code for execution before or
 # after the installation process.
@@ -152,7 +182,12 @@ IFS="$OLDIFS"
 for script in "${scripts[@]}"; do source "$script"; done
 
 COMBINED_STATUS=0
-for DEFINITION in "${DEFINITIONS[@]}"; do
+for i in "${!DEFINITIONS[@]}"; do
+  DEFINITION="${DEFINITIONS[$i]}"
+  if is_array VERSION_ALIASES; then
+    VERSION_ALIAS="${VERSION_ALIASES[$i]}"
+  fi
+
   STATUS=0
 
   # Try to resolve a prefix if user indeed gave a prefix.
@@ -160,8 +195,9 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
   # and hooks also see the resolved name
   DEFINITION="$(pyenv-latest -q -k "$DEFINITION" || echo "$DEFINITION")"
 
-  # Set VERSION_NAME from $DEFINITION. Then compute the installation prefix.
-  VERSION_NAME="${DEFINITION##*/}"
+  # Set VERSION_NAME from $VERSION_ALIAS if it is defined, else $DEFINITION. 
+  # Then compute the installation prefix.
+  VERSION_NAME="${VERSION_ALIAS:-$DEFINITION##*/}"
   [ -n "$DEBUG" ] && VERSION_NAME="${VERSION_NAME}-debug"
   PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
 
