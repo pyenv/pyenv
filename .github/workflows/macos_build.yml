@@ -32,7 +32,7 @@ jobs:
         run: |
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
-          bin/pyenv install -v ${{ matrix.python-version }}
+          bin/pyenv --debug install ${{ matrix.python-version }}
           bin/pyenv global ${{ matrix.python-version }}
           bin/pyenv rehash
       - run: python --version
