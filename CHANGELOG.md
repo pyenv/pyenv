@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.4.1
+* Add CPython 3.12.3 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2941
+* Add CPython 3.13.0a6 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2942
+* Add PyPy v7.3.16 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2948
+* Add CPython 3.14-dev, update 3.13-dev by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2960
+* Add CPython 3.13.0b1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2959
+
 ## Release v2.4.0
 * Add CPython 3.13.0a4 by @saaketp in https://github.com/pyenv/pyenv/pull/2903
 * Handle the case where `pyenv-commands --sh` returns nothing by @aphedges in https://github.com/pyenv/pyenv/pull/2908

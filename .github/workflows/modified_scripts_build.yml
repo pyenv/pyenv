@@ -49,7 +49,7 @@ jobs:
           fi
       - run: |
           #build
-          pyenv install -v ${{ matrix.python-version }}
+          pyenv --debug install ${{ matrix.python-version }}
           pyenv global ${{ matrix.python-version }}
       # Micropython doesn't support --version
       - run: |
