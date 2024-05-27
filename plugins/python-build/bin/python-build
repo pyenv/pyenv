@@ -397,7 +397,7 @@ http_get_aria2c() {
   fi
 
   if aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
-    [ -n "$2" ] || cat "${out}"
+    [ -n "$2" ] || cat "${dir_out:-.}/${out}"
   else
     false
   fi
