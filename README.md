@@ -32,7 +32,7 @@ On systems with Homebrew package manager, the “Using Package Managers” metho
    On macOS or Linux, we recommend installing rbenv with [Homebrew](https://brew.sh).
    
    ```sh
-   brew install rbenv ruby-build
+   brew install rbenv
    ```
    
    #### Debian, Ubuntu, and their derivatives
