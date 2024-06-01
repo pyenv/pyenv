@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+export LC_ALL=C # boost grep performance by disabling unicode
 
 if [ "$1" = "--debug" ]; then
   export PYENV_DEBUG=1
@@ -118,16 +119,21 @@ case "$command" in
   exec pyenv-help
   ;;
 * )
-  command_path="$(command -v "pyenv-$command" || true)"
-  if [ -z "$command_path" ]; then
-    if [ "$command" == "shell" ]; then
-      abort "shell integration not enabled. Run \`pyenv init' for instructions."
-    else
-      abort "no such command \`$command'"
+  # Just a version number given (or `latest` or `system`) -> assume `pyenv local $@`
+  if grep -q -E "^[0-9]+(\.[0-9]+){0,2}$" <<<"${command}" || [ "$command" == "latest" ] || [ "$command" == "system" ]; then
+    command_path="pyenv-local"
+  else
+    command_path="$(command -v "pyenv-$command" || true)"
+    if [ -z "$command_path" ]; then
+      if [ "$command" == "shell" ]; then
+        abort "shell integration not enabled. Run \`pyenv init' for instructions."
+      else
+        abort "no such command \`$command'"
+      fi
     fi
-  fi
 
-  shift 1
+    shift 1
+  fi
   if [ "$1" = --help ]; then
     if [[ "$command" == "sh-"* ]]; then
       echo "pyenv help \"$command\""

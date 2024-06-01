@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
+# Summary: Writes specified version(s) to the specified file if the version(s) exist
 # Usage: pyenv version-file-write <file> <version>
+# If the specified version is not installed, only display error message and return error code.
+# If only a single version="system" is specified and installed, display previous version (if any) and remove file.
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -13,12 +16,46 @@ if [ -z "$versions" ] || [ -z "$PYENV_VERSION_FILE" ]; then
   exit 1
 fi
 
-# Make sure the specified version is installed.
-pyenv-prefix "${versions[@]}" >/dev/null
+# Make sure the specified version(s) are installed.
+# Use pyenv-prefix loop logic.
+if [ -n "$1" ]; then
+  OLDIFS="$IFS"
+  {
+    IFS=:
+    export PYENV_VERSION="$*"
+  }
+  IFS="$OLDIFS"
+elif [ -z "$PYENV_VERSION" ]; then
+  PYENV_VERSION="$(pyenv-version-name)"
+fi
 
-# Write the version out to disk.
-# Create an empty file. Using "rm" might cause a permission error.
-> "$PYENV_VERSION_FILE"
-for version in "${versions[@]}"; do
-  echo "$version" >> "$PYENV_VERSION_FILE"
-done
+PYENV_VERSIONS=()
+OLDIFS="$IFS"
+{
+  IFS=:
+  for version in ${PYENV_VERSION}; do
+    if ! INSTALLED="$(pyenv-installed "$version" 2>&1)"; then
+      echo "$INSTALLED" >&2
+      exit 1
+    fi
+    PYENV_VERSIONS=("${PYENV_VERSIONS[@]}" "$INSTALLED")
+  done
+}
+IFS="$OLDIFS"
+
+# Special case: only system was specified and found
+if [ "$1" = "system" ]; then
+  if [ -f "$PYENV_VERSION_FILE" ]; then
+    if previous="$(head -1 "$PYENV_VERSION_FILE" | grep -E "^[0-9]+\.[0-9]+\.[0-9]+$")"; then
+      echo "pyenv: using system version instead of $previous now"
+    fi
+    rm "$PYENV_VERSION_FILE"
+  fi
+else
+  # Write the version out to disk.
+  # Create an empty file. Using "rm" might cause a permission error.
+  > "$PYENV_VERSION_FILE"
+  for version in "${PYENV_VERSIONS[@]}"; do
+    echo "$version" >> "$PYENV_VERSION_FILE"
+  done
+fi
