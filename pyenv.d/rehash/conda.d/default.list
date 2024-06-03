@@ -64,6 +64,8 @@ redis-check-aof
 redis-check-dump
 redis-cli
 redis-server
+# sed
+sed
 # sqlite3
 sqlite3
 # xslt-config
@@ -190,3 +192,4 @@ who
 whoami
 yes
 # --- end exclusions from coreutils
+greadlink
