@@ -580,9 +580,12 @@ uninstall from the system.
 
 ## Pyenv plugins
 
-Pyenv provides a simple, flexible and maintainable way to extend and customize its functionality with plugins --
+Pyenv provides a simple way to extend and customize its functionality with plugins --
 as simple as creating a plugin directory and dropping a shell script on a certain subpath of it
 with whatever extra logic you need to be run at certain moments.
+
+The main idea is that most things that you can put under `$PYENV_ROOT/<whatever>` you can also put
+under `$PYENV_ROOT/plugins/your_plugin_name/<whatever>`.
 
 See [_Plugins_ on the wiki](https://github.com/pyenv/pyenv/wiki/Plugins) on how to install and use plugins
 as well as a catalog of some useful existing plugins for common needs.
