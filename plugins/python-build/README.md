@@ -200,20 +200,6 @@ $ cat fix1.patch fix2.patch | pyenv install --patch 2.7.10
 ```
 
 
-### Building with `--enable-shared`
-
-You can build CPython with `--enable-shared` to install a version with
-shared object.
-
-If `--enable-shared` was found in `PYTHON_CONFIGURE_OPTS` or `CONFIGURE_OPTS`,
-`python-build` will automatically set `RPATH` to the pyenv's prefix directory.
-This means you don't have to set `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` for
-the version(s) installed with `--enable-shared`.
-
-```sh
-$ env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 2.7.9
-```
-
 ### Building for maximum performance
 
 Building CPython with `--enable-optimizations` will result in a faster
