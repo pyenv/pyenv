@@ -1,5 +1,13 @@
 # Version History
 
+## Release v2.4.2
+* Add script to install graalpy development builds by @timfel in https://github.com/pyenv/pyenv/pull/2969
+* Correct the Explanation of PATH Variable Lookup by @Y-askour in https://github.com/pyenv/pyenv/pull/2975
+* Document PYTHON_BUILD_CURL_OPTS, PYTHON_BUILD_WGET_OPTS, PYTHON_BUILD_ARIA2_OPTS by @native-api in https://github.com/pyenv/pyenv/pull/2976
+* Add sed and greadlink to shim exceptions by @native-api in https://github.com/pyenv/pyenv/pull/2977
+* Add CPython 3.13.0b2 by @jsirois in https://github.com/pyenv/pyenv/pull/2978
+* Add CPython 3.12.4 by @xxzgc in https://github.com/pyenv/pyenv/pull/2981
+
 ## Release v2.4.1
 * Add CPython 3.12.3 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2941
 * Add CPython 3.13.0a6 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2942
