@@ -96,7 +96,10 @@ versions of Python that are not yet supported by python-build.
 See the [python-build built-in definitions](https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build) as a starting point for
 custom definition files.
 
-[definitions]: https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build
+#### Adding definitions with a Pyenv plugin
+
+You can add your own definitions with a [Pyenv plugin](https://github.com/pyenv/pyenv?tab=readme-ov-file#pyenv-plugins) by placing them under
+`$PYENV_ROOT/plugins/your_plugin_name/share/python-build`.
 
 ### Default build configuration
 
