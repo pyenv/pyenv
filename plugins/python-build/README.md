@@ -227,14 +227,30 @@ definition. (All bundled definitions include checksums.)
 ### Package download mirrors
 
 python-build will first attempt to download package files from a mirror hosted on
-GitHub Pages. If a package is not available on the mirror, if the mirror
-is down, or if the download is corrupt, python-build will fall back to the
+GitHub Pages. If this fails, it will fall back to the
 official URL specified in the definition file.
 
 You can point python-build to another mirror by specifying the
-`PYTHON_BUILD_MIRROR_URL` environment variable--useful if you'd like to run your
-own local mirror, for example. Package mirror URLs are constructed by joining
-this variable with the SHA2 checksum of the package file.
+`PYTHON_BUILD_MIRROR_URL` environment variable.
+
+Package mirror URLs are constructed by joining
+`$PYTHON_BUILD_MIRROR_URL` with the SHA2 checksum of the package file as specified in the URL
+in the installation script (the part after the hash sign). E.g.:
+
+```
+https://mycache.example.com/0419e9085bf51b7a672009b3f50dbf1859acdf18ba725d0ec19aa5c8503f0ea3
+```
+
+If you have replicated the directory structure of an official site, the easiest way to adapt
+would be to make symlinks at the mirror's root:
+
+```
+0419e9085bf51b7a672009b3f50dbf1859acdf18ba725d0ec19aa5c8503f0ea3 -> 3.10.10/Python-3.10.10.tar.xz
+```
+
+The rationale is to abstract away difference between directory structures of sites
+of various Python flavors and their occasional changes as well as to accomodate
+people who only wish to cache some select downloads. This also allows to mirror multiple sites at once.
 
 If the mirror being used does not have the same checksum (*e.g.* with a
 pull-through cache like Artifactory), you can set the
@@ -247,15 +263,15 @@ mirror by setting the `PYTHON_BUILD_SKIP_MIRROR` environment variable.
 The official python-build download mirror is provided by
 [GitHub Pages](http://yyuu.github.io/pythons/).
 
-### Package download caching
+### Package download cache
 
-You can instruct python-build to keep a local cache of downloaded package files
-by setting the `PYTHON_BUILD_CACHE_PATH` environment variable. When set, package
-files will be kept in this directory after the first successful download and
-reused by subsequent invocations of `python-build` and `pyenv install`.
+Python-build will keep a cache of downloaded package files
+at the location specified by the `PYTHON_BUILD_CACHE_PATH` environment variable
+if it exists. The default is `~/.pyenv/cache`, so you can
+enable caching by just creating that directory.
 
-The `pyenv install` command defaults this path to `~/.pyenv/cache`, so in most
-cases you can enable download caching simply by creating that directory.
+The name of the would-be cached file is reported by Pyenv in the "Downloading &lt;filename&gt;..." message.
+It's possible to warm up the cache by manually putting the file there under an appropriate name.
 
 ### Keeping the build directory after installation
 
