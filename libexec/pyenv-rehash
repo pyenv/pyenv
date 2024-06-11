@@ -90,12 +90,9 @@ remove_outdated_shims() {
 
 # List basenames of executables for every Python version
 list_executable_names() {
-  local version file
-  pyenv-versions --bare --skip-aliases | \
-  while read -r version; do
-    for file in "${PYENV_ROOT}/versions/${version}/bin/"*; do
-      echo "${file##*/}"
-    done
+  local file
+  for file in "${PYENV_ROOT}/versions/*/bin/"*; do
+    echo "${file##*/}"
   done
 }
 
@@ -140,7 +137,7 @@ if ((${BASH_VERSINFO[0]} > 3)); then
       fi
     done
   }
-
+  
 else # Same for bash < 4.
 
     registered_shims=" "
@@ -165,6 +162,7 @@ else # Same for bash < 4.
         fi
       done
     }
+
 fi
 
 shopt -s nullglob
@@ -174,17 +172,20 @@ shopt -s nullglob
 create_prototype_shim
 remove_outdated_shims
 # shellcheck disable=SC2046
-make_shims $(list_executable_names | sort -u)
+make_shims $(list_executable_names)
 
 
-# Allow plugins to register shims.
-OLDIFS="$IFS"
-IFS=$'\n' scripts=(`pyenv-hooks rehash`)
-IFS="$OLDIFS"
-
-for script in "${scripts[@]}"; do
-  source "$script"
-done
+get_hooks() {
+  shopt -s nullglob
+  IFS=: hook_paths=($PYENV_HOOK_PATH)
+  for path in "${hook_paths[@]}"; do
+    for script in "$path/$PYENV_COMMAND"/*.bash; do
+      source "$script"
+    done
+  done
+  shopt -u nullglob
+}
+get_hooks
 
 install_registered_shims
 remove_stale_shims
