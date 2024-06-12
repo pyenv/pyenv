@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.4.3
+* Add miniconda3 24.4.0-0 by @binbjz in https://github.com/pyenv/pyenv/pull/2982
+
 ## Release v2.4.2
 * Add script to install graalpy development builds by @timfel in https://github.com/pyenv/pyenv/pull/2969
 * Correct the Explanation of PATH Variable Lookup by @Y-askour in https://github.com/pyenv/pyenv/pull/2975
