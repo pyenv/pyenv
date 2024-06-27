@@ -1,0 +1,25 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Miniconda3-py312_24.5.0-0-Linux-aarch64.sh" "https://repo.anaconda.com/miniconda/Miniconda3-py312_24.5.0-0-Linux-aarch64.sh#70afe954cc8ee91f605f9aa48985bfe01ecfc10751339e8245eac7262b01298d" "miniconda" verify_py312
+  ;;
+"Linux-s390x" )
+  install_script "Miniconda3-py312_24.5.0-0-Linux-s390x.sh" "https://repo.anaconda.com/miniconda/Miniconda3-py312_24.5.0-0-Linux-s390x.sh#bd2a0a8ea34c84c860868d5b8efde07afc51cdede76b64dd94e9c3fd2d65257e" "miniconda" verify_py312
+  ;;
+"Linux-x86_64" )
+  install_script "Miniconda3-py312_24.5.0-0-Linux-x86_64.sh" "https://repo.anaconda.com/miniconda/Miniconda3-py312_24.5.0-0-Linux-x86_64.sh#4b3b3b1b99215e85fd73fb2c2d7ebf318ac942a457072de62d885056556eb83e" "miniconda" verify_py312
+  ;;
+"MacOSX-arm64" )
+  install_script "Miniconda3-py312_24.5.0-0-MacOSX-arm64.sh" "https://repo.anaconda.com/miniconda/Miniconda3-py312_24.5.0-0-MacOSX-arm64.sh#12e678b8156aea69a132568b6176a019c7a1ba753ddf5caedf086d3c5460fe92" "miniconda" verify_py312
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniconda3-py312_24.5.0-0-MacOSX-x86_64.sh" "https://repo.anaconda.com/miniconda/Miniconda3-py312_24.5.0-0-MacOSX-x86_64.sh#b1c87c8334ea878d30a9976c1860b1004e6d55bdec5228089fec40be81156363" "miniconda" verify_py312
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
