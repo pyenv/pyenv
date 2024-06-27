@@ -822,6 +822,7 @@ build_package_standard_build() {
       use_homebrew_zlib || true
     fi
     use_dsymutil || true
+    use_free_threading || true
   fi
 
   ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
@@ -1758,6 +1759,12 @@ use_tcltk() {
 use_dsymutil() {
   if [[ -n "$PYTHON_BUILD_CONFIGURE_WITH_DSYMUTIL" ]] && is_mac; then
     package_option python configure --with-dsymutil
+  fi
+}
+
+use_free_threading() {
+  if [[ -n "$PYTHON_BUILD_FREE_THREADING" ]]; then
+    package_option python configure --disable-gil
   fi
 }
 
