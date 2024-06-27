@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.4.4
+* Add support for miniconda3 24.5.0-0 with py3.12, py3.11, py3.10, py3.9 by @binbjz in https://github.com/pyenv/pyenv/pull/2994
+* Add support for free-threaded Python by @colesbury in https://github.com/pyenv/pyenv/pull/2995
+
 ## Release v2.4.3
 * Add miniconda3 24.4.0-0 by @binbjz in https://github.com/pyenv/pyenv/pull/2982
 
