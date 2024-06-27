@@ -397,7 +397,7 @@ http_get_aria2c() {
   fi
 
   if aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
-    [ -n "$2" ] || cat "${out}"
+    [ -n "$2" ] || cat "${dir_out:-.}/${out}"
   else
     false
   fi
@@ -2019,6 +2019,11 @@ build_package_verify_py312() {
 # Post-install check for Python 3.13.x
 build_package_verify_py313() {
   build_package_verify_py312 "$1" "${2:-3.13}"
+}
+
+# Post-install check for Python 3.14.x
+build_package_verify_py314() {
+  build_package_verify_py313 "$1" "${2:-3.13}"
 }
 
 # Post-install check for Python 3.x rolling release scripts

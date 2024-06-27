@@ -86,7 +86,7 @@ to the correct Python installation.
 
 ### Understanding PATH
 
-When you run a command like `python` or `pip`, your operating system
+When you run a command like `python` or `pip`, your shell (bash / zshrc / ...)
 searches through a list of directories to find an executable file with
 that name. This list of directories lives in an environment variable
 called `PATH`, with each directory in the list separated by a colon:
@@ -580,9 +580,12 @@ uninstall from the system.
 
 ## Pyenv plugins
 
-Pyenv provides a simple, flexible and maintainable way to extend and customize its functionality with plugins --
+Pyenv provides a simple way to extend and customize its functionality with plugins --
 as simple as creating a plugin directory and dropping a shell script on a certain subpath of it
 with whatever extra logic you need to be run at certain moments.
+
+The main idea is that most things that you can put under `$PYENV_ROOT/<whatever>` you can also put
+under `$PYENV_ROOT/plugins/your_plugin_name/<whatever>`.
 
 See [_Plugins_ on the wiki](https://github.com/pyenv/pyenv/wiki/Plugins) on how to install and use plugins
 as well as a catalog of some useful existing plugins for common needs.
@@ -675,7 +678,6 @@ name | default | description
 `PYENV_DEBUG` | | Outputs debug information.<br>Also as: `pyenv --debug <subcommand>`
 `PYENV_HOOK_PATH` | [_see wiki_][hooks] | Colon-separated list of paths searched for pyenv hooks.
 `PYENV_DIR` | `$PWD` | Directory to start searching for `.python-version` files.
-`PYTHON_BUILD_ARIA2_OPTS` | | Used to pass additional parameters to [`aria2`](https://aria2.github.io/).<br>If the `aria2c` binary is available on `PATH`, pyenv uses `aria2c` instead of `curl` or `wget` to download the Python Source code. If you have an unstable internet connection, you can use this variable to instruct `aria2` to accelerate the download.<br>In most cases, you will only need to use `-x 10 -k 1M` as value to `PYTHON_BUILD_ARIA2_OPTS` environment variable
 
 See also [_Special environment variables_ in Python-Build's README](plugins/python-build/README.md#special-environment-variables)
 for environment variables that can be used to customize the build.
