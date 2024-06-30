@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.4.5
+* Add CPython 3.13.0b3 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/2996
+
 ## Release v2.4.4
 * Add support for miniconda3 24.5.0-0 with py3.12, py3.11, py3.10, py3.9 by @binbjz in https://github.com/pyenv/pyenv/pull/2994
 * Add support for free-threaded Python by @colesbury in https://github.com/pyenv/pyenv/pull/2995
