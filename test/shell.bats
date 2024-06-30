@@ -31,6 +31,11 @@ load test_helper
   assert_success 'echo "$PYENV_VERSION"'
 }
 
+@test "shell version (pwsh)" {
+  PYENV_SHELL=pwsh PYENV_VERSION="1.2.3" run pyenv-sh-shell
+  assert_success 'echo "$PYENV_VERSION"'
+}
+
 @test "shell revert" {
   PYENV_SHELL=bash run pyenv-sh-shell -
   assert_success
@@ -39,6 +44,12 @@ load test_helper
 
 @test "shell revert (fish)" {
   PYENV_SHELL=fish run pyenv-sh-shell -
+  assert_success
+  assert_line 0 'if set -q PYENV_VERSION_OLD'
+}
+
+@test "shell revert (pwsh)" {
+  PYENV_SHELL=pwsh run pyenv-sh-shell -
   assert_success
   assert_line 0 'if set -q PYENV_VERSION_OLD'
 }
@@ -58,6 +69,14 @@ OUT
   assert_output <<OUT
 set -gu PYENV_VERSION_OLD "\$PYENV_VERSION"
 set -e PYENV_VERSION
+OUT
+}
+
+@test "shell unset (pwsh)" {
+  PYENV_SHELL=pwsh run pyenv-sh-shell --unset
+  assert_success
+  assert_output <<OUT
+\$Env:PYENV_VERSION, \$Env:PYENV_VERSION_OLD = \$null, \$Env:PYENV_VERSION
 OUT
 }
 
@@ -87,5 +106,14 @@ OUT
   assert_output <<OUT
 set -gu PYENV_VERSION_OLD "\$PYENV_VERSION"
 set -gx PYENV_VERSION "1.2.3"
+OUT
+}
+
+@test "shell change version (pwsh)" {
+  mkdir -p "${PYENV_ROOT}/versions/1.2.3"
+  PYENV_SHELL=pwsh run pyenv-sh-shell 1.2.3
+  assert_success
+  assert_output <<OUT
+\$Env:PYENV_VERSION, \$Env:PYENV_VERSION_OLD = "1.2.3", \$Env:PYENV_VERSION
 OUT
 }
