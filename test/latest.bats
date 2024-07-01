@@ -103,6 +103,9 @@ echo 3.8.5-latest
 echo 3.8.5a2
 echo 3.8.5b3
 echo 3.8.5rc2
+echo 3.8.5t
+echo 3.8.5b3t
+echo 3.8.5rc2t
 echo 3.8.1
 echo 3.8.1/envs/foo
 !
