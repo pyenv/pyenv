@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+# Summary: Display an installed Python version
+# Usage: pyenv installed [<version>]
+#
+# Displays the installed Python version, searching for shortcuts if necessary.
+# If no version is given, `pyenv installed' displays the latest installed version.
+# If version is `system`, `system` will be returned if an installed system Python can be found.
+# If version is `latest`, the latest installed Python version will be returned (3.12.3).
+# If version is `3`, the latest installed Python version of this major version will be returned (3.12.3).
+# If version is `12` or `3.12`, the latest installed patch of this minor version will be returned (3.12.3).
+# If version is `3.12.3`, the same version will be returned if that patch version is installed (3.12.3).
+# If version is not found or no versions are installed, an error message will be returned with an error code.
+
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec pyenv-versions --bare
+fi
+
+majors=({3,2}) # Supported Python versions: 3,2 (latest first)
+
+versions() {
+  # Sort correctly (3.10.9 comes before 3.10.10)
+  pyenv versions --bare | sort -V | $(type -p ggrep grep | head -1) -F "$query" || true
+}
+
+latest_version() {
+  versions | tail -1
+}
+
+latest_major() {
+  # 3 -> latest major 3.12.3
+  versions | grep -oE "^$(regex "$1")\\.[0-9]+\\.[0-9]+$" | tail -1
+}
+
+latest_minor() {
+  # 3.12 -> latest minor 3.12.3
+  versions | grep -oE "^$(regex "$1")\\.([0-9]+)$" | tail -1
+}
+
+installed() {
+  # 3.12.3 -> 3.12.3 if installed (else "")
+  versions | grep -oE "^$(regex "$1")$" || true
+}
+
+regex() {
+  echo "${1//\./\\.}"
+}
+
+if [ -n "$1" ]; then
+  version="$1"
+else
+  version="latest"
+fi
+
+if [ "$version" = "system" ]; then
+  if PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python 2>/dev/null)" || \
+      PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python3 2>/dev/null)" || \
+      PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python2 2>/dev/null)"; then
+    echo "system"
+    exit 0
+  else
+    echo "pyenv: system version not found in PATH" >&2
+    exit 1
+  fi
+fi
+if [ "$version" = "latest" ]; then
+  LATEST_PATCH=$(latest_version)
+  if [ -n "$LATEST_PATCH" ]; then
+    echo "$LATEST_PATCH"
+    exit 0
+  else
+    echo "pyenv: no versions installed" >&2
+    exit 1
+  fi
+fi
+
+# Check version=3 (major without minor and patch) => 3.12.3 (latest major version)
+# Or version=12 (minor without major and patch) => 3.12.3 (latest patch version)
+if grep -q -E "^[0-9]+(\s*)$" <<<"${version}"; then
+  for major in "${majors[@]}"; do
+    if [ "$version" = "$major" ]; then
+      LATEST_MAJOR=$(latest_major "$version")
+      if [ -n "$LATEST_MAJOR" ]; then
+        echo "$LATEST_MAJOR"
+        exit 0
+      fi
+    else
+      LATEST_MINOR=$(latest_minor "$major.$version")
+      if [ -n "$LATEST_MINOR" ]; then
+        echo "$LATEST_MINOR"
+        exit 0
+      fi
+    fi
+  done
+fi
+
+# Check version=3.12 (minor without patch) => 3.12.3 (latest patch version)
+if grep -q -E "^[0-9]+\.[0-9]+(\s*)$" <<<"${version}"; then
+  LATEST_MINOR=$(latest_minor "$version")
+  if [ -n "$LATEST_MINOR" ]; then
+    echo "$LATEST_MINOR"
+    exit 0
+  fi
+fi
+
+# Check version=3.12.3 (full version number) => 3.12.3 (installed version)
+if grep -q -E "^[0-9]+\.[0-9]+\.[0-9]+(\s*)$" <<<"${version}"; then
+  INSTALLED=$(installed "$version")
+  if [ -n "$INSTALLED" ]; then
+    echo "$INSTALLED"
+    exit 0
+  fi
+fi
+
+echo "pyenv: version \`${version}' not installed" >&2
+exit 1
