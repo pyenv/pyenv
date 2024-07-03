@@ -30,9 +30,9 @@ OLDIFS="$IFS"
 { IFS=:
   for version in ${PYENV_VERSION}; do
     if [ "$version" = "system" ]; then
-      if PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python 2>/dev/null)" || \
-          PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python3 2>/dev/null)" || \
-          PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python2 2>/dev/null)"; then
+      if PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python --skip-advice 2>/dev/null)" || \
+          PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python3 --skip-advice 2>/dev/null)" || \
+          PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python2 --skip-advice 2>/dev/null)"; then
         shopt -s extglob
         # In some distros (Arch), Python can be found in sbin as well as bin
         PYENV_PREFIX_PATH="${PYTHON_PATH%/?(s)bin/*}"

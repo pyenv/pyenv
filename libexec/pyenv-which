@@ -2,13 +2,14 @@
 #
 # Summary: Display the full path to an executable
 #
-# Usage: pyenv which <command> [--nosystem]
+# Usage: pyenv which <command> [--nosystem] [--skip-advice]
 #
 # Displays the full path to the executable that pyenv will invoke when
 # you run the given command.
 # Use --nosystem argument in case when you don't need to search command in the 
 # system environment.
-#
+# Internal switch --skip-advice used to skip printing an error message on a
+# failed search.
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -18,11 +19,27 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-shims --short
 fi
 
-if [ "$2" = "--nosystem" ]; then
-  system=""
-else
-  system="system"
-fi
+system="system"
+SKIP_ADVICE=""
+PYENV_COMMAND="$1"
+
+while [[ $# -gt 0 ]]
+do
+  case "$1" in
+    --skip-advice)
+      SKIP_ADVICE=1
+      shift
+      ;;
+    --nosystem)
+      system=""
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
 
 remove_from_path() {
   local path_to_remove="$1"
@@ -35,8 +52,6 @@ remove_from_path() {
   result="${result%:}"
   echo "${result#:}"
 }
-
-PYENV_COMMAND="$1"
 
 if [ -z "$PYENV_COMMAND" ]; then
   pyenv-help --usage which >&2
@@ -85,16 +100,17 @@ else
   fi
 
   echo "pyenv: $PYENV_COMMAND: command not found" >&2
-
-  versions="$(pyenv-whence "$PYENV_COMMAND" || true)"
-  if [ -n "$versions" ]; then
-    { echo
-      echo "The \`$1' command exists in these Python versions:"
-      echo "$versions" | sed 's/^/  /g'
-      echo
-      echo "Note: See 'pyenv help global' for tips on allowing both"
-      echo "      python2 and python3 to be found."
-    } >&2
+  if [ -z "$SKIP_ADVICE" ]; then
+    versions="$(pyenv-whence "$PYENV_COMMAND" || true)"
+    if [ -n "$versions" ]; then
+      { echo
+        echo "The \`$PYENV_COMMAND' command exists in these Python versions:"
+        echo "$versions" | sed 's/^/  /g'
+        echo
+        echo "Note: See 'pyenv help global' for tips on allowing both"
+        echo "      python2 and python3 to be found."
+      } >&2
+    fi
   fi
 
   exit 127
