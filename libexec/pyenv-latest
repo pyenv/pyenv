@@ -50,7 +50,7 @@ IFS=$'\n'
 
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
-          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+$/d'));
+          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+$/d' -e '/[0-9]+t$/d'));
 
     # Compose a sorting key, followed by | and original value
     DEFINITION_CANDIDATES=(\
