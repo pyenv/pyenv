@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: rbenv
 .\"    Author: Mislav Marohnić
-.\" Generator: Asciidoctor 2.0.17
-.\"      Date: 2022-10-09
+.\" Generator: Asciidoctor 2.0.20
+.\"      Date: 2023-11-08
 .\"    Manual: Rbenv Manual
-.\"    Source: rbenv 1.2.0-36-g6b1cc34
+.\"    Source: rbenv 1.3.0
 .\"  Language: English
 .\"
-.TH "RBENV" "1" "2022-10-09" "rbenv 1.2.0\-36\-g6b1cc34" "Rbenv Manual"
+.TH "RBENV" "1" "2023-11-08" "rbenv 1.3.0" "Rbenv Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -38,7 +38,7 @@ rbenv respects the \fI.ruby\-version\fP file in a project directory by making su
 .sp
 It does so by generating shims for all Ruby executables. As long as rbenv shims directory is prepended to PATH, rbenv automatically ensures transparent switching between Ruby versions.
 .sp
-rbenv looks for available Ruby versions in the \fI$RBENV_ROOT/versions/\fP directory.
+rbenv looks for available Ruby versions in the \fI$RBENV_ROOT/versions\fP directory.
 .SH "COMMANDS"
 .sp
 \fBrbenv global\fP [\fI<version>\fP]
@@ -120,7 +120,7 @@ Directory to traverse bottom\-up to locate the \fI.ruby\-version\fP file
 .sp
 As its core functionality, rbenv only switches between Ruby versions and does nothing else, but offers a plugin mechanism to hook into and override almost any aspect of its default behavior.
 .sp
-The most common plugin for rbenv is \fBruby\-build\fP which facilitates installing new Ruby versions into the \fI$RBENV_ROOT/versions/\fP directory.
+The most common plugin for rbenv is \fBruby\-build\fP which facilitates installing new Ruby versions into the \fI$RBENV_ROOT/versions\fP directory.
 .sp
 Read more at \c
 .URL "https://github.com/rbenv/rbenv/wiki/Plugins" "" ""
