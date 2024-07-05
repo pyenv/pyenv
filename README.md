@@ -37,7 +37,8 @@ On systems with Homebrew package manager, the “Using Package Managers” metho
    
    #### Debian, Ubuntu, and their derivatives
        
-   Note that the version of rbenv that is packaged and maintained in the
+   > [!CAUTION]   
+   > The version of rbenv that is packaged and maintained in official
    Debian and Ubuntu repositories is _out of date_. To install the latest
    version, it is recommended to [install rbenv using git](#basic-git-checkout).
    
@@ -144,7 +145,7 @@ Select a Ruby version for your project using `rbenv local 3.1.2`, for example. T
 gem install bundler
 ```
 
-> [!WARNING]  
+> [!NOTE]  
 > You _should not use sudo_ to install gems. Typically, the Ruby versions will be installed under your home directory and thus writeable by your user. If you get the “you don't have write permissions” error when installing gems, it's likely that your "system" Ruby version is still a global default. Change that with `rbenv global <version>` and try again.
 
 Check the location where gems are being installed with `gem env`:
