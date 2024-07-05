@@ -57,7 +57,7 @@ OUT
   assert_success "writing ~/.bash_profile: now configured for rbenv."
   run cat ~/.bash_profile
   # shellcheck disable=SC2016
-  assert_line 'eval "$(rbenv init - bash)"'
+  assert_line 'eval "$(rbenv init - --no-rehash bash)"'
 }
 
 @test "set up bash (bashrc)" {
@@ -68,7 +68,7 @@ OUT
   assert_success "writing ~/.bashrc: now configured for rbenv."
   run cat ~/.bashrc
   # shellcheck disable=SC2016
-  assert_line 'eval "$(rbenv init - bash)"'
+  assert_line 'eval "$(rbenv init - --no-rehash bash)"'
 }
 
 @test "set up zsh" {
@@ -78,7 +78,7 @@ OUT
   assert_success "writing ~/.zprofile: now configured for rbenv."
   run cat ~/.zprofile
   # shellcheck disable=SC2016
-  assert_line 'eval "$(rbenv init - zsh)"'
+  assert_line 'eval "$(rbenv init - --no-rehash zsh)"'
 }
 
 @test "set up zsh (zshrc)" {
@@ -89,7 +89,7 @@ OUT
   assert_success "writing ~/.zshrc: now configured for rbenv."
   run cat ~/.zshrc
   # shellcheck disable=SC2016
-  assert_line 'eval "$(rbenv init - zsh)"'
+  assert_line 'eval "$(rbenv init - --no-rehash zsh)"'
 }
 
 @test "set up fish" {
@@ -97,7 +97,7 @@ OUT
   run rbenv-init fish
   assert_success "writing ~/.config/fish/config.fish: now configured for rbenv."
   run cat ~/.config/fish/config.fish
-  assert_line 'status --is-interactive; and rbenv init - fish | source'
+  assert_line 'status --is-interactive; and rbenv init - --no-rehash fish | source'
 }
 
 @test "set up multiple shells at once" {

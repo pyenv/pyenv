@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for rbenv
-# Usage: rbenv init [--no-rehash] [<shells>...]
+# Usage: rbenv init [<shells>...]
 #        rbenv init - [--no-rehash] [<shell>]
 #
 # Modifies shell initialization files to bootstrap rbenv functionality.
@@ -110,7 +110,7 @@ if [ -z "$print" ]; then
         [ -n "$profile" ] || profile="$HOME/.bash_profile"
       fi
       write_config "$profile" \
-        "eval \"\$($rbenv_command init -${no_rehash:+ --no-rehash} bash)\""
+        "eval \"\$($rbenv_command init - --no-rehash bash)\""
       ;;
     zsh )
       # check zshrc for backward compatibility with older rbenv init
@@ -120,7 +120,7 @@ if [ -z "$print" ]; then
         profile="${ZDOTDIR:-$HOME}/.zprofile"
       fi
       write_config "$profile" \
-        "eval \"\$($rbenv_command init -${no_rehash:+ --no-rehash} zsh)\""
+        "eval \"\$($rbenv_command init - --no-rehash zsh)\""
       ;;
     ksh | ksh93 | mksh )
       # There are two implementations of Korn shell: AT&T (ksh93) and Mir (mksh).
@@ -133,7 +133,7 @@ if [ -z "$print" ]; then
       ;;
     fish )
       write_config "${XDG_CONFIG_HOME:-$HOME/.config}/fish/config.fish" \
-        "status --is-interactive; and $rbenv_command init -${no_rehash:+ --no-rehash} fish | source"
+        "status --is-interactive; and $rbenv_command init - --no-rehash fish | source"
       ;;
     * )
       printf 'unsupported shell: "%s"\n' "$shell" >&2
