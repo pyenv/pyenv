@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.4.7
+* Add support for anaconda3-2024.06-1 by @binbjz in https://github.com/pyenv/pyenv/pull/3009
+* Fix debug build for X.Yt-dev by @native-api in https://github.com/pyenv/pyenv/pull/
+
 ## Release v2.4.6
 * CI: push MacOS jobs to MacOS 13 and 14 by @native-api in https://github.com/pyenv/pyenv/pull/3002
 * Add 3.13.0b3t and exclude it from `pyenv latest` by @colesbury in https://github.com/pyenv/pyenv/pull/3001
