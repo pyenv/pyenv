@@ -60,13 +60,13 @@ On systems with Homebrew package manager, the “Using Package Managers” metho
    sudo dnf install rbenv
    ```
 
-3. Set up your shell to load rbenv.
+2. Set up your shell to load rbenv.
 
     ```sh
     rbenv init
     ```
 
-4. Close your Terminal window and open a new one so your changes take effect.
+3. Close your Terminal window and open a new one so your changes take effect.
 
 That's it! You are now ready to [install some Ruby versions](#installing-ruby-versions).
 
