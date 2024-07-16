@@ -52,6 +52,14 @@ On systems with Homebrew package manager, the “Using Package Managers” metho
    rbenv and you can install it from the AUR using the instructions from this
    [wiki page](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_and_upgrading_packages).
 
+   #### Fedora
+
+   Fedora has an [official package](https://packages.fedoraproject.org/pkgs/rbenv/rbenv/) which you can install:
+
+   ```sh
+   sudo dnf install rbenv
+   ```
+
 2. Set up your shell to load rbenv.
 
     ```sh
