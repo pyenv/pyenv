@@ -18,7 +18,7 @@ stub_python_build_no_latest() {
   
 stub_python_build() {
   stub_python_build_no_latest "$@"
-  stub pyenv-latest false
+  stub pyenv-latest '-f -k * : shift 2; echo "$@"'
 }
 
 @test "install a single version" {
@@ -65,9 +65,9 @@ OUT
   stub_python_build_lib
   for i in {1..3}; do stub_python_build_no_latest; done
   stub pyenv-latest \
-      '-q -k 3.4 : echo 3.4.2' \
-      '-q -k 3.5.1 : false' \
-      '-q -k 3.5 : echo 3.5.2'
+      '-r -k 3.4 : echo 3.4.2' \
+      '-r -k 3.5.1 : false' \
+      '-r -k 3.5 : echo 3.5.2'
 
   run pyenv-install 3.4 3.5.1 3.5
   assert_success <<OUT

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 # Summary: Print the latest installed or known version with the given prefix
-# Usage: pyenv latest [-k|--known] [-q|--quiet] <prefix>
+# Usage: pyenv latest [-k|--known] <prefix>
 #
 #   -k/--known      Select from all known versions instead of installed
-#   -q/--quiet      Do not print an error message on resolution failure
+#   -b/--bypass     (internal) On a resolution failure, do not print an error message
+#                   but rather print the argument unchanged
+#   -f/--force      (internal) Same as -b but also do not return a failure exit code
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -15,8 +17,13 @@ do
             FROM_KNOWN=1
             shift
             ;;
-        -q|--quiet)
-            QUIET=1
+        -b|--bypass)
+            BYPASS=1
+            shift
+            ;;
+        -f|--force)
+            FORCE=1
+            BYPASS=1
             shift
             ;;
         *)
@@ -71,10 +78,14 @@ IFS=$'\n'
     if [[ -n "$DEFINITION" ]]; then
         echo "$DEFINITION"
     else
-        if [[ -z $QUIET ]]; then
+        if [[ -z $BYPASS ]]; then
             echo "pyenv: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
+        else
+            echo "$prefix"
         fi
-        exitcode=1
+        if [[ -z $FORCE ]]; then
+            exitcode=1
+        fi
     fi
 
 exit $exitcode

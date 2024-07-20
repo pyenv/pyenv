@@ -42,7 +42,7 @@ OLDIFS="$IFS"
         exit 1
       fi
     else
-      version="$(pyenv-latest -q "$version" || echo "$version")"
+      version="$(pyenv-latest -f "$version")"
       PYENV_PREFIX_PATH="${PYENV_ROOT}/versions/${version}"
     fi
     if [ -d "$PYENV_PREFIX_PATH" ]; then

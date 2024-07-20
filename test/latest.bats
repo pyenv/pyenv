@@ -115,3 +115,25 @@ echo 3.8.1/envs/foo
 3.8.1
 !
 }
+
+@test "falls back to argument with -b" {
+  create_executable pyenv-versions <<!
+#!$BASH
+!
+  run pyenv-latest -b nonexistent
+  assert_failure
+  assert_output <<!
+nonexistent
+!
+}
+
+@test "falls back to argument and succeeds with -f" {
+  create_executable pyenv-versions <<!
+#!$BASH
+!
+  run pyenv-latest -f nonexistent
+  assert_success
+  assert_output <<!
+nonexistent
+!
+}
