@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.4.8
+* Fix pyenv-uninstall not having the debug tracing invocation by @native-api in https://github.com/pyenv/pyenv/pull/3020
+* Add CPython 3.13.0b4 and 3.13.0b4t by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3019
+* README: Remove reference to Fig by @ThomasHaz in https://github.com/pyenv/pyenv/pull/3018
+* Fix tests failing if plugins are installed by @native-api in https://github.com/pyenv/pyenv/pull/3022
+* pyenv-latest: replace -q with -b and -f, document as internal by @native-api in https://github.com/pyenv/pyenv/pull/3021
+
 ## Release v2.4.7
 * Add support for anaconda3-2024.06-1 by @binbjz in https://github.com/pyenv/pyenv/pull/3009
 * Fix debug build for X.Yt-dev by @native-api in https://github.com/pyenv/pyenv/pull/
