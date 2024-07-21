@@ -46,12 +46,7 @@ load test_helper
   assert_output "pyenv: cannot change working directory to \`$dir'"
 }
 
-@test "adds its own libexec to PATH" {
-  run pyenv echo "PATH"
-  assert_success "${BATS_TEST_DIRNAME%/*}/libexec:${BATS_TEST_DIRNAME%/*}/plugins/python-build/bin:$PATH"
-}
-
-@test "adds plugin bin dirs to PATH" {
+@test "adds its own libexec and plugin bin dirs to PATH" {
   mkdir -p "$PYENV_ROOT"/plugins/python-build/bin
   mkdir -p "$PYENV_ROOT"/plugins/pyenv-each/bin
   run pyenv echo -F: "PATH"
