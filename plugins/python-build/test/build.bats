@@ -888,54 +888,6 @@ OUT
   assert_success "hello world"
 }
 
-@test "mruby strategy overwrites non-writable files" {
-  # nop
-}
-
-@test "mruby strategy fetches rake if missing" {
-  # nop
-}
-
-@test "rbx uses bundle then rake" {
-  # nop
-}
-
-@test "fixes rbx binstubs" {
-  # nop
-}
-
-@test "JRuby build" {
-  # nop
-}
-
-@test "JRuby+Graal does not install launchers" {
-  # nop
-}
-
-@test "JRuby Java 7 missing" {
-  # nop
-}
-
-@test "JRuby Java is outdated" {
-  # nop
-}
-
-@test "JRuby Java 7 up-to-date" {
-  # nop
-}
-
-@test "Java version string not on first line" {
-  # nop
-}
-
-@test "Java version string on OpenJDK" {
-  # nop
-}
-
-@test "JRuby Java 9 version string" {
-  # nop
-}
-
 @test "non-writable TMPDIR aborts build" {
   export TMPDIR="${TMP}/build"
   mkdir -p "$TMPDIR"
