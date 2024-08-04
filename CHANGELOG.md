@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.4.9
+* Add miniforge3-24.3.0-0 by @goerz in https://github.com/pyenv/pyenv/pull/3028
+* Add CPython 3.13.0rc1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3029
+
 ## Release v2.4.8
 * Fix pyenv-uninstall not having the debug tracing invocation by @native-api in https://github.com/pyenv/pyenv/pull/3020
 * Add CPython 3.13.0b4 and 3.13.0b4t by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3019
