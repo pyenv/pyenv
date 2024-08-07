@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.4.10
+* Add CPython 3.12.5 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3030
+
 ## Release v2.4.9
 * Add miniforge3-24.3.0-0 by @goerz in https://github.com/pyenv/pyenv/pull/3028
 * Add CPython 3.13.0rc1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3029
