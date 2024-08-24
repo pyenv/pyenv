@@ -68,5 +68,5 @@ load test_helper
 @test "PYENV_HOOK_PATH includes pyenv built-in plugins" {
   unset PYENV_HOOK_PATH
   run pyenv echo "PYENV_HOOK_PATH"
-  assert_success "${PYENV_ROOT}/pyenv.d:${BATS_TEST_DIRNAME%/*}/pyenv.d:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib/pyenv/hooks"
+  assert_success "${PYENV_ROOT}/pyenv.d:${BATS_TEST_DIRNAME%/*}/pyenv.d:/usr/etc/pyenv.d:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib/pyenv/hooks"
 }
