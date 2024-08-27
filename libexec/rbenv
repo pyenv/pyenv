@@ -82,7 +82,7 @@ if [ ! "${libexec_dir%/*}"/rbenv.d -ef "$RBENV_ROOT"/rbenv.d ]; then
   # Add rbenv's own `rbenv.d` unless rbenv was cloned to RBENV_ROOT
   RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${libexec_dir%/*}/rbenv.d"
 fi
-RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:/usr/etc/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 for plugin_hook in "${RBENV_ROOT}/plugins/"*/etc/rbenv.d; do
   RBENV_HOOK_PATH="${RBENV_HOOK_PATH}:${plugin_hook}"
 done

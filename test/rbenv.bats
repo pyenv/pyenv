@@ -64,7 +64,7 @@ load test_helper
 @test "RBENV_HOOK_PATH includes etc/rbenv.d folders" {
   mkdir -p "$RBENV_ROOT"/plugins/rbenv-foo/etc/rbenv.d
   run rbenv echo -F: "RBENV_HOOK_PATH"
-  assert_line 6 "${RBENV_ROOT}/plugins/rbenv-foo/etc/rbenv.d"
+  assert_line 7 "${RBENV_ROOT}/plugins/rbenv-foo/etc/rbenv.d"
 }
 
 @test "RBENV_HOOK_PATH preserves value from environment" {
@@ -78,5 +78,5 @@ load test_helper
 @test "RBENV_HOOK_PATH includes rbenv built-in plugins" {
   unset RBENV_HOOK_PATH
   run rbenv echo "RBENV_HOOK_PATH"
-  assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
+  assert_success "${RBENV_ROOT}/rbenv.d:${BATS_TEST_DIRNAME%/*}/rbenv.d:/usr/etc/rbenv.d:/usr/local/etc/rbenv.d:/etc/rbenv.d:/usr/lib/rbenv/hooks"
 }
