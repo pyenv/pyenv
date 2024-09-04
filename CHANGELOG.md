@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.4.11
+* Add /usr/etc/pyenv.d to hooks path by @tomschr in https://github.com/pyenv/pyenv/pull/3039
+* Add miniconda3-24.7.1-0 by @binbjz in https://github.com/pyenv/pyenv/pull/3040
+* Add PyPy v7.3.17 by @jsirois in https://github.com/pyenv/pyenv/pull/3045
+
 ## Release v2.4.10
 * Add CPython 3.12.5 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3030
 
