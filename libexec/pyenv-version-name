@@ -30,11 +30,11 @@ OLDIFS="$IFS"
 { IFS=:
   any_not_installed=0
   for version in ${PYENV_VERSION}; do
-    if version_exists "$version" || [ "$version" = "system" ]; then
-      versions=("${versions[@]}" "${version}")
-    elif version_exists "${version#python-}"; then
-      versions=("${versions[@]}" "${version#python-}")
-    elif resolved_version="$(pyenv-latest -b "$version")"; then
+    # Remove the explicit 'python-' prefix from versions like 'python-3.12'.
+    normalised_version="${version#python-}"
+    if version_exists "${normalised_version}" || [ "$version" = "system" ]; then
+      versions=("${versions[@]}" "${normalised_version}")
+    elif resolved_version="$(pyenv-latest -b "${normalised_version}")"; then
       versions=("${versions[@]}" "${resolved_version}")
     else
       echo "pyenv: version \`$version' is not installed (set by $(pyenv-version-origin))" >&2
