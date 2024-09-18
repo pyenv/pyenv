@@ -1,0 +1,64 @@
+# Copyright (c) 2024, Oracle and/or its affiliates. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is furnished to do
+# so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+VERSION='24.1.0'
+BUILD=''
+
+colorize 1 "GraalPy 23.1 and later installed by python-build use the faster Oracle GraalVM distribution" && echo
+colorize 1 "Oracle GraalVM uses the GFTC license, which is free for development and production use, see https://medium.com/graalvm/161527df3d76" && echo
+colorize 1 "The GraalVM Community Edition variant of GraalPy is also available, under the name graalpy-community-${VERSION}" && echo
+
+
+graalpy_arch="$(graalpy_architecture 2>/dev/null || true)"
+
+case "$graalpy_arch" in
+"linux-amd64" )
+  checksum="95819091eee7c21566601c22536768204b7c75e9b59e522a10961612a1dd6298"
+  ;;
+"linux-aarch64" )
+  checksum="838662e07ce745708d58a50e5e030f9af608306c4595adb3a8e7ac1f6e7d8b6a"
+  ;;
+"macos-amd64" )
+  checksum="4bee92fdf97ef9e2f9a8dfc56030b9f40860019bf57c9cd097a4b86baaf31d94"
+  ;;
+"macos-aarch64" )
+  checksum="520888b407e47c8bbc91b0830d540a1eb1a6919ad0ce5be3e657e54f77ee0fba"
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": No binary distribution of GraalPy is available for $(uname -sm)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
+
+if [ -n "${BUILD}" ]; then
+  { echo
+    colorize 1 "ERROR"
+    echo "Oracle GraalPy currently doesn't provide snapshot builds. Use graalpy-community if you need snapshots."
+    echo
+  } >&2
+  exit 1
+fi
+
+url="https://github.com/oracle/graalpython/releases/download/graal-${VERSION}/graalpy-${VERSION}-${graalpy_arch}.tar.gz#${checksum}"
+
+install_package "graalpy-${VERSION}" "${url}" "copy" ensurepip
