@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.4.13
+* docs: Use `--verbose` with performance CPython build instructions by @caerulescens in https://github.com/pyenv/pyenv/pull/3053
+* Fix latest version resolution when using `python-` prefix by @edmorley in https://github.com/pyenv/pyenv/pull/3056
+* Fix tgz checksum for 3.9.20; fallback OpenSSL URLs and checksums by @native-api in https://github.com/pyenv/pyenv/pull/3060
+* Fix OpenSSL 3.3.2 download URLs by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3059
+* Add GraalPy 24.1.0 by @msimacek in https://github.com/pyenv/pyenv/pull/3066
+
 ## Release v2.4.12
 * Add CPython 3.13.0rc2 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3049
 * Add CPython 3.8.20, 3.9.20, 3.10.15, 3.11.10 and 3.12.6 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3050
