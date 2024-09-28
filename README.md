@@ -329,6 +329,8 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
       ~~~
 
   - For **Zsh**:
+  
+    Run the following to add the commands to `~/.zshrc`:
     ~~~ zsh
     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
     echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
