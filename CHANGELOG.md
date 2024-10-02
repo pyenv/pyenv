@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.4.14
+* Add CPython 3.12.7 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3078
+* Add CPython 3.13.0rc3 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3077
+
 ## Release v2.4.13
 * docs: Use `--verbose` with performance CPython build instructions by @caerulescens in https://github.com/pyenv/pyenv/pull/3053
 * Fix latest version resolution when using `python-` prefix by @edmorley in https://github.com/pyenv/pyenv/pull/3056
