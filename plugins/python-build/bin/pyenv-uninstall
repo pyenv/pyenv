@@ -75,7 +75,7 @@ uninstall-python() {
       exit 1
     fi
 
-    read -p "pyenv: remove $PREFIX? [y|N] "
+    read -p "pyenv: remove $PREFIX? (y/N) "
     case "$REPLY" in
     y | Y | yes | YES ) ;;
     * ) exit 1 ;;
