@@ -127,3 +127,10 @@ OUT
   assert_success
   assert_output "3.12.6"
 }
+
+@test "pyenv version started by python-" {
+  create_version "python-3.12.6"
+  PYENV_VERSION="python-3.12.6" run pyenv-version-name
+  assert_success
+  assert_output "python-3.12.6"
+}
