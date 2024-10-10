@@ -11,28 +11,6 @@ conda_exists() {
   [ -n "${condas}" ]
 }
 
-shims=()
-shopt -s nullglob
-for shim in $(cat "${BASH_SOURCE%/*}/conda.d/"*".list" | sort | uniq | sed -e 's/#.*$//' | sed -e '/^[[:space:]]*$/d'); do
-  if [ -n "${shim##*/}" ]; then
-    shims[${#shims[*]}]="${shim})return 0;;"
-  fi
-done
-shopt -u nullglob
-eval "conda_shim(){ case \"\${1##*/}\" in ${shims[@]} *)return 1;;esac;}"
-
-# override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`
-# https://github.com/pyenv/pyenv-virtualenv/blob/v20160716/etc/pyenv.d/rehash/envs.bash
-make_shims() {
-  local file shim
-  for file do
-    shim="${file##*/}"
-    if ! conda_shim "${shim}" 1>&2; then
-      register_shim "$shim"
-    fi
-  done
-}
-
 deregister_conda_shims() {
   # adapted for Bash 4.x's associative array (#1749)
   if declare -p registered_shims 2> /dev/null | grep -Eq '^(declare|typeset) -A'; then
@@ -54,5 +32,27 @@ deregister_conda_shims() {
 }
 
 if conda_exists; then
+  shims=()
+  shopt -s nullglob
+  for shim in $(cat "${BASH_SOURCE%/*}/conda.d/"*".list" | sort -u | sed -e 's/#.*$//'  -e '/^[[:space:]]*$/d'); do
+    if [ -n "${shim##*/}" ]; then
+      shims[${#shims[*]}]="${shim})return 0;;"
+    fi
+  done
+  shopt -u nullglob
+  eval "conda_shim(){ case \"\${1##*/}\" in ${shims[@]} *)return 1;;esac;}"
+
+  # override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`
+  # https://github.com/pyenv/pyenv-virtualenv/blob/v20160716/etc/pyenv.d/rehash/envs.bash
+  make_shims() {
+    local file shim
+    for file do
+      shim="${file##*/}"
+      if ! conda_shim "${shim}" 1>&2; then
+        register_shim "$shim"
+      fi
+    done
+  }
+
   deregister_conda_shims
 fi
