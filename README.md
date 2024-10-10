@@ -9,7 +9,89 @@ tools that do one thing well.
 This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 [ruby-build](https://github.com/rbenv/ruby-build), and modified for Python.
 
-![Terminal output example](/terminal_output.png)
+### Quick Start
+
+1. Install python build dependencies, git. ([refer here](https://github.com/pyenv/pyenv/wiki#suggested-build-environment))
+
+2. Install pyenv.
+
+#### Linux, Bash
+
+```
+    curl https://pyenv.run | bash
+```
+
+#### MacOS with Homebrew
+
+```
+    brew update
+    brew install pyenv
+```
+
+3. Edit your startup shell scripts to pickup pyenv.
+
+ * Check your shell with `echo $SHELL` command
+
+ * write the following lines to the end of ~/.bashrc and ~/.profile or the equivalent for your shell. ([refer here](#set-up-your-shell-environment-for-pyenv))
+
+    ```
+        export PYENV_ROOT="$HOME/.pyenv"
+        export PATH="$PYENV_ROOT/bin:$PATH"
+        eval "$(pyenv init -)"
+    ```
+
+4. logout and login to your account to ensure environment is applied.
+5. Run the command `pyenv` to ensure pyenv is installed.
+
+### Important Commands
+
+1. List all the pythons that are installed.
+
+```
+    pyenv versions
+```
+
+2. Display the current active python in the current directory.
+
+```
+    pyenv version
+```
+
+3. List the python versions available for install.
+
+```
+    pyenv install -l
+```
+
+4. Install a version of python.
+
+```
+    pyenv install <version>
+```
+
+5. Use a specific version of python in the current directory.
+
+```
+    pyenv local <version>
+```
+
+6. Go back to using system python for current directory.
+
+```
+    pyenv local system
+```
+
+7. Use a specific version of python for all directories.
+
+```
+    pyenv global <version>
+```
+
+### Install a python version
+
+The following video shows how to install a python version for a specific directory. It uses some commands from the [Important Commands](#important-commands) section.
+
+![Terminal output example](/install_local_python.gif)
 
 
 ### What pyenv _does..._
@@ -37,6 +119,9 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 
 ## Table of Contents
 
+* **[Quick Start](#quick-start)**
+* **[Important Commands](#important-commands)**
+* **[Install a python version](#install-a-python-version)**
 * **[How It Works](#how-it-works)**
   * [Understanding PATH](#understanding-path)
   * [Understanding Shims](#understanding-shims)
