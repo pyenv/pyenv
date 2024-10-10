@@ -32,8 +32,12 @@ OLDIFS="$IFS"
   for version in ${PYENV_VERSION}; do
     # Remove the explicit 'python-' prefix from versions like 'python-3.12'.
     normalised_version="${version#python-}"
-    if version_exists "${normalised_version}" || [ "$version" = "system" ]; then
+    if version_exists "${version}" || [ "$version" = "system" ]; then
+      versions=("${versions[@]}" "${version}")
+    elif version_exists "${normalised_version}"; then
       versions=("${versions[@]}" "${normalised_version}")
+    elif resolved_version="$(pyenv-latest -b "${version}")"; then
+      versions=("${versions[@]}" "${resolved_version}")
     elif resolved_version="$(pyenv-latest -b "${normalised_version}")"; then
       versions=("${versions[@]}" "${resolved_version}")
     else
