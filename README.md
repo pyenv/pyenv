@@ -9,9 +9,6 @@ tools that do one thing well.
 This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 [ruby-build](https://github.com/rbenv/ruby-build), and modified for Python.
 
-![Terminal output example](/terminal_output.png)
-
-
 ### What pyenv _does..._
 
 * Lets you **change the global Python version** on a per-user basis.
@@ -32,22 +29,19 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
     yourself, or [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv)
     to automate the process.
 
+
 ----
 
 
 ## Table of Contents
 
-* **[How It Works](#how-it-works)**
-  * [Understanding PATH](#understanding-path)
-  * [Understanding Shims](#understanding-shims)
-  * [Understanding Python version selection](#understanding-python-version-selection)
-  * [Locating Pyenv-provided Python Installations](#locating-pyenv-provided-python-installations)
 * **[Installation](#installation)**
   * [Getting Pyenv](#getting-pyenv)
-    * [UNIX/MacOS](#unixmacos)
-      * [Homebrew in macOS](#homebrew-in-macos)
+    * [Linux/UNIX](#linuxunix)
       * [Automatic installer](#automatic-installer)
       * [Basic GitHub Checkout](#basic-github-checkout)
+    * [MacOS](#macos)
+      * [Homebrew in macOS](#homebrew-in-macos)
     * [Windows](#windows)
   * [Set up your shell environment for Pyenv](#set-up-your-shell-environment-for-pyenv)
   * [Restart your shell](#restart-your-shell)
@@ -67,6 +61,11 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 * [Advanced Configuration](#advanced-configuration)
   * [Using Pyenv without shims](#using-pyenv-without-shims)
   * [Environment variables](#environment-variables)
+* **[How It Works](#how-it-works)**
+  * [Understanding PATH](#understanding-path)
+  * [Understanding Shims](#understanding-shims)
+  * [Understanding Python version selection](#understanding-python-version-selection)
+  * [Locating Pyenv-provided Python Installations](#locating-pyenv-provided-python-installations)
 * **[Development](#development)**
   * [Contributing](#contributing)
   * [Version History](#version-history)
@@ -75,136 +74,43 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 
 ----
 
-
-## How It Works
-
-At a high level, pyenv intercepts Python commands using shim
-executables injected into your `PATH`, determines which Python version
-has been specified by your application, and passes your commands along
-to the correct Python installation.
-
-
-### Understanding PATH
-
-When you run a command like `python` or `pip`, your shell (bash / zshrc / ...)
-searches through a list of directories to find an executable file with
-that name. This list of directories lives in an environment variable
-called `PATH`, with each directory in the list separated by a colon:
-
-    /usr/local/bin:/usr/bin:/bin
-
-Directories in `PATH` are searched from left to right, so a matching
-executable in a directory at the beginning of the list takes
-precedence over another one at the end. In this example, the
-`/usr/local/bin` directory will be searched first, then `/usr/bin`,
-then `/bin`.
-
-
-### Understanding Shims
-
-pyenv works by inserting a directory of _shims_ at the front of your
-`PATH`:
-
-    $(pyenv root)/shims:/usr/local/bin:/usr/bin:/bin
-
-Through a process called _rehashing_, pyenv maintains shims in that
-directory to match every Python command across every installed version
-of Python—`python`, `pip`, and so on.
-
-Shims are lightweight executables that simply pass your command along
-to pyenv. So with pyenv installed, when you run, say, `pip`, your
-operating system will do the following:
-
-* Search your `PATH` for an executable file named `pip`
-* Find the pyenv shim named `pip` at the beginning of your `PATH`
-* Run the shim named `pip`, which in turn passes the command along to
-  pyenv
-
-
-### Understanding Python version selection
-
-When you execute a shim, pyenv determines which Python version to use by
-reading it from the following sources, in this order:
-
-1. The `PYENV_VERSION` environment variable (if specified). You can use
-   the [`pyenv shell`](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-shell) command to set this environment
-   variable in your current shell session.
-
-2. The application-specific `.python-version` file in the current
-   directory (if present). You can modify the current directory's
-   `.python-version` file with the [`pyenv local`](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-local)
-   command.
-
-3. The first `.python-version` file found (if any) by searching each parent
-   directory, until reaching the root of your filesystem.
-
-4. The global `$(pyenv root)/version` file. You can modify this file using
-   the [`pyenv global`](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-global) command.
-   If the global version file is not present, pyenv assumes you want to use the "system"
-   Python (see below).
-
-A special version name "`system`" means to use whatever Python is found on `PATH`
-after the shims `PATH` entry (in other words, whatever would be run if Pyenv
-shims weren't on `PATH`). Note that Pyenv considers those installations outside
-its control and does not attempt to inspect or distinguish them in any way.
-So e.g. if you are on MacOS and have OS-bundled Python 3.8.9 and Homebrew-installed
-Python 3.9.12 and 3.10.2 -- for Pyenv, this is still a single "`system`" version,
-and whichever of those is first on `PATH` under the executable name you
-specified will be run.
-
-**NOTE:** You can activate multiple versions at the same time, including multiple
-versions of Python2 or Python3 simultaneously. This allows for parallel usage of
-Python2 and Python3, and is required with tools like `tox`. For example, to instruct
-Pyenv to first use your system Python and Python3 (which are e.g. 2.7.9 and 3.4.2)
-but also have Python 3.3.6, 3.2.1, and 2.5.2 available, you first `pyenv install`
-the missing versions, then set `pyenv global system 3.3.6 3.2.1 2.5.2`.
-Then you'll be able to invoke any of those versions with an appropriate `pythonX` or
-`pythonX.Y` name.
-You can also specify multiple versions in a `.python-version` file by hand,
-separated by newlines. Lines starting with a `#` are ignored.
-
-[`pyenv which <command>`](COMMANDS.md#pyenv-which) displays which real executable would be
-run when you invoke `<command>` via a shim.
-E.g. if you have 3.3.6, 3.2.1 and 2.5.2 installed of which 3.3.6 and 2.5.2 are selected
-and your system Python is 3.2.5,
-`pyenv which python2.5` should display `$(pyenv root)/versions/2.5.2/bin/python2.5`,
-`pyenv which python3` -- `$(pyenv root)/versions/3.3.6/bin/python3` and
-`pyenv which python3.2` -- path to your system Python due to the fall-through (see below).
-
-Shims also fall through to anything further on `PATH` if the corresponding executable is
-not present in any of the selected Python installations.
-This allows you to use any programs installed elsewhere on the system as long as
-they are not shadowed by a selected Python installation.
-
-
-### Locating Pyenv-provided Python installations
-
-Once pyenv has determined which version of Python your application has
-specified, it passes the command along to the corresponding Python
-installation.
-
-Each Python version is installed into its own directory under
-`$(pyenv root)/versions`.
-
-For example, you might have these versions installed:
-
-* `$(pyenv root)/versions/2.7.8/`
-* `$(pyenv root)/versions/3.4.2/`
-* `$(pyenv root)/versions/pypy-2.4.0/`
-
-As far as Pyenv is concerned, version names are simply directories under
-`$(pyenv root)/versions`.
-
-----
-
-
 ## Installation
 
 ### Getting Pyenv
-#### UNIX/MacOS
-##### Homebrew in macOS
+#### Linux/Unix
 
-   1. Consider installing with [Homebrew](https://brew.sh):
+These steps also work in MacOS, but homebrew is recommended. See the MacOS section below.
+
+##### 1. Automatic installer (Recommended)
+
+```bash
+curl https://pyenv.run | bash
+```
+
+For more details visit our other project:
+https://github.com/pyenv/pyenv-installer
+
+
+##### 2. Basic GitHub Checkout
+
+This will get you going with the latest version of Pyenv and make it
+easy to fork and contribute any changes back upstream.
+
+* **Check out Pyenv where you want it installed.**
+   A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else):
+    ```
+    git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+    ```
+*  Optionally, try to compile a dynamic Bash extension to speed up Pyenv. Don't
+   worry if it fails; Pyenv will still work normally:
+    ```
+    cd ~/.pyenv && src/configure && make -C src
+    ```
+
+#### MacOS
+##### [Homebrew](https://brew.sh) in macOS
+
+   1. Update homebrew and install pyenv:
       ```sh
       brew update
       brew install pyenv
@@ -240,33 +146,6 @@ As far as Pyenv is concerned, version names are simply directories under
         alias brew="env PATH=(string replace (pyenv root)/shims '' \"\$PATH\") brew"
         ~~~
 
-
-##### Automatic installer
-
-```bash
-curl https://pyenv.run | bash
-```
-
-For more details visit our other project:
-https://github.com/pyenv/pyenv-installer
-
-
-##### Basic GitHub Checkout
-
-This will get you going with the latest version of Pyenv and make it
-easy to fork and contribute any changes back upstream.
-
-* **Check out Pyenv where you want it installed.**
-   A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else):
-    ```
-    git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-    ```
-*  Optionally, try to compile a dynamic Bash extension to speed up Pyenv. Don't
-   worry if it fails; Pyenv will still work normally:
-    ```
-    cd ~/.pyenv && src/configure && make -C src
-    ```
-
 #### Windows
 
 Pyenv does not officially support Windows and does not work in Windows outside
@@ -280,17 +159,6 @@ which does install native Windows Python versions.
 
 
 ### Set up your shell environment for Pyenv
-
-**Upgrade note:** The startup logic and instructions have been updated for simplicity in 2.3.0.
-The previous, more complicated configuration scheme for 2.0.0-2.2.5 still works.
-
-* Define environment variable `PYENV_ROOT` to point to the path where
-  Pyenv will store its data. `$HOME/.pyenv` is the default.
-  If you installed Pyenv via Git checkout, we recommend
-  to set it to the same location as where you cloned it.
-* Add the `pyenv` executable to your `PATH` if it's not already there
-* run `eval "$(pyenv init -)"` to install `pyenv` into your shell as a shell function, enable shims and autocompletion
-  * You may run `eval "$(pyenv init --path)"` instead to just enable shims, without shell integration
 
 The below setup should work for the vast majority of users for common use cases.
 See [Advanced configuration](#advanced-configuration) for details and more configuration options.
@@ -384,10 +252,27 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 
   You can now begin using Pyenv.
 
+### Upgrade Note
+
+**if you have just upgraded to pyenv version >= 2.3.0**
+
+The startup logic and instructions have been updated for simplicity in 2.3.0.
+The previous, more complicated configuration scheme for 2.0.0-2.2.5 still works.
+
+* Define environment variable `PYENV_ROOT` to point to the path where
+  Pyenv will store its data. `$HOME/.pyenv` is the default.
+  If you installed Pyenv via Git checkout, we recommend
+  to set it to the same location as where you cloned it.
+* Add the `pyenv` executable to your `PATH` if it's not already there
+* run `eval "$(pyenv init -)"` to install `pyenv` into your shell as a shell function, enable shims and autocompletion
+  * You may run `eval "$(pyenv init --path)"` instead to just enable shims, without shell integration
+
 ----
 
 
 ## Usage
+
+![Terminal output example](/install_local_python.gif)
 
 ### Install additional Python versions
 
@@ -588,6 +473,7 @@ as well as a catalog of some useful existing plugins for common needs.
 
 See [_Authoring plugins_ on the wiki](https://github.com/pyenv/pyenv/wiki/Authoring-plugins) on writing your own plugins.
 
+----
 
 ## Advanced Configuration
 
@@ -677,6 +563,128 @@ name | default | description
 
 See also [_Special environment variables_ in Python-Build's README](plugins/python-build/README.md#special-environment-variables)
 for environment variables that can be used to customize the build.
+
+----
+
+## How It Works
+
+At a high level, pyenv intercepts Python commands using shim
+executables injected into your `PATH`, determines which Python version
+has been specified by your application, and passes your commands along
+to the correct Python installation.
+
+
+### Understanding PATH
+
+When you run a command like `python` or `pip`, your shell (bash / zshrc / ...)
+searches through a list of directories to find an executable file with
+that name. This list of directories lives in an environment variable
+called `PATH`, with each directory in the list separated by a colon:
+
+    /usr/local/bin:/usr/bin:/bin
+
+Directories in `PATH` are searched from left to right, so a matching
+executable in a directory at the beginning of the list takes
+precedence over another one at the end. In this example, the
+`/usr/local/bin` directory will be searched first, then `/usr/bin`,
+then `/bin`.
+
+
+### Understanding Shims
+
+pyenv works by inserting a directory of _shims_ at the front of your
+`PATH`:
+
+    $(pyenv root)/shims:/usr/local/bin:/usr/bin:/bin
+
+Through a process called _rehashing_, pyenv maintains shims in that
+directory to match every Python command across every installed version
+of Python—`python`, `pip`, and so on.
+
+Shims are lightweight executables that simply pass your command along
+to pyenv. So with pyenv installed, when you run, say, `pip`, your
+operating system will do the following:
+
+* Search your `PATH` for an executable file named `pip`
+* Find the pyenv shim named `pip` at the beginning of your `PATH`
+* Run the shim named `pip`, which in turn passes the command along to
+  pyenv
+
+
+### Understanding Python version selection
+
+When you execute a shim, pyenv determines which Python version to use by
+reading it from the following sources, in this order:
+
+1. The `PYENV_VERSION` environment variable (if specified). You can use
+   the [`pyenv shell`](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-shell) command to set this environment
+   variable in your current shell session.
+
+2. The application-specific `.python-version` file in the current
+   directory (if present). You can modify the current directory's
+   `.python-version` file with the [`pyenv local`](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-local)
+   command.
+
+3. The first `.python-version` file found (if any) by searching each parent
+   directory, until reaching the root of your filesystem.
+
+4. The global `$(pyenv root)/version` file. You can modify this file using
+   the [`pyenv global`](https://github.com/pyenv/pyenv/blob/master/COMMANDS.md#pyenv-global) command.
+   If the global version file is not present, pyenv assumes you want to use the "system"
+   Python (see below).
+
+A special version name "`system`" means to use whatever Python is found on `PATH`
+after the shims `PATH` entry (in other words, whatever would be run if Pyenv
+shims weren't on `PATH`). Note that Pyenv considers those installations outside
+its control and does not attempt to inspect or distinguish them in any way.
+So e.g. if you are on MacOS and have OS-bundled Python 3.8.9 and Homebrew-installed
+Python 3.9.12 and 3.10.2 -- for Pyenv, this is still a single "`system`" version,
+and whichever of those is first on `PATH` under the executable name you
+specified will be run.
+
+**NOTE:** You can activate multiple versions at the same time, including multiple
+versions of Python2 or Python3 simultaneously. This allows for parallel usage of
+Python2 and Python3, and is required with tools like `tox`. For example, to instruct
+Pyenv to first use your system Python and Python3 (which are e.g. 2.7.9 and 3.4.2)
+but also have Python 3.3.6, 3.2.1, and 2.5.2 available, you first `pyenv install`
+the missing versions, then set `pyenv global system 3.3.6 3.2.1 2.5.2`.
+Then you'll be able to invoke any of those versions with an appropriate `pythonX` or
+`pythonX.Y` name.
+You can also specify multiple versions in a `.python-version` file by hand,
+separated by newlines. Lines starting with a `#` are ignored.
+
+[`pyenv which <command>`](COMMANDS.md#pyenv-which) displays which real executable would be
+run when you invoke `<command>` via a shim.
+E.g. if you have 3.3.6, 3.2.1 and 2.5.2 installed of which 3.3.6 and 2.5.2 are selected
+and your system Python is 3.2.5,
+`pyenv which python2.5` should display `$(pyenv root)/versions/2.5.2/bin/python2.5`,
+`pyenv which python3` -- `$(pyenv root)/versions/3.3.6/bin/python3` and
+`pyenv which python3.2` -- path to your system Python due to the fall-through (see below).
+
+Shims also fall through to anything further on `PATH` if the corresponding executable is
+not present in any of the selected Python installations.
+This allows you to use any programs installed elsewhere on the system as long as
+they are not shadowed by a selected Python installation.
+
+
+### Locating Pyenv-provided Python installations
+
+Once pyenv has determined which version of Python your application has
+specified, it passes the command along to the corresponding Python
+installation.
+
+Each Python version is installed into its own directory under
+`$(pyenv root)/versions`.
+
+For example, you might have these versions installed:
+
+* `$(pyenv root)/versions/2.7.8/`
+* `$(pyenv root)/versions/3.4.2/`
+* `$(pyenv root)/versions/pypy-2.4.0/`
+
+As far as Pyenv is concerned, version names are simply directories under
+`$(pyenv root)/versions`.
+
 
 ----
 
