@@ -35,13 +35,13 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 
 ## Table of Contents
 
-* **[Install a python version](#install-a-python-version)**
 * **[Installation](#installation)**
   * [Getting Pyenv](#getting-pyenv)
-    * [UNIX/MacOS](#unixmacos)
-      * [Homebrew in macOS](#homebrew-in-macos)
+    * [Linux/UNIX/MacOS](#linuxunixmacos)
       * [Automatic installer](#automatic-installer)
       * [Basic GitHub Checkout](#basic-github-checkout)
+    * [MacOS](#macos)
+      * [Homebrew in macOS](#homebrew-in-macos)
     * [Windows](#windows)
   * [Set up your shell environment for Pyenv](#set-up-your-shell-environment-for-pyenv)
   * [Restart your shell](#restart-your-shell)
@@ -77,7 +77,34 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 ## Installation
 
 ### Getting Pyenv
-#### UNIX/MacOS
+#### Linux/Unix/MacOS
+##### Automatic installer
+
+```bash
+curl https://pyenv.run | bash
+```
+
+For more details visit our other project:
+https://github.com/pyenv/pyenv-installer
+
+
+##### Basic GitHub Checkout
+
+This will get you going with the latest version of Pyenv and make it
+easy to fork and contribute any changes back upstream.
+
+* **Check out Pyenv where you want it installed.**
+   A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else):
+    ```
+    git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+    ```
+*  Optionally, try to compile a dynamic Bash extension to speed up Pyenv. Don't
+   worry if it fails; Pyenv will still work normally:
+    ```
+    cd ~/.pyenv && src/configure && make -C src
+    ```
+
+#### MacOS
 ##### Homebrew in macOS
 
    1. Consider installing with [Homebrew](https://brew.sh):
@@ -116,33 +143,6 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
         alias brew="env PATH=(string replace (pyenv root)/shims '' \"\$PATH\") brew"
         ~~~
 
-
-##### Automatic installer
-
-```bash
-curl https://pyenv.run | bash
-```
-
-For more details visit our other project:
-https://github.com/pyenv/pyenv-installer
-
-
-##### Basic GitHub Checkout
-
-This will get you going with the latest version of Pyenv and make it
-easy to fork and contribute any changes back upstream.
-
-* **Check out Pyenv where you want it installed.**
-   A good place to choose is `$HOME/.pyenv` (but you can install it somewhere else):
-    ```
-    git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-    ```
-*  Optionally, try to compile a dynamic Bash extension to speed up Pyenv. Don't
-   worry if it fails; Pyenv will still work normally:
-    ```
-    cd ~/.pyenv && src/configure && make -C src
-    ```
-
 #### Windows
 
 Pyenv does not officially support Windows and does not work in Windows outside
@@ -156,17 +156,6 @@ which does install native Windows Python versions.
 
 
 ### Set up your shell environment for Pyenv
-
-**Upgrade note:** The startup logic and instructions have been updated for simplicity in 2.3.0.
-The previous, more complicated configuration scheme for 2.0.0-2.2.5 still works.
-
-* Define environment variable `PYENV_ROOT` to point to the path where
-  Pyenv will store its data. `$HOME/.pyenv` is the default.
-  If you installed Pyenv via Git checkout, we recommend
-  to set it to the same location as where you cloned it.
-* Add the `pyenv` executable to your `PATH` if it's not already there
-* run `eval "$(pyenv init -)"` to install `pyenv` into your shell as a shell function, enable shims and autocompletion
-  * You may run `eval "$(pyenv init --path)"` instead to just enable shims, without shell integration
 
 The below setup should work for the vast majority of users for common use cases.
 See [Advanced configuration](#advanced-configuration) for details and more configuration options.
@@ -257,6 +246,21 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
   before attempting to install a new Python version.
 
   You can now begin using Pyenv.
+
+### Upgrade Note
+
+**if you have just upgraded to pyenv version >= 2.3.0**
+
+The startup logic and instructions have been updated for simplicity in 2.3.0.
+The previous, more complicated configuration scheme for 2.0.0-2.2.5 still works.
+
+* Define environment variable `PYENV_ROOT` to point to the path where
+  Pyenv will store its data. `$HOME/.pyenv` is the default.
+  If you installed Pyenv via Git checkout, we recommend
+  to set it to the same location as where you cloned it.
+* Add the `pyenv` executable to your `PATH` if it's not already there
+* run `eval "$(pyenv init -)"` to install `pyenv` into your shell as a shell function, enable shims and autocompletion
+  * You may run `eval "$(pyenv init --path)"` instead to just enable shims, without shell integration
 
 ----
 
