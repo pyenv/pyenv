@@ -37,7 +37,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 
 * **[Installation](#installation)**
   * [Getting Pyenv](#getting-pyenv)
-    * [Linux/UNIX/MacOS](#linuxunixmacos)
+    * [Linux/UNIX](#linuxunix)
       * [Automatic installer](#automatic-installer)
       * [Basic GitHub Checkout](#basic-github-checkout)
     * [MacOS](#macos)
@@ -77,8 +77,11 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 ## Installation
 
 ### Getting Pyenv
-#### Linux/Unix/MacOS
-##### Automatic installer
+#### Linux/Unix
+
+These steps also work in MacOS, but homebrew is recommended. See the MacOS section below.
+
+##### 1. Automatic installer (Recommended)
 
 ```bash
 curl https://pyenv.run | bash
@@ -88,7 +91,7 @@ For more details visit our other project:
 https://github.com/pyenv/pyenv-installer
 
 
-##### Basic GitHub Checkout
+##### 2. Basic GitHub Checkout
 
 This will get you going with the latest version of Pyenv and make it
 easy to fork and contribute any changes back upstream.
@@ -105,9 +108,9 @@ easy to fork and contribute any changes back upstream.
     ```
 
 #### MacOS
-##### Homebrew in macOS
+##### [Homebrew](https://brew.sh) in macOS
 
-   1. Consider installing with [Homebrew](https://brew.sh):
+   1. Update homebrew and install pyenv:
       ```sh
       brew update
       brew install pyenv
