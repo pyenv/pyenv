@@ -345,6 +345,7 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 
     ~~~ fish
     set -Ux PYENV_ROOT $HOME/.pyenv
+    mkdir -p $PYENV_ROOT/bin
     fish_add_path $PYENV_ROOT/bin
     ~~~
 
