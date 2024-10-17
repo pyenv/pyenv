@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.4.16
+* Add GraalPy 24.1.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3092
+* Add CPython 3.14.0a1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3093
+
 ## Release v2.4.15
 * CI: replace set-output with GITHUB_OUTPUT by @tuzi3040 in https://github.com/pyenv/pyenv/pull/3079
 * Make uninstall yes/no prompt consistent with others by @dpoznik in https://github.com/pyenv/pyenv/pull/3080
