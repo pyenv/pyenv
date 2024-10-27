@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.4.17
+* Add miniconda3-24.9.2-0 by @binbjz in https://github.com/pyenv/pyenv/pull/3096
+* Add Anaconda3-2024.10-1 by @binbjz in https://github.com/pyenv/pyenv/pull/3097
+
 ## Release v2.4.16
 * Add GraalPy 24.1.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3092
 * Add CPython 3.14.0a1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3093
