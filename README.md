@@ -174,7 +174,6 @@ which does install native Windows Python versions.
 The below setup should work for the vast majority of users for common use cases.
 See [Advanced configuration](#advanced-configuration) for details and more configuration options.
 
-
 #### Bash
   <details>
 

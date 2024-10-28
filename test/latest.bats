@@ -94,7 +94,7 @@ echo 3.10.6
 !
 }
 
-@test "ignores rolling releases, branch tips, alternative srcs, prereleases and virtualenvs" {
+@test "ignores rolling releases, branch tips, alternative srcs, prereleases, virtualenvs; 't' versions if prefix without 't'" {
   create_executable pyenv-versions <<!
 #!$BASH
 echo 3.8.5-dev
@@ -113,6 +113,21 @@ echo 3.8.1/envs/foo
   assert_success
   assert_output <<!
 3.8.1
+!
+}
+
+@test "resolves to a 't' version if prefix has 't'" {
+  create_executable pyenv-versions <<!
+#!$BASH
+echo 3.13.2t
+echo 3.13.5
+echo 3.13.5t
+echo 3.14.6
+!
+  run pyenv-latest 3t
+  assert_success
+  assert_output <<!
+3.13.5t
 !
 }
 

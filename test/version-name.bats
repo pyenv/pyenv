@@ -120,3 +120,17 @@ OUT
   assert_success
   assert_output "2.7.11"
 }
+
+@test "pyenv-latest fallback with prefix in name" {
+  create_version "3.12.6"
+  PYENV_VERSION="python-3.12" run pyenv-version-name
+  assert_success
+  assert_output "3.12.6"
+}
+
+@test "pyenv version started by python-" {
+  create_version "python-3.12.6"
+  PYENV_VERSION="python-3.12.6" run pyenv-version-name
+  assert_success
+  assert_output "python-3.12.6"
+}

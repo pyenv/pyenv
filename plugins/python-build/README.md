@@ -208,7 +208,7 @@ enables PGO (profile guided optimization). While your mileage may vary, it is
 common for performance improvement from this to be in the ballpark of 30%.
 
 ```sh
-env PYTHON_CONFIGURE_OPTS='--enable-optimizations --with-lto' PYTHON_CFLAGS='-march=native -mtune=native' pyenv install 3.6.0
+env PYTHON_CONFIGURE_OPTS='--enable-optimizations --with-lto' PYTHON_CFLAGS='-march=native -mtune=native' pyenv install --verbose 3.6.0
 ```
 
 You can also customize the task used for profile guided optimization by setting

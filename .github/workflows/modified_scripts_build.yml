@@ -21,8 +21,7 @@ jobs:
           echo "$EOF" >> $GITHUB_ENV;
       - id: modified-versions
         run: |
-          echo -n "::set-output name=versions::"
-          echo "${{ env.versions }}" | jq -R . | jq -sc .
+          echo "versions=`echo "${{ env.versions }}" | jq -R . | jq -sc .`" >> $GITHUB_OUTPUT
   macos_build:
     needs: discover_modified_scripts
     if: needs.discover_modified_scripts.outputs.versions != '[""]'

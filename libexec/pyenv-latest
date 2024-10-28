@@ -48,16 +48,25 @@ IFS=$'\n'
         exit $exitcode;
     fi
     
+    suffix=""
+    if [[ $prefix =~ ^(.*[0-9])t$ ]]; then
+        suffix="t"
+        prefix="${BASH_REMATCH[1]}"
+    fi
+    
     # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
     prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
+    suffix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$suffix")"
     # FIXME: more reliable and readable would probably be to loop over them and transform in pure Bash
     DEFINITION_CANDIDATES=(\
       $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
-      grep -Ee "^$prefix_re[-.]" || true))
+      grep -Ee "^$prefix_re[-.].*$suffix_re\$" || true))
 
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
-          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+$/d' -e '/[0-9]+t$/d'));
+          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+$/d' \
+            $(if [[ -z $suffix ]]; then echo "-e /[0-9]t\$/d"; fi)
+        ));
 
     # Compose a sorting key, followed by | and original value
     DEFINITION_CANDIDATES=(\

@@ -1,5 +1,40 @@
 # Version History
 
+## Release v2.4.17
+* Add miniconda3-24.9.2-0 by @binbjz in https://github.com/pyenv/pyenv/pull/3096
+* Add Anaconda3-2024.10-1 by @binbjz in https://github.com/pyenv/pyenv/pull/3097
+
+## Release v2.4.16
+* Add GraalPy 24.1.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3092
+* Add CPython 3.14.0a1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3093
+
+## Release v2.4.15
+* CI: replace set-output with GITHUB_OUTPUT by @tuzi3040 in https://github.com/pyenv/pyenv/pull/3079
+* Make uninstall yes/no prompt consistent with others by @dpoznik in https://github.com/pyenv/pyenv/pull/3080
+* Add CPython 3.13.0 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3081
+* Avoid shadowing of virtualenvs with the name starting with "python-" by @aarbouin in https://github.com/pyenv/pyenv/pull/3086
+* Support free-threaded CPython flavor in prefix resolution by @native-api in https://github.com/pyenv/pyenv/pull/3090
+
+## Release v2.4.14
+* Add CPython 3.12.7 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3078
+* Add CPython 3.13.0rc3 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3077
+
+## Release v2.4.13
+* docs: Use `--verbose` with performance CPython build instructions by @caerulescens in https://github.com/pyenv/pyenv/pull/3053
+* Fix latest version resolution when using `python-` prefix by @edmorley in https://github.com/pyenv/pyenv/pull/3056
+* Fix tgz checksum for 3.9.20; fallback OpenSSL URLs and checksums by @native-api in https://github.com/pyenv/pyenv/pull/3060
+* Fix OpenSSL 3.3.2 download URLs by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3059
+* Add GraalPy 24.1.0 by @msimacek in https://github.com/pyenv/pyenv/pull/3066
+
+## Release v2.4.12
+* Add CPython 3.13.0rc2 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3049
+* Add CPython 3.8.20, 3.9.20, 3.10.15, 3.11.10 and 3.12.6 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3050
+
+## Release v2.4.11
+* Add /usr/etc/pyenv.d to hooks path by @tomschr in https://github.com/pyenv/pyenv/pull/3039
+* Add miniconda3-24.7.1-0 by @binbjz in https://github.com/pyenv/pyenv/pull/3040
+* Add PyPy v7.3.17 by @jsirois in https://github.com/pyenv/pyenv/pull/3045
+
 ## Release v2.4.10
 * Add CPython 3.12.5 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3030
 
