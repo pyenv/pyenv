@@ -14,7 +14,7 @@ shell="$(basename "${PYENV_SHELL:-$SHELL}")"
 pyenv-rehash
 
 case "$shell" in
-fish )
+fish | pwsh )
   # no rehash support
   ;;
 * )
