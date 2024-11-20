@@ -269,7 +269,9 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 ### E. Upgrade Notes
 ----
 
-**if you have just upgraded to pyenv version >= 2.3.0**
+**if you have upgraded from pyenv version 2.0.x-2.2.x**
+
+<details>
 
 The startup logic and instructions have been updated for simplicity in 2.3.0.
 The previous, more complicated configuration scheme for 2.0.0-2.2.5 still works.
@@ -281,6 +283,8 @@ The previous, more complicated configuration scheme for 2.0.0-2.2.5 still works.
 * Add the `pyenv` executable to your `PATH` if it's not already there
 * run `eval "$(pyenv init -)"` to install `pyenv` into your shell as a shell function, enable shims and autocompletion
   * You may run `eval "$(pyenv init --path)"` instead to just enable shims, without shell integration
+
+</details>
 
 ----
 
