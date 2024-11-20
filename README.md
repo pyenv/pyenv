@@ -80,9 +80,9 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 ----
 #### Linux/Unix
 <details>
-  
-These steps also work in MacOS, but homebrew is recommended. See the MacOS section below.
 
+The Homebrew option from the [MacOS section below](#macos) would also work if you have Homebrew installed.
+  
 ##### 1. Automatic installer (Recommended)
 
 ```bash
@@ -114,6 +114,8 @@ easy to fork and contribute any changes back upstream.
 
 <details>
   
+The options from the [Linux section above](#linuxunix) also work but Homebrew is recommended for basic usage.
+
 ##### [Homebrew](https://brew.sh) in macOS
 
    1. Update homebrew and install pyenv:
