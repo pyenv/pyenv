@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.4.19
+* Add CPython 3.14.0a2 by @nedbat in https://github.com/pyenv/pyenv/pull/3110
+* Add quick start section and gif demo to accompany it. by @madhu-GG in https://github.com/pyenv/pyenv/pull/3044
+
 ## Release v2.4.18
 * Add miniforge3-24.9.2-0 by @goerz in https://github.com/pyenv/pyenv/pull/3106
 
