@@ -310,6 +310,7 @@ Running `pyenv install -l` gives the list of all available versions.
 ----
 
 <details> <summary> Notes about python releases </summary>
+  
 **NOTE:** Most Pyenv-provided Python releases are source releases and are built
 from source as part of installation (that's why you need Python build dependencies preinstalled).
 You can pass options to Python's `configure` and compiler flags to customize the build,
