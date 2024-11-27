@@ -129,7 +129,7 @@ The options from the [Linux section above](#linuxunix) also work but Homebrew is
       brew install pyenv --head
       ```
    3. Then follow the rest of the post-installation steps, starting with
-      [Set up your shell environment for Pyenv](#set-up-your-shell-environment-for-pyenv).
+      [Set up your shell environment for Pyenv](#b-set-up-your-shell-environment-for-pyenv).
 
    4. OPTIONAL. To fix `brew doctor`'s warning _""config" scripts exist outside your system or Homebrew directories"_
 
