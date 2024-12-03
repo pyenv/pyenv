@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.4.20
+* README: Fix Markdown in "Notes about python releases" by @noelleleigh in https://github.com/pyenv/pyenv/pull/3112
+* README: correct link to shell setup instructions by @shortcuts in https://github.com/pyenv/pyenv/pull/3113
+* Add CPython 3.9.21, 3.10.16, 3.11.11, 3.12.8 and 3.13.1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3117
+
 ## Release v2.4.19
 * Add CPython 3.14.0a2 by @nedbat in https://github.com/pyenv/pyenv/pull/3110
 * Add quick start section and gif demo to accompany it. by @madhu-GG in https://github.com/pyenv/pyenv/pull/3044
