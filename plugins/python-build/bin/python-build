@@ -1671,25 +1671,32 @@ use_xcode_sdk_zlib() {
 
 use_homebrew_tcltk() {
   can_use_homebrew || return 1
-  # get the version from the folder that homebrew versions
-  local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
-  if [ -d "$tcltk_libdir" ]; then
-    echo "python-build: use tcl-tk from homebrew"
-    if [[ -z "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
-      local tcltk_version="$(sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo $TCL_VERSION')"
-      package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
-      # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
-      # We're not using tclConfig.sh here 'cuz it produces the version-specific path to <brew prefix>/Cellar
-      # and we'd rather have rpath set to <brew prefix>/opt/<...> to allow micro release upgrades without rebuilding
-      # XXX: do use tclConfig.sh and translate the paths if more path shenanigans appear in later releases
-      if [ -d "$tcltk_libdir/include/tcl-tk" ]; then
-        package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include/tcl-tk"
-      else
-        package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+  # Since https://github.com/Homebrew/homebrew-core/commit/f10e88617b41555193c22fdcba6109fe82155ee2 (10.11.2024),
+  # tcl-tk is 9.0 which is not compatible with CPython as of this writing
+  # but we'll keep it as backup for cases like non-updated Homebrew
+  local tcltk
+  for tcltk in "tcl-tk@8" "tcl-tk"; do
+    local tcltk_libdir="$(brew --prefix "${tcltk}" 2>/dev/null || true)"
+    if [ -d "$tcltk_libdir" ]; then
+      echo "python-build: use tcl-tk from homebrew"
+      if [[ -z "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
+        local tcltk_version="$(sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo $TCL_VERSION')"
+        package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+        # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
+        # We're not using tclConfig.sh here 'cuz it produces the version-specific path to <brew prefix>/Cellar
+        # and we'd rather have rpath set to <brew prefix>/opt/<...> to allow micro release upgrades without rebuilding
+        # XXX: do use tclConfig.sh and translate the paths if more path shenanigans appear in later releases
+        if [ -d "$tcltk_libdir/include/tcl-tk" ]; then
+          package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include/tcl-tk"
+        else
+          package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+        fi
       fi
+      export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+      return
     fi
-    export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-  fi
+  done
+  return 1
 }
 
 # FIXME: this function is a workaround for #1125
