@@ -814,7 +814,7 @@ build_package_standard_build() {
 
   if [ "$package_var_name" = "PYTHON" ]; then
     use_homebrew || true
-    use_tcltk || true
+    use_custom_tcltk || use_homebrew_tcltk || true
     use_homebrew_readline || use_freebsd_pkg || true
     use_homebrew_ncurses || true
     if is_mac -ge 1014; then
@@ -1693,7 +1693,7 @@ use_homebrew_tcltk() {
         fi
       fi
       export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-      return
+      return 0
     fi
   done
   return 1
@@ -1701,8 +1701,13 @@ use_homebrew_tcltk() {
 
 # FIXME: this function is a workaround for #1125
 # once fixed, it should be removed.
+# if tcltk_ops_flag is in PYTHON_CONFIGURE_OPTS, use user provided tcltk
 use_custom_tcltk() {
-  local tcltk_ops="$1"
+  local tcl_tk_ops="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
+
+  if [[ -z "$tcl_tk_ops" ]]; then
+    return 1
+  fi
   local tcltk_ops_flag="--with-tcltk-libs="
   # get tcltk libs
   local tcltk_libs="${tcltk_ops//$tcltk_ops_flag/}"
@@ -1743,21 +1748,6 @@ get_tcltk_flag_from() {
   done
 
   IFS="$OLDIFS"
-}
-
-use_tcltk() {
-  if can_use_homebrew; then
-    local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
-  fi
-  local tcl_tk_libs="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
-
-  # if tcltk_ops_flag is in PYTHON_CONFIGURE_OPTS, use user provided tcltk
-  # otherwise default to homebrew-installed tcl-tk, if installed
-  if [[ -n "$tcl_tk_libs" ]]; then
-    use_custom_tcltk "$tcl_tk_libs"
-  elif [ -d "$tcltk_libdir" ]; then
-    use_homebrew_tcltk
-  fi
 }
 
 # Since 3.12, CPython can add DWARF debug information in MacOS
