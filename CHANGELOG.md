@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.4.21
+* Add CPython 3.13.1t by @makukha in https://github.com/pyenv/pyenv/pull/3120
+* Prefer tcl-tk@8 from Homebrew due to release of Tcl/Tk 9 with which only 3.12+ are compatible by @native-api in https://github.com/pyenv/pyenv/pull/3118
+
 ## Release v2.4.20
 * README: Fix Markdown in "Notes about python releases" by @noelleleigh in https://github.com/pyenv/pyenv/pull/3112
 * README: correct link to shell setup instructions by @shortcuts in https://github.com/pyenv/pyenv/pull/3113
