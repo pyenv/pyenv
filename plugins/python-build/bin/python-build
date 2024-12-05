@@ -1703,9 +1703,9 @@ use_homebrew_tcltk() {
 # once fixed, it should be removed.
 # if tcltk_ops_flag is in PYTHON_CONFIGURE_OPTS, use user provided tcltk
 use_custom_tcltk() {
-  local tcl_tk_ops="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
+  local tcltk_ops="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
 
-  if [[ -z "$tcl_tk_ops" ]]; then
+  if [[ -z "$tcltk_ops" ]]; then
     return 1
   fi
   local tcltk_ops_flag="--with-tcltk-libs="

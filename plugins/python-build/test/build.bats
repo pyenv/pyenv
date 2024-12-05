@@ -739,7 +739,7 @@ OUT
 
   for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
-  for i in {1..5}; do stub brew false; done
+  for i in {1..6}; do stub brew false; done
   stub_make_install
 
   run_inline_definition <<DEF
