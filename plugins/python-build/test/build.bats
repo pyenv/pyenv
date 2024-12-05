@@ -182,7 +182,7 @@ OUT
   for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew "--prefix libyaml : echo '$brew_libdir'"
-  for i in {1..5}; do stub brew false; done
+  for i in {1..6}; do stub brew false; done
   stub_make_install
 
   install_fixture definitions/needs-yaml
@@ -208,7 +208,7 @@ OUT
   mkdir -p "$readline_libdir"
   for i in {1..8}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
-  for i in {1..2}; do stub brew false; done
+  for i in {1..3}; do stub brew false; done
   stub brew "--prefix readline : echo '$readline_libdir'"
   for i in {1..2}; do stub brew false; done
   stub_make_install
@@ -238,7 +238,7 @@ OUT
   mkdir -p "$ncurses_libdir"
   for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
-  for i in {1..3}; do stub brew false; done
+  for i in {1..4}; do stub brew false; done
   stub brew "--prefix ncurses : echo '$ncurses_libdir'"
   stub brew false
   stub_make_install
@@ -364,7 +364,7 @@ OUT
 
   for i in {1..4}; do stub uname '-s : echo Linux'; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
-  for i in {1..4}; do stub brew false; done
+  for i in {1..5}; do stub brew false; done
   stub_make_install
   export PYTHON_BUILD_USE_HOMEBREW=1
 
@@ -394,7 +394,7 @@ OUT
 
   for i in {1..4}; do stub uname '-s : echo Linux'; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
-  for i in {1..4}; do stub brew false; done
+  for i in {1..5}; do stub brew false; done
   stub_make_install
   export PYTHON_BUILD_USE_HOMEBREW=1
 
@@ -453,7 +453,7 @@ OUT
   for i in {1..8}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
-  for i in {1..4}; do stub brew false; done
+  for i in {1..5}; do stub brew false; done
   stub_make_install
 
   export PYTHON_CONFIGURE_OPTS="CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib"
@@ -482,11 +482,11 @@ OUT
   mkdir -p "$tcl_tk_libdir/lib"
   echo "TCL_VERSION='$tcl_tk_version'" >>"$tcl_tk_libdir/lib/tclConfig.sh"
 
-  for i in {1..10}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
   stub brew false
-  for i in {1..2}; do stub brew "--prefix tcl-tk : echo '$tcl_tk_libdir'"; done
+  stub brew "--prefix tcl-tk@8 : echo '$tcl_tk_libdir'"
   for i in {1..3}; do stub brew false; done
 
   stub_make_install
@@ -516,10 +516,10 @@ OUT
   tcl_tk_version_long="8.6.10"
   tcl_tk_version="${tcl_tk_version_long%.*}"
 
-  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..8}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
-  for i in {1..5}; do stub brew false; done
+  for i in {1..4}; do stub brew false; done
   stub_make_install
 
   export PYTHON_CONFIGURE_OPTS="--with-tcltk-libs='-L${TMP}/custom-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version'"
@@ -544,14 +544,14 @@ OUT
 @test "tcl-tk is linked from Homebrew via pkgconfig only when envvar is set" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..10}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
 
   tcl_tk_libdir="$TMP/homebrew-tcl-tk"
   mkdir -p "$tcl_tk_libdir/lib"
 
   stub brew false
-  for i in {1..2}; do stub brew "--prefix tcl-tk : echo '${tcl_tk_libdir}'"; done
+  stub brew "--prefix tcl-tk@8 : echo '${tcl_tk_libdir}'"
   for i in {1..3}; do stub brew false; done
 
   stub_make_install
@@ -739,7 +739,7 @@ OUT
 
   for i in {1..10}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
-  for i in {1..5}; do stub brew false; done
+  for i in {1..6}; do stub brew false; done
   stub_make_install
 
   run_inline_definition <<DEF
