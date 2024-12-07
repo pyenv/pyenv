@@ -558,7 +558,7 @@ download_tarball() {
 }
 
 has_tar_xz_support() {
-  tar Jcf - /dev/null 1>/dev/null 2>&1
+  [[ -z $_PYTHON_BUILD_FORCE_SKIP_XZ ]] && tar Jcf - /dev/null 1>/dev/null 2>&1
 }
 
 fetch_git() {
