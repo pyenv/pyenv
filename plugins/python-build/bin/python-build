@@ -1596,10 +1596,6 @@ build_package_mac_openssl() {
   # Compile a shared lib with zlib dynamically linked.
   package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5} no-docs no-apps no-tests
 
-  # Default MAKE_OPTS are -j 2 which can confuse the build. Thankfully, make
-  # gives precedence to the last -j option, so we can override that.
-  package_option openssl make -j 1
-
   build_package_standard "$@"
 
   # Extract root certs from the system keychain in .pem format and rehash.
