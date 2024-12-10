@@ -389,6 +389,82 @@ for more details on how the selection works and more information on its usage.
 
 ----
 
+### Usage in alpine container
+
+This installs pyenv, pyenv-virtualenv, pyenv-doctor and pyenv-update; python 3.13 and 3.12; makes python3.13 the version you get when running `python3`.
+
+~~~dockerfile
+FROM alpine:latest
+
+# The the installed versions, this can be combined with the next comment and renovate to get automated updates in your CI. If you do not use renovate remove the `# renovate:` lines.
+# renovate: datasource=github-tags depName=pyenv/pyenv versioning=semver
+ENV PYENV_CMD_VERSION="v2.4.22"
+# renovate: datasource=github-tags depName=pyenv/pyenv-virtualenv versioning=semver
+ENV PYENV_VITUALENV_VERSION="v1.2.4"
+
+# Keep the version first which you want to have available via `python3` or `python`, the versions after that are available as e.g. `python3.12`.
+# We check the version accessible via `python3` in the last RUN, so be sure to update the version there too.
+ENV INSTALLED_PYTHON_VERSIONS="3.13 3.12"
+
+# Set/extend environment variables:
+ENV PYENV_ROOT="/root/.pyenv"
+ENV PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:$PATH"
+
+# install pyenv and dependencies:
+RUN apk upgrade --no-cache && \
+    apk add \
+    bash \
+    git \
+    build-base \
+    linux-headers \
+    && \
+    apk add --no-cache build-base zlib-dev openssl-dev libffi-dev readline-dev bzip2-dev ncurses-dev xz-dev sqlite-dev tk-dev --virtual pyenv-build-deps \
+    && \
+    git clone -c advice.detachedHead=0 --depth 1 --branch "${PYENV_CMD_VERSION}" https://github.com/pyenv/pyenv.git "${PYENV_ROOT}" && \
+    git clone -c advice.detachedHead=0 --depth 1 --branch "${PYENV_VITUALENV_VERSION}" https://github.com/pyenv/pyenv-virtualenv.git "${PYENV_ROOT}/plugins/pyenv-virtualenv" && \
+    git clone -c advice.detachedHead=0 --depth 1 https://github.com/pyenv/pyenv-doctor.git "${PYENV_ROOT}/plugins/pyenv-doctor" && \
+    git clone -c advice.detachedHead=0 --depth 1 https://github.com/pyenv/pyenv-update.git "${PYENV_ROOT}/plugins/pyenv-update" && \
+    printf 'export PYENV_ROOT="$HOME/.pyenv"\n' >> ~/.profile && \
+    printf 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"\n' >> ~/.profile && \
+    printf 'eval "$(pyenv init -)"\n' >> ~/.profile && \
+    eval "$(pyenv init -)" && \
+    pyenv doctor
+
+# Build python versions from INSTALLED_PYTHON_VERSIONS:
+# depending on the container image builder you might have remove the `--mount...` stuff, this allows having the builds cached in a common place.
+# When you build the image more often you get quite some speed improvements.
+RUN --mount=type=cache,mode=777,id=pyenv,target=/var/cache/pyenv \
+    for python_version in ${INSTALLED_PYTHON_VERSIONS}; do PYTHON_BUILD_CACHE_PATH=/var/cache/pyenv pyenv install "${python_version}"; done
+
+# Set the global versions and run `python3.xxx --version` to show the full version that has been installed (not just 3.11)
+RUN pyenv global ${INSTALLED_PYTHON_VERSIONS} && \
+    for python_version in $(echo "${INSTALLED_PYTHON_VERSIONS}" | sed 's,-dev,,g') ; do python${python_version} --version ; which python${python_version} ; done && \
+    apk del pyenv-build-deps # remove the packages only required for the build
+
+RUN python3 --version | grep -q "Python 3.13" || { echo "Python version is not correct when running python3" ; exit 1 ;}
+~~~
+
+Unrelated to pyenv, if you use renovate to update the versions above add this to its config (`renovate.json5`):
+
+~~~json5
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // variants are described in the README.md
+  customManagers: [
+    {
+      customType: "regex",
+      fileMatch: ["(^|/|\\.)Dockerfile$", "(^|/)Dockerfile\\.[^/]*$"],
+      matchStrings: [
+        '#\\s*renovate:\\s*datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?( extractVersion=(?<extractVersion>.*?))?( registryUrl=(?<registryUrl>.*?))?( sourceUrl=(?<sourceUrl>.*?))?\\sENV .*?_VERSION="(?<currentValue>.*)"\\s',
+      ],
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+    },
+  ],
+}
+~~~
+
+----
+
 ### Uninstall Python versions
 
 As time goes on, you will accumulate Python versions in your
