@@ -51,6 +51,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Install additional Python versions](#install-additional-python-versions)
     * [Prefix auto-resolution to the latest version](#prefix-auto-resolution-to-the-latest-version)
   * [Switch between Python versions](#switch-between-python-versions)
+    * [Making multiple versions available](#making-multiple-versions-available)
   * [Uninstall Python versions](#uninstall-python-versions)
   * [Other operations](#other-operations)
 * [Upgrading](#upgrading)
