@@ -389,16 +389,18 @@ for more details on how the selection works and more information on its usage.
 
 ----
 
-### Making multiple versions available
+#### Making multiple versions available
 
-In case you want to be able to use e.g. `python3.11` and `python3.12` you can specify them as multiple arguments.
-
-Beware that the _first_ version in the list will be the one you get, when you run `python`/`python3`.
+You can select multiple Python versions at the same time by specifying multiple arguments.
+E.g. if you wish to use the latest installed CPython 3.11 and 3.12:
 
 ~~~bash
-# use python 3.11 when running `python`/`python3`, also make `python3.12` available
 pyenv global 3.11 3.12
 ~~~
+
+Whenever you run a command provided by a Python installation, these versions will be searched for it in the specified order.
+Versions selected with `pyenv shell` are searched first, then `pyenv local`, then `pyenv global`.
+[Due to the shims' fall-through behavior]((#understanding-python-version-selection)), "`system`" is always implicitly searched afterwards.
 
 ----
 
