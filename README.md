@@ -389,6 +389,19 @@ for more details on how the selection works and more information on its usage.
 
 ----
 
+### Making multiple versions available
+
+In case you want to be able to use e.g. `python3.11` and `python3.12` you can specify them as multiple arguments.
+
+Beware that the _first_ version in the list will be the one you get, when you run `python`/`python3`.
+
+~~~bash
+# use python 3.11 when running `python`/`python3`, also make `python3.12` available
+pyenv global 3.11 3.12
+~~~
+
+----
+
 ### Uninstall Python versions
 
 As time goes on, you will accumulate Python versions in your
