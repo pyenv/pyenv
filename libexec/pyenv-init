@@ -60,8 +60,6 @@ if [ -z "$shell" ]; then
   shell="${shell%%-*}"
 fi
 
-root="${0%/*}/.."
-
 function main() {
   case "$mode" in
   "help")
@@ -244,7 +242,7 @@ function print_env() {
 }
 
 function print_completion() {
-  completion="${root}/completions/pyenv.${shell}"
+  completion="${PYENV_ROOT}/completions/pyenv.${shell}"
   if [ -r "$completion" ]; then
     echo "source '$completion'"
   fi
