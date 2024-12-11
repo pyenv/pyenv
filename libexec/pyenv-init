@@ -22,35 +22,37 @@ fi
 mode="help"
 no_rehash=""
 no_push_path=""
-for args in "$@"
-do
-  if [ "$args" = "-" ]; then
-    mode="print"
-    shift
-  fi
+shell=""
 
-  if [ "$args" = "--path" ]; then
-    mode="path"
-    shift
-  fi
-
-  if [ "$args" = "--detect-shell" ]; then
-    mode="detect-shell"
-    shift
-  fi
-
-  if [ "$args" = "--no-push-path" ]; then
-    no_push_path=1
-    shift
-  fi
-  
-  if [ "$args" = "--no-rehash" ]; then
-    no_rehash=1
-    shift
-  fi
+for arg in "$@"; do
+  case "$arg" in
+    -)
+      mode="print"
+      ;;
+    zsh|bash|ksh|fish)
+      shell="$arg"
+      ;;
+    --path)
+      mode="path"
+      ;;
+    --detect-shell)
+      mode="detect-shell"
+      ;;
+    --no-push-path)
+      no_push_path=1
+      ;;
+    --no-rehash)
+      no_rehash=1
+      ;;
+    *)
+      echo "Warning: Unknown option '$arg'" >&2
+      echo "Run 'pyenv init --help' for usage." >&2
+      exit 1
+      ;;
+  esac
 done
 
-shell="$1"
+# If shell is not provided, detect it.
 if [ -z "$shell" ]; then
   shell="$(ps -p "$PPID" -o 'args=' 2>/dev/null || true)"
   shell="${shell%% *}"
