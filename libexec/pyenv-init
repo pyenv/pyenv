@@ -24,13 +24,10 @@ no_rehash=""
 no_push_path=""
 shell=""
 
-for arg in "$@"; do
-  case "$arg" in
+while [ "$#" -gt 0 ]; do
+  case "$1" in
     -)
       mode="print"
-      ;;
-    zsh|bash|ksh|fish)
-      shell="$arg"
       ;;
     --path)
       mode="path"
@@ -45,11 +42,10 @@ for arg in "$@"; do
       no_rehash=1
       ;;
     *)
-      echo "Warning: Unknown option '$arg'" >&2
-      echo "Run 'pyenv init --help' for usage." >&2
-      exit 1
+      shell="$1"
       ;;
   esac
+  shift
 done
 
 # If shell is not provided, detect it.
