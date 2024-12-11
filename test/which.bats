@@ -57,11 +57,12 @@ create_executable() {
 }
 
 @test "doesn't include current directory in PATH search" {
+  bats_require_minimum_version 1.5.0
   mkdir -p "$RBENV_TEST_DIR"
   cd "$RBENV_TEST_DIR"
   touch kill-all-humans
   chmod +x kill-all-humans
-  PATH="$(path_without "kill-all-humans")" RBENV_VERSION=system run rbenv-which kill-all-humans
+  PATH="$(path_without "kill-all-humans")" RBENV_VERSION=system run -127 rbenv-which kill-all-humans
   assert_failure "rbenv: kill-all-humans: command not found"
 }
 
@@ -72,22 +73,25 @@ create_executable() {
 }
 
 @test "no executable found" {
+  bats_require_minimum_version 1.5.0
   create_executable "1.8" "rspec"
-  RBENV_VERSION=1.8 run rbenv-which rake
+  RBENV_VERSION=1.8 run -127 rbenv-which rake
   assert_failure "rbenv: rake: command not found"
 }
 
 @test "no executable found for system version" {
-  PATH="$(path_without "rake")" RBENV_VERSION=system run rbenv-which rake
+  bats_require_minimum_version 1.5.0
+  PATH="$(path_without "rake")" RBENV_VERSION=system run -127 rbenv-which rake
   assert_failure "rbenv: rake: command not found"
 }
 
 @test "executable found in other versions" {
+  bats_require_minimum_version 1.5.0
   create_executable "1.8" "ruby"
   create_executable "1.9" "rspec"
   create_executable "2.0" "rspec"
 
-  RBENV_VERSION=1.8 run rbenv-which rspec
+  RBENV_VERSION=1.8 run -127 rbenv-which rspec
   assert_failure
   assert_output <<OUT
 rbenv: rspec: command not found
@@ -99,9 +103,10 @@ OUT
 }
 
 @test "executable not found in user gems" {
+  bats_require_minimum_version 1.5.0
   create_executable "2.7.6" "ruby"
   create_executable "${HOME}/.gem/ruby/2.7.0/bin" "rake"
-  GEM_HOME='' RBENV_VERSION=2.7.6 run rbenv-which rake
+  GEM_HOME='' RBENV_VERSION=2.7.6 run -127 rbenv-which rake
   assert_failure
 }
 
