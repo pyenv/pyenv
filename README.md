@@ -191,27 +191,27 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
       ```bash
       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-      echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+      echo 'eval "$(pyenv init - bash)"' >> ~/.bashrc
       ```
-  3. Then, if you have `~/.profile`, `~/.bash_profile` or `~/.bash_login`, add the commands there as well.
+  2. Then, if you have `~/.profile`, `~/.bash_profile` or `~/.bash_login`, add the commands there as well.
      If you have none of these, create a `~/.profile` and add the commands there.
 
      * to add to `~/.profile`:
        ``` bash
        echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
        echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
-       echo 'eval "$(pyenv init -)"' >> ~/.profile
+       echo 'eval "$(pyenv init - bash)"' >> ~/.profile
        ```
      * to add to `~/.bash_profile`:
        ```bash
        echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
        echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
-       echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
+       echo 'eval "$(pyenv init - bash)"' >> ~/.bash_profile
        ```
 
    **Bash warning**: There are some systems where the `BASH_ENV` variable is configured
    to point to `.bashrc`. On such systems, you should almost certainly put the
-   `eval "$(pyenv init -)"` line into `.bash_profile`, and **not** into `.bashrc`. Otherwise, you
+   `eval "$(pyenv init - bash)"` line into `.bash_profile`, and **not** into `.bashrc`. Otherwise, you
    may observe strange behaviour, such as `pyenv` getting into an infinite loop.
    See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
    
@@ -224,7 +224,7 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
   ```zsh
     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
     echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
-    echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+    echo 'eval "$(pyenv init - zsh)"' >> ~/.zshrc
   ```
   
   If you wish to get Pyenv in noninteractive login shells as well, also add the commands to `~/.zprofile` or `~/.zlogin`.
@@ -248,7 +248,7 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 
   3. Now, add this to `~/.config/fish/config.fish`:
      ~~~ fish
-       pyenv init - | source
+       pyenv init - fish | source
      ~~~
   </details>
 
