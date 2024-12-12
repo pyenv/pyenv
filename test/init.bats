@@ -72,7 +72,7 @@ OUT
 @test "fish instructions" {
   run pyenv-init fish
   assert [ "$status" -eq 1 ]
-  assert_line 'pyenv init - | source'
+  assert_line 'pyenv init - fish | source'
 }
 
 @test "shell detection for installer" {
