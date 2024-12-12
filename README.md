@@ -51,6 +51,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Install additional Python versions](#install-additional-python-versions)
     * [Prefix auto-resolution to the latest version](#prefix-auto-resolution-to-the-latest-version)
   * [Switch between Python versions](#switch-between-python-versions)
+    * [Making multiple versions available](#making-multiple-versions-available)
   * [Uninstall Python versions](#uninstall-python-versions)
   * [Other operations](#other-operations)
 * [Upgrading](#upgrading)
@@ -386,6 +387,21 @@ Using "`system`" as a version name would reset the selection to your system-prov
 See [Understanding shims](#understanding-shims) and
 [Understanding Python version selection](#understanding-python-version-selection)
 for more details on how the selection works and more information on its usage.
+
+----
+
+#### Making multiple versions available
+
+You can select multiple Python versions at the same time by specifying multiple arguments.
+E.g. if you wish to use the latest installed CPython 3.11 and 3.12:
+
+~~~bash
+pyenv global 3.11 3.12
+~~~
+
+Whenever you run a command provided by a Python installation, these versions will be searched for it in the specified order.
+Versions selected with `pyenv shell` are searched first, then `pyenv local`, then `pyenv global`.
+[Due to the shims' fall-through behavior]((#understanding-python-version-selection)), `system` is always implicitly searched afterwards.
 
 ----
 
