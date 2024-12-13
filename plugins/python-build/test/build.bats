@@ -30,12 +30,12 @@ cached_tarball() {
 tarball() {
   local name="$1"
   local path="$PWD/$name"
-  local configure="$path/configure"
+  local configure="$path/${2:-configure}"
   shift 1
 
   executable "$configure" <<OUT
 #!$BASH
-echo "$name: CPPFLAGS=\\"\$CPPFLAGS\\" LDFLAGS=\\"\$LDFLAGS\\" PKG_CONFIG_PATH=\\"\$PKG_CONFIG_PATH\\"" >> build.log
+echo "$name: CFLAGS=\\"\$CFLAGS\\" CPPFLAGS=\\"\$CPPFLAGS\\" LDFLAGS=\\"\$LDFLAGS\\" PKG_CONFIG_PATH=\\"\$PKG_CONFIG_PATH\\"" >> build.log
 echo "$name: \$@" \${PYTHONOPT:+PYTHONOPT=\$PYTHONOPT} >> build.log
 OUT
 
@@ -50,7 +50,7 @@ OUT
 stub_make_install() {
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \
-    "install : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
+    "${1:-install} : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
 }
 
 assert_build_log() {
@@ -74,14 +74,57 @@ assert_build_log() {
   unstub make
 
   assert_build_log <<OUT
-yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+yaml-0.1.6: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
+OUT
+}
+
+@test "apply global and package-specific flags, package flags come later to have precedence" {
+  local yaml_configure="yaml_configure"
+
+  export YAML_CONFIGURE="./$yaml_configure"
+  export YAML_PREFIX_PATH=yaml_prefix_path
+  export YAML_CONFIGURE_OPTS="yaml_configure_opt1 yaml_configure_opt2"
+  export YAML_MAKE_OPTS="yaml_make_opt1 yaml_make_opt2"
+  export YAML_CFLAGS="yaml_cflag1 yaml_cflag2"
+  export YAML_CPPFLAGS="yaml_cppflag1 yaml_cppflag2"
+  export YAML_LDFLAGS="yaml_ldflag1 yaml_ldflag2"
+  export CONFIGURE_OPTS="configure_opt1 configure_opt2"
+  export MAKE_OPTS="make_opt1 make_opt2"
+  export MAKE_INSTALL_OPTS="make_install_opt1 make_install_opt2"
+  export PYTHON_MAKE_INSTALL_OPTS="python_make_install_opt1 python_make_install_opt2"
+  export PYTHON_MAKE_INSTALL_TARGET="python_make_install_target"
+
+  cached_tarball "yaml-0.1.6" "$yaml_configure"
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..10}; do stub uname '-s : echo Linux'; done
+  stub brew false
+  stub_make_install
+  stub_make_install "$PYTHON_MAKE_INSTALL_TARGET"
+  
+
+  install_fixture definitions/needs-yaml
+  assert_success
+
+  unstub uname
+  unstub make
+
+  assert_build_log <<OUT
+yaml-0.1.6: CFLAGS="yaml_cflag1 yaml_cflag2" CPPFLAGS="-I${TMP}/install/include yaml_cppflag1 yaml_cppflag2" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib yaml_ldflag1 yaml_ldflag2" PKG_CONFIG_PATH=""
+yaml-0.1.6: --prefix=yaml_prefix_path configure_opt1 configure_opt2 yaml_configure_opt1 yaml_configure_opt2
+make make_opt1 make_opt2 yaml_make_opt1 yaml_make_opt2
+make install make_install_opt1 make_install_opt2
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib configure_opt1 configure_opt2
+make make_opt1 make_opt2
+make python_make_install_target make_install_opt1 make_install_opt2 python_make_install_opt1 python_make_install_opt2
 OUT
 }
 
@@ -103,12 +146,12 @@ OUT
   unstub patch
 
   assert_build_log <<OUT
-yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+yaml-0.1.6: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
 patch -p0 --force -i $TMP/python-patch.XXX
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -133,12 +176,12 @@ OUT
   unstub patch
 
   assert_build_log <<OUT
-yaml-0.1.6: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+yaml-0.1.6: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 yaml-0.1.6: --prefix=$INSTALL_ROOT
 make -j 2
 make install
 patch -p1 --force -i $TMP/python-patch.XXX
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -166,7 +209,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -194,7 +237,7 @@ OUT
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I$brew_libdir/include -I${TMP}/install/include" LDFLAGS="-L$brew_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$brew_libdir/include -I${TMP}/install/include" LDFLAGS="-L$brew_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -224,7 +267,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I$readline_libdir/include -I${TMP}/install/include" LDFLAGS="-L$readline_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$readline_libdir/include -I${TMP}/install/include" LDFLAGS="-L$readline_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -254,7 +297,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I$ncurses_libdir/include -I${TMP}/install/include" LDFLAGS="-L$ncurses_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$ncurses_libdir/include -I${TMP}/install/include" LDFLAGS="-L$ncurses_libdir/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -286,7 +329,7 @@ DEF
   unstub sysctl
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib --with-openssl=/usr/local
 make -j 1
 make install
@@ -321,7 +364,7 @@ DEF
     unstub sysctl
 
     assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include -I/usr/local/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L/usr/local/lib -Wl,-rpath,/usr/local/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I/usr/local/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L/usr/local/lib -Wl,-rpath,/usr/local/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 1
 make install
@@ -349,7 +392,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -378,7 +421,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -408,7 +451,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -435,7 +478,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -468,7 +511,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib CPPFLAGS=-I$readline_libdir/include LDFLAGS=-L$readline_libdir/lib
 make -j 2
 make install
@@ -502,7 +545,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/homebrew-tcl-tk/lib/pkgconfig"
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/homebrew-tcl-tk/lib/pkgconfig"
 Python-3.6.2: --prefix=${TMP}/install --enable-shared --libdir=${TMP}/install/lib --with-tcltk-libs=-L${TMP}/homebrew-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version --with-tcltk-includes=-I${TMP}/homebrew-tcl-tk/include
 make -j 2
 make install
@@ -534,7 +577,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib --with-tcltk-libs=-L${TMP}/custom-tcl-tk/lib -ltcl8.6 -ltk8.6
 make -j 2
 make install
@@ -568,7 +611,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/homebrew-tcl-tk/lib/pkgconfig"
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/homebrew-tcl-tk/lib/pkgconfig"
 Python-3.6.2: --prefix=${TMP}/install --enable-shared --libdir=${TMP}/install/lib
 make -j 2
 make install
@@ -594,7 +637,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -622,7 +665,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 4
 make install
@@ -651,7 +694,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 1
 make install
@@ -675,38 +718,10 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install DOGE="such wow"
-OUT
-}
-
-@test "(PYTHON_)CONFIGURE_OPTS and (PYTHON_)MAKE_OPTS take priority over automatically added options" {
-  cached_tarball "Python-3.6.2"
-
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
-
-  stub_make_install
-
-  export CONFIGURE_OPTS="--custom-configure"
-  export PYTHON_CONFIGURE_OPTS='--custom-python-configure'
-  export MAKE_OPTS="${MAKE_OPTS:+$MAKE_OPTS }--custom-make"
-  export PYTHON_MAKE_OPTS="--custom-python-make"
-  export PYTHON_MAKE_INSTALL_OPTS="--custom-make-install"
-  run_inline_definition <<DEF
-install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
-DEF
-  assert_success
-
-  unstub uname
-  unstub make
-
-  assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib --custom-configure --custom-python-configure
-make -j 2 --custom-make --custom-python-make
-make install --custom-make-install
 OUT
 }
 
@@ -727,7 +742,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --libdir=$INSTALL_ROOT/lib --disable-shared
 make -j 2
 make install
@@ -754,7 +769,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=${TMP}/install/lib --with-dsymutil
 make -j 2
 make install
@@ -777,7 +792,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=${TMP}/install/lib
 make -j 2
 make install
@@ -867,7 +882,7 @@ DEF
 
   assert_build_log <<OUT
 apply -p1 -i /my/patch.diff
-Python-3.6.2: CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install

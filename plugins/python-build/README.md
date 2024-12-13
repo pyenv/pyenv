@@ -169,16 +169,14 @@ You can set certain environment variables to control the build process.
 * `PYTHON_BUILD_DEFINITIONS` can be a list of colon-separated paths that get
   additionally searched when looking up build definitions.
 * `CC` sets the path to the C compiler.
-* `PYTHON_CFLAGS` lets you pass additional options to the default `CFLAGS`. Use
-  this to override, for instance, the `-O3` option.
 * `CONFIGURE_OPTS` lets you pass additional options to `./configure`.
 * `MAKE` lets you override the command to use for `make`. Useful for specifying
   GNU make (`gmake`) on some systems.
 * `MAKE_OPTS` (or `MAKEOPTS`) lets you pass additional options to `make`.
 * `MAKE_INSTALL_OPTS` lets you pass additional options to `make install`.
-* `PYTHON_CONFIGURE_OPTS` and `PYTHON_MAKE_OPTS` and `PYTHON_MAKE_INSTALL_OPTS` allow
-  you to specify configure and make options for building CPython. These variables
-  will be passed to Python only, not any dependent packages (e.g. libyaml).
+* `<PACKAGE>_CFLAGS`, `<PACKAGE>_CPPFLAGS`, `<PACKAGE>_LDFLAGS` let you pass additional options to `CFLAGS`/`CPPFLAGS`/`LDFLAGS` specifically for building `<package>` (Python itself or a dependency library) from source as part of the build script. `<PACKAGE>` should be a capitalized name of the package without version (technically, capitalized first argument to `install_package` without version). E.g. for CPython, it's "`PYTHON`", for Readline, "`READLINE`", for PyPy (only applies when building it from source), "`PYPY`". Check the source of the build script you're using if unsure.
+* `<PACKAGE>_CONFIGURE_OPTS`, `<PACKAGE>_MAKE_OPTS`, `<PACKAGE>_MAKE_INSTALL_OPTS`, `<PACKAGE>_MAKE_INSTALL_TARGET` allow
+  you to specify configure and make options for building `<package>` (same as above). "Make install target" would replace "`install`" in the `make install` invocation.
 
 ### Applying patches to Python before compiling
 
