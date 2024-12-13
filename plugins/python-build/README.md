@@ -174,7 +174,7 @@ You can set certain environment variables to control the build process.
   GNU make (`gmake`) on some systems.
 * `MAKE_OPTS` (or `MAKEOPTS`) lets you pass additional options to `make`.
 * `MAKE_INSTALL_OPTS` lets you pass additional options to `make install`.
-* `<PACKAGE>_CFLAGS`, `<PACKAGE>_CPPFLAGS`, `<PACKAGE>_LDFLAGS` lets you pass additional options to `CFLAGS`/`CPPFLAGS`/`LDFLAGS` specifically for building `<package>` (Python itself or a dependency library) from source as part of the build script. `<PACKAGE>` should be a capitalized name of the package without version (technically, capitalized first argument to `install_package` without version). E.g. for CPython, it's "`PYTHON`", for Readline, "`READLINE`", for PyPy (only applies when building it from source), "`PYPY`". Check the source of the build script you're using if unsure.
+* `<PACKAGE>_CFLAGS`, `<PACKAGE>_CPPFLAGS`, `<PACKAGE>_LDFLAGS` let you pass additional options to `CFLAGS`/`CPPFLAGS`/`LDFLAGS` specifically for building `<package>` (Python itself or a dependency library) from source as part of the build script. `<PACKAGE>` should be a capitalized name of the package without version (technically, capitalized first argument to `install_package` without version). E.g. for CPython, it's "`PYTHON`", for Readline, "`READLINE`", for PyPy (only applies when building it from source), "`PYPY`". Check the source of the build script you're using if unsure.
 * `<PACKAGE>_CONFIGURE_OPTS`, `<PACKAGE>_MAKE_OPTS`, `<PACKAGE>_MAKE_INSTALL_OPTS`, `<PACKAGE>_MAKE_INSTALL_TARGET` allow
   you to specify configure and make options for building `<package>` (same as above). "Make install target" would replace "`install`" in the `make install` invocation.
 
