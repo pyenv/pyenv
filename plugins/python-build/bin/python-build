@@ -811,6 +811,8 @@ build_package_standard_build() {
   local PACKAGE_MAKE_OPTS="${package_var_name}_MAKE_OPTS"
   local PACKAGE_MAKE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
+  local PACKAGE_CPPFLAGS="${package_var_name}_CPPFLAGS"
+  local PACKAGE_LDFLAGS="${package_var_name}_LDFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
     use_homebrew || true
@@ -826,8 +828,14 @@ build_package_standard_build() {
     use_free_threading || true
   fi
 
-  ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
-      export CFLAGS="$CFLAGS ${!PACKAGE_CFLAGS}"
+  ( if [[ -n "${!PACKAGE_CFLAGS}" ]]; then
+      export CFLAGS="${CFLAGS:+$CFLAGS }${!PACKAGE_CFLAGS}"
+    fi
+    if [[ -n "${!PACKAGE_CPPFLAGS}" ]]; then
+      export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }${!PACKAGE_CPPFLAGS}"
+    fi
+    if [[ -n "${!PACKAGE_LDFLAGS}" ]]; then
+      export LDFLAGS="${LDFLAGS:+$LDFLAGS }${!PACKAGE_LDFLAGS}"
     fi
     if [ -z "$CC" ] && is_mac -ge 1010; then
       export CC=clang
