@@ -253,52 +253,40 @@ function print_shell_function() {
   commands=(`pyenv-commands --sh`)
   case "$shell" in
   fish )
-    cat <<EOS
-function pyenv
+    echo "function pyenv
   set command \$argv[1]
   set -e argv[1]
 
-  switch "\$command"
+  switch \"\$command\"
   case ${commands[*]}
-    source (pyenv "sh-\$command" \$argv|psub)
+    source (pyenv \"sh-\$command\" \$argv|psub)
   case '*'
-    command pyenv "\$command" \$argv
+    command pyenv \"\$command\" \$argv
   end
-end
-EOS
+end"
     ;;
   ksh | ksh93 | mksh )
-    cat <<EOS
-function pyenv {
-  typeset command
-EOS
+    echo "function pyenv {
+  typeset command=\$1"
     ;;
   * )
-    cat <<EOS
-pyenv() {
-  local command
-EOS
+    echo "pyenv() {
+  local command=\$1"
     ;;
   esac
 
   if [ "$shell" != "fish" ]; then
     IFS="|"
-    cat <<EOS
-  command="\${1:-}"
-  if [ "\$#" -gt 0 ]; then
-    shift
-  fi
-
-  case "\$command" in
+    echo "  [ \"\$#\" -gt 0 ] && shift
+  case \"\$command\" in
   ${commands[*]:-/})
-    eval "\$(pyenv "sh-\$command" "\$@")"
+    eval \"\$(pyenv \"sh-\$command\" \"\$@\")\"
     ;;
   *)
-    command pyenv "\$command" "\$@"
+    command pyenv \"\$command\" \"\$@\"
     ;;
   esac
-}
-EOS
+}"
   fi
 }
 
