@@ -20,9 +20,6 @@ if [ "$1" = "--complete" ]; then
 fi
 
 mode="help"
-no_rehash=""
-no_push_path=""
-shell=""
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
