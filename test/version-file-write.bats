@@ -21,6 +21,13 @@ setup() {
   assert [ ! -e ".python-version" ]
 }
 
+@test "setting nonexistent version succeeds with force" {
+  assert [ ! -e ".python-version" ]
+  run pyenv-version-file-write --force ".python-version" "2.7.6"
+  assert_success
+  assert [ -e ".python-version" ]
+}
+
 @test "writes value to arbitrary file" {
   mkdir -p "${PYENV_ROOT}/versions/2.7.6"
   assert [ ! -e "my-version" ]
