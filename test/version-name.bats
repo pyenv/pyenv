@@ -73,6 +73,11 @@ SH
   assert_failure "pyenv: version \`1.2' is not installed (set by PYENV_VERSION environment variable)"
 }
 
+@test "missing version with --force" {
+  PYENV_VERSION=1.2 run pyenv-version-name -f
+  assert_success "1.2"
+}
+
 @test "one missing version (second missing)" {
   create_version "3.5.1"
   PYENV_VERSION="3.5.1:1.2" run pyenv-version-name
