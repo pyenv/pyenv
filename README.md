@@ -400,7 +400,6 @@ pyenv global 3.11 3.12
 ~~~
 
 Whenever you run a command provided by a Python installation, these versions will be searched for it in the specified order.
-Versions selected with `pyenv shell` are searched first, then `pyenv local`, then `pyenv global`.
 [Due to the shims' fall-through behavior]((#understanding-python-version-selection)), `system` is always implicitly searched afterwards.
 
 ----
