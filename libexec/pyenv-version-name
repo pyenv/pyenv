@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Summary: Show the current Python version
 #
-#   -f/--force    If a version doesn't exist, print it as is rather than produce an error
+#   -f/--force    (Internal) If a version doesn't exist, print it as is rather than produce an error
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
