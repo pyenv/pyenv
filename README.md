@@ -190,7 +190,7 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 
       ```bash
       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-      echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+      echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
       echo 'eval "$(pyenv init -)"' >> ~/.bashrc
       ```
   3. Then, if you have `~/.profile`, `~/.bash_profile` or `~/.bash_login`, add the commands there as well.
@@ -199,7 +199,7 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
      * to add to `~/.profile`:
        ``` bash
        echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
-       echo 'command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
        echo 'eval "$(pyenv init -)"' >> ~/.profile
        ```
      * to add to `~/.bash_profile`:
