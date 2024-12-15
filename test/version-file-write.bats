@@ -9,7 +9,7 @@ setup() {
 
 @test "invocation without 2 arguments prints usage" {
   run pyenv-version-file-write
-  assert_failure "Usage: pyenv version-file-write <file> <version>"
+  assert_failure "Usage: pyenv version-file-write [-f|--force] <file> <version> [...]"
   run pyenv-version-file-write "one" ""
   assert_failure
 }

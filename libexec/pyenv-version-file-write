@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Usage: pyenv version-file-write [-f|--force] <file> <version>
+# Usage: pyenv version-file-write [-f|--force] <file> <version> [...]
+#
+#   -f/--force    Don't verify that the versions exist
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
