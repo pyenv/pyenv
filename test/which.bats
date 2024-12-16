@@ -153,6 +153,21 @@ SH
   assert_success "${PYENV_ROOT}/versions/3.4/bin/python"
 }
 
+@test "tolerates nonexistent versions from pyenv-version-name" {
+  mkdir -p "$PYENV_ROOT"
+  cat > "${PYENV_ROOT}/version" <<EOF
+2.7
+3.4
+EOF
+  create_executable "3.4" "python"
+
+  mkdir -p "$PYENV_TEST_DIR"
+  cd "$PYENV_TEST_DIR"
+
+  PYENV_VERSION= run pyenv-which python
+  assert_success "${PYENV_ROOT}/versions/3.4/bin/python"
+}
+
 @test "resolves pyenv-latest prefixes" {
   create_executable "3.4.2" "python"
   

@@ -59,7 +59,7 @@ if [ -z "$PYENV_COMMAND" ]; then
 fi
 
 OLDIFS="$IFS"
-IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name)})
+IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name -f)})
 IFS="$OLDIFS"
 
 declare -a nonexistent_versions
