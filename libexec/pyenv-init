@@ -27,24 +27,16 @@ do
   if [ "$args" = "-" ]; then
     mode="print"
     shift
-  fi
-
-  if [ "$args" = "--path" ]; then
+  elif [ "$args" = "--path" ]; then
     mode="path"
     shift
-  fi
-
-  if [ "$args" = "--detect-shell" ]; then
+  elif [ "$args" = "--detect-shell" ]; then
     mode="detect-shell"
     shift
-  fi
-
-  if [ "$args" = "--no-push-path" ]; then
+  elif [ "$args" = "--no-push-path" ]; then
     no_push_path=1
     shift
-  fi
-  
-  if [ "$args" = "--no-rehash" ]; then
+  elif [ "$args" = "--no-rehash" ]; then
     no_rehash=1
     shift
   fi
@@ -202,6 +194,11 @@ function print_path() {
         echo 'set -eg PATH[$pyenv_index]; end; set -e pyenv_index'
         print_path_prepend_shims
         ;;
+      zsh )
+        echo 'stale_path=($PYENV_ROOT/shims)'
+        echo 'path=(${path:|stale_path})'
+        print_path_prepend_shims
+        ;;
       * )
         # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
         # that makes it source `bashrc` under SSH even when not interactive.
@@ -225,6 +222,10 @@ function print_path_prepend_shims() {
     case "$shell" in
       fish )
           echo 'set -gx PATH '\'"${PYENV_ROOT}/shims"\'' $PATH'
+          ;;
+      zsh )
+          echo 'path=($PYENV_ROOT/shims $path)'
+          echo 'export PATH'
           ;;
       * )
           echo 'export PATH="'"${PYENV_ROOT}"'/shims:${PATH}"'
@@ -257,7 +258,6 @@ function print_rehash() {
 }
 
 function print_shell_function() {
-  commands=(`pyenv-commands --sh`)
   case "$shell" in
   fish )
     cat <<EOS
@@ -266,7 +266,7 @@ function pyenv
   set -e argv[1]
 
   switch "\$command"
-  case ${commands[*]}
+  case activate deactivate rehash shell
     source (pyenv "sh-\$command" \$argv|psub)
   case '*'
     command pyenv "\$command" \$argv
@@ -284,20 +284,13 @@ EOS
     cat <<EOS
 pyenv() {
   local command
-EOS
-    ;;
-  esac
-
-  if [ "$shell" != "fish" ]; then
-    IFS="|"
-    cat <<EOS
   command="\${1:-}"
   if [ "\$#" -gt 0 ]; then
     shift
   fi
 
   case "\$command" in
-  ${commands[*]:-/})
+  activate|deactivate|rehash|shell)
     eval "\$(pyenv "sh-\$command" "\$@")"
     ;;
   *)
@@ -306,7 +299,8 @@ EOS
   esac
 }
 EOS
-  fi
+    ;;
+  esac
 }
 
 main
