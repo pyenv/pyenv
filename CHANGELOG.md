@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.4.23
+* README: explain using multiple versions by @Finkregh in https://github.com/pyenv/pyenv/pull/3126
+* Support PACKAGE_CPPFLAGS and PACKAGE_LDFLAGS by @native-api in https://github.com/pyenv/pyenv/pull/3130
+* Adjust suggested shell startup code to support Pyenv with Pyenv-Win in WSL by @native-api in https://github.com/pyenv/pyenv/pull/3132
+* Support nonexistent versions being present and set in a local .python-version by @native-api in https://github.com/pyenv/pyenv/pull/3134
+* Add CPython 3.14.0a3 by @nedbat in https://github.com/pyenv/pyenv/pull/3135
+
 ## Release v2.4.22
 * Speed up building bundled OpenSSL by @native-api in https://github.com/pyenv/pyenv/pull/3124
 * CI: add building modified scripts with bundled MacOS dependencies by @native-api in https://github.com/pyenv/pyenv/pull/3123
