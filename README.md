@@ -656,23 +656,25 @@ for the environment variables that control Pyenv's behavior.
 extra commands into your shell. Coming from RVM, some of you might be
 opposed to this idea. Here's what `eval "$(pyenv init -)"` actually does:
 
+1. **Finds current shell.**
+   `pyenv init` figures out what shell you are using, as the exact commands of `eval "$(pyenv init -)"` vary depending on shell. Specifying which shell you are using (e.g. `eval "$(pyenv init - bash)"`) is preferred, because it reduces launch time significantly.
 
-1. **Sets up the shims path.** This is what allows Pyenv to intercept
+2. **Sets up the shims path.** This is what allows Pyenv to intercept
    and redirect invocations of `python`, `pip` etc. transparently.
    It prepends `$(pyenv root)/shims` to your `$PATH`.
    It also deletes any other instances of `$(pyenv root)/shims` on `PATH`
    which allows to invoke `eval "$(pyenv init -)"` multiple times without
    getting duplicate `PATH` entries.
 
-2. **Installs autocompletion.** This is entirely optional but pretty
+3. **Installs autocompletion.** This is entirely optional but pretty
    useful. Sourcing `$(pyenv root)/completions/pyenv.bash` will set that
    up. There are also completions for Zsh and Fish.
 
-3. **Rehashes shims.** From time to time you'll need to rebuild your
+4. **Rehashes shims.** From time to time you'll need to rebuild your
    shim files. Doing this on init makes sure everything is up to
    date. You can always run `pyenv rehash` manually.
 
-4. **Installs `pyenv` into the current shell as a shell function.**
+5. **Installs `pyenv` into the current shell as a shell function.**
    This bit is also optional, but allows
    pyenv and plugins to change variables in your current shell.
    This is required for some commands like `pyenv shell` to work.
@@ -681,7 +683,7 @@ opposed to this idea. Here's what `eval "$(pyenv init -)"` actually does:
    for some reason you need `pyenv` to be a real script rather than a
    shell function, you can safely skip it.
 
-`eval "$(pyenv init --path)"` only does items 1 and 3.
+`eval "$(pyenv init --path)"` only does items 2 and 4.
 
 To see exactly what happens under the hood for yourself, run `pyenv init -`
 or `pyenv init --path`.
