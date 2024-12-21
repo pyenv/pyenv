@@ -35,12 +35,11 @@ create_executable() {
   assert_line "command pyenv rehash 2>/dev/null"
 }
 
-
 @test "setup shell completions" {
-  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
+  exec_root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - bash
   assert_success
-  assert_line "source '${root}/test/../libexec/../completions/pyenv.bash'"
+  assert_line "source '${exec_root}/completions/pyenv.bash'"
 }
 
 @test "detect parent shell" {
@@ -63,16 +62,16 @@ OUT
 }
 
 @test "setup shell completions (fish)" {
-  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
+  exec_root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - fish
   assert_success
-  assert_line "source '${root}/test/../libexec/../completions/pyenv.fish'"
+  assert_line "source '${exec_root}/completions/pyenv.fish'"
 }
 
 @test "fish instructions" {
   run pyenv-init fish
   assert [ "$status" -eq 1 ]
-  assert_line 'pyenv init - | source'
+  assert_line 'pyenv init - fish | source'
 }
 
 @test "shell detection for installer" {
