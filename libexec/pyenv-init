@@ -159,7 +159,7 @@ function help_() {
       echo
       echo 'export PYENV_ROOT="$HOME/.pyenv"'
       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
-      echo "eval \"\$(pyenv init - $shell)\""
+      echo 'eval "$(pyenv init -'$shell')"'
       ;;
     esac
     echo
@@ -253,40 +253,40 @@ function print_shell_function() {
   commands=(`pyenv-commands --sh`)
   case "$shell" in
   fish )
-    echo "function pyenv
-  set command \$argv[1]
+    echo 'function pyenv
+  set command $argv[1]
   set -e argv[1]
 
-  switch \"\$command\"
-  case ${commands[*]}
-    source (pyenv \"sh-\$command\" \$argv|psub)
-  case '*'
-    command pyenv \"\$command\" \$argv
+  switch "$command"
+  case '"${commands[*]}"'
+    source (pyenv "sh-$command" $argv|psub)
+  case "*"
+    command pyenv "$command" $argv
   end
-end"
+end'
     ;;
   ksh | ksh93 | mksh )
-    echo "function pyenv {
-  typeset command=\$1"
+    echo 'function pyenv {
+  typeset command=$1'
     ;;
   * )
-    echo "pyenv() {
-  local command=\$1"
+    echo 'pyenv() {
+  local command=$1'
     ;;
   esac
 
   if [ "$shell" != "fish" ]; then
     IFS="|"
-    echo "  [ \"\$#\" -gt 0 ] && shift
-  case \"\$command\" in
-  ${commands[*]:-/})
-    eval \"\$(pyenv \"sh-\$command\" \"\$@\")\"
+    echo '  [ "$#" -gt 0 ] && shift
+  case "$command" in
+  '"${commands[*]:-/}"')
+    eval "$(pyenv "sh-$command" "$@")"
     ;;
   *)
-    command pyenv \"\$command\" \"\$@\"
+    command pyenv "$command" "$@"
     ;;
   esac
-}"
+}'
   fi
 }
 
