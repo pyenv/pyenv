@@ -213,7 +213,7 @@ class CondaVersion(NamedTuple):
                 return PyVersion.PY37
             else:
                 # since 4.8, Miniconda specifies versions explicitly in the file name
-                return None
+                raise ValueError("Miniconda 4.8+ is supposed to specify a Python version explicitly")
         if self.flavor == "anaconda":
             # https://docs.anaconda.com/free/anaconda/reference/release-notes/
             if v >= (2024,6):
@@ -270,6 +270,7 @@ class CondaSpec(NamedTuple):
             SupportedArch(arch),
             md5,
             repo,
+            py_ver
         )
         if py_version is None and py_ver is None and ver != "latest":
             spec = spec.with_py_version(spec.version.default_py_version())
