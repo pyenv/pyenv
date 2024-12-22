@@ -253,7 +253,8 @@ function print_shell_function() {
   commands=(`pyenv-commands --sh`)
   case "$shell" in
   fish )
-    echo 'function pyenv
+    echo \
+'function pyenv
   set command $argv[1]
   set -e argv[1]
 
@@ -266,18 +267,21 @@ function print_shell_function() {
 end'
     ;;
   ksh | ksh93 | mksh )
-    echo 'function pyenv {
-  typeset command=$1'
+    echo \
+'function pyenv {
+  typeset command=${1:-}'
     ;;
   * )
-    echo 'pyenv() {
-  local command=$1'
+    echo \
+'pyenv() {
+  local command=${1:-}'
     ;;
   esac
 
   if [ "$shell" != "fish" ]; then
     IFS="|"
-    echo '  [ "$#" -gt 0 ] && shift
+    echo \
+'  [ "$#" -gt 0 ] && shift
   case "$command" in
   '"${commands[*]:-/}"')
     eval "$(pyenv "sh-$command" "$@")"
