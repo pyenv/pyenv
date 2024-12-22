@@ -667,7 +667,7 @@ opposed to this idea. Here's what `eval "$(pyenv init -)"` actually does:
    getting duplicate `PATH` entries.
 
 3. **Installs autocompletion.** This is entirely optional but pretty
-   useful. Sourcing `$(pyenv root)/completions/pyenv.bash` will set that
+   useful. Sourcing `<pyenv installation prefix>/completions/pyenv.bash` will set that
    up. There are also completions for Zsh and Fish.
 
 4. **Rehashes shims.** From time to time you'll need to rebuild your
