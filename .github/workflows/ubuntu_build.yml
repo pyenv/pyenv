@@ -15,7 +15,7 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       # Normally, we would use the superbly maintained...
