@@ -13,6 +13,13 @@ logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 MINIFORGE_REPO = 'conda-forge/miniforge'
 DISTRIBUTIONS = ['miniforge', 'mambaforge']
 
+SKIPPED_RELEASES = [
+    '4.13.0-0',     #has no Mambaforge. We already generated scripts for Miniforge
+    '22.11.1-0',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
+    '22.11.1-1',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
+    '22.11.1-2',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
+]
+
 install_script_fmt = """
 case "$(anaconda_architecture 2>/dev/null || true)" in
 {install_lines}
@@ -119,7 +126,7 @@ for release in requests.get(f'https://api.github.com/repos/{MINIFORGE_REPO}/rele
     # Build scripts for miniforge3-4.13.0-0 have already been generated.
     # Assuming this was a fluke, we don't yet need to implement proactively checking all releases for contents
     # or ignoring a release if _any_ of the flavors is already present in Pyenv.
-    if version == '4.13.0-0':
+    if version in SKIPPED_RELEASES:
         continue
 
     if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in DISTRIBUTIONS):
