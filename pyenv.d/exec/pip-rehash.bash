@@ -6,6 +6,14 @@ if [[ $PYENV_REHASH_COMMAND =~ ^(pip|easy_install)[23](\.\d)?$ ]]; then
   PYENV_REHASH_COMMAND="${BASH_REMATCH[1]}"
 fi
 
+for (( i=1; i<$#; i++ )); do
+  next=$((i+1))
+  if [[ ${!i} == "-m" && ${!next} == "pip" ]]; then
+    PYENV_REHASH_COMMAND="pip"
+    break
+  fi
+done
+
 if [ -x "${PYENV_PIP_REHASH_ROOT}/${PYENV_REHASH_COMMAND}" ]; then
   PYENV_COMMAND_PATH="${PYENV_PIP_REHASH_ROOT}/${PYENV_REHASH_COMMAND##*/}"
   PYENV_BIN_PATH="${PYENV_PIP_REHASH_ROOT}"
