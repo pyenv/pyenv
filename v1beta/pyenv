@@ -1,0 +1,32 @@
+  buildscript {
+
+    repositories {
+      // Check that you have the following line (if not, add it):
+      google()  // Google's Maven repository
+    }
+
+    dependencies {
+      // ...
+
+      // Add the following lines:
+      classpath 'com.google.gms:google-services:4.4.2'  // Google Services plugin
+      implementation 'com.google.android.gms:18.5.0'
+    }
+  }
+
+  allprojects {
+    // ...
+
+    repositories {
+      // Check that you have the following line (if not, add it):
+      google()  // Google's Maven repository
+      // ...
+    }
+  }
+  apply plugin: 'com.android.application'
+  // Add the following line:
+  apply plugin: 'com.google.gms.google-services'  // Google Services plugin
+
+  android {
+    // ...
+  }
