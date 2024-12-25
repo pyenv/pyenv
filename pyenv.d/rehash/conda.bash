@@ -18,13 +18,11 @@ if conda_exists; then
   # `conda_shim` to skip creating shims for those binaries.
   build_conda_exclusion_list() {
     shims=()
-    shopt -s nullglob
-    for shim in $(cat "${BASH_SOURCE%/*}/conda.d/"*".list" | sort -u | sed -e 's/#.*$//' | sed -e '/^[[:space:]]*$/d'); do
+    for shim in $(sed 's/#.*$//; /^[[:space:]]*$/d' "${BASH_SOURCE%/*}/conda.d/default.list"); do
       if [ -n "${shim##*/}" ]; then
         shims[${#shims[*]}]="${shim})return 0;;"
       fi
     done
-    shopt -u nullglob
     eval \
 "conda_shim() {
   case \"\${1##*/}\" in
