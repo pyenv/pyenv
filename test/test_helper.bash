@@ -18,21 +18,47 @@ if [ -z "$PYENV_TEST_DIR" ]; then
   export PYENV_ROOT="${PYENV_TEST_DIR}/root"
   export HOME="${PYENV_TEST_DIR}/home"
   export PYENV_HOOK_PATH="${PYENV_ROOT}/pyenv.d"
+  PYENV_LIBEXEC="${BATS_TEST_DIRNAME%/*}/libexec"
 
-  PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
-  PATH="${PYENV_TEST_DIR}/bin:$PATH"
-  PATH="${BATS_TEST_DIRNAME%/*}/libexec:$PATH"
-  PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
-  PATH="${PYENV_ROOT}/shims:$PATH"
-  export PATH
+  if [ -n "$ISOLATED_ENVIRONMENT" ]; then
+    mkdir -p "$PYENV_ROOT" "$HOME" "$PYENV_HOOK_PATH" \
+    "$PYENV_TEST_DIR"/bin "$PYENV_TEST_DIR"/plugins/python-build
+    
+    cp -r "$PYENV_LIBEXEC" "$PYENV_TEST_DIR"
+    cp -r "${BATS_TEST_DIRNAME%/*}/plugins/python-build" "$PYENV_TEST_DIR"/plugins/
+    ln -s "$PYENV_TEST_DIR/libexec/pyenv" "$PYENV_TEST_DIR/bin/pyenv"
+    # cp -rL "${BATS_TEST_DIRNAME%/*}/bin" "$PYENV_TEST_DIR"
+    cp -r "${BATS_TEST_DIRNAME%/*}/completions" "$PYENV_TEST_DIR"
+    cp -r "${BATS_TEST_DIRNAME%/*}/pyenv.d" "$PYENV_TEST_DIR"
+    PATH="${PYENV_TEST_DIR}/bin:/usr/bin"
+    export PATH
+
+  else
+    PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
+    PATH="${PYENV_TEST_DIR}/bin:$PATH"
+    PATH="$PYENV_LIBEXEC:$PATH"
+    PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
+    PATH="${PYENV_ROOT}/shims:$PATH"
+    export PATH
+  fi
 
   for xdg_var in `env 2>/dev/null | grep ^XDG_ | cut -d= -f1`; do unset "$xdg_var"; done
   unset xdg_var
 fi
 
-teardown() {
-  rm -rf "$PYENV_TEST_DIR"
-}
+# We don't want to remove the test directory between
+# tests if we are running in an isolated environment.
+# We want to set up the isolated environment once and
+# delete it at after all tests are run.
+if [ -n "$ISOLATED_ENVIRONMENT" ]; then
+  teardown_file() {
+    rm -rf "$PYENV_TEST_DIR"
+  }
+else
+  teardown() {
+    rm -rf "$PYENV_TEST_DIR"
+  }
+fi
 
 flunk() {
   { if [ "$#" -eq 0 ]; then cat -
