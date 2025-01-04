@@ -87,7 +87,7 @@ The Homebrew option from the [MacOS section below](#macos) would also work if yo
 ##### 1. Automatic installer (Recommended)
 
 ```bash
-curl https://pyenv.run | bash
+curl -fsSL https://pyenv.run | bash
 ```
 
 For more details visit our other project:
