@@ -164,6 +164,12 @@ You can set certain environment variables to control the build process.
 * `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it would normally will.
 * `PYTHON_BUILD_USE_HOMEBREW`, if set, will search for libraries installed by Homebrew when it would normally not.
 * `PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA`, override the Homebrew OpenSSL formula to use.
+* `PYTHON_BUILD_CONFIGURE_WITH_DSYMUTIL`, add DWARF debug information on MacOS. Available on Python 3.12 and newer.
+* `PYTHON_BUILD_FREE_THREADING`, build an interpreter with the free-threaded (GIL-disabled) ABI. Available on Python 3.13 and newer.
+* `PYTHON_BUILD_ADDRESS_SANITIZER`, build an interpreter with address sanitizer.
+* `PYTHON_BUILD_MEMORY_SANITIZER`, build an interpreter with memory sanitizer.
+* `PYTHON_BUILD_UNDEFINED_BEHAVIOR_SANITIZER`, build an interpreter with undefined behavior sanitizer.
+* `PYTHON_BUILD_THREAD_SANITIZER`, build an interpreter with thread sanitizer. Available on Python 3.13 and newer.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
   in `share/python-build/` are looked up.
 * `PYTHON_BUILD_DEFINITIONS` can be a list of colon-separated paths that get
