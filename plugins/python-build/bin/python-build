@@ -826,6 +826,10 @@ build_package_standard_build() {
     fi
     use_dsymutil || true
     use_free_threading || true
+    use_address_sanitizer || true
+    use_memory_sanitizer || true
+    use_undefined_behavior_sanitizer || true
+    use_thread_sanitizer || true
   fi
 
   ( if [[ -n "${!PACKAGE_CFLAGS}" ]]; then
@@ -1767,6 +1771,30 @@ use_dsymutil() {
 use_free_threading() {
   if [[ -n "$PYTHON_BUILD_FREE_THREADING" ]]; then
     package_option python configure --disable-gil
+  fi
+}
+
+use_address_sanitizer() {
+  if [[ -n "$PYTHON_BUILD_ADDRESS_SANITIZER" ]]; then
+    package_option python configure --with-address-sanitizer
+  fi
+}
+
+use_memory_sanitizer() {
+  if [[ -n "$PYTHON_BUILD_MEMORY_SANITIZER" ]]; then
+    package_option python configure --with-memory-sanitizer
+  fi
+}
+
+use_undefined_behavior_sanitizer() {
+  if [[ -n "$PYTHON_BUILD_UNDEFINED_BEHAVIOR_SANITIZER" ]]; then
+    package_option python configure --with-undefined-behavior-sanitizer
+  fi
+}
+
+use_thread_sanitizer() {
+  if [[ -n "$PYTHON_BUILD_THREAD_SANITIZER" ]]; then
+    package_option python configure --with-thread-sanitizer
   fi
 }
 
