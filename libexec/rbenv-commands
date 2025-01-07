@@ -26,7 +26,12 @@ elif [ "$1" = "--no-sh" ]; then
   shift
 fi
 
-IFS=: read -d '' -r -a paths <<<"$PATH" || true
+if [ "$(type -t readarray)" = "builtin" ]; then
+  readarray -d : -t paths < <(printf "%s" "$PATH")
+else
+  # bash 3.x compatibility
+  IFS=: read -r -a paths <<<"$PATH" || true
+fi
 
 shopt -s nullglob
 
