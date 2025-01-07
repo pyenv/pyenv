@@ -154,7 +154,12 @@ print_usage() {
 if [ "$1" = "--complete-commands" ]; then
   command_prefix="${2:-}"
   seen=()
-  IFS=: read -d '' -r -a paths <<<"$PATH" || true
+  if [ "$(type -t readarray)" = "builtin" ]; then
+    readarray -d : -t paths < <(printf "%s" "$PATH")
+  else
+    # bash 3.x compatibility
+    IFS=: read -r -a paths <<<"$PATH" || true
+  fi
   shopt -s nullglob
   for path in "${paths[@]}"; do
     for command in "${path}/rbenv-${command_prefix}"*; do
