@@ -756,7 +756,7 @@ build_package() {
 
   echo "Installing ${package_name}..." >&2
 
-  [ -n "$HAS_PATCH" ] && apply_patch "$package_name" <(cat "${package_name}.patch")
+  [ -n "$HAS_PATCH" ] && apply_patch "$package_name" < $(cat "${package_name}.patch")
 
   for command in $commands; do
     "build_package_${command}" "$package_name"
