@@ -18,37 +18,33 @@ if [ "$1" = "--complete" ]; then
   exit
 fi
 
+exclude_shell=
+command_prefix="rbenv-"
+
 if [ "$1" = "--sh" ]; then
-  sh=1
+  command_prefix="rbenv-sh-"
   shift
 elif [ "$1" = "--no-sh" ]; then
-  nosh=1
+  exclude_shell=1
   shift
-fi
-
-if [ "$(type -t readarray)" = "builtin" ]; then
-  readarray -d : -t paths < <(printf "%s" "$PATH")
-else
-  # bash 3.x compatibility
-  IFS=: read -r -a paths <<<"$PATH" || true
 fi
 
 shopt -s nullglob
 
-{ for path in "${paths[@]}"; do
-    for command in "${path}/rbenv-"*; do
-      command="${command##*rbenv-}"
-      if [ -n "$sh" ]; then
-        if [ "${command:0:3}" = "sh-" ]; then
-          echo "${command##sh-}"
+{
+  PATH_remain="$PATH"
+  # traverse PATH to find "rbenv-" prefixed commands
+  while true; do
+    path="${PATH_remain%%:*}"
+    if [ -n "$path" ]; then
+      for rbenv_command in "${path}/${command_prefix}"*; do
+        rbenv_command="${rbenv_command##*rbenv-}"
+        if [[ -z $exclude_shell || $rbenv_command != sh-* ]]; then
+          echo "${rbenv_command##sh-}"
         fi
-      elif [ -n "$nosh" ]; then
-        if [ "${command:0:3}" != "sh-" ]; then
-          echo "${command##sh-}"
-        fi
-      else
-        echo "${command##sh-}"
-      fi
-    done
+      done
+    fi
+    [[ $PATH_remain == *:* ]] || break
+    PATH_remain="${PATH_remain#*:}"
   done
 } | sort | uniq
