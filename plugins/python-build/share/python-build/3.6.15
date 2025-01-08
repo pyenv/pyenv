@@ -6,4 +6,3 @@ if has_tar_xz_support; then
 else
   install_package "Python-3.6.15" "https://www.python.org/ftp/python/3.6.15/Python-3.6.15.tgz#54570b7e339e2cfd72b29c7e2fdb47c0b7b18b7412e61de5b463fc087c13b043" standard verify_py36 copy_python_gdb ensurepip
 fi
-
