@@ -159,7 +159,7 @@ function help_() {
       echo
       echo 'export PYENV_ROOT="$HOME/.pyenv"'
       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
-      echo 'eval "$(pyenv init -'$shell')"'
+      echo 'eval "$(pyenv init - '$shell')"'
       ;;
     esac
     echo
