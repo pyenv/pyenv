@@ -5,6 +5,10 @@ PYENV_REHASH_COMMAND="${PYENV_COMMAND##*/}"
 if [[ $PYENV_REHASH_COMMAND =~ ^(pip|easy_install)[23](\.[0-9]+)?$ ]]; then
   PYENV_REHASH_COMMAND="${BASH_REMATCH[1]}"
 
+# Check for `uv pip ` in arguments
+elif [[ "$*" =~ uv[[:space:]]pip[[:space:]] ]]; then
+  PYENV_REHASH_COMMAND="pip"
+
 # Check for ` -m pip ` in arguments
 elif [[ "$*" =~ [[:space:]]-m[[:space:]]pip[[:space:]] ]]; then
   PYENV_REHASH_COMMAND="pip"
