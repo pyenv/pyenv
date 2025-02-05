@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.5.2
+* Fix OpenSSL version parsing in python-build script by @threadflow in https://github.com/pyenv/pyenv/pull/3181
+* Add GraalPy 24.1.2 by @msimacek in https://github.com/pyenv/pyenv/pull/3176
+* Add CPython 3.12.9 and 3.13.2 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3183
+
 ## Release v2.5.1
 * CI: use Ubuntu 24.04; use ubuntu-latest for the ubuntu_build check by @native-api in https://github.com/pyenv/pyenv/pull/3144
 * Fix: mistake in configuration hints in `pyenv init` and manpage by @ChristianFredrikJohnsen in https://github.com/pyenv/pyenv/pull/3145
