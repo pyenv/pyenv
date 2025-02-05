@@ -1622,7 +1622,7 @@ openssl_version() {
   local -a ver
   IFS=- ver=( ${1:?} )
   IFS=. ver=( ${ver[1]} )
-  [[ ${ver[2]} =~ '^([[:digit:]]+)[[:alpha:]]$' ]] && ver[2]="${BASH_REMATCH[1]}"
+  [[ ${ver[2]} =~ ^([[:digit:]]+)[[:alpha:]]$ ]] && ver[2]="${BASH_REMATCH[1]}"
   echo $(( ${ver[0]}*10000 + ${ver[1]}*100 + ${ver[2]} ))
 }
 
