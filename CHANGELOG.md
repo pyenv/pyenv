@@ -1,5 +1,26 @@
 # Version History
 
+## Release v2.5.2
+* Fix OpenSSL version parsing in python-build script by @threadflow in https://github.com/pyenv/pyenv/pull/3181
+* Add GraalPy 24.1.2 by @msimacek in https://github.com/pyenv/pyenv/pull/3176
+* Add CPython 3.12.9 and 3.13.2 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3183
+
+## Release v2.5.1
+* CI: use Ubuntu 24.04; use ubuntu-latest for the ubuntu_build check by @native-api in https://github.com/pyenv/pyenv/pull/3144
+* Fix: mistake in configuration hints in `pyenv init` and manpage by @ChristianFredrikJohnsen in https://github.com/pyenv/pyenv/pull/3145
+* README: Add recommended curl arguments to suggested installer invocation by @JayBazuzi in https://github.com/pyenv/pyenv/pull/3155
+* Add miniforge3-24.11.2-0, miniforge3-24.11.2-1 by @native-api in https://github.com/pyenv/pyenv/pull/3163
+* Fix "Unsupported options" error building bundled OpenSSL <3.2.0 by @native-api in https://github.com/pyenv/pyenv/pull/3164
+* Add CPython 3.14.0a4 by @nedbat in https://github.com/pyenv/pyenv/pull/3168
+
+## Release v2.5.0
+* `pyenv init -` performance improvements; recommend using `pyenv init - <shell>` by @ChristianFredrikJohnsen in https://github.com/pyenv/pyenv/pull/3136
+* Add miniconda3-24.11.1-0 by @binbjz in https://github.com/pyenv/pyenv/pull/3138
+* Add miniconda3-24.3.0-0 by @native-api in https://github.com/pyenv/pyenv/pull/3139
+* CI: only run macos_build_bundled_dependencies and ubuntu_build_tar_gz for CPython by @native-api in https://github.com/pyenv/pyenv/pull/3141
+* Add miniforge3 and mambaforge3 24.1.2-0, 24.3.0-0, 24.5.0-0, 24.7.1-0, 24.7.1-1, 24.7.1-2, 24.9.0-0, 24.9.2-0, 24.11.0-0, 24.11.0-1 by @native-api in https://github.com/pyenv/pyenv/pull/3142
+* Skip broken miniforge3/mambaforge3 22.11.0-0, 22.11.0-1, 22.11.0-2 in the generation script by @native-api in https://github.com/pyenv/pyenv/pull/3143
+
 ## Release v2.4.23
 * README: explain using multiple versions by @Finkregh in https://github.com/pyenv/pyenv/pull/3126
 * Support PACKAGE_CPPFLAGS and PACKAGE_LDFLAGS by @native-api in https://github.com/pyenv/pyenv/pull/3130

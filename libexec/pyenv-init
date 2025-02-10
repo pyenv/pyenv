@@ -20,37 +20,32 @@ if [ "$1" = "--complete" ]; then
 fi
 
 mode="help"
-no_rehash=""
-no_push_path=""
-for args in "$@"
-do
-  if [ "$args" = "-" ]; then
-    mode="print"
-    shift
-  fi
 
-  if [ "$args" = "--path" ]; then
-    mode="path"
-    shift
-  fi
-
-  if [ "$args" = "--detect-shell" ]; then
-    mode="detect-shell"
-    shift
-  fi
-
-  if [ "$args" = "--no-push-path" ]; then
-    no_push_path=1
-    shift
-  fi
-  
-  if [ "$args" = "--no-rehash" ]; then
-    no_rehash=1
-    shift
-  fi
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -)
+      mode="print"
+      ;;
+    --path)
+      mode="path"
+      ;;
+    --detect-shell)
+      mode="detect-shell"
+      ;;
+    --no-push-path)
+      no_push_path=1
+      ;;
+    --no-rehash)
+      no_rehash=1
+      ;;
+    *)
+      shell="$1"
+      ;;
+  esac
+  shift
 done
 
-shell="$1"
+# If shell is not provided, detect it.
 if [ -z "$shell" ]; then
   shell="$(ps -p "$PPID" -o 'args=' 2>/dev/null || true)"
   shell="${shell%% *}"
@@ -59,8 +54,6 @@ if [ -z "$shell" ]; then
   shell="${shell##*/}"
   shell="${shell%%-*}"
 fi
-
-root="${0%/*}/.."
 
 function main() {
   case "$mode" in
@@ -150,7 +143,7 @@ function help_() {
       echo "# Load pyenv automatically by appending"
       echo "# the following to ~/.config/fish/config.fish:"
       echo
-      echo 'pyenv init - | source'
+      echo 'pyenv init - fish | source'
       echo
       ;;
     * )
@@ -166,7 +159,7 @@ function help_() {
       echo
       echo 'export PYENV_ROOT="$HOME/.pyenv"'
       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
-      echo 'eval "$(pyenv init -)"'
+      echo 'eval "$(pyenv init - '$shell')"'
       ;;
     esac
     echo
@@ -244,7 +237,7 @@ function print_env() {
 }
 
 function print_completion() {
-  completion="${root}/completions/pyenv.${shell}"
+  completion="${0%/*/*}/completions/pyenv.${shell}"
   if [ -r "$completion" ]; then
     echo "source '$completion'"
   fi
@@ -260,52 +253,44 @@ function print_shell_function() {
   commands=(`pyenv-commands --sh`)
   case "$shell" in
   fish )
-    cat <<EOS
-function pyenv
-  set command \$argv[1]
+    echo \
+'function pyenv
+  set command $argv[1]
   set -e argv[1]
 
-  switch "\$command"
-  case ${commands[*]}
-    source (pyenv "sh-\$command" \$argv|psub)
-  case '*'
-    command pyenv "\$command" \$argv
+  switch "$command"
+  case '"${commands[*]}"'
+    source (pyenv "sh-$command" $argv|psub)
+  case "*"
+    command pyenv "$command" $argv
   end
-end
-EOS
+end'
     ;;
   ksh | ksh93 | mksh )
-    cat <<EOS
-function pyenv {
-  typeset command
-EOS
+    echo \
+'function pyenv {
+  typeset command=${1:-}'
     ;;
   * )
-    cat <<EOS
-pyenv() {
-  local command
-EOS
+    echo \
+'pyenv() {
+  local command=${1:-}'
     ;;
   esac
 
   if [ "$shell" != "fish" ]; then
     IFS="|"
-    cat <<EOS
-  command="\${1:-}"
-  if [ "\$#" -gt 0 ]; then
-    shift
-  fi
-
-  case "\$command" in
-  ${commands[*]:-/})
-    eval "\$(pyenv "sh-\$command" "\$@")"
+    echo \
+'  [ "$#" -gt 0 ] && shift
+  case "$command" in
+  '"${commands[*]:-/}"')
+    eval "$(pyenv "sh-$command" "$@")"
     ;;
   *)
-    command pyenv "\$command" "\$@"
+    command pyenv "$command" "$@"
     ;;
   esac
-}
-EOS
+}'
   fi
 }
 
