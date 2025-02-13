@@ -1,5 +1,14 @@
 # Version History
 
+## Release v2.5.3
+* Add PyPy v7.3.18 by @dand-oss in https://github.com/pyenv/pyenv/pull/3184
+* Add Miniconda3 25.1.1-0 by @binbjz in https://github.com/pyenv/pyenv/pull/3190
+* Add miniforge3-25.1.1-0, miniforge3-24.11.3-0 by @native-api in https://github.com/pyenv/pyenv/pull/3191
+* Add CPython 3.14.0a5 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3194
+* Add Miniconda3 25.1.1-1 by @binbjz in https://github.com/pyenv/pyenv/pull/3192
+* Update hashes for Python 3.14.0a5 tarballs by @jsirois in https://github.com/pyenv/pyenv/pull/3196
+* rehash: Do not execute conda-specific code if conda is not installed by @ChristianFredrikJohnsen in https://github.com/pyenv/pyenv/pull/3151
+
 ## Release v2.5.2
 * Fix OpenSSL version parsing in python-build script by @threadflow in https://github.com/pyenv/pyenv/pull/3181
 * Add GraalPy 24.1.2 by @msimacek in https://github.com/pyenv/pyenv/pull/3176
