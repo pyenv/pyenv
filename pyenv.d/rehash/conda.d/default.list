@@ -117,6 +117,7 @@ factor
 false
 fmt
 fold
+greadlink
 groups
 head
 hostid
@@ -192,4 +193,3 @@ who
 whoami
 yes
 # --- end exclusions from coreutils
-greadlink
