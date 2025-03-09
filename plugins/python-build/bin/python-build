@@ -128,10 +128,36 @@ can_use_homebrew() {
   }
   [[ -n "$PYTHON_BUILD_USE_HOMEBREW" ]] && return 0
   [[ -n "$PYTHON_BUILD_SKIP_HOMEBREW" ]] && return 1
-  is_mac && return 0
+  is_mac && command -v brew &>/dev/null && return 0
   # In Linux, if Pyenv itself is installed with Homebrew,
   # we assume the user wants to take dependencies from there as well by default
   command -v brew &>/dev/null && [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "$(brew --prefix 2>/dev/null ||true)")"/* ]] && return 0
+  return 1
+}
+
+can_use_macports() {
+  [[ -n "$PYTHON_BUILD_USE_MACPORTS" && -n "$PYTHON_BUILD_SKIP_MACPORTS" ]] && {
+    echo "error: mutually exclusive environment variables PYTHON_BUILD_USE_MACPORTS and PYTHON_BUILD_SKIP_MACPORTS are set" >&3
+    exit 1
+  }
+  [[ -n "$PYTHON_BUILD_USE_MACPORTS" ]] && return 0
+  [[ -n "$PYTHON_BUILD_SKIP_MACPORTS" ]] && return 1
+  command -v port &>/dev/null && return 0
+  return 1
+}
+
+is_homebrew_preferred() {
+  can_use_homebrew || return 1
+  [ -n "$PYTHON_BUILD_USE_HOMEBREW" ] && return 0
+  local brew_path port_path path paths
+  command -v port &>/dev/null && port_path=$(dirname "$(command -v port)")
+  [ -z "$port_path" ] && return 0
+  [ -n "$PYTHON_BUILD_USE_MACPORTS" ] && return 1
+  command -v brew &>/dev/null && brew_path=$(dirname "$(command -v brew)")
+  [ -z "$brew_path" ] && return 1
+  # Homebrew and MacPorts found in PATH
+  # find out what to use based on the PATH order
+  [[ $PATH == *$brew_path*":"*$port_path* ]] && return 0
   return 1
 }
 
@@ -815,14 +841,28 @@ build_package_standard_build() {
   local PACKAGE_LDFLAGS="${package_var_name}_LDFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
-    use_homebrew || true
-    use_custom_tcltk || use_homebrew_tcltk || true
-    use_homebrew_readline || use_freebsd_pkg || true
-    use_homebrew_ncurses || true
-    if is_mac -ge 1014; then
-      use_xcode_sdk_zlib || use_homebrew_zlib || true
+    if is_homebrew_preferred; then
+      use_homebrew || true
+      use_custom_tcltk || use_homebrew_tcltk || true
+      use_homebrew_readline || true
+      use_homebrew_ncurses || true
+      if is_mac -ge 1014; then
+        use_xcode_sdk_zlib || use_homebrew_zlib || true
+      else
+        use_homebrew_zlib || true
+      fi
+    elif can_use_macports; then
+      use_macports || true
+      use_custom_tcltk || true
+      use_macports_readline || true
+      use_macports_ncurses || true
+      if is_mac -ge 1014; then
+        use_xcode_sdk_zlib || use_macports_zlib || true
+      else
+        use_macports_zlib || true
+      fi
     else
-      use_homebrew_zlib || true
+      use_freebsd_pkg || true
     fi
     use_dsymutil || true
     use_free_threading || true
@@ -1438,9 +1478,24 @@ use_homebrew() {
   fi
 }
 
+use_macports() {
+  can_use_macports || return 1
+  local port_location="$(command -v port)"
+  if [ -n "$port_location" ]; then
+    local prefix="${port_location%/bin/port}"
+    export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${prefix}/include"
+    append_ldflags_libs "-L${prefix}/lib -Wl,-rpath,${prefix}/lib"
+  fi
+}
+
 needs_yaml() {
-  ! configured_with_package_dir "python" "yaml.h" &&
-  ! use_homebrew_yaml
+  if ! configured_with_package_dir "python" "yaml.h"; then
+    if is_homebrew_preferred; then
+      use_homebrew_yaml && return 1
+    elif can_use_macports; then
+      use_macports_yaml && return 1
+    fi
+  fi
 }
 
 use_homebrew_yaml() {
@@ -1450,6 +1505,21 @@ use_homebrew_yaml() {
     echo "python-build: use libyaml from homebrew"
     export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
     export LDFLAGS="-L$libdir/lib${LDFLAGS:+ ${LDFLAGS% }}"
+  else
+    return 1
+  fi
+}
+
+use_macports_yaml() {
+  can_use_macports || return 1
+  local prefix="$(port -q location libyaml 2>/dev/null || true)"
+  if [ -n "$prefix" ]; then
+    local libdir="$prefix/opt/local"
+    if [ -d "$libdir" ]; then
+      echo "python-build: use libyaml from MacPorts"
+      export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+      export LDFLAGS="-L$libdir/lib${LDFLAGS:+ ${LDFLAGS% }}"
+    fi
   else
     return 1
   fi
@@ -1488,9 +1558,13 @@ use_freebsd_pkg() {
 has_broken_mac_readline() {
   # Mac OS X 10.4 has broken readline.
   # https://github.com/pyenv/pyenv/issues/23
-  is_mac &&
-  ! configured_with_package_dir "python" "readline/rlconf.h" &&
-  ! use_homebrew_readline
+  if is_mac && ! configured_with_package_dir "python" "readline/rlconf.h"; then
+    if is_homebrew_preferred; then
+      use_homebrew_readline && return 1
+    elif can_use_macports; then
+      use_macports_readline && return 1
+    fi
+  fi
 }
 
 use_homebrew_readline() {
@@ -1507,6 +1581,23 @@ use_homebrew_readline() {
   fi
 }
 
+use_macports_readline() {
+  can_use_macports || return 1
+  if ! configured_with_package_dir "python" "readline/rlconf.h"; then
+    local prefix="$(port -q location readline 2>/dev/null || true)"
+    if [ -n "$prefix" ]; then
+      local libdir="$prefix/opt/local"
+      if [ -d "$libdir" ]; then
+        echo "python-build: use readline from MacPorts"
+        export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+        export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+      fi
+    else
+      return 1
+    fi
+  fi
+}
+
 use_homebrew_ncurses() {
   can_use_homebrew || return 1
   local libdir="$(brew --prefix ncurses 2>/dev/null || true)"
@@ -1514,6 +1605,21 @@ use_homebrew_ncurses() {
     echo "python-build: use ncurses from homebrew"
     export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
     export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+  else
+    return 1
+  fi
+}
+
+use_macports_ncurses() {
+  can_use_macports || return 1
+  local prefix="$(port -q location ncurses 2>/dev/null || true)"
+  if [[ -n "$prefix" ]]; then
+    local libdir="$prefix/opt/local"
+    if [ -d "$libdir" ]; then
+      echo "python-build: use ncurses from MacPorts"
+      export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+      export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+    fi
   else
     return 1
   fi
@@ -1548,8 +1654,13 @@ build_package_mac_readline() {
 has_broken_mac_openssl() {
   is_mac || return 1
   local openssl_version="$(/usr/bin/openssl version 2>/dev/null || true)"
-  [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]] &&
-  ! use_homebrew_openssl
+  if [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]]; then
+    if is_homebrew_preferred; then
+      use_homebrew_openssl && return 1
+    elif can_use_macports; then
+      use_macports_openssl && return 1
+    fi
+  fi
 }
 
 use_homebrew_openssl() {
@@ -1566,6 +1677,31 @@ use_homebrew_openssl() {
       else
         export CPPFLAGS="-I$ssldir/include ${CPPFLAGS:+ $CPPFLAGS}"
         export LDFLAGS="-L$ssldir/lib${LDFLAGS:+ $LDFLAGS}"
+      fi
+      export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
+      return
+    fi
+  done
+  return 1
+}
+
+use_macports_openssl() {
+  can_use_macports || return 1
+  command -v port >/dev/null || return 1
+  for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
+    local ssldir="$(port -q location "${openssl}" 2>/dev/null || true)"
+    if [ -n "$ssldir" ]; then
+      ssldir="${ssldir}/opt/local"
+      if [ -d "$ssldir" ]; then
+        echo "python-build: use ${openssl} from MacPorts"
+        if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
+          # configure script of newer CPython versions support `--with-openssl`
+          # https://bugs.python.org/issue21541
+          package_option python configure --with-openssl="${ssldir}"
+        else
+          export CPPFLAGS="-I$ssldir/include ${CPPFLAGS:+ $CPPFLAGS}"
+          export LDFLAGS="-L$ssldir/lib${LDFLAGS:+ $LDFLAGS}"
+        fi
       fi
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
       return
@@ -1684,6 +1820,21 @@ use_xcode_sdk_zlib() {
     if is_mac -ge 1100; then
       export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${xc_sdk_path}/usr/lib"
     fi
+  fi
+}
+
+use_macports_zlib() {
+  can_use_macports || return 1
+  local prefix="$(port -q location zlib 2>/dev/null || true)"
+  if [[ -n "$prefix" ]]; then
+      local libdir="$prefix/opt/local"
+      if [[ -d "$libdir" ]]; then
+        echo "python-build: use zlib from MacPorts"
+        export CPPFLAGS="-I$prefix/include ${CPPFLAGS}"
+        export LDFLAGS="-L$prefix/lib ${LDFLAGS}"
+      fi
+  else
+    return 1
   fi
 }
 
