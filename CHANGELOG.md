@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.5.4
+* Add anaconda3-2025.1.1-2 by @binbjz in https://github.com/pyenv/pyenv/pull/3198
+* Add PyPy v7.3.19 by @jsirois in https://github.com/pyenv/pyenv/pull/3205
+* Add CPython 3.14.0a6 by @nedbat in https://github.com/pyenv/pyenv/pull/3213
+
 ## Release v2.5.3
 * Add PyPy v7.3.18 by @dand-oss in https://github.com/pyenv/pyenv/pull/3184
 * Add Miniconda3 25.1.1-0 by @binbjz in https://github.com/pyenv/pyenv/pull/3190
