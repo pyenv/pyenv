@@ -62,8 +62,7 @@ assert_build_log() {
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..10}; do stub uname '-s : echo Linux'; done
-  stub brew false
+  for i in {1..5}; do stub uname '-s : echo Linux'; done
   stub_make_install
   stub_make_install
 
@@ -104,8 +103,7 @@ OUT
   cached_tarball "yaml-0.1.6" "$yaml_configure"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..10}; do stub uname '-s : echo Linux'; done
-  stub brew false
+  for i in {1..5}; do stub uname '-s : echo Linux'; done
   stub_make_install
   stub_make_install "$PYTHON_MAKE_INSTALL_TARGET"
   
@@ -132,8 +130,7 @@ OUT
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..10}; do stub uname '-s : echo Linux'; done
-  stub brew false
+  for i in {1..5}; do stub uname '-s : echo Linux'; done
   stub_make_install
   stub_make_install
   stub patch ' : echo patch "$@" | sed -E "s/\.[[:alnum:]]+$/.XXX/" >> build.log'
@@ -162,8 +159,7 @@ OUT
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
 
-  for i in {1..10}; do stub uname '-s : echo Linux'; done
-  stub brew false
+  for i in {1..5}; do stub uname '-s : echo Linux'; done
   stub_make_install
   stub_make_install
   stub patch ' : echo patch "$@" | sed -E "s/\.[[:alnum:]]+$/.XXX/" >> build.log'
@@ -182,6 +178,135 @@ make -j 2
 make install
 patch -p1 --force -i $TMP/python-patch.XXX
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "Homebrew is used when brew is before port in PATH" {
+  cached_tarball "Python-3.6.2"
+
+  BREW_PREFIX="$TMP/homebrew-prefix"
+  mkdir -p "$BREW_PREFIX/bin"
+  PORT_PREFIX="$TMP/macports-prefix"
+  mkdir -p "$PORT_PREFIX/bin"
+
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub brew "--prefix : echo '$BREW_PREFIX'"
+  for i in {1..5}; do stub brew false; done
+  stub_make_install
+  export PATH="$BREW_PREFIX/bin:$PORT_PREFIX/bin:$PATH"
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "MacPorts is used over Homebrew when both present and port is first in PATH" {
+  cached_tarball "Python-3.6.2"
+
+  BREW_PREFIX="$TMP/homebrew-prefix"
+  mkdir -p "$BREW_PREFIX/bin"
+  PORT_PREFIX=$TMP
+
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  for i in {1..3}; do stub port false; done
+  stub_make_install
+  export PATH="$PORT_PREFIX/bin:$BREW_PREFIX/bin:$PATH"
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$PORT_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$PORT_PREFIX/lib -Wl,-rpath,$PORT_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "Non-empty PYTHON_BUILD_USE_HOMEBREW overrides PATH order selection" {
+  cached_tarball "Python-3.6.2"
+
+  BREW_PREFIX="$TMP/homebrew-prefix"
+  mkdir -p "$BREW_PREFIX/bin"
+  PORT_PREFIX=$TMP
+
+  for i in {1..3}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub brew "--prefix : echo '$BREW_PREFIX'"
+  for i in {1..5}; do stub brew false; done
+  stub_make_install
+  export PYTHON_BUILD_USE_HOMEBREW=1
+  export PATH="$PORT_PREFIX/bin:$BREW_PREFIX/bin:$PATH"
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "Non-empty PYTHON_BUILD_USE_MACPORTS overrides PATH order selection" {
+  cached_tarball "Python-3.6.2"
+
+  BREW_PREFIX="$TMP/homebrew-prefix"
+  mkdir -p "$BREW_PREFIX/bin"
+  PORT_PREFIX=$TMP
+
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  for i in {1..3}; do stub port false; done
+  stub_make_install
+  export PYTHON_BUILD_USE_MACPORTS=1
+  export PATH="$BREW_PREFIX/bin:$PORT_PREFIX/bin:$PATH"
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$PORT_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$PORT_PREFIX/lib -Wl,-rpath,$PORT_PREFIX/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -222,7 +347,7 @@ OUT
   brew_libdir="$TMP/homebrew-yaml"
   mkdir -p "$brew_libdir"
 
-  for i in {1..10}; do stub uname '-s : echo Darwin'; done
+  for i in {1..11}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew "--prefix libyaml : echo '$brew_libdir'"
   for i in {1..6}; do stub brew false; done
@@ -249,7 +374,7 @@ OUT
 
   readline_libdir="$TMP/homebrew-readline"
   mkdir -p "$readline_libdir"
-  for i in {1..8}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   for i in {1..3}; do stub brew false; done
   stub brew "--prefix readline : echo '$readline_libdir'"
@@ -304,12 +429,100 @@ make install
 OUT
 }
 
+@test "yaml is linked from MacPorts" {
+  cached_tarball "Python-3.6.2"
+
+  yaml_libdir="$TMP/port-yaml"
+  mkdir -p "$yaml_libdir/opt/local"
+
+  for i in {1..5}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub port "-q location libyaml : echo '$yaml_libdir'"
+  for i in {1..3}; do stub port false; done
+  stub_make_install
+
+  install_fixture definitions/needs-yaml
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$yaml_libdir/opt/local/include -I${TMP}/install/include -I${TMP}/include" LDFLAGS="-L$yaml_libdir/opt/local/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L${TMP}/lib -Wl,-rpath,${TMP}/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "readline is linked from MacPorts" {
+  cached_tarball "Python-3.6.2"
+
+  readline_libdir="$TMP/port-readline"
+  mkdir -p "$readline_libdir/opt/local"
+
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub port "-q location readline : echo '$readline_libdir'"
+  for i in {1..2}; do stub port false; done
+  stub_make_install
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$readline_libdir/opt/local/include -I${TMP}/install/include -I${TMP}/include" LDFLAGS="-L$readline_libdir/opt/local/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L${TMP}/lib -Wl,-rpath,${TMP}/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "ncurses is linked from MacPorts" {
+  cached_tarball "Python-3.6.2"
+
+  ncurses_libdir="$TMP/port-ncurses"
+  mkdir -p "$ncurses_libdir/opt/local"
+
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub port false
+  stub port "-q location ncurses : echo '$ncurses_libdir'"
+  stub port false
+  stub_make_install
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$ncurses_libdir/opt/local/include -I${TMP}/install/include -I${TMP}/include" LDFLAGS="-L$ncurses_libdir/opt/local/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L${TMP}/lib -Wl,-rpath,${TMP}/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
 @test "openssl is linked from Ports in FreeBSD if present" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..7}; do stub uname '-s : echo FreeBSD'; done
+  for i in {1..5}; do stub uname '-s : echo FreeBSD'; done
   stub uname '-r : echo 11.0-RELEASE'
-  for i in {1..3}; do stub uname '-s : echo FreeBSD'; done
   stub sysctl '-n hw.ncpu : echo 1'
 
   stub pkg "info -e openssl : true"
@@ -341,9 +554,8 @@ OUT
 
   for lib in readline sqlite3; do
 
-    for i in {1..7}; do stub uname '-s : echo FreeBSD'; done
+    for i in {1..5}; do stub uname '-s : echo FreeBSD'; done
     stub uname '-r : echo 11.0-RELEASE'
-    for i in {1..3}; do stub uname '-s : echo FreeBSD'; done
     stub sysctl '-n hw.ncpu : echo 1'
 
     stub pkg false
@@ -376,7 +588,7 @@ OUT
 @test "homebrew is not touched if PYTHON_BUILD_SKIP_HOMEBREW is set" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..3}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew true; brew
   stub_make_install
@@ -405,7 +617,7 @@ OUT
   BREW_PREFIX="$TMP/homebrew-prefix"
   mkdir -p "$BREW_PREFIX"
 
-  for i in {1..4}; do stub uname '-s : echo Linux'; done
+  for i in {1..3}; do stub uname '-s : echo Linux'; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
   for i in {1..5}; do stub brew false; done
   stub_make_install
@@ -435,7 +647,7 @@ OUT
   BREW_PREFIX="${BREW_PREFIX%/*}"
   BREW_PREFIX="${BREW_PREFIX%/*}"
 
-  for i in {1..4}; do stub uname '-s : echo Linux'; done
+  for i in {1..3}; do stub uname '-s : echo Linux'; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
   for i in {1..5}; do stub brew false; done
   stub_make_install
@@ -464,8 +676,8 @@ OUT
   BREW_PREFIX="$TMP/homebrew-prefix"
   mkdir -p "$BREW_PREFIX"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
-  for i in {1..5}; do stub brew "--prefix : echo '$BREW_PREFIX'"; done
+  for i in {1..4}; do stub uname '-s : echo Linux'; done
+  stub brew "--prefix : echo '$BREW_PREFIX'"
   stub_make_install
 
   run_inline_definition <<DEF
@@ -493,9 +705,8 @@ OUT
   mkdir -p "$readline_libdir/include/readline"
   touch "$readline_libdir/include/readline/rlconf.h"
 
-  for i in {1..8}; do stub uname '-s : echo Darwin'; done
+  for i in {1..9}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
-
   for i in {1..5}; do stub brew false; done
   stub_make_install
 
@@ -617,11 +828,38 @@ make -j 2
 make install
 OUT
 }
+
+@test "MacPorts is not touched if PYTHON_BUILD_SKIP_MACPORTS is set" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub port true; port
+  stub_make_install
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
 @test "number of CPU cores defaults to 2" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..10}; do stub uname '-s : echo Darwin'; done
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
+  for i in {1..5}; do stub uname '-s : echo Darwin'; done
+  stub sw_vers '-productVersion : echo 10.10'
 
   stub sysctl false
   stub_make_install
@@ -647,8 +885,8 @@ OUT
 @test "number of CPU cores is detected on Mac" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..10}; do stub uname '-s : echo Darwin'; done
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
+  for i in {1..5}; do stub uname '-s : echo Darwin'; done
+  stub sw_vers '-productVersion : echo 10.10'
 
   stub sysctl '-n hw.ncpu : echo 4'
   stub_make_install
@@ -675,9 +913,8 @@ OUT
 @test "number of CPU cores is detected on FreeBSD" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..7}; do stub uname '-s : echo FreeBSD'; done
+  for i in {1..5}; do stub uname '-s : echo FreeBSD'; done
   stub uname '-r : echo 11.0-RELEASE'
-  for i in {1..3}; do stub uname '-s : echo FreeBSD'; done
   for i in {1..3}; do stub pkg false; done
 
   stub sysctl '-n hw.ncpu : echo 1'
@@ -704,7 +941,7 @@ OUT
 @test "setting PYTHON_MAKE_INSTALL_OPTS to a multi-word string" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..4}; do stub uname '-s : echo Linux'; done
 
   stub_make_install
 
@@ -728,7 +965,7 @@ OUT
 @test "--enable-shared is not added if --disable-shared is passed" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..4}; do stub uname '-s : echo Linux'; done
 
   stub_make_install
 
@@ -779,7 +1016,7 @@ OUT
 @test "configuring with dSYM has no effect in non-MacOS" {
   cached_tarball "Python-3.6.2"
 
-  for i in {1..10}; do stub uname '-s : echo Linux'; done
+  for i in {1..5}; do stub uname '-s : echo Linux'; done
   stub_make_install
 
   run_inline_definition <<DEF
@@ -812,9 +1049,8 @@ OUT
   cached_tarball "Python-3.6.2"
 
   stub uname "-s : echo FreeBSD" "-r : echo 9.1"
-  for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
+  for i in {1..4}; do stub uname "-s : echo FreeBSD"; done
   stub uname "-r : echo 9.1"
-  for i in {1..3}; do stub uname "-s : echo FreeBSD"; done
 
   MAKE=gmake stub_make_install
 
@@ -829,9 +1065,8 @@ OUT
   cached_tarball "Python-3.6.2"
 
   stub uname "-s : echo FreeBSD" "-r : echo 10.0-RELEASE"
-  for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
+  for i in {1..4}; do stub uname "-s : echo FreeBSD"; done
   stub uname "-r : echo 10.0-RELEASE"
-  for i in {1..3}; do stub uname "-s : echo FreeBSD"; done
 
   stub_make_install
 
@@ -845,9 +1080,8 @@ OUT
   cached_tarball "Python-3.6.2"
 
   stub uname "-s : echo FreeBSD" "-r : echo 11.0-RELEASE"
-  for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
+  for i in {1..4}; do stub uname "-s : echo FreeBSD"; done
   stub uname "-r : echo 11.0-RELEASE"
-  for i in {1..3}; do stub uname "-s : echo FreeBSD"; done
 
   stub_make_install
 
@@ -866,7 +1100,7 @@ apply -p1 -i /my/patch.diff
 exec ./configure "\$@"
 CONF
 
-  for i in {1..9}; do stub uname '-s : echo Linux'; done
+  for i in {1..4}; do stub uname '-s : echo Linux'; done
   stub apply 'echo apply "$@" >> build.log'
   stub_make_install
 
