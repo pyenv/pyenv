@@ -142,7 +142,7 @@ can_use_macports() {
   }
   [[ -n "$PYTHON_BUILD_USE_MACPORTS" ]] && return 0
   [[ -n "$PYTHON_BUILD_SKIP_MACPORTS" ]] && return 1
-  command -v port &>/dev/null && return 0
+  is_mac && command -v port &>/dev/null && return 0
   return 1
 }
 
