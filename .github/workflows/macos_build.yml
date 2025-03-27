@@ -29,9 +29,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2.17
         with:
           key: ${{ github.job }}-${{ matrix.python-version }}
-      - name: install ccache
-        run: |
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          create-symlink: true
         # https://github.com/pyenv/pyenv#installation
       - run: pwd
       - env:
