@@ -38,13 +38,13 @@ jobs:
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
           echo "$PATH"
-          # bin/pyenv --debug install ${{ matrix.python-version }}
-          # bin/pyenv global ${{ matrix.python-version }}
-          # bin/pyenv rehash
-      # - run: python --version
+          bin/pyenv --debug install ${{ matrix.python-version }}
+          bin/pyenv global ${{ matrix.python-version }}
+          bin/pyenv rehash
+      - run: python --version
       - run: echo "$PATH"
-      # - run: python -m pip --version
-      # - shell: python  # Prove that actual Python == expected Python
-        # env:
-          # EXPECTED_PYTHON: ${{ matrix.python-version }}
-        # run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
+      - run: python -m pip --version
+      - shell: python  # Prove that actual Python == expected Python
+        env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))
