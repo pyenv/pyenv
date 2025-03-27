@@ -27,7 +27,11 @@ jobs:
           sudo apt-get update -q; sudo apt install -yq make build-essential libssl-dev zlib1g-dev \
           libbz2-dev libreadline-dev libsqlite3-dev curl \
           libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-      # https://github.com/pyenv/pyenv#installation
+      - name: Ccache for gh actions
+        uses: hendrikmuhs/ccache-action@v1.2.17
+        with:
+          key: ${{ github.job }}-${{ matrix.python-version}}
+        # https://github.com/pyenv/pyenv#installation
       - run: pwd
       - env:
           PYENV_ROOT: /home/runner/work/pyenv/pyenv
