@@ -28,7 +28,10 @@ jobs:
       - name: Ccache for gh actions
         uses: hendrikmuhs/ccache-action@v1.2.17
         with:
-          key: ${{ github.job }}-${{ matrix.python-version}}
+          key: ${{ github.job }}-${{ matrix.python-version }}
+      - name: install ccache
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
         # https://github.com/pyenv/pyenv#installation
       - run: pwd
       - env:
