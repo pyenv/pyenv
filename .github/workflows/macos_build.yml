@@ -12,9 +12,9 @@ jobs:
         python-version:
           - "3.9"
           - "3.10"
-          # - "3.11"
-          # - "3.12"
-          # - "3.13"
+          - "3.11"
+          - "3.12"
+          - "3.13"
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
