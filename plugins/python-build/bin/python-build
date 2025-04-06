@@ -122,6 +122,9 @@ is_mac() {
 }
 
 can_use_homebrew() {
+  if locked_in; then
+    locked_in homebrew && rc=$? || rc=$?; return $rc
+  fi
   [[ -n "$PYTHON_BUILD_USE_HOMEBREW" && -n "$PYTHON_BUILD_SKIP_HOMEBREW" ]] && {
     echo "error: mutually exclusive environment variables PYTHON_BUILD_USE_HOMEBREW and PYTHON_BUILD_SKIP_HOMEBREW are set" >&3
     exit 1
@@ -131,11 +134,17 @@ can_use_homebrew() {
   is_mac && command -v brew &>/dev/null && return 0
   # In Linux, if Pyenv itself is installed with Homebrew,
   # we assume the user wants to take dependencies from there as well by default
-  command -v brew &>/dev/null && [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "$(brew --prefix 2>/dev/null ||true)")"/* ]] && return 0
-  return 1
+  command -v brew &>/dev/null && [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "$(brew --prefix 2>/dev/null ||true)")"/* ]] &&
+  { lock_in homebrew; return 0; }
+  
+  # do not check the same stuff multiple times
+  declare -g PYTHON_BUILD_SKIP_HOMEBREW=1; return 1
 }
 
 can_use_macports() {
+  if locked_in; then
+    locked_in macports && rc=$? || rc=$?; return $rc
+  fi
   [[ -n "$PYTHON_BUILD_USE_MACPORTS" && -n "$PYTHON_BUILD_SKIP_MACPORTS" ]] && {
     echo "error: mutually exclusive environment variables PYTHON_BUILD_USE_MACPORTS and PYTHON_BUILD_SKIP_MACPORTS are set" >&3
     exit 1
@@ -143,7 +152,21 @@ can_use_macports() {
   [[ -n "$PYTHON_BUILD_USE_MACPORTS" ]] && return 0
   [[ -n "$PYTHON_BUILD_SKIP_MACPORTS" ]] && return 1
   is_mac && command -v port &>/dev/null && return 0
-  return 1
+
+  # do not check the same stuff multiple times
+  declare -g PYTHON_BUILD_SKIP_MACPORTS=1; return 1
+}
+
+locked_in() {
+  if [[ -z "$1" ]]; then
+    [[ -n $_PYTHON_BUILD_ECOSYSTEM_LOCKED_IN ]]
+  else
+    [[ $_PYTHON_BUILD_ECOSYSTEM_LOCKED_IN == "$1" ]]
+  fi
+}
+
+lock_in() {
+  declare -g _PYTHON_BUILD_ECOSYSTEM_LOCKED_IN=${1:?}
 }
 
 #  9.1  -> 901
@@ -827,7 +850,6 @@ build_package_standard_build() {
 
   if [ "$package_var_name" = "PYTHON" ]; then
     if can_use_homebrew; then
-      use_homebrew || true
       use_custom_tcltk || use_homebrew_tcltk || true
       use_homebrew_readline || true
       use_homebrew_ncurses || true
@@ -836,9 +858,9 @@ build_package_standard_build() {
       else
         use_homebrew_zlib || true
       fi
+      use_homebrew || true
     fi
     if can_use_macports; then
-      use_macports || true
       use_custom_tcltk || true
       use_macports_readline || true
       use_macports_ncurses || true
@@ -847,6 +869,7 @@ build_package_standard_build() {
       else
         use_macports_zlib || true
       fi
+      use_macports || true
     fi
 
     use_freebsd_pkg || true
@@ -1452,7 +1475,7 @@ prepend_ldflags_libs() {
 }
 
 use_homebrew() {
-  can_use_homebrew || return 1
+  locked_in homebrew || return 1
   # unless Homebrew is at the default /usr/local, need to add its paths to
   # compiler search to be able to use non-keg-only deps from there
   if command -v brew &>/dev/null; then
@@ -1466,7 +1489,7 @@ use_homebrew() {
 }
 
 use_macports() {
-  can_use_macports || return 1
+  locked_in macports || return 1
   local port_location="$(command -v port)"
   if [ -n "$port_location" ]; then
     local prefix="${port_location%/bin/port}"
@@ -1492,6 +1515,7 @@ use_homebrew_yaml() {
     echo "python-build: use libyaml from homebrew"
     export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
     export LDFLAGS="-L$libdir/lib${LDFLAGS:+ ${LDFLAGS% }}"
+    lock_in homebrew
   else
     return 1
   fi
@@ -1506,6 +1530,7 @@ use_macports_yaml() {
       echo "python-build: use libyaml from MacPorts"
       export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
       export LDFLAGS="-L$libdir/lib${LDFLAGS:+ ${LDFLAGS% }}"
+      lock_in macports
     fi
   else
     return 1
@@ -1563,6 +1588,7 @@ use_homebrew_readline() {
       echo "python-build: use readline from homebrew"
       export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
       export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+      lock_in homebrew
     else
       return 1
     fi
@@ -1579,6 +1605,7 @@ use_macports_readline() {
         echo "python-build: use readline from MacPorts"
         export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
         export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+        lock_in macports
       fi
     else
       return 1
@@ -1593,6 +1620,7 @@ use_homebrew_ncurses() {
     echo "python-build: use ncurses from homebrew"
     export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
     export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+    lock_in homebrew
   else
     return 1
   fi
@@ -1607,6 +1635,7 @@ use_macports_ncurses() {
       echo "python-build: use ncurses from MacPorts"
       export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
       export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+      lock_in macports
     fi
   else
     return 1
@@ -1668,7 +1697,8 @@ use_homebrew_openssl() {
         export LDFLAGS="-L$ssldir/lib${LDFLAGS:+ $LDFLAGS}"
       fi
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
-      return
+      lock_in homebrew
+      return 0
     fi
   done
   return 1
@@ -1693,7 +1723,8 @@ use_macports_openssl() {
         fi
       fi
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
-      return
+      lock_in macports
+      return 0
     fi
   done
   return 1
@@ -1793,6 +1824,7 @@ use_homebrew_zlib() {
   if [ -d "$brew_zlib" ]; then
     echo "python-build: use zlib from homebrew"
     export CFLAGS="-I${brew_zlib} ${CFLAGS}"
+    lock_in homebrew
   fi
 }
 
@@ -1821,6 +1853,7 @@ use_macports_zlib() {
         echo "python-build: use zlib from MacPorts"
         export CPPFLAGS="-I$prefix/include ${CPPFLAGS}"
         export LDFLAGS="-L$prefix/lib ${LDFLAGS}"
+        lock_in macports
       fi
   else
     return 1
@@ -1851,6 +1884,7 @@ use_homebrew_tcltk() {
         fi
       fi
       export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+      lock_in homebrew
       return 0
     fi
   done
