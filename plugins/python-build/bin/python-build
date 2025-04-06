@@ -146,21 +146,6 @@ can_use_macports() {
   return 1
 }
 
-is_homebrew_preferred() {
-  can_use_homebrew || return 1
-  [ -n "$PYTHON_BUILD_USE_HOMEBREW" ] && return 0
-  local brew_path port_path path paths
-  command -v port &>/dev/null && port_path=$(dirname "$(command -v port)")
-  [ -z "$port_path" ] && return 0
-  [ -n "$PYTHON_BUILD_USE_MACPORTS" ] && return 1
-  command -v brew &>/dev/null && brew_path=$(dirname "$(command -v brew)")
-  [ -z "$brew_path" ] && return 1
-  # Homebrew and MacPorts found in PATH
-  # find out what to use based on the PATH order
-  [[ $PATH == *$brew_path*":"*$port_path* ]] && return 0
-  return 1
-}
-
 #  9.1  -> 901
 # 10.9  -> 1009
 # 10.10 -> 1010
@@ -841,7 +826,7 @@ build_package_standard_build() {
   local PACKAGE_LDFLAGS="${package_var_name}_LDFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
-    if is_homebrew_preferred; then
+    if can_use_homebrew; then
       use_homebrew || true
       use_custom_tcltk || use_homebrew_tcltk || true
       use_homebrew_readline || true
@@ -851,7 +836,8 @@ build_package_standard_build() {
       else
         use_homebrew_zlib || true
       fi
-    elif can_use_macports; then
+    fi
+    if can_use_macports; then
       use_macports || true
       use_custom_tcltk || true
       use_macports_readline || true
@@ -861,9 +847,10 @@ build_package_standard_build() {
       else
         use_macports_zlib || true
       fi
-    else
-      use_freebsd_pkg || true
     fi
+
+    use_freebsd_pkg || true
+
     use_dsymutil || true
     use_free_threading || true
   fi
@@ -1490,7 +1477,7 @@ use_macports() {
 
 needs_yaml() {
   if ! configured_with_package_dir "python" "yaml.h"; then
-    if is_homebrew_preferred; then
+    if can_use_homebrew; then
       use_homebrew_yaml && return 1
     elif can_use_macports; then
       use_macports_yaml && return 1
@@ -1559,9 +1546,10 @@ has_broken_mac_readline() {
   # Mac OS X 10.4 has broken readline.
   # https://github.com/pyenv/pyenv/issues/23
   if is_mac && ! configured_with_package_dir "python" "readline/rlconf.h"; then
-    if is_homebrew_preferred; then
+    if can_use_homebrew; then
       use_homebrew_readline && return 1
-    elif can_use_macports; then
+    fi
+    if can_use_macports; then
       use_macports_readline && return 1
     fi
   fi
@@ -1655,9 +1643,10 @@ has_broken_mac_openssl() {
   is_mac || return 1
   local openssl_version="$(/usr/bin/openssl version 2>/dev/null || true)"
   if [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]]; then
-    if is_homebrew_preferred; then
+    if can_use_homebrew; then
       use_homebrew_openssl && return 1
-    elif can_use_macports; then
+    fi
+    if can_use_macports; then
       use_macports_openssl && return 1
     fi
   fi
