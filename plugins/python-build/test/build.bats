@@ -651,7 +651,6 @@ OUT
   stub brew "--prefix : echo '$BREW_PREFIX'"
   for i in {1..5}; do stub brew false; done
   stub_make_install
-  export PYTHON_BUILD_USE_HOMEBREW=1
 
   run_inline_definition <<DEF
 install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
