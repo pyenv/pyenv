@@ -184,7 +184,7 @@ make install
 OUT
 }
 
-@test "Homebrew is used when brew is before port in PATH" {
+@test "Homebrew and port are tried if both are present in PATHin MacOS" {
   cached_tarball "Python-3.6.2"
 
   BREW_PREFIX="$TMP/homebrew-prefix"
@@ -196,6 +196,7 @@ OUT
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
   for i in {1..5}; do stub brew false; done
+  for i in {1..5}; do stub port false; done
   stub_make_install
   export PATH="$BREW_PREFIX/bin:$PORT_PREFIX/bin:$PATH"
 
@@ -207,41 +208,11 @@ DEF
   unstub uname
   unstub sw_vers
   unstub brew
-  unstub make
-
-  assert_build_log <<OUT
-Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
-make -j 2
-make install
-OUT
-}
-
-@test "MacPorts is used over Homebrew when both present and port is first in PATH" {
-  cached_tarball "Python-3.6.2"
-
-  BREW_PREFIX="$TMP/homebrew-prefix"
-  mkdir -p "$BREW_PREFIX/bin"
-  PORT_PREFIX=$TMP
-
-  for i in {1..4}; do stub uname '-s : echo Darwin'; done
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
-  for i in {1..3}; do stub port false; done
-  stub_make_install
-  export PATH="$PORT_PREFIX/bin:$BREW_PREFIX/bin:$PATH"
-
-  run_inline_definition <<DEF
-install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
-DEF
-  assert_success
-
-  unstub uname
-  unstub sw_vers
   unstub port
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$PORT_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$PORT_PREFIX/lib -Wl,-rpath,$PORT_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -591,6 +562,7 @@ OUT
   for i in {1..3}; do stub uname '-s : echo Darwin'; done
   for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
   stub brew true; brew
+  stub port false
   stub_make_install
   export PYTHON_BUILD_SKIP_HOMEBREW=1
 
@@ -605,6 +577,89 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "MacPorts is not touched if PYTHON_BUILD_SKIP_MACPORTS is set" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..3}; do stub uname '-s : echo Darwin'; done
+  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
+  stub brew false
+  stub port true; port
+  stub_make_install
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "MacPorts is not touched in Linux" {
+  cached_tarball "Python-3.6.2"
+
+  for i in {1..3}; do stub uname '-s : echo Linux'; done
+  stub port true; port
+  stub_make_install
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "MacPorts is used in Linux if PYTHON_BUILD_USE_MACPORTS is set" {
+  cached_tarball "Python-3.6.2"
+
+  PORT_PREFIX="$TMP/port-prefix"
+  mkdir -p "$PORT_PREFIX/bin"
+  PORT_PREFIX=$TMP
+
+  for i in {1..4}; do stub uname '-s : echo Linux'; done
+  stub brew false
+  for i in {1..3}; do stub port false; done
+  stub_make_install
+  export PATH="$PORT_PREFIX/bin:$PATH"
+  export PYTHON_BUILD_USE_MACPORTS=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$PORT_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$PORT_PREFIX/lib -Wl,-rpath,$PORT_PREFIX/lib" PKG_CONFIG_PATH=""
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -823,32 +878,6 @@ DEF
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/homebrew-tcl-tk/lib/pkgconfig"
 Python-3.6.2: --prefix=${TMP}/install --enable-shared --libdir=${TMP}/install/lib
-make -j 2
-make install
-OUT
-}
-
-@test "MacPorts is not touched if PYTHON_BUILD_SKIP_MACPORTS is set" {
-  cached_tarball "Python-3.6.2"
-
-  for i in {1..4}; do stub uname '-s : echo Darwin'; done
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 1010'; done
-  stub port true; port
-  stub_make_install
-  export PYTHON_BUILD_SKIP_MACPORTS=1
-
-  run_inline_definition <<DEF
-install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
-DEF
-  assert_success
-
-  unstub uname
-  unstub port
-  unstub make
-
-  assert_build_log <<OUT
-Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
-Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
