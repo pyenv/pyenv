@@ -867,7 +867,6 @@ build_package_standard_build() {
       else
         use_homebrew_zlib || true
       fi
-      use_homebrew || true
     fi
     if can_use_macports; then
       use_custom_tcltk || true
@@ -878,6 +877,11 @@ build_package_standard_build() {
       else
         use_macports_zlib || true
       fi
+    fi
+    if can_use_homebrew; then
+      use_homebrew || true
+    fi
+    if can_use_macports; then
       use_macports || true
     fi
 
@@ -1484,7 +1488,7 @@ prepend_ldflags_libs() {
 }
 
 use_homebrew() {
-  locked_in homebrew || return 1
+  can_use_homebrew || return 1
   # unless Homebrew is at the default /usr/local, need to add its paths to
   # compiler search to be able to use non-keg-only deps from there
   if command -v brew &>/dev/null; then
@@ -1493,17 +1497,19 @@ use_homebrew() {
     if [[ -n $brew_prefix && $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ]]; then
       export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${brew_prefix}/include"
       append_ldflags_libs "-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
+      lock_in homebrew
     fi
   fi
 }
 
 use_macports() {
-  locked_in macports || return 1
+  can_use_macports || return 1
   local port_location="$(command -v port)"
   if [ -n "$port_location" ]; then
     local prefix="${port_location%/bin/port}"
     export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${prefix}/include"
     append_ldflags_libs "-L${prefix}/lib -Wl,-rpath,${prefix}/lib"
+    lock_in macports
   fi
 }
 
