@@ -2434,6 +2434,12 @@ if [ -z "${GET_PIP_URL}" ]; then
     3.6 | 3.6.* | pypy3.6 | pypy3.6-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.6/get-pip.py"
       ;;
+    3.7 | 3.7.* | pypy3.7 | pypy3.7-* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.7/get-pip.py"
+      ;;
+    3.8 | 3.8.* | pypy3.8 | pypy3.8-* | pyston* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.8/get-pip.py"
+      ;;
     * )
       GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
       ;;
