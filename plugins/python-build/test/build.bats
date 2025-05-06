@@ -309,7 +309,6 @@ OUT
 
   stub uname '-s : echo FreeBSD'
   stub uname '-r : echo 11.0-RELEASE'
-  stub uname '-s : echo FreeBSD'
   stub sysctl '-n hw.ncpu : echo 1'
 
   stub pkg "info -e openssl : true"
@@ -343,7 +342,6 @@ OUT
 
     stub uname '-s : echo FreeBSD'
     stub uname '-r : echo 11.0-RELEASE'
-    stub uname '-s : echo FreeBSD'
     stub sysctl '-n hw.ncpu : echo 1'
 
     stub pkg false
