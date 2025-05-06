@@ -808,10 +808,8 @@ OUT
 @test "make on FreeBSD 9 defaults to gmake" {
   cached_tarball "Python-3.6.2"
 
-  stub uname "-s : echo FreeBSD" "-r : echo 9.1"
-  for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
+  stub uname "-s : echo FreeBSD"
   stub uname "-r : echo 9.1"
-  for i in {1..3}; do stub uname "-s : echo FreeBSD"; done
 
   MAKE=gmake stub_make_install
 
@@ -825,10 +823,8 @@ OUT
 @test "make on FreeBSD 10" {
   cached_tarball "Python-3.6.2"
 
-  stub uname "-s : echo FreeBSD" "-r : echo 10.0-RELEASE"
-  for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
+  stub uname "-s : echo FreeBSD"
   stub uname "-r : echo 10.0-RELEASE"
-  for i in {1..3}; do stub uname "-s : echo FreeBSD"; done
 
   stub_make_install
 
@@ -841,10 +837,8 @@ OUT
 @test "make on FreeBSD 11" {
   cached_tarball "Python-3.6.2"
 
-  stub uname "-s : echo FreeBSD" "-r : echo 11.0-RELEASE"
-  for i in {1..6}; do stub uname "-s : echo FreeBSD"; done
+  stub uname "-s : echo FreeBSD"
   stub uname "-r : echo 11.0-RELEASE"
-  for i in {1..3}; do stub uname "-s : echo FreeBSD"; done
 
   stub_make_install
 

@@ -1464,7 +1464,7 @@ use_freebsd_pkg() {
     fi
 
     # check if 11-R or later
-    release="$(uname -r)"
+    release="${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}"
     if [ "${release%%.*}" -ge 11 ]; then
       # Use packages from Ports Collection.
       #
@@ -2255,7 +2255,7 @@ if [ -z "$MAKE" ]; then
     if [ "$(echo $1 | sed 's/-.*$//')" = "jruby" ]; then
       export MAKE="gmake"
     else
-      if [ "$(uname -r | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
+      if [ "echo ${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)} | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
         export MAKE="gmake"
       else
         export MAKE="make"
