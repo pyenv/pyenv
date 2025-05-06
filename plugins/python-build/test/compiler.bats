@@ -10,7 +10,7 @@ export -n PYTHON_CONFIGURE_OPTS
 @test "require_gcc on OS X 10.9" {
 
   stub uname '-s : echo Darwin'
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 10.9.5'; done
+  stub sw_vers '-productVersion : echo 10.9.5'
 
   stub gcc '--version : echo 4.2.1'
 
@@ -32,7 +32,7 @@ OUT
 
 @test "require_gcc on OS X 10.10" {
   stub uname '-s : echo Darwin'
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
+  stub sw_vers '-productVersion : echo 10.10'
 
   stub gcc '--version : echo 4.2.1'
 
@@ -70,7 +70,7 @@ DEF
   cd "$INSTALL_ROOT"
 
   stub uname '-s : echo Darwin'
-  for i in {1..3}; do stub sw_vers '-productVersion : echo 10.10'; done
+  stub sw_vers '-productVersion : echo 10.10'
 
   stub cc 'false'
   stub brew 'false'

@@ -347,7 +347,7 @@ OUT
 @test "default MACOSX_DEPLOYMENT_TARGET" {
   # yyuu/pyenv#257
   stub uname '-s : echo Darwin'
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
+  stub sw_vers '-productVersion : echo 10.10'
 
   TMPDIR="$TMP" run_inline_definition <<OUT
 echo "\${MACOSX_DEPLOYMENT_TARGET}"

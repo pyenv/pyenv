@@ -621,7 +621,7 @@ OUT
   cached_tarball "Python-3.6.2"
 
   stub uname '-s : echo Darwin'
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
+  stub sw_vers '-productVersion : echo 10.10'
 
   stub sysctl false
   stub_make_install
@@ -648,7 +648,7 @@ OUT
   cached_tarball "Python-3.6.2"
 
   stub uname '-s : echo Darwin'
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
+  stub sw_vers '-productVersion : echo 10.10'
 
   stub sysctl '-n hw.ncpu : echo 4'
   stub_make_install
