@@ -675,7 +675,6 @@ OUT
 
   stub uname '-s : echo FreeBSD'
   stub uname '-r : echo 11.0-RELEASE'
-  stub uname '-s : echo FreeBSD'
   for i in {1..3}; do stub pkg false; done
 
   stub sysctl '-n hw.ncpu : echo 1'
