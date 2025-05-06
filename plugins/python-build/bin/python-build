@@ -2255,7 +2255,7 @@ if [ -z "$MAKE" ]; then
     if [ "$(echo $1 | sed 's/-.*$//')" = "jruby" ]; then
       export MAKE="gmake"
     else
-      if [ "$(echo ${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)} | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
+      if [ "$(sed 's/[^[:digit:]].*//' <<<"${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}")" -lt 10 ]; then
         export MAKE="gmake"
       else
         export MAKE="make"
