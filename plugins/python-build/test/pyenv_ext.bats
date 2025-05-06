@@ -254,6 +254,7 @@ OUT
   unset framework_path executable
 
   stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
 
   PYTHON_CONFIGURE_OPTS="--enable-framework" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
@@ -275,6 +276,7 @@ EOS
 @test "enable universalsdk" {
   
   stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
   stub arch "echo x86_64"
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
@@ -293,6 +295,7 @@ EOS
 @test "enable universalsdk on Apple Silicon" {
 
   stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 11.7'
   stub arch "echo arm64"
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
@@ -311,6 +314,7 @@ EOS
 @test "enable universalsdk with explicit archs argument" {
 
   stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 11.7'
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk --with-universal-archs=foo" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
