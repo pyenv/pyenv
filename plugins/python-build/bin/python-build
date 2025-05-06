@@ -106,7 +106,7 @@ os_information() {
   if type -p lsb_release >/dev/null; then
     lsb_release -sir | xargs echo
   elif type -p sw_vers >/dev/null; then
-    echo "OS X $(sw_vers -productVersion)"
+    echo "OS X ${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)}"
   elif [ -r /etc/os-release ]; then
     source /etc/os-release
     echo "$NAME" $VERSION_ID
@@ -117,7 +117,7 @@ os_information() {
 }
 
 is_mac() {
-  [ "$(uname -s)" = "Darwin" ] || return 1
+  [ "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" = "Darwin" ] || return 1
   [ $# -eq 0 ] || [ "$(osx_version)" "$@" ]
 }
 
@@ -140,7 +140,7 @@ can_use_homebrew() {
 # 10.10 -> 1010
 osx_version() {
   local -a ver
-  IFS=. ver=( `sw_vers -productVersion` )
+  IFS=. ver=( ${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)} )
   IFS="$OLDIFS"
   echo $(( ${ver[0]}*100 + ${ver[1]} ))
 }
@@ -179,7 +179,7 @@ file_is_not_empty() {
 
 num_cpu_cores() {
   local num
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   Darwin | *BSD )
     num="$(sysctl -n hw.ncpu 2>/dev/null || true)"
     ;;
@@ -971,7 +971,7 @@ build_package_micropython() {
 }
 
 pypy_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
     case "$(uname -m)" in
     "arm64" ) echo "osarm64" ;;
@@ -1003,7 +1003,7 @@ pypy_architecture() {
 }
 
 graalpy_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
     case "$(uname -m)" in
     "x86_64" ) echo "macos-amd64" ;;
@@ -1084,7 +1084,7 @@ build_package_pypy_builder() {
 }
 
 activepython_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" ) echo "macosx10.9-i386-x86_64" ;;
   "Linux" )
     case "$(uname -m)" in
@@ -1104,7 +1104,7 @@ build_package_activepython() {
 }
 
 anaconda_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
     case "$(uname -m)" in
     "arm64" ) echo "MacOSX-arm64" ;;
@@ -1381,7 +1381,7 @@ require_osx_version() {
   function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
   local required_version="$@"
-  local osx_version="$(sw_vers -productVersion)"
+  local osx_version="${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)}"
   if [[ $(version $osx_version) -ge $(version $required_version) ]]; then
     return 0
   fi
@@ -1457,7 +1457,7 @@ use_homebrew_yaml() {
 
 use_freebsd_pkg() {
   # check if FreeBSD
-  if [ "FreeBSD" = "$(uname -s)" ]; then
+  if [ "FreeBSD" = "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" ]; then
     # use openssl if installed from Ports Collection
     if pkg info -e openssl; then
       package_option python configure --with-openssl="/usr/local"
@@ -2251,7 +2251,7 @@ if [ -n "$noexec" ]; then
 fi
 
 if [ -z "$MAKE" ]; then
-  if [ "FreeBSD" = "$(uname -s)" ]; then
+  if [ "FreeBSD" = "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" ]; then
     if [ "$(echo $1 | sed 's/-.*$//')" = "jruby" ]; then
       export MAKE="gmake"
     else
