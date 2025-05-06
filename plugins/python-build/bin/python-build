@@ -2255,7 +2255,9 @@ if [ -z "$MAKE" ]; then
     if [ "$(echo $1 | sed 's/-.*$//')" = "jruby" ]; then
       export MAKE="gmake"
     else
-      if [ "$(sed 's/[^[:digit:]].*//')" -lt 10 ]<<<"${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}"; then
+      # var assignment inside $() does not propagate due to being in subshell
+      _PYTHON_BUILD_CACHE_UNAME_R="${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}"
+      if [ "$(echo "$_PYTHON_BUILD_CACHE_UNAME_R" | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
         export MAKE="gmake"
       else
         export MAKE="make"
