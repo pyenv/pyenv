@@ -2256,7 +2256,7 @@ if [ -z "$MAKE" ]; then
       export MAKE="gmake"
     else
       # var assignment inside $() does not propagate due to being in subshell
-      _PYTHON_BUILD_CACHE_UNAME_R="${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}"
+      : "${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}"
       if [ "$(echo "$_PYTHON_BUILD_CACHE_UNAME_R" | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
         export MAKE="gmake"
       else
