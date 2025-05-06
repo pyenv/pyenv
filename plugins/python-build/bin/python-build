@@ -2450,7 +2450,7 @@ fi
 # Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
 if is_mac; then
   if [ -z "${MACOSX_DEPLOYMENT_TARGET}" ]; then
-    MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null || true)"
+    MACOS_VERSION="${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)}"
     MACOS_VERSION_ARRAY=(${MACOS_VERSION//\./ })
     if [ "${#MACOS_VERSION_ARRAY[@]}" -ge 2 ]; then
       export MACOSX_DEPLOYMENT_TARGET="${MACOS_VERSION_ARRAY[0]}.${MACOS_VERSION_ARRAY[1]}"
