@@ -134,7 +134,7 @@ can_use_homebrew() {
   is_mac && command -v brew &>/dev/null && return 0
   # In Linux, if Pyenv itself is installed with Homebrew,
   # we assume the user wants to take dependencies from there as well by default
-  command -v brew &>/dev/null && [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "$(brew --prefix 2>/dev/null ||true)")"/* ]] &&
+  command -v brew &>/dev/null && [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "$(brew --prefix)")"/* ]] &&
   { lock_in homebrew; return 0; }
   
   # do not check the same stuff multiple times
