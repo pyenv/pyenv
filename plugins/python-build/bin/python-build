@@ -2040,7 +2040,12 @@ build_package_verify_py313() {
 
 # Post-install check for Python 3.14.x
 build_package_verify_py314() {
-  build_package_verify_py313 "$1" "${2:-3.13}"
+  build_package_verify_py313 "$1" "${2:-3.14}"
+}
+
+# Post-install check for Python 3.15.x
+build_package_verify_py315() {
+  build_package_verify_py314 "$1" "${2:-3.15}"
 }
 
 # Post-install check for Python 3.x rolling release scripts

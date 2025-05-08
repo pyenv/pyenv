@@ -1,2 +1,0 @@
-export PYTHON_BUILD_FREE_THREADING=1
-source "$(dirname "${BASH_SOURCE[0]}")"/3.14.0a7
