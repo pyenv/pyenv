@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.5.7
+* Point 3.14-dev to `3.14` branch by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3246
+
 ## Release v2.5.6
 * Add GraalPy 24.2.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3238
 * Fix get-pip URLs for 3.7, 3.8 and Pyston by @dmrlawson in https://github.com/pyenv/pyenv/pull/3242
