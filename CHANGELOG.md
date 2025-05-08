@@ -1,5 +1,11 @@
 # Version History
 
+## Release v2.5.6
+* Add GraalPy 24.2.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3238
+* Fix get-pip URLs for 3.7, 3.8 and Pyston by @dmrlawson in https://github.com/pyenv/pyenv/pull/3242
+* [CI] Cache `uname` and `sw_vers` output in Python-Build for easier mocking in tests by @native-api in https://github.com/pyenv/pyenv/pull/3244
+* Add CPython 3.14.0b1 and 3.15-dev by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3245
+
 ## Release v2.5.5
 * Add graalpy 24.2 by @msimacek in https://github.com/pyenv/pyenv/pull/3215
 * Switch 3.9+ to OpenSSL 3 by @native-api in https://github.com/pyenv/pyenv/pull/3223
