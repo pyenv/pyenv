@@ -81,7 +81,12 @@ abs_dirname() {
       cd "$cd_path"
     fi
     name="${path##*/}"
-    path="$(resolve_link "$name" || true)"
+    if [[ $name == ".." ]]; then
+      cd ..
+      path="$PWD"
+    else
+      path="$(resolve_link "$name" || true)"
+    fi
   done
 
   echo "$PWD"
