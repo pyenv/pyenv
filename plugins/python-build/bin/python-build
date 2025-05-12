@@ -27,7 +27,6 @@ shopt -s extglob
 
 exec 3<&2 # preserve original stderr at fd 3
 
-
 lib() {
   parse_options() {
     OPTIONS=()
@@ -147,7 +146,7 @@ can_use_homebrew() {
   { lock_in homebrew; return 0; }
   
   # do not check the same stuff multiple times
-  declare -g PYTHON_BUILD_SKIP_HOMEBREW=1; return 1
+  PYTHON_BUILD_SKIP_HOMEBREW=1; return 1
 }
 
 can_use_macports() {
@@ -163,7 +162,7 @@ can_use_macports() {
   is_mac && command -v port &>/dev/null && return 0
 
   # do not check the same stuff multiple times
-  declare -g PYTHON_BUILD_SKIP_MACPORTS=1; return 1
+  PYTHON_BUILD_SKIP_MACPORTS=1; return 1
 }
 
 locked_in() {
@@ -175,7 +174,7 @@ locked_in() {
 }
 
 lock_in() {
-  declare -g _PYTHON_BUILD_ECOSYSTEM_LOCKED_IN=${1:?}
+  _PYTHON_BUILD_ECOSYSTEM_LOCKED_IN=${1:?}
 }
 
 #  9.1  -> 901
