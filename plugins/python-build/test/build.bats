@@ -70,6 +70,9 @@ assert_build_log() {
   install_fixture definitions/needs-yaml
   assert_success
 
+  unstub uname
+  unstub make
+
   assert_build_log <<OUT
 yaml-0.1.6: CFLAGS="" CPPFLAGS="-I${TMP}/install/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH=""
 yaml-0.1.6: --prefix=$INSTALL_ROOT
@@ -80,9 +83,6 @@ Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
 OUT
-
-  unstub uname
-  unstub make
 }
 
 @test "apply global and package-specific flags, package flags come later to have precedence" {

@@ -141,8 +141,9 @@ can_use_homebrew() {
   local brew_prefix
   command -v brew &>/dev/null && \
     # tests can have non-functional `brew' stub aliased to `false'
-    brew_prefix="$(brew --prefix)" && 
-    [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "${brew_prefix}")"/* ]] &&
+    # in Bash 3.2, var="$(cmd)" errexits on failure even if part of a conditional chain
+    brew_prefix="$(brew --prefix || true)" && [[ -n "$brew_prefix" ]] && \
+    [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "${brew_prefix}")"/* ]] && \
   { lock_in homebrew; return 0; }
   
   # do not check the same stuff multiple times
