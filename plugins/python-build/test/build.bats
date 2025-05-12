@@ -665,12 +665,9 @@ OUT
 @test "homebrew is used in Linux if Pyenv is installed with Homebrew" {
   cached_tarball "Python-3.6.2"
 
-  set -x
   BREW_PREFIX="$(type -p python-build)"
   BREW_PREFIX="${BREW_PREFIX%/*}"
-  BREW_PREFIX="$(cd "$BREW_PREFIX"; pwd)"
   BREW_PREFIX="${BREW_PREFIX%/*}"
-  set +x
 
   stub uname '-s : echo Linux'
   stub brew "--prefix : echo '$BREW_PREFIX'"
