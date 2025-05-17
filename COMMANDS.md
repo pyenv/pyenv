@@ -272,8 +272,15 @@ version of Python, or install a package that provides binaries.
 Displays the currently active Python version, along with information on
 how it was set.
 
+    Usage: pyenv version [--bare]
+
+    --bare    show just the version name. An alias to `pyenv version-name'
+
+
     $ pyenv version
     2.7.6 (set by /home/yyuu/.pyenv/version)
+    $ pyenv version --bare
+    2.7.6
 
 
 ## `pyenv versions`
