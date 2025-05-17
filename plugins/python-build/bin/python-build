@@ -1160,8 +1160,8 @@ setup_builtin_patches() {
     cat >"${package_name}.patch"
     HAS_PATCH=true
   elif [[ -d "${package_patch_path}" ]]; then
-    { find "${package_patch_path}" -maxdepth 1 -type f
-    } 2>/dev/null | sort | xargs cat 1>"${package_name}.patch"
+    { find "${package_patch_path}" -maxdepth 1 -type f -print0
+    } 2>/dev/null | sort -z | xargs -0 cat 1>"${package_name}.patch"
     HAS_PATCH=true
   fi
 }
