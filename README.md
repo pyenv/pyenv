@@ -180,31 +180,31 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 #### Bash
   <details>
 
-    Stock Bash startup files vary widely between distributions in which of them source
-    which, under what circumstances, in what order and what additional configuration they perform.
-    As such, the most reliable way to get Pyenv in all environments is to append Pyenv
-    configuration commands to both `.bashrc` (for interactive shells)
-    and the profile file that Bash would use (for login shells).
+  Stock Bash startup files vary widely between distributions in which of them source
+  which, under what circumstances, in what order and what additional configuration they perform.
+  As such, the most reliable way to get Pyenv in all environments is to append Pyenv
+  configuration commands to both `.bashrc` (for interactive shells)
+  and the profile file that Bash would use (for login shells).
 
   1. First, add the commands to `~/.bashrc` by running the following in your terminal:
 
       ```bash
-    echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+      echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
       echo 'eval "$(pyenv init - bash)"' >> ~/.bashrc
       ```
   2. Then, if you have `~/.profile`, `~/.bash_profile` or `~/.bash_login`, add the commands there as well.
      If you have none of these, create a `~/.profile` and add the commands there.
 
-    * to add to `~/.profile`:
+     * to add to `~/.profile`:
        ``` bash
-      echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
        echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
        echo 'eval "$(pyenv init - bash)"' >> ~/.profile
        ```
-    * to add to `~/.bash_profile`:
+     * to add to `~/.bash_profile`:
        ```bash
-      echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
+       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
        echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
        echo 'eval "$(pyenv init - bash)"' >> ~/.bash_profile
        ```
@@ -226,8 +226,8 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
     echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
     echo 'eval "$(pyenv init - zsh)"' >> ~/.zshrc
   ```
-
-    If you wish to get Pyenv in noninteractive login shells as well, also add the commands to `~/.zprofile` or `~/.zlogin`.
+  
+  If you wish to get Pyenv in noninteractive login shells as well, also add the commands to `~/.zprofile` or `~/.zlogin`.
   </details>
 
 #### Fish
@@ -235,21 +235,21 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
   <details>
 
   1. If you have Fish 3.2.0 or newer, execute this interactively:
-    ~~~ fish
-    set -Ux PYENV_ROOT $HOME/.pyenv
-    test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
-    ~~~
+     ```fish
+       set -Ux PYENV_ROOT $HOME/.pyenv
+       test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
+     ```
 
   2. Otherwise, execute the snippet below:
-    ~~~ fish
-    set -Ux PYENV_ROOT $HOME/.pyenv
-    test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
-    ~~~
+     ```fish
+       set -Ux PYENV_ROOT $HOME/.pyenv
+       test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+     ```
 
   3. Now, add this to `~/.config/fish/config.fish`:
-    ~~~ fish
+     ```fish
        pyenv init - fish | source
-    ~~~
+     ```
   </details>
 
 ### C. Restart your shell
