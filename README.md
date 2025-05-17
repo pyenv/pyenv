@@ -336,15 +336,14 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 
     ~~~ fish
     set -Ux PYENV_ROOT $HOME/.pyenv
-    mkdir -p $PYENV_ROOT/bin
-    fish_add_path $PYENV_ROOT/bin
+    test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
     ~~~
 
     Otherwise, execute the snippet below:
 
     ~~~ fish
     set -Ux PYENV_ROOT $HOME/.pyenv
-    set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+    test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
     ~~~
 
     Now, add this to `~/.config/fish/config.fish`:
