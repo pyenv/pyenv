@@ -2,9 +2,7 @@
 # Summary: Show the current Python version(s) and its origin
 # Usage: pyenv version [--bare]
 #
-# Shows the currently selected Python version(s) and how it was
-# selected. To obtain only the version string, use `pyenv version
-# --bare` or `pyenv version-name'.
+#     --bare    show just the version name. An alias to `pyenv version-name'
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
