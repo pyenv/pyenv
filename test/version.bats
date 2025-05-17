@@ -71,16 +71,11 @@ pyenv-version-without-stderr() {
 OUT
 }
 
-@test "--bare is an alias to pyenv-version-name" {
-  mkdir -p "$PYENV_TEST_DIR/bin"
-  export PATH="$PYENV_TEST_DIR/bin:$PATH"
-  echo >"$PYENV_TEST_DIR/bin/pyenv-version-name" <<!
-#!/bin/sh
-echo 'pyenv-version-name stub'
-!
+@test "--bare" {
+  create_version "3.3.3"
   run pyenv-version --bare
   assert_success
   assert_output <<OUT
-pyenv-version-name stub
+3.3.3
 OUT
 }
