@@ -83,7 +83,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 <details>
 
 The Homebrew option from the [MacOS section below](#macos) would also work if you have Homebrew installed.
-  
+
 ##### 1. Automatic installer (Recommended)
 
 ```bash
@@ -114,7 +114,7 @@ easy to fork and contribute any changes back upstream.
 #### MacOS
 
 <details>
-  
+
 The options from the [Linux section above](#linuxunix) also work but Homebrew is recommended for basic usage.
 
 ##### [Homebrew](https://brew.sh) in macOS
@@ -229,27 +229,27 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
   
   If you wish to get Pyenv in noninteractive login shells as well, also add the commands to `~/.zprofile` or `~/.zlogin`.
   </details>
-  
+
 #### Fish
-  
+
   <details>
-    
+
   1. If you have Fish 3.2.0 or newer, execute this interactively:
-     ~~~ fish
+     ```fish
        set -Ux PYENV_ROOT $HOME/.pyenv
-       fish_add_path $PYENV_ROOT/bin
-     ~~~
+       test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
+     ```
 
   2. Otherwise, execute the snippet below:
-     ~~~ fish
+     ```fish
        set -Ux PYENV_ROOT $HOME/.pyenv
-       set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
-     ~~~
+       test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+     ```
 
   3. Now, add this to `~/.config/fish/config.fish`:
-     ~~~ fish
+     ```fish
        pyenv init - fish | source
-     ~~~
+     ```
   </details>
 
 ### C. Restart your shell
