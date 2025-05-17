@@ -75,7 +75,7 @@ OUT
   mkdir -p "$PYENV_TEST_DIR/bin"
   export PATH="$PYENV_TEST_DIR/bin:$PATH"
   echo >"$PYENV_TEST_DIR/bin/pyenv-version-name" <<!
-#!/usr/bin/env bash
+#!/bin/sh
 echo 'pyenv-version-name stub'
 !
   run pyenv-version --bare
