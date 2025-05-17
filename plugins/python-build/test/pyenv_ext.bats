@@ -144,7 +144,7 @@ OUT
   echo "bar" | install_patch definitions/vanilla-python "Python-3.6.2/bar.patch"
   echo "baz" | install_patch definitions/vanilla-python "Python-3.6.2/baz.patch"
 
-  for i in {1..2}; do stub uname '-s : echo Linux'; done
+  stub uname '-s : echo Linux'
 
   TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
@@ -171,7 +171,7 @@ OUT
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
 
-  for i in {1..4}; do stub uname '-s : echo Darwin'; done
+  stub uname '-s : echo Darwin'
 
   PYTHON_MAKE_INSTALL_TARGET="altinstall" TMPDIR="$TMP" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
@@ -253,7 +253,8 @@ OUT
   done
   unset framework_path executable
 
-  for i in {1..3}; do stub uname '-s : echo Darwin'; done
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
 
   PYTHON_CONFIGURE_OPTS="--enable-framework" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
@@ -274,7 +275,8 @@ EOS
 
 @test "enable universalsdk" {
   
-  for i in {1..3}; do stub uname '-s : echo Darwin'; done
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
   stub arch "echo x86_64"
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
@@ -292,7 +294,8 @@ EOS
 
 @test "enable universalsdk on Apple Silicon" {
 
-  for i in {1..3}; do stub uname '-s : echo Darwin'; done
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 11.7'
   stub arch "echo arm64"
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$TMP" run_inline_definition <<OUT
@@ -310,7 +313,8 @@ EOS
 
 @test "enable universalsdk with explicit archs argument" {
 
-  for i in {1..3}; do stub uname '-s : echo Darwin'; done
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 11.7'
 
   PYTHON_CONFIGURE_OPTS="--enable-universalsdk --with-universal-archs=foo" TMPDIR="$TMP" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
@@ -325,7 +329,7 @@ EOS
   cached_tarball "Python-3.6.2"
 
   for i in {1..4}; do stub brew false; done
-  for i in {1..7}; do stub uname '-s : echo Linux'; done
+  stub uname '-s : echo Linux'
   stub "$MAKE" \
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
@@ -346,8 +350,8 @@ OUT
 
 @test "default MACOSX_DEPLOYMENT_TARGET" {
   # yyuu/pyenv#257
-  for i in {1..3}; do stub uname '-s : echo Darwin'; done
-  for i in {1..2}; do stub sw_vers '-productVersion : echo 10.10'; done
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 10.10'
 
   TMPDIR="$TMP" run_inline_definition <<OUT
 echo "\${MACOSX_DEPLOYMENT_TARGET}"
@@ -393,6 +397,14 @@ OUT
   assert_success
 }
 
+@test "use the custom GET_PIP_URL for 2.7 versions" {
+  run_inline_definition_with_name --name=2.7 <<OUT
+echo "\${GET_PIP_URL}"
+OUT
+  assert_output "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
+  assert_success
+}
+
 @test "use the custom GET_PIP_URL for 3.2 versions" {
   run_inline_definition_with_name --name=3.2 <<OUT
 echo "\${GET_PIP_URL}"
@@ -406,5 +418,53 @@ OUT
 echo "\${GET_PIP_URL}"
 OUT
   assert_output "https://bootstrap.pypa.io/pip/3.3/get-pip.py"
+  assert_success
+}
+
+@test "use the custom GET_PIP_URL for 3.4 versions" {
+  run_inline_definition_with_name --name=3.4 <<OUT
+echo "\${GET_PIP_URL}"
+OUT
+  assert_output "https://bootstrap.pypa.io/pip/3.4/get-pip.py"
+  assert_success
+}
+
+@test "use the custom GET_PIP_URL for 3.5 versions" {
+  run_inline_definition_with_name --name=3.5 <<OUT
+echo "\${GET_PIP_URL}"
+OUT
+  assert_output "https://bootstrap.pypa.io/pip/3.5/get-pip.py"
+  assert_success
+}
+
+@test "use the custom GET_PIP_URL for 3.6 versions" {
+  run_inline_definition_with_name --name=3.6 <<OUT
+echo "\${GET_PIP_URL}"
+OUT
+  assert_output "https://bootstrap.pypa.io/pip/3.6/get-pip.py"
+  assert_success
+}
+
+@test "use the custom GET_PIP_URL for pypy2.7 versions" {
+  run_inline_definition_with_name --name=pypy2.7-7.3.12 <<OUT
+echo "\${GET_PIP_URL}"
+OUT
+  assert_output "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
+  assert_success
+}
+
+@test "use the custom GET_PIP_URL for pypy3.5 versions" {
+  run_inline_definition_with_name --name=pypy3.5-7.0.0 <<OUT
+echo "\${GET_PIP_URL}"
+OUT
+  assert_output "https://bootstrap.pypa.io/pip/3.5/get-pip.py"
+  assert_success
+}
+
+@test "use the custom GET_PIP_URL for pypy3.6 versions" {
+  run_inline_definition_with_name --name=pypy3.6-7.3.3 <<OUT
+echo "\${GET_PIP_URL}"
+OUT
+  assert_output "https://bootstrap.pypa.io/pip/3.6/get-pip.py"
   assert_success
 }

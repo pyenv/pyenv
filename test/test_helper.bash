@@ -21,7 +21,7 @@ if [ -z "$PYENV_TEST_DIR" ]; then
 
   PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
   PATH="${PYENV_TEST_DIR}/bin:$PATH"
-  PATH="${BATS_TEST_DIRNAME}/../libexec:$PATH"
+  PATH="${BATS_TEST_DIRNAME%/*}/libexec:$PATH"
   PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
   PATH="${PYENV_ROOT}/shims:$PATH"
   export PATH

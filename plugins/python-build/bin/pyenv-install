@@ -158,7 +158,7 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
   # Try to resolve a prefix if user indeed gave a prefix.
   # We install the version under the resolved name
   # and hooks also see the resolved name
-  DEFINITION="$(pyenv-latest -q -k "$DEFINITION" || echo "$DEFINITION")"
+  DEFINITION="$(pyenv-latest -f -k "$DEFINITION")"
 
   # Set VERSION_NAME from $DEFINITION. Then compute the installation prefix.
   VERSION_NAME="${DEFINITION##*/}"

@@ -2,6 +2,18 @@
 
 load test_helper
 
+setup() {
+  export PATH="${PYENV_TEST_DIR}/bin:$PATH"
+}
+
+create_executable() {
+  local name="$1"
+  local bin="${PYENV_TEST_DIR}/bin"
+  mkdir -p "$bin"
+  sed -Ee '1s/^ +//' > "${bin}/$name"
+  chmod +x "${bin}/$name"
+}
+
 @test "creates shims and versions directories" {
   assert [ ! -d "${PYENV_ROOT}/shims" ]
   assert [ ! -d "${PYENV_ROOT}/versions" ]
@@ -23,12 +35,11 @@ load test_helper
   assert_line "command pyenv rehash 2>/dev/null"
 }
 
-
 @test "setup shell completions" {
-  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
+  exec_root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - bash
   assert_success
-  assert_line "source '${root}/test/../libexec/../completions/pyenv.bash'"
+  assert_line "source '${exec_root}/completions/pyenv.bash'"
 }
 
 @test "detect parent shell" {
@@ -51,16 +62,16 @@ OUT
 }
 
 @test "setup shell completions (fish)" {
-  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
+  exec_root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
   run pyenv-init - fish
   assert_success
-  assert_line "source '${root}/test/../libexec/../completions/pyenv.fish'"
+  assert_line "source '${exec_root}/completions/pyenv.fish'"
 }
 
 @test "fish instructions" {
   run pyenv-init fish
   assert [ "$status" -eq 1 ]
-  assert_line 'pyenv init - | source'
+  assert_line 'pyenv init - fish | source'
 }
 
 @test "shell detection for installer" {
@@ -165,6 +176,24 @@ echo "\$PATH"
   run pyenv-init - zsh
   assert_success
   assert_line '  case "$command" in'
+}
+
+@test "outputs sh-compatible case syntax" {
+  create_executable pyenv-commands <<!
+#!$BASH
+echo -e 'activate\ndeactivate\nrehash\nshell'
+!
+  run pyenv-init - bash
+  assert_success
+  assert_line '  activate|deactivate|rehash|shell)'
+
+  create_executable pyenv-commands <<!
+#!$BASH
+echo
+!
+  run pyenv-init - bash
+  assert_success
+  assert_line '  /)'
 }
 
 @test "outputs fish-specific syntax (fish)" {

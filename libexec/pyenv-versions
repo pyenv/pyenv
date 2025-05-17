@@ -128,9 +128,9 @@ print_version() {
 
 # Include "system" in the non-bare output, if it exists
 if [ -n "$include_system" ] && \
-    (PYENV_VERSION=system pyenv-which python >/dev/null 2>&1 || \
-     PYENV_VERSION=system pyenv-which python3 >/dev/null 2>&1 || \
-     PYENV_VERSION=system pyenv-which python2 >/dev/null 2>&1) ; then
+    (PYENV_VERSION=system pyenv-which python --skip-advice >/dev/null 2>&1 || \
+     PYENV_VERSION=system pyenv-which python3 --skip-advice >/dev/null 2>&1 || \
+     PYENV_VERSION=system pyenv-which python2 --skip-advice >/dev/null 2>&1) ; then
   print_version system "/"
 fi
 

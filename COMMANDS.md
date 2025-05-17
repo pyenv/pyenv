@@ -91,6 +91,10 @@ or, if you prefer 3.3.3 over 2.7.6,
     Python 3.3.3
 
 
+You can use the `-f/--force` flag to force setting versions even if some aren't installed.
+This is mainly useful in special cases like provisioning scripts.
+
+
 ## `pyenv global`
 
 Sets the global version of Python to be used in all shells by writing

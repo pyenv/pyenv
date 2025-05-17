@@ -1,0 +1,28 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Anaconda3-2023.09-0-Linux-aarch64" "https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-aarch64.sh#69ee26361c1ec974199bce5c0369e3e9a71541de7979d2b9cfa4af556d1ae0ea" "anaconda" verify_py311
+  ;;
+"Linux-ppc64le" )
+  install_script "Anaconda3-2023.09-0-Linux-ppc64le" "https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-ppc64le.sh#5ea1ed9808af95eb2655fe6a4ffdb66bea66ecd1d053fc2ee69eacc7685ef665" "anaconda" verify_py311
+  ;;
+"Linux-s390x" )
+  install_script "Anaconda3-2023.09-0-Linux-s390x" "https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-s390x.sh#ee817071a2ad94e044fb48061a721bc86606b2f4906b705e4f42177eeb3ca7c5" "anaconda" verify_py311
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda3-2023.09-0-Linux-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2023.09-0-Linux-x86_64.sh#6c8a4abb36fbb711dc055b7049a23bbfd61d356de9468b41c5140f8a11abd851" "anaconda" verify_py311
+  ;;
+"MacOSX-arm64" )
+  install_script "Anaconda3-2023.09-0-MacOSX-arm64" "https://repo.anaconda.com/archive/Anaconda3-2023.09-0-MacOSX-arm64.sh#34121775d9e30a6ea12af0a462e1881670b0c175b426e06fd7b1581625ebd69b" "anaconda" verify_py311
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda3-2023.09-0-MacOSX-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2023.09-0-MacOSX-x86_64.sh#0c64a2c634fe31335079d97340c277c81b3f0c9dfe862a06599570640ac897a4" "anaconda" verify_py311
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Anaconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

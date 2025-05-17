@@ -1,0 +1,81 @@
+VERSION='7.3.15'
+PYVER='2.7'
+
+# https://www.pypy.org/checksums.html
+aarch64_hash=31b41fca7280636d7818713b7a0fab8f34ece9c82cc88e51d305d43b3e6306d6
+linux32_hash=cb5c1da62a8ca31050173c4f6f537bc3ff316026895e5f1897b9bb526babae79
+linux64_hash=e857553bdc4f25ba9670a5c173a057a9ff71262d5c5da73a6ddef9d7dc5d4f5e
+osarm64_hash=618d33df7ac6570d88a58183e3e15c56f63f862968cecbd2ee896eac6255cea6
+osx64_hash=72dac262fc63115b6ccd2c3c15e7afd1b2e7a65d7e97265c116246d1cf2cdffd
+s390x_hash=eb442279ec3f1eb17da296e38b531d3ca50c6418eab208a020bca4646a1dea46
+
+### end of manual settings - following lines same for every download
+
+function err_no_binary {
+    local archmsg="${1}"
+    local ver="pypy${PYVER}-v${VERSION}-src"
+    local url="https://downloads.python.org/pypy/${ver}.tar.bz2"
+    { echo
+      colorize 1 "ERROR"
+      echo ": The binary distribution of PyPy is not available for ${archmsg}."
+      echo "try '${url}' to build from source."
+      echo
+    } >&2
+    exit 1
+}
+
+function pypy_pkg_data {
+    # pypy architecture tag
+    local ARCH="${1}"
+
+    # defaults
+    local cmd='install_package'  # use bz2
+    local pkg="${ARCH}" # assume matches
+    local ext='tar.bz2'
+    local hash='' # undefined
+
+    # select the hash, fix pkg if not match ARCH
+    case "${ARCH}" in
+    'linux-aarch64' )
+      hash="${aarch64_hash}"
+      pkg='aarch64'
+      ;;
+    'linux' )
+      hash="${linux32_hash}"
+      pkg='linux32'
+      ;;
+    'linux64' )
+      hash="${linux64_hash}"
+      ;;
+    'osarm64' )
+      hash="${osarm64_hash}"
+      pkg='macos_arm64'
+      ;;
+    'osx64' )
+      if require_osx_version "10.13"; then
+        hash="${osx64_hash}"
+        pkg='macos_x86_64'
+      else
+        err_no_binary "${ARCH}, OS X < 10.13"
+      fi
+      ;;
+    's390x' )
+      hash="${s390x_hash}"
+      ;;
+    * )
+      err_no_binary "${ARCH}"
+      ;;
+    esac
+
+    local basever="pypy${PYVER}-v${VERSION}"
+    local baseurl="https://downloads.python.org/pypy/${basever}"
+
+    # result - command, package dir, url+hash
+    echo "${cmd}" "${basever}-${pkg}" "${baseurl}-${pkg}.${ext}#${hash}"
+}
+
+# determine command, package directory, url+hash
+declare -a pd="$(pypy_pkg_data "$(pypy_architecture 2>/dev/null || true)")"
+
+# install
+${pd[0]} "${pd[1]}" "${pd[2]}" 'pypy' "verify_py${PYVER//./}" 'ensurepip_lt21'

@@ -1,0 +1,25 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Anaconda3-2024.06-1-Linux-aarch64" "https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Linux-aarch64.sh#b4be0ad2052236882402902a31d32cd37635d3db194a42f977be0d68a8ff1a31" "anaconda" verify_py312
+  ;;
+"Linux-s390x" )
+  install_script "Anaconda3-2024.06-1-Linux-s390x" "https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Linux-s390x.sh#1b3f4ef4147137fb1861f8251679ea96e651a7c405993c61e39441e43ee2dd11" "anaconda" verify_py312
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda3-2024.06-1-Linux-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Linux-x86_64.sh#539bb43d9a52d758d0fdfa1b1b049920ec6f8c6d15ee9fe4a423355fe551a8f7" "anaconda" verify_py312
+  ;;
+"MacOSX-arm64" )
+  install_script "Anaconda3-2024.06-1-MacOSX-arm64" "https://repo.anaconda.com/archive/Anaconda3-2024.06-1-MacOSX-arm64.sh#f9e0795431910ee4ac341c0cc2a0b62e6c497440789b4117c20736db45b34204" "anaconda" verify_py312
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda3-2024.06-1-MacOSX-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2024.06-1-MacOSX-x86_64.sh#9b2aa48bfc58e337176d8b5f3776692815807e1346ec12ebcc46a01801bb4ee0" "anaconda" verify_py312
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Anaconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

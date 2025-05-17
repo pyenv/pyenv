@@ -10,7 +10,7 @@ pyenv_install_resolve_latest() {
       $(python-build --definitions | \
         grep -F "${DEFINITION_PREFIX}" | \
         grep "^${DEFINITION_TYPE}" | \
-        sed -E -e '/-dev$/d' -e '/-src$/d' -e '/(b|rc)[0-9]+$/d' | \
+        sed -E -e '/-dev$/d' -e '/-src$/d' -e '/(b|rc)[0-9]+$/d' -e '/[0-9]+t$/d' | \
         sort -t. -k1,1r -k 2,2nr -k 3,3nr \
       || true))
     DEFINITION="${DEFINITION_CANDIDATES}"

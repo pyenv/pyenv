@@ -96,7 +96,53 @@ versions of Python that are not yet supported by python-build.
 See the [python-build built-in definitions](https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build) as a starting point for
 custom definition files.
 
-[definitions]: https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build
+#### Adding definitions with a Pyenv plugin
+
+You can add your own definitions with a [Pyenv plugin](https://github.com/pyenv/pyenv?tab=readme-ov-file#pyenv-plugins) by placing them under
+`$PYENV_ROOT/plugins/your_plugin_name/share/python-build`.
+
+### Default build configuration
+
+Without the user customizing the build with environment variables (see below),
+`python-build` builds Python with mostly default Configure options
+to maintain the principle of the least surprise.
+
+The exceptions -- non-default options that are set by default -- are listed below:
+
+| Option/Behavior | Rationale |
+|-----------------|-----------|
+| `--enable-shared` is on by default. Pass `--disable-shared` to Configure options to override | The official CPython Docker image uses it. It's required to embed CPython. |
+| argument to `--enable-universalsdk` is ignored and set to `/` | 
+| `--with-universal-archs` defaults to `universal2` on ARM64 architecture | the only dual-architecture Macs in use today are Apple Silicon which can only build that one |
+| argument to `--enable-framework` is ignored and set to a specific value | CPython's build logic requires a very specific argument to avoid installing the `Applications` part globally |
+| argument to `--enable-unicode` in non-MacOS is overridden to `ucs4` for 2.x-3.3 |
+| `MACOSX_DEPLOYMENT_TARGET` defaults to the running MacOS version |
+
+
+#### Integration with 3rd-party package ecosystems
+
+##### Homebrew
+
+Homebrew is used to find dependency packages if `brew` is found on `PATH`:
+* In MacOS, or
+* If the running Pyenv itself is installed with Homebrew
+
+Set `PYTHON_BUILD_USE_HOMEBREW` or `PYTHON_BUILD_SKIP_HOMEBREW` to override this default.
+
+When Homebrew is used, its `include` and `lib` paths are added to compiler search path (the latter is also set as `rpath`),
+and also Python dependencies that are typically keg-only are searched for in the Homebrew installation and added individually.
+
+**NOTE:** Homebrew is not used in Linux by default because it's rolling-release which causes a problem.
+Upgrading a Python dependency in Homebrew to a new major version (that `brew` does without warning)
+would break all Pyenv-managed installations that depend on it.
+You can use a [community plugin `fix-version`](https://github.com/pyenv/pyenv/wiki/Plugins#community-plugins)
+to fix installations in such a case.
+
+##### Portage
+
+In FreeBSD, if `pkg` is on PATH, Ports are searched for some dependencies that Configure is known to not search for via `pkg-config`.
+(Later versions of CPython search for more packages via `pkg-config` so this may eventually become redundant.)
+
 
 ### Special environment variables
 
@@ -113,22 +159,24 @@ You can set certain environment variables to control the build process.
   checksum of the file to the mirror URL.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
-* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew on macOS.
+* `PYTHON_BUILD_HTTP_CLIENT`, explicitly specify the HTTP client type to use. `aria2`, `curl` and `wget` are the supported values and by default, are searched in that order.
+* `PYTHON_BUILD_CURL_OPTS`, `PYTHON_BUILD_WGET_OPTS`, `PYTHON_BUILD_ARIA2_OPTS` pass additional parameters to the corresponding HTTP client.
+* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it would normally will.
+* `PYTHON_BUILD_USE_HOMEBREW`, if set, will search for libraries installed by Homebrew when it would normally not.
+* `PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA`, override the Homebrew OpenSSL formula to use.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
   in `share/python-build/` are looked up.
 * `PYTHON_BUILD_DEFINITIONS` can be a list of colon-separated paths that get
   additionally searched when looking up build definitions.
 * `CC` sets the path to the C compiler.
-* `PYTHON_CFLAGS` lets you pass additional options to the default `CFLAGS`. Use
-  this to override, for instance, the `-O3` option.
 * `CONFIGURE_OPTS` lets you pass additional options to `./configure`.
 * `MAKE` lets you override the command to use for `make`. Useful for specifying
   GNU make (`gmake`) on some systems.
 * `MAKE_OPTS` (or `MAKEOPTS`) lets you pass additional options to `make`.
 * `MAKE_INSTALL_OPTS` lets you pass additional options to `make install`.
-* `PYTHON_CONFIGURE_OPTS` and `PYTHON_MAKE_OPTS` and `PYTHON_MAKE_INSTALL_OPTS` allow
-  you to specify configure and make options for building CPython. These variables
-  will be passed to Python only, not any dependent packages (e.g. libyaml).
+* `<PACKAGE>_CFLAGS`, `<PACKAGE>_CPPFLAGS`, `<PACKAGE>_LDFLAGS` let you pass additional options to `CFLAGS`/`CPPFLAGS`/`LDFLAGS` specifically for building `<package>` (Python itself or a dependency library) from source as part of the build script. `<PACKAGE>` should be a capitalized name of the package without version (technically, capitalized first argument to `install_package` without version). E.g. for CPython, it's "`PYTHON`", for Readline, "`READLINE`", for PyPy (only applies when building it from source), "`PYPY`". Check the source of the build script you're using if unsure.
+* `<PACKAGE>_CONFIGURE_OPTS`, `<PACKAGE>_MAKE_OPTS`, `<PACKAGE>_MAKE_INSTALL_OPTS`, `<PACKAGE>_MAKE_INSTALL_TARGET` allow
+  you to specify configure and make options for building `<package>` (same as above). "Make install target" would replace "`install`" in the `make install` invocation.
 
 ### Applying patches to Python before compiling
 
@@ -150,20 +198,6 @@ $ cat fix1.patch fix2.patch | pyenv install --patch 2.7.10
 ```
 
 
-### Building with `--enable-shared`
-
-You can build CPython with `--enable-shared` to install a version with
-shared object.
-
-If `--enable-shared` was found in `PYTHON_CONFIGURE_OPTS` or `CONFIGURE_OPTS`,
-`python-build` will automatically set `RPATH` to the pyenv's prefix directory.
-This means you don't have to set `LD_LIBRARY_PATH` or `DYLD_LIBRARY_PATH` for
-the version(s) installed with `--enable-shared`.
-
-```sh
-$ env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 2.7.9
-```
-
 ### Building for maximum performance
 
 Building CPython with `--enable-optimizations` will result in a faster
@@ -172,7 +206,7 @@ enables PGO (profile guided optimization). While your mileage may vary, it is
 common for performance improvement from this to be in the ballpark of 30%.
 
 ```sh
-env PYTHON_CONFIGURE_OPTS='--enable-optimizations --with-lto' PYTHON_CFLAGS='-march=native -mtune=native' pyenv install 3.6.0
+env PYTHON_CONFIGURE_OPTS='--enable-optimizations --with-lto' PYTHON_CFLAGS='-march=native -mtune=native' pyenv install --verbose 3.6.0
 ```
 
 You can also customize the task used for profile guided optimization by setting
@@ -191,14 +225,30 @@ definition. (All bundled definitions include checksums.)
 ### Package download mirrors
 
 python-build will first attempt to download package files from a mirror hosted on
-GitHub Pages. If a package is not available on the mirror, if the mirror
-is down, or if the download is corrupt, python-build will fall back to the
+GitHub Pages. If this fails, it will fall back to the
 official URL specified in the definition file.
 
 You can point python-build to another mirror by specifying the
-`PYTHON_BUILD_MIRROR_URL` environment variable--useful if you'd like to run your
-own local mirror, for example. Package mirror URLs are constructed by joining
-this variable with the SHA2 checksum of the package file.
+`PYTHON_BUILD_MIRROR_URL` environment variable.
+
+Package mirror URLs are constructed by joining
+`$PYTHON_BUILD_MIRROR_URL` with the SHA2 checksum of the package file as specified in the URL
+in the installation script (the part after the hash sign). E.g.:
+
+```
+https://mycache.example.com/0419e9085bf51b7a672009b3f50dbf1859acdf18ba725d0ec19aa5c8503f0ea3
+```
+
+If you have replicated the directory structure of an official site, the easiest way to adapt
+would be to make symlinks at the mirror's root:
+
+```
+0419e9085bf51b7a672009b3f50dbf1859acdf18ba725d0ec19aa5c8503f0ea3 -> 3.10.10/Python-3.10.10.tar.xz
+```
+
+The rationale is to abstract away difference between directory structures of sites
+of various Python flavors and their occasional changes as well as to accomodate
+people who only wish to cache some select downloads. This also allows to mirror multiple sites at once.
 
 If the mirror being used does not have the same checksum (*e.g.* with a
 pull-through cache like Artifactory), you can set the
@@ -211,15 +261,15 @@ mirror by setting the `PYTHON_BUILD_SKIP_MIRROR` environment variable.
 The official python-build download mirror is provided by
 [GitHub Pages](http://yyuu.github.io/pythons/).
 
-### Package download caching
+### Package download cache
 
-You can instruct python-build to keep a local cache of downloaded package files
-by setting the `PYTHON_BUILD_CACHE_PATH` environment variable. When set, package
-files will be kept in this directory after the first successful download and
-reused by subsequent invocations of `python-build` and `pyenv install`.
+Python-build will keep a cache of downloaded package files
+at the location specified by the `PYTHON_BUILD_CACHE_PATH` environment variable
+if it exists. The default is `~/.pyenv/cache`, so you can
+enable caching by just creating that directory.
 
-The `pyenv install` command defaults this path to `~/.pyenv/cache`, so in most
-cases you can enable download caching simply by creating that directory.
+The name of the would-be cached file is reported by Pyenv in the "Downloading &lt;filename&gt;..." message.
+It's possible to warm up the cache by manually putting the file there under an appropriate name.
 
 ### Keeping the build directory after installation
 
