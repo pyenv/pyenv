@@ -73,7 +73,7 @@ OUT
 
 @test "--bare" {
   create_version "3.3.3"
-  run pyenv-version --bare
+  PYENV_VERSION=3.3.3 run pyenv-version --bare
   assert_success
   assert_output <<OUT
 3.3.3
