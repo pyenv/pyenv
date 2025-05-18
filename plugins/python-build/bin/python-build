@@ -19,6 +19,7 @@ PYTHON_BUILD_VERSION="20180424"
 OLDIFS="$IFS"
 
 set -E
+shopt -s extglob
 [ -n "$PYENV_DEBUG" ] && {
   export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
   set -x
@@ -105,7 +106,7 @@ os_information() {
   if type -p lsb_release >/dev/null; then
     lsb_release -sir | xargs echo
   elif type -p sw_vers >/dev/null; then
-    echo "OS X $(sw_vers -productVersion)"
+    echo "OS X ${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)}"
   elif [ -r /etc/os-release ]; then
     source /etc/os-release
     echo "$NAME" $VERSION_ID
@@ -116,7 +117,7 @@ os_information() {
 }
 
 is_mac() {
-  [ "$(uname -s)" = "Darwin" ] || return 1
+  [ "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" = "Darwin" ] || return 1
   [ $# -eq 0 ] || [ "$(osx_version)" "$@" ]
 }
 
@@ -139,7 +140,7 @@ can_use_homebrew() {
 # 10.10 -> 1010
 osx_version() {
   local -a ver
-  IFS=. ver=( `sw_vers -productVersion` )
+  IFS=. ver=( ${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)} )
   IFS="$OLDIFS"
   echo $(( ${ver[0]}*100 + ${ver[1]} ))
 }
@@ -178,7 +179,7 @@ file_is_not_empty() {
 
 num_cpu_cores() {
   local num
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   Darwin | *BSD )
     num="$(sysctl -n hw.ncpu 2>/dev/null || true)"
     ;;
@@ -397,7 +398,7 @@ http_get_aria2c() {
   fi
 
   if aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
-    [ -n "$2" ] || cat "${out}"
+    [ -n "$2" ] || cat "${dir_out:-.}/${out}"
   else
     false
   fi
@@ -557,7 +558,7 @@ download_tarball() {
 }
 
 has_tar_xz_support() {
-  tar Jcf - /dev/null 1>/dev/null 2>&1
+  [[ -z $_PYTHON_BUILD_FORCE_SKIP_XZ ]] && tar Jcf - /dev/null 1>/dev/null 2>&1
 }
 
 fetch_git() {
@@ -810,10 +811,12 @@ build_package_standard_build() {
   local PACKAGE_MAKE_OPTS="${package_var_name}_MAKE_OPTS"
   local PACKAGE_MAKE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
+  local PACKAGE_CPPFLAGS="${package_var_name}_CPPFLAGS"
+  local PACKAGE_LDFLAGS="${package_var_name}_LDFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
     use_homebrew || true
-    use_tcltk || true
+    use_custom_tcltk || use_homebrew_tcltk || true
     use_homebrew_readline || use_freebsd_pkg || true
     use_homebrew_ncurses || true
     if is_mac -ge 1014; then
@@ -822,10 +825,17 @@ build_package_standard_build() {
       use_homebrew_zlib || true
     fi
     use_dsymutil || true
+    use_free_threading || true
   fi
 
-  ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
-      export CFLAGS="$CFLAGS ${!PACKAGE_CFLAGS}"
+  ( if [[ -n "${!PACKAGE_CFLAGS}" ]]; then
+      export CFLAGS="${CFLAGS:+$CFLAGS }${!PACKAGE_CFLAGS}"
+    fi
+    if [[ -n "${!PACKAGE_CPPFLAGS}" ]]; then
+      export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }${!PACKAGE_CPPFLAGS}"
+    fi
+    if [[ -n "${!PACKAGE_LDFLAGS}" ]]; then
+      export LDFLAGS="${LDFLAGS:+$LDFLAGS }${!PACKAGE_LDFLAGS}"
     fi
     if [ -z "$CC" ] && is_mac -ge 1010; then
       export CC=clang
@@ -961,7 +971,7 @@ build_package_micropython() {
 }
 
 pypy_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
     case "$(uname -m)" in
     "arm64" ) echo "osarm64" ;;
@@ -993,7 +1003,7 @@ pypy_architecture() {
 }
 
 graalpy_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
     case "$(uname -m)" in
     "x86_64" ) echo "macos-amd64" ;;
@@ -1074,7 +1084,7 @@ build_package_pypy_builder() {
 }
 
 activepython_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" ) echo "macosx10.9-i386-x86_64" ;;
   "Linux" )
     case "$(uname -m)" in
@@ -1094,7 +1104,7 @@ build_package_activepython() {
 }
 
 anaconda_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
     case "$(uname -m)" in
     "arm64" ) echo "MacOSX-arm64" ;;
@@ -1150,8 +1160,8 @@ setup_builtin_patches() {
     cat >"${package_name}.patch"
     HAS_PATCH=true
   elif [[ -d "${package_patch_path}" ]]; then
-    { find "${package_patch_path}" -maxdepth 1 -type f
-    } 2>/dev/null | sort | xargs cat 1>"${package_name}.patch"
+    { find "${package_patch_path}" -maxdepth 1 -type f -print0
+    } 2>/dev/null | sort -z | xargs -0 cat 1>"${package_name}.patch"
     HAS_PATCH=true
   fi
 }
@@ -1371,7 +1381,7 @@ require_osx_version() {
   function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
   local required_version="$@"
-  local osx_version="$(sw_vers -productVersion)"
+  local osx_version="${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)}"
   if [[ $(version $osx_version) -ge $(version $required_version) ]]; then
     return 0
   fi
@@ -1447,14 +1457,14 @@ use_homebrew_yaml() {
 
 use_freebsd_pkg() {
   # check if FreeBSD
-  if [ "FreeBSD" = "$(uname -s)" ]; then
+  if [ "FreeBSD" = "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" ]; then
     # use openssl if installed from Ports Collection
     if pkg info -e openssl; then
       package_option python configure --with-openssl="/usr/local"
     fi
 
     # check if 11-R or later
-    release="$(uname -r)"
+    release="${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}"
     if [ "${release%%.*}" -ge 11 ]; then
       # Use packages from Ports Collection.
       #
@@ -1590,13 +1600,13 @@ build_package_mac_openssl() {
 
   local nokerberos
   [[ "$1" != openssl-1.0.* ]] || nokerberos=1
+  
+  # switches introduced in OpenSSL 3.2
+  local extra_no_features
+  [[ $(openssl_version $1) -ge 30200 ]] && extra_no_features=1
 
   # Compile a shared lib with zlib dynamically linked.
-  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5}
-
-  # Default MAKE_OPTS are -j 2 which can confuse the build. Thankfully, make
-  # gives precedence to the last -j option, so we can override that.
-  package_option openssl make -j 1
+  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5} ${extra_no_features:+no-docs no-apps} no-tests
 
   build_package_standard "$@"
 
@@ -1604,6 +1614,16 @@ build_package_mac_openssl() {
   local pem_file="$OPENSSLDIR/cert.pem"
   security find-certificate -a -p /Library/Keychains/System.keychain > "$pem_file"
   security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> "$pem_file"
+}
+
+# openssl-1.0.1k  -> 10001
+# openssl-3.2.1  -> 30201
+openssl_version() {
+  local -a ver
+  IFS=- ver=( ${1:?} )
+  IFS=. ver=( ${ver[1]} )
+  [[ ${ver[2]} =~ ^([[:digit:]]+)[[:alpha:]]$ ]] && ver[2]="${BASH_REMATCH[1]}"
+  echo $(( ${ver[0]}*10000 + ${ver[1]}*100 + ${ver[2]} ))
 }
 
 # Post-install check that the openssl extension was built.
@@ -1669,31 +1689,43 @@ use_xcode_sdk_zlib() {
 
 use_homebrew_tcltk() {
   can_use_homebrew || return 1
-  # get the version from the folder that homebrew versions
-  local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
-  if [ -d "$tcltk_libdir" ]; then
-    echo "python-build: use tcl-tk from homebrew"
-    if [[ -z "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
-      local tcltk_version="$(sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo $TCL_VERSION')"
-      package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
-      # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
-      # We're not using tclConfig.sh here 'cuz it produces the version-specific path to <brew prefix>/Cellar
-      # and we'd rather have rpath set to <brew prefix>/opt/<...> to allow micro release upgrades without rebuilding
-      # XXX: do use tclConfig.sh and translate the paths if more path shenanigans appear in later releases
-      if [ -d "$tcltk_libdir/include/tcl-tk" ]; then
-        package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include/tcl-tk"
-      else
-        package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+  # Since https://github.com/Homebrew/homebrew-core/commit/f10e88617b41555193c22fdcba6109fe82155ee2 (10.11.2024),
+  # tcl-tk is 9.0 which is not compatible with CPython as of this writing
+  # but we'll keep it as backup for cases like non-updated Homebrew
+  local tcltk
+  for tcltk in "tcl-tk@8" "tcl-tk"; do
+    local tcltk_libdir="$(brew --prefix "${tcltk}" 2>/dev/null || true)"
+    if [ -d "$tcltk_libdir" ]; then
+      echo "python-build: use tcl-tk from homebrew"
+      if [[ -z "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
+        local tcltk_version="$(sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo $TCL_VERSION')"
+        package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+        # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
+        # We're not using tclConfig.sh here 'cuz it produces the version-specific path to <brew prefix>/Cellar
+        # and we'd rather have rpath set to <brew prefix>/opt/<...> to allow micro release upgrades without rebuilding
+        # XXX: do use tclConfig.sh and translate the paths if more path shenanigans appear in later releases
+        if [ -d "$tcltk_libdir/include/tcl-tk" ]; then
+          package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include/tcl-tk"
+        else
+          package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+        fi
       fi
+      export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+      return 0
     fi
-    export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-  fi
+  done
+  return 1
 }
 
 # FIXME: this function is a workaround for #1125
 # once fixed, it should be removed.
+# if tcltk_ops_flag is in PYTHON_CONFIGURE_OPTS, use user provided tcltk
 use_custom_tcltk() {
-  local tcltk_ops="$1"
+  local tcltk_ops="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
+
+  if [[ -z "$tcltk_ops" ]]; then
+    return 1
+  fi
   local tcltk_ops_flag="--with-tcltk-libs="
   # get tcltk libs
   local tcltk_libs="${tcltk_ops//$tcltk_ops_flag/}"
@@ -1736,21 +1768,6 @@ get_tcltk_flag_from() {
   IFS="$OLDIFS"
 }
 
-use_tcltk() {
-  if can_use_homebrew; then
-    local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
-  fi
-  local tcl_tk_libs="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
-
-  # if tcltk_ops_flag is in PYTHON_CONFIGURE_OPTS, use user provided tcltk
-  # otherwise default to homebrew-installed tcl-tk, if installed
-  if [[ -n "$tcl_tk_libs" ]]; then
-    use_custom_tcltk "$tcl_tk_libs"
-  elif [ -d "$tcltk_libdir" ]; then
-    use_homebrew_tcltk
-  fi
-}
-
 # Since 3.12, CPython can add DWARF debug information in MacOS
 # using Apple's nonstandard way, `dsymutil', that creates a "dSYM bundle"
 # that's supposed to be installed alongside executables
@@ -1758,6 +1775,12 @@ use_tcltk() {
 use_dsymutil() {
   if [[ -n "$PYTHON_BUILD_CONFIGURE_WITH_DSYMUTIL" ]] && is_mac; then
     package_option python configure --with-dsymutil
+  fi
+}
+
+use_free_threading() {
+  if [[ -n "$PYTHON_BUILD_FREE_THREADING" ]]; then
+    package_option python configure --disable-gil
   fi
 }
 
@@ -1777,20 +1800,14 @@ build_package_auto_tcltk() {
   fi
 }
 
-# extglob must be set at both parse time and runtime
-# https://stackoverflow.com/questions/49283740/bash-script-throws-syntax-errors-when-the-extglob-option-is-set-inside-a-subsh
-shopt -s extglob
 package_is_python() {
-  shopt -s extglob
   case "$1" in
     Python-* | jython-* | pypy-* | pypy[0-9].+([0-9])-* | stackless-* )
       return 0
       ;;
   esac
   return 1
-  shopt -u extglob
 }
-shopt -u extglob
 
 apply_patch() {
   local package_name="$1"
@@ -2021,6 +2038,16 @@ build_package_verify_py313() {
   build_package_verify_py312 "$1" "${2:-3.13}"
 }
 
+# Post-install check for Python 3.14.x
+build_package_verify_py314() {
+  build_package_verify_py313 "$1" "${2:-3.14}"
+}
+
+# Post-install check for Python 3.15.x
+build_package_verify_py315() {
+  build_package_verify_py314 "$1" "${2:-3.15}"
+}
+
 # Post-install check for Python 3.x rolling release scripts
 # XXX: Will need splitting into project-specific ones if there emerge
 # multiple rolling-release scripts with different checks needed
@@ -2229,11 +2256,13 @@ if [ -n "$noexec" ]; then
 fi
 
 if [ -z "$MAKE" ]; then
-  if [ "FreeBSD" = "$(uname -s)" ]; then
+  if [ "FreeBSD" = "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" ]; then
     if [ "$(echo $1 | sed 's/-.*$//')" = "jruby" ]; then
       export MAKE="gmake"
     else
-      if [ "$(uname -r | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
+      # var assignment inside $() does not propagate due to being in subshell
+      : "${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}"
+      if [ "$(echo "$_PYTHON_BUILD_CACHE_UNAME_R" | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
         export MAKE="gmake"
       else
         export MAKE="make"
@@ -2296,7 +2325,6 @@ if [[ "$PYPY_OPTS" == *"--shared"* ]]; then
 fi
 
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
-shopt -s extglob
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   if ! is_mac; then
     echo "python-build: framework installation is not supported outside of MacOS." >&2
@@ -2322,10 +2350,8 @@ if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; the
   PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//--enable-framework?(=*([^ ]))?( )/}";
   PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS% }"
 fi
-shopt -u extglob
 
 # Build against universal SDK
-shopt -s extglob
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
   if ! is_mac; then
     echo "python-build: universal installation is not supported outside of MacOS." >&2
@@ -2347,7 +2373,6 @@ if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; 
     fi
   fi
 fi
-shopt -u extglob
 
 # Compile with `--enable-unicode=ucs4` by default (#257)
 if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
@@ -2416,6 +2441,12 @@ if [ -z "${GET_PIP_URL}" ]; then
     3.6 | 3.6.* | pypy3.6 | pypy3.6-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.6/get-pip.py"
       ;;
+    3.7 | 3.7.* | pypy3.7 | pypy3.7-* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.7/get-pip.py"
+      ;;
+    3.8 | 3.8.* | pypy3.8 | pypy3.8-* | pyston* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.8/get-pip.py"
+      ;;
     * )
       GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
       ;;
@@ -2426,7 +2457,7 @@ fi
 # Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
 if is_mac; then
   if [ -z "${MACOSX_DEPLOYMENT_TARGET}" ]; then
-    MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null || true)"
+    MACOS_VERSION="${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)}"
     MACOS_VERSION_ARRAY=(${MACOS_VERSION//\./ })
     if [ "${#MACOS_VERSION_ARRAY[@]}" -ge 2 ]; then
       export MACOSX_DEPLOYMENT_TARGET="${MACOS_VERSION_ARRAY[0]}.${MACOS_VERSION_ARRAY[1]}"
@@ -2442,6 +2473,7 @@ python_bin_suffix() {
     version_name="${version_name%-dev}"
     version_name="${version_name%-rc*}"
     version_name="${version_name%rc*}"
+    version_name="${version_name%%*([^0-9])}"
     version_info=(${version_name//./ })
     echo "${version_info[0]}.${version_info[1]}"
     ;;

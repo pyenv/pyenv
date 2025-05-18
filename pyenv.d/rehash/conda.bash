@@ -11,48 +11,62 @@ conda_exists() {
   [ -n "${condas}" ]
 }
 
-shims=()
-shopt -s nullglob
-for shim in $(cat "${BASH_SOURCE%/*}/conda.d/"*".list" | sort | uniq | sed -e 's/#.*$//' | sed -e '/^[[:space:]]*$/d'); do
-  if [ -n "${shim##*/}" ]; then
-    shims[${#shims[*]}]="${shim})return 0;;"
-  fi
-done
-shopt -u nullglob
-eval "conda_shim(){ case \"\${1##*/}\" in ${shims[@]} *)return 1;;esac;}"
-
-# override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`
-# https://github.com/pyenv/pyenv-virtualenv/blob/v20160716/etc/pyenv.d/rehash/envs.bash
-make_shims() {
-  local file shim
-  for file do
-    shim="${file##*/}"
-    if ! conda_shim "${shim}" 1>&2; then
-      register_shim "$shim"
-    fi
-  done
-}
-
-deregister_conda_shims() {
-  # adapted for Bash 4.x's associative array (#1749)
-  if declare -p registered_shims 2> /dev/null | grep -Eq '^(declare|typeset) -A'; then
-    for shim in ${!registered_shims[*]}; do
-      if conda_shim "${shim}" 1>&2; then
-        unset registered_shims[${shim}]
-      fi
-    done
-  else
-    local shim
-    local shims=()
-    for shim in ${registered_shims}; do
-      if ! conda_shim "${shim}" 1>&2; then
-        shims[${#shims[*]}]="${shim}"
-      fi
-    done
-    registered_shims=" ${shims[@]} "
-  fi
-}
-
 if conda_exists; then
+
+  # Reads the list of `blacklisted` conda binaries
+  # from `conda.d/default.list` and creates a function
+  # `conda_shim` to skip creating shims for those binaries.
+  build_conda_exclusion_list() {
+    shims=()
+    for shim in $(sed 's/#.*$//; /^[[:space:]]*$/d' "${BASH_SOURCE%/*}/conda.d/default.list"); do
+      if [ -n "${shim##*/}" ]; then
+        shims[${#shims[*]}]="${shim})return 0;;"
+      fi
+    done
+    eval \
+"conda_shim() {
+  case \"\${1##*/}\" in
+    ${shims[@]}
+    *) return 1;;
+  esac
+}"
+  }
+
+  # override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`
+  # https://github.com/pyenv/pyenv-virtualenv/blob/v20160716/etc/pyenv.d/rehash/envs.bash
+  # The only difference between this `make_shims` and the `make_shims` defined
+  # in `libexec/pyenv-rehash` is that this one calls `conda_shim` to check
+  # if shim is blacklisted. If blacklisted -> skip creating shim.
+  make_shims() {
+    local file shim
+    for file do
+      shim="${file##*/}"
+      if ! conda_shim "${shim}" 1>&2; then
+        register_shim "$shim"
+      fi
+    done
+  }
+
+  deregister_conda_shims() {
+    # adapted for Bash 4.x's associative array (#1749)
+    if declare -p registered_shims 2> /dev/null | grep -Eq '^(declare|typeset) -A'; then
+      for shim in ${!registered_shims[*]}; do
+        if conda_shim "${shim}" 1>&2; then
+          unset registered_shims[${shim}]
+        fi
+      done
+    else
+      local shim
+      local shims=()
+      for shim in ${registered_shims}; do
+        if ! conda_shim "${shim}" 1>&2; then
+          shims[${#shims[*]}]="${shim}"
+        fi
+      done
+      registered_shims=" ${shims[@]} "
+    fi
+  }
+
+  build_conda_exclusion_list
   deregister_conda_shims
 fi

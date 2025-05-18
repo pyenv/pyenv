@@ -100,10 +100,6 @@ if [ -n "${!_STUB_END}" ]; then
   rm -f "${!_STUB_RUN}"
   rm -f "${!_STUB_LOG}"
 
-  # Clean up the run file.
-  rm -f "${!_STUB_RUN}"
-  rm -f "${!_STUB_LOG}"
-
   # Return the result.
   exit "${!_STUB_RESULT}"
 

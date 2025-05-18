@@ -94,7 +94,7 @@ if [ "${bin_path%/*}" != "$PYENV_ROOT" ]; then
   # Add pyenv's own `pyenv.d` unless pyenv was cloned to PYENV_ROOT
   PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${bin_path%/*}/pyenv.d"
 fi
-PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib/pyenv/hooks"
+PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:/usr/etc/pyenv.d:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib/pyenv/hooks"
 for plugin_hook in "${PYENV_ROOT}/plugins/"*/etc/pyenv.d; do
   PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${plugin_hook}"
 done

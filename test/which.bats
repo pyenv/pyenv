@@ -71,7 +71,16 @@ create_executable() {
 @test "version not installed" {
   create_executable "3.4" "py.test"
   PYENV_VERSION=3.3 run pyenv-which py.test
-  assert_failure "pyenv: version \`3.3' is not installed (set by PYENV_VERSION environment variable)"
+  assert_failure <<OUT
+pyenv: version \`3.3' is not installed (set by PYENV_VERSION environment variable)
+pyenv: py.test: command not found
+   
+The \`py.test' command exists in these Python versions:
+  3.4
+
+ Note: See 'pyenv help global' for tips on allowing both
+       python2 and python3 to be found.
+OUT
 }
 
 @test "versions not installed" {
@@ -80,6 +89,13 @@ create_executable() {
   assert_failure <<OUT
 pyenv: version \`2.7' is not installed (set by PYENV_VERSION environment variable)
 pyenv: version \`3.3' is not installed (set by PYENV_VERSION environment variable)
+pyenv: py.test: command not found
+   
+The \`py.test' command exists in these Python versions:
+  3.4
+
+ Note: See 'pyenv help global' for tips on allowing both
+       python2 and python3 to be found.
 OUT
 }
 
@@ -137,6 +153,21 @@ SH
   assert_success "${PYENV_ROOT}/versions/3.4/bin/python"
 }
 
+@test "tolerates nonexistent versions from pyenv-version-name" {
+  mkdir -p "$PYENV_ROOT"
+  cat > "${PYENV_ROOT}/version" <<EOF
+2.7
+3.4
+EOF
+  create_executable "3.4" "python"
+
+  mkdir -p "$PYENV_TEST_DIR"
+  cd "$PYENV_TEST_DIR"
+
+  PYENV_VERSION= run pyenv-which python
+  assert_success "${PYENV_ROOT}/versions/3.4/bin/python"
+}
+
 @test "resolves pyenv-latest prefixes" {
   create_executable "3.4.2" "python"
   
@@ -154,4 +185,16 @@ exit
 
   PYENV_VERSION=3.4 run pyenv-which python
   assert_success "version=3.4.2"
+}
+
+@test "skip advice supresses error messages" {
+  create_executable "2.7" "python"
+  create_executable "3.3" "py.test"
+  create_executable "3.4" "py.test"
+
+  PYENV_VERSION=2.7 run pyenv-which py.test --skip-advice
+  assert_failure
+  assert_output <<OUT
+pyenv: py.test: command not found
+OUT
 }

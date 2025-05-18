@@ -11,8 +11,14 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 
 MINIFORGE_REPO = 'conda-forge/miniforge'
-PYTHON_VERSION = '310'
 DISTRIBUTIONS = ['miniforge', 'mambaforge']
+
+SKIPPED_RELEASES = [
+    '4.13.0-0',     #has no Mambaforge. We already generated scripts for Miniforge
+    '22.11.1-0',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
+    '22.11.1-1',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
+    '22.11.1-2',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
+]
 
 install_script_fmt = """
 case "$(anaconda_architecture 2>/dev/null || true)" in
@@ -38,7 +44,7 @@ here = Path(__file__).resolve()
 out_dir: Path = here.parent.parent / "share" / "python-build"
 
 def download_sha(url):
-    logger.debug('Downloading SHA file %(url)s', locals())
+    logger.info('Downloading SHA file %(url)s', locals())
     tup = tuple(reversed(requests.get(url).text.replace('./', '').rstrip().split()))
     logger.debug('Got %(tup)s', locals())
     return tup
@@ -56,7 +62,7 @@ def create_spec(filename, sha, url):
         'filename': filename,
         'sha': sha,
         'url': url,
-        'py_version': PYTHON_VERSION,
+        'py_version': py_version(version),
         'flavor': flavor,
         'os': os,
         'arch': arch,
@@ -67,13 +73,29 @@ def create_spec(filename, sha, url):
 
     return spec
 
+def py_version(release):
+    """Suffix for `verify_pyXXX` to call in the generated build script"""
+    release_line = tuple(int(part) for part in release.split(".")[:2])
+    # current version: mentioned under https://github.com/conda-forge/miniforge?tab=readme-ov-file#miniforge3
+    # transition points:
+    # https://github.com/conda-forge/miniforge/blame/main/Miniforge3/construct.yaml
+    # look for "- python <version>" in non-pypy branch and which tag the commit is first in
+    if release_line >= (24,5):
+        # yes, they jumped from 3.10 directly to 3.12
+        # https://github.com/conda-forge/miniforge/commit/bddad0baf22b37cfe079e47fd1680fdfb2183590
+        return "312"
+    if release_line >= (4,14):
+        return "310"
+    raise ValueError("Bundled Python version unknown for release `%s'"%release)
+
 def supported(filename):
     return ('pypy' not in filename) and ('Windows' not in filename)
 
 def add_version(release):
     tag_name = release['tag_name']
     download_urls = { f['name']: f['browser_download_url'] for f in release['assets'] }
-    shas = dict([download_sha(url) for (name, url) in download_urls.items() if name.endswith('.sha256') and tag_name in name])
+    # can assume that sha files are named similar to release files so can also check supported(on their names)
+    shas = dict([download_sha(url) for (name, url) in download_urls.items() if name.endswith('.sha256') and supported(os.path.basename(name)) and tag_name in name])
     specs = [create_spec(filename, sha, download_urls[filename]) for (filename, sha) in shas.items() if supported(filename)]
 
     for distribution in DISTRIBUTIONS:
@@ -104,7 +126,7 @@ for release in requests.get(f'https://api.github.com/repos/{MINIFORGE_REPO}/rele
     # Build scripts for miniforge3-4.13.0-0 have already been generated.
     # Assuming this was a fluke, we don't yet need to implement proactively checking all releases for contents
     # or ignoring a release if _any_ of the flavors is already present in Pyenv.
-    if version == '4.13.0-0':
+    if version in SKIPPED_RELEASES:
         continue
 
     if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in DISTRIBUTIONS):
