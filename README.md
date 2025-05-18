@@ -361,20 +361,13 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
     
   - For **Nushell**:
 
-    On MacOS or Linux, the path can be added like:
+    In MacOS or Linux, the path can be added like:
     
     ~~~ nu
-    $env.PATH = ($env.PATH | split row (char esep) | prepend $"(pyenv root)/shims")
-    ~~~
-
-    Windows users need to install [pyenv-win](https://github.com/pyenv-win/pyenv-win)
-    and execute the `Get-Command pyenv` command in PowerShell to get the path of `pyenv.ps1` after the installation.
-
-    The result usually looks like: `C:\Users\<your-username>\.pyenv\pyenv-win\bin\pyenv.ps1`
-
-    Then add the path of pyenv to your Nushell PATH:
-    ~~~ nu
-    $env.Path = ($env.Path | split row (char esep) | prepend $"~/.pyenv/pyenv-win/bin/pyenv.ps1")
+    $env.PYENV_ROOT = "~/.pyenv" | path expand
+    if (( [ $"($env.PYENV_ROOT)/bin" ] | path type ) == "dir") {
+      $env.PATH = $env.PATH | prepend $"($env.PYENV_ROOT)/bin" }
+    $env.PATH = $env.PATH | prepend $"(pyenv root)/shims"
     ~~~
 
    **Bash warning**: There are some systems where the `BASH_ENV` variable is configured
