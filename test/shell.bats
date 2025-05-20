@@ -51,7 +51,7 @@ load test_helper
 @test "shell revert (pwsh)" {
   PYENV_SHELL=pwsh run pyenv-sh-shell -
   assert_success
-  assert_line 0 'if set -q PYENV_VERSION_OLD'
+  assert_line 0 'if ( Get-Item -Path Env:\PYENV_VERSION* ) {'
 }
 
 @test "shell unset" {
