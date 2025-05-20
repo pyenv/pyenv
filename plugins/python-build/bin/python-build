@@ -1585,7 +1585,8 @@ use_freebsd_pkg() {
 has_broken_mac_readline() {
   # Mac OS X 10.4 has broken readline.
   # https://github.com/pyenv/pyenv/issues/23
-  if is_mac && ! configured_with_package_dir "python" "readline/rlconf.h"; then
+  is_mac || return 1
+  if ! configured_with_package_dir "python" "readline/rlconf.h"; then
     if can_use_homebrew; then
       use_homebrew_readline && return 1
     fi
