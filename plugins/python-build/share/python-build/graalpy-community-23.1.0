@@ -1,0 +1,54 @@
+# Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of
+# this software and associated documentation files (the "Software"), to deal in
+# the Software without restriction, including without limitation the rights to
+# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+# of the Software, and to permit persons to whom the Software is furnished to do
+# so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+VERSION='23.1.0'
+BUILD=''
+
+graalpy_arch="$(graalpy_architecture 2>/dev/null || true)"
+
+case "$graalpy_arch" in
+"linux-amd64" )
+  checksum="720334d90d52b5337db018ad6582953e9383c27188f08810250c2fe14a11db5a"
+  ;;
+"linux-aarch64" )
+  checksum="c7dc4f94413e667070f7d46f57af04c4db53383e721be9637b58cb030dfa1f58"
+  ;;
+"macos-amd64" )
+  checksum="13583382ba716231edce1b71d53e9efba776fef003ef2f515bda9c00a831779a"
+  ;;
+"macos-aarch64" )
+  checksum="5bc39af6938c507ec169b02a34237b6f4b286982e5be04b3109c171becc1949d"
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": No binary distribution of GraalPy is available for $(uname -sm)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
+
+if [ -n "${BUILD}" ]; then
+  url="https://github.com/graalvm/graalvm-ce-dev-builds/releases/download/${VERSION}-dev-${BUILD}/graalpy-community-dev-${graalpy_arch}.tar.gz"
+else
+  url="https://github.com/oracle/graalpython/releases/download/graal-${VERSION}/graalpy-community-${VERSION}-${graalpy_arch}.tar.gz#${checksum}"
+fi
+
+install_package "graalpy-community-${VERSION}${BUILD}" "${url}" "copy" ensurepip

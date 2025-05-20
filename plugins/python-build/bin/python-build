@@ -19,10 +19,13 @@ PYTHON_BUILD_VERSION="20180424"
 OLDIFS="$IFS"
 
 set -E
-[ -n "$PYENV_DEBUG" ] && set -x
+shopt -s extglob
+[ -n "$PYENV_DEBUG" ] && {
+  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+  set -x
+}
 
 exec 3<&2 # preserve original stderr at fd 3
-
 
 lib() {
   parse_options() {
@@ -77,7 +80,12 @@ abs_dirname() {
       cd "$cd_path"
     fi
     name="${path##*/}"
-    path="$(resolve_link "$name" || true)"
+    if [[ $name == ".." ]]; then
+      cd ..
+      path="$PWD"
+    else
+      path="$(resolve_link "$name" || true)"
+    fi
   done
 
   echo "$PWD"
@@ -102,7 +110,7 @@ os_information() {
   if type -p lsb_release >/dev/null; then
     lsb_release -sir | xargs echo
   elif type -p sw_vers >/dev/null; then
-    echo "OS X $(sw_vers -productVersion)"
+    echo "OS X ${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)}"
   elif [ -r /etc/os-release ]; then
     source /etc/os-release
     echo "$NAME" $VERSION_ID
@@ -113,13 +121,61 @@ os_information() {
 }
 
 is_mac() {
-  [ "$(uname -s)" = "Darwin" ] || return 1
+  [ "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" = "Darwin" ] || return 1
   [ $# -eq 0 ] || [ "$(osx_version)" "$@" ]
 }
 
 can_use_homebrew() {
-    [ -z "$PYTHON_BUILD_SKIP_HOMEBREW" ] || return 1
-    is_mac || return 1
+  if locked_in; then
+    locked_in homebrew && rc=$? || rc=$?; return $rc
+  fi
+  [[ -n "$PYTHON_BUILD_USE_HOMEBREW" && -n "$PYTHON_BUILD_SKIP_HOMEBREW" ]] && {
+    echo "error: mutually exclusive environment variables PYTHON_BUILD_USE_HOMEBREW and PYTHON_BUILD_SKIP_HOMEBREW are set" >&3
+    exit 1
+  }
+  [[ -n "$PYTHON_BUILD_USE_HOMEBREW" ]] && return 0
+  [[ -n "$PYTHON_BUILD_SKIP_HOMEBREW" ]] && return 1
+  is_mac && command -v brew &>/dev/null && return 0
+  # In Linux, if Pyenv itself is installed with Homebrew,
+  # we assume the user wants to take dependencies from there as well by default
+  local brew_prefix
+  command -v brew &>/dev/null && \
+    # tests can have non-functional `brew' stub aliased to `false'
+    # in Bash 3.2, var="$(cmd)" errexits on failure even if part of a conditional chain
+    brew_prefix="$(brew --prefix || true)" && [[ -n "$brew_prefix" ]] && \
+    [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "${brew_prefix}")"/* ]] && \
+  { lock_in homebrew; return 0; }
+  
+  # do not check the same stuff multiple times
+  PYTHON_BUILD_SKIP_HOMEBREW=1; return 1
+}
+
+can_use_macports() {
+  if locked_in; then
+    locked_in macports && rc=$? || rc=$?; return $rc
+  fi
+  [[ -n "$PYTHON_BUILD_USE_MACPORTS" && -n "$PYTHON_BUILD_SKIP_MACPORTS" ]] && {
+    echo "error: mutually exclusive environment variables PYTHON_BUILD_USE_MACPORTS and PYTHON_BUILD_SKIP_MACPORTS are set" >&3
+    exit 1
+  }
+  [[ -n "$PYTHON_BUILD_USE_MACPORTS" ]] && return 0
+  [[ -n "$PYTHON_BUILD_SKIP_MACPORTS" ]] && return 1
+  is_mac && command -v port &>/dev/null && return 0
+
+  # do not check the same stuff multiple times
+  PYTHON_BUILD_SKIP_MACPORTS=1; return 1
+}
+
+locked_in() {
+  if [[ -z "$1" ]]; then
+    [[ -n $_PYTHON_BUILD_ECOSYSTEM_LOCKED_IN ]]
+  else
+    [[ $_PYTHON_BUILD_ECOSYSTEM_LOCKED_IN == "$1" ]]
+  fi
+}
+
+lock_in() {
+  _PYTHON_BUILD_ECOSYSTEM_LOCKED_IN=${1:?}
 }
 
 #  9.1  -> 901
@@ -127,7 +183,7 @@ can_use_homebrew() {
 # 10.10 -> 1010
 osx_version() {
   local -a ver
-  IFS=. ver=( `sw_vers -productVersion` )
+  IFS=. ver=( ${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)} )
   IFS="$OLDIFS"
   echo $(( ${ver[0]}*100 + ${ver[1]} ))
 }
@@ -166,7 +222,7 @@ file_is_not_empty() {
 
 num_cpu_cores() {
   local num
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   Darwin | *BSD )
     num="$(sysctl -n hw.ncpu 2>/dev/null || true)"
     ;;
@@ -385,7 +441,7 @@ http_get_aria2c() {
   fi
 
   if aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
-    [ -n "$2" ] || cat "${out}"
+    [ -n "$2" ] || cat "${dir_out:-.}/${out}"
   else
     false
   fi
@@ -545,7 +601,7 @@ download_tarball() {
 }
 
 has_tar_xz_support() {
-  tar Jcf - /dev/null 1>/dev/null 2>&1
+  [[ -z $_PYTHON_BUILD_FORCE_SKIP_XZ ]] && tar Jcf - /dev/null 1>/dev/null 2>&1
 }
 
 fetch_git() {
@@ -798,21 +854,51 @@ build_package_standard_build() {
   local PACKAGE_MAKE_OPTS="${package_var_name}_MAKE_OPTS"
   local PACKAGE_MAKE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
   local PACKAGE_CFLAGS="${package_var_name}_CFLAGS"
+  local PACKAGE_CPPFLAGS="${package_var_name}_CPPFLAGS"
+  local PACKAGE_LDFLAGS="${package_var_name}_LDFLAGS"
 
   if [ "$package_var_name" = "PYTHON" ]; then
-    use_homebrew || true
-    use_tcltk || true
-    use_homebrew_readline || use_freebsd_pkg || true
-    if is_mac -ge 1014; then
-      use_xcode_sdk_zlib || use_homebrew_zlib || true
-    else
-      use_homebrew_zlib || true
+    if can_use_homebrew; then
+      use_custom_tcltk || use_homebrew_tcltk || true
+      use_homebrew_readline || true
+      use_homebrew_ncurses || true
+      if is_mac -ge 1014; then
+        use_xcode_sdk_zlib || use_homebrew_zlib || true
+      else
+        use_homebrew_zlib || true
+      fi
     fi
+    if can_use_macports; then
+      use_custom_tcltk || true
+      use_macports_readline || true
+      use_macports_ncurses || true
+      if is_mac -ge 1014; then
+        use_xcode_sdk_zlib || use_macports_zlib || true
+      else
+        use_macports_zlib || true
+      fi
+    fi
+    if can_use_homebrew; then
+      use_homebrew || true
+    fi
+    if can_use_macports; then
+      use_macports || true
+    fi
+
+    use_freebsd_pkg || true
+
     use_dsymutil || true
+    use_free_threading || true
   fi
 
-  ( if [ "${CFLAGS+defined}" ] || [ "${!PACKAGE_CFLAGS+defined}" ]; then
-      export CFLAGS="$CFLAGS ${!PACKAGE_CFLAGS}"
+  ( if [[ -n "${!PACKAGE_CFLAGS}" ]]; then
+      export CFLAGS="${CFLAGS:+$CFLAGS }${!PACKAGE_CFLAGS}"
+    fi
+    if [[ -n "${!PACKAGE_CPPFLAGS}" ]]; then
+      export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }${!PACKAGE_CPPFLAGS}"
+    fi
+    if [[ -n "${!PACKAGE_LDFLAGS}" ]]; then
+      export LDFLAGS="${LDFLAGS:+$LDFLAGS }${!PACKAGE_LDFLAGS}"
     fi
     if [ -z "$CC" ] && is_mac -ge 1010; then
       export CC=clang
@@ -924,7 +1010,13 @@ build_package_ironpython_builder() {
   ( cd "Stage/Release/IronPython-"* && build_package_ironpython )
 }
 
+build_package_micropython_1_9() {
+  # supported version 1.9.3 and 1.9.4
+  build_package_micropython "with_axtls"
+}
+
 build_package_micropython() {
+  # supported version 1.10 and higher
   if [ "${MAKEOPTS+defined}" ]; then
     MAKE_OPTS="$MAKEOPTS"
   elif [ -z "${MAKE_OPTS+defined}" ]; then
@@ -933,7 +1025,7 @@ build_package_micropython() {
   { cd mpy-cross
     "$MAKE" $MAKE_OPTS
     cd ../ports/unix
-    "$MAKE" $MAKE_OPTS axtls
+    [ "$1" = "with_axtls" ] && "$MAKE" $MAKE_OPTS axtls
     "$MAKE" $MAKE_OPTS CFLAGS_EXTRA="-DMICROPY_PY_SYS_PATH_DEFAULT='\".frozen:${PREFIX_PATH}/lib/micropython\"' $CFLAGS_EXTRA"
     "$MAKE" install $MAKE_INSTALL_OPTS PREFIX="${PREFIX_PATH}"
     ln -fs micropython "${PREFIX_PATH}/bin/python"
@@ -942,7 +1034,7 @@ build_package_micropython() {
 }
 
 pypy_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
     case "$(uname -m)" in
     "arm64" ) echo "osarm64" ;;
@@ -974,7 +1066,7 @@ pypy_architecture() {
 }
 
 graalpy_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
     case "$(uname -m)" in
     "x86_64" ) echo "macos-amd64" ;;
@@ -1055,7 +1147,7 @@ build_package_pypy_builder() {
 }
 
 activepython_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" ) echo "macosx10.9-i386-x86_64" ;;
   "Linux" )
     case "$(uname -m)" in
@@ -1075,7 +1167,7 @@ build_package_activepython() {
 }
 
 anaconda_architecture() {
-  case "$(uname -s)" in
+  case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
     case "$(uname -m)" in
     "arm64" ) echo "MacOSX-arm64" ;;
@@ -1131,8 +1223,8 @@ setup_builtin_patches() {
     cat >"${package_name}.patch"
     HAS_PATCH=true
   elif [[ -d "${package_patch_path}" ]]; then
-    { find "${package_patch_path}" -maxdepth 1 -type f
-    } 2>/dev/null | sort | xargs cat 1>"${package_name}.patch"
+    { find "${package_patch_path}" -maxdepth 1 -type f -print0
+    } 2>/dev/null | sort -z | xargs -0 cat 1>"${package_name}.patch"
     HAS_PATCH=true
   fi
 }
@@ -1352,7 +1444,7 @@ require_osx_version() {
   function version { echo "$@" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'; }
 
   local required_version="$@"
-  local osx_version="$(sw_vers -productVersion)"
+  local osx_version="${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)}"
   if [[ $(version $osx_version) -ge $(version $required_version) ]]; then
     return 0
   fi
@@ -1382,6 +1474,19 @@ configured_with_package_dir() {
   return 1
 }
 
+# `python-config` ignores LDFLAGS envvar. Adding to LIBS is the only way to add extra stuff
+# to `python-config --ldflags` output
+append_ldflags_libs() {
+  local args="$1"
+  export LDFLAGS="${LDFLAGS:+$LDFLAGS }$args"
+  export LIBS="${LIBS:+${LIBS% } }$args"
+}
+prepend_ldflags_libs() {
+  local args="$1"
+  export LDFLAGS="$args${LDFLAGS:+ $LDFLAGS}"
+  export LIBS="$args${LIBS:+ $LIBS}"
+}
+
 use_homebrew() {
   can_use_homebrew || return 1
   # unless Homebrew is at the default /usr/local, need to add its paths to
@@ -1391,17 +1496,31 @@ use_homebrew() {
     # /usr/local/lib:/usr/lib is the default library search path
     if [[ -n $brew_prefix && $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ]]; then
       export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${brew_prefix}/include"
-      export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
-      # `python-config` ignores LDFLAGS envvar. Adding to LIBS is the only way to add extra stuff
-      # to `python-config --ldflags` output
-      export LIBS="${LIBS:+${LIBS% } }-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
+      append_ldflags_libs "-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
+      lock_in homebrew
     fi
   fi
 }
 
+use_macports() {
+  can_use_macports || return 1
+  local port_location="$(command -v port)"
+  if [ -n "$port_location" ]; then
+    local prefix="${port_location%/bin/port}"
+    export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${prefix}/include"
+    append_ldflags_libs "-L${prefix}/lib -Wl,-rpath,${prefix}/lib"
+    lock_in macports
+  fi
+}
+
 needs_yaml() {
-  ! configured_with_package_dir "python" "yaml.h" &&
-  ! use_homebrew_yaml
+  if ! configured_with_package_dir "python" "yaml.h"; then
+    if can_use_homebrew; then
+      use_homebrew_yaml && return 1
+    elif can_use_macports; then
+      use_macports_yaml && return 1
+    fi
+  fi
 }
 
 use_homebrew_yaml() {
@@ -1411,6 +1530,23 @@ use_homebrew_yaml() {
     echo "python-build: use libyaml from homebrew"
     export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
     export LDFLAGS="-L$libdir/lib${LDFLAGS:+ ${LDFLAGS% }}"
+    lock_in homebrew
+  else
+    return 1
+  fi
+}
+
+use_macports_yaml() {
+  can_use_macports || return 1
+  local prefix="$(port -q location libyaml 2>/dev/null || true)"
+  if [ -n "$prefix" ]; then
+    local libdir="$prefix/opt/local"
+    if [ -d "$libdir" ]; then
+      echo "python-build: use libyaml from MacPorts"
+      export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+      export LDFLAGS="-L$libdir/lib${LDFLAGS:+ ${LDFLAGS% }}"
+      lock_in macports
+    fi
   else
     return 1
   fi
@@ -1418,14 +1554,14 @@ use_homebrew_yaml() {
 
 use_freebsd_pkg() {
   # check if FreeBSD
-  if [ "FreeBSD" = "$(uname -s)" ]; then
+  if [ "FreeBSD" = "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" ]; then
     # use openssl if installed from Ports Collection
-    if [ -f /usr/local/include/openssl/ssl.h ]; then
+    if pkg info -e openssl; then
       package_option python configure --with-openssl="/usr/local"
     fi
 
     # check if 11-R or later
-    release="$(uname -r)"
+    release="${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}"
     if [ "${release%%.*}" -ge 11 ]; then
       # Use packages from Ports Collection.
       #
@@ -1449,9 +1585,14 @@ use_freebsd_pkg() {
 has_broken_mac_readline() {
   # Mac OS X 10.4 has broken readline.
   # https://github.com/pyenv/pyenv/issues/23
-  is_mac &&
-  ! configured_with_package_dir "python" "readline/rlconf.h" &&
-  ! use_homebrew_readline
+  if is_mac && ! configured_with_package_dir "python" "readline/rlconf.h"; then
+    if can_use_homebrew; then
+      use_homebrew_readline && return 1
+    fi
+    if can_use_macports; then
+      use_macports_readline && return 1
+    fi
+  fi
 }
 
 use_homebrew_readline() {
@@ -1462,15 +1603,69 @@ use_homebrew_readline() {
       echo "python-build: use readline from homebrew"
       export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
       export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+      lock_in homebrew
     else
       return 1
     fi
   fi
 }
 
+use_macports_readline() {
+  can_use_macports || return 1
+  if ! configured_with_package_dir "python" "readline/rlconf.h"; then
+    local prefix="$(port -q location readline 2>/dev/null || true)"
+    if [ -n "$prefix" ]; then
+      local libdir="$prefix/opt/local"
+      if [ -d "$libdir" ]; then
+        echo "python-build: use readline from MacPorts"
+        export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+        export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+        lock_in macports
+      fi
+    else
+      return 1
+    fi
+  fi
+}
+
+use_homebrew_ncurses() {
+  can_use_homebrew || return 1
+  local libdir="$(brew --prefix ncurses 2>/dev/null || true)"
+  if [ -d "$libdir" ]; then
+    echo "python-build: use ncurses from homebrew"
+    export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+    export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+    lock_in homebrew
+  else
+    return 1
+  fi
+}
+
+use_macports_ncurses() {
+  can_use_macports || return 1
+  local prefix="$(port -q location ncurses 2>/dev/null || true)"
+  if [[ -n "$prefix" ]]; then
+    local libdir="$prefix/opt/local"
+    if [ -d "$libdir" ]; then
+      echo "python-build: use ncurses from MacPorts"
+      export CPPFLAGS="-I$libdir/include${CPPFLAGS:+ $CPPFLAGS}"
+      export LDFLAGS="-L$libdir/lib${LDFLAGS:+ $LDFLAGS}"
+      lock_in macports
+    fi
+  else
+    return 1
+  fi
+}
+
 prefer_openssl11() {
   # Allow overriding the preference of OpenSSL version per definition basis (#1302, #1325, #1326)
   PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@1.1 openssl}"
+  export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
+}
+
+prefer_openssl3() {
+  # Allow overriding the preference of OpenSSL version per definition basis (#1302, #1325, #1326)
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@1.1 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
 }
 
@@ -1491,8 +1686,14 @@ build_package_mac_readline() {
 has_broken_mac_openssl() {
   is_mac || return 1
   local openssl_version="$(/usr/bin/openssl version 2>/dev/null || true)"
-  [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]] &&
-  ! use_homebrew_openssl
+  if [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]]; then
+    if can_use_homebrew; then
+      use_homebrew_openssl && return 1
+    fi
+    if can_use_macports; then
+      use_macports_openssl && return 1
+    fi
+  fi
 }
 
 use_homebrew_openssl() {
@@ -1511,7 +1712,34 @@ use_homebrew_openssl() {
         export LDFLAGS="-L$ssldir/lib${LDFLAGS:+ $LDFLAGS}"
       fi
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
-      return
+      lock_in homebrew
+      return 0
+    fi
+  done
+  return 1
+}
+
+use_macports_openssl() {
+  can_use_macports || return 1
+  command -v port >/dev/null || return 1
+  for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
+    local ssldir="$(port -q location "${openssl}" 2>/dev/null || true)"
+    if [ -n "$ssldir" ]; then
+      ssldir="${ssldir}/opt/local"
+      if [ -d "$ssldir" ]; then
+        echo "python-build: use ${openssl} from MacPorts"
+        if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
+          # configure script of newer CPython versions support `--with-openssl`
+          # https://bugs.python.org/issue21541
+          package_option python configure --with-openssl="${ssldir}"
+        else
+          export CPPFLAGS="-I$ssldir/include ${CPPFLAGS:+ $CPPFLAGS}"
+          export LDFLAGS="-L$ssldir/lib${LDFLAGS:+ $LDFLAGS}"
+        fi
+      fi
+      export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
+      lock_in macports
+      return 0
     fi
   done
   return 1
@@ -1543,13 +1771,13 @@ build_package_mac_openssl() {
 
   local nokerberos
   [[ "$1" != openssl-1.0.* ]] || nokerberos=1
+  
+  # switches introduced in OpenSSL 3.2
+  local extra_no_features
+  [[ $(openssl_version $1) -ge 30200 ]] && extra_no_features=1
 
   # Compile a shared lib with zlib dynamically linked.
-  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5}
-
-  # Default MAKE_OPTS are -j 2 which can confuse the build. Thankfully, make
-  # gives precedence to the last -j option, so we can override that.
-  package_option openssl make -j 1
+  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5} ${extra_no_features:+no-docs no-apps} no-tests
 
   build_package_standard "$@"
 
@@ -1557,6 +1785,16 @@ build_package_mac_openssl() {
   local pem_file="$OPENSSLDIR/cert.pem"
   security find-certificate -a -p /Library/Keychains/System.keychain > "$pem_file"
   security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> "$pem_file"
+}
+
+# openssl-1.0.1k  -> 10001
+# openssl-3.2.1  -> 30201
+openssl_version() {
+  local -a ver
+  IFS=- ver=( ${1:?} )
+  IFS=. ver=( ${ver[1]} )
+  [[ ${ver[2]} =~ ^([[:digit:]]+)[[:alpha:]]$ ]] && ver[2]="${BASH_REMATCH[1]}"
+  echo $(( ${ver[0]}*10000 + ${ver[1]}*100 + ${ver[2]} ))
 }
 
 # Post-install check that the openssl extension was built.
@@ -1601,6 +1839,7 @@ use_homebrew_zlib() {
   if [ -d "$brew_zlib" ]; then
     echo "python-build: use zlib from homebrew"
     export CFLAGS="-I${brew_zlib} ${CFLAGS}"
+    lock_in homebrew
   fi
 }
 
@@ -1610,32 +1849,72 @@ use_xcode_sdk_zlib() {
   local xc_sdk_path="$(xcrun --show-sdk-path 2>/dev/null || true)"
   if [ -d "$xc_sdk_path" ]; then
     echo "python-build: use zlib from xcode sdk"
-    export CFLAGS="${CFLAGS:+$CFLAGS }-I${xc_sdk_path}/usr/include"
+    # Even though SDK's compiler uses the SDK dirs implicitly,
+    # CPython's setup.py has to have nonstandard paths specified explicitly
+    # to search for zlib.h in them
+    export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${xc_sdk_path}/usr/include"
     if is_mac -ge 1100; then
       export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${xc_sdk_path}/usr/lib"
     fi
   fi
 }
 
+use_macports_zlib() {
+  can_use_macports || return 1
+  local prefix="$(port -q location zlib 2>/dev/null || true)"
+  if [[ -n "$prefix" ]]; then
+      local libdir="$prefix/opt/local"
+      if [[ -d "$libdir" ]]; then
+        echo "python-build: use zlib from MacPorts"
+        export CPPFLAGS="-I$prefix/include ${CPPFLAGS}"
+        export LDFLAGS="-L$prefix/lib ${LDFLAGS}"
+        lock_in macports
+      fi
+  else
+    return 1
+  fi
+}
+
 use_homebrew_tcltk() {
   can_use_homebrew || return 1
-  # get the version from the folder that homebrew versions
-  local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
-  if [ -d "$tcltk_libdir" ]; then
-    echo "python-build: use tcl-tk from homebrew"
-    if [[ -z "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
-      local tcltk_version="$(sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo $TCL_VERSION')"
-      package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
-      package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+  # Since https://github.com/Homebrew/homebrew-core/commit/f10e88617b41555193c22fdcba6109fe82155ee2 (10.11.2024),
+  # tcl-tk is 9.0 which is not compatible with CPython as of this writing
+  # but we'll keep it as backup for cases like non-updated Homebrew
+  local tcltk
+  for tcltk in "tcl-tk@8" "tcl-tk"; do
+    local tcltk_libdir="$(brew --prefix "${tcltk}" 2>/dev/null || true)"
+    if [ -d "$tcltk_libdir" ]; then
+      echo "python-build: use tcl-tk from homebrew"
+      if [[ -z "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
+        local tcltk_version="$(sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo $TCL_VERSION')"
+        package_option python configure --with-tcltk-libs="-L$tcltk_libdir/lib -ltcl$tcltk_version -ltk$tcltk_version"
+        # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
+        # We're not using tclConfig.sh here 'cuz it produces the version-specific path to <brew prefix>/Cellar
+        # and we'd rather have rpath set to <brew prefix>/opt/<...> to allow micro release upgrades without rebuilding
+        # XXX: do use tclConfig.sh and translate the paths if more path shenanigans appear in later releases
+        if [ -d "$tcltk_libdir/include/tcl-tk" ]; then
+          package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include/tcl-tk"
+        else
+          package_option python configure --with-tcltk-includes="-I$tcltk_libdir/include"
+        fi
+      fi
+      export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+      lock_in homebrew
+      return 0
     fi
-    export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-  fi
+  done
+  return 1
 }
 
 # FIXME: this function is a workaround for #1125
 # once fixed, it should be removed.
+# if tcltk_ops_flag is in PYTHON_CONFIGURE_OPTS, use user provided tcltk
 use_custom_tcltk() {
-  local tcltk_ops="$1"
+  local tcltk_ops="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
+
+  if [[ -z "$tcltk_ops" ]]; then
+    return 1
+  fi
   local tcltk_ops_flag="--with-tcltk-libs="
   # get tcltk libs
   local tcltk_libs="${tcltk_ops//$tcltk_ops_flag/}"
@@ -1678,21 +1957,6 @@ get_tcltk_flag_from() {
   IFS="$OLDIFS"
 }
 
-use_tcltk() {
-  if can_use_homebrew; then
-    local tcltk_libdir="$(brew --prefix tcl-tk 2>/dev/null || true)"
-  fi
-  local tcl_tk_libs="$(get_tcltk_flag_from "$PYTHON_CONFIGURE_OPTS")"
-
-  # if tcltk_ops_flag is in PYTHON_CONFIGURE_OPTS, use user provided tcltk
-  # otherwise default to homebrew-installed tcl-tk, if installed
-  if [[ -n "$tcl_tk_libs" ]]; then
-    use_custom_tcltk "$tcl_tk_libs"
-  elif [ -d "$tcltk_libdir" ]; then
-    use_homebrew_tcltk
-  fi
-}
-
 # Since 3.12, CPython can add DWARF debug information in MacOS
 # using Apple's nonstandard way, `dsymutil', that creates a "dSYM bundle"
 # that's supposed to be installed alongside executables
@@ -1700,6 +1964,12 @@ use_tcltk() {
 use_dsymutil() {
   if [[ -n "$PYTHON_BUILD_CONFIGURE_WITH_DSYMUTIL" ]] && is_mac; then
     package_option python configure --with-dsymutil
+  fi
+}
+
+use_free_threading() {
+  if [[ -n "$PYTHON_BUILD_FREE_THREADING" ]]; then
+    package_option python configure --disable-gil
   fi
 }
 
@@ -1719,20 +1989,14 @@ build_package_auto_tcltk() {
   fi
 }
 
-# extglob must be set at both parse time and runtime
-# https://stackoverflow.com/questions/49283740/bash-script-throws-syntax-errors-when-the-extglob-option-is-set-inside-a-subsh
-shopt -s extglob
 package_is_python() {
-  shopt -s extglob
   case "$1" in
     Python-* | jython-* | pypy-* | pypy[0-9].+([0-9])-* | stackless-* )
       return 0
       ;;
   esac
   return 1
-  shopt -u extglob
 }
-shopt -u extglob
 
 apply_patch() {
   local package_name="$1"
@@ -1963,6 +2227,16 @@ build_package_verify_py313() {
   build_package_verify_py312 "$1" "${2:-3.13}"
 }
 
+# Post-install check for Python 3.14.x
+build_package_verify_py314() {
+  build_package_verify_py313 "$1" "${2:-3.14}"
+}
+
+# Post-install check for Python 3.15.x
+build_package_verify_py315() {
+  build_package_verify_py314 "$1" "${2:-3.15}"
+}
+
 # Post-install check for Python 3.x rolling release scripts
 # XXX: Will need splitting into project-specific ones if there emerge
 # multiple rolling-release scripts with different checks needed
@@ -2018,14 +2292,23 @@ build_package_get_pip() {
   build_package_symlink_version_suffix
 }
 
+# Pip <21 (in 2.7 and derivatives like PyPy-2.7) doesn't support -I
+build_package_ensurepip_lt21() {
+  build_package_ensurepip lt21
+}
+
 build_package_ensurepip() {
+  local mode="$1"
   local ensurepip_opts
   # Install as `--altinstall` if the Python is installed as `altinstall` (#255)
   if [[ "$PYTHON_MAKE_INSTALL_TARGET" == *"altinstall"* ]]; then
     ensurepip_opts="--altinstall"
   fi
+  local python_opts="-I"
+  if [[ $mode == "lt21" ]]; then python_opts="-s"; fi
+  
   # FIXME: `--altinstall` with `get-pip.py`
-  "$PYTHON_BIN" -s -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
+  "$PYTHON_BIN" $python_opts -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
   build_package_symlink_version_suffix
 }
 
@@ -2162,11 +2445,13 @@ if [ -n "$noexec" ]; then
 fi
 
 if [ -z "$MAKE" ]; then
-  if [ "FreeBSD" = "$(uname -s)" ]; then
+  if [ "FreeBSD" = "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" ]; then
     if [ "$(echo $1 | sed 's/-.*$//')" = "jruby" ]; then
       export MAKE="gmake"
     else
-      if [ "$(uname -r | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
+      # var assignment inside $() does not propagate due to being in subshell
+      : "${_PYTHON_BUILD_CACHE_UNAME_R:=$(uname -r)}"
+      if [ "$(echo "$_PYTHON_BUILD_CACHE_UNAME_R" | sed 's/[^[:digit:]].*//')" -lt 10 ]; then
         export MAKE="gmake"
       else
         export MAKE="make"
@@ -2219,17 +2504,16 @@ package_option python configure --libdir="${PREFIX_PATH}/lib"
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS ${PYTHON_CONFIGURE_OPTS_ARRAY[@]}" == *"--enable-shared"* ]]; then
   # The ld on Darwin embeds the full paths to each dylib by default
   if [[ "$LDFLAGS" != *"-rpath="* ]] ; then
-    export LDFLAGS="-Wl,-rpath,${PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
+    prepend_ldflags_libs "-Wl,-rpath,${PREFIX_PATH}/lib"
   fi
 fi
 
 # python-build: Set `RPATH` if --shared` was given for PyPy (#244)
 if [[ "$PYPY_OPTS" == *"--shared"* ]]; then
-  export LDFLAGS="-Wl,-rpath=${PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
+  prepend_ldflags_libs "-Wl,-rpath=${PREFIX_PATH}/lib"
 fi
 
 # Add support for framework installation (`--enable-framework`) of CPython (#55, #99)
-shopt -s extglob
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; then
   if ! is_mac; then
     echo "python-build: framework installation is not supported outside of MacOS." >&2
@@ -2255,10 +2539,8 @@ if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; the
   PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS//--enable-framework?(=*([^ ]))?( )/}";
   PYTHON_CONFIGURE_OPTS="${PYTHON_CONFIGURE_OPTS% }"
 fi
-shopt -u extglob
 
 # Build against universal SDK
-shopt -s extglob
 if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; then
   if ! is_mac; then
     echo "python-build: universal installation is not supported outside of MacOS." >&2
@@ -2280,7 +2562,6 @@ if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-universalsdk"* ]]; 
     fi
   fi
 fi
-shopt -u extglob
 
 # Compile with `--enable-unicode=ucs4` by default (#257)
 if [[ "$PYTHON_CONFIGURE_OPTS" != *"--enable-unicode="* ]]; then
@@ -2331,7 +2612,7 @@ if [ -z "${GET_PIP_URL}" ]; then
     2.6 | 2.6.* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/2.6/get-pip.py"
       ;;
-    2.7 | 2.7.* )
+    2.7 | 2.7.* | pypy2.7 | pypy2.7-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/2.7/get-pip.py"
       ;;
     3.2 | 3.2.* )
@@ -2343,11 +2624,17 @@ if [ -z "${GET_PIP_URL}" ]; then
     3.4 | 3.4.* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.4/get-pip.py"
       ;;
-    3.5 | 3.5.* )
+    3.5 | 3.5.* | pypy3.5 | pypy3.5-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.5/get-pip.py"
       ;;
-    3.6 | 3.6.* )
+    3.6 | 3.6.* | pypy3.6 | pypy3.6-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.6/get-pip.py"
+      ;;
+    3.7 | 3.7.* | pypy3.7 | pypy3.7-* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.7/get-pip.py"
+      ;;
+    3.8 | 3.8.* | pypy3.8 | pypy3.8-* | pyston* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.8/get-pip.py"
       ;;
     * )
       GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
@@ -2359,7 +2646,7 @@ fi
 # Set MACOSX_DEPLOYMENT_TARGET from the product version of OS X (#219, #220)
 if is_mac; then
   if [ -z "${MACOSX_DEPLOYMENT_TARGET}" ]; then
-    MACOS_VERSION="$(sw_vers -productVersion 2>/dev/null || true)"
+    MACOS_VERSION="${_PYTHON_BUILD_CACHE_SW_VERS:=$(sw_vers -productVersion)}"
     MACOS_VERSION_ARRAY=(${MACOS_VERSION//\./ })
     if [ "${#MACOS_VERSION_ARRAY[@]}" -ge 2 ]; then
       export MACOSX_DEPLOYMENT_TARGET="${MACOS_VERSION_ARRAY[0]}.${MACOS_VERSION_ARRAY[1]}"
@@ -2375,6 +2662,7 @@ python_bin_suffix() {
     version_name="${version_name%-dev}"
     version_name="${version_name%-rc*}"
     version_name="${version_name%rc*}"
+    version_name="${version_name%%*([^0-9])}"
     version_info=(${version_name//./ })
     echo "${version_info[0]}.${version_info[1]}"
     ;;
@@ -2407,7 +2695,7 @@ if [ -n "$VERBOSE" ]; then
   trap "kill $TAIL_PID" SIGINT SIGTERM EXIT
 fi
 
-export LDFLAGS="-L${PREFIX_PATH}/lib${LDFLAGS:+ $LDFLAGS}"
+prepend_ldflags_libs "-L${PREFIX_PATH}/lib"
 export CPPFLAGS="-I${PREFIX_PATH}/include${CPPFLAGS:+ $CPPFLAGS}"
 
 unset PYTHONHOME

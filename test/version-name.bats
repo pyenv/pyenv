@@ -73,6 +73,11 @@ SH
   assert_failure "pyenv: version \`1.2' is not installed (set by PYENV_VERSION environment variable)"
 }
 
+@test "missing version with --force" {
+  PYENV_VERSION=1.2 run pyenv-version-name -f
+  assert_success "1.2"
+}
+
 @test "one missing version (second missing)" {
   create_version "3.5.1"
   PYENV_VERSION="3.5.1:1.2" run pyenv-version-name
@@ -119,4 +124,18 @@ OUT
   PYENV_VERSION="2.7" run pyenv-version-name
   assert_success
   assert_output "2.7.11"
+}
+
+@test "pyenv-latest fallback with prefix in name" {
+  create_version "3.12.6"
+  PYENV_VERSION="python-3.12" run pyenv-version-name
+  assert_success
+  assert_output "3.12.6"
+}
+
+@test "pyenv version started by python-" {
+  create_version "python-3.12.6"
+  PYENV_VERSION="python-3.12.6" run pyenv-version-name
+  assert_success
+  assert_output "python-3.12.6"
 }

@@ -1,0 +1,28 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Miniconda3-py310_23.5.1-0-Linux-aarch64" "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.5.1-0-Linux-aarch64.sh#d6a99c45326f8e849b18964090f0f5ac56bc4f173a6b18a4a5057bc09bd128f3" "miniconda" verify_py310
+  ;;
+"Linux-ppc64le" )
+  install_script "Miniconda3-py310_23.5.1-0-Linux-ppc64le" "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.5.1-0-Linux-ppc64le.sh#920a8d8f9a6aa6bc1cd2ddf56cb0af779b3c70eb82d61fb05397814adfc0837f" "miniconda" verify_py310
+  ;;
+"Linux-s390x" )
+  install_script "Miniconda3-py310_23.5.1-0-Linux-s390x" "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.5.1-0-Linux-s390x.sh#63962e4c21e13b680f62d8c7cf11fb1a4a2192188d0d7c0a0994099470b65567" "miniconda" verify_py310
+  ;;
+"Linux-x86_64" )
+  install_script "Miniconda3-py310_23.5.1-0-Linux-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.5.1-0-Linux-x86_64.sh#9f4cd0a9f7289a1e03b79fe6d06bab0769c46c33a774ea8a94dc3c1883344d85" "miniconda" verify_py310
+  ;;
+"MacOSX-arm64" )
+  install_script "Miniconda3-py310_23.5.1-0-MacOSX-arm64" "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.5.1-0-MacOSX-arm64.sh#dde48d596695115a05218d694b20212d900a66c005a1926a9018a756b1188f1f" "miniconda" verify_py310
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniconda3-py310_23.5.1-0-MacOSX-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py310_23.5.1-0-MacOSX-x86_64.sh#4e5315e39ce5be6d64fb0bf0a62aa6e8d09224542fa5b9a4d695c599bd6f66b0" "miniconda" verify_py310
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

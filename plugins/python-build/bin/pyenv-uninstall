@@ -11,6 +11,7 @@
 # See `pyenv versions` for a complete list of installed versions.
 #
 set -e
+[ -n "$PYENV_DEBUG" ] && set -x
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
@@ -74,7 +75,7 @@ uninstall-python() {
       exit 1
     fi
 
-    read -p "pyenv: remove $PREFIX? [y|N] "
+    read -p "pyenv: remove $PREFIX? (y/N) "
     case "$REPLY" in
     y | Y | yes | YES ) ;;
     * ) exit 1 ;;

@@ -197,7 +197,7 @@ index 0000000..1fc2747
 +Before making the call, the VALUES vector should be initialized 
 +with pointers to the appropriate argument values.
 +
-+To call the the function using the initialized ffi_cif, use the
++To call the function using the initialized ffi_cif, use the
 +ffi_call function:
 +
 +void ffi_call(ffi_cif *cif, void *fn, void *rvalue, void **avalues);

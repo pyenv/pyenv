@@ -1,0 +1,12 @@
+prefer_openssl3
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+# Avoid a compilation error when linking against OpenSSL built with SSLv3 support (fixed in 3.10.0) (#2181)
+export PYTHON_CFLAGS="-DOPENSSL_NO_SSL3${PYTHON_CFLAGS:+ $PYTHON_CFLAGS}"
+
+install_package "openssl-1.1.1u" "https://www.openssl.org/source/openssl-1.1.1u.tar.gz#e2f8d84b523eecd06c7be7626830370300fbcc15386bf5142d72758f6963ebc6" mac_openssl --if has_broken_mac_openssl
+install_package "readline-8.1" "https://ftpmirror.gnu.org/readline/readline-8.1.tar.gz#f8ceb4ee131e3232226a17f51b164afc46cd0b9e6cef344be87c65962cb82b02" mac_readline --if has_broken_mac_readline
+if has_tar_xz_support; then
+  install_package "Python-3.9.21" "https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tar.xz#3126f59592c9b0d798584755f2bf7b081fa1ca35ce7a6fea980108d752a05bb1" standard verify_py39 copy_python_gdb ensurepip
+else
+  install_package "Python-3.9.21" "https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tgz#667c3ba2ca98d39ead1162f6548c3475768582e2ff89e0821d25eb956ac09944" standard verify_py39 copy_python_gdb ensurepip
+fi

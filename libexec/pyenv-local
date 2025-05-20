@@ -2,8 +2,10 @@
 #
 # Summary: Set or show the local application-specific Python version(s)
 #
-# Usage: pyenv local <version> <version2> <..>
+# Usage: pyenv local [-f|--force] [<version> [...]]
 #        pyenv local --unset
+#
+#   -f/--force    Do not verify that the versions being set exist
 #
 # Sets the local application-specific Python version(s) by writing the
 # version name to a file named `.python-version'.
@@ -36,12 +38,25 @@ if [ "$1" = "--complete" ]; then
   exec pyenv-versions --bare
 fi
 
+while [[ $# -gt 0 ]]
+do
+    case "$1" in
+        -f|--force)
+            FORCE=1
+            shift
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 versions=("$@")
 
 if [ "$versions" = "--unset" ]; then
   rm -f .python-version
 elif [ -n "$versions" ]; then
-  pyenv-version-file-write .python-version "${versions[@]}"
+  pyenv-version-file-write ${FORCE:+-f }.python-version "${versions[@]}"
 else
   if version_file="$(pyenv-version-file "$PWD")"; then
     IFS=: versions=($(pyenv-version-file-read "$version_file"))

@@ -9,7 +9,7 @@ setup() {
 
 @test "invocation without 2 arguments prints usage" {
   run pyenv-version-file-write
-  assert_failure "Usage: pyenv version-file-write <file> <version>"
+  assert_failure "Usage: pyenv version-file-write [-f|--force] <file> <version> [...]"
   run pyenv-version-file-write "one" ""
   assert_failure
 }
@@ -19,6 +19,13 @@ setup() {
   run pyenv-version-file-write ".python-version" "2.7.6"
   assert_failure "pyenv: version \`2.7.6' not installed"
   assert [ ! -e ".python-version" ]
+}
+
+@test "setting nonexistent version succeeds with force" {
+  assert [ ! -e ".python-version" ]
+  run pyenv-version-file-write --force ".python-version" "2.7.6"
+  assert_success
+  assert [ -e ".python-version" ]
 }
 
 @test "writes value to arbitrary file" {
