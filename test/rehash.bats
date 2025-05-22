@@ -120,3 +120,10 @@ SH
   assert_success ""
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
+
+@test "sh-rehash in pwsh" {
+  create_executable "3.4" "python"
+  PYENV_SHELL=pwsh run pyenv-sh-rehash
+  assert_success ""
+  assert [ -x "${PYENV_ROOT}/shims/python" ]
+}
