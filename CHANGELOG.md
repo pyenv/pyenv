@@ -1,5 +1,15 @@
 # Version History
 
+## Release v2.6.0
+* python-build: Support patch paths with spaces/special characters by @native-api in https://github.com/pyenv/pyenv/pull/3251
+* Add CODEOWNERS file by @native-api in https://github.com/pyenv/pyenv/pull/3247
+* README: make fish PATH add conditional on the directory existing by @BooleanCat in https://github.com/pyenv/pyenv/pull/2786
+* Add --bare option to `pyenv version` by @jjwatt in https://github.com/pyenv/pyenv/pull/2783
+* README: Add shell setup instructions for nushell by @jordanst3wart in https://github.com/pyenv/pyenv/pull/2916
+* Add MacPorts support for python-build by @studnitskiy in https://github.com/pyenv/pyenv/pull/3186
+* python-build: fix `has_broken_mac_readline` when Readline is explicitly configured by @fofoni in https://github.com/pyenv/pyenv/pull/3254
+* Add CPython 3.14.0b2 by @nedbat in https://github.com/pyenv/pyenv/pull/3259
+
 ## Release v2.5.7
 * Point 3.14-dev to `3.14` branch by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3246
 
