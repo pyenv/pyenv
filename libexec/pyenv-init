@@ -169,6 +169,11 @@ function help_() {
 }
 
 function init_dirs() {
+  if [ -z "$PYENV_ROOT" ]; then
+    echo 'Error: PYENV_ROOT is not set. Aborting.' >&2
+    exit 1
+  fi
+
   mkdir -p "${PYENV_ROOT}/"{shims,versions}
 }
 
