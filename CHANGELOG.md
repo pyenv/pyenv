@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.6.1
+* Add CPython 3.9.23, 3.10.18, 3.11.13, 3.12.11, 3.13.4 by @nedbat in https://github.com/pyenv/pyenv/pull/3266
+
 ## Release v2.6.0
 * python-build: Support patch paths with spaces/special characters by @native-api in https://github.com/pyenv/pyenv/pull/3251
 * Add CODEOWNERS file by @native-api in https://github.com/pyenv/pyenv/pull/3247
