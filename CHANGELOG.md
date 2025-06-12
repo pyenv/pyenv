@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.6.2
+* Add CPython 3.13.5 by @nedbat in https://github.com/pyenv/pyenv/pull/3269
+
 ## Release v2.6.1
 * Add CPython 3.9.23, 3.10.18, 3.11.13, 3.12.11, 3.13.4 by @nedbat in https://github.com/pyenv/pyenv/pull/3266
 
