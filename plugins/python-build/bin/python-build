@@ -1509,6 +1509,7 @@ use_macports() {
     local prefix="${port_location%/bin/port}"
     export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${prefix}/include"
     append_ldflags_libs "-L${prefix}/lib -Wl,-rpath,${prefix}/lib"
+    export PKG_CONFIG_PATH="$prefix/lib/pkgconfig/:${PKG_CONFIG_PATH}"
     lock_in macports
   fi
 }
@@ -1538,15 +1539,9 @@ use_homebrew_yaml() {
 
 use_macports_yaml() {
   can_use_macports || return 1
-  local port_location="$(command -v port)"
-  local prefix="${port_location%/bin/port}"
-  if [ -n "$prefix" ]; then
-    if [[ $(port -q installed libyaml | awk '{print $3}') == "(active)" ]]; then
-      echo "python-build: use libyaml from MacPorts"
-      export CPPFLAGS="-I$prefix/include${CPPFLAGS:+ $CPPFLAGS}"
-      export LDFLAGS="-L$prefix/lib${LDFLAGS:+ ${LDFLAGS% }}"
-      lock_in macports
-    fi
+  if [[ $(port -q installed libyaml | awk '{print $3}') == "(active)" ]]; then
+    echo "python-build: use libyaml from MacPorts"
+    lock_in macports
   else
     return 1
   fi
@@ -1615,15 +1610,9 @@ use_homebrew_readline() {
 use_macports_readline() {
   can_use_macports || return 1
   if ! configured_with_package_dir "python" "readline/rlconf.h"; then
-    local port_location="$(command -v port)"
-    local prefix="${port_location%/bin/port}"
-    if [ -n "$prefix" ]; then
-      if [[ $(port -q installed readline | awk '{print $3}') == "(active)" ]]; then
-        echo "python-build: use readline from MacPorts"
-        export CPPFLAGS="-I$prefix/include${CPPFLAGS:+ $CPPFLAGS}"
-        export LDFLAGS="-L$prefix/lib${LDFLAGS:+ $LDFLAGS}"
-        lock_in macports
-      fi
+    if [[ $(port -q installed readline | awk '{print $3}') == "(active)" ]]; then
+      echo "python-build: use readline from MacPorts"
+      lock_in macports
     else
       return 1
     fi
@@ -1645,15 +1634,9 @@ use_homebrew_ncurses() {
 
 use_macports_ncurses() {
   can_use_macports || return 1
-  local port_location="$(command -v port)"
-  local prefix="${port_location%/bin/port}"
-  if [ -n "$prefix" ]; then
-    if [[ $(port -q installed ncurses | awk '{print $3}') == "(active)" ]]; then
-      echo "python-build: use ncurses from MacPorts"
-      export CPPFLAGS="-I$prefix/include${CPPFLAGS:+ $CPPFLAGS}"
-      export LDFLAGS="-L$prefix/lib${LDFLAGS:+ $LDFLAGS}"
-      lock_in macports
-    fi
+  if [[ $(port -q installed ncurses | awk '{print $3}') == "(active)" ]]; then
+    echo "python-build: use ncurses from MacPorts"
+    lock_in macports
   else
     return 1
   fi
@@ -1725,21 +1708,13 @@ use_macports_openssl() {
   can_use_macports || return 1
   command -v port >/dev/null || return 1
   for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
-    local port_location="$(command -v port)"
-    local prefix="${port_location%/bin/port}"
-    if [ -n "$prefix" ]; then
-      if [[ $(port -q installed ${openssl} | awk '{print $3}') == "(active)" ]]; then
-        echo "python-build: use ${openssl} from MacPorts"
-        if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
-          # configure script of newer CPython versions support `--with-openssl`
-          # https://bugs.python.org/issue21541
-          package_option python configure --with-openssl="${prefix}"
-        else
-          export CPPFLAGS="-I$prefix/include ${CPPFLAGS:+ $CPPFLAGS}"
-          export LDFLAGS="-L$prefix/lib${LDFLAGS:+ $LDFLAGS}"
-        fi
+    if [[ $(port -q installed ${openssl} | awk '{print $3}') == "(active)" ]]; then
+      echo "python-build: use ${openssl} from MacPorts"
+      if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
+        # configure script of newer CPython versions support `--with-openssl`
+        # https://bugs.python.org/issue21541
+        package_option python configure --with-openssl="${prefix}"
       fi
-      export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
       lock_in macports
       return 0
     fi
@@ -1863,15 +1838,11 @@ use_xcode_sdk_zlib() {
 
 use_macports_zlib() {
   can_use_macports || return 1
-  local port_location="$(command -v port)"
-  local prefix="${port_location%/bin/port}"
-  if [ -n "$prefix" ]; then
-    if [[ $(port -q installed zlib | awk '{print $3}') == "(active)" ]]; then
-        echo "python-build: use zlib from MacPorts"
-        export CPPFLAGS="-I$prefix/include ${CPPFLAGS}"
-        export LDFLAGS="-L$prefix/lib ${LDFLAGS}"
-        lock_in macports
-      fi
+  if [[ $(port -q installed zlib | awk '{print $3}') == "(active)" ]]; then
+    echo "python-build: use zlib from MacPorts"
+    export CPPFLAGS="-I$prefix/include ${CPPFLAGS}"
+    export LDFLAGS="-L$prefix/lib ${LDFLAGS}"
+    lock_in macports
   else
     return 1
   fi
