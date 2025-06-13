@@ -50,6 +50,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 * **[Usage](#usage)**
   * [Install additional Python versions](#install-additional-python-versions)
     * [Prefix auto-resolution to the latest version](#prefix-auto-resolution-to-the-latest-version)
+    * [Python versions with extended support](#python-versions-with-extended-support)
   * [Switch between Python versions](#switch-between-python-versions)
     * [Making multiple versions available](#making-multiple-versions-available)
   * [Uninstall Python versions](#uninstall-python-versions)
@@ -367,8 +368,9 @@ You can run [`pyenv latest -k <prefix>`](COMMANDS.md#pyenv-latest) to see how `p
 
 See the [`pyenv latest` documentation](COMMANDS.md#pyenv-latest) for details.
 
+----
 
-<details> <summary> Python versions with extended support </summary>
+#### Python versions with extended support
 
 For the following Python releases, Pyenv applies user-provided patches that add support for some newer environments.
 Though we don't actively maintain those patches, since existing releases never change,
