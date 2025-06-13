@@ -1508,7 +1508,7 @@ use_macports() {
   if [ -n "$port_location" ]; then
     local prefix="${port_location%/bin/port}"
     export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${prefix}/include"
-    append_ldflags_libs "-L${prefix}/lib -Wl,-rpath,${prefix}/lib"
+    prepend_ldflags_libs "-L${prefix}/lib -Wl,-rpath,${prefix}/lib"
     export PKG_CONFIG_PATH="$prefix/lib/pkgconfig/:${PKG_CONFIG_PATH}"
     lock_in macports
   fi
@@ -1707,6 +1707,8 @@ use_homebrew_openssl() {
 use_macports_openssl() {
   can_use_macports || return 1
   command -v port >/dev/null || return 1
+  local port_location="$(command -v port)"
+  local prefix="${port_location%/bin/port}"
   for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
     if [[ $(port -q installed ${openssl} | awk '{print $3}') == "(active)" ]]; then
       echo "python-build: use ${openssl} from MacPorts"
@@ -2679,3 +2681,5 @@ mkdir -p "$BUILD_PATH"
 source "$DEFINITION_PATH"
 [ -z "${KEEP_BUILD_PATH}" ] && rm -fr "$BUILD_PATH"
 trap - ERR
+
+
