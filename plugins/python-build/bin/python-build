@@ -1507,7 +1507,7 @@ use_macports() {
   local port_location="$(command -v port)"
   if [ -n "$port_location" ]; then
     local prefix="${port_location%/bin/port}"
-    export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${prefix}/include"
+    export CPPFLAGS="-I${prefix}/include${CPPFLAGS:+ $CPPFLAGS}"
     prepend_ldflags_libs "-L${prefix}/lib -Wl,-rpath,${prefix}/lib"
     export PKG_CONFIG_PATH="$prefix/lib/pkgconfig/:${PKG_CONFIG_PATH}"
     lock_in macports
