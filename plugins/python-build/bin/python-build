@@ -1509,7 +1509,7 @@ use_macports() {
     local prefix="${port_location%/bin/port}"
     export CPPFLAGS="-I${prefix}/include${CPPFLAGS:+ $CPPFLAGS}"
     prepend_ldflags_libs "-L${prefix}/lib -Wl,-rpath,${prefix}/lib"
-    export PKG_CONFIG_PATH="$prefix/lib/pkgconfig/:${PKG_CONFIG_PATH}"
+    export PKG_CONFIG_PATH="$prefix/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
     lock_in macports
   fi
 }
