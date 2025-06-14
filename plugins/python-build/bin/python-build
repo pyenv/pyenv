@@ -1842,8 +1842,6 @@ use_macports_zlib() {
   can_use_macports || return 1
   if [[ $(port -q installed zlib | awk '{print $3}') == "(active)" ]]; then
     echo "python-build: use zlib from MacPorts"
-    export CPPFLAGS="-I$prefix/include ${CPPFLAGS}"
-    export LDFLAGS="-L$prefix/lib ${LDFLAGS}"
     lock_in macports
   else
     return 1
@@ -2681,5 +2679,3 @@ mkdir -p "$BUILD_PATH"
 source "$DEFINITION_PATH"
 [ -z "${KEEP_BUILD_PATH}" ] && rm -fr "$BUILD_PATH"
 trap - ERR
-
-
