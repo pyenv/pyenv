@@ -275,7 +275,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$PORT_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$PORT_PREFIX/lib -Wl,-rpath,$PORT_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I$PORT_PREFIX/include -I${TMP}/install/include" LDFLAGS="-L$PORT_PREFIX/lib -Wl,-rpath,$PORT_PREFIX/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/lib/pkgconfig"
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -373,12 +373,9 @@ OUT
 @test "yaml is linked from MacPorts" {
   cached_tarball "Python-3.6.2"
 
-  yaml_libdir="$TMP/port-yaml"
-  mkdir -p "$yaml_libdir/opt/local"
-
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
-  stub port "-q location libyaml : echo '$yaml_libdir'"
+  stub port "-q installed libyaml : echo '  libyaml @0.2.5_0 (active)'"
   for i in {1..3}; do stub port false; done
   stub_make_install
 
@@ -391,7 +388,7 @@ OUT
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CFLAGS="" CPPFLAGS="-I$yaml_libdir/opt/local/include -I${TMP}/install/include -I${TMP}/include" LDFLAGS="-L$yaml_libdir/opt/local/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L${TMP}/lib -Wl,-rpath,${TMP}/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/include -I${TMP}/install/include" LDFLAGS="-L${TMP}/lib -Wl,-rpath,${TMP}/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/lib/pkgconfig"
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -401,12 +398,9 @@ OUT
 @test "readline is linked from MacPorts" {
   cached_tarball "Python-3.6.2"
 
-  readline_libdir="$TMP/port-readline"
-  mkdir -p "$readline_libdir/opt/local"
-
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
-  stub port "-q location readline : echo '$readline_libdir'"
+  stub port "-q installed readline : echo '  readline @8.2.013_0 (active)'"
   for i in {1..2}; do stub port false; done
   stub_make_install
 
@@ -421,7 +415,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CFLAGS="" CPPFLAGS="-I$readline_libdir/opt/local/include -I${TMP}/install/include -I${TMP}/include" LDFLAGS="-L$readline_libdir/opt/local/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L${TMP}/lib -Wl,-rpath,${TMP}/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/include -I${TMP}/install/include" LDFLAGS="-L${TMP}/lib -Wl,-rpath,${TMP}/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/lib/pkgconfig"
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -431,13 +425,10 @@ OUT
 @test "ncurses is linked from MacPorts" {
   cached_tarball "Python-3.6.2"
 
-  ncurses_libdir="$TMP/port-ncurses"
-  mkdir -p "$ncurses_libdir/opt/local"
-
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
   stub port false
-  stub port "-q location ncurses : echo '$ncurses_libdir'"
+  stub port "-q installed ncurses : echo '$ncurses_libdir'"
   stub port false
   stub_make_install
 
@@ -452,7 +443,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CFLAGS="" CPPFLAGS="-I$ncurses_libdir/opt/local/include -I${TMP}/install/include -I${TMP}/include" LDFLAGS="-L$ncurses_libdir/opt/local/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L${TMP}/lib -Wl,-rpath,${TMP}/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/include -I${TMP}/install/include" LDFLAGS="-L${TMP}/lib -Wl,-rpath,${TMP}/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/lib/pkgconfig"
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -626,7 +617,7 @@ DEF
   unstub make
 
   assert_build_log <<OUT
-Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/install/include -I$PORT_PREFIX/include" LDFLAGS="-L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib -L$PORT_PREFIX/lib -Wl,-rpath,$PORT_PREFIX/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${TMP}/include -I${TMP}/install/include" LDFLAGS="-L${TMP}/lib -Wl,-rpath,${TMP}/lib -L${TMP}/install/lib -Wl,-rpath,${TMP}/install/lib" PKG_CONFIG_PATH="${TMP}/lib/pkgconfig"
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
