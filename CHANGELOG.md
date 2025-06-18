@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.6.3
+* README: Re-promote "Python versions with extended support" to a section by @native-api in https://github.com/pyenv/pyenv/pull/3276
+* Support linking to MacPorts ports installed from binary archives by @0916dhkim in https://github.com/pyenv/pyenv/pull/3272
+* Add CPython 3.14.0b3 by @nedbat in https://github.com/pyenv/pyenv/pull/3278
+
 ## Release v2.6.2
 * Add CPython 3.13.5 by @nedbat in https://github.com/pyenv/pyenv/pull/3269
 
