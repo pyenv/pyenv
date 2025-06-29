@@ -884,6 +884,9 @@ build_package_standard_build() {
     if can_use_macports; then
       use_macports || true
     fi
+    if is_mac -ge 1014 && ! can_use_homebrew && ! can_use_macports; then
+      use_xcode_sdk_zlib || true
+    fi
 
     use_freebsd_pkg || true
 
