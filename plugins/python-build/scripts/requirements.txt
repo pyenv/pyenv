@@ -1,2 +1,9 @@
 requests-html
 lxml[html_clean]
+packaging~=20.4
+requests~=2.32.4
+sortedcontainers~=2.4.0
+tqdm~=4.51.0
+pandas~=1.5.3
+numpy~=1.24.2
+jc @ git+https://github.com/native-api/jc@haslib_mode
