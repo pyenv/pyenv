@@ -1,0 +1,14 @@
+VERSION='7.3.20'
+PYVER='3.11'
+
+# https://www.pypy.org/checksums.html
+hash=7786dda760003e2ea7409c1037e50200c578ec427ce0245ac4cd758710b206fb
+
+### end of manual settings - following lines same for every download
+
+ver="pypy${PYVER}-v${VERSION}-src"
+url="https://downloads.python.org/pypy/${ver}.tar.bz2"
+
+prefer_openssl11
+install_package "openssl-1.1.1f" "https://www.openssl.org/source/openssl-1.1.1f.tar.gz#186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35" mac_openssl --if has_broken_mac_openssl
+install_package "${ver}" "${url}#${hash}" 'pypy_builder' "verify_py${PYVER//./}" 'ensurepip'
