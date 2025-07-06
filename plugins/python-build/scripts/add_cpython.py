@@ -25,26 +25,6 @@ logger = logging.getLogger(__name__)
 
 REPO = "https://www.python.org/ftp/python/"
 
-install_script_fmt = """
-case "$(anaconda_architecture 2>/dev/null || true)" in
-{install_lines}
-* )
-  {{ echo
-    colorize 1 "ERROR"
-    echo ": The binary distribution of {tflavor} is not available for $(anaconda_architecture 2>/dev/null || true)."
-    echo
-  }} >&2
-  exit 1
-  ;;
-esac
-""".lstrip()
-
-install_line_fmt = """
-"{os}-{arch}" )
-  install_script "{tflavor}{suffix}-{version_py_version}{version_str}-{os}-{arch}" "{repo}/{tflavor}{suffix}-{version_py_version}{version_str}-{os}-{arch}.sh#{md5}" "{flavor}" verify_{py_version}
-  ;;
-""".strip()
-
 here = Path(__file__).resolve()
 out_dir: Path = here.parent.parent / "share" / "python-build"
 
