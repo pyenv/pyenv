@@ -1,0 +1,17 @@
+$scriptblock = {
+    param($wordToComplete, $commandAst, $cursorPosition)
+        $words = $commandAst.ToString() 
+        if ( $wordToComplete ) {
+          $matches = (($words[0..$cursorPosition] -join '') | Select-String -Pattern "\s+" -AllMatches).Matches
+          if ( $matches ) {
+            $cursorPosition = $matches[-1].Index - 1
+          }
+        }
+        $words = $words[0..$cursorPosition] -join '' -split "\s+"
+        if ( $words.Count -ge 2 ) {
+          pyenv completions $words[1] | where { $_ -match $wordToComplete }
+        } else {
+          pyenv commands | where { $_ -match $wordToComplete }
+        }
+}
+Register-ArgumentCompleter -Native -CommandName pyenv -ScriptBlock $scriptblock
