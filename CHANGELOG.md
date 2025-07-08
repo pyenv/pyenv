@@ -1,5 +1,11 @@
 # Version History
 
+## Release v2.6.4
+* Backport bpo_36106 to 3.5.10 and 3.6.15 by @native-api in https://github.com/pyenv/pyenv/pull/3280
+* (regression) Use Zlib from XCode SDK in MacOS without Homebrew or Macports by @native-api in https://github.com/pyenv/pyenv/pull/3282
+* Add PyPy v7.3.20 by @jsirois in https://github.com/pyenv/pyenv/pull/3284
+* Add CPython 3.14.0b4 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3285
+
 ## Release v2.6.3
 * README: Re-promote "Python versions with extended support" to a section by @native-api in https://github.com/pyenv/pyenv/pull/3276
 * Support linking to MacPorts ports installed from binary archives by @0916dhkim in https://github.com/pyenv/pyenv/pull/3272
