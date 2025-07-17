@@ -229,6 +229,13 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
   ```
   
   If you wish to get Pyenv in noninteractive login shells as well, also add the commands to `~/.zprofile` or `~/.zlogin`.
+  
+  If you use Homebrew to install Pyenv, the `pyenv` command should be in the `bin` folder of Homebrew. There is no `bin` folder in `$HOME/.pyenv`, you need to add `/$HOME/.pyenv/shims` to PATH:
+
+  ```zsh
+  echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zprofile
+  echo '[[ -d $PYENV_ROOT/shims ]] && export PATH="$PYENV_ROOT/shims:$PATH"' >> ~/.zprofile
+  ```
   </details>
 
 #### Fish
