@@ -1,0 +1,14 @@
+require_java
+unrequire_python27
+install_jar "jython-2.7.4" "https://repo1.maven.org/maven2/org/python/jython-installer/2.7.4/jython-installer-2.7.4.jar#6001f0741ed5f4a474e5c5861bcccf38dc65819e25d46a258cbc0278394a070b" jython
+
+case "$(pypy_architecture 2>/dev/null || true)" in
+"osx64"|"win32" )
+  # Jython does not seem to work properly on OSX/windows unless JAVA_HOME is set
+  if [ -z "${JAVA_HOME+defined}" ]; then
+    colorize 1 "WARNING: "
+    echo "Please ensure that your JAVA_HOME environment variable is set correctly!"
+    echo "See http://bugs.jython.org/issue2346 for details."
+  fi
+  ;;
+esac
