@@ -1,0 +1,22 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Anaconda3-2025.06-0-Linux-aarch64" "https://repo.anaconda.com/archive/Anaconda3-2025.06-0-Linux-aarch64.sh#e6177f844f6156f07978c85b1f18ca3b7724d5ab5dba44b88a7f6b2452ba6271" "anaconda" verify_py312
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda3-2025.06-0-Linux-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2025.06-0-Linux-x86_64.sh#08db13f6db5dd4f99b3a6db96c68d064d50ea23742013b70f588e3a27a5204da" "anaconda" verify_py312
+  ;;
+"MacOSX-arm64" )
+  install_script "Anaconda3-2025.06-0-MacOSX-arm64" "https://repo.anaconda.com/archive/Anaconda3-2025.06-0-MacOSX-arm64.sh#195f234204e2f18803cea38bbebefcaac5a3d8d95e2e4ee106d1b87b23b9fc4a" "anaconda" verify_py312
+  ;;
+"MacOSX-x86_64" )
+  install_script "Anaconda3-2025.06-0-MacOSX-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2025.06-0-MacOSX-x86_64.sh#8625a155ff1d2848afa360e70357e14c25f0ac7ac21e4e4bf15015bc58b08d06" "anaconda" verify_py312
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Anaconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
