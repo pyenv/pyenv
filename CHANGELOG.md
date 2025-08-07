@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.6.6
+* Add anaconda3-2025.06-0, anaconda3-2025.06-1, miniconda3-25.3.1-1, miniconda3-25.5.1-0, miniconda3-25.5.1-1 by @native-api in https://github.com/pyenv/pyenv/pull/3295
+* Add CPython 3.13.6 by @cesarcoatl in https://github.com/pyenv/pyenv/pull/3297
+
 ## Release v2.6.5
 * Bump OpenSSL to 3.5.1 in the latest releases and branch tips in CPython 3.12 - 3.15 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3287
 * Add Jython 2.7.4 by @cesarcoatl in https://github.com/pyenv/pyenv/pull/3290
