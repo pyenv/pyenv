@@ -1831,7 +1831,7 @@ use_xcode_sdk_zlib() {
   [[ "${CC:-clang}" != "clang" || "$(command -v clang 2>/dev/null || true)" != "/usr/bin/clang" ]] && return 1
   # The flags set by this function break the build in XCode 16 due to unknown changes from XCode 15
   # For future-proofing, also disable it if we cannot determine the version
-  [[ $(xcodebuild -version) =~ ^Xcode\ ([[:digit:]]+) ]] && xcode_major="${BASH_REMATCH[1]}"
+  [[ $(xcodebuild -version 2>/dev/null || true) =~ ^Xcode\ ([[:digit:]]+) ]] && xcode_major="${BASH_REMATCH[1]}"
   [[ -z $xcode_major || $xcode_major -ge 16 ]] && return 1
   local xc_sdk_path="$(xcrun --show-sdk-path 2>/dev/null || true)"
   if [ -d "$xc_sdk_path" ]; then
