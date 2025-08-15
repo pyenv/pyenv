@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.6.7
+* Skip Zlib from XCode for XCode 16+ by @native-api in https://github.com/pyenv/pyenv/pull/3298
+* Don't fail the build if `xcodebuild` fails by @native-api in https://github.com/pyenv/pyenv/pull/3302
+* Add CPython 3.14.0rc2 and 3.13.7 by @nedbat in https://github.com/pyenv/pyenv/pull/3303
+
 ## Release v2.6.6
 * Add anaconda3-2025.06-0, anaconda3-2025.06-1, miniconda3-25.3.1-1, miniconda3-25.5.1-0, miniconda3-25.5.1-1 by @native-api in https://github.com/pyenv/pyenv/pull/3295
 * Add CPython 3.13.6 by @cesarcoatl in https://github.com/pyenv/pyenv/pull/3297
