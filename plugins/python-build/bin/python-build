@@ -1829,42 +1829,26 @@ use_xcode_sdk_zlib() {
   # If a custom compiler is used, including XCode SDK will likely break it
   [[ "${CC:-clang}" != "clang" || "$(command -v clang 2>/dev/null || true)" != "/usr/bin/clang" ]] && return 1
 
-  local sdkroot="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
   local sdkver="$(xcrun --sdk macosx --show-sdk-version 2>/dev/null || true)"
   local sdkmajor
   [[ ${sdkver} =~ ^([[:digit:]]+) ]] && sdkmajor="${BASH_REMATCH[1]}"
   if [ -z "$sdkmajor" ]; then
     return 1
   fi
+  local sdkroot="$(xcrun --sdk macosx --show-sdk-path)"
 
   # Since Xcode 16 / macOS SDK 15, Apple tightened how the linker uses SDK content:
-  # SDKs contain text-based stubs (.tbd) and expect one to specify an SDK root (sysroot)
-  # rather than treating SDK/usr/lib like a normal library directory.
-  # Forcing -L "$SDK/usr/lib" now leads to odd link failures.
-  # Using -I "$SDKROOT/usr/include" is still okay but
-  # XCode 16 era -> macOS SDK 15.x and later: avoid adding SDK/usr/lib to -L
-  if [ "$sdkmajor" -ge 15 ]; then
-    echo "python-build: use zlib from xcode sdk (MacOS SDK major version ${sdkmajor} => XCode16+)"
-    # Make zlib.h visible to setup.py (literal path check) and use sysroot for compile/link
-    export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-isysroot ${sdkroot} -I${sdkroot}/usr/include"
-    # Tell linker to use SDK sysroot and link against zlib; avoid -L $SDK/usr/lib
-    export LDFLAGS="${LDFLAGS:+$LDFLAGS }-Wl,-sysroot,${sdkroot} -lz"
-    return 0
-  fi
-
-  if [ -d "${sdkroot}/usr/include" ]; then
-    echo "python-build: use zlib from xcode sdk (legacy SDK major ${sdkmajor})"
-    # Even though SDK's compiler uses the SDK dirs implicitly,
-    # CPython's setup.py has to have nonstandard paths specified explicitly
-    # to search for zlib.h in them
-    export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${sdkroot}/usr/include"
-    if is_mac -ge 1100; then
-      export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${sdkroot}/usr/lib -lz"
-    fi
-    return 0
-  fi
-
-  return 1
+  # forcing -L "$SDK/usr/lib" now leads to odd link failures.
+  echo "python-build: use zlib from xcode sdk"
+  # Since 3.9.1 (bpo-41116), CPython's setup.py logic can search default SDK's sysroot itself
+  # so we don't need to do anything
+  # Since 3.5.2 (Issue #25136), distutils knows to look for Apple XCode 7+ stub libraries (.tbd)
+  # when searching in the SDK
+  # Since 2.7.4 and 3.2.1 (issue #7724), setup.py and distutils can search in the MacOS SDK when
+  # it's explicitly specified with -isysroot
+  
+  export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-isysroot ${sdkroot}"
+  return 0
 }
 
 use_macports_zlib() {
