@@ -33,6 +33,7 @@ jobs:
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
           bin/pyenv --debug install ${{ matrix.python-version }}
+          if [[ $? -ne 0 ]]; then echo "config.log contents:"; cat "${TMP}/python-build.*/config.log; fi
           bin/pyenv global ${{ matrix.python-version }}
           bin/pyenv rehash
       - run: python --version
