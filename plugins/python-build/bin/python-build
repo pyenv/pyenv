@@ -1832,9 +1832,6 @@ use_xcode_sdk_zlib() {
   local sdkroot="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
   [[ -z ${sdkroot} || ! -d ${sdkroot} ]] && return 1
 
-  # If we can't determine SDK info, be conservative and don't enable this logic
-  if [ -z "$sdkroot" ] || [ -z "$sdkver" ]; then
-
   # Since Xcode 16 / macOS SDK 15, Apple tightened how the linker uses SDK content:
   # forcing -L "$SDK/usr/lib" now leads to odd link failures.
   echo "python-build: use zlib from xcode sdk"
