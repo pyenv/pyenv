@@ -1826,24 +1826,24 @@ use_homebrew_zlib() {
 }
 
 use_xcode_sdk_zlib() {
-  local xcode_major;
   # If a custom compiler is used, including XCode SDK will likely break it
   [[ "${CC:-clang}" != "clang" || "$(command -v clang 2>/dev/null || true)" != "/usr/bin/clang" ]] && return 1
-  # The flags set by this function break the build in XCode 16 due to unknown changes from XCode 15
-  # For future-proofing, also disable it if we cannot determine the version
-  [[ $(xcodebuild -version 2>/dev/null || true) =~ ^Xcode\ ([[:digit:]]+) ]] && xcode_major="${BASH_REMATCH[1]}"
-  [[ -z $xcode_major || $xcode_major -ge 16 ]] && return 1
-  local xc_sdk_path="$(xcrun --show-sdk-path 2>/dev/null || true)"
-  if [ -d "$xc_sdk_path" ]; then
-    echo "python-build: use zlib from xcode sdk"
-    # Even though SDK's compiler uses the SDK dirs implicitly,
-    # CPython's setup.py has to have nonstandard paths specified explicitly
-    # to search for zlib.h in them
-    export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${xc_sdk_path}/usr/include"
-    if is_mac -ge 1100; then
-      export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${xc_sdk_path}/usr/lib"
-    fi
-  fi
+
+  local sdkroot="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
+  [[ -z ${sdkroot} || ! -d ${sdkroot} ]] && return 1
+
+  # Since Xcode 16 / macOS SDK 15, Apple tightened how the linker uses SDK content:
+  # forcing -L "$SDK/usr/lib" now leads to odd link failures.
+  echo "python-build: use zlib from xcode sdk"
+  # Since 3.9.1 (bpo-41116), CPython's setup.py logic can search default SDK's sysroot itself
+  # so we don't need to do anything
+  # Since 3.5.2 (Issue #25136), distutils knows to look for Apple XCode 7+ stub libraries (.tbd)
+  # when searching in the SDK
+  # Since 2.7.4 and 3.2.1 (issue #7724), setup.py and distutils can search in the MacOS SDK when
+  # it's explicitly specified with -isysroot
+  
+  export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-isysroot ${sdkroot}"
+  return 0
 }
 
 use_macports_zlib() {
