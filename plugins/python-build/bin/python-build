@@ -1829,13 +1829,8 @@ use_xcode_sdk_zlib() {
   # If a custom compiler is used, including XCode SDK will likely break it
   [[ "${CC:-clang}" != "clang" || "$(command -v clang 2>/dev/null || true)" != "/usr/bin/clang" ]] && return 1
 
-  local sdkver="$(xcrun --sdk macosx --show-sdk-version 2>/dev/null || true)"
-  local sdkmajor
-  [[ ${sdkver} =~ ^([[:digit:]]+) ]] && sdkmajor="${BASH_REMATCH[1]}"
-  if [ -z "$sdkmajor" ]; then
-    return 1
-  fi
-  local sdkroot="$(xcrun --sdk macosx --show-sdk-path)"
+  local sdkroot="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
+  [[ -z ${sdkroot} || ! -d ${sdkroot} ]] && return 1
 
   # Since Xcode 16 / macOS SDK 15, Apple tightened how the linker uses SDK content:
   # forcing -L "$SDK/usr/lib" now leads to odd link failures.
