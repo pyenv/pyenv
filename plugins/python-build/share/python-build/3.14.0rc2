@@ -1,4 +1,3 @@
-#
 prefer_openssl3
 export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
 install_package "openssl-3.5.1" "https://github.com/openssl/openssl/releases/download/openssl-3.5.1/openssl-3.5.1.tar.gz#529043b15cffa5f36077a4d0af83f3de399807181d607441d734196d889b641f" mac_openssl --if has_broken_mac_openssl
