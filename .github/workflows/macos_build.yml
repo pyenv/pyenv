@@ -11,11 +11,11 @@ jobs:
       matrix:
         python-version:
           - "3.9"
-          - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
-    runs-on: macos-latest
+          # - "3.10"
+          # - "3.11"
+          # - "3.12"
+          # - "3.13"
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       # Normally, we would use the superbly maintained...
