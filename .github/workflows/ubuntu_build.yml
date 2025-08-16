@@ -1,11 +1,11 @@
-name: macos_build
+name: ubuntu_build
 on: [pull_request, push]
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)
 
 jobs:
-  macos_build:
+  ubuntu_build:
     strategy:
       fail-fast: false
       matrix:
@@ -15,20 +15,22 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       # Normally, we would use the superbly maintained...
       # - uses: actions/setup-python@v2
       #   with:
       #    python-version: ${{ matrix.python-version }}
-      # ... but in the repo, we want to test pyenv builds on macOS
+      # ... but in the repo, we want to test pyenv builds on Ubuntu
       - run: |
-          brew install openssl readline sqlite3 xz zlib
+          sudo apt-get update -q; sudo apt install -yq make build-essential libssl-dev zlib1g-dev \
+          libbz2-dev libreadline-dev libsqlite3-dev curl \
+          libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
       # https://github.com/pyenv/pyenv#installation
       - run: pwd
       - env:
-          PYENV_ROOT: /Users/runner/work/pyenv/pyenv
+          PYENV_ROOT: /home/runner/work/pyenv/pyenv
         run: |
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
