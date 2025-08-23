@@ -18,6 +18,7 @@ SKIPPED_RELEASES = [
     '22.11.1-0',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
     '22.11.1-1',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
     '22.11.1-2',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
+    '25.3.0-0',     #marked as prerelease, no Linux version
 ]
 
 install_script_fmt = """
