@@ -221,6 +221,7 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 #### Zsh
   
   <details>
+  Add Pyenv startup commands to `~/.zshrc` by running the following in your terminal:
   
   ```zsh
   echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc

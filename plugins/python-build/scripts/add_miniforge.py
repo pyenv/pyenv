@@ -11,13 +11,15 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
 
 MINIFORGE_REPO = 'conda-forge/miniforge'
-DISTRIBUTIONS = ['miniforge', 'mambaforge']
+DISTRIBUTIONS = ['miniforge']
+DISTRIBUTIONS_PRE25  = ['miniforge', 'mambaforge']
 
 SKIPPED_RELEASES = [
     '4.13.0-0',     #has no Mambaforge. We already generated scripts for Miniforge
     '22.11.1-0',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
     '22.11.1-1',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
     '22.11.1-2',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
+    '25.3.0-0',     #marked as prerelease, no Linux version
 ]
 
 install_script_fmt = """
@@ -73,32 +75,36 @@ def create_spec(filename, sha, url):
 
     return spec
 
-def py_version(release):
+def version_tuple(version):
+    return tuple(int(part) for part in version.split('-')[0].split("."))
+
+def py_version(version):
     """Suffix for `verify_pyXXX` to call in the generated build script"""
-    release_line = tuple(int(part) for part in release.split(".")[:2])
-    # current version: mentioned under https://github.com/conda-forge/miniforge?tab=readme-ov-file#miniforge3
+    version_tuple_ = version_tuple(version)
+    # current version: mentioned under https://github.com/conda-forge/miniforge?tab=readme-ov-file#requirements-and-installers
     # transition points:
     # https://github.com/conda-forge/miniforge/blame/main/Miniforge3/construct.yaml
     # look for "- python <version>" in non-pypy branch and which tag the commit is first in
-    if release_line >= (24,5):
+    if version_tuple_ >= (24,5):
         # yes, they jumped from 3.10 directly to 3.12
         # https://github.com/conda-forge/miniforge/commit/bddad0baf22b37cfe079e47fd1680fdfb2183590
         return "312"
-    if release_line >= (4,14):
+    if version_tuple_ >= (4,14):
         return "310"
-    raise ValueError("Bundled Python version unknown for release `%s'"%release)
+    raise ValueError("Bundled Python version unknown for release `%s'"%version)
 
 def supported(filename):
     return ('pypy' not in filename) and ('Windows' not in filename)
 
-def add_version(release):
+def add_version(release, distributions):
     tag_name = release['tag_name']
     download_urls = { f['name']: f['browser_download_url'] for f in release['assets'] }
     # can assume that sha files are named similar to release files so can also check supported(on their names)
     shas = dict([download_sha(url) for (name, url) in download_urls.items() if name.endswith('.sha256') and supported(os.path.basename(name)) and tag_name in name])
     specs = [create_spec(filename, sha, download_urls[filename]) for (filename, sha) in shas.items() if supported(filename)]
+    
 
-    for distribution in DISTRIBUTIONS:
+    for distribution in distributions:
         distribution_specs = [spec for spec in specs if distribution in spec['flavor'].lower()]
         count = len(distribution_specs)
 
@@ -120,15 +126,17 @@ def add_version(release):
 for release in requests.get(f'https://api.github.com/repos/{MINIFORGE_REPO}/releases').json():
     version = release['tag_name']
 
-    logger.info('Looking for %(version)s in %(out_dir)s', locals())
-
-    # This release has no mambaforge artifacts which causes the next check to always trigger.
-    # Build scripts for miniforge3-4.13.0-0 have already been generated.
-    # Assuming this was a fluke, we don't yet need to implement proactively checking all releases for contents
-    # or ignoring a release if _any_ of the flavors is already present in Pyenv.
     if version in SKIPPED_RELEASES:
         continue
 
-    if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in DISTRIBUTIONS):
+    logger.info('Looking for %(version)s in %(out_dir)s', locals())
+
+    # mambaforge is retired https://github.com/conda-forge/miniforge/releases/tag/24.11.2-0
+    if version_tuple(version) >= (24,11,2):
+        distributions = DISTRIBUTIONS
+    else:
+        distributions = DISTRIBUTIONS_PRE25
+
+    if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in distributions):
         logger.info('Downloading %(version)s', locals())
-        add_version(release)
+        add_version(release, distributions)
