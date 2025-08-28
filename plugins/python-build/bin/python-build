@@ -863,7 +863,7 @@ build_package_standard_build() {
       use_homebrew_readline || true
       use_homebrew_ncurses || true
       if is_mac -ge 1014; then
-        use_xcode_sdk_zlib || use_homebrew_zlib || true
+        use_homebrew_zlib || use_xcode_sdk_zlib || true
       else
         use_homebrew_zlib || true
       fi
@@ -873,7 +873,7 @@ build_package_standard_build() {
       use_macports_readline || true
       use_macports_ncurses || true
       if is_mac -ge 1014; then
-        use_xcode_sdk_zlib || use_macports_zlib || true
+        use_macports_zlib || use_xcode_sdk_zlib || true
       else
         use_macports_zlib || true
       fi
