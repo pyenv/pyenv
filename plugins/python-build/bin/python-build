@@ -1820,7 +1820,8 @@ use_homebrew_zlib() {
   local brew_zlib="$(brew --prefix zlib 2>/dev/null || true)"
   if [ -d "$brew_zlib" ]; then
     echo "python-build: use zlib from homebrew"
-    export CFLAGS="-I${brew_zlib} ${CFLAGS}"
+    export CPPFLAGS="-I${brew_zlib}/include${CPPFLAGS:+ ${CPPFLAGS}}"
+    export LDFLAGS="-L${brew_zlib}/lib${LDFLAGS:+ ${LDFLAGS}}"
     lock_in homebrew
   fi
 }
