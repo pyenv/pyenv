@@ -863,7 +863,9 @@ build_package_standard_build() {
       use_homebrew_readline || true
       use_homebrew_ncurses || true
       if is_mac -ge 1014; then
-        use_homebrew_zlib || use_xcode_sdk_zlib || true
+        # While XCode SDK is "always available",
+        # still need a fallback in case we are using an alternate compiler
+        use_xcode_sdk_zlib || use_homebrew_zlib || true
       else
         use_homebrew_zlib || true
       fi
@@ -873,7 +875,9 @@ build_package_standard_build() {
       use_macports_readline || true
       use_macports_ncurses || true
       if is_mac -ge 1014; then
-        use_macports_zlib || use_xcode_sdk_zlib || true
+        # While XCode SDK is "always available",
+        # still need a fallback in case we are using an alternate compiler
+        use_xcode_sdk_zlib || use_homebrew_zlib || true
       else
         use_macports_zlib || true
       fi
@@ -1825,6 +1829,7 @@ use_homebrew_zlib() {
     export CPPFLAGS="-I${brew_zlib}/include${CPPFLAGS:+ ${CPPFLAGS}}"
     export LDFLAGS="-L${brew_zlib}/lib${LDFLAGS:+ ${LDFLAGS}}"
     lock_in homebrew
+    rc=0
   fi
 }
 
@@ -1840,12 +1845,13 @@ use_xcode_sdk_zlib() {
   echo "python-build: use zlib from xcode sdk"
   # Since 3.9.1 (bpo-41116), CPython's setup.py logic can search default SDK's sysroot itself
   # so we don't need to do anything
-  # Since 3.5.2 (Issue #25136), distutils knows to look for Apple XCode 7+ stub libraries (.tbd)
+  # Since 2.7.12 and 3.5.2 (Issue #25136), distutils knows to look for Apple XCode 7+ stub libraries (.tbd)
   # when searching in the SDK
   # Since 2.7.4 and 3.2.1 (issue #7724), setup.py and distutils can search in the MacOS SDK when
   # it's explicitly specified with -isysroot
   
-  export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-isysroot ${sdkroot}"
+  #distutils.unixcompiler and setup.py specifically search CFLAGS for "-isysroot"
+  export CFLAGS="${CFLAGS:+$CFLAGS }-isysroot ${sdkroot}"
   return 0
 }
 
