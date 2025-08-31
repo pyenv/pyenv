@@ -863,7 +863,9 @@ build_package_standard_build() {
       use_homebrew_readline || true
       use_homebrew_ncurses || true
       if is_mac -ge 1014; then
-        use_homebrew_zlib || use_xcode_sdk_zlib || true
+        # While XCode SDK is "always available",
+        # still need a fallback in case we are using an alternate compiler
+        use_xcode_sdk_zlib || use_homebrew_zlib || true
       else
         use_homebrew_zlib || true
       fi
@@ -873,7 +875,9 @@ build_package_standard_build() {
       use_macports_readline || true
       use_macports_ncurses || true
       if is_mac -ge 1014; then
-        use_macports_zlib || use_xcode_sdk_zlib || true
+        # While XCode SDK is "always available",
+        # still need a fallback in case we are using an alternate compiler
+        use_xcode_sdk_zlib || use_homebrew_zlib || true
       else
         use_macports_zlib || true
       fi
@@ -1823,6 +1827,7 @@ use_homebrew_zlib() {
     export CPPFLAGS="-I${brew_zlib}/include${CPPFLAGS:+ ${CPPFLAGS}}"
     export LDFLAGS="-L${brew_zlib}/lib${LDFLAGS:+ ${LDFLAGS}}"
     lock_in homebrew
+    rc=0
   fi
 }
 
