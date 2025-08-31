@@ -1593,6 +1593,7 @@ has_broken_mac_readline() {
   if can_use_macports; then
     use_macports_readline && return 1
   fi
+  return 0
 }
 
 use_homebrew_readline() {
@@ -1682,6 +1683,7 @@ has_broken_mac_openssl() {
       use_macports_openssl && return 1
     fi
   fi
+  return 0
 }
 
 use_homebrew_openssl() {
