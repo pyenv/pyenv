@@ -124,20 +124,25 @@ def add_version(release, distributions):
         else:
             logger.info('Did not find specs for %(distribution)s', locals())
 
-for release in requests.get(f'https://api.github.com/repos/{MINIFORGE_REPO}/releases').json():
-    version = release['tag_name']
 
-    if version in SKIPPED_RELEASES:
-        continue
+def main():
+    for release in requests.get(f'https://api.github.com/repos/{MINIFORGE_REPO}/releases').json():
+        version = release['tag_name']
 
-    logger.info('Looking for %(version)s in %(out_dir)s', locals())
+        if version in SKIPPED_RELEASES:
+            continue
 
-    # mambaforge is retired https://github.com/conda-forge/miniforge/releases/tag/24.11.2-0
-    if version_tuple(version) >= (24,11,2):
-        distributions = DISTRIBUTIONS
-    else:
-        distributions = DISTRIBUTIONS_PRE25
+        logger.info('Looking for %(version)s in %(out_dir)s', locals())
 
-    if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in distributions):
-        logger.info('Downloading %(version)s', locals())
-        add_version(release, distributions)
+        # mambaforge is retired https://github.com/conda-forge/miniforge/releases/tag/24.11.2-0
+        if version_tuple(version) >= (24, 11, 2):
+            distributions = DISTRIBUTIONS
+        else:
+            distributions = DISTRIBUTIONS_PRE25
+
+        if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in distributions):
+            logger.info('Downloading %(version)s', locals())
+            add_version(release, distributions)
+
+if __name__ == '__main__':
+    main()
