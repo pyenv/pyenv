@@ -1,4 +1,4 @@
-prefer_openssl11
+prefer_openssl3
 export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
 # Avoid a compilation error when linking against OpenSSL built with SSLv3 support (fixed in 3.10.0) (#2181)
 export PYTHON_CFLAGS="-DOPENSSL_NO_SSL3${PYTHON_CFLAGS:+ $PYTHON_CFLAGS}"

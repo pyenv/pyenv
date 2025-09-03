@@ -1,4 +1,4 @@
-prefer_openssl11
+prefer_openssl3
 export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
 export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
 install_package "openssl-1.1.1q" "https://www.openssl.org/source/openssl-1.1.1q.tar.gz#d7939ce614029cdff0b6c20f0e2e5703158a489a72b2507b8bd51bf8c8fd10ca" mac_openssl --if has_broken_mac_openssl

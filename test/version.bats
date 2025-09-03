@@ -70,3 +70,12 @@ pyenv-version-without-stderr() {
 3.3.3 (set by PYENV_VERSION environment variable)
 OUT
 }
+
+@test "--bare prints just the name" {
+  create_version "3.3.3"
+  PYENV_VERSION=3.3.3 run pyenv-version --bare
+  assert_success
+  assert_output <<OUT
+3.3.3
+OUT
+}

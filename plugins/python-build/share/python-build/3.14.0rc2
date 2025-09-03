@@ -1,0 +1,9 @@
+prefer_openssl3
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+install_package "openssl-3.5.1" "https://github.com/openssl/openssl/releases/download/openssl-3.5.1/openssl-3.5.1.tar.gz#529043b15cffa5f36077a4d0af83f3de399807181d607441d734196d889b641f" mac_openssl --if has_broken_mac_openssl
+install_package "readline-8.2" "https://ftpmirror.gnu.org/readline/readline-8.2.tar.gz#3feb7171f16a84ee82ca18a36d7b9be109a52c04f492a053331d7d1095007c35" mac_readline --if has_broken_mac_readline
+if has_tar_xz_support; then
+    install_package "Python-3.14.0rc2" "https://www.python.org/ftp/python/3.14.0/Python-3.14.0rc2.tar.xz#bc62854cf232345bd22c9091a68464e01e056c6473a3fffa84572c8a342da656" standard verify_py314 copy_python_gdb ensurepip
+else
+    install_package "Python-3.14.0rc2" "https://www.python.org/ftp/python/3.14.0/Python-3.14.0rc2.tgz#b336f5d76fcf2725b29108f253d4338fbe4cc6a17cd8baf059deebb5a343dd8f" standard verify_py314 copy_python_gdb ensurepip
+fi

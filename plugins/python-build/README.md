@@ -138,6 +138,17 @@ would break all Pyenv-managed installations that depend on it.
 You can use a [community plugin `fix-version`](https://github.com/pyenv/pyenv/wiki/Plugins#community-plugins)
 to fix installations in such a case.
 
+##### MacPorts
+
+MacPorts Homebrew is used to find dependency packages if `port` is found on `PATH` in MacOS.
+
+Set `PYTHON_BUILD_USE_MACPORTS` or `PYTHON_BUILD_SKIP_MACPORTS` to override this default.
+
+###### Interaction with Homebrew
+
+If both Homebrew and MacPorts are installed and allowed to be used, Homebrew takes preference.
+There first ecosystem where any of the required dependency packages is found is used.
+
 ##### Portage
 
 In FreeBSD, if `pkg` is on PATH, Ports are searched for some dependencies that Configure is known to not search for via `pkg-config`.
@@ -164,6 +175,8 @@ You can set certain environment variables to control the build process.
 * `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it would normally will.
 * `PYTHON_BUILD_USE_HOMEBREW`, if set, will search for libraries installed by Homebrew when it would normally not.
 * `PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA`, override the Homebrew OpenSSL formula to use.
+* `PYTHON_BUILD_SKIP_MACPORTS`, if set, will not search for libraries installed by MacPorts when it would normally will.
+* `PYTHON_BUILD_USE_MACPORTS`, if set, will search for libraries installed by MacPorts when it would normally not.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
   in `share/python-build/` are looked up.
 * `PYTHON_BUILD_DEFINITIONS` can be a list of colon-separated paths that get

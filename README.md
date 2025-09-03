@@ -50,6 +50,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 * **[Usage](#usage)**
   * [Install additional Python versions](#install-additional-python-versions)
     * [Prefix auto-resolution to the latest version](#prefix-auto-resolution-to-the-latest-version)
+    * [Python versions with extended support](#python-versions-with-extended-support)
   * [Switch between Python versions](#switch-between-python-versions)
     * [Making multiple versions available](#making-multiple-versions-available)
   * [Uninstall Python versions](#uninstall-python-versions)
@@ -83,7 +84,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 <details>
 
 The Homebrew option from the [MacOS section below](#macos) would also work if you have Homebrew installed.
-  
+
 ##### 1. Automatic installer (Recommended)
 
 ```bash
@@ -114,7 +115,7 @@ easy to fork and contribute any changes back upstream.
 #### MacOS
 
 <details>
-  
+
 The options from the [Linux section above](#linuxunix) also work but Homebrew is recommended for basic usage.
 
 ##### [Homebrew](https://brew.sh) in macOS
@@ -220,37 +221,56 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 #### Zsh
   
   <details>
+  Add Pyenv startup commands to `~/.zshrc` by running the following in your terminal:
   
   ```zsh
-    echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
-    echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
-    echo 'eval "$(pyenv init - zsh)"' >> ~/.zshrc
+  echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
+  echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
+  echo 'eval "$(pyenv init - zsh)"' >> ~/.zshrc
   ```
   
   If you wish to get Pyenv in noninteractive login shells as well, also add the commands to `~/.zprofile` or `~/.zlogin`.
   </details>
-  
+
 #### Fish
-  
+
   <details>
-    
+
   1. If you have Fish 3.2.0 or newer, execute this interactively:
-     ~~~ fish
-       set -Ux PYENV_ROOT $HOME/.pyenv
-       fish_add_path $PYENV_ROOT/bin
-     ~~~
+     ```fish
+     set -Ux PYENV_ROOT $HOME/.pyenv
+     test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
+     ```
 
   2. Otherwise, execute the snippet below:
-     ~~~ fish
-       set -Ux PYENV_ROOT $HOME/.pyenv
-       set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
-     ~~~
+     ```fish
+     set -Ux PYENV_ROOT $HOME/.pyenv
+     test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+     ```
 
   3. Now, add this to `~/.config/fish/config.fish`:
-     ~~~ fish
-       pyenv init - fish | source
-     ~~~
+     ```fish
+     pyenv init - fish | source
+     ```
   </details>
+
+#### Nushell
+
+  <details>
+
+  Add the following lines to your `config.nu` to add Pyenv and its shims to your `PATH`.
+  Shell integration (completions and subcommands changing the shell's state)
+  isn't currently supported.
+
+  ~~~ nu
+  $env.PYENV_ROOT = "~/.pyenv" | path expand
+  if (( $"($env.PYENV_ROOT)/bin" | path type ) == "dir") {
+    $env.PATH = $env.PATH | prepend $"($env.PYENV_ROOT)/bin" }
+  $env.PATH = $env.PATH | prepend $"(pyenv root)/shims"
+  ~~~
+
+  </details>
+
 
 ### C. Restart your shell
 ----
@@ -349,8 +369,9 @@ You can run [`pyenv latest -k <prefix>`](COMMANDS.md#pyenv-latest) to see how `p
 
 See the [`pyenv latest` documentation](COMMANDS.md#pyenv-latest) for details.
 
+----
 
-<details> <summary> Python versions with extended support </summary>
+#### Python versions with extended support
 
 For the following Python releases, Pyenv applies user-provided patches that add support for some newer environments.
 Though we don't actively maintain those patches, since existing releases never change,

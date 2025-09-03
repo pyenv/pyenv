@@ -55,7 +55,7 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
   echo true > "${TMP}/definitions/2.7.8-test"
   mkdir -p "${TMP}/other"
   echo false > "${TMP}/other/2.7.8-test"
-  run bin/python-build "2.7.8-test" "${TMP}/install"
+  run python-build "2.7.8-test" "${TMP}/install"
   assert_success ""
 }
 

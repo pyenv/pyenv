@@ -6,7 +6,7 @@ jobs:
     outputs:
       versions: ${{steps.modified-versions.outputs.versions}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: git fetch origin "$GITHUB_BASE_REF"
       - shell: bash
         run: >
@@ -36,10 +36,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
-        os: ["macos-13", "macos-14"]
+        os: ["macos-13", "macos-14", "macos-15"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"
@@ -96,10 +96,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions_cpython_only)}}
-        os: ["macos-13", "macos-14"]
+        os: ["macos-13", "macos-14", "macos-15"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"
@@ -160,7 +160,7 @@ jobs:
         os: ["ubuntu-22.04", "ubuntu-24.04"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"
@@ -218,7 +218,7 @@ jobs:
         os: ["ubuntu-latest"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"

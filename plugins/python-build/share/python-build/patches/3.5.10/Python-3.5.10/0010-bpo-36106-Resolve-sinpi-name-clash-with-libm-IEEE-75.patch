@@ -1,0 +1,68 @@
+From f57cd8288dbe6aba99c057f37ad6d58f8db75350 Mon Sep 17 00:00:00 2001
+From: Dima Pasechnik <dimpase@gmail.com>
+Date: Tue, 26 Feb 2019 06:36:11 +0000
+Subject: [PATCH] bpo-36106: Resolve sinpi name clash with libm (IEEE-754
+ violation). (GH-12027)
+
+The standard math library (libm) may follow IEEE-754 recommendation to
+include an implementation of sinPi(), i.e. sinPi(x):=sin(pi*x).
+And this triggers a name clash, found by FreeBSD developer
+Steve Kargl, who worken on putting sinpi into libm used on FreeBSD
+(it has to be named "sinpi", not "sinPi", cf. e.g.
+https://en.cppreference.com/w/c/experimental/fpext4).
+---
+ .../next/Library/2019-02-25-13-21-43.bpo-36106.VuhEiQ.rst | 1 +
+ Modules/mathmodule.c                                      | 8 ++++----
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/Library/2019-02-25-13-21-43.bpo-36106.VuhEiQ.rst
+
+diff --git a/Misc/NEWS.d/next/Library/2019-02-25-13-21-43.bpo-36106.VuhEiQ.rst b/Misc/NEWS.d/next/Library/2019-02-25-13-21-43.bpo-36106.VuhEiQ.rst
+new file mode 100644
+index 00000000000..36e17508cd4
+--- /dev/null
++++ b/Misc/NEWS.d/next/Library/2019-02-25-13-21-43.bpo-36106.VuhEiQ.rst
+@@ -0,0 +1 @@
++Resolve potential name clash with libm's sinpi(). Patch by Dmitrii Pasechnik.
+diff --git a/Modules/mathmodule.c b/Modules/mathmodule.c
+index 2272f622f0b..fd0eb327c74 100644
+--- a/Modules/mathmodule.c
++++ b/Modules/mathmodule.c
+@@ -100,7 +100,7 @@ static const double sqrtpi = 1.772453850905516027298167483341145182798;
+     }
+ 
+ static double
+-sinpi(double x)
++m_sinpi(double x)
+ {
+     double y, r;
+     int n;
+@@ -328,7 +328,7 @@ m_tgamma(double x)
+        integer. */
+     if (absx > 200.0) {
+         if (x < 0.0) {
+-            return 0.0/sinpi(x);
++            return 0.0/m_sinpi(x);
+         }
+         else {
+             errno = ERANGE;
+@@ -352,7 +352,7 @@ m_tgamma(double x)
+     }
+     z = z * lanczos_g / y;
+     if (x < 0.0) {
+-        r = -pi / sinpi(absx) / absx * exp(y) / lanczos_sum(absx);
++        r = -pi / m_sinpi(absx) / absx * exp(y) / lanczos_sum(absx);
+         r -= z * r;
+         if (absx < 140.0) {
+             r /= pow(y, absx - 0.5);
+@@ -423,7 +423,7 @@ m_lgamma(double x)
+     r += (absx - 0.5) * (log(absx + lanczos_g - 0.5) - 1);
+     if (x < 0.0)
+         /* Use reflection formula to get value for negative x. */
+-        r = logpi - log(fabs(sinpi(absx))) - log(absx) - r;
++        r = logpi - log(fabs(m_sinpi(absx))) - log(absx) - r;
+     if (Py_IS_INFINITY(r))
+         errno = ERANGE;
+     return r;
+-- 
+2.36.1.windows.1
+
