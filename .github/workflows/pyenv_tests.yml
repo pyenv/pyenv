@@ -40,8 +40,13 @@ jobs:
         run: |
           echo $PYENV_ROOT
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
-      - run: |
+      - name: Run test on the host
+        run: |
           make test
+      - name: Run test with docker
+        if: ${{ ! contains(matrix.os, 'macos') }}
+        run: |
+          make test-docker
       - env:
           PYENV_NATIVE_EXT: 1
         run: |
