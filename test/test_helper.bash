@@ -5,6 +5,7 @@ unset PYENV_DIR
 if [ -z "$PYENV_TEST_DIR" ]; then
   PYENV_TEST_DIR="${BATS_TMPDIR}/pyenv"
   export PYENV_TEST_DIR="$(mktemp -d "${PYENV_TEST_DIR}.XXX" 2>/dev/null || echo "$PYENV_TEST_DIR")"
+  mkdir -p "${PYENV_TEST_DIR}"
 
   if enable -f "${BATS_TEST_DIRNAME}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
     export PYENV_TEST_DIR="$(realpath "$PYENV_TEST_DIR")"

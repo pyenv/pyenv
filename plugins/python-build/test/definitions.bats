@@ -87,9 +87,9 @@ jython-2.5.4-rc1
 jython-2.7-beta1
 jython-2.7-beta2
 jython-2.7-beta3"
-  for ver in "$expected"; do
+  while IFS=$'\n' read -r ver; do
     touch "${PYTHON_BUILD_ROOT}/share/python-build/$ver"
-  done
+  done <<<"$expected"
   run python-build --definitions
   assert_success "$expected"
 }

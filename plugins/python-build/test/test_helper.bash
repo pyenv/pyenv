@@ -6,9 +6,7 @@ if [ "$FIXTURE_ROOT" != "$BATS_TEST_DIRNAME/fixtures" ]; then
   export FIXTURE_ROOT="$BATS_TEST_DIRNAME/fixtures"
   export INSTALL_ROOT="$TMP/install"
   PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-  if [ "FreeBSD" = "$(uname -s)" ]; then
-    PATH="/usr/local/bin:$PATH"
-  fi
+  PATH="/usr/local/bin:$PATH"
   PATH="$BATS_TEST_DIRNAME/../bin:$PATH"
   PATH="$TMP/bin:$PATH"
   export PATH
@@ -29,7 +27,7 @@ stub() {
   export "${prefix}_STUB_END"=
 
   mkdir -p "${TMP}/bin"
-  ln -sf "${BATS_TEST_DIRNAME}/stubs/stub" "${TMP}/bin/${program}"
+  cp "${BATS_TEST_DIRNAME}/stubs/stub" "${TMP}/bin/${program}"
 
   touch "${TMP}/${program}-stub-plan"
   for arg in "$@"; do printf "%s\n" "$arg" >> "${TMP}/${program}-stub-plan"; done

@@ -238,6 +238,7 @@ OUT
 }
 
 @test "non-bare output shows symlink contents" {
+  stub_system_python
   create_version "1.9.0"
   create_alias "link" "1.9.0"
 

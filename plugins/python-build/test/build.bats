@@ -378,6 +378,9 @@ OUT
   stub port "-q installed libyaml : echo '  libyaml @0.2.5_0 (active)'"
   for i in {1..3}; do stub port false; done
   stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  PORT_PREFIX="$(which port)"
+  PORT_PREFIX="${PORT_PREFIX%/bin/port}"
 
   install_fixture definitions/needs-yaml
   assert_success
@@ -403,6 +406,9 @@ OUT
   stub port "-q installed readline : echo '  readline @8.2.013_0 (active)'"
   for i in {1..2}; do stub port false; done
   stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  PORT_PREFIX="$(which port)"
+  PORT_PREFIX="${PORT_PREFIX%/bin/port}"
 
   run_inline_definition <<DEF
 install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
@@ -431,6 +437,9 @@ OUT
   stub port "-q installed ncurses : echo '$ncurses_libdir'"
   stub port false
   stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  PORT_PREFIX="$(which port)"
+  PORT_PREFIX="${PORT_PREFIX%/bin/port}"
 
   run_inline_definition <<DEF
 install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
@@ -845,6 +854,7 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
+  for i in {1..6}; do stub brew false; done
 
   stub sysctl false
   stub_make_install
@@ -857,6 +867,7 @@ DEF
 
   unstub uname
   unstub sw_vers
+  unstub brew
   unstub make
 
   assert_build_log <<OUT
@@ -872,6 +883,7 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
+  for i in {1..6}; do stub brew false; done
 
   stub sysctl '-n hw.ncpu : echo 4'
   stub_make_install
@@ -884,6 +896,7 @@ DEF
 
   unstub uname
   unstub sw_vers
+  unstub brew
   unstub sysctl
   unstub make
 
