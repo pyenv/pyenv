@@ -2,9 +2,9 @@
 
 load test_helper
 
-setup() {
-  export PYENV_ROOT="${TMP}/pyenv"
-  export HOOK_PATH="${TMP}/i has hooks"
+_setup() {
+  export PYENV_ROOT="${BATS_TEST_TMPDIR}/pyenv"
+  export HOOK_PATH="${BATS_TEST_TMPDIR}/i has hooks"
   mkdir -p "$HOOK_PATH"
 }
 
@@ -16,7 +16,7 @@ OUT
   stub pyenv-hooks "install : echo '$HOOK_PATH'/install.bash"
   stub pyenv-rehash "echo rehashed"
 
-  definition="${TMP}/3.6.2"
+  definition="${BATS_TEST_TMPDIR}/3.6.2"
   stub pyenv-latest "echo $definition"
 
   cat > "$definition" <<<"echo python-build"

@@ -2,7 +2,7 @@
 
 load test_helper
 
-setup() {
+_setup() {
   mkdir -p "${PYENV_TEST_DIR}/myproject"
   cd "${PYENV_TEST_DIR}/myproject"
 }

@@ -11,7 +11,7 @@ create_alias() {
   ln -s "$2" "${PYENV_ROOT}/versions/$1"
 }
 
-setup() {
+_setup() {
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
 }

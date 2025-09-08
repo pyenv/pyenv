@@ -1,9 +1,9 @@
 #!/usr/bin/env bats
 
 load test_helper
-export PYENV_ROOT="${TMP}/pyenv"
 
-setup() {
+_setup() {
+  export PYENV_ROOT="${BATS_TEST_TMPDIR}/pyenv"
   stub pyenv-hooks 'install : true'
   stub pyenv-rehash true
 }
@@ -39,8 +39,8 @@ stub_python_build() {
   run pyenv-install 3.4.1 3.4.2
   assert_success
   assert_output <<OUT
-python-build 3.4.1 ${TMP}/pyenv/versions/3.4.1
-python-build 3.4.2 ${TMP}/pyenv/versions/3.4.2
+python-build 3.4.1 ${BATS_TEST_TMPDIR}/pyenv/versions/3.4.1
+python-build 3.4.2 ${BATS_TEST_TMPDIR}/pyenv/versions/3.4.2
 OUT
 
   unstub python-build
@@ -54,7 +54,7 @@ OUT
   run pyenv-install 3.4.1 3.4.2
   assert_failure
   assert_output <<OUT
-fail: python-build 3.4.1 ${TMP}/pyenv/versions/3.4.1
+fail: python-build 3.4.1 ${BATS_TEST_TMPDIR}/pyenv/versions/3.4.1
 OUT
 
   unstub python-build
