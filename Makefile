@@ -29,7 +29,10 @@ $(TEST_UNIT_DOCKER_TARGETS): $(TEST_UNIT_DOCKER_PREFIX)-% : $(TEST_BATS_IMAGE_PR
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
 		-u "$$(id -u $$(whoami)):$$(id -g $$(whoami))" \
-		$(INTERACTIVE) \
+		$${BATS_TEST_FILTER:+-e BATS_TEST_FILTER="$${BATS_TEST_FILTER}"} \
+		$${BATS_FILE_FILTER:+-e BATS_FILE_FILTER="$${BATS_FILE_FILTER}"} \
+	        $${CI+-e CI="$${CI}"} \
+	        $(INTERACTIVE) \
 		$(DOCKER_IMAGE):$(DOCKER_TAG) \
 		test/run
 
@@ -52,9 +55,10 @@ $(TEST_PLUGIN_DOCKER_TARGETS): $(TEST_PLUGIN_DOCKER_PREFIX)-% : $(TEST_BATS_IMAG
 		-v /etc/passwd:/etc/passwd:ro \
 		-v /etc/group:/etc/group:ro \
 		-u "$$(id -u $$(whoami)):$$(id -g $$(whoami))" \
-		$(INTERACTIVE) \
+	        $${CI+-e CI="$${CI}"} \
+	        $(INTERACTIVE) \
 		$(DOCKER_IMAGE):$(DOCKER_TAG) \
-		bats plugins/python-build/test
+		bats $${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} plugins/python-build/test/$${BATS_FILE_FILTER}
 
 # Build all images needed for bats under docker
 .PHONY: $(TEST_BATS_IMAGE_PREFIX)
@@ -89,7 +93,7 @@ test-unit: bats
 	PATH="./bats/bin:$$PATH" test/run
 	
 test-plugin: bats
-	cd plugins/python-build && $(PWD)/bats/bin/bats $${CI:+--tap} test
+	cd plugins/python-build && $(PWD)/bats/bin/bats $${CI:+--tap} $${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
 
 PYTHON_BUILD_ROOT := $(CURDIR)/plugins/python-build
 PYTHON_BUILD_OPTS ?= --verbose
