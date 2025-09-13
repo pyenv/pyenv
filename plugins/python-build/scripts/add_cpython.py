@@ -6,27 +6,28 @@ then writes a build script for any which do not exist locally,
 saving it to plugins/python-build/share/python-build.
 
 """
+import argparse
+import collections
+import functools
 import logging
+import pathlib
 import re
 import string
 import sys
 import textwrap
-from argparse import ArgumentParser
-from collections import defaultdict
-from dataclasses import dataclass
+import typing
 from enum import Enum
-from functools import total_ordering
-from pathlib import Path
 from typing import NamedTuple, List, Optional, DefaultDict, Dict
 
+import packaging.version
 import requests_html
 
 logger = logging.getLogger(__name__)
 
 REPO = "https://www.python.org/ftp/python/"
 
-here = Path(__file__).resolve()
-out_dir: Path = here.parent.parent / "share" / "python-build"
+here = pathlib.Path(__file__).resolve()
+out_dir: pathlib.Path = here.parent.parent / "share" / "python-build"
 
 
 class StrEnum(str, Enum):
@@ -53,31 +54,6 @@ class SupportedOS(StrEnum):
     MACOSX = "MacOSX"
 
 
-class SupportedArch(StrEnum):
-    AARCH64 = "aarch64"
-    ARM64 = "arm64"
-    PPC64LE = "ppc64le"
-    S390X = "s390x"
-    X86_64 = "x86_64"
-    X86 = "x86"
-
-
-class Flavor(StrEnum):
-    ANACONDA = "anaconda"
-    MINICONDA = "miniconda"
-
-
-class TFlavor(StrEnum):
-    ANACONDA = "Anaconda"
-    MINICONDA = "Miniconda"
-
-
-class Suffix(StrEnum):
-    TWO = "2"
-    THREE = "3"
-    NONE = ""
-
-
 PyVersion = None
 class PyVersionMeta(type):
     def __getattr__(self, name):
@@ -87,7 +63,7 @@ class PyVersionMeta(type):
         return super(PyVersionMeta,self).__getattr__(self, name)
 
 
-@dataclass(frozen=True)
+@collections.dataclass(frozen=True)
 class PyVersion(metaclass=PyVersionMeta):
     major: str
     minor: str
@@ -111,7 +87,7 @@ class PyVersion(metaclass=PyVersionMeta):
         return self.value
 
 
-@total_ordering
+@functools.total_ordering
 class VersionStr(str):
     def info(self):
         return tuple(int(n) for n in self.replace("-", ".").split("."))
@@ -133,8 +109,6 @@ class VersionStr(str):
 
 
 class CondaVersion(NamedTuple):
-    flavor: Flavor
-    suffix: Suffix
     version_str: VersionStr
     py_version: Optional[PyVersion]
 
@@ -174,8 +148,6 @@ class CondaVersion(NamedTuple):
         """
         if self.py_version:
             return self.py_version
-        elif self.suffix == Suffix.TWO:
-            return PyVersion.PY27
 
         v = self.version_str.info()
         if self.flavor == "miniconda":
@@ -208,66 +180,15 @@ class CondaVersion(NamedTuple):
         raise ValueError(self.flavor)
 
 
-class CondaSpec(NamedTuple):
-    tflavor: TFlavor
-    version: CondaVersion
-    os: SupportedOS
-    arch: SupportedArch
-    md5: str
-    repo: str
-    py_version: Optional[PyVersion] = None
+class PyenvCPythonVersion(packaging.version.Version):
+    _free_threaded: bool = False
 
-    @classmethod
-    def from_filestem(cls, stem, md5, repo, py_version=None):
-        # The `*vers` captures the new trailing `-1` in some file names (a build number?)
-        # so they can be processed properly.
-        miniconda_n, *vers, os, arch = stem.split("-")
-        ver = "-".join(vers)
-        suffix = miniconda_n[-1]
-        if suffix in string.digits:
-            tflavor = miniconda_n[:-1]
-        else:
-            tflavor = miniconda_n
-            suffix = ""
-        flavor = tflavor.lower()
-
-        if ver.startswith("py"):
-            py_ver, ver = ver.split("_", maxsplit=1)
-            py_ver = PyVersion(py_ver)
-        else:
-            py_ver = None
-        spec = CondaSpec(
-            TFlavor(tflavor),
-            CondaVersion(Flavor(flavor), Suffix(suffix), VersionStr(ver), py_ver),
-            SupportedOS(os),
-            SupportedArch(arch),
-            md5,
-            repo,
-            py_ver
-        )
-        if py_version is None and py_ver is None and ver != "latest":
-            spec = spec.with_py_version(spec.version.default_py_version())
-        return spec
-
-    def to_install_lines(self):
-        """
-        Installation command for this version of Miniconda for use in a Pyenv installation script
-        """
-        return install_line_fmt.format(
-            tflavor=self.tflavor,
-            flavor=self.version.flavor,
-            repo=self.repo,
-            suffix=self.version.suffix,
-            version_str=self.version.version_str,
-            version_py_version=f"{self.version.py_version}_" if self.version.py_version else "",
-            os=self.os,
-            arch=self.arch,
-            md5=self.md5,
-            py_version=self.py_version,
-        )
-
-    def with_py_version(self, py_version: PyVersion):
-        return CondaSpec(*self[:-1], py_version=py_version)
+    def __init__(self, version_str):
+        m = re.match(r"^(.*[^a-zA-Z])t$", version_str)
+        if m:
+            self._free_threaded = True
+            version_str = m.group(1)
+        super().__init__(self, version_str)
 
 
 def make_script(specs: List[CondaSpec]):
@@ -278,92 +199,46 @@ def make_script(specs: List[CondaSpec]):
     )
 
 
-def get_existing_condas(name):
+def get_existing_scripts(name, pattern) -> typing.Generator[typing.Tuple[str, PyenvCPythonVersion]]:
     """
-    Enumerate existing Miniconda installation scripts in share/python-build/ except rolling releases.
-
-    :returns: A generator of :class:`CondaVersion` objects.
+    Enumerate existing installation scripts in share/python-build/ by pattern
     """
-    logger.info("Getting known %(name)s versions",locals())
+    logger.debug("Getting existing versions")
     for p in out_dir.iterdir():
         entry_name = p.name
-        if not p.is_file() or not entry_name.startswith(name):
+        if not p.is_file() or not re.match(pattern,entry_name):
             continue
         try:
-            v = CondaVersion.from_str(entry_name)
-            if v.version_str != "latest":
-                logger.debug("Found existing %(name)s version %(v)s", locals())
-                yield v
+            v = PyenvCPythonVersion(entry_name)
+            logger.debug("Existing %(name)s version %(v)s", locals())
+            yield entry_name, v
         except ValueError as e:
             logger.error("Unable to parse existing version %s: %s", entry_name, e)
 
 
-def get_available_condas(name, repo):
+def get_available_versions(name, repo) -> typing.Generator[typing.Tuple[str, str]]:
     """
-    Fetch remote miniconda versions.
-
-    :returns: A generator of :class:`CondaSpec` objects for each release available for download
-    except rolling releases.
+    Fetch remote versions
     """
     logger.info("Fetching remote %(name)s versions",locals())
     session = requests_html.HTMLSession()
     response = session.get(repo)
     page: requests_html.HTML = response.html
-    table = page.find("table", first=True)
-    rows = table.find("tr")[1:]
-    for row in rows:
-        f, size, date, md5 = row.find("td")
-        fname = f.text
-        md5 = md5.text
+    table = page.find("pre", first=True)
+    # the first entry is ".."
+    links = table.find("a")[1:]
+    for link in links:
+        logger.debug('Available %(name)s version: %(link)s', locals())
+        yield link.text, link.attrs['href']
 
-        if not fname.endswith(".sh"):
-            continue
-        stem = fname[:-3]
+def main():
+    args = parse_args()
+    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
 
-        try:
-            s = CondaSpec.from_filestem(stem, md5, repo)
-            if s.version.version_str != "latest":
-                logger.debug("Found remote %(name)s version %(s)s", locals())
-                yield s
-        except ValueError:
-            pass
-
-
-def key_fn(spec: CondaSpec):
-    return (
-        spec.tflavor,
-        spec.version.version_str.info(),
-        spec.version.suffix.value,
-        spec.os.value,
-        spec.arch.value,
-    )
-
-
-if __name__ == "__main__":
-    parser = ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "-d", "--dry-run", action="store_true",
-        help="Do not write scripts, just report them to stdout",
-    )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", default=0,
-        help="Increase verbosity of logging",
-    )
-    parsed = parser.parse_args()
-
-    logging.basicConfig(level=logging.DEBUG if parsed.verbose else logging.INFO)
-
-    existing_versions = set()
-    available_specs = set()
-    for name,repo in ("miniconda",MINICONDA_REPO),("anaconda",ANACONDA_REPO):
-        existing_versions |= set(get_existing_condas(name))
-        available_specs |= set(get_available_condas(name, repo))
-
+    existing_versions = dict(get_existing_scripts("CPython", "^\d++\.\d++(?!-)"))
+    available_versions = dict(get_available_versions("CPython", REPO))
     # version triple to triple-ified spec to raw spec
-    to_add: DefaultDict[
-        CondaVersion, Dict[CondaSpec, CondaSpec]
-    ] = defaultdict(dict)
-
+    versions_to_add = set(available_versions.keys()) - set(existing_versions.keys())
     logger.info("Checking for new versions")
     for s in sorted(available_specs, key=key_fn):
         key = s.version
@@ -382,15 +257,32 @@ if __name__ == "__main__":
             continue
 
         to_add[key][s] = s
-
     logger.info("Writing %s scripts", len(to_add))
     for ver, d in to_add.items():
         specs = list(d.values())
         fpath = out_dir / ver.to_filename()
         script_str = make_script(specs)
         logger.info("Writing script for %s", ver)
-        if parsed.dry_run:
+        if args.dry_run:
             print(f"Would write spec to {fpath}:\n" + textwrap.indent(script_str, "  "))
         else:
             with open(fpath, "w") as f:
                 f.write(script_str)
+
+
+def parse_args():
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "-d", "--dry-run", action="store_true",
+        help="Do not write scripts, just report them to stdout",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", default=0,
+        help="Increase verbosity of logging",
+    )
+    parsed = parser.parse_args()
+    return parsed
+
+
+if __name__ == "__main__":
+    main()
