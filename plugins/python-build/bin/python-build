@@ -464,7 +464,7 @@ http_get_curl() {
   local curl_is_snap;
   if [[ $(command -v curl) == "/snap/"* ]]; then curl_is_snap=1; fi
   if [[ -n $2 && -n $curl_is_snap ]]; then out="$HOME/$(basename "$2")"; else out="$2"; fi
-  curl -q -o "${out:--}" -sSLf ${CURL_OPTS} "$1"
+  curl -q -o "${out:--}" -sSLf ${CURL_OPTS} "$1" || return $?
   if [[ -n $out && -n $curl_is_snap ]]; then mv "$out" "$2"; fi
 }
 
