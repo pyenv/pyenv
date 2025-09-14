@@ -1508,7 +1508,9 @@ use_homebrew() {
   if command -v brew &>/dev/null; then
     local brew_prefix="$(brew --prefix 2>/dev/null || true)"
     # /usr/local/lib:/usr/lib is the default library search path
-    if [[ -n $brew_prefix && $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ]]; then
+    if [[ -n $brew_prefix && ( ( $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ) 
+        #when -isysroot is passed to Apple CLang, /usr/(local) are excluded from the default search path
+        || ( is_mac && osx_using_default_compiler && $CFLAGS =~ (^|\ )-isysroot\  ) ) ]]; then
       export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${brew_prefix}/include"
       append_ldflags_libs "-L${brew_prefix}/lib -Wl,-rpath,${brew_prefix}/lib"
       lock_in homebrew
@@ -1842,7 +1844,7 @@ use_homebrew_zlib() {
 
 use_xcode_sdk_zlib() {
   # If a custom compiler is used, including XCode SDK will likely break it
-  [[ "${CC:-clang}" != "clang" || "$(command -v clang 2>/dev/null || true)" != "/usr/bin/clang" ]] && return 1
+  osx_using_default_compiler || return 1
 
   local sdkroot="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
   [[ -z ${sdkroot} || ! -d ${sdkroot} ]] && return 1
@@ -1860,6 +1862,10 @@ use_xcode_sdk_zlib() {
   #distutils.unixcompiler and setup.py specifically search CFLAGS for "-isysroot"
   export CFLAGS="${CFLAGS:+$CFLAGS }-isysroot ${sdkroot}"
   return 0
+}
+
+osx_using_default_compiler() {
+  [[ "${CC:-clang}" == "clang" && "$(command -v clang 2>/dev/null || true)" == "/usr/bin/clang" ]]
 }
 
 use_macports_zlib() {
