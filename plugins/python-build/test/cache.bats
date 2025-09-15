@@ -1,10 +1,9 @@
 #!/usr/bin/env bats
 
 load test_helper
-export PYTHON_BUILD_SKIP_MIRROR=1
-export PYTHON_BUILD_CACHE_PATH="$TMP/cache"
-
-setup() {
+_setup() {
+  export PYTHON_BUILD_SKIP_MIRROR=1
+  export PYTHON_BUILD_CACHE_PATH="$BATS_TEST_TMPDIR/cache"
   mkdir "$PYTHON_BUILD_CACHE_PATH"
 }
 
@@ -77,7 +76,7 @@ setup() {
 @test "nonexistent cache directory is ignored" {
   stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
 
-  export PYTHON_BUILD_CACHE_PATH="${TMP}/nonexistent"
+  export PYTHON_BUILD_CACHE_PATH="${BATS_TEST_TMPDIR}/nonexistent"
 
   install_fixture definitions/without-checksum
 

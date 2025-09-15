@@ -32,14 +32,14 @@ load test_helper
 }
 
 @test "inherited PYENV_DIR" {
-  dir="${BATS_TMPDIR}/myproject"
+  dir="${BATS_TEST_TMPDIR}/myproject"
   mkdir -p "$dir"
   PYENV_DIR="$dir" run pyenv echo PYENV_DIR
   assert_output "$dir"
 }
 
 @test "invalid PYENV_DIR" {
-  dir="${BATS_TMPDIR}/does-not-exist"
+  dir="${BATS_TEST_TMPDIR}/does-not-exist"
   assert [ ! -d "$dir" ]
   PYENV_DIR="$dir" run pyenv echo PYENV_DIR
   assert_failure

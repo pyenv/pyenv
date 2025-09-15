@@ -2,7 +2,7 @@
 
 load test_helper
 
-setup() {
+_setup() {
   export PATH="${PYENV_TEST_DIR}/bin:$PATH"
 }
 

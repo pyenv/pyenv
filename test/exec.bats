@@ -8,15 +8,16 @@ create_executable() {
   bin="${PYENV_ROOT}/versions/${PYENV_VERSION}/bin"
   mkdir -p "$bin"
   { if [ $# -eq 0 ]; then cat -
-    else echo "$@"
+    else printf '%s\n' "$@"
     fi
   } | sed -Ee '1s/^ +//' > "${bin}/$name"
   chmod +x "${bin}/$name"
 }
 
 @test "fails with invalid version" {
+  bats_require_minimum_version 1.5.0
   export PYENV_VERSION="3.4"
-  run pyenv-exec nonexistent
+  run -127 pyenv-exec nonexistent
   assert_failure <<EOF
 pyenv: version \`3.4' is not installed (set by PYENV_VERSION environment variable)
 pyenv: nonexistent: command not found
@@ -24,10 +25,11 @@ EOF
 }
 
 @test "fails with invalid version set from file" {
+  bats_require_minimum_version 1.5.0
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
   echo 2.7 > .python-version
-  run pyenv-exec nonexistent
+  run -127 pyenv-exec nonexistent
   assert_failure <<EOF
 pyenv: version \`2.7' is not installed (set by $PWD/.python-version)
 pyenv: nonexistent: command not found
@@ -85,18 +87,25 @@ OUT
 }
 
 @test "sys.executable with system version (#98)" {
-  system_python="$(python3 -c 'import sys; print(sys.executable)')"
+  export PATH="${PYENV_ROOT}/versions/bin:${PATH}"
+  create_executable "python3" <<SH
+#!$BASH
+echo system
+SH
+  system_python="$(python3)"
+  assert_equal "${system_python}" "system"
 
-  PYENV_VERSION="custom"
-  create_executable "python3" ""
-  unset PYENV_VERSION
+  export PYENV_VERSION="custom"
+  create_executable "python3" "#!/bin/sh" "echo custom"
 
   pyenv-rehash
-  run pyenv-exec python3 -c 'import sys; print(sys.executable)'
-  assert_success "${system_python}"
+
+  custom_python="$(pyenv-exec python3)"
+  assert_equal "${custom_python}" "custom"
 }
 
 @test 'PATH is not modified with system Python' {
+  export PATH="${PYENV_TEST_DIR}:${PATH}"
   # Create a wrapper executable that verifies PATH.
   PYENV_VERSION="custom"
   create_executable "python3" '[[ "$PATH" == "${PYENV_TEST_DIR}/root/versions/custom/bin:"* ]] || { echo "unexpected:$PATH"; exit 2;}'
@@ -104,7 +113,13 @@ OUT
   pyenv-rehash
 
   # Path is not modified with system Python.
-  run pyenv-exec python3 -c 'import os; print(os.getenv("PATH"))'
+  cat > "${PYENV_TEST_DIR}/python3" <<SH
+#!$BASH
+echo \$PATH
+SH
+  chmod +x "${PYENV_TEST_DIR}/python3"
+  pyenv-rehash
+  run pyenv-exec python3
   assert_success "$PATH"
 
   # Path is modified with custom Python.
@@ -116,6 +131,6 @@ OUT
   assert_success
 
   # Path is not modified with system:custom Python.
-  PYENV_VERSION=system:custom run pyenv-exec python3 -c 'import os; print(os.getenv("PATH"))'
+  PYENV_VERSION=system:custom run pyenv-exec python3
   assert_success "$PATH"
 }
