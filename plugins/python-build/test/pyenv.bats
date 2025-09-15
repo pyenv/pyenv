@@ -293,10 +293,11 @@ OUT
 }
 
 @test "invalid arguments for pyenv-uninstall" {
+  bats_require_minimum_version 1.5.0
   mkdir -p "${PYENV_ROOT}/versions/3.10.3"
   mkdir -p "${PYENV_ROOT}/versions/3.10.4"
 
-  run pyenv-uninstall -f 3.10.3 --invalid-option 3.10.4
+  run -127 pyenv-uninstall -f 3.10.3 --invalid-option 3.10.4
   assert_failure
 
   assert [ -d "${PYENV_ROOT}/versions/3.10.3" ]

@@ -1,3 +1,5 @@
+BATS_VERSION = v1.10.0
+
 .PHONY: test test-build test-unit test-plugin
 
 # Do not pass in user flags to build tests.
@@ -25,5 +27,11 @@ test-build:
 	[ -e $(PYTHON_BUILD_TEST_PREFIX)/bin/pip ]
 	$(PYTHON_BUILD_TEST_PREFIX)/bin/pip -V
 
-bats:
-	git clone --depth 1 --branch v1.2.0 https://github.com/bats-core/bats-core.git bats
+.SECONDARY: bats-$(BATS_VERSION)
+bats-$(BATS_VERSION):
+	rm -rf bats
+	ln -sf bats-$(BATS_VERSION) bats
+	git clone --depth 1 --branch $(BATS_VERSION) https://github.com/bats-core/bats-core.git bats-$(BATS_VERSION)
+
+.PHONY: bats
+bats: bats-$(BATS_VERSION)

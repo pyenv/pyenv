@@ -15,8 +15,9 @@ create_executable() {
 }
 
 @test "fails with invalid version" {
+  bats_require_minimum_version 1.5.0
   export PYENV_VERSION="3.4"
-  run pyenv-exec nonexistent
+  run -127 pyenv-exec nonexistent
   assert_failure <<EOF
 pyenv: version \`3.4' is not installed (set by PYENV_VERSION environment variable)
 pyenv: nonexistent: command not found
@@ -24,10 +25,11 @@ EOF
 }
 
 @test "fails with invalid version set from file" {
+  bats_require_minimum_version 1.5.0
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
   echo 2.7 > .python-version
-  run pyenv-exec nonexistent
+  run -127 pyenv-exec nonexistent
   assert_failure <<EOF
 pyenv: version \`2.7' is not installed (set by $PWD/.python-version)
 pyenv: nonexistent: command not found
