@@ -135,6 +135,7 @@ OUT
 }
 
 @test "upgrade instructions given for a nonexistent version" {
+  mkdir -p "${PYENV_ROOT}/.git"
   stub brew false
   stub_python_build_lib
   stub_python_build 'echo ERROR >&2 && exit 2'
@@ -153,14 +154,14 @@ See all available versions with \`pyenv install --list'.
 
 If the version you need is missing, try upgrading pyenv:
 
-  cd ${BATS_TEST_DIRNAME}/../../.. && git pull && cd -
+  cd ${PYENV_ROOT} && git pull && cd -
 OUT
 
   unstub python-build
 }
 
 @test "homebrew upgrade instructions given when pyenv is homebrew-installed" {
-  stub brew "--prefix : echo '${BATS_TEST_DIRNAME%/*}'"
+  stub brew "--prefix : echo '${PYENV_ROOT%/*}'"
   stub_python_build_lib
   stub_python_build 'echo ERROR >&2 && exit 2' \
     "--definitions : true"
