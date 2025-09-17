@@ -6,8 +6,8 @@ create_version() {
   mkdir -p "${PYENV_ROOT}/versions/$1"
 }
 
-setup() {
-  mkdir -p "$PYENV_TEST_DIR"
+_setup() {
+  mkdir -p "${PYENV_TEST_DIR}"
   cd "$PYENV_TEST_DIR"
 }
 

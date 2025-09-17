@@ -12,14 +12,14 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
 }
 
 @test "custom PYTHON_BUILD_ROOT: nonexistent" {
-  export PYTHON_BUILD_ROOT="$TMP"
+  export PYTHON_BUILD_ROOT="$BATS_TEST_TMPDIR"
   refute [ -e "${PYTHON_BUILD_ROOT}/share/python-build" ]
   run python-build --definitions
   assert_success ""
 }
 
 @test "custom PYTHON_BUILD_ROOT: single definition" {
-  export PYTHON_BUILD_ROOT="$TMP"
+  export PYTHON_BUILD_ROOT="$BATS_TEST_TMPDIR"
   mkdir -p "${PYTHON_BUILD_ROOT}/share/python-build"
   touch "${PYTHON_BUILD_ROOT}/share/python-build/2.7.8-test"
   run python-build --definitions
@@ -27,7 +27,7 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
 }
 
 @test "one path via PYTHON_BUILD_DEFINITIONS" {
-  export PYTHON_BUILD_DEFINITIONS="${TMP}/definitions"
+  export PYTHON_BUILD_DEFINITIONS="${BATS_TEST_TMPDIR}/definitions"
   mkdir -p "$PYTHON_BUILD_DEFINITIONS"
   touch "${PYTHON_BUILD_DEFINITIONS}/2.7.8-test"
   run python-build --definitions
@@ -37,11 +37,11 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
 }
 
 @test "multiple paths via PYTHON_BUILD_DEFINITIONS" {
-  export PYTHON_BUILD_DEFINITIONS="${TMP}/definitions:${TMP}/other"
-  mkdir -p "${TMP}/definitions"
-  touch "${TMP}/definitions/2.7.8-test"
-  mkdir -p "${TMP}/other"
-  touch "${TMP}/other/3.4.2-test"
+  export PYTHON_BUILD_DEFINITIONS="${BATS_TEST_TMPDIR}/definitions:${BATS_TEST_TMPDIR}/other"
+  mkdir -p "${BATS_TEST_TMPDIR}/definitions"
+  touch "${BATS_TEST_TMPDIR}/definitions/2.7.8-test"
+  mkdir -p "${BATS_TEST_TMPDIR}/other"
+  touch "${BATS_TEST_TMPDIR}/other/3.4.2-test"
   run python-build --definitions
   assert_success
   assert_output_contains "2.7.8-test"
@@ -50,23 +50,23 @@ NUM_DEFINITIONS="$(find "$BATS_TEST_DIRNAME"/../share/python-build -maxdepth 1 -
 }
 
 @test "installing definition from PYTHON_BUILD_DEFINITIONS by priority" {
-  export PYTHON_BUILD_DEFINITIONS="${TMP}/definitions:${TMP}/other"
-  mkdir -p "${TMP}/definitions"
-  echo true > "${TMP}/definitions/2.7.8-test"
-  mkdir -p "${TMP}/other"
-  echo false > "${TMP}/other/2.7.8-test"
-  run python-build "2.7.8-test" "${TMP}/install"
+  export PYTHON_BUILD_DEFINITIONS="${BATS_TEST_TMPDIR}/definitions:${BATS_TEST_TMPDIR}/other"
+  mkdir -p "${BATS_TEST_TMPDIR}/definitions"
+  echo true > "${BATS_TEST_TMPDIR}/definitions/2.7.8-test"
+  mkdir -p "${BATS_TEST_TMPDIR}/other"
+  echo false > "${BATS_TEST_TMPDIR}/other/2.7.8-test"
+  run python-build "2.7.8-test" "${BATS_TEST_TMPDIR}/install"
   assert_success ""
 }
 
 @test "installing nonexistent definition" {
-  run python-build "nonexistent" "${TMP}/install"
+  run python-build "nonexistent" "${BATS_TEST_TMPDIR}/install"
   assert [ "$status" -eq 2 ]
   assert_output "python-build: definition not found: nonexistent"
 }
 
 @test "sorting Python versions" {
-  export PYTHON_BUILD_ROOT="$TMP"
+  export PYTHON_BUILD_ROOT="$BATS_TEST_TMPDIR"
   mkdir -p "${PYTHON_BUILD_ROOT}/share/python-build"
   expected="2.7-dev
 2.7
@@ -87,15 +87,15 @@ jython-2.5.4-rc1
 jython-2.7-beta1
 jython-2.7-beta2
 jython-2.7-beta3"
-  for ver in "$expected"; do
+  while IFS=$'\n' read -r ver; do
     touch "${PYTHON_BUILD_ROOT}/share/python-build/$ver"
-  done
+  done <<<"$expected"
   run python-build --definitions
   assert_success "$expected"
 }
 
 @test "removing duplicate Python versions" {
-  export PYTHON_BUILD_ROOT="$TMP"
+  export PYTHON_BUILD_ROOT="$BATS_TEST_TMPDIR"
   export PYTHON_BUILD_DEFINITIONS="${PYTHON_BUILD_ROOT}/share/python-build"
   mkdir -p "$PYTHON_BUILD_DEFINITIONS"
   touch "${PYTHON_BUILD_DEFINITIONS}/2.7.8"

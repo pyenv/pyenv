@@ -1,10 +1,12 @@
 #!/usr/bin/env bats
 
 load test_helper
-export PYTHON_BUILD_SKIP_MIRROR=
-export PYTHON_BUILD_CACHE_PATH=
-export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
 
+_setup() {
+  export PYTHON_BUILD_SKIP_MIRROR=
+  export PYTHON_BUILD_CACHE_PATH=
+  export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
+}
 
 @test "package URL without checksum bypasses mirror" {
   stub shasum true
