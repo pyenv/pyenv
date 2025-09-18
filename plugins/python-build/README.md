@@ -175,6 +175,7 @@ You can set certain environment variables to control the build process.
 * `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it would normally will.
 * `PYTHON_BUILD_USE_HOMEBREW`, if set, will search for libraries installed by Homebrew when it would normally not.
 * `PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA`, override the Homebrew OpenSSL formula to use.
+* `PYTHON_BUILD_TCLTK_FORMULA`, override the Homebrew Tcl/Tk formula to use.
 * `PYTHON_BUILD_SKIP_MACPORTS`, if set, will not search for libraries installed by MacPorts when it would normally will.
 * `PYTHON_BUILD_USE_MACPORTS`, if set, will search for libraries installed by MacPorts when it would normally not.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions

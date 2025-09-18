@@ -1884,7 +1884,7 @@ use_homebrew_tcltk() {
   # tcl-tk is 9.0 which is not compatible with CPython as of this writing
   # but we'll keep it as backup for cases like non-updated Homebrew
   local tcltk
-  for tcltk in "tcl-tk@8" "tcl-tk"; do
+  for tcltk in ${PYTHON_BUILD_TCLTK_FORMULA:-tcl-tk@8 tcl-tk}; do
     local tcltk_libdir="$(brew --prefix "${tcltk}" 2>/dev/null || true)"
     if [ -d "$tcltk_libdir" ]; then
       echo "python-build: use tcl-tk from homebrew"
