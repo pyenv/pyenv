@@ -19,6 +19,7 @@ setup() {
   export BATS_TEST_TMPDIR="${bats_test_tmpdir}"
   export PYENV_TEST_DIR="${BATS_TEST_TMPDIR}/pyenv"
   export PYENV_ROOT="${PYENV_TEST_DIR}/root"
+  export PYENV_INSTALL_PATH="${PYENV_TEST_DIR}"
   export HOME="${PYENV_TEST_DIR}/home"
   export PYENV_HOOK_PATH="${PYENV_ROOT}/pyenv.d"
 
