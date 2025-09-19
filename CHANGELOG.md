@@ -1,5 +1,19 @@
 # Version History
 
+## Release v2.6.8
+* Use Zlib from XCode SDK in a way compatible with XCode 16 and CLT by @JarheadStever in https://github.com/pyenv/pyenv/pull/3301
+* Add miniforge 25.3.0-1, 25.3.0-2, 25.3.0-3, 25.3.1-0, skip miniforge 25.3.0-0 by @native-api in https://github.com/pyenv/pyenv/pull/3306
+* Fix Readline and OpenSSL detection for MacPorts without the corresponding package by @native-api in https://github.com/pyenv/pyenv/pull/3317
+* Bump actions/checkout from 4 to 5 in the github-actions group by @dependabot[bot] in https://github.com/pyenv/pyenv/pull/3318
+* Fix rehash hook for pipx/pipx.x/pipx.xx by @rockandska in https://github.com/pyenv/pyenv/pull/3320
+* Add miniconda 25.7.0-2 by @native-api in https://github.com/pyenv/pyenv/pull/3323
+* Support curl from a snap by @native-api in https://github.com/pyenv/pyenv/pull/3329
+* CI: Bats test suite in docker by @rockandska in https://github.com/pyenv/pyenv/pull/3324
+* Add GraalPy 25.0.0 by @msimacek in https://github.com/pyenv/pyenv/pull/3331
+* Upgrade pip detetcion in pip-rehash to accept multiple variations by @rockandska in https://github.com/pyenv/pyenv/pull/3330
+* Add CPython 3.14.0rc3 by @nedbat in https://github.com/pyenv/pyenv/pull/3333
+* Use TCLTK_* and pkg-config for 3.11+ linking with Homebrew Tcl/Tk; add PYTHON_BUILD_TCLTK_FORMULA envvar by @native-api in https://github.com/pyenv/pyenv/pull/3327
+
 ## Release v2.6.7
 * Skip Zlib from XCode for XCode 16+ by @native-api in https://github.com/pyenv/pyenv/pull/3298
 * Don't fail the build if `xcodebuild` fails by @native-api in https://github.com/pyenv/pyenv/pull/3302
