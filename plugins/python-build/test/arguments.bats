@@ -4,7 +4,7 @@ load test_helper
 
 @test "not enough arguments for python-build" {
   # use empty inline definition so nothing gets built anyway
-  local definition="${TMP}/build-definition"
+  local definition="${BATS_TEST_TMPDIR}/build-definition"
   echo '' > "$definition"
 
   run python-build "$definition"
@@ -14,10 +14,10 @@ load test_helper
 
 @test "extra arguments for python-build" {
   # use empty inline definition so nothing gets built anyway
-  local definition="${TMP}/build-definition"
+  local definition="${BATS_TEST_TMPDIR}/build-definition"
   echo '' > "$definition"
 
-  run python-build "$definition" "${TMP}/install" ""
+  run python-build "$definition" "${BATS_TEST_TMPDIR}/install" ""
   assert_failure
   assert_output_contains 'Usage: python-build'
 }

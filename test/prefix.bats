@@ -20,7 +20,7 @@ load test_helper
   mkdir -p "${PYENV_TEST_DIR}/bin"
   touch "${PYENV_TEST_DIR}/bin/python"
   chmod +x "${PYENV_TEST_DIR}/bin/python"
-  PYENV_VERSION="system" run pyenv-prefix
+  PATH="${PYENV_TEST_DIR}/libexec:$PATH" PYENV_VERSION="system" run pyenv-prefix
   assert_success "$PYENV_TEST_DIR"
 }
 
@@ -34,15 +34,15 @@ load test_helper
 }
 
 @test "prefix for system in /" {
-  mkdir -p "${BATS_TEST_DIRNAME}/libexec"
-  cat >"${BATS_TEST_DIRNAME}/libexec/pyenv-which" <<OUT
+  mkdir -p "${PYENV_TEST_DIR}/libexec"
+  cat >"${PYENV_TEST_DIR}/libexec/pyenv-which" <<OUT
 #!/bin/sh
 echo /bin/python
 OUT
-  chmod +x "${BATS_TEST_DIRNAME}/libexec/pyenv-which"
-  PYENV_VERSION="system" run pyenv-prefix
+  chmod +x "${PYENV_TEST_DIR}/libexec/pyenv-which"
+  PATH="${PYENV_TEST_DIR}/libexec:$PATH" PYENV_VERSION="system" run pyenv-prefix
   assert_success "/"
-  rm -f "${BATS_TEST_DIRNAME}/libexec/pyenv-which"
+  rm -f "${PYENV_TEST_DIR}/libexec/pyenv-which"
 }
 
 @test "prefix for invalid system" {

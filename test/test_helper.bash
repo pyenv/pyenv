@@ -1,20 +1,23 @@
 unset PYENV_VERSION
 unset PYENV_DIR
 
-# guard against executing this block twice due to bats internals
-if [ -z "$PYENV_TEST_DIR" ]; then
-  PYENV_TEST_DIR="${BATS_TMPDIR}/pyenv"
-  export PYENV_TEST_DIR="$(mktemp -d "${PYENV_TEST_DIR}.XXX" 2>/dev/null || echo "$PYENV_TEST_DIR")"
-
-  if enable -f "${BATS_TEST_DIRNAME}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
-    export PYENV_TEST_DIR="$(realpath "$PYENV_TEST_DIR")"
-  else
+setup() {
+  if ! enable -f "${BATS_TEST_DIRNAME}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
     if [ -n "$PYENV_NATIVE_EXT" ]; then
       echo "pyenv: failed to load \`realpath' builtin" >&2
       exit 1
     fi
   fi
 
+  local bats_test_tmpdir="$(realpath "${BATS_TEST_TMPDIR}")"
+  if [ -z "${bats_test_tmpdir}" ];then
+    # Use readlink if running in a container instead of realpath lib
+    bats_test_tmpdir="$(readlink -f "${BATS_TEST_TMPDIR}")"
+  fi
+
+  # update BATS_TEST_TMPDIR discover by realpath/readlink to avoid "//"
+  export BATS_TEST_TMPDIR="${bats_test_tmpdir}"
+  export PYENV_TEST_DIR="${BATS_TEST_TMPDIR}/pyenv"
   export PYENV_ROOT="${PYENV_TEST_DIR}/root"
   export HOME="${PYENV_TEST_DIR}/home"
   export PYENV_HOOK_PATH="${PYENV_ROOT}/pyenv.d"
@@ -28,10 +31,11 @@ if [ -z "$PYENV_TEST_DIR" ]; then
 
   for xdg_var in `env 2>/dev/null | grep ^XDG_ | cut -d= -f1`; do unset "$xdg_var"; done
   unset xdg_var
-fi
 
-teardown() {
-  rm -rf "$PYENV_TEST_DIR"
+  # If test specific setup exist, run it
+  if [[ $(type -t _setup) == function ]];then
+    _setup
+  fi
 }
 
 flunk() {

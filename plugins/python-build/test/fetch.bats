@@ -1,11 +1,10 @@
 #!/usr/bin/env bats
 
 load test_helper
-export PYTHON_BUILD_SKIP_MIRROR=1
-export PYTHON_BUILD_CACHE_PATH=
-
-setup() {
-  export PYTHON_BUILD_BUILD_PATH="${TMP}/source"
+_setup() {
+  export PYTHON_BUILD_SKIP_MIRROR=1
+  export PYTHON_BUILD_CACHE_PATH=
+  export PYTHON_BUILD_BUILD_PATH="${BATS_TEST_TMPDIR}/source"
   mkdir -p "${PYTHON_BUILD_BUILD_PATH}"
 }
 
@@ -29,7 +28,7 @@ setup() {
 Downloading package-1.0.0.tar.gz...
 -> http://example.com/packages/package-1.0.0.tar.gz
 Installing package-1.0.0...
-Installed package-1.0.0 to ${TMP}/install
+Installed package-1.0.0 to ${BATS_TEST_TMPDIR}/install
 OUT
   unstub aria2c
 }
@@ -44,7 +43,7 @@ DEF
   assert_output <<OUT
 Cloning http://example.com/packages/package.git...
 Installing package-dev...
-Installed package-dev to ${TMP}/install
+Installed package-dev to ${BATS_TEST_TMPDIR}/install
 OUT
   unstub git
 }
@@ -62,7 +61,7 @@ DEF
   assert_output <<OUT
 Cloning http://example.com/packages/package.git...
 Installing package-dev...
-Installed package-dev to ${TMP}/install
+Installed package-dev to ${BATS_TEST_TMPDIR}/install
 OUT
   unstub git
 }

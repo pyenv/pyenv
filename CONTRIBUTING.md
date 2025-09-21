@@ -13,12 +13,6 @@ General guidance
   You can still add performance optimizations etc that take advantage of newer Bash features
   as long as there is a fallback execution route for Bash 3.
 
-* Be extra careful when submitting logic specific for the Apple Silicon platform
-
-  As of this writing, Github Actions do not support it and only one team member has the necessary hardware.
-  So we may be unable to test your changes and may have to take your word for it.
-
-
 Formatting PRs
 ==============
 

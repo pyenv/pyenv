@@ -4,7 +4,6 @@ set -e
 status=0
 program="${0##*/}"
 PROGRAM="$(echo "$program" | tr a-z- A-Z_)"
-[ -n "$TMPDIR" ] || TMPDIR="/tmp"
 
 _STUB_PLAN="${PROGRAM}_STUB_PLAN"
 _STUB_RUN="${PROGRAM}_STUB_RUN"
@@ -13,11 +12,11 @@ _STUB_RESULT="${PROGRAM}_STUB_RESULT"
 _STUB_END="${PROGRAM}_STUB_END"
 _STUB_LOG="${PROGRAM}_STUB_LOG"
 
-[ -n "${!_STUB_LOG}" ] || eval "${_STUB_LOG}"="${TMPDIR}/${program}-stub-log"
+[ -n "${!_STUB_LOG}" ] || eval "${_STUB_LOG}"="${BATS_TEST_TMPDIR}/${program}-stub-log"
 if test -z "${!_STUB_END}"; then echo "$program" "$@" >>"${!_STUB_LOG}"; fi
 
 [ -e "${!_STUB_PLAN}" ] || exit 1
-[ -n "${!_STUB_RUN}" ] || eval "${_STUB_RUN}"="${TMPDIR}/${program}-stub-run"
+[ -n "${!_STUB_RUN}" ] || eval "${_STUB_RUN}"="${BATS_TEST_TMPDIR}/${program}-stub-run"
 
 
 # Initialize or load the stub run information.

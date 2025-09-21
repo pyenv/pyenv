@@ -6,4 +6,4 @@ if [ -n "$PYENV_NATIVE_EXT" ]; then
   make -C src
 fi
 
-exec bats ${CI:+--tap} test
+exec bats ${CI:+--tap} ${BATS_TEST_FILTER:+--filter "${BATS_TEST_FILTER}"} test/${BATS_FILE_FILTER}

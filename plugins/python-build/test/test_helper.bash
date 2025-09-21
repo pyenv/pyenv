@@ -1,21 +1,18 @@
-export TMP="$BATS_TEST_DIRNAME/tmp"
-export PYTHON_BUILD_CURL_OPTS=
-export PYTHON_BUILD_HTTP_CLIENT="curl"
+setup() {
+  export PYTHON_BUILD_CURL_OPTS=
+  export PYTHON_BUILD_HTTP_CLIENT="curl"
 
-if [ "$FIXTURE_ROOT" != "$BATS_TEST_DIRNAME/fixtures" ]; then
-  export FIXTURE_ROOT="$BATS_TEST_DIRNAME/fixtures"
-  export INSTALL_ROOT="$TMP/install"
-  PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-  if [ "FreeBSD" = "$(uname -s)" ]; then
-    PATH="/usr/local/bin:$PATH"
-  fi
-  PATH="$BATS_TEST_DIRNAME/../bin:$PATH"
-  PATH="$TMP/bin:$PATH"
+  export FIXTURE_ROOT="${BATS_TEST_DIRNAME}/fixtures"
+  export INSTALL_ROOT="${BATS_TEST_TMPDIR}/install"
+  PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+  PATH="${BATS_TEST_DIRNAME}/../bin:$PATH"
+  PATH="${BATS_TEST_TMPDIR}/bin:$PATH"
   export PATH
-fi
 
-teardown() {
-  rm -fr "${TMP:?}"/*
+  # If test specific setup exist, run it
+  if [[ $(type -t _setup) == function ]];then
+    _setup
+  fi
 }
 
 stub() {
@@ -23,22 +20,22 @@ stub() {
   local prefix="$(echo "$program" | tr a-z- A-Z_)"
   shift
 
-  export "${prefix}_STUB_PLAN"="${TMP}/${program}-stub-plan"
-  export "${prefix}_STUB_RUN"="${TMP}/${program}-stub-run"
-  export "${prefix}_STUB_LOG"="${TMP}/${program}-stub-log"
+  export "${prefix}_STUB_PLAN"="${BATS_TEST_TMPDIR}/${program}-stub-plan"
+  export "${prefix}_STUB_RUN"="${BATS_TEST_TMPDIR}/${program}-stub-run"
+  export "${prefix}_STUB_LOG"="${BATS_TEST_TMPDIR}/${program}-stub-log"
   export "${prefix}_STUB_END"=
 
-  mkdir -p "${TMP}/bin"
-  ln -sf "${BATS_TEST_DIRNAME}/stubs/stub" "${TMP}/bin/${program}"
+  mkdir -p "${BATS_TEST_TMPDIR}/bin"
+  cp "${BATS_TEST_DIRNAME}/stubs/stub" "${BATS_TEST_TMPDIR}/bin/${program}"
 
-  touch "${TMP}/${program}-stub-plan"
-  for arg in "$@"; do printf "%s\n" "$arg" >> "${TMP}/${program}-stub-plan"; done
+  touch "${BATS_TEST_TMPDIR}/${program}-stub-plan"
+  for arg in "$@"; do printf "%s\n" "$arg" >> "${BATS_TEST_TMPDIR}/${program}-stub-plan"; done
 }
 
 unstub() {
   local program="$1"
   local prefix="$(echo "$program" | tr a-z- A-Z_)"
-  local path="${TMP}/bin/${program}"
+  local path="${BATS_TEST_TMPDIR}/bin/${program}"
 
   export "${prefix}_STUB_END"=1
 
@@ -46,12 +43,12 @@ unstub() {
   "$path" || STATUS="$?"
 
   rm -f "$path"
-  rm -f "${TMP}/${program}-stub-plan" "${TMP}/${program}-stub-run"
+  rm -f "${BATS_TEST_TMPDIR}/${program}-stub-plan" "${BATS_TEST_TMPDIR}/${program}-stub-run"
   return "$STATUS"
 }
 
 run_inline_definition() {
-  local definition="${TMP}/build-definition"
+  local definition="${BATS_TEST_TMPDIR}/build-definition"
   cat > "$definition"
   run python-build "$definition" "${1:-$INSTALL_ROOT}"
 }
@@ -87,7 +84,7 @@ flunk() {
   { if [ "$#" -eq 0 ]; then cat -
     else echo "$@"
     fi
-  } | sed "s:${TMP}:\${TMP}:g" >&2
+  } | sed "s:${BATS_TEST_TMPDIR}:\${BATS_TEST_TMPDIR}:g" >&2
   return 1
 }
 

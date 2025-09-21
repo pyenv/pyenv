@@ -2,9 +2,8 @@
 
 load test_helper
 
-export GIT_DIR="${PYENV_TEST_DIR}/.git"
-
-setup() {
+_setup() {
+  export GIT_DIR="${PYENV_TEST_DIR}/.git"
   mkdir -p "$HOME"
   git config --global user.name  "Tester"
   git config --global user.email "tester@test.local"
