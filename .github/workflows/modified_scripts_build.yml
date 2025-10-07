@@ -21,10 +21,10 @@ jobs:
           echo "$versions" >> $GITHUB_ENV;
           echo "$EOF" >> $GITHUB_ENV;
           
-          versions_cpython_only=$(grep -Ee '^[[:digit:]]' <<<"$version")
+          versions_cpython_only=$(grep -Ee '^[[:digit:]]' <<<"$versions")
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64);
           echo "versions_cpython_only<<$EOF" >> $GITHUB_ENV;
-          echo $versions_cpython_only >> $GITHUB_ENV;
+          echo "$versions_cpython_only" >> $GITHUB_ENV;
           echo "$EOF" >> $GITHUB_ENV;
       - id: modified-versions
         run: |
