@@ -5,6 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       versions: ${{steps.modified-versions.outputs.versions}}
+      versions_cpython_only: ${{steps.modified-versions.outputs.versions_cpython_only}}
     steps:
       - uses: actions/checkout@v5
       - run: git fetch origin "$GITHUB_BASE_REF"
