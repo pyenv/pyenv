@@ -1,5 +1,11 @@
 # Version History
 
+## Release v2.6.9
+* CI: modified-scripts-build: fix CPython-specific jobs never firing by @tuzi3040 in https://github.com/pyenv/pyenv/pull/3338
+* CI: modified-scripts-build: fix output variable for CPython-specific workflows by @native-api in https://github.com/pyenv/pyenv/pull/3340
+* Add CPython 3.14.0 by @SnoopJ in https://github.com/pyenv/pyenv/pull/3339
+* Add CPython 3.13.8 by @jsirois in https://github.com/pyenv/pyenv/pull/3341
+
 ## Release v2.6.8
 * Use Zlib from XCode SDK in a way compatible with XCode 16 and CLT by @JarheadStever in https://github.com/pyenv/pyenv/pull/3301
 * Add miniforge 25.3.0-1, 25.3.0-2, 25.3.0-3, 25.3.1-0, skip miniforge 25.3.0-0 by @native-api in https://github.com/pyenv/pyenv/pull/3306
