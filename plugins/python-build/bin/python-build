@@ -1889,10 +1889,10 @@ use_homebrew_tcltk() {
     if [ -d "$tcltk_libdir" ]; then
       echo "python-build: use ${PYTHON_BUILD_TCLTK_FORMULA} from homebrew"
       # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
-      local tcltk_includes="$(sh -c 'cd "$tcltk_libdir"'/lib; . tclConfig.sh; . tkConfig.sh; echo "$TCL_INCLUDE_SPEC $TK_INCLUDE_SPEC"')"
+      local tcltk_includes="$(sh -c 'cd '"$tcltk_libdir"'/lib; . tclConfig.sh; . tkConfig.sh; echo "$TCL_INCLUDE_SPEC $TK_INCLUDE_SPEC"')"
       # Tcl/Tk is not keg-only so it's safe to use -L with Cellar path; rpath would be of Homebrew
       # and would not break with version upgrades
-      local tcltk_libs="$(sh -c 'cd "$tcltk_libdir"'/lib; . tclConfig.sh; . tkConfig.sh; echo "$TCL_LIB_SPEC $TK_LIB_SPEC"')"
+      local tcltk_libs="$(sh -c 'cd '"$tcltk_libdir"'/lib; . tclConfig.sh; . tkConfig.sh; echo "$TCL_LIB_SPEC $TK_LIB_SPEC"')"
       # Since 2.7.6, 3.3.3, 3.4.0 (Issue #1584): --with-tcltk-includes + --with-tcltk-libs Configure options
       # Since 3.11.0 (bpo-45847): `pkg-config` call, TCLTK_CFLAGS + TCLTK_LIBS override
       if [[ -n "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
