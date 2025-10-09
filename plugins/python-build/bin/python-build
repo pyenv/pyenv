@@ -1910,7 +1910,7 @@ use_homebrew_tcltk() {
       else
         package_option python configure --with-tcltk-includes="$tcltk_includes"
         package_option python configure --with-tcltk-libs="$tcltk_libs"
-        export CFLAGS="${tcltk_cflags}${CFLAGS:+ $CFLAGS}"
+        [[ -n $tcltk_cflags ]] && export CFLAGS="${tcltk_cflags}${CFLAGS:+ $CFLAGS}"
       fi
       #set in either case as a failsafe
       export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
