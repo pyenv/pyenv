@@ -1892,7 +1892,7 @@ use_homebrew_tcltk() {
       local tcltk_includes="$(sh -c 'cd '"$tcltk_libdir"'/lib; . tclConfig.sh; . tkConfig.sh; echo "$TCL_INCLUDE_SPEC $TK_INCLUDE_SPEC"')"
       # Homebrew Tcl/Tk 9 is built with external libtommath. CPython's build as of 3.14.0 does not detect that and fails to link to tommath symbols
       local tcltk_cflags
-      if sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo "$TCL_DEFS"' | grep -qwf '-DTCL_WITH_EXTERNAL_TOMMATH=1'; then
+      if sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo "$TCL_DEFS"' | grep -qwFe '-DTCL_WITH_EXTERNAL_TOMMATH=1'; then
         tcltk_cflags="${tcltk_includes} -DTCL_WITH_EXTERNAL_TOMMATH=1"
       fi
       # For some reason, keg-only tcl-tk@8 successfully links with Tkinter without specifying rpath, with `/opt' rpath
