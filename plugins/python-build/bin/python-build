@@ -1880,18 +1880,23 @@ use_macports_zlib() {
 
 use_homebrew_tcltk() {
   can_use_homebrew || return 1
-  # Since https://github.com/Homebrew/homebrew-core/commit/f10e88617b41555193c22fdcba6109fe82155ee2 (10.11.2024),
-  # tcl-tk is 9.0 which is not compatible with CPython as of this writing
-  # but we'll keep it as backup for cases like non-updated Homebrew
   local tcltk
+  # Since https://github.com/Homebrew/homebrew-core/commit/f10e88617b41555193c22fdcba6109fe82155ee2 (10.11.2024),
+  # tcl-tk is 9.0. It's supported in CPython since 3.14.0a1 (gh-124111) but is not officially supported as of 3.14.0
+  # so we prefer 8
   for tcltk in ${PYTHON_BUILD_TCLTK_FORMULA:-tcl-tk@8 tcl-tk}; do
     local tcltk_libdir="$(brew --prefix "${tcltk}" 2>/dev/null || true)"
     if [ -d "$tcltk_libdir" ]; then
       echo "python-build: use ${PYTHON_BUILD_TCLTK_FORMULA} from homebrew"
       # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
       local tcltk_includes="$(sh -c 'cd '"$tcltk_libdir"'/lib; . tclConfig.sh; . tkConfig.sh; echo "$TCL_INCLUDE_SPEC $TK_INCLUDE_SPEC"')"
-      # Tcl/Tk is not keg-only so it's safe to use -L with Cellar path; rpath would be of Homebrew
-      # and would not break with version upgrades
+      # Homebrew Tcl/Tk 9 is built with external libtommath. CPython's build as of 3.14.0 does not detect that and fails to link to tommath symbols
+      local tcltk_cflags
+      if sh -c '. '"$tcltk_libdir"'/lib/tclConfig.sh; echo "$TCL_DEFS"' | grep -qwf '-DTCL_WITH_EXTERNAL_TOMMATH=1'; then
+        tcltk_cflags="${tcltk_includes} -DTCL_WITH_EXTERNAL_TOMMATH=1"
+      fi
+      # For some reason, keg-only tcl-tk@8 successfully links with Tkinter without specifying rpath, with `/opt' rpath
+      # so no need to translate /Cellar path to /opt path
       local tcltk_libs="$(sh -c 'cd '"$tcltk_libdir"'/lib; . tclConfig.sh; . tkConfig.sh; echo "$TCL_LIB_SPEC $TK_LIB_SPEC"')"
       # Since 2.7.6, 3.3.3, 3.4.0 (Issue #1584): --with-tcltk-includes + --with-tcltk-libs Configure options
       # Since 3.11.0 (bpo-45847): `pkg-config` call, TCLTK_CFLAGS + TCLTK_LIBS override
@@ -1900,11 +1905,12 @@ use_homebrew_tcltk() {
         # There's no way to provide a fallback only if it's is not present
         # and Configure's logic of detecting if it's present is complicated.
         # So we just override it always
-        export TCLTK_CFLAGS="$tcltk_includes"
+        export TCLTK_CFLAGS="$tcltk_includes${tcltk_cflags:+ $tcltk_cflags}"
         export TCLTK_LIBS="$tcltk_libs"
       else
         package_option python configure --with-tcltk-includes="$tcltk_includes"
         package_option python configure --with-tcltk-libs="$tcltk_libs"
+        export CFLAGS="${tcltk_cflags}${CFLAGS:+ $CFLAGS}"
       fi
       #set in either case as a failsafe
       export PKG_CONFIG_PATH="${tcltk_libdir}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
