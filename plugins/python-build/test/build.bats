@@ -69,15 +69,15 @@ assert_build_log() {
 }
 
 stub_tcltk() {
-  tcl_tk_libdir="${1:?}"
-  mkdir -p "$tcl_tk_libdir/lib"
-  cat >"$tcl_tk_libdir/lib/tclConfig.sh" <<!
-TCL_INCLUDE_SPEC='-I${tcl_tk_lib}/include'
-TCL_LIB_SPEC='-L{tcl_tk_lib}/lib -ltclX.Y'
+  local tcltk_prefix="${1:?}"
+  mkdir -p "$tcltk_prefix/lib"
+  cat >"$tcltk_prefix/lib/tclConfig.sh" <<!
+TCL_INCLUDE_SPEC='-I${tcltk_prefix}/include'
+TCL_LIB_SPEC='-L${tcltk_prefix}/lib -ltclX.Y'
 !
-  cat >"$tcl_tk_libdir/lib/tkConfig.sh" <<!
-TK_INCLUDE_SPEC='-I${tcl_tk_lib}/include'
-TK_LIB_SPEC='-L{tcl_tk_lib}/lib -ltkX.Y'
+  cat >"$tcltk_prefix/lib/tkConfig.sh" <<!
+TK_INCLUDE_SPEC='-I${tcltk_prefix}/include'
+TK_LIB_SPEC='-L${tcltk_prefix}/lib -ltkX.Y'
 !
 
 }
@@ -230,11 +230,11 @@ install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.
 DEF
   assert_success
 
-  unstub uname
-  unstub sw_vers
-  unstub brew
-  unstub port
-  unstub make
+#  unstub uname
+#  unstub sw_vers
+#  unstub brew
+#  unstub port
+#  unstub make
 
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
@@ -777,7 +777,7 @@ OUT
 
 @test "tcl-tk is linked from Homebrew via --with-tcl-*" {
   cached_tarball "Python-3.6.2"
-  stub_tcltk "${tcl_tk_libdir:=BATS_TEST_TMPDIR/homebrew-tcl-tk}"
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
@@ -807,7 +807,7 @@ OUT
 
 @test "tcl-tk with external libtommath is linked from Homebrew via --with-tcl-*" {
   cached_tarball "Python-3.6.2"
-  stub_tcltk "${tcl_tk_libdir:=BATS_TEST_TMPDIR/homebrew-tcl-tk}"
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
   cat >>"$tcl_tk_libdir/lib/tclConfig.sh" <<!
 TCL_DEFS='-DSMTH -DTCL_WITH_EXTERNAL_TOMMATH=1 -DSMTH_ELSE'
 !
@@ -840,7 +840,7 @@ OUT
 
 @test "tcl-tk is linked from Homebrew with PYTHON_BUILD_TCLTK_FORMULA" {
   cached_tarball "Python-3.6.2"
-  stub_tcltk "${tcl_tk_libdir:=BATS_TEST_TMPDIR/homebrew-tcl-tk}"
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
@@ -871,7 +871,7 @@ OUT
 
 @test "tcl-tk is linked from Homebrew via pkg-config and override vars" {
   cached_tarball "Python-3.6.2" - TCLTK_CFLAGS TCLTK_LIBS
-  stub_tcltk "${tcl_tk_libdir:=BATS_TEST_TMPDIR/homebrew-tcl-tk}"
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
@@ -903,7 +903,7 @@ OUT
 
 @test "tcl-tk with external libtommath is linked from Homebrew via pkg-config and override vars" {
   cached_tarball "Python-3.6.2" - TCLTK_CFLAGS TCLTK_LIBS
-  stub_tcltk "${tcl_tk_libdir:=BATS_TEST_TMPDIR/homebrew-tcl-tk}"
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
   cat >>"$tcl_tk_libdir/lib/tclConfig.sh" <<!
 TCL_DEFS='-DSMTH -DTCL_WITH_EXTERNAL_TOMMATH=1 -DSMTH_ELSE'
 !
