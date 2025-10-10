@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.6.10
+* Add CPython 3.12.12, 3.11.14, 3.10.19, 3.9.24 by @nedbat in https://github.com/pyenv/pyenv/pull/3344
+
 ## Release v2.6.9
 * CI: modified-scripts-build: fix CPython-specific jobs never firing by @tuzi3040 in https://github.com/pyenv/pyenv/pull/3338
 * CI: modified-scripts-build: fix output variable for CPython-specific workflows by @native-api in https://github.com/pyenv/pyenv/pull/3340
