@@ -68,6 +68,20 @@ assert_build_log() {
   assert_output
 }
 
+stub_tcltk() {
+  local tcltk_prefix="${1:?}"
+  mkdir -p "$tcltk_prefix/lib"
+  cat >"$tcltk_prefix/lib/tclConfig.sh" <<!
+TCL_INCLUDE_SPEC='-I${tcltk_prefix}/include'
+TCL_LIB_SPEC='-L${tcltk_prefix}/lib -ltclX.Y'
+!
+  cat >"$tcltk_prefix/lib/tkConfig.sh" <<!
+TK_INCLUDE_SPEC='-I${tcltk_prefix}/include'
+TK_LIB_SPEC='-L${tcltk_prefix}/lib -ltkX.Y'
+!
+
+}
+
 @test "yaml is installed for python" {
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
@@ -216,11 +230,11 @@ install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.
 DEF
   assert_success
 
-  unstub uname
-  unstub sw_vers
-  unstub brew
-  unstub port
-  unstub make
+#  unstub uname
+#  unstub sw_vers
+#  unstub brew
+#  unstub port
+#  unstub make
 
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
@@ -763,10 +777,7 @@ OUT
 
 @test "tcl-tk is linked from Homebrew via --with-tcl-*" {
   cached_tarball "Python-3.6.2"
-  tcl_tk_version=8.6
-  tcl_tk_libdir="$BATS_TEST_TMPDIR/homebrew-tcl-tk"
-  mkdir -p "$tcl_tk_libdir/lib"
-  echo "TCL_VERSION='$tcl_tk_version'" >>"$tcl_tk_libdir/lib/tclConfig.sh"
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
@@ -788,7 +799,40 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib/pkgconfig"
-Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib --with-tcltk-includes=-I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include --with-tcltk-libs=-L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version
+Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib --with-tcltk-includes=-I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include -I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include --with-tcltk-libs=-L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltclX.Y -L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltkX.Y
+make -j 2
+make install
+OUT
+}
+
+@test "tcl-tk with external libtommath is linked from Homebrew via --with-tcl-*" {
+  cached_tarball "Python-3.6.2"
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
+  cat >>"$tcl_tk_libdir/lib/tclConfig.sh" <<!
+TCL_DEFS='-DSMTH -DTCL_WITH_EXTERNAL_TOMMATH=1 -DSMTH_ELSE'
+!
+
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+
+  stub brew "--prefix tcl-tk@8 : echo '$tcl_tk_libdir'"
+  for i in {1..4}; do stub brew false; done
+
+  stub_make_install
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="-DTCL_WITH_EXTERNAL_TOMMATH=1" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib/pkgconfig"
+Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib --with-tcltk-includes=-I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include -I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include --with-tcltk-libs=-L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltclX.Y -L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltkX.Y
 make -j 2
 make install
 OUT
@@ -796,10 +840,7 @@ OUT
 
 @test "tcl-tk is linked from Homebrew with PYTHON_BUILD_TCLTK_FORMULA" {
   cached_tarball "Python-3.6.2"
-  tcl_tk_version=8.6
-  tcl_tk_libdir="$BATS_TEST_TMPDIR/homebrew-tcl-tk"
-  mkdir -p "$tcl_tk_libdir/lib"
-  echo "TCL_VERSION='$tcl_tk_version'" >>"$tcl_tk_libdir/lib/tclConfig.sh"
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
@@ -822,7 +863,7 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib/pkgconfig"
-Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib --with-tcltk-includes=-I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include --with-tcltk-libs=-L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version
+Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib --with-tcltk-includes=-I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include -I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include --with-tcltk-libs=-L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltclX.Y -L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltkX.Y
 make -j 2
 make install
 OUT
@@ -830,10 +871,7 @@ OUT
 
 @test "tcl-tk is linked from Homebrew via pkg-config and override vars" {
   cached_tarball "Python-3.6.2" - TCLTK_CFLAGS TCLTK_LIBS
-  tcl_tk_version=8.6
-  tcl_tk_libdir="$BATS_TEST_TMPDIR/homebrew-tcl-tk"
-  mkdir -p "$tcl_tk_libdir/lib"
-  echo "TCL_VERSION='$tcl_tk_version'" >>"$tcl_tk_libdir/lib/tclConfig.sh"
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
@@ -857,7 +895,42 @@ DEF
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib/pkgconfig"
 Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib
-Python-3.6.2: TCLTK_CFLAGS=-I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include TCLTK_LIBS=-L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltcl$tcl_tk_version -ltk$tcl_tk_version
+Python-3.6.2: TCLTK_CFLAGS=-I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include -I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include TCLTK_LIBS=-L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltclX.Y -L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltkX.Y
+make -j 2
+make install
+OUT
+}
+
+@test "tcl-tk with external libtommath is linked from Homebrew via pkg-config and override vars" {
+  cached_tarball "Python-3.6.2" - TCLTK_CFLAGS TCLTK_LIBS
+  stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
+  cat >>"$tcl_tk_libdir/lib/tclConfig.sh" <<!
+TCL_DEFS='-DSMTH -DTCL_WITH_EXTERNAL_TOMMATH=1 -DSMTH_ELSE'
+!
+
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+
+  stub brew "--prefix tcl-tk@8 : echo '$tcl_tk_libdir'"
+  for i in {1..4}; do stub brew false; done
+
+  stub_make_install
+
+  run_inline_definition <<DEF
+PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub brew
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib/pkgconfig"
+Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib
+Python-3.6.2: TCLTK_CFLAGS=-I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include -I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include -DTCL_WITH_EXTERNAL_TOMMATH=1 TCLTK_LIBS=-L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltclX.Y -L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltkX.Y
 make -j 2
 make install
 OUT
