@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.6.11
+* Support building against Homebrew Tcl/Tk 9 by @native-api in https://github.com/pyenv/pyenv/pull/3343
+* Add CPython 3.13.9 by @nedbat in https://github.com/pyenv/pyenv/pull/3346
+* Add CPython 3.15.0a1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3347
+
 ## Release v2.6.10
 * Add CPython 3.12.12, 3.11.14, 3.10.19, 3.9.24 by @nedbat in https://github.com/pyenv/pyenv/pull/3344
 
