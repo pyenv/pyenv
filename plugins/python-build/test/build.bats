@@ -230,11 +230,11 @@ install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.
 DEF
   assert_success
 
-#  unstub uname
-#  unstub sw_vers
-#  unstub brew
-#  unstub port
-#  unstub make
+  unstub uname
+  unstub sw_vers
+  unstub brew
+  unstub port
+  unstub make
 
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include -I$BREW_PREFIX/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib -L$BREW_PREFIX/lib -Wl,-rpath,$BREW_PREFIX/lib" PKG_CONFIG_PATH=""
