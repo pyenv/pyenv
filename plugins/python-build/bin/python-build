@@ -2032,6 +2032,35 @@ use_pixi_zlib() {
   fi
 }
 
+configure_tcltk_flags() {
+  local prefix="$1"
+
+  # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
+  local tcltk_includes="$(sh -c 'cd '"$prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_INCLUDE_SPEC $TK_INCLUDE_SPEC"')"
+  # Homebrew Tcl/Tk 9 is built with external libtommath. CPython's build as of 3.14.0 does not detect that and fails to link to tommath symbols
+  local tcltk_cflags=""
+  if sh -c '. '"$prefix"'/lib/tclConfig.sh; echo "$TCL_DEFS"' | grep -qwFe '-DTCL_WITH_EXTERNAL_TOMMATH=1'; then
+    tcltk_cflags="-DTCL_WITH_EXTERNAL_TOMMATH=1"
+  fi
+  # For some reason, keg-only tcl-tk@8 successfully links with Tkinter without specifying rpath, with `/opt' rpath
+  # so no need to translate /Cellar path to /opt path
+  local tcltk_libs="$(sh -c 'cd '"$prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_LIB_SPEC $TK_LIB_SPEC"')"
+  # Since 2.7.6, 3.3.3, 3.4.0 (Issue #1584): --with-tcltk-includes + --with-tcltk-libs Configure options
+  # Since 3.11.0 (bpo-45847): `pkg-config` call, TCLTK_CFLAGS + TCLTK_LIBS override
+  if [[ -n "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
+    # pkg-config is not present out of the box in MacOS.
+    # There's no way to provide a fallback only if it's is not present
+    # and Configure's logic of detecting if it's present is complicated.
+    # So we just override it always
+    export TCLTK_CFLAGS="$tcltk_includes${tcltk_cflags:+ $tcltk_cflags}"
+    export TCLTK_LIBS="$tcltk_libs"
+  else
+    package_option python configure --with-tcltk-includes="$tcltk_includes"
+    package_option python configure --with-tcltk-libs="$tcltk_libs"
+    [[ -n $tcltk_cflags ]] && export CFLAGS="${tcltk_cflags}${CFLAGS:+ $CFLAGS}"
+  fi
+}
+
 use_homebrew_tcltk() {
   can_use_homebrew || return 1
   local tcltk_formula
@@ -2042,33 +2071,9 @@ use_homebrew_tcltk() {
     local tcltk_prefix="$(brew --prefix "${tcltk_formula}" 2>/dev/null || true)"
     if [ -d "$tcltk_prefix" ]; then
       echo "python-build: use ${tcltk_formula} from homebrew"
-      # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
-      local tcltk_includes="$(sh -c 'cd '"$tcltk_prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_INCLUDE_SPEC $TK_INCLUDE_SPEC"')"
-      # Homebrew Tcl/Tk 9 is built with external libtommath. CPython's build as of 3.14.0 does not detect that and fails to link to tommath symbols
-      local tcltk_cflags
-      if sh -c '. '"$tcltk_prefix"'/lib/tclConfig.sh; echo "$TCL_DEFS"' | grep -qwFe '-DTCL_WITH_EXTERNAL_TOMMATH=1'; then
-        tcltk_cflags="-DTCL_WITH_EXTERNAL_TOMMATH=1"
-      fi
-      # For some reason, keg-only tcl-tk@8 successfully links with Tkinter without specifying rpath, with `/opt' rpath
-      # so no need to translate /Cellar path to /opt path
-      local tcltk_libs="$(sh -c 'cd '"$tcltk_prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_LIB_SPEC $TK_LIB_SPEC"')"
-      # Since 2.7.6, 3.3.3, 3.4.0 (Issue #1584): --with-tcltk-includes + --with-tcltk-libs Configure options
-      # Since 3.11.0 (bpo-45847): `pkg-config` call, TCLTK_CFLAGS + TCLTK_LIBS override
-      if [[ -n "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
-        # pkg-config is not present out of the box in MacOS.
-        # There's no way to provide a fallback only if it's is not present
-        # and Configure's logic of detecting if it's present is complicated.
-        # So we just override it always
-        export TCLTK_CFLAGS="$tcltk_includes${tcltk_cflags:+ $tcltk_cflags}"
-        export TCLTK_LIBS="$tcltk_libs"
-      else
-        package_option python configure --with-tcltk-includes="$tcltk_includes"
-        package_option python configure --with-tcltk-libs="$tcltk_libs"
-        [[ -n $tcltk_cflags ]] && export CFLAGS="${tcltk_cflags}${CFLAGS:+ $CFLAGS}"
-      fi
-      #set in either case as a failsafe
+      configure_tcltk_flags "$tcltk_prefix"
+      # set PKG_CONFIG_PATH as a failsafe
       export PKG_CONFIG_PATH="${tcltk_prefix}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-
       lock_in homebrew
       return 0
     fi
@@ -2085,29 +2090,7 @@ use_pixi_tcltk() {
   if pixi global list --environment "$env_name" 2>/dev/null | grep -q "^tk"; then
     echo "python-build: use tk from pixi (${env_name})"
     local prefix="$(pixi_env_prefix)" || return 1
-    # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
-    local tcltk_includes="$(sh -c 'cd '"$prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_INCLUDE_SPEC $TK_INCLUDE_SPEC"')"
-    # Homebrew Tcl/Tk 9 is built with external libtommath. CPython's build as of 3.14.0 does not detect that and fails to link to tommath symbols
-    local tcltk_cflags
-    if sh -c '. '"$prefix"'/lib/tclConfig.sh; echo "$TCL_DEFS"' | grep -qwFe '-DTCL_WITH_EXTERNAL_TOMMATH=1'; then
-      tcltk_cflags="-DTCL_WITH_EXTERNAL_TOMMATH=1"
-    fi
-    # For some reason, keg-only tcl-tk@8 successfully links with Tkinter without specifying rpath, with `/opt' rpath
-    # so no need to translate /Cellar path to /opt path
-    local tcltk_libs="$(sh -c 'cd '"$prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_LIB_SPEC $TK_LIB_SPEC"')"
-    if [[ -n "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
-      # pkg-config is not present out of the box in MacOS.
-      # There's no way to provide a fallback only if it's is not present
-      # and Configure's logic of detecting if it's present is complicated.
-      # So we just override it always
-      export TCLTK_CFLAGS="$tcltk_includes${tcltk_cflags:+ $tcltk_cflags}"
-      export TCLTK_LIBS="$tcltk_libs"
-    else
-      package_option python configure --with-tcltk-includes="$tcltk_includes"
-      package_option python configure --with-tcltk-libs="$tcltk_libs"
-      [[ -n $tcltk_cflags ]] && export CFLAGS="${tcltk_cflags}${CFLAGS:+ $CFLAGS}"
-    fi
-
+    configure_tcltk_flags "$prefix"
     lock_in pixi
     return 0
   fi
