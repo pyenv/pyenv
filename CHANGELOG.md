@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.6.12
+* Add graalpy-25.0.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3350
+* Add CPython 3.9.25 by @nedbat in https://github.com/pyenv/pyenv/pull/3355
+
 ## Release v2.6.11
 * Support building against Homebrew Tcl/Tk 9 by @native-api in https://github.com/pyenv/pyenv/pull/3343
 * Add CPython 3.13.9 by @nedbat in https://github.com/pyenv/pyenv/pull/3346
