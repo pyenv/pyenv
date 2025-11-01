@@ -202,7 +202,14 @@ build_failed() {
       colorize 33 "Results logged to ${LOG_PATH}"
       printf "\n\n"
       echo "Last 10 log lines:"
-      tail -n 10 "$LOG_PATH"
+      TAIL=`tail -n 10 "$LOG_PATH"`
+      echo "$TAIL"
+      if echo "$TAIL" | grep -q "no acceptable C compiler found"; then
+        printf "\n"
+        echo "Are the build dependencies for Python correctly installed?"
+        echo "Please consult to the Wiki page for more info."
+        echo "https://github.com/pyenv/pyenv/wiki#suggested-build-environment"
+      fi
     fi
   } >&3
   exit 1
