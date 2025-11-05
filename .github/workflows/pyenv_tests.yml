@@ -12,8 +12,8 @@ jobs:
         os:
           - ubuntu-24.04
           - ubuntu-22.04
+          - macos-15-intel
           - macos-14
-          - macos-13
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
