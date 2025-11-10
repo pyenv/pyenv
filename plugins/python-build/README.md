@@ -144,10 +144,19 @@ MacPorts Homebrew is used to find dependency packages if `port` is found on `PAT
 
 Set `PYTHON_BUILD_USE_MACPORTS` or `PYTHON_BUILD_SKIP_MACPORTS` to override this default.
 
-###### Interaction with Homebrew
+##### Pixi
 
-If both Homebrew and MacPorts are installed and allowed to be used, Homebrew takes preference.
-There first ecosystem where any of the required dependency packages is found is used.
+Pixi is used to find dependency packages if `pixi` is found on `PATH` in both MacOS and Linux.
+
+Set `PYTHON_BUILD_USE_PIXI` or `PYTHON_BUILD_SKIP_PIXI` to override this default.
+
+By default, python-build looks for dependencies in a Pixi global environment named `python-deps`.
+You can override this by setting `PYTHON_BUILD_PIXI_ENV` to a different environment name.
+
+##### Interaction between Homebrew, MacPorts and pixi
+
+If more than once package ecosystems are installed, Homebrew takes preference, then MacPorts, then pixi.
+The first ecosystem where any of the required dependency packages is found is used.
 
 ##### Portage
 
@@ -178,6 +187,9 @@ You can set certain environment variables to control the build process.
 * `PYTHON_BUILD_TCLTK_FORMULA`, override the Homebrew Tcl/Tk formula to use.
 * `PYTHON_BUILD_SKIP_MACPORTS`, if set, will not search for libraries installed by MacPorts when it would normally will.
 * `PYTHON_BUILD_USE_MACPORTS`, if set, will search for libraries installed by MacPorts when it would normally not.
+* `PYTHON_BUILD_SKIP_PIXI`, if set, will not search for libraries installed by pixi when it would normally will.
+* `PYTHON_BUILD_USE_PIXI`, if set, will search for libraries installed by pixi when it would normally not.
+* `PYTHON_BUILD_PIXI_ENV`, override the Pixi global environment to use (defaults to `python-deps`).
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
   in `share/python-build/` are looked up.
 * `PYTHON_BUILD_DEFINITIONS` can be a list of colon-separated paths that get
