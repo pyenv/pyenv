@@ -7,271 +7,226 @@ saving it to plugins/python-build/share/python-build.
 
 """
 import argparse
-import collections
-import functools
+import dataclasses
+import hashlib
+import io
+import itertools
 import logging
+import operator
 import pathlib
+import pprint
 import re
-import string
-import sys
-import textwrap
 import typing
-from enum import Enum
-from typing import NamedTuple, List, Optional, DefaultDict, Dict
+import urllib.parse
 
+import more_itertools
 import packaging.version
+import requests
 import requests_html
+import sortedcontainers
 
 logger = logging.getLogger(__name__)
 
 REPO = "https://www.python.org/ftp/python/"
 
+CUTOFF_VERSION=packaging.version.Version('3.9')
+EXCLUDED_VERSIONS= {
+    packaging.version.Version("3.9.3")  #recalled
+}
+
 here = pathlib.Path(__file__).resolve()
 out_dir: pathlib.Path = here.parent.parent / "share" / "python-build"
 
-
-class StrEnum(str, Enum):
-    """Enum subclass whose members are also instances of str
-    and directly comparable to strings. str type is forced at declaration.
-
-    Adapted from https://github.com/kissgyorgy/enum34-custom/blob/dbc89596761c970398701d26c6a5bbcfcf70f548/enum_custom.py#L100
-    (MIT license)
-    """
-
-    def __new__(cls, *args):
-        for arg in args:
-            if not isinstance(arg, str):
-                raise TypeError("Not text %s:" % arg)
-
-        return super(StrEnum, cls).__new__(cls, *args)
-
-    def __str__(self):
-        return str(self.value)
+T_THUNK=\
+'''export PYTHON_BUILD_FREE_THREADING=1
+source "${BASH_SOURCE[0]%t}"'''
 
 
-class SupportedOS(StrEnum):
-    LINUX = "Linux"
-    MACOSX = "MacOSX"
-
-
-PyVersion = None
-class PyVersionMeta(type):
-    def __getattr__(self, name):
-        """Generate PyVersion.PYXXX on demand to future-proof it"""
-        if PyVersion is not None:
-            return PyVersion(name.lower())
-        return super(PyVersionMeta,self).__getattr__(self, name)
-
-
-@collections.dataclass(frozen=True)
-class PyVersion(metaclass=PyVersionMeta):
-    major: str
-    minor: str
-
-    def __init__(self, value):
-        (major, minor) = re.match(r"py(\d)(\d+)", value).groups()
-        object.__setattr__(self, "major", major)
-        object.__setattr__(self, "minor", minor)
-
-    @property
-    def value(self):
-        return f"py{self.major}{self.minor}"
-
-    def version(self):
-        return f"{self.major}.{self.minor}"
-
-    def version_info(self):
-        return (self.major, self.minor)
-
-    def __str__(self):
-        return self.value
-
-
-@functools.total_ordering
-class VersionStr(str):
-    def info(self):
-        return tuple(int(n) for n in self.replace("-", ".").split("."))
-
-    def __eq__(self, other):
-        return str(self) == str(other)
-
-    def __lt__(self, other):
-        if isinstance(other, VersionStr):
-            return self.info() < other.info()
-        raise ValueError("VersionStr can only be compared to other VersionStr")
-
-    @classmethod
-    def from_info(cls, version_info):
-        return VersionStr(".".join(str(n) for n in version_info))
-
-    def __hash__(self):
-        return hash(str(self))
-
-
-class CondaVersion(NamedTuple):
-    version_str: VersionStr
-    py_version: Optional[PyVersion]
-
-    @classmethod
-    def from_str(cls, s):
-        """
-        Convert a string of the form "miniconda_n-ver" or "miniconda_n-py_ver-ver" to a :class:`CondaVersion` object.
-        """
-        miniconda_n, _, remainder = s.partition("-")
-        suffix = miniconda_n[-1]
-        if suffix in string.digits:
-            flavor = miniconda_n[:-1]
-        else:
-            flavor = miniconda_n
-            suffix = ""
-
-        components = remainder.split("-")
-        if flavor == Flavor.MINICONDA and len(components) >= 2:
-            py_ver, *ver_parts = components
-            py_ver = PyVersion(f"py{py_ver.replace('.', '')}")
-            ver = "-".join(ver_parts)
-        else:
-            ver = "-".join(components)
-            py_ver = None
-
-        return CondaVersion(Flavor(flavor), Suffix(suffix), VersionStr(ver), py_ver)
-
-    def to_filename(self):
-        if self.py_version:
-            return f"{self.flavor}{self.suffix}-{self.py_version.version()}-{self.version_str}"
-        else:
-            return f"{self.flavor}{self.suffix}-{self.version_str}"
-
-    def default_py_version(self):
-        """
-        :class:`PyVersion` of Python used with this Miniconda version
-        """
-        if self.py_version:
-            return self.py_version
-
-        v = self.version_str.info()
-        if self.flavor == "miniconda":
-            # https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-python.html
-            if v < (4, 7):
-                return PyVersion.PY36
-            if v < (4, 8):
-                return PyVersion.PY37
-            else:
-                # since 4.8, Miniconda specifies versions explicitly in the file name
-                raise ValueError("Miniconda 4.8+ is supposed to specify a Python version explicitly")
-        if self.flavor == "anaconda":
-            # https://docs.anaconda.com/free/anaconda/reference/release-notes/
-            if v >= (2024,6):
-                return PyVersion.PY312
-            if v >= (2023,7):
-                return PyVersion.PY311
-            if v >= (2023,3):
-                return PyVersion.PY310
-            if v >= (2021,11):
-                return PyVersion.PY39
-            if v >= (2020,7):
-                return PyVersion.PY38
-            if v >= (2020,2):
-                return PyVersion.PY37
-            if v >= (5,3,0):
-                return PyVersion.PY37
-            return PyVersion.PY36
-
-        raise ValueError(self.flavor)
-
-
-class PyenvCPythonVersion(packaging.version.Version):
-    _free_threaded: bool = False
-
-    def __init__(self, version_str):
-        m = re.match(r"^(.*[^a-zA-Z])t$", version_str)
-        if m:
-            self._free_threaded = True
-            version_str = m.group(1)
-        super().__init__(self, version_str)
-
-
-def make_script(specs: List[CondaSpec]):
-    install_lines = [s.to_install_lines() for s in specs]
-    return install_script_fmt.format(
-        install_lines="\n".join(install_lines),
-        tflavor=specs[0].tflavor,
-    )
-
-
-def get_existing_scripts(name, pattern) -> typing.Generator[typing.Tuple[str, PyenvCPythonVersion]]:
+def get_existing_scripts(name="CPython", pattern=r'^\d+\.\d+(?:(t?)(-\w+)|(.\d+((?:a|b|rc)\d)?(t?)))$'):
     """
     Enumerate existing installation scripts in share/python-build/ by pattern
     """
     logger.debug("Getting existing versions")
     for p in out_dir.iterdir():
         entry_name = p.name
-        if not p.is_file() or not re.match(pattern,entry_name):
+        if not p.is_file() or not (m := re.match(pattern,entry_name)) or m.group(1)=='t' or m.group(5)=='t':
             continue
         try:
-            v = PyenvCPythonVersion(entry_name)
+            v = packaging.version.Version(entry_name)
+            # branch tip scrpts are different from release scripts and thus unusable as a pattern
+            if v.dev is not None:
+                continue
             logger.debug("Existing %(name)s version %(v)s", locals())
-            yield entry_name, v
+            yield v,entry_name
         except ValueError as e:
             logger.error("Unable to parse existing version %s: %s", entry_name, e)
 
 
-def get_available_versions(name, repo) -> typing.Generator[typing.Tuple[str, str]]:
-    """
-    Fetch remote versions
-    """
-    logger.info("Fetching remote %(name)s versions",locals())
-    session = requests_html.HTMLSession()
-    response = session.get(repo)
-    page: requests_html.HTML = response.html
+def _get_download_entries(url, pattern, session=None):
+    if session is None:
+        session = requests_html.HTMLSession()
+    response = session.get(url)
+    page = response.html
     table = page.find("pre", first=True)
     # the first entry is ".."
     links = table.find("a")[1:]
     for link in links:
+        name = link.text.rstrip('/')
+        if not re.match(pattern, name):
+            continue
+        yield name, urllib.parse.urljoin(response.url,link.attrs['href'])
+
+
+def get_available_versions(name="CPython", url=REPO, pattern=r'^\d+', session=None):
+    """
+    Fetch remote versions
+    """
+    logger.info("Fetching remote %(name)s versions",locals())
+    for name, url in _get_download_entries(url, pattern, session):
+
         logger.debug('Available %(name)s version: %(link)s', locals())
-        yield link.text, link.attrs['href']
+        yield packaging.version.Version(name), url
+
+
+def get_available_source_downloads(url, session) -> typing.Dict[
+        packaging.version.Version,
+        typing.Dict[str,typing.Tuple[str,str]]]:
+    result: typing.Dict[packaging.version.Version, dict] = {}
+    for name, url in _get_download_entries(url, r'Python-.*\.(tar\.xz|tgz)$', session):
+        m=re.match(r'(?P<package>Python-(?P<version>.*))\.(?P<extension>tar\.xz|tgz)$',name)
+        version = packaging.version.Version(m.group("version"))
+        extension = m.group("extension")
+        result.setdefault(version,{})[extension]=(m.group("package"),url)
+    return result
+
+
+def pick_previous_version(version: packaging.version.Version,
+                          available_versions: typing.Iterable[packaging.version.Version]):
+    return max(v for v in available_versions if v < version)
+
+
+def adapt_script(version: packaging.version.Version,
+                 extensions_urls: typing.Dict[str,typing.Tuple[str,str]],
+                 previous_version: packaging.version.Version,
+                 is_prerelease_upgrade: bool) -> None:
+    previous_version_path = out_dir.joinpath(str(previous_version))
+    with previous_version_path.open("r", encoding='utf-8') as f:
+        script = f.readlines()
+    result = io.StringIO()
+    for line in script:
+        if m:=re.match(r'\s*install_package\s+"(?P<package>Python-\S+)"\s+'
+                       r'"(?P<url>\S+)"\s+.*\s+verify_py(?P<verify_py_suffix>\d+)\s+.*$',
+                       line):
+            existing_url_path = urllib.parse.urlparse(m.group('url')).path
+            try:
+                matched_extension = more_itertools.one(ext for ext in extensions_urls if existing_url_path.endswith(ext))
+            except ValueError:
+                logger.error(f'Cannot match existing URL path\'s {existing_url_path} extension '
+                             f'to available packages {extensions_urls}')
+                return
+            new_package_name, new_package_url = extensions_urls[matched_extension]
+            new_package_hash = Url.sha256_url(new_package_url)
+
+            verify_py_suffix = str(version.major)+str(version.minor)
+
+            line = Re.subgroups(m,
+                                package=new_package_name,
+                                url=new_package_url+'#'+new_package_hash,
+                                verify_py_suffix=verify_py_suffix)
+
+        result.write(line)
+    result_path = out_dir.joinpath(str(version))
+    logger.debug(f"Writing {result_path}")
+    result_path.write_text(result.getvalue(), encoding='utf-8')
+    result.close()
+
+    if is_prerelease_upgrade:
+        logger.debug(f'Deleting {previous_version_path}')
+        previous_version_path.unlink()
+
+    if (version.major, version.minor) >= (3, 13):
+        # an old thunk may have older version-specific code
+        # so it's safer to write a known version-independent template
+        thunk_path = out_dir.joinpath(str(version) + "t")
+        logger.debug(f"Writing {thunk_path}")
+        thunk_path.write_text(T_THUNK, encoding='utf-8')
+        if is_prerelease_upgrade:
+            previous_thunk_path = out_dir.joinpath(str(previous_version) + "t")
+            logger.debug(f"Deleting {previous_thunk_path}")
+            previous_thunk_path.unlink()
+
+def add_version(version: packaging.version.Version,
+                url: str,
+                existing_versions: typing.Collection[packaging.version.Version],
+                session: requests_html.BaseSession = None):
+    previous_version = pick_previous_version(version, existing_versions)
+    is_prerelease_upgrade = previous_version.major==version.major\
+            and previous_version.minor==version.minor\
+            and previous_version.micro==version.micro
+    if is_prerelease_upgrade:
+        logger.info(f"Checking for a (pre)release for {version} newer than {previous_version}")
+    else:
+        logger.info(f"Adding {version} based on {previous_version}")
+
+    available_downloads = get_available_source_downloads(url, session)
+    latest_available_download_version = max(available_downloads.keys())
+    if latest_available_download_version == previous_version:
+        logger.info("No newer download found")
+        return
+
+    adapt_script(latest_available_download_version,
+                 available_downloads[latest_available_download_version],
+                 previous_version,
+                 is_prerelease_upgrade)
 
 def main():
     args = parse_args()
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
+    cached_session=None
 
-    existing_versions = dict(get_existing_scripts("CPython", "^\d++\.\d++(?!-)"))
-    available_versions = dict(get_available_versions("CPython", REPO))
+    existing_versions = dict(get_existing_scripts())
+    available_versions = dict(get_available_versions(session=cached_session))
     # version triple to triple-ified spec to raw spec
     versions_to_add = set(available_versions.keys()) - set(existing_versions.keys())
+    versions_to_add = {v for v in versions_to_add if v>=CUTOFF_VERSION and v not in EXCLUDED_VERSIONS}
     logger.info("Checking for new versions")
-    for s in sorted(available_specs, key=key_fn):
-        key = s.version
-        vv = key.version_str.info()
-
-        reason = None
-        if key in existing_versions:
-            reason = "already exists"
-        elif key.version_str.info() <= (4, 3, 30):
-            reason = "too old"
-        elif len(key.version_str.info()) >= 4 and "-" not in key.version_str:
-            reason = "ignoring hotfix releases"
-
-        if reason:
-            logger.debug("Ignoring version %(s)s (%(reason)s)", locals())
-            continue
-
-        to_add[key][s] = s
-    logger.info("Writing %s scripts", len(to_add))
-    for ver, d in to_add.items():
-        specs = list(d.values())
-        fpath = out_dir / ver.to_filename()
-        script_str = make_script(specs)
-        logger.info("Writing script for %s", ver)
-        if args.dry_run:
-            print(f"Would write spec to {fpath}:\n" + textwrap.indent(script_str, "  "))
-        else:
-            with open(fpath, "w") as f:
-                f.write(script_str)
+    logger.debug("Existing_versions:\n"+pprint.pformat(existing_versions))
+    logger.debug("Available_versions:\n"+pprint.pformat(available_versions))
+    logger.debug("Versions to add:\n"+pprint.pformat(versions_to_add))
+    for version_to_add in versions_to_add:
+        add_version(version_to_add, available_versions[version_to_add], existing_versions)
+    # for s in available_versions:
+    #     key = s.version
+    #     vv = key.version_str.info()
+    #
+    #     reason = None
+    #     if key in existing_versions:
+    #         reason = "already exists"
+    #     elif key.version_str.info() <= (4, 3, 30):
+    #         reason = "too old"
+    #     elif len(key.version_str.info()) >= 4 and "-" not in key.version_str:
+    #         reason = "ignoring hotfix releases"
+    #
+    #     if reason:
+    #         logger.debug("Ignoring version %(s)s (%(reason)s)", locals())
+    #         continue
+    #
+    #     to_add[key][s] = s
+    # logger.info("Writing %s scripts", len(to_add))
+    # for ver, d in to_add.items():
+    #     specs = list(d.values())
+    #     fpath = out_dir / ver.to_filename()
+    #     script_str = make_script(specs)
+    #     logger.info("Writing script for %s", ver)
+    #     if args.dry_run:
+    #         print(f"Would write spec to {fpath}:\n" + textwrap.indent(script_str, "  "))
+    #     else:
+    #         with open(fpath, "w") as f:
+    #             f.write(script_str)
 
 
 def parse_args():
-    parser = ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "-d", "--dry-run", action="store_true",
         help="Do not write scripts, just report them to stdout",
@@ -282,6 +237,60 @@ def parse_args():
     )
     parsed = parser.parse_args()
     return parsed
+
+class Re:
+    @dataclasses.dataclass
+    class _interval:
+        group: typing.Union[int, str, None]
+        start: int
+        end: int
+    @staticmethod
+    def subgroups(match: re.Match,
+                  /, *args: [typing.AnyStr],
+                  **kwargs: [typing.AnyStr])\
+            -> typing.AnyStr:
+        repls={i:repl for i,repl in enumerate(args) if repl is not None}
+        repls.update({n:repl for n,repl in kwargs.items() if repl is not None})
+
+        intervals: sortedcontainers.SortedList[Re._interval]=\
+            sortedcontainers.SortedKeyList(key=operator.attrgetter("start","end"))
+
+        for group_id in itertools.chain(range(1,len(match.groups())), match.groupdict().keys()):
+            if group_id not in repls:
+                continue
+            if match.start(group_id) == -1:
+                continue
+            intervals.add(Re._interval(group_id,match.start(group_id),match.end(group_id)))
+        del group_id
+
+        last_interval=Re._interval(None,0,0)
+        result=""
+        for interval in intervals:
+            if interval.start < last_interval.end:
+                raise ValueError(f"Cannot replace intersecting matches "
+                                 f"for groups {last_interval.group} and {interval.group} "
+                                 f"(position {interval.start})")
+            if interval.end == interval.start and \
+                    last_interval.start == last_interval.end == interval.start:
+                raise ValueError(f"Cannot replace consecutive zero-length matches "
+                                 f"for groups {last_interval.group} and {interval.group} "
+                                 f"(position {interval.start})")
+
+            result+=match.string[last_interval.end:interval.start]+repls[interval.group]
+            last_interval = interval
+        result+=match.string[last_interval.end:]
+
+        return result
+
+class Url:
+    @staticmethod
+    def sha256_url(url):
+        logger.info(f"Downloading and computing hash of {url}")
+        h=hashlib.sha256()
+        r=requests.get(url,stream=True)
+        for c in r.iter_content(None):
+            h.update(c)
+        return h.hexdigest()
 
 
 if __name__ == "__main__":
