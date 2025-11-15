@@ -218,34 +218,6 @@ def main():
     logger.debug("Versions to add:\n"+pprint.pformat(versions_to_add))
     for version_to_add in versions_to_add:
         add_version(version_to_add, available_versions[version_to_add], existing_versions, session=cached_session)
-    # for s in available_versions:
-    #     key = s.version
-    #     vv = key.version_str.info()
-    #
-    #     reason = None
-    #     if key in existing_versions:
-    #         reason = "already exists"
-    #     elif key.version_str.info() <= (4, 3, 30):
-    #         reason = "too old"
-    #     elif len(key.version_str.info()) >= 4 and "-" not in key.version_str:
-    #         reason = "ignoring hotfix releases"
-    #
-    #     if reason:
-    #         logger.debug("Ignoring version %(s)s (%(reason)s)", locals())
-    #         continue
-    #
-    #     to_add[key][s] = s
-    # logger.info("Writing %s scripts", len(to_add))
-    # for ver, d in to_add.items():
-    #     specs = list(d.values())
-    #     fpath = out_dir / ver.to_filename()
-    #     script_str = make_script(specs)
-    #     logger.info("Writing script for %s", ver)
-    #     if args.dry_run:
-    #         print(f"Would write spec to {fpath}:\n" + textwrap.indent(script_str, "  "))
-    #     else:
-    #         with open(fpath, "w") as f:
-    #             f.write(script_str)
 
 
 def parse_args():
