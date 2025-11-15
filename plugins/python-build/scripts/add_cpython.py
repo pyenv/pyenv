@@ -108,7 +108,8 @@ def pick_previous_version(version: packaging.version.Version,
 def adapt_script(version: packaging.version.Version,
                  extensions_urls: typing.Dict[str,typing.Tuple[str,str]],
                  previous_version: packaging.version.Version,
-                 is_prerelease_upgrade: bool) -> None:
+                 is_prerelease_upgrade: bool,
+                 session: requests_html.BaseSession = None) -> None:
     previous_version_path = out_dir.joinpath(str(previous_version))
     with previous_version_path.open("r", encoding='utf-8') as f:
         script = f.readlines()
@@ -125,7 +126,7 @@ def adapt_script(version: packaging.version.Version,
                              f'to available packages {extensions_urls}')
                 return
             new_package_name, new_package_url = extensions_urls[matched_extension]
-            new_package_hash = Url.sha256_url(new_package_url)
+            new_package_hash = Url.sha256_url(new_package_url, session)
 
             verify_py_suffix = str(version.major)+str(version.minor)
 
@@ -203,7 +204,7 @@ def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
 def main():
     args = parse_args()
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
-    cached_session=None
+    cached_session=requests_html.HTMLSession()
 
     existing_versions = dict(get_existing_scripts())
     available_versions = dict(get_available_versions(session=cached_session))
@@ -215,7 +216,7 @@ def main():
     logger.debug("Available_versions:\n"+pprint.pformat(available_versions))
     logger.debug("Versions to add:\n"+pprint.pformat(versions_to_add))
     for version_to_add in versions_to_add:
-        add_version(version_to_add, available_versions[version_to_add], existing_versions)
+        add_version(version_to_add, available_versions[version_to_add], existing_versions, session=cached_session)
     # for s in available_versions:
     #     key = s.version
     #     vv = key.version_str.info()
@@ -306,10 +307,12 @@ class Re:
 
 class Url:
     @staticmethod
-    def sha256_url(url):
+    def sha256_url(url, session=None):
+        if session is None:
+            session = requests_html.HTMLSession()
         logger.info(f"Downloading and computing hash of {url}")
         h=hashlib.sha256()
-        r=requests.get(url,stream=True)
+        r=session.get(url,stream=True)
         for c in r.iter_content(None):
             h.update(c)
         return h.hexdigest()
