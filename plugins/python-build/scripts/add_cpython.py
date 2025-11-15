@@ -24,6 +24,7 @@ import packaging.version
 import requests
 import requests_html
 import sortedcontainers
+import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -306,6 +307,7 @@ class Re:
         return result
 
 class Url:
+    logger = logging.getLogger("Url")
     @staticmethod
     def sha256_url(url, session=None):
         if session is None:
@@ -313,8 +315,11 @@ class Url:
         logger.info(f"Downloading and computing hash of {url}")
         h=hashlib.sha256()
         r=session.get(url,stream=True)
-        for c in r.iter_content(None):
-            h.update(c)
+        total_bytes=int(r.headers.get('content-length',0)) or float('inf')
+        with tqdm.tqdm(total=total_bytes, unit='B', unit_scale=True, unit_divisor=1024) as t:
+            for c in r.iter_content(1024):
+                t.update(len(c))
+                h.update(c)
         return h.hexdigest()
 
 
