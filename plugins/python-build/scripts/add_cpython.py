@@ -140,24 +140,9 @@ def adapt_script(version: packaging.version.Version,
     result_path.write_text(result.getvalue(), encoding='utf-8')
     result.close()
 
-    if is_prerelease_upgrade:
-        logger.debug(f'Deleting {previous_version_path}')
-        previous_version_path.unlink()
-
-    if (version.major, version.minor) >= (3, 13):
-        # an old thunk may have older version-specific code
-        # so it's safer to write a known version-independent template
-        thunk_path = out_dir.joinpath(str(version) + "t")
-        logger.debug(f"Writing {thunk_path}")
-        thunk_path.write_text(T_THUNK, encoding='utf-8')
-        if is_prerelease_upgrade:
-            previous_thunk_path = out_dir.joinpath(str(previous_version) + "t")
-            logger.debug(f"Deleting {previous_thunk_path}")
-            previous_thunk_path.unlink()
-
 def add_version(version: packaging.version.Version,
                 url: str,
-                existing_versions: typing.Collection[packaging.version.Version],
+                existing_versions: typing.MutableMapping[packaging.version.Version,typing.Any],
                 session: requests_html.BaseSession = None):
     previous_version = pick_previous_version(version, existing_versions)
     is_prerelease_upgrade = previous_version.major==version.major\
@@ -170,14 +155,50 @@ def add_version(version: packaging.version.Version,
 
     available_downloads = get_available_source_downloads(url, session)
     latest_available_download_version = max(available_downloads.keys())
-    if latest_available_download_version == previous_version:
-        logger.info("No newer download found")
-        return
+    if is_prerelease_upgrade:
+        if latest_available_download_version == previous_version:
+            logger.info("No newer download found")
+            return False
+        else:
+            logger.info(f"Adding {version} replacing {previous_version}")
 
     adapt_script(latest_available_download_version,
                  available_downloads[latest_available_download_version],
                  previous_version,
-                 is_prerelease_upgrade)
+                 is_prerelease_upgrade,
+                 session)
+
+    cleanup_prerelease_upgrade(is_prerelease_upgrade, previous_version, existing_versions)
+
+    handle_t_thunks(version, previous_version, is_prerelease_upgrade)
+
+    return True
+
+
+def cleanup_prerelease_upgrade(
+        is_prerelease_upgrade: bool,
+        previous_version: packaging.version.Version,
+        existing_versions: typing.MutableMapping[packaging.version.Version,typing.Any])\
+        -> None:
+    if is_prerelease_upgrade:
+        previous_version_path = out_dir.joinpath(str(previous_version))
+        logger.debug(f'Deleting {previous_version_path}')
+        previous_version_path.unlink()
+        del existing_versions[previous_version]
+
+
+def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
+    if (version.major, version.minor) >= (3, 13):
+        # an old thunk may have older version-specific code
+        # so it's safer to write a known version-independent template
+        thunk_path = out_dir.joinpath(str(version) + "t")
+        logger.debug(f"Writing {thunk_path}")
+        thunk_path.write_text(T_THUNK, encoding='utf-8')
+        if is_prerelease_upgrade:
+            previous_thunk_path = out_dir.joinpath(str(previous_version) + "t")
+            logger.debug(f"Deleting {previous_thunk_path}")
+            previous_thunk_path.unlink()
+
 
 def main():
     args = parse_args()
@@ -237,6 +258,7 @@ def parse_args():
     )
     parsed = parser.parse_args()
     return parsed
+
 
 class Re:
     @dataclasses.dataclass
