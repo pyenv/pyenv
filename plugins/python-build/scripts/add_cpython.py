@@ -211,11 +211,11 @@ def main():
     available_versions = dict(get_available_versions(session=cached_session))
     # version triple to triple-ified spec to raw spec
     versions_to_add = set(available_versions.keys()) - set(existing_versions.keys())
-    versions_to_add = {v for v in versions_to_add if v>=CUTOFF_VERSION and v not in EXCLUDED_VERSIONS}
+    versions_to_add = sorted({v for v in versions_to_add if v>=CUTOFF_VERSION and v not in EXCLUDED_VERSIONS})
     logger.info("Checking for new versions")
     logger.debug("Existing_versions:\n"+pprint.pformat(existing_versions))
     logger.debug("Available_versions:\n"+pprint.pformat(available_versions))
-    logger.debug("Versions to add:\n"+pprint.pformat(versions_to_add))
+    logger.info("Versions to add:\n"+pprint.pformat(versions_to_add))
     for version_to_add in versions_to_add:
         add_version(version_to_add, available_versions[version_to_add], existing_versions, session=cached_session)
 
