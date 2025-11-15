@@ -84,7 +84,7 @@ def get_available_versions(name="CPython", url=REPO, pattern=r'^\d+', session=No
     logger.info("Fetching remote %(name)s versions",locals())
     for name, url in _get_download_entries(url, pattern, session):
 
-        logger.debug('Available %(name)s version: %(link)s', locals())
+        logger.debug(f'Available version: {name}, {url}')
         yield packaging.version.Version(name), url
 
 
