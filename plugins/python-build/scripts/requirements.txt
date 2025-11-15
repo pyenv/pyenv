@@ -3,3 +3,4 @@ requests-html
 packaging~=20.4
 requests~=2.32.4
 sortedcontainers~=2.4.0
+tqdm~=4.51.0
