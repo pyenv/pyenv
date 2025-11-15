@@ -108,8 +108,7 @@ def pick_previous_version(version: packaging.version.Version,
 def adapt_script(version: packaging.version.Version,
                  extensions_urls: typing.Dict[str,typing.Tuple[str,str]],
                  previous_version: packaging.version.Version,
-                 is_prerelease_upgrade: bool,
-                 session: requests_html.BaseSession = None) -> None:
+                 session: requests_html.BaseSession = None) -> pathlib.Path:
     previous_version_path = out_dir.joinpath(str(previous_version))
     with previous_version_path.open("r", encoding='utf-8') as f:
         script = f.readlines()
@@ -141,6 +140,8 @@ def adapt_script(version: packaging.version.Version,
     result_path.write_text(result.getvalue(), encoding='utf-8')
     result.close()
 
+    return result_path
+
 def add_version(version: packaging.version.Version,
                 url: str,
                 existing_versions: typing.MutableMapping[packaging.version.Version,typing.Any],
@@ -163,11 +164,11 @@ def add_version(version: packaging.version.Version,
         assert latest_available_download_version == version
         del latest_available_download_version
 
-    adapt_script(version,
+    new_path = adapt_script(version,
                  latest_available_download,
                  previous_version,
-                 is_prerelease_upgrade,
                  session)
+    existing_versions[version]=new_path.name
 
     cleanup_prerelease_upgrade(is_prerelease_upgrade, previous_version, existing_versions)
 
