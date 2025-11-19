@@ -241,7 +241,7 @@ function print_env() {
 }
 
 function print_completion() {
-  completion="${0%/*/*}/completions/pyenv.${shell}"
+  completion="${PYENV_INSTALL_PATH}/completions/pyenv.${shell}"
   if [ -r "$completion" ]; then
     echo "source '$completion'"
   fi
