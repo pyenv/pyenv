@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.6.13
+* CI: Replace macos-13 with macos-15-intel by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3356
+* Add Miniconda3-25.9.1-1 by @binbjz in https://github.com/pyenv/pyenv/pull/3357
+* Add CPython 3.15.0a2 by @nedbat in https://github.com/pyenv/pyenv/pull/3359
+
 ## Release v2.6.12
 * Add graalpy-25.0.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3350
 * Add CPython 3.9.25 by @nedbat in https://github.com/pyenv/pyenv/pull/3355
