@@ -4,7 +4,7 @@ export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
 install_package "openssl-3.6.0" "https://github.com/openssl/openssl/releases/download/openssl-3.6.0/openssl-3.6.0.tar.gz#b6a5f44b7eb69e3fa35dbf15524405b44837a481d43d81daddde3ff21fcbb8e9" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.3" "https://ftpmirror.gnu.org/readline/readline-8.3.tar.gz#fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc" mac_readline --if has_broken_mac_readline
 if has_tar_xz_support; then
-    install_package "Python-3.15.0a1" "https://www.python.org/ftp/python/3.15.0/Python-3.15.0a1.tar.xz#3194939d488eeaeefdcf990d35542d9ad1ce788789c4e2305a2060eb7058e5a4" standard verify_py314 copy_python_gdb ensurepip
+    install_package "Python-3.15.0a2" "https://www.python.org/ftp/python/3.15.0/Python-3.15.0a2.tar.xz#d8a0a2f4a7f3d7090cf195e81814efe95f70554955557f40e149d8694a662751" standard verify_py315 copy_python_gdb ensurepip
 else
-    install_package "Python-3.15.0a1" "https://www.python.org/ftp/python/3.15.0/Python-3.15.0a1.tgz#d70f3895c97db60d058bbdfa3a55fadd385bcb1c1269e686040858e3c109c993" standard verify_py314 copy_python_gdb ensurepip
+    install_package "Python-3.15.0a2" "https://www.python.org/ftp/python/3.15.0/Python-3.15.0a2.tgz#484924d5f963f3d4215ca50c13634b6a7067e9f273893145a6209fe7c93b78ff" standard verify_py315 copy_python_gdb ensurepip
 fi
