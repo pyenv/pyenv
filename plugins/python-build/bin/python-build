@@ -1861,6 +1861,9 @@ use_xcode_sdk_zlib() {
   
   #distutils.unixcompiler and setup.py specifically search CFLAGS for "-isysroot"
   export CFLAGS="${CFLAGS:+$CFLAGS }-isysroot ${sdkroot}"
+  #while one can get away with adding it just to CFLAGS, this may cause linker failures
+  #if XCode is for a different major MacOS version (e.g. reported for XCode 12.4 on MacOS 10.15)
+  export LDFLAGS="${LDFLAGS:+$LDFLAGS }-isysroot ${sdkroot}"
   return 0
 }
 
