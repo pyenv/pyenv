@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.6.14
+* CI: Bump actions/checkout from 5 to 6 in the github-actions group by @dependabot[bot] in https://github.com/pyenv/pyenv/pull/3360
+* Fix "ld: symbol(s) not found" for C system calls in some MacOS versions if XCode is for a newer major MacOS version by @native-api in https://github.com/pyenv/pyenv/pull/3362
+* Add CPython 3.14.1 by @nedbat in https://github.com/pyenv/pyenv/pull/3363
+
 ## Release v2.6.13
 * CI: Replace macos-13 with macos-15-intel by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3356
 * Add Miniconda3-25.9.1-1 by @binbjz in https://github.com/pyenv/pyenv/pull/3357
