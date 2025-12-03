@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.6.15
+* Add CPython 3.13.10 by @jsirois in https://github.com/pyenv/pyenv/pull/3364
+
 ## Release v2.6.14
 * CI: Bump actions/checkout from 5 to 6 in the github-actions group by @dependabot[bot] in https://github.com/pyenv/pyenv/pull/3360
 * Fix "ld: symbol(s) not found" for C system calls in some MacOS versions if XCode is for a newer major MacOS version by @native-api in https://github.com/pyenv/pyenv/pull/3362
