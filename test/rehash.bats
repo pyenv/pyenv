@@ -112,7 +112,11 @@ SH
   PYENV_SHELL=bash run pyenv-sh-rehash
   assert_success "pyenv-rehash
 hash -r 2>/dev/null || true"
-  PYENV_SHELL=bash run eval "$(pyenv-sh-rehash)"
+}
+
+@test "sh-rehash in bash (integration)" {
+  create_executable "3.4" "python"
+  run eval "$(pyenv-sh-rehash)"
   assert_success
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
@@ -121,7 +125,12 @@ hash -r 2>/dev/null || true"
   create_executable "3.4" "python"
   PYENV_SHELL=fish run pyenv-sh-rehash
   assert_success "pyenv-rehash"
-  PYENV_SHELL=bash run eval "$(pyenv-sh-rehash)"
+}
+
+@test "sh-rehash in fish (integration)" {
+  command -v fish >/dev/null || skip "-- fish not installed" 
+  create_executable "3.4" "python"
+  run fish -Nc "eval (pyenv-sh-rehash)"
   assert_success
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
