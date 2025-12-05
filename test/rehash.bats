@@ -110,7 +110,7 @@ SH
 @test "sh-rehash in bash" {
   create_executable "3.4" "python"
   PYENV_SHELL=bash run pyenv-sh-rehash
-  assert_success "pyenv-rehash
+  assert_success "command pyenv rehash
 hash -r 2>/dev/null || true"
 }
 
@@ -124,7 +124,7 @@ hash -r 2>/dev/null || true"
 @test "sh-rehash in fish" {
   create_executable "3.4" "python"
   PYENV_SHELL=fish run pyenv-sh-rehash
-  assert_success "pyenv-rehash"
+  assert_success "command pyenv rehash"
 }
 
 @test "sh-rehash in fish (integration)" {
