@@ -1,5 +1,50 @@
 # Version History
 
+## Release v2.6.15
+* Add CPython 3.13.10 by @jsirois in https://github.com/pyenv/pyenv/pull/3364
+
+## Release v2.6.14
+* CI: Bump actions/checkout from 5 to 6 in the github-actions group by @dependabot[bot] in https://github.com/pyenv/pyenv/pull/3360
+* Fix "ld: symbol(s) not found" for C system calls in some MacOS versions if XCode is for a newer major MacOS version by @native-api in https://github.com/pyenv/pyenv/pull/3362
+* Add CPython 3.14.1 by @nedbat in https://github.com/pyenv/pyenv/pull/3363
+
+## Release v2.6.13
+* CI: Replace macos-13 with macos-15-intel by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3356
+* Add Miniconda3-25.9.1-1 by @binbjz in https://github.com/pyenv/pyenv/pull/3357
+* Add CPython 3.15.0a2 by @nedbat in https://github.com/pyenv/pyenv/pull/3359
+
+## Release v2.6.12
+* Add graalpy-25.0.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3350
+* Add CPython 3.9.25 by @nedbat in https://github.com/pyenv/pyenv/pull/3355
+
+## Release v2.6.11
+* Support building against Homebrew Tcl/Tk 9 by @native-api in https://github.com/pyenv/pyenv/pull/3343
+* Add CPython 3.13.9 by @nedbat in https://github.com/pyenv/pyenv/pull/3346
+* Add CPython 3.15.0a1 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3347
+
+## Release v2.6.10
+* Add CPython 3.12.12, 3.11.14, 3.10.19, 3.9.24 by @nedbat in https://github.com/pyenv/pyenv/pull/3344
+
+## Release v2.6.9
+* CI: modified-scripts-build: fix CPython-specific jobs never firing by @tuzi3040 in https://github.com/pyenv/pyenv/pull/3338
+* CI: modified-scripts-build: fix output variable for CPython-specific workflows by @native-api in https://github.com/pyenv/pyenv/pull/3340
+* Add CPython 3.14.0 by @SnoopJ in https://github.com/pyenv/pyenv/pull/3339
+* Add CPython 3.13.8 by @jsirois in https://github.com/pyenv/pyenv/pull/3341
+
+## Release v2.6.8
+* Use Zlib from XCode SDK in a way compatible with XCode 16 and CLT by @JarheadStever in https://github.com/pyenv/pyenv/pull/3301
+* Add miniforge 25.3.0-1, 25.3.0-2, 25.3.0-3, 25.3.1-0, skip miniforge 25.3.0-0 by @native-api in https://github.com/pyenv/pyenv/pull/3306
+* Fix Readline and OpenSSL detection for MacPorts without the corresponding package by @native-api in https://github.com/pyenv/pyenv/pull/3317
+* Bump actions/checkout from 4 to 5 in the github-actions group by @dependabot[bot] in https://github.com/pyenv/pyenv/pull/3318
+* Fix rehash hook for pipx/pipx.x/pipx.xx by @rockandska in https://github.com/pyenv/pyenv/pull/3320
+* Add miniconda 25.7.0-2 by @native-api in https://github.com/pyenv/pyenv/pull/3323
+* Support curl from a snap by @native-api in https://github.com/pyenv/pyenv/pull/3329
+* CI: Bats test suite in docker by @rockandska in https://github.com/pyenv/pyenv/pull/3324
+* Add GraalPy 25.0.0 by @msimacek in https://github.com/pyenv/pyenv/pull/3331
+* Upgrade pip detetcion in pip-rehash to accept multiple variations by @rockandska in https://github.com/pyenv/pyenv/pull/3330
+* Add CPython 3.14.0rc3 by @nedbat in https://github.com/pyenv/pyenv/pull/3333
+* Use TCLTK_* and pkg-config for 3.11+ linking with Homebrew Tcl/Tk; add PYTHON_BUILD_TCLTK_FORMULA envvar by @native-api in https://github.com/pyenv/pyenv/pull/3327
+
 ## Release v2.6.7
 * Skip Zlib from XCode for XCode 16+ by @native-api in https://github.com/pyenv/pyenv/pull/3298
 * Don't fail the build if `xcodebuild` fails by @native-api in https://github.com/pyenv/pyenv/pull/3302
