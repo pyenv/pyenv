@@ -35,7 +35,7 @@ release_lock() {
 }
 
 if [ ! -w "$SHIM_PATH" ]; then
-  echo "pyenv: cannot rehash: $SHIM_PATH isn't writable"
+  echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2
   exit 1
 fi
 
@@ -46,15 +46,27 @@ while (( SECONDS <= start + ${PYENV_REHASH_TIMEOUT:-60} )); do
     acquired=1
     break
   else
+    #Landlock sandbox subsystem in the Linux kernel returns false information in access() as of 6.14.0,
+    # making -w "$SHIM_PATH" not catch the fact that the shims dir is not writable in this case.
+    #Bash doesn't provide access to errno to check for non-EEXIST error code in acquire_lock.
+    #So check for writablity by trying to write to a different file,
+    # in a way that taxes the usual use case as little as possible.
+    if [[ -z $tested_for_other_write_errors ]]; then
+      ( t="$(mktemp -p "$SHIM_PATH")" && rm "$t" ) && tested_for_other_write_errors=1 ||
+        { echo "pyenv: cannot rehash: $SHIM_PATH isnt writable" >&2; break; }
+    fi
     # POSIX sleep(1) doesn't provide subsecond precision, but many others do
     sleep 0.1 2>/dev/null || sleep 1
   fi
 done
 
 if [ -z "${acquired}" ]; then
-  echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists"
+  if [[ -n $tested_for_other_write_errors ]]; then
+      echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists" >&2
+  fi
   exit 1
 fi
+unset tested_for_other_write_errors
 
 # The prototype shim file is a script that re-execs itself, passing
 # its filename and any arguments to `pyenv exec`. This file is
