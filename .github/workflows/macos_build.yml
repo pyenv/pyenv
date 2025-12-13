@@ -18,11 +18,6 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
-      # Normally, we would use the superbly maintained...
-      # - uses: actions/setup-python@v2
-      #   with:
-      #    python-version: ${{ matrix.python-version }}
-      # ... but in the repo, we want to test pyenv builds on macOS
       - run: |
           brew install openssl readline sqlite3 xz tcl-tk@8 libb2 zstd
       # https://github.com/pyenv/pyenv#installation
