@@ -20,6 +20,7 @@ SKIPPED_RELEASES = [
     '22.11.1-1',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
     '22.11.1-2',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
     '25.3.0-0',     #marked as prerelease, no Linux version
+    '25.11.0-0',    #regression reported in constructor, re-released as 25.11.0-1 with hotfix bumping to constructor>=3.14 (was >=3.12, 3.13 implicit)
 ]
 
 install_script_fmt = """

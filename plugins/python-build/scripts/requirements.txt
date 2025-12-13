@@ -1,1 +1,2 @@
 requests-html
+lxml[html_clean]
