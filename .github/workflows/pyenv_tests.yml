@@ -13,6 +13,7 @@ jobs:
           - ubuntu-24.04
           - ubuntu-22.04
           - macos-15-intel
+          - macos-15
           - macos-14
     runs-on: ${{ matrix.os }}
     steps:
