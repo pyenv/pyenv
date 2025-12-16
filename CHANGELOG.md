@@ -1,5 +1,10 @@
 # Version History
 
+## Release v2.6.17
+* Add miniforge 25.9.1-0, 25.11.0-1 by @13steinj in https://github.com/pyenv/pyenv/pull/3371
+* miniconda3-latest: auto accept TOS by @native-api in https://github.com/pyenv/pyenv/pull/3373
+* Add CPython 3.15.0a3 by @edgarrmondragon in https://github.com/pyenv/pyenv/pull/3374
+
 ## Release v2.6.16
 * rehash: Fix hanging for 60 seconds when shims directory is not writable due to Linux Landlock by @native-api in https://github.com/pyenv/pyenv/pull/3367
 * Add Miniconda3-25.9.1-3 by @binbjz in https://github.com/pyenv/pyenv/pull/3368
