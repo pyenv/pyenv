@@ -28,7 +28,7 @@ setup() {
   PATH="${BATS_TEST_DIRNAME%/*}/libexec:$PATH"
   PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
   PATH="${PYENV_ROOT}/shims:$PATH"
-  export PATH
+  PATH="${BATS_TEST_TMPDIR}/stubs:$PATH"
 
   for xdg_var in `env 2>/dev/null | grep ^XDG_ | cut -d= -f1`; do unset "$xdg_var"; done
   unset xdg_var
@@ -128,7 +128,7 @@ path_without() {
       if [ "$found" != "${PYENV_ROOT}/shims" ]; then
         alt="${PYENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
         mkdir -p "$alt"
-        for util in bash head cut readlink greadlink; do
+        for util in bash head cut readlink greadlink tr sed; do
           if [ -x "${found}/$util" ]; then
             ln -s "${found}/$util" "${alt}/$util"
           fi
@@ -156,9 +156,13 @@ create_alt_executable_in_version() {
   create_executable "${PYENV_ROOT}/versions/$version/bin" "$@"
 }
 
+create_stub() {
+  create_executable "${BATS_TEST_TMPDIR}/stubs" "$@"
+}
+
 create_executable() {
-  bin="${1:?}"
-  name="${2:?}"
+  local bin="${1:?}"
+  local name="${2:?}"
   shift 2
   mkdir -p "$bin"
   local payload

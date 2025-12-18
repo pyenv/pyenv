@@ -193,3 +193,29 @@ exit
 pyenv: py.test: command not found
 OUT
 }
+
+@test "excludes paths in _PYENV_SHIM_PATHS_{PROGRAM} from search only for PROGRAM" {
+  progname='123;wacky-prog.name ^%$#'
+  envvarname="_PYENV_SHIM_PATHS_123_WACKY_PROG_NAME_____"
+  create_path_executable "$progname"
+
+  for dir_ in "$BATS_TEST_TMPDIR/alt-path"{1,2}; do
+    mkdir -p "$dir_"
+    ln -s "${PYENV_TEST_DIR}/bin/$progname" "$dir_/$progname"
+    eval 'export '"$envvarname"'="$dir_${'"$envvarname"':+:$'"$envvarname"'}"'
+    PATH="$dir_:$PATH"
+  done
+  create_executable "$dir_" "normal_program"
+  
+  run pyenv-which "$progname"
+  assert_success
+  assert_output <<!
+$PYENV_TEST_DIR/bin/$progname
+!
+
+  run pyenv-which "normal_program"
+  assert_success
+  assert_output <<!
+$dir_/normal_program
+!
+}

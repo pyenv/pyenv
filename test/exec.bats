@@ -116,3 +116,26 @@ OUT
   PYENV_VERSION=system:custom run pyenv-exec python3
   assert_success "$PATH"
 }
+
+@test "sets/adds to _PYENV_SHIM_PATHS_{PROGRAM} when _PYENV_SHIM_PATH is set, unsets _PYENV_SHIM_PATH" {
+  progname='123;wacky-prog.name ^%$#'
+  envvarname="_PYENV_SHIM_PATHS_123_WACKY_PROG_NAME_____"
+  create_path_executable "$progname" <<!
+echo $envvarname="\$$envvarname"
+echo _PYENV_SHIM_PATH="\$_PYENV_SHIM_PATH"
+!
+  _PYENV_SHIM_PATH=/unusual/shim/location run pyenv-exec "$progname"
+  assert_success
+  assert_output <<!
+$envvarname=/unusual/shim/location
+_PYENV_SHIM_PATH=
+!
+
+  eval "export ${envvarname}=/another/shim/location"
+  _PYENV_SHIM_PATH=/unusual/shim/location run pyenv-exec "$progname"
+  assert_success
+  assert_output <<!
+$envvarname=/unusual/shim/location:/another/shim/location
+_PYENV_SHIM_PATH=
+!
+}

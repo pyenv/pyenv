@@ -42,15 +42,19 @@ done
 
 
 remove_from_path() {
-  local path_to_remove="$1"
-  local path_before
+  local -a paths_to_remove
+  IFS=: paths_to_remove=($1)
+  local path_to_remove path_before
   local result=":${PATH//\~/$HOME}:"
-  while [ "$path_before" != "$result" ]; do
-    path_before="$result"
-    result="${result//:$path_to_remove:/:}"
+  for path_to_remove in "${paths_to_remove[@]}"; do
+    while true; do
+      path_before="$result"
+      result="${result//:$path_to_remove:/:}"
+      if [[ ${#path_before} == "${#result}" ]]; then break; fi
+    done
   done
-  result="${result%:}"
-  echo "${result#:}"
+  result="${result:1:${#result}-2}"
+  echo "$result"
 }
 
 if [ -z "$PYENV_COMMAND" ]; then
@@ -66,8 +70,10 @@ declare -a nonexistent_versions
 
 for version in "${versions[@]}" "$system"; do
   if [ "$version" = "system" ]; then
-    PATH="$(remove_from_path "${PYENV_ROOT}/shims")"
-    PYENV_COMMAND_PATH="$(command -v "$PYENV_COMMAND" || true)"
+    PROGRAM="$(echo "$PYENV_COMMAND" | tr a-z- A-Z_ | sed 's/[^A-Z0-9_]/_/g')"
+    NR_CUSTOM_SHIM_PATHS="_PYENV_SHIM_PATHS_$PROGRAM"
+    SEARCH_PATH="$(remove_from_path "${PYENV_ROOT}/shims${!NR_CUSTOM_SHIM_PATHS:+:${!NR_CUSTOM_SHIM_PATHS}}")"
+    PYENV_COMMAND_PATH="$(PATH="$SEARCH_PATH" command -v "$PYENV_COMMAND" || true)"
   else
     # $version may be a prefix to be resolved by pyenv-latest
     version_path="$(pyenv-prefix "${version}" 2>/dev/null)" || \

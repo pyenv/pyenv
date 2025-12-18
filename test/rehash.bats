@@ -127,3 +127,28 @@ hash -r 2>/dev/null || true"
   assert_success
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
+
+@test "shim sets _PYENV_SHIM_PATH when linked from elsewhere" {
+  export PYENV_VERSION="custom"
+  create_alt_executable python3
+  #must stub pyenv before rehash 'cuz the path is hardcoded into shims
+  create_stub pyenv <<!
+[[ \$1 == 'exec' ]] && \
+echo _PYENV_SHIM_PATH="\$_PYENV_SHIM_PATH"
+!
+  pyenv-rehash
+  mkdir -p "${PYENV_TEST_DIR}/alt-shim"
+  ln -s "${PYENV_ROOT}/shims/python3" "${PYENV_TEST_DIR}/alt-shim/python3"
+  
+  run "${PYENV_TEST_DIR}/alt-shim/python3"
+  assert_success
+  assert_output <<!
+_PYENV_SHIM_PATH=${PYENV_TEST_DIR}/alt-shim
+!
+
+  run python3
+  assert_success
+  assert_output <<!
+_PYENV_SHIM_PATH=
+!
+}
