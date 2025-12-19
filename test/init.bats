@@ -6,14 +6,6 @@ _setup() {
   export PATH="${PYENV_TEST_DIR}/bin:$PATH"
 }
 
-create_executable() {
-  local name="$1"
-  local bin="${PYENV_TEST_DIR}/bin"
-  mkdir -p "$bin"
-  sed -Ee '1s/^ +//' > "${bin}/$name"
-  chmod +x "${bin}/$name"
-}
-
 @test "creates shims and versions directories" {
   assert [ ! -d "${PYENV_ROOT}/shims" ]
   assert [ ! -d "${PYENV_ROOT}/versions" ]
@@ -179,7 +171,7 @@ echo "\$PATH"
 }
 
 @test "outputs sh-compatible case syntax" {
-  create_executable pyenv-commands <<!
+  create_path_executable pyenv-commands <<!
 #!$BASH
 echo -e 'activate\ndeactivate\nrehash\nshell'
 !
@@ -187,7 +179,7 @@ echo -e 'activate\ndeactivate\nrehash\nshell'
   assert_success
   assert_line '  activate|deactivate|rehash|shell)'
 
-  create_executable pyenv-commands <<!
+  create_path_executable pyenv-commands <<!
 #!$BASH
 echo
 !

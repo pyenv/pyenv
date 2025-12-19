@@ -22,14 +22,6 @@ stub_system_python() {
   touch "$stub" && chmod +x "$stub"
 }
 
-create_executable() {
-  local name="$1"
-  local bin="${PYENV_TEST_DIR}/bin"
-  mkdir -p "$bin"
-  sed -Ee '1s/^ +//' > "${bin}/$name"
-  chmod +x "${bin}/$name"
-}
-
 @test "no versions installed" {
   stub_system_python
   assert [ ! -d "${PYENV_ROOT}/versions" ]
@@ -199,7 +191,7 @@ OUT
   create_version "1.9.0"
   create_version "1.53.0"
   create_version "1.218.0"
-  create_executable sort <<SH
+  create_path_executable sort <<SH
 #!$BASH
 cat >/dev/null
 if [ "\$1" == "--version-sort" ]; then
@@ -223,7 +215,7 @@ OUT
   create_version "1.9.0"
   create_version "1.53.0"
   create_version "1.218.0"
-  create_executable sort <<SH
+  create_path_executable sort <<SH
 #!$BASH
 exit 1
 SH

@@ -2,6 +2,7 @@ unset PYENV_VERSION
 unset PYENV_DIR
 
 setup() {
+  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
   if ! enable -f "${BATS_TEST_DIRNAME}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
     if [ -n "$PYENV_NATIVE_EXT" ]; then
       echo "pyenv: failed to load \`realpath' builtin" >&2
@@ -139,6 +140,39 @@ path_without() {
   path="${path#:}"
   path="${path%:}"
   echo "$path"
+}
+
+create_path_executable() {
+  create_executable "${PYENV_TEST_DIR}/bin" "$@"
+}
+
+create_alt_executable() {
+  create_alt_executable_in_version "${PYENV_VERSION}" "$@"
+}
+
+create_alt_executable_in_version() {
+  local version="${1:?}"
+  shift 1
+  create_executable "${PYENV_ROOT}/versions/$version/bin" "$@"
+}
+
+create_executable() {
+  bin="${1:?}"
+  name="${2:?}"
+  shift 2
+  mkdir -p "$bin"
+  local payload
+  # Bats doesn't redirect stdin
+  if [[ $# -eq 0 && ! -t 0 ]]; then
+    payload="$(cat -)"
+  else
+    payload="$(printf '%s\n' "$@")"
+  fi
+  if [[ $payload != "#!/"* ]]; then
+    payload="#!$BASH"$'\n'"$payload"
+  fi
+  echo "$payload" > "${bin}/$name"
+  chmod +x "${bin}/$name"
 }
 
 create_hook() {

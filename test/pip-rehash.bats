@@ -2,13 +2,6 @@
 
 load test_helper
 
-create_executable() {
-  local bin="${PYENV_ROOT}/versions/${PYENV_VERSION}/bin"
-  mkdir -p "$bin"
-  echo "#!/bin/sh" > "${bin}/$1"
-  chmod +x "${bin}/$1"
-}
-
 copy_src_pyenvd() {
   mkdir -p "${PYENV_ROOT}"
   cp -r "${BATS_TEST_DIRNAME}/../pyenv.d" "${PYENV_ROOT}"
@@ -16,8 +9,8 @@ copy_src_pyenvd() {
 
 @test "pip-rehash triggered when using 'pip'" {
   export PYENV_VERSION="3.7.14"
-  create_executable "example"
-  create_executable "pip"
+  create_alt_executable "example"
+  create_alt_executable "pip"
   copy_src_pyenvd
   run command -v example 2> /dev/null
   assert_failure
@@ -29,8 +22,8 @@ copy_src_pyenvd() {
 
 @test "pip-rehash triggered when using 'pip3'" {
   export PYENV_VERSION="3.7.14"
-  create_executable "example"
-  create_executable "pip3"
+  create_alt_executable "example"
+  create_alt_executable "pip3"
   copy_src_pyenvd
   run command -v example 2> /dev/null
   assert_failure
@@ -42,8 +35,8 @@ copy_src_pyenvd() {
 
 @test "pip-rehash triggered when using 'pip3.x'" {
   export PYENV_VERSION="3.7.14"
-  create_executable "example"
-  create_executable "pip3.7"
+  create_alt_executable "example"
+  create_alt_executable "pip3.7"
   copy_src_pyenvd
   run command -v example 2> /dev/null
   assert_failure
@@ -55,8 +48,8 @@ copy_src_pyenvd() {
 
 @test "pip-rehash triggered when using 'python -m pip install'" {
   export PYENV_VERSION="3.7.14"
-  create_executable "example"
-  create_executable "python"
+  create_alt_executable "example"
+  create_alt_executable "python"
   copy_src_pyenvd
   run command -v example 2> /dev/null
   assert_failure

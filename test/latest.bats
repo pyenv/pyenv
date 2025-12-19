@@ -6,16 +6,8 @@ _setup() {
   export PATH="${PYENV_TEST_DIR}/bin:$PATH"
 }
 
-create_executable() {
-  local name="$1"
-  local bin="${PYENV_TEST_DIR}/bin"
-  mkdir -p "$bin"
-  sed -Ee '1s/^ +//' > "${bin}/$name"
-  chmod +x "${bin}/$name"
-}
-
 @test "read from installed" {
-  create_executable pyenv-versions <<!
+  create_path_executable pyenv-versions <<!
 #!$BASH
 echo 4.5.6
 !
@@ -27,7 +19,7 @@ echo 4.5.6
 }
 
 @test "read from known" {
-  create_executable python-build <<!
+  create_path_executable python-build <<!
 #!$BASH
 echo 4.5.6
 !
@@ -39,7 +31,7 @@ echo 4.5.6
 }
 
 @test "installed version not found" {
-  create_executable pyenv-versions <<!
+  create_path_executable pyenv-versions <<!
 #!$BASH
 echo 3.5.6
 echo 3.10.8
@@ -52,7 +44,7 @@ pyenv: no installed versions match the prefix \`3.8'
 }
 
 @test "known version not found" {
-  create_executable python-build <<!
+  create_path_executable python-build <<!
 #!$BASH
 echo 3.5.6
 echo 3.10.8
@@ -65,7 +57,7 @@ pyenv: no known versions match the prefix \`3.8'
 }
 
 @test "complete name resolves to itself" {
-  create_executable pyenv-versions <<!
+  create_path_executable pyenv-versions <<!
 #!$BASH
 echo foo
 echo foo.bar
@@ -80,7 +72,7 @@ foo
 }
 
 @test "sort CPython" {
-  create_executable pyenv-versions <<!
+  create_path_executable pyenv-versions <<!
 #!$BASH
 echo 2.7.18
 echo 3.5.6
@@ -95,7 +87,7 @@ echo 3.10.6
 }
 
 @test "ignores rolling releases, branch tips, alternative srcs, prereleases, virtualenvs; 't' versions if prefix without 't'" {
-  create_executable pyenv-versions <<!
+  create_path_executable pyenv-versions <<!
 #!$BASH
 echo 3.8.5-dev
 echo 3.8.5-src
@@ -117,7 +109,7 @@ echo 3.8.1/envs/foo
 }
 
 @test "resolves to a 't' version if prefix has 't'" {
-  create_executable pyenv-versions <<!
+  create_path_executable pyenv-versions <<!
 #!$BASH
 echo 3.13.2t
 echo 3.13.5
@@ -132,7 +124,7 @@ echo 3.14.6
 }
 
 @test "falls back to argument with -b" {
-  create_executable pyenv-versions <<!
+  create_path_executable pyenv-versions <<!
 #!$BASH
 !
   run pyenv-latest -b nonexistent
@@ -143,7 +135,7 @@ nonexistent
 }
 
 @test "falls back to argument and succeeds with -f" {
-  create_executable pyenv-versions <<!
+  create_path_executable pyenv-versions <<!
 #!$BASH
 !
   run pyenv-latest -f nonexistent
