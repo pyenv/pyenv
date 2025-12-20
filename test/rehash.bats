@@ -129,7 +129,7 @@ hash -r 2>/dev/null || true"
 }
 
 @test "sh-rehash in pwsh" {
-  create_executable "3.4" "python"
+  create_alt_executable_in_version "3.4" "python"
   PYENV_SHELL=pwsh run pyenv-sh-rehash
   assert_success "&pyenv rehash"
 }
