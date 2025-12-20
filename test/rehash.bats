@@ -109,7 +109,7 @@ hash -r 2>/dev/null || true"
 
 @test "sh-rehash in bash (integration)" {
   create_alt_executable_in_version "3.4" "python"
-  run eval "$(pyenv-sh-rehash)"
+  PYENV_SHELL=bash run eval "$(pyenv-sh-rehash)"
   assert_success
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
@@ -123,7 +123,7 @@ hash -r 2>/dev/null || true"
 @test "sh-rehash in fish (integration)" {
   command -v fish >/dev/null || skip "-- fish not installed" 
   create_alt_executable_in_version "3.4" "python"
-  run fish -Nc "eval (pyenv-sh-rehash)"
+  PYENV_SHELL=fish fish -Nc "source (pyenv-sh-rehash | psub)"
   assert_success
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
