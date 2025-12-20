@@ -159,7 +159,7 @@ function help_() {
       echo '# Load pyenv automatically by appending'
       echo "# the following to $profile :"
       echo
-      echo '$Env:PYENV_ROOT="$HOME/.pyenv"'
+      echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"'
       echo '$Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH"'
       echo 'iex ((pyenv init -) -join "`n")'
       ;;

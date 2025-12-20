@@ -278,7 +278,7 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
   Add the commands to `$profile.CurrentUserAllHosts` by running the following in your terminal:
 
   ~~~ pwsh
-  echo '$Env:PYENV_ROOT="$HOME/.pyenv"' >> $profile.CurrentUserAllHosts
+  echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"' >> $profile.CurrentUserAllHosts
   echo '$Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH"' >> $profile.CurrentUserAllHosts
   echo 'iex ((pyenv init -) -join "`n")' >> $profile.CurrentUserAllHosts
   ~~~
