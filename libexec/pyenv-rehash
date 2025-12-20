@@ -82,6 +82,10 @@ set -e
 program="\${0##*/}"
 
 export PYENV_ROOT="$PYENV_ROOT"
+SHIM_PATH=\${0%/*}
+if [[ \$SHIM_PATH != "$PYENV_ROOT/shims" ]]; then
+  export _PYENV_SHIM_PATH="\$SHIM_PATH"
+fi
 exec "$(command -v pyenv)" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"

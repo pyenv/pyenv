@@ -2,13 +2,6 @@
 
 load test_helper
 
-create_executable() {
-  local bin="${PYENV_ROOT}/versions/${1}/bin"
-  mkdir -p "$bin"
-  touch "${bin}/$2"
-  chmod +x "${bin}/$2"
-}
-
 @test "empty rehash" {
   assert [ ! -d "${PYENV_ROOT}/shims" ]
   run pyenv-rehash
@@ -42,10 +35,10 @@ create_executable() {
 }
 
 @test "creates shims" {
-  create_executable "2.7" "python"
-  create_executable "2.7" "fab"
-  create_executable "3.4" "python"
-  create_executable "3.4" "py.test"
+  create_alt_executable_in_version "2.7" "python"
+  create_alt_executable_in_version "2.7" "fab"
+  create_alt_executable_in_version "3.4" "python"
+  create_alt_executable_in_version "3.4" "py.test"
 
   assert [ ! -e "${PYENV_ROOT}/shims/fab" ]
   assert [ ! -e "${PYENV_ROOT}/shims/python" ]
@@ -68,8 +61,8 @@ OUT
   touch "${PYENV_ROOT}/shims/oldshim1"
   chmod +x "${PYENV_ROOT}/shims/oldshim1"
 
-  create_executable "3.4" "fab"
-  create_executable "3.4" "python"
+  create_alt_executable_in_version "3.4" "fab"
+  create_alt_executable_in_version "3.4" "python"
 
   run pyenv-rehash
   assert_success ""
@@ -78,8 +71,8 @@ OUT
 }
 
 @test "binary install locations containing spaces" {
-  create_executable "dirname1 p247" "python"
-  create_executable "dirname2 preview1" "py.test"
+  create_alt_executable_in_version "dirname1 p247" "python"
+  create_alt_executable_in_version "dirname2 preview1" "py.test"
 
   assert [ ! -e "${PYENV_ROOT}/shims/python" ]
   assert [ ! -e "${PYENV_ROOT}/shims/py.test" ]
@@ -108,29 +101,54 @@ SH
 }
 
 @test "sh-rehash in bash" {
-  create_executable "3.4" "python"
+  create_alt_executable_in_version "3.4" "python"
   PYENV_SHELL=bash run pyenv-sh-rehash
   assert_success "command pyenv rehash
 hash -r 2>/dev/null || true"
 }
 
 @test "sh-rehash in bash (integration)" {
-  create_executable "3.4" "python"
+  create_alt_executable_in_version "3.4" "python"
   run eval "$(pyenv-sh-rehash)"
   assert_success
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
 
 @test "sh-rehash in fish" {
-  create_executable "3.4" "python"
+  create_alt_executable_in_version "3.4" "python"
   PYENV_SHELL=fish run pyenv-sh-rehash
   assert_success "command pyenv rehash"
 }
 
 @test "sh-rehash in fish (integration)" {
   command -v fish >/dev/null || skip "-- fish not installed" 
-  create_executable "3.4" "python"
+  create_alt_executable_in_version "3.4" "python"
   run fish -Nc "eval (pyenv-sh-rehash)"
   assert_success
   assert [ -x "${PYENV_ROOT}/shims/python" ]
+}
+
+@test "shim sets _PYENV_SHIM_PATH when linked from elsewhere" {
+  export PYENV_VERSION="custom"
+  create_alt_executable python3
+  #must stub pyenv before rehash 'cuz the path is hardcoded into shims
+  create_stub pyenv <<!
+[[ \$1 == 'exec' ]] && \
+echo _PYENV_SHIM_PATH="\$_PYENV_SHIM_PATH"
+!
+  pyenv-rehash
+  mkdir -p "${PYENV_TEST_DIR}/alt-shim"
+  ln -s "${PYENV_ROOT}/shims/python3" "${PYENV_TEST_DIR}/alt-shim/python3"
+  
+  run "${PYENV_TEST_DIR}/alt-shim/python3"
+  assert_success
+  assert_output <<!
+_PYENV_SHIM_PATH=${PYENV_TEST_DIR}/alt-shim
+!
+
+  run python3
+  assert_success
+  assert_output <<!
+_PYENV_SHIM_PATH=
+!
 }
