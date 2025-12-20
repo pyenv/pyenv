@@ -200,7 +200,7 @@ function print_path() {
           echo 'end'
           ;;
       pwsh )
-          echo 'if ( $Env:PATH -match "'"${PYENV_ROOT}/shims"'" ) {'
+          echo 'if ( $Env:PATH -notmatch "'"${PYENV_ROOT}/shims"'" ) {'
           print_path_prepend_shims
           echo '}'
           ;;
