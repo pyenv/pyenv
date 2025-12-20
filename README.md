@@ -271,16 +271,19 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 
   </details>
 
-  - For **Microsoft PowerShell**:
+#### Microsoft PowerShell
 
-    Add the commands to `$profile.CurrentUserAllHosts` by running the following in your terminal:
+  <details>
 
-    ~~~ pwsh
-    echo '$Env:PYENV_ROOT="$HOME/.pyenv"' >> $profile.CurrentUserAllHosts
-    echo '$Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH"' >> $profile.CurrentUserAllHosts
-    echo 'iex ((pyenv init -) -join "`n")' >> $profile.CurrentUserAllHosts
-    ~~~
+  Add the commands to `$profile.CurrentUserAllHosts` by running the following in your terminal:
 
+  ~~~ pwsh
+  echo '$Env:PYENV_ROOT="$HOME/.pyenv"' >> $profile.CurrentUserAllHosts
+  echo '$Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH"' >> $profile.CurrentUserAllHosts
+  echo 'iex ((pyenv init -) -join "`n")' >> $profile.CurrentUserAllHosts
+  ~~~
+
+  </details>
 
 ### C. Restart your shell
 ----
