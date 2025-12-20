@@ -34,7 +34,8 @@ setup() {
   unset xdg_var
 
   # Workaround for Powershell. When tests are run from a terminal,
-  # Powershell erroneously prints ANSI escape sequences
+  # and running a script fron a here-document,
+  # Powershell 7.5.4 erroneously prints ANSI escape sequences
   # even if its output is redirected, breaking the comparison logic
   export NO_COLOR=1
 
