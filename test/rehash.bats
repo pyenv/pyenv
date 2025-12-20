@@ -137,7 +137,7 @@ hash -r 2>/dev/null || true"
 @test "sh-rehash in powershell (integration)" {
   command -v pwsh >/dev/null || skip "-- powershell not installed" 
   create_alt_executable_in_version "3.4" "python"
-  run pwsh -nop -c 'iex ((&pyenv-sh-rehash) -join "\`n")'
+  PYENV_SHELL=pwsh run pwsh -nop -c 'iex ((&pyenv-sh-rehash) -join "\`n")'
   assert_success
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
