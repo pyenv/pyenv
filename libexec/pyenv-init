@@ -157,14 +157,7 @@ function help_() {
       ;;
     pwsh )
       echo '# Load pyenv automatically by appending'
-      echo -n "# the following to "
-      if [ "$profile" == "$rc" ]; then
-        echo "$profile :"
-      else
-        echo
-        echo "${profile_explain:-$profile} (for login shells)"
-        echo "and $rc (for interactive shells) :"
-      fi
+      echo "# the following to $profile :"
       echo
       echo '$Env:PYENV_ROOT="$HOME/.pyenv"'
       echo '$Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH"'
