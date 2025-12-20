@@ -13,26 +13,14 @@ jobs:
           - ubuntu-24.04
           - ubuntu-22.04
           - macos-15-intel
+          - macos-15
           - macos-14
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
-      # Normally, we would use the superbly maintained...
-      # - uses: actions/setup-python@v2
-      #   with:
-      #    python-version: ${{ matrix.python-version }}
-      # ... but in the repo, we want to test pyenv builds on Ubuntu
-      # - run: |
-          # sudo apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev \
-              # libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
-              # xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-      # https://github.com/pyenv/pyenv#installation
       - run: |
           if test "$RUNNER_OS" == "macOS"; then
             brew install coreutils fish
-          elif [[ $(lsb_release -sr | awk -F. '{print $1}') -ge 20 ]]; then
-            # Ubuntu 18 has fish 2 which lacks many features that facilitate testing
-            sudo apt install fish -yq
           fi
       - run: pwd
       - env:
