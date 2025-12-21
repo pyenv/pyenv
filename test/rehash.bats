@@ -128,6 +128,26 @@ hash -r 2>/dev/null || true"
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
 
+@test "sh-rehash in pwsh" {
+  create_alt_executable_in_version "3.4" "python"
+  PYENV_SHELL=pwsh run pyenv-sh-rehash
+  assert_success "& (get-command pyenv -commandtype application) rehash"
+}
+
+@test "sh-rehash in pwsh (integration)" {
+  command -v pwsh >/dev/null || skip "-- pwsh not installed" 
+  assert [ ! -x "${PYENV_ROOT}/shims/python" ]
+  create_alt_executable_in_version "3.4" "python"
+  run pwsh -nop -c -<<'!'
+$ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
+iex ((& pyenv init - pwsh) -join "`n")
+& pyenv rehash
+!
+  assert_success ""
+  assert [ -x "${PYENV_ROOT}/shims/python" ]
+}
+
 @test "shim sets _PYENV_SHIM_PATH when linked from elsewhere" {
   export PYENV_VERSION="custom"
   create_alt_executable python3

@@ -11,11 +11,17 @@ shell="$(basename "${PYENV_SHELL:-$SHELL}")"
 
 # When pyenv shell integration is enabled, delegate to pyenv-rehash,
 # then tell the shell to empty its command lookup cache.
-echo "command pyenv rehash"
+case "$shell" in
+pwsh)
+  echo "& (get-command pyenv -commandtype application) rehash"
+  ;;
+*)
+  echo "command pyenv rehash"
+esac
 
 case "$shell" in
-fish )
-  # no rehash support
+fish | pwsh )
+  # no executable cache
   ;;
 * )
   echo "hash -r 2>/dev/null || true"

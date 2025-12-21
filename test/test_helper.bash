@@ -33,6 +33,12 @@ setup() {
   for xdg_var in `env 2>/dev/null | grep ^XDG_ | cut -d= -f1`; do unset "$xdg_var"; done
   unset xdg_var
 
+  # Workaround for Powershell. When tests are run from a terminal,
+  # and running a script fron a here-document,
+  # Powershell 7.5.4 erroneously prints ANSI escape sequences
+  # even if its output is redirected, breaking the comparison logic
+  export NO_COLOR=1
+
   # If test specific setup exist, run it
   if [[ $(type -t _setup) == function ]];then
     _setup
@@ -67,8 +73,8 @@ assert_failure() {
 
 assert_equal() {
   if [ "$1" != "$2" ]; then
-    { echo "expected: $1"
-      echo "actual:   $2"
+    { echo "expected: \`$1'"
+      echo "actual:   \`$2'"
     } | flunk
   fi
 }

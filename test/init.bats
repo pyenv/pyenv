@@ -62,6 +62,19 @@ OUT
   assert_line 'pyenv init - fish | source'
 }
 
+@test "setup shell completions (pwsh)" {
+  root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
+  run pyenv-init - pwsh
+  assert_success
+  assert_line "iex (gc ${root}/completions/pyenv.pwsh -Raw)"
+}
+
+@test "pwsh instructions" {
+  run pyenv-init pwsh
+  assert [ "$status" -eq 1 ]
+  assert_line 'iex ((pyenv init -) -join "`n")'
+}
+
 @test "shell detection for installer" {
   run pyenv-init --detect-shell
   assert_success
@@ -88,6 +101,13 @@ OUT
   assert_line "set -gx PATH '${PYENV_ROOT}/shims' \$PATH"
 }
 
+@test "adds shims to PATH (pwsh)" {
+  export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
+  run pyenv-init - pwsh
+  assert_success
+  assert_line '$Env:PATH="'${PYENV_ROOT}'/shims:$Env:PATH"'
+}
+
 @test "removes existing shims from PATH" {
   OLDPATH="$PATH"
   export PATH="${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:$PATH"
@@ -107,6 +127,19 @@ echo "\$PATH"
 set -x PATH "$PATH"
 pyenv init - | source
 echo "\$PATH"
+!
+  assert_success
+  assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH//${PYENV_ROOT}\/shims:/}"
+}
+
+@test "removes existing shims from PATH (pwsh)" {
+  command -v pwsh >/dev/null || skip "-- pwsh not installed"
+  OLDPATH="$PATH"
+  export PATH="${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:$PATH"
+  run pwsh -noni -c - <<!
+\$Env:PATH="$PATH"
+iex ((pyenv init -) -join "\`n")
+echo "\$Env:PATH"
 !
   assert_success
   assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH//${PYENV_ROOT}\/shims:/}"
@@ -134,6 +167,19 @@ echo "\$PATH"
   assert_output "${PYENV_ROOT}/shims:${PATH}"
 }
 
+@test "adds shims to PATH with --no-push-path if they're not on PATH (pwsh)" {
+  command -v pwsh >/dev/null || skip "-- pwsh not installed"
+  PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
+  run pwsh -nop -c - <<!
+#Powershell silently prepends its own PATH entry upon start
+\$Env:PATH="$PATH"
+iex ((pyenv init - --no-push-path) -join "\`n")
+echo "\$Env:PATH"
+!
+  assert_success
+  assert_output "${PYENV_ROOT}/shims:${PATH}"
+}
+
 @test "doesn't change PATH with --no-push-path if shims are already on PATH" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:${PYENV_ROOT}/shims:/usr/bin:/bin:/usr/local/bin"
   run bash -e <<!
@@ -151,6 +197,19 @@ echo "\$PATH"
 set -x PATH "$PATH"
 pyenv-init - --no-push-path| source
 echo "\$PATH"
+!
+  assert_success
+  assert_output "${PATH}"
+}
+
+@test "doesn't change PATH with --no-push-path if shims are already on PATH (pwsh)" {
+  command -v pwsh >/dev/null || skip "-- pwsh not installed"
+  PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:${PYENV_ROOT}/shims:/bin:/usr/local/bin"
+  run pwsh -nop -c - <<!
+#Powershell silently prepends its own PATH entry upon start
+\$Env:PATH="$PATH"
+iex ((pyenv init - --no-push-path) -join "\`n")
+echo "\$Env:PATH"
 !
   assert_success
   assert_output "${PATH}"
@@ -186,5 +245,12 @@ echo
   run pyenv-init - fish
   assert_success
   assert_line '  switch "$command"'
+  refute_line '  case "$command" in'
+}
+
+@test "outputs pwsh-specific syntax (pwsh)" {
+  run pyenv-init - pwsh
+  assert_success
+  refute_line '  switch "$command"'
   refute_line '  case "$command" in'
 }
