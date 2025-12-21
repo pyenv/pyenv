@@ -322,12 +322,12 @@ function pyenv {
   }
 
   if ( ("${commands[*]}" -split ' ') -contains \$command ) {
-    \$shell_cmds = &pyenv sh-\$command \$args
+    \$shell_cmds = (& (get-command -commandtype application pyenv) sh-\$command \$args)
     if ( \$shell_cmds.Count -gt 0 ) {
       iex (\$shell_cmds -join "\`n")
     }
   } else {
-    & \$Env:PYENV_ROOT/bin/pyenv \$command \$args
+    & (get-command -commandtype application pyenv) \$command \$args
   }
 }
 EOS

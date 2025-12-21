@@ -131,14 +131,20 @@ hash -r 2>/dev/null || true"
 @test "sh-rehash in pwsh" {
   create_alt_executable_in_version "3.4" "python"
   PYENV_SHELL=pwsh run pyenv-sh-rehash
-  assert_success "&pyenv rehash"
+  assert_success "& (get-command pyenv -commandtype application) rehash"
 }
 
 @test "sh-rehash in pwsh (integration)" {
   command -v pwsh >/dev/null || skip "-- pwsh not installed" 
+  assert [ ! -x "${PYENV_ROOT}/shims/python" ]
   create_alt_executable_in_version "3.4" "python"
-  PYENV_SHELL=pwsh run pwsh -nop -c 'iex ((&pyenv-sh-rehash) -join "\`n")'
-  assert_success
+  run pwsh -nop -c -<<'!'
+$ErrorActionPreference = "Stop"
+$PSNativeCommandUseErrorActionPreference = $true
+iex ((& pyenv init - pwsh) -join "`n")
+& pyenv rehash
+!
+  assert_success ""
   assert [ -x "${PYENV_ROOT}/shims/python" ]
 }
 

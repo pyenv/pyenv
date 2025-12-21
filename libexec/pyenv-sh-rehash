@@ -13,7 +13,7 @@ shell="$(basename "${PYENV_SHELL:-$SHELL}")"
 # then tell the shell to empty its command lookup cache.
 case "$shell" in
 pwsh)
-  echo "&pyenv rehash"
+  echo "& (get-command pyenv -commandtype application) rehash"
   ;;
 *)
   echo "command pyenv rehash"
@@ -21,7 +21,7 @@ esac
 
 case "$shell" in
 fish | pwsh )
-  # no rehash support
+  # no executable cache
   ;;
 * )
   echo "hash -r 2>/dev/null || true"
