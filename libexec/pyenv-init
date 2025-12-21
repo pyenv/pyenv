@@ -160,7 +160,8 @@ function help_() {
       echo "# the following to $profile :"
       echo
       echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"'
-      echo '$Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH"'
+      echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {'
+      echo '  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }'
       echo 'iex ((pyenv init -) -join "`n")'
       ;;
     * )
