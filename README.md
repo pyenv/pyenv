@@ -280,7 +280,7 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
   ~~~ pwsh
   echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"' >> $profile.CurrentUserAllHosts
   echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) { 
-        $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }' >> $profile.CurrentUserAllHosts
+    $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }' >> $profile.CurrentUserAllHosts
   echo 'iex ((pyenv init -) -join "`n")' >> $profile.CurrentUserAllHosts
   ~~~
 
