@@ -14,13 +14,13 @@ load test_helper
 @test "auto rehash" {
   run pyenv-init -
   assert_success
-  assert_line "command pyenv rehash 2>/dev/null"
+  assert_line "command pyenv rehash"
 }
 
 @test "auto rehash for --path" {
   run pyenv-init --path
   assert_success
-  assert_line "command pyenv rehash 2>/dev/null"
+  assert_line "command pyenv rehash"
 }
 
 @test "setup shell completions" {

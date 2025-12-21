@@ -21,8 +21,12 @@ load test_helper
   export PYENV_REHASH_TIMEOUT=1
   mkdir -p "${PYENV_ROOT}/shims"
   touch "${PYENV_ROOT}/shims/.pyenv-shim"
-  run pyenv-rehash
-  assert_failure "pyenv: cannot rehash: ${PYENV_ROOT}/shims/.pyenv-shim exists"
+  #avoid failure due to a localized error message
+  LANG=C run pyenv-rehash
+  assert_failure <<!
+pyenv: cannot rehash: couldn't acquire lock ${PYENV_ROOT}/shims/.pyenv-shim for 1 seconds. Last error message:
+*/pyenv-rehash: line *: ${PYENV_ROOT}/shims/.pyenv-shim: cannot overwrite existing file
+!
 }
 
 @test "wait until lock acquisition" {

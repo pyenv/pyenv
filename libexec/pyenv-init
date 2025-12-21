@@ -287,10 +287,10 @@ function print_rehash() {
   if [ -z "$no_rehash" ]; then
     case "$shell" in
     pwsh )
-      echo '& pyenv rehash 2>/dev/null'
+      echo '& pyenv rehash'
       ;;
     * )
-      echo 'command pyenv rehash 2>/dev/null'
+      echo 'command pyenv rehash'
       ;;
     esac
   fi

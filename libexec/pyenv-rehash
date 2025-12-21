@@ -10,6 +10,8 @@ PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
 # Create the shims directory if it doesn't already exist.
 mkdir -p "$SHIM_PATH"
 
+declare last_acquire_error
+
 acquire_lock() {
   # Ensure only one instance of pyenv-rehash is running at a time by
   # setting the shell's `noclobber` option and attempting to write to
@@ -17,14 +19,10 @@ acquire_lock() {
   # to stderr and exit with a non-zero status.
   local ret
   set -o noclobber
-  echo > "$PROTOTYPE_SHIM_PATH" 2>| /dev/null || ret=1
+  last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" || ret=1
   set +o noclobber
   [ -z "${ret}" ]
 }
-
-# If we were able to obtain a lock, register a trap to clean up the
-# prototype shim when the process exits.
-trap release_lock EXIT
 
 remove_prototype_shim() {
   rm -f "$PROTOTYPE_SHIM_PATH"
@@ -39,11 +37,17 @@ if [ ! -w "$SHIM_PATH" ]; then
   exit 1
 fi
 
-unset acquired
-start=$SECONDS
-while (( SECONDS <= start + ${PYENV_REHASH_TIMEOUT:-60} )); do
-  if acquire_lock 2>/dev/null; then
+declare acquired tested_for_other_write_errors
+declare start=$SECONDS
+PYENV_REHASH_TIMEOUT=${PYENV_REHASH_TIMEOUT:-60}
+while (( SECONDS <= start + PYENV_REHASH_TIMEOUT )); do
+  if acquire_lock; then
     acquired=1
+
+    # If we were able to obtain a lock, register a trap to clean up the
+    # prototype shim when the process exits.
+    trap release_lock EXIT
+
     break
   else
     #Landlock sandbox subsystem in the Linux kernel returns false information in access() as of 6.14.0,
@@ -53,7 +57,7 @@ while (( SECONDS <= start + ${PYENV_REHASH_TIMEOUT:-60} )); do
     # in a way that taxes the usual use case as little as possible.
     if [[ -z $tested_for_other_write_errors ]]; then
       ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm "$t" ) && tested_for_other_write_errors=1 ||
-        { echo "pyenv: cannot rehash: $SHIM_PATH isnt writable" >&2; break; }
+        { echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2; break; }
     fi
     # POSIX sleep(1) doesn't provide subsecond precision, but many others do
     sleep 0.1 2>/dev/null || sleep 1
@@ -62,7 +66,9 @@ done
 
 if [ -z "${acquired}" ]; then
   if [[ -n $tested_for_other_write_errors ]]; then
-      echo "pyenv: cannot rehash: $PROTOTYPE_SHIM_PATH exists" >&2
+      echo "pyenv: cannot rehash: couldn't acquire lock"\
+        "$PROTOTYPE_SHIM_PATH for $PYENV_REHASH_TIMEOUT seconds. Last error message:" >&2
+      echo "$last_acquire_error" >&2
   fi
   exit 1
 fi
