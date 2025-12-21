@@ -52,7 +52,7 @@ while (( SECONDS <= start + ${PYENV_REHASH_TIMEOUT:-60} )); do
     #So check for writablity by trying to write to a different file,
     # in a way that taxes the usual use case as little as possible.
     if [[ -z $tested_for_other_write_errors ]]; then
-      ( t="$(mktemp -p "$SHIM_PATH")" && rm "$t" ) && tested_for_other_write_errors=1 ||
+      ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm "$t" ) && tested_for_other_write_errors=1 ||
         { echo "pyenv: cannot rehash: $SHIM_PATH isnt writable" >&2; break; }
     fi
     # POSIX sleep(1) doesn't provide subsecond precision, but many others do
