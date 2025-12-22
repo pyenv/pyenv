@@ -3,10 +3,10 @@
 load test_helper
 
 _setup() {
-  export GIT_DIR="${HOME}/.git"
-  mkdir -p "$HOME"
-  git config --global user.name  "Tester"
-  git config --global user.email "tester@test.local"
+  export GIT_DIR="${PYENV_TEST_DIR}/.git"
+  mkdir -p "$GIT_DIR"
+  git config user.name  "Tester"
+  git config user.email "tester@test.local"
   cd "$PYENV_TEST_DIR"
 }
 

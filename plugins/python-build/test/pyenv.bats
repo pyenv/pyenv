@@ -141,7 +141,7 @@ OUT
   stub_python_build "--definitions : echo 2.6.9 2.7.9-rc1 2.7.9-rc2 3.4.2 | tr ' ' $'\\n'"
 
   mkdir "$BATS_TEST_TMPDIR/.git"
-  PYENV_INSTALL_PATH="$BATS_TEST_TMPDIR" run pyenv-install 2.7.9
+  _PYENV_INSTALL_PREFIX="$BATS_TEST_TMPDIR" run pyenv-install 2.7.9
   assert_failure
   assert_output <<OUT
 ERROR
@@ -166,7 +166,7 @@ OUT
   stub_python_build 'echo ERROR >&2 && exit 2' \
     "--definitions : true"
 
-  PYENV_INSTALL_PATH="$BATS_TEST_TMPDIR" run pyenv-install 1.9.3
+  _PYENV_INSTALL_PREFIX="$BATS_TEST_TMPDIR" run pyenv-install 1.9.3
   assert_failure
   assert_output <<OUT
 ERROR

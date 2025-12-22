@@ -265,12 +265,12 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
       echo "See all available versions with \`pyenv install --list'."
       echo
       echo -n "If the version you need is missing, try upgrading pyenv"
-      if [ "${PYENV_INSTALL_PATH}" != "${PYENV_INSTALL_PATH#$(brew --prefix 2>/dev/null)}" ]; then
+      if [[ command -v brew && "${_PYENV_INSTALL_PREFIX}" == "$(brew --prefix)/"* ]; then
         printf ":\n\n"
         echo "  brew update && brew upgrade pyenv"
-      elif [ -d "${PYENV_INSTALL_PATH}/.git" ]; then
+      elif [ -d "${_PYENV_INSTALL_PREFIX}/.git" ]; then
         printf ":\n\n"
-        echo "  cd ${PYENV_INSTALL_PATH} && git pull && cd -"
+        echo "  cd ${_PYENV_INSTALL_PREFIX} && git pull && cd -"
       else
         printf ".\n"
       fi

@@ -76,27 +76,27 @@ export PYENV_DIR
 
 shopt -s nullglob
 
-PYENV_INSTALL_PATH="$(abs_dirname "$0")"
-PYENV_INSTALL_PATH="${PYENV_INSTALL_PATH%/*}"
+_PYENV_INSTALL_PREFIX="$(abs_dirname "$0")"
+_PYENV_INSTALL_PREFIX="${_PYENV_INSTALL_PREFIX%/*}"
 
-export PYENV_INSTALL_PATH
+export _PYENV_INSTALL_PREFIX
 
-for plugin_bin in "${PYENV_INSTALL_PATH}"/plugins/*/bin; do
+for plugin_bin in "${_PYENV_INSTALL_PREFIX}"/plugins/*/bin; do
   PATH="${plugin_bin}:${PATH}"
 done
 # PYENV_ROOT can be set to anything, so it may happen to be equal to the base path above,
 # resulting in duplicate PATH entries
-if [ "${PYENV_INSTALL_PATH}" != "$PYENV_ROOT" ]; then
+if [ "${_PYENV_INSTALL_PREFIX}" != "$PYENV_ROOT" ]; then
   for plugin_bin in "${PYENV_ROOT}"/plugins/*/bin; do
     PATH="${plugin_bin}:${PATH}"
   done
 fi
-export PATH="${PYENV_INSTALL_PATH}/libexec:${PATH}"
+export PATH="${_PYENV_INSTALL_PREFIX}/libexec:${PATH}"
 
 PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${PYENV_ROOT}/pyenv.d"
-if [ "${PYENV_INSTALL_PATH}" != "$PYENV_ROOT" ]; then
+if [ "${_PYENV_INSTALL_PREFIX}" != "$PYENV_ROOT" ]; then
   # Add pyenv's own `pyenv.d` unless pyenv was cloned to PYENV_ROOT
-  PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${PYENV_INSTALL_PATH}/pyenv.d"
+  PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${_PYENV_INSTALL_PREFIX}/pyenv.d"
 fi
 PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:/usr/etc/pyenv.d:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib/pyenv/hooks"
 for plugin_hook in "${PYENV_ROOT}/plugins/"*/etc/pyenv.d; do

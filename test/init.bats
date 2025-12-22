@@ -36,10 +36,9 @@ create_executable() {
 }
 
 @test "setup shell completions" {
-  exec_root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
-  PYENV_INSTALL_PATH="${exec_root}" run pyenv-init - bash
+  run pyenv-init - bash
   assert_success
-  assert_line "source '${exec_root}/completions/pyenv.bash'"
+  assert_line "source '${_PYENV_INSTALL_PREFIX}/completions/pyenv.bash'"
 }
 
 @test "detect parent shell" {
@@ -62,10 +61,9 @@ OUT
 }
 
 @test "setup shell completions (fish)" {
-  exec_root="$(cd $BATS_TEST_DIRNAME/.. && pwd)"
-  PYENV_INSTALL_PATH="${exec_root}" run pyenv-init - fish
+  run pyenv-init - fish
   assert_success
-  assert_line "source '${exec_root}/completions/pyenv.fish'"
+  assert_line "source '${_PYENV_INSTALL_PREFIX}/completions/pyenv.fish'"
 }
 
 @test "fish instructions" {

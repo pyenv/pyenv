@@ -2,7 +2,8 @@ unset PYENV_VERSION
 unset PYENV_DIR
 
 setup() {
-  if ! enable -f "${BATS_TEST_DIRNAME}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
+  export _PYENV_INSTALL_PREFIX="${BATS_TEST_DIRNAME%/*}"
+  if ! enable -f "${_PYENV_INSTALL_PREFIX}"/libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
     if [ -n "$PYENV_NATIVE_EXT" ]; then
       echo "pyenv: failed to load \`realpath' builtin" >&2
       exit 1
@@ -19,13 +20,12 @@ setup() {
   export BATS_TEST_TMPDIR="${bats_test_tmpdir}"
   export PYENV_TEST_DIR="${BATS_TEST_TMPDIR}/pyenv"
   export PYENV_ROOT="${PYENV_TEST_DIR}/root"
-  export PYENV_INSTALL_PATH="${PYENV_TEST_DIR}"
   export HOME="${PYENV_TEST_DIR}/home"
   export PYENV_HOOK_PATH="${PYENV_ROOT}/pyenv.d"
 
   PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
   PATH="${PYENV_TEST_DIR}/bin:$PATH"
-  PATH="${BATS_TEST_DIRNAME%/*}/libexec:$PATH"
+  PATH="${_PYENV_INSTALL_PREFIX}/libexec:$PATH"
   PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
   PATH="${PYENV_ROOT}/shims:$PATH"
   export PATH
