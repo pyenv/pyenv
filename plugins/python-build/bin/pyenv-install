@@ -256,7 +256,6 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
   # Display a more helpful message if the definition wasn't found.
   if [ "$STATUS" == "2" ]; then
     { candidates="$(definitions "$DEFINITION")"
-      here="$(dirname "${0%/*}")/../.."
       if [ -n "$candidates" ]; then
         echo
         echo "The following versions contain \`$DEFINITION' in the name:"
@@ -266,12 +265,13 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
       echo "See all available versions with \`pyenv install --list'."
       echo
       echo -n "If the version you need is missing, try upgrading pyenv"
-      if [ "$here" != "${here#$(brew --prefix 2>/dev/null)}" ]; then
+      declare brew_prefix
+      if brew_prefix="$(brew --prefix 2>/dev/null)" && [[ $_PYENV_INSTALL_PREFIX/ == "$brew_prefix/"* ]]; then
         printf ":\n\n"
         echo "  brew update && brew upgrade pyenv"
-      elif [ -d "${here}/.git" ]; then
+      elif [ -d "${_PYENV_INSTALL_PREFIX}/.git" ]; then
         printf ":\n\n"
-        echo "  cd ${here} && git pull && cd -"
+        echo "  cd ${_PYENV_INSTALL_PREFIX} && git pull && cd -"
       else
         printf ".\n"
       fi

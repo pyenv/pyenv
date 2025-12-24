@@ -270,7 +270,7 @@ function print_env() {
 }
 
 function print_completion() {
-  completion="${0%/*/*}/completions/pyenv.${shell}"
+  completion="${_PYENV_INSTALL_PREFIX}/completions/pyenv.${shell}"
   if [ -r "$completion" ]; then
     case "$shell" in
     pwsh )

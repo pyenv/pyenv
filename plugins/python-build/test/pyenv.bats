@@ -140,7 +140,11 @@ OUT
   stub_python_build 'echo ERROR >&2 && exit 2'
   stub_python_build "--definitions : echo 2.6.9 2.7.9-rc1 2.7.9-rc2 3.4.2 | tr ' ' $'\\n'"
 
-  run pyenv-install 2.7.9
+  mkdir "$BATS_TEST_TMPDIR/.git"
+  #Faking the Pyenv installation prefix may break things.
+  # May have to move some dependent stuff into the fake root for the code to find it
+  # or introduce an overriding test variable in the code specifically for the hint.
+  _PYENV_INSTALL_PREFIX="$BATS_TEST_TMPDIR" run pyenv-install 2.7.9
   assert_failure
   assert_output <<OUT
 ERROR
@@ -153,19 +157,19 @@ See all available versions with \`pyenv install --list'.
 
 If the version you need is missing, try upgrading pyenv:
 
-  cd ${BATS_TEST_DIRNAME}/../../.. && git pull && cd -
+  cd ${BATS_TEST_TMPDIR} && git pull && cd -
 OUT
 
   unstub python-build
 }
 
 @test "homebrew upgrade instructions given when pyenv is homebrew-installed" {
-  stub brew "--prefix : echo '${BATS_TEST_DIRNAME%/*}'"
+  stub brew "--prefix : echo '${_PYENV_INSTALL_PREFIX}'"
   stub_python_build_lib
   stub_python_build 'echo ERROR >&2 && exit 2' \
     "--definitions : true"
 
-  run pyenv-install 1.9.3
+  _PYENV_INSTALL_PREFIX="$BATS_TEST_TMPDIR" run pyenv-install 1.9.3
   assert_failure
   assert_output <<OUT
 ERROR

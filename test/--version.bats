@@ -3,10 +3,11 @@
 load test_helper
 
 _setup() {
-  export GIT_DIR="${PYENV_TEST_DIR}/.git"
-  mkdir -p "$HOME"
-  git config --global user.name  "Tester"
-  git config --global user.email "tester@test.local"
+  export GIT_DIR="${PYENV_TEST_DIR}"
+  export GIT_WORK_TREE="$GIT_DIR"
+  git init --quiet
+  git config user.name  "Tester"
+  git config user.email "tester@test.local"
   cd "$PYENV_TEST_DIR"
 }
 
@@ -22,7 +23,6 @@ git_commit() {
 }
 
 @test "doesn't read version from non-pyenv repo" {
-  git init
   git remote add origin https://github.com/homebrew/homebrew.git
   git_commit
   git tag v1.0
@@ -33,7 +33,6 @@ git_commit() {
 }
 
 @test "reads version from git repo" {
-  git init
   git remote add origin https://github.com/pyenv/pyenv.git
   git_commit
   git tag v0.4.1
@@ -45,7 +44,6 @@ git_commit() {
 }
 
 @test "prints default version if no tags in git repo" {
-  git init
   git remote add origin https://github.com/pyenv/pyenv.git
   git_commit
 
