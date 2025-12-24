@@ -271,6 +271,20 @@ See [Advanced configuration](#advanced-configuration) for details and more confi
 
   </details>
 
+#### Microsoft PowerShell
+
+  <details>
+
+  Add the commands to `$profile.CurrentUserAllHosts` by running the following in your terminal:
+
+  ~~~ pwsh
+  echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"' >> $profile.CurrentUserAllHosts
+  echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) { 
+    $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }' >> $profile.CurrentUserAllHosts
+  echo 'iex ((pyenv init -) -join "`n")' >> $profile.CurrentUserAllHosts
+  ~~~
+
+  </details>
 
 ### C. Restart your shell
 ----
@@ -689,7 +703,7 @@ opposed to this idea. Here's what `eval "$(pyenv init -)"` actually does:
 
 3. **Installs autocompletion.** This is entirely optional but pretty
    useful. Sourcing `<pyenv installation prefix>/completions/pyenv.bash` will set that
-   up. There are also completions for Zsh and Fish.
+   up. There are also completions for Zsh, Fish and PowerShell.
 
 4. **Rehashes shims.** From time to time you'll need to rebuild your
    shim files. Doing this on init makes sure everything is up to

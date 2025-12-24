@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Miniconda3-py310_25.9.1-1-Linux-aarch64" "https://repo.anaconda.com/miniconda/Miniconda3-py310_25.9.1-1-Linux-aarch64.sh#28fc3db9c7ee63cedab38b0e6006409f1f448be7ffc57b270623efd4422b0608" "miniconda" verify_py310
+  ;;
+"Linux-x86_64" )
+  install_script "Miniconda3-py310_25.9.1-1-Linux-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py310_25.9.1-1-Linux-x86_64.sh#04a8b03d8b0ec062d923e592201a6fd88b7247c309ef8848afb25c424c40ac39" "miniconda" verify_py310
+  ;;
+"MacOSX-arm64" )
+  install_script "Miniconda3-py310_25.9.1-1-MacOSX-arm64" "https://repo.anaconda.com/miniconda/Miniconda3-py310_25.9.1-1-MacOSX-arm64.sh#fb3fbef60259b36b0248c73fecdd974f8554d5fccfe0a7b8a45eb06dedbe8a85" "miniconda" verify_py310
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

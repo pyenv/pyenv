@@ -3,6 +3,7 @@ unset PYENV_DIR
 
 setup() {
   export _PYENV_INSTALL_PREFIX="${BATS_TEST_DIRNAME%/*}"
+  export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
   if ! enable -f "${_PYENV_INSTALL_PREFIX}"/libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
     if [ -n "$PYENV_NATIVE_EXT" ]; then
       echo "pyenv: failed to load \`realpath' builtin" >&2
@@ -28,10 +29,16 @@ setup() {
   PATH="${_PYENV_INSTALL_PREFIX}/libexec:$PATH"
   PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
   PATH="${PYENV_ROOT}/shims:$PATH"
-  export PATH
+  PATH="${BATS_TEST_TMPDIR}/stubs:$PATH"
 
   for xdg_var in `env 2>/dev/null | grep ^XDG_ | cut -d= -f1`; do unset "$xdg_var"; done
   unset xdg_var
+
+  # Workaround for Powershell. When tests are run from a terminal,
+  # and running a script fron a here-document,
+  # Powershell 7.5.4 erroneously prints ANSI escape sequences
+  # even if its output is redirected, breaking the comparison logic
+  export NO_COLOR=1
 
   # If test specific setup exist, run it
   if [[ $(type -t _setup) == function ]];then
@@ -67,8 +74,8 @@ assert_failure() {
 
 assert_equal() {
   if [ "$1" != "$2" ]; then
-    { echo "expected: $1"
-      echo "actual:   $2"
+    { echo "expected: \`$1'"
+      echo "actual:   \`$2'"
     } | flunk
   fi
 }
@@ -128,7 +135,7 @@ path_without() {
       if [ "$found" != "${PYENV_ROOT}/shims" ]; then
         alt="${PYENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
         mkdir -p "$alt"
-        for util in bash head cut readlink greadlink; do
+        for util in bash head cut readlink greadlink tr sed; do
           if [ -x "${found}/$util" ]; then
             ln -s "${found}/$util" "${alt}/$util"
           fi
@@ -140,6 +147,43 @@ path_without() {
   path="${path#:}"
   path="${path%:}"
   echo "$path"
+}
+
+create_path_executable() {
+  create_executable "${PYENV_TEST_DIR}/bin" "$@"
+}
+
+create_alt_executable() {
+  create_alt_executable_in_version "${PYENV_VERSION}" "$@"
+}
+
+create_alt_executable_in_version() {
+  local version="${1:?}"
+  shift 1
+  create_executable "${PYENV_ROOT}/versions/$version/bin" "$@"
+}
+
+create_stub() {
+  create_executable "${BATS_TEST_TMPDIR}/stubs" "$@"
+}
+
+create_executable() {
+  local bin="${1:?}"
+  local name="${2:?}"
+  shift 2
+  mkdir -p "$bin"
+  local payload
+  # Bats doesn't redirect stdin
+  if [[ $# -eq 0 && ! -t 0 ]]; then
+    payload="$(cat -)"
+  else
+    payload="$(printf '%s\n' "$@")"
+  fi
+  if [[ $payload != "#!/"* ]]; then
+    payload="#!$BASH"$'\n'"$payload"
+  fi
+  echo "$payload" > "${bin}/$name"
+  chmod +x "${bin}/$name"
 }
 
 create_hook() {

@@ -2,19 +2,9 @@
 
 load test_helper
 
-create_executable() {
-  local bin
-  if [[ $1 == */* ]]; then bin="$1"
-  else bin="${PYENV_ROOT}/versions/${1}/bin"
-  fi
-  mkdir -p "$bin"
-  touch "${bin}/$2"
-  chmod +x "${bin}/$2"
-}
-
 @test "outputs path to executable" {
-  create_executable "2.7" "python"
-  create_executable "3.4" "py.test"
+  create_alt_executable_in_version "2.7" "python"
+  create_alt_executable_in_version "3.4" "py.test"
 
   PYENV_VERSION=2.7 run pyenv-which python
   assert_success "${PYENV_ROOT}/versions/2.7/bin/python"
@@ -27,7 +17,7 @@ create_executable() {
 }
 
 @test "searches PATH for system version" {
-  create_executable "${PYENV_TEST_DIR}/bin" "kill-all-humans"
+  create_path_executable "kill-all-humans"
   create_executable "${PYENV_ROOT}/shims" "kill-all-humans"
 
   PYENV_VERSION=system run pyenv-which kill-all-humans
@@ -35,7 +25,7 @@ create_executable() {
 }
 
 @test "searches PATH for system version (shims prepended)" {
-  create_executable "${PYENV_TEST_DIR}/bin" "kill-all-humans"
+  create_path_executable "kill-all-humans"
   create_executable "${PYENV_ROOT}/shims" "kill-all-humans"
 
   PATH="${PYENV_ROOT}/shims:$PATH" PYENV_VERSION=system run pyenv-which kill-all-humans
@@ -43,7 +33,7 @@ create_executable() {
 }
 
 @test "searches PATH for system version (shims appended)" {
-  create_executable "${PYENV_TEST_DIR}/bin" "kill-all-humans"
+  create_path_executable "kill-all-humans"
   create_executable "${PYENV_ROOT}/shims" "kill-all-humans"
 
   PATH="$PATH:${PYENV_ROOT}/shims" PYENV_VERSION=system run pyenv-which kill-all-humans
@@ -51,7 +41,7 @@ create_executable() {
 }
 
 @test "searches PATH for system version (shims spread)" {
-  create_executable "${PYENV_TEST_DIR}/bin" "kill-all-humans"
+  create_path_executable "kill-all-humans"
   create_executable "${PYENV_ROOT}/shims" "kill-all-humans"
 
   PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/shims:/tmp/non-existent:$PATH:${PYENV_ROOT}/shims" \
@@ -61,17 +51,15 @@ create_executable() {
 
 @test "doesn't include current directory in PATH search" {
   bats_require_minimum_version 1.5.0
-  mkdir -p "$PYENV_TEST_DIR"
+  create_executable "$PYENV_TEST_DIR" kill-all-humans
   cd "$PYENV_TEST_DIR"
-  touch kill-all-humans
-  chmod +x kill-all-humans
   PATH="$(path_without "kill-all-humans")" PYENV_VERSION=system run -127 pyenv-which kill-all-humans
   assert_failure "pyenv: kill-all-humans: command not found"
 }
 
 @test "version not installed" {
   bats_require_minimum_version 1.5.0
-  create_executable "3.4" "py.test"
+  create_alt_executable_in_version "3.4" "py.test"
   PYENV_VERSION=3.3 run -127 pyenv-which py.test
   assert_failure <<OUT
 pyenv: version \`3.3' is not installed (set by PYENV_VERSION environment variable)
@@ -87,7 +75,7 @@ OUT
 
 @test "versions not installed" {
   bats_require_minimum_version 1.5.0
-  create_executable "3.4" "py.test"
+  create_alt_executable_in_version "3.4" "py.test"
   PYENV_VERSION=2.7:3.3 run -127 pyenv-which py.test
   assert_failure <<OUT
 pyenv: version \`2.7' is not installed (set by PYENV_VERSION environment variable)
@@ -104,7 +92,7 @@ OUT
 
 @test "no executable found" {
   bats_require_minimum_version 1.5.0
-  create_executable "2.7" "py.test"
+  create_alt_executable_in_version "2.7" "py.test"
   PYENV_VERSION=2.7 run -127 pyenv-which fab
   assert_failure "pyenv: fab: command not found"
 }
@@ -117,9 +105,9 @@ OUT
 
 @test "executable found in other versions" {
   bats_require_minimum_version 1.5.0
-  create_executable "2.7" "python"
-  create_executable "3.3" "py.test"
-  create_executable "3.4" "py.test"
+  create_alt_executable_in_version "2.7" "python"
+  create_alt_executable_in_version "3.3" "py.test"
+  create_alt_executable_in_version "3.4" "py.test"
 
   PYENV_VERSION=2.7 run -127 pyenv-which py.test
   assert_failure
@@ -150,7 +138,7 @@ SH
 @test "discovers version from pyenv-version-name" {
   mkdir -p "$PYENV_ROOT"
   cat > "${PYENV_ROOT}/version" <<<"3.4"
-  create_executable "3.4" "python"
+  create_alt_executable_in_version "3.4" "python"
 
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
@@ -165,7 +153,7 @@ SH
 2.7
 3.4
 EOF
-  create_executable "3.4" "python"
+  create_alt_executable_in_version "3.4" "python"
 
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
@@ -175,7 +163,7 @@ EOF
 }
 
 @test "resolves pyenv-latest prefixes" {
-  create_executable "3.4.2" "python"
+  create_alt_executable_in_version "3.4.2" "python"
   
   PYENV_VERSION=3.4 run pyenv-which python
   assert_success "${PYENV_ROOT}/versions/3.4.2/bin/python"
@@ -187,7 +175,7 @@ echo version=\$version
 exit
 !
 
-  create_executable "3.4.2" "python"
+  create_alt_executable_in_version "3.4.2" "python"
 
   PYENV_VERSION=3.4 run pyenv-which python
   assert_success "version=3.4.2"
@@ -195,13 +183,39 @@ exit
 
 @test "skip advice supresses error messages" {
   bats_require_minimum_version 1.5.0
-  create_executable "2.7" "python"
-  create_executable "3.3" "py.test"
-  create_executable "3.4" "py.test"
+  create_alt_executable_in_version "2.7" "python"
+  create_alt_executable_in_version "3.3" "py.test"
+  create_alt_executable_in_version "3.4" "py.test"
 
   PYENV_VERSION=2.7 run -127 pyenv-which py.test --skip-advice
   assert_failure
   assert_output <<OUT
 pyenv: py.test: command not found
 OUT
+}
+
+@test "excludes paths in _PYENV_SHIM_PATHS_{PROGRAM} from search only for PROGRAM" {
+  progname='123;wacky-prog.name ^%$#'
+  envvarname="_PYENV_SHIM_PATHS_123_WACKY_PROG_NAME_____"
+  create_path_executable "$progname"
+
+  for dir_ in "$BATS_TEST_TMPDIR/alt-path"{1,2}; do
+    mkdir -p "$dir_"
+    ln -s "${PYENV_TEST_DIR}/bin/$progname" "$dir_/$progname"
+    eval 'export '"$envvarname"'="$dir_${'"$envvarname"':+:$'"$envvarname"'}"'
+    PATH="$dir_:$PATH"
+  done
+  create_executable "$dir_" "normal_program"
+  
+  run pyenv-which "$progname"
+  assert_success
+  assert_output <<!
+$PYENV_TEST_DIR/bin/$progname
+!
+
+  run pyenv-which "normal_program"
+  assert_success
+  assert_output <<!
+$dir_/normal_program
+!
 }
