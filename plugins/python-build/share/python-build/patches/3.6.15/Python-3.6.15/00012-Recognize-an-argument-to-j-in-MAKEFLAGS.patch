@@ -1,0 +1,29 @@
+From ed9010349e8f6351a64ba2c7005fa0c3e40655bd Mon Sep 17 00:00:00 2001
+From: Ivan Pozdeev <vano@mail.mipt.ru>
+Date: Fri, 26 Dec 2025 13:39:21 +0300
+Subject: [PATCH] Recognize an argument to -j in MAKEFLAGS
+
+---
+ setup.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 467362813dc..a3623c577af 100644
+--- a/setup.py
++++ b/setup.py
+@@ -277,8 +277,10 @@ class PyBuildExt(build_ext):
+         build_ext.__init__(self, dist)
+         self.failed = []
+         self.failed_on_import = []
+-        if '-j' in os.environ.get('MAKEFLAGS', ''):
+-            self.parallel = True
++        m=re.search(r'(?:^|\s)(?:-j|--jobs)(?:\s+|=)?(\d*)',os.environ.get('MAKEFLAGS', ''))
++        if m is not None:
++            self.parallel = int(m.group(1)) if m.group(1) else True
++        del m
+ 
+     def build_extensions(self):
+ 
+-- 
+2.36.1.windows.1
+
