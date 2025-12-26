@@ -1769,12 +1769,16 @@ build_package_mac_openssl() {
   local nokerberos
   [[ "$1" != openssl-1.0.* ]] || nokerberos=1
   
+  # switches introduced in OpenSSL 1.1.1
+  local notests
+  [[ $(openssl_version $1) -ge 10101 ]] && notests=1
+  
   # switches introduced in OpenSSL 3.2
   local extra_no_features
   [[ $(openssl_version $1) -ge 30200 ]] && extra_no_features=1
 
   # Compile a shared lib with zlib dynamically linked.
-  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5} ${extra_no_features:+no-docs no-apps} no-tests
+  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5} ${extra_no_features:+no-docs no-apps} ${notests:+no-tests}
 
   build_package_standard "$@"
 
