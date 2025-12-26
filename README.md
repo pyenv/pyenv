@@ -67,6 +67,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Locating Pyenv-provided Python Installations](#locating-pyenv-provided-python-installations)
 * [Advanced Configuration](#advanced-configuration)
   * [Using Pyenv without shims](#using-pyenv-without-shims)
+  * [Running nested shells from Python-based programs](#running-nested-shells-from-python-based-programs)
   * [Environment variables](#environment-variables)
 * **[Development](#development)**
   * [Contributing](#contributing)
@@ -753,6 +754,32 @@ as currently configured.
 
 `pyenv exec` works by prepending `$(pyenv root)/versions/<selected version>/bin`
 to `PATH` in the `<command>`'s environment, the same as what e.g. RVM does.
+
+### Running nested shells from Python-based programs
+
+In addition to altering `PATH`, `pyenv exec` sets `PYENV_VERSION` in the
+executed program's environment to ensure that it won't spontaneouly switch to
+using a different Python version.
+
+Some Python-based programs (e.g. Jupyter) can spawn nested shell sessions.
+`pyenv version` in such a shell would dutily report that the current version was
+set by an environment variable.
+
+Depending on your use case, this version lock may be undesirable.
+In this case, you need to change or unset the environment variable,
+either directly or via `pyenv shell`.
+
+To automate this, you can do so in your shell's interactive startup file,
+detecting the nested shell session via some characteristic environment variable
+that the spawning application sets.
+
+E.g. in Jupyter's case (as of this writing), it's `JUPYTER_SERVER_ROOT`,
+and the corresponding `~/.bashrc` line may look like this:
+
+```bash
+[[ -n $JUPYTER_SERVER_ROOT ]] && unset PYENV_VERSION
+```
+
 
 
 ### Environment variables
