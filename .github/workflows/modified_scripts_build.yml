@@ -129,7 +129,7 @@ jobs:
           EXPECTED_PYTHON: ${{ matrix.python-version }}
         run: |
           #check
-          python -c 'if True:
+          python -c '
           import os, sys, os.path
           correct_dir = os.path.join(
             os.environ["PYENV_ROOT"],
@@ -242,7 +242,7 @@ jobs:
           EXPECTED_PYTHON: ${{ matrix.python-version }}
         run: |
           #check
-          python -c 'if True:
+          python -c '
           import os, sys, os.path
           correct_dir = os.path.join(
             os.environ["PYENV_ROOT"],
