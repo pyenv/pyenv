@@ -4,6 +4,4 @@ packaging
 requests
 sortedcontainers
 tqdm
-pandas
-numpy
 jc @ git+https://github.com/native-api/jc@haslib_mode
