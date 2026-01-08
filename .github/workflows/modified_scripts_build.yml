@@ -171,10 +171,6 @@ jobs:
             os.environ["EXPECTED_PYTHON"],
             "bin")
           assert os.path.dirname(sys.executable) == correct_dir'
-      # bundled executables in some Anaconda releases cause the post-run step to hang in MacOS
-      - run: |
-          pyenv global system
-          rm -f "$(pyenv root)"/shims/*
 
   ubuntu_build:
     needs: discover_modified_scripts
@@ -235,6 +231,10 @@ jobs:
               "bin")
             assert os.path.dirname(sys.executable) == correct_dir'
           fi
+      # bundled executables in some Anaconda releases cause the post-run step to break
+      - run: |
+          pyenv global system
+          rm -f "$(pyenv root)"/shims/*
   ubuntu_build_tar_gz:
     needs: discover_modified_scripts
     if: needs.discover_modified_scripts.outputs.versions_cpython_only != '[""]'
