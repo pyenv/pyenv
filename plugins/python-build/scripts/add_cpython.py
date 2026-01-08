@@ -30,8 +30,6 @@ import tqdm
 
 logger = logging.getLogger(__name__)
 
-REPO = "https://www.python.org/ftp/python/"
-
 CUTOFF_VERSION=packaging.version.Version('3.9')
 EXCLUDED_VERSIONS= {
     packaging.version.Version("3.9.3")  #recalled upstream
@@ -126,6 +124,7 @@ def add_version(version: packaging.version.Version):
 
     handle_t_thunks(version, previous_version, is_prerelease_upgrade)
 
+    print(version)
     return True
 
 
@@ -170,7 +169,7 @@ def main():
                             if v.micro == 0 and v not in VersionDirectory.existing):
         # may actually be a prerelease
         VersionDirectory.available.get_store_available_source_downloads(initial_release, True)
-    del initial_release
+        del initial_release
 
     versions_to_add = sorted(VersionDirectory.available.keys() - VersionDirectory.existing.keys())
 
@@ -294,12 +293,16 @@ class CPythonAvailableVersionsDirectory(KeyedList[_CPythonAvailableVersionInfo, 
         super().__init__(seq)
         self._session = session
 
-    def populate(self, url=REPO, pattern=r'^\d+'):
+    def populate(self):
         """
         Fetch remote versions
         """
         logger.info("Fetching available CPython versions")
-        for name, url in DownloadPage.enum_download_entries(url, pattern, self._session):
+        for name, url in DownloadPage.enum_download_entries(
+                "https://www.python.org/ftp/python/",
+                r'^(\d+.*)/$', self._session,
+                make_name= lambda m: m.group(1)
+        ):
             v = packaging.version.Version(name)
             if v < CUTOFF_VERSION or v in EXCLUDED_VERSIONS:
                 continue
@@ -341,11 +344,13 @@ class CPythonAvailableVersionsDirectory(KeyedList[_CPythonAvailableVersionInfo, 
             ))
 
         if not exact_download_found:
+            actual_version = max(additional_versions_found.keys())
+            logger.debug(f"Refining available version {version} to {actual_version}")
             del self[version]
 
             self.append(
                 additional_versions_found[
-                    max(additional_versions_found.keys())
+                    actual_version
                 ])
 
 
@@ -368,6 +373,8 @@ class CPythonExistingScriptsDirectory(KeyedList[_CPythonExistingScriptInfo, pack
                 continue
             try:
                 v = packaging.version.Version(entry_name)
+                if v < CUTOFF_VERSION:
+                    continue
                 # branch tip scrpts are different from release scripts and thus unusable as a pattern
                 if v.dev is not None:
                     continue
@@ -488,19 +495,34 @@ class DownloadPage:
         url: str
 
     @classmethod
-    def enum_download_entries(cls, url, pattern, session=None) -> typing.Generator[_DownloadPageEntry, None, None]:
+    def enum_download_entries(cls, url, pattern, session=None,
+                              make_name = lambda m: m.string ) \
+            -> typing.Generator[_DownloadPageEntry, None, None]:
+        """
+        Enum download entries in a standard Apache directory page
+        (incl. CPython download page https://www.python.org/ftp/python/)
+        or a GNU mirror directory page
+        (https://ftpmirror.gnu.org/<package>/ destinations)
+        """
         if session is None:
             session = requests_html.HTMLSession()
         response = session.get(url)
         page = response.html
         table = page.find("pre", first=True)
-        # the first entry is ".."
-        links = table.find("a")[1:]
+        # some GNU mirrors format entries as a table
+        # (e.g. https://mirrors.ibiblio.org/gnu/readline/)
+        if table is None:
+            table = page.find("table", first=True)
+        links = table.find("a")
         for link in links:
-            name = link.text.rstrip('/')
-            if not re.match(pattern, name):
+            href = link.attrs['href']
+            # CPython entries are directories
+            name = link.text
+            # skip directory entries
+            if not (m:=re.match(pattern, name)):
                 continue
-            yield cls._DownloadPageEntry(name, urllib.parse.urljoin(response.url, link.attrs['href']))
+            name = make_name(m)
+            yield cls._DownloadPageEntry(name, urllib.parse.urljoin(response.url, href))
 
 
 class Re:
