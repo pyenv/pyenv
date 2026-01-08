@@ -6,6 +6,7 @@ jobs:
     outputs:
       versions: ${{steps.modified-versions.outputs.versions}}
       versions_cpython_only: ${{steps.modified-versions.outputs.versions_cpython_only}}
+      versions_macos_build_exclude: ${{steps.modified-versions.outputs.versions_macos_build_exclude}}
     steps:
       - uses: actions/checkout@v6
       - run: git fetch origin "$GITHUB_BASE_REF"
@@ -26,10 +27,41 @@ jobs:
           echo "versions_cpython_only<<$EOF" >> $GITHUB_ENV;
           echo "$versions_cpython_only" >> $GITHUB_ENV;
           echo "$EOF" >> $GITHUB_ENV;
+      - run: pip install packaging
+      - name: Build exclusions JSON
+        shell: python
+        run: |
+          import base64
+          import os
+          import json
+          import random
+          import re
+          import subprocess
+          
+          import packaging.version
+          
+          result=[]
+          
+          for line in os.environ['versions'].splitlines():
+            if m:=re.match(r'([^-]+)-(\d+\.\d+)-(\d+\.\d+.\d+)', line):
+              name, version = m.group(1), packaging.version.Version(m.group(3))
+              
+              # Miniconda dropped MacOS x64 support
+              if name == 'miniconda3' and version >= packaging.version.Version('25.9.1'):
+                result.append({'os':'macos-15-intel','python-version':line})
+          
+          EOF = str(random.getrandbits(15*8))
+          
+          with open(os.environ['GITHUB_ENV'],'w') as f:
+            f.write(f"versions_macos_build_exclude_json<<{EOF}\n")
+            json.dump(result, f)
+            f.write(f'\n{EOF}\n')
+          
       - id: modified-versions
         run: |
           echo "versions=`echo "${{ env.versions }}" | jq -R . | jq -sc .`" >> $GITHUB_OUTPUT
           echo "versions_cpython_only=`echo "${{ env.versions_cpython_only }}" | jq -R . | jq -sc .`" >> $GITHUB_OUTPUT
+          echo 'versions_macos_build_exclude=${{ env.versions_macos_build_exclude_json }}' >> $GITHUB_OUTPUT
   macos_build:
     needs: discover_modified_scripts
     if: needs.discover_modified_scripts.outputs.versions != '[""]'
@@ -38,6 +70,7 @@ jobs:
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
         os: ["macos-14", "macos-15", "macos-15-intel"]
+        exclude: ${{fromJson(needs.discover_modified_scripts.outputs.versions_macos_build_exclude)}}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -90,6 +123,7 @@ jobs:
       - run: |
           pyenv global system
           rm -f "$(pyenv root)"/shims/*
+          
 
   macos_build_bundled_dependencies:
     needs: discover_modified_scripts
