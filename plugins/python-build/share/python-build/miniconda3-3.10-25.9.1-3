@@ -1,3 +1,4 @@
+export CONDA_PLUGINS_AUTO_ACCEPT_TOS=true
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-aarch64" )
   install_script "Miniconda3-py310_25.9.1-3-Linux-aarch64" "https://repo.anaconda.com/miniconda/Miniconda3-py310_25.9.1-3-Linux-aarch64.sh#bc58460f17ec60d6c920d4352dd4d5e465aa22b56580bd4cd57c9693859761ec" "miniconda" verify_py310

@@ -32,7 +32,11 @@ CONDA_REPO = "https://repo.anaconda.com"
 MINICONDA_REPO = CONDA_REPO + "/miniconda"
 ANACONDA_REPO = CONDA_REPO + "/archive"
 
+auto_accept_tos_fmt="""export CONDA_PLUGINS_AUTO_ACCEPT_TOS=true
+""".strip()
+
 install_script_fmt = """
+{auto_accept_tos}
 case "$(anaconda_architecture 2>/dev/null || true)" in
 {install_lines}
 * )
@@ -215,7 +219,9 @@ class CondaVersion(NamedTuple):
                 # since 4.8, Miniconda specifies versions explicitly in the file name
                 raise ValueError("Miniconda 4.8+ is supposed to specify a Python version explicitly")
         if self.flavor == "anaconda":
-            # https://docs.anaconda.com/free/anaconda/reference/release-notes/
+            # https://www.anaconda.com/docs/tools/anaconda-org/release-notes
+            if v >= (2025,6):
+                return PyVersion.PY313
             if v >= (2024,6):
                 return PyVersion.PY312
             if v >= (2023,7):
@@ -233,6 +239,13 @@ class CondaVersion(NamedTuple):
             return PyVersion.PY36
 
         raise ValueError(self.flavor)
+        
+    def requires_tos_accept(self):
+        """
+        requires to accept TOS for installation
+        """
+        return self.flavor == Flavor.MINICONDA \
+            and self.version_str.info() >= (25,)
 
 
 class CondaSpec(NamedTuple):
@@ -302,7 +315,8 @@ def make_script(specs: List[CondaSpec]):
     return install_script_fmt.format(
         install_lines="\n".join(install_lines),
         tflavor=specs[0].tflavor,
-    )
+        auto_accept_tos = auto_accept_tos_fmt if specs[0].version.requires_tos_accept() else ""
+    ).lstrip()
 
 
 def get_existing_condas(name):
