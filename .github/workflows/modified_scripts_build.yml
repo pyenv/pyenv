@@ -31,7 +31,6 @@ jobs:
       - name: Build exclusions JSON
         shell: python
         run: |
-          import base64
           import os
           import json
           import random
@@ -47,7 +46,14 @@ jobs:
               name, version = m.group(1), packaging.version.Version(m.group(3))
               
               # Miniconda dropped MacOS x64 support
-              if name == 'miniconda3' and version >= packaging.version.Version('25.9.1'):
+              if (name == 'miniconda3' and version >= packaging.version.Version('25.9.1')):
+                result.append({'os':'macos-15-intel','python-version':line})
+            
+            if m:=re.match(r'([^-]+)-(\d+\.\d+)', line):
+              name, version = m.group(1), packaging.version.Version(m.group(2))
+              
+              # Anaconda dropped MacOS x64 support
+              if name == 'anaconda3' and version >= packaging.version.Version('2025.12'):
                 result.append({'os':'macos-15-intel','python-version':line})
           
           EOF = str(random.getrandbits(15*8))
@@ -171,10 +177,6 @@ jobs:
             os.environ["EXPECTED_PYTHON"],
             "bin")
           assert os.path.dirname(sys.executable) == correct_dir'
-      # bundled executables in some Anaconda releases cause the post-run step to hang in MacOS
-      - run: |
-          pyenv global system
-          rm -f "$(pyenv root)"/shims/*
 
   ubuntu_build:
     needs: discover_modified_scripts
@@ -235,6 +237,10 @@ jobs:
               "bin")
             assert os.path.dirname(sys.executable) == correct_dir'
           fi
+      # bundled executables in some Anaconda releases cause the post-run step to break
+      - run: |
+          pyenv global system
+          rm -f "$(pyenv root)"/shims/*
   ubuntu_build_tar_gz:
     needs: discover_modified_scripts
     if: needs.discover_modified_scripts.outputs.versions_cpython_only != '[""]'
