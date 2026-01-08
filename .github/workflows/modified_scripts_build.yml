@@ -6,6 +6,7 @@ jobs:
     outputs:
       versions: ${{steps.modified-versions.outputs.versions}}
       versions_cpython_only: ${{steps.modified-versions.outputs.versions_cpython_only}}
+      versions_macos_intel_supported: ${{steps.modified-versions.outputs.versions_macos_intel_supported}}
     steps:
       - uses: actions/checkout@v6
       - run: git fetch origin "$GITHUB_BASE_REF"
@@ -26,10 +27,34 @@ jobs:
           echo "versions_cpython_only<<$EOF" >> $GITHUB_ENV;
           echo "$versions_cpython_only" >> $GITHUB_ENV;
           echo "$EOF" >> $GITHUB_ENV;
+      - name: Build macOS Intel supported list
+        shell: bash
+        run: |
+          versions_macos_intel_supported=$(
+            while IFS= read -r v; do
+              if [[ "$v" == miniconda*-* ]]; then
+                def="plugins/python-build/share/python-build/$v"
+                if [[ -f "$def" ]]; then
+                  if grep -q 'MacOSX-x86_64' "$def"; then
+                    echo "$v"
+                  fi
+                else
+                  echo "$v"
+                fi
+              else
+                echo "$v"
+              fi
+            done <<<"$versions"
+          )
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "versions_macos_intel_supported<<$EOF" >> $GITHUB_ENV
+          echo "$versions_macos_intel_supported" >> $GITHUB_ENV
+          echo "$EOF" >> $GITHUB_ENV
       - id: modified-versions
         run: |
           echo "versions=`echo "${{ env.versions }}" | jq -R . | jq -sc .`" >> $GITHUB_OUTPUT
           echo "versions_cpython_only=`echo "${{ env.versions_cpython_only }}" | jq -R . | jq -sc .`" >> $GITHUB_OUTPUT
+          echo "versions_macos_intel_supported=`echo "${{ env.versions_macos_intel_supported }}" | jq -R . | jq -sc .`" >> $GITHUB_OUTPUT
   macos_build:
     needs: discover_modified_scripts
     if: needs.discover_modified_scripts.outputs.versions != '[""]'
@@ -37,7 +62,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
-        os: ["macos-14", "macos-15", "macos-15-intel"]
+        os: ["macos-14", "macos-15"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
@@ -58,6 +83,70 @@ jobs:
           #build
           pyenv --debug install ${{ matrix.python-version }} && rc=$? || rc=$?
           if [[ $rc -ne 0 ]]; then echo config.log:; cat $TMPDIR/python-build*/*/config.log; false; fi
+          pyenv global ${{ matrix.python-version }}
+      # Micropython doesn't support --version
+      - run: |
+          #print version
+          if [[ "${{ matrix.python-version }}" == "micropython-"* ]]; then
+            python -c 'import sys; print(sys.version)'
+          else
+            python --version
+            python -m pip --version
+          fi
+      # Micropython doesn't support sys.executable, os.path, older versions even os
+      - env:
+          EXPECTED_PYTHON: ${{ matrix.python-version }}
+        run: |
+          #check
+          if [[ "${{ matrix.python-version }}" == "micropython-"* ]]; then
+            [[ $(pyenv which python) == "${{ env.PYENV_ROOT }}/versions/${{ matrix.python-version }}/bin/python" ]] || exit 1
+            python -c 'import sys; assert sys.implementation.name == "micropython"'
+          else
+            python -c 'if True:
+            import os, sys, os.path
+            correct_dir = os.path.join(
+              os.environ["PYENV_ROOT"],
+              "versions",
+              os.environ["EXPECTED_PYTHON"],
+              "bin")
+            assert os.path.dirname(sys.executable) == correct_dir'
+          fi
+      # bundled executables in some Anaconda releases cause the post-run step to hang in MacOS
+      - run: |
+          pyenv global system
+          rm -f "$(pyenv root)"/shims/*
+          
+  macos_build_intel:
+    needs: discover_modified_scripts
+    if: needs.discover_modified_scripts.outputs.versions_macos_intel_supported != '[""]'
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions_macos_intel_supported)}}
+        os: ["macos-15-intel"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - run: |
+          #envvars
+          export PYENV_ROOT="$GITHUB_WORKSPACE"
+          echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
+          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+      - run: |
+          #prerequisites
+          brew install openssl openssl@1.1 readline sqlite3 xz zlib
+          if [[ "${{ matrix.python-version }}" =~ pypy.*-(src|dev) ]]; then
+            export PYENV_BOOTSTRAP_VERSION=pypy2.7-7
+            echo "PYENV_BOOTSTRAP_VERSION=$PYENV_BOOTSTRAP_VERSION" >> $GITHUB_ENV
+            pyenv install $PYENV_BOOTSTRAP_VERSION
+          fi
+      - run: |
+          #build
+          pyenv --debug install ${{ matrix.python-version }} && rc=$? || rc=$?
+          if [[ $rc -ne 0 ]]; then
+            echo config.log:; cat $TMPDIR/python-build*/*/config.log
+            false
+          fi
           pyenv global ${{ matrix.python-version }}
       # Micropython doesn't support --version
       - run: |
