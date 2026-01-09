@@ -1,0 +1,45 @@
+name: Add versions
+
+on:
+  - workflow_dispatch
+  - schedule:
+    # Every N hours
+    - cron: '* */8 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  add_cpython:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6     
+        with:
+          python-version: 3
+          cache: 'pip'
+          cache-dependency-path: plugins/python-build/scripts/requirements.txt
+      - run: pip install -r plugins/python-build/scripts/requirements.txt
+      
+      - name: check for a release
+        run: |
+          python plugins/python-build/scripts/add_cpython.py --verbose >added_versions.lst && rc=$? || rc=$?
+          echo "rc=$rc" >> $GITHUB_ENV
+      - name: set PR properties
+        shell: python
+        run: |
+          import os
+          import sys
+          versions=[l.rstrip() for l in open("added_versions.lst")]
+          with open(os.environ['GITHUB_ENV'],'a') as f:
+            f.write(f'branch_name=auto_add_version/{"_".join(versions)}\n')
+            f.write(f'pr_name=Add {", ".join(versions)}\n')
+          os.remove("added_versions.lst")
+      
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
+        if: env.rc == 0
+        with:
+          branch: ${{ env.branch_name }}
+          title: ${{ env.pr_name }}

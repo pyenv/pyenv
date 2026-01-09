@@ -1,4 +1,6 @@
+more_itertools
 requests-html
+fake_useragent<2
 lxml[html_clean]
 packaging
 requests
