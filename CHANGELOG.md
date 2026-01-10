@@ -1,5 +1,21 @@
 # Version History
 
+## Release v2.6.18
+* Fix an infinite loop if a shim is symlinked to and called from a different location with "system" version active by @native-api in https://github.com/pyenv/pyenv/pull/3375
+* CI: Update and cleanup workflow scripts by @native-api in https://github.com/pyenv/pyenv/pull/3372
+* Add PowerShell support by @fblanchetNaN in https://github.com/pyenv/pyenv/pull/2749
+* rehash: support older BSD `mktemp` by @native-api in https://github.com/pyenv/pyenv/pull/3376
+* rehash: report final lock acquisition error while silencing provisional ones; init: don't silence automatic rehash by @native-api in https://github.com/pyenv/pyenv/pull/3377
+* pyenv launcher: introduce and export _PYENV_INSTALL_PREFIX by @rockandska in https://github.com/pyenv/pyenv/pull/3334
+* README: Document how to change Python version in a shell spawned from a Python-based program (e.g. Jupyter) by @native-api in https://github.com/pyenv/pyenv/pull/3380
+* Recognize an argument to -j in MAKEFLAGS when building extensions in 3.10-3.11 and latest 3.5-3.9 by @native-api in https://github.com/pyenv/pyenv/pull/3379
+* CI: add a script to autogenerate CPython build scripts by @native-api in https://github.com/pyenv/pyenv/pull/3358
+* Add miniconda3-25.11.1-1 by @binbjz in https://github.com/pyenv/pyenv/pull/3382
+* CI: exclude unsupported MacOS-x64 for recent Miniconda versions by @binbjz in https://github.com/pyenv/pyenv/pull/3385
+* Auto-accept TOS for miniconda3-25+ by @native-api in https://github.com/pyenv/pyenv/pull/3386
+* Add anaconda-2025.12-1 by @native-api in https://github.com/pyenv/pyenv/pull/3387
+* CI: automatically check for CPython releases and generate PRs by @native-api in https://github.com/pyenv/pyenv/pull/3388
+
 ## Release v2.6.17
 * Add miniforge 25.9.1-0, 25.11.0-1 by @13steinj in https://github.com/pyenv/pyenv/pull/3371
 * miniconda3-latest: auto accept TOS by @native-api in https://github.com/pyenv/pyenv/pull/3373
