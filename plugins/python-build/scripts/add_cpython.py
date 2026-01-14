@@ -146,8 +146,7 @@ def cleanup_prerelease_upgrade(
     logger.info(f'Git moving {previous_version_filename} '
                 f'to {new_version_filename} (preserving new data)')
 
-    with open(new_version_path) as f:
-        data = f.read()
+    data = new_version_path.read_text()
     new_version_path.unlink()
 
     subprocess.check_call(("git","-C",OUT_DIR,
@@ -155,24 +154,34 @@ def cleanup_prerelease_upgrade(
                            previous_version_filename,
                            new_version_filename))
 
-    with open(new_version_path,"w") as f:
-        f.write(data)
-    del data
+    new_version_path.write_text(data)
 
     del VersionDirectory.existing[previous_version]
 
 
 def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
-    if (version.major, version.minor) >= (3, 13):
-        # an old thunk may have older version-specific code
-        # so it's safer to write a known version-independent template
-        thunk_path = OUT_DIR.joinpath(str(version) + "t")
-        logger.info(f"Writing {thunk_path}")
-        thunk_path.write_text(T_THUNK, encoding='utf-8')
-        if is_prerelease_upgrade:
-            previous_thunk_path = OUT_DIR.joinpath(str(previous_version) + "t")
-            logger.info(f"Deleting {previous_thunk_path}")
-            previous_thunk_path.unlink()
+    if (version.major, version.minor) < (3, 13):
+        return
+
+    # an old thunk may have older version-specific code
+    # so it's safer to write a known version-independent template
+    thunk_name = (str(version) + "t")
+    thunk_path = OUT_DIR / thunk_name
+    previous_thunk_name = str(previous_version) + "t"
+    previous_thunk_path = OUT_DIR / previous_thunk_name
+    if is_prerelease_upgrade:
+        logger.info(f"Git moving {previous_thunk_name} to {thunk_name}")
+        subprocess.check_call(("git","-C",OUT_DIR,
+                              "mv",
+                              previous_thunk_name,
+                              thunk_name))
+    else:
+        logger.info(f"Deleting {previous_thunk_path}")
+        previous_thunk_path.unlink()
+
+    logger.info(f"Writing {thunk_path}")
+    thunk_path.write_text(T_THUNK, encoding='utf-8')
+
 
 Arguments: argparse.Namespace
 
