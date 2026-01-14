@@ -34,7 +34,7 @@ jobs:
           versions=[l.rstrip() for l in open("added_versions.lst")]
           with open(os.environ['GITHUB_ENV'],'a') as f:
             f.write(f'branch_name=auto_add_version/{"_".join(versions)}\n')
-            f.write(f'pr_name=Add {", ".join(versions)}\n')
+            f.write(f'pr_name=Add CPython {", ".join(versions)}\n')
           os.remove("added_versions.lst")
       
       - name: Create Pull Request

@@ -13,9 +13,11 @@ import io
 import itertools
 import logging
 import operator
+import os.path
 import pathlib
 import pprint
 import re
+import subprocess
 import sys
 import typing
 import urllib.parse
@@ -40,7 +42,8 @@ OUT_DIR: pathlib.Path = here.parent.parent / "share" / "python-build"
 
 T_THUNK=\
 '''export PYTHON_BUILD_FREE_THREADING=1
-source "${BASH_SOURCE[0]%t}"'''
+source "${BASH_SOURCE[0]%t}"
+'''
 
 
 def adapt_script(version: packaging.version.Version,
@@ -120,7 +123,7 @@ def add_version(version: packaging.version.Version):
         return False
     VersionDirectory.existing.append(_CPythonExistingScriptInfo(version,str(new_path)))
 
-    cleanup_prerelease_upgrade(is_prerelease_upgrade, previous_version)
+    cleanup_prerelease_upgrade(is_prerelease_upgrade, previous_version, version)
 
     handle_t_thunks(version, previous_version, is_prerelease_upgrade)
 
@@ -130,13 +133,33 @@ def add_version(version: packaging.version.Version):
 
 def cleanup_prerelease_upgrade(
         is_prerelease_upgrade: bool,
-        previous_version: packaging.version.Version)\
+        previous_version: packaging.version.Version,
+        new_version: packaging.version.Version)\
         -> None:
-    if is_prerelease_upgrade:
-        previous_version_path = OUT_DIR / str(previous_version)
-        logger.info(f'Deleting {previous_version_path}')
-        previous_version_path.unlink()
-        del VersionDirectory.existing[previous_version]
+    if not is_prerelease_upgrade:
+        return
+
+    previous_version_filename = str(previous_version)
+    new_version_filename = str(new_version)
+    new_version_path = OUT_DIR / new_version_filename
+
+    logger.info(f'Git moving {previous_version_filename} '
+                f'to {new_version_filename} (preserving new data)')
+
+    with open(new_version_path) as f:
+        data = f.read()
+    new_version_path.unlink()
+
+    subprocess.check_call(("git","-C",OUT_DIR,
+                           "mv",
+                           previous_version_filename,
+                           new_version_filename))
+
+    with open(new_version_path,"w") as f:
+        f.write(data)
+    del data
+
+    del VersionDirectory.existing[previous_version]
 
 
 def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
@@ -468,10 +491,13 @@ class ReadlineVersionsDirectory(KeyedList[_ReadlineVersionInfo, packaging.versio
         max_item = candidates._latest_release()
         hash_ = Url.sha256_url(max_item.url, VersionDirectory.session)
 
+        permalink = 'https://ftpmirror.gnu.org/readline/' +\
+              os.path.basename(urllib.parse.urlparse(max_item.url).path)
+
         result = _ReadlineVersionInfo(
             max_item.version,
             max_item.package_name,
-            max_item.url,
+            permalink,
             hash_)
         self.append(result)
 
