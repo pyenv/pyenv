@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.6.20
+* CI: adjust CPython PR generation logic by @native-api in https://github.com/pyenv/pyenv/pull/3392
+* Add CPython 3.15.0a5 by @nedbat in https://github.com/pyenv/pyenv/pull/3393
+
 ## Release v2.6.19
 * Add CPython 3.15.0a4 by @nedbat in https://github.com/pyenv/pyenv/pull/3390
 
