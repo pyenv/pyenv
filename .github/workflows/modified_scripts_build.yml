@@ -56,6 +56,14 @@ jobs:
               if name == 'anaconda3' and version >= packaging.version.Version('2025.12'):
                 result.append({'os':'macos-15-intel','python-version':line})
           
+            if m:=re.match(r'graalpy-(community-)?-(\d+\.\d+.\d+)', line):
+              version = packaging.version.Version(m.group(2))
+              
+              # GraalPy dropped MacOS x64 support
+              if version >= packaging.version.Version('25.0.2'):
+                result.append({'os':'macos-15-intel','python-version':line})
+              
+          
           EOF = str(random.getrandbits(15*8))
           
           with open(os.environ['GITHUB_ENV'],'w') as f:
