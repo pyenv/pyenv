@@ -166,6 +166,60 @@ can_use_macports() {
   PYTHON_BUILD_SKIP_MACPORTS=1; return 1
 }
 
+can_use_pixi() {
+  if locked_in; then
+    locked_in pixi && rc=$? || rc=$?; return $rc
+  fi
+  [[ -n "$PYTHON_BUILD_USE_PIXI" && -n "$PYTHON_BUILD_SKIP_PIXI" ]] && {
+    echo "error: mutually exclusive environment variables PYTHON_BUILD_USE_PIXI and PYTHON_BUILD_SKIP_PIXI are set" >&3
+    exit 1
+  }
+  [[ -n "$PYTHON_BUILD_USE_PIXI" ]] && return 0
+  [[ -n "$PYTHON_BUILD_SKIP_PIXI" ]] && return 1
+  # Return cached result if already checked
+  [[ -n "$PYTHON_BUILD_PIXI_ENVS_DIR" ]] && return 0
+  # Check if pixi exists and cache the environment directory
+  local envs_dir
+  command -v pixi &>/dev/null && \
+    envs_dir="$(pixi info 2>/dev/null | grep 'Environment dir:' | awk '{print $3}')" && \
+    [[ -n "$envs_dir" ]] && { export PYTHON_BUILD_PIXI_ENVS_DIR="$envs_dir"; return 0; }
+
+  # do not check the same stuff multiple times
+  PYTHON_BUILD_SKIP_PIXI=1; return 1
+}
+
+pixi_env_prefix() {
+  # Return cached value if available
+  if [[ -n "${PYTHON_BUILD_PIXI_PREFIX:-}" ]]; then
+    echo "$PYTHON_BUILD_PIXI_PREFIX"
+    return 0
+  fi
+
+  # Use PYTHON_BUILD_PIXI_ENV if set, otherwise default to "python-deps"
+  local env_name="${PYTHON_BUILD_PIXI_ENV:-python-deps}"
+
+  # Use cached envs_dir if available, otherwise get it from pixi info
+  local envs_dir="${PYTHON_BUILD_PIXI_ENVS_DIR:-}"
+  if [ -z "$envs_dir" ]; then
+    envs_dir="$(pixi info 2>/dev/null | grep 'Environment dir:' | awk '{print $3}')"
+    if [ -z "$envs_dir" ]; then
+      return 1
+    fi
+    export PYTHON_BUILD_PIXI_ENVS_DIR="$envs_dir"
+  fi
+
+  local prefix="${envs_dir}/${env_name}"
+
+  # Check if the environment exists
+  if [ -d "$prefix" ]; then
+    # Cache the prefix for subsequent calls
+    export PYTHON_BUILD_PIXI_PREFIX="$prefix"
+    echo "$prefix"
+    return 0
+  fi
+  return 1
+}
+
 locked_in() {
   if [[ -z "$1" ]]; then
     [[ -n $_PYTHON_BUILD_ECOSYSTEM_LOCKED_IN ]]
@@ -889,13 +943,28 @@ build_package_standard_build() {
         use_macports_zlib || true
       fi
     fi
+    if can_use_pixi; then
+      use_custom_tcltk || use_pixi_tcltk || true
+      use_pixi_readline || true
+      use_pixi_ncurses || true
+      if is_mac -ge 1014; then
+        # While XCode SDK is "always available",
+        # still need a fallback in case we are using an alternate compiler
+        use_xcode_sdk_zlib || use_pixi_zlib || true
+      else
+        use_pixi_zlib || true
+      fi
+    fi
     if can_use_homebrew; then
       use_homebrew || true
     fi
     if can_use_macports; then
       use_macports || true
     fi
-    if is_mac -ge 1014 && ! can_use_homebrew && ! can_use_macports; then
+    if can_use_pixi; then
+      use_pixi || true
+    fi
+    if is_mac -ge 1014 && ! can_use_homebrew && ! can_use_macports && ! can_use_pixi; then
       use_xcode_sdk_zlib || true
     fi
 
@@ -1530,12 +1599,25 @@ use_macports() {
   fi
 }
 
+use_pixi() {
+  can_use_pixi || return 1
+  if command -v pixi &>/dev/null; then
+    local prefix="$(pixi_env_prefix)" || return 1
+    export CPPFLAGS="-I${prefix}/include${CPPFLAGS:+ $CPPFLAGS}"
+    prepend_ldflags_libs "-L${prefix}/lib -Wl,-rpath,${prefix}/lib"
+    export PKG_CONFIG_PATH="$prefix/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+    lock_in pixi
+  fi
+}
+
 needs_yaml() {
   if ! configured_with_package_dir "python" "yaml.h"; then
     if can_use_homebrew; then
       use_homebrew_yaml && return 1
     elif can_use_macports; then
       use_macports_yaml && return 1
+    elif can_use_pixi; then
+      use_pixi_yaml && return 1
     fi
   fi
 }
@@ -1558,6 +1640,17 @@ use_macports_yaml() {
   if [[ $(port -q installed libyaml | awk '{print $3}') == "(active)" ]]; then
     echo "python-build: use libyaml from MacPorts"
     lock_in macports
+  else
+    return 1
+  fi
+}
+
+use_pixi_yaml() {
+  can_use_pixi || return 1
+  local env_name="${PYTHON_BUILD_PIXI_ENV:-python-deps}"
+  if pixi global list --environment "$env_name" 2>/dev/null | grep -q "^yaml"; then
+    echo "python-build: use libyaml from pixi (${env_name})"
+    lock_in pixi
   else
     return 1
   fi
@@ -1606,6 +1699,9 @@ has_broken_mac_readline() {
   if can_use_macports; then
     use_macports_readline && return 1
   fi
+  if can_use_pixi; then
+    use_pixi_readline && return 1
+  fi
   return 0
 }
 
@@ -1636,6 +1732,19 @@ use_macports_readline() {
   fi
 }
 
+use_pixi_readline() {
+  can_use_pixi || return 1
+  if ! configured_with_package_dir "python" "readline/rlconf.h"; then
+    local env_name="${PYTHON_BUILD_PIXI_ENV:-python-deps}"
+    if pixi global list --environment "$env_name" 2>/dev/null | grep -q "^readline"; then
+      echo "python-build: use readline from pixi (${env_name})"
+      lock_in pixi
+    else
+      return 1
+    fi
+  fi
+}
+
 use_homebrew_ncurses() {
   can_use_homebrew || return 1
   local libdir="$(brew --prefix ncurses 2>/dev/null || true)"
@@ -1654,6 +1763,17 @@ use_macports_ncurses() {
   if [[ $(port -q installed ncurses | awk '{print $3}') == "(active)" ]]; then
     echo "python-build: use ncurses from MacPorts"
     lock_in macports
+  else
+    return 1
+  fi
+}
+
+use_pixi_ncurses() {
+  can_use_pixi || return 1
+  local env_name="${PYTHON_BUILD_PIXI_ENV:-python-deps}"
+  if pixi global list --environment "$env_name" 2>/dev/null | grep -q "^ncurses"; then
+    echo "python-build: use ncurses from pixi (${env_name})"
+    lock_in pixi
   else
     return 1
   fi
@@ -1694,6 +1814,9 @@ has_broken_mac_openssl() {
     fi
     if can_use_macports; then
       use_macports_openssl && return 1
+    fi
+    if can_use_pixi; then
+      use_pixi_openssl && return 1
     fi
   fi
   return 0
@@ -1739,6 +1862,26 @@ use_macports_openssl() {
       return 0
     fi
   done
+  return 1
+}
+
+use_pixi_openssl() {
+  can_use_pixi || return 1
+  command -v pixi >/dev/null || return 1
+
+  local env_name="${PYTHON_BUILD_PIXI_ENV:-python-deps}"
+
+  if pixi global list --environment "$env_name" 2>/dev/null | grep -q "^openssl"; then
+    echo "python-build: use openssl from pixi (${env_name})"
+    if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
+      # configure script of newer CPython versions support `--with-openssl`
+      # https://bugs.python.org/issue21541
+      local prefix="$(pixi_env_prefix)" || return 1
+      package_option python configure --with-openssl="${prefix}"
+    fi
+    lock_in pixi
+    return 0
+  fi
   return 1
 }
 
@@ -1885,6 +2028,46 @@ use_macports_zlib() {
   fi
 }
 
+use_pixi_zlib() {
+  can_use_pixi || return 1
+  local env_name="${PYTHON_BUILD_PIXI_ENV:-python-deps}"
+  if pixi global list --environment "$env_name" 2>/dev/null | grep -q "^zlib"; then
+    echo "python-build: use zlib from pixi (${env_name})"
+    lock_in pixi
+  else
+    return 1
+  fi
+}
+
+configure_tcltk_flags() {
+  local prefix="$1"
+
+  # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
+  local tcltk_includes="$(sh -c 'cd '"$prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_INCLUDE_SPEC $TK_INCLUDE_SPEC"')"
+  # Homebrew Tcl/Tk 9 is built with external libtommath. CPython's build as of 3.14.0 does not detect that and fails to link to tommath symbols
+  local tcltk_cflags=""
+  if sh -c '. '"$prefix"'/lib/tclConfig.sh; echo "$TCL_DEFS"' | grep -qwFe '-DTCL_WITH_EXTERNAL_TOMMATH=1'; then
+    tcltk_cflags="-DTCL_WITH_EXTERNAL_TOMMATH=1"
+  fi
+  # For some reason, keg-only tcl-tk@8 successfully links with Tkinter without specifying rpath, with `/opt' rpath
+  # so no need to translate /Cellar path to /opt path
+  local tcltk_libs="$(sh -c 'cd '"$prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_LIB_SPEC $TK_LIB_SPEC"')"
+  # Since 2.7.6, 3.3.3, 3.4.0 (Issue #1584): --with-tcltk-includes + --with-tcltk-libs Configure options
+  # Since 3.11.0 (bpo-45847): `pkg-config` call, TCLTK_CFLAGS + TCLTK_LIBS override
+  if [[ -n "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
+    # pkg-config is not present out of the box in MacOS.
+    # There's no way to provide a fallback only if it's is not present
+    # and Configure's logic of detecting if it's present is complicated.
+    # So we just override it always
+    export TCLTK_CFLAGS="$tcltk_includes${tcltk_cflags:+ $tcltk_cflags}"
+    export TCLTK_LIBS="$tcltk_libs"
+  else
+    package_option python configure --with-tcltk-includes="$tcltk_includes"
+    package_option python configure --with-tcltk-libs="$tcltk_libs"
+    [[ -n $tcltk_cflags ]] && export CFLAGS="${tcltk_cflags}${CFLAGS:+ $CFLAGS}"
+  fi
+}
+
 use_homebrew_tcltk() {
   can_use_homebrew || return 1
   local tcltk_formula
@@ -1895,37 +2078,29 @@ use_homebrew_tcltk() {
     local tcltk_prefix="$(brew --prefix "${tcltk_formula}" 2>/dev/null || true)"
     if [ -d "$tcltk_prefix" ]; then
       echo "python-build: use ${tcltk_formula} from homebrew"
-      # In Homebrew Tcl/Tk 8.6.13, headers have been moved to the 'tcl-tk' subdir.
-      local tcltk_includes="$(sh -c 'cd '"$tcltk_prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_INCLUDE_SPEC $TK_INCLUDE_SPEC"')"
-      # Homebrew Tcl/Tk 9 is built with external libtommath. CPython's build as of 3.14.0 does not detect that and fails to link to tommath symbols
-      local tcltk_cflags
-      if sh -c '. '"$tcltk_prefix"'/lib/tclConfig.sh; echo "$TCL_DEFS"' | grep -qwFe '-DTCL_WITH_EXTERNAL_TOMMATH=1'; then
-        tcltk_cflags="-DTCL_WITH_EXTERNAL_TOMMATH=1"
-      fi
-      # For some reason, keg-only tcl-tk@8 successfully links with Tkinter without specifying rpath, with `/opt' rpath
-      # so no need to translate /Cellar path to /opt path
-      local tcltk_libs="$(sh -c 'cd '"$tcltk_prefix"'/lib; . ./tclConfig.sh; . ./tkConfig.sh; echo "$TCL_LIB_SPEC $TK_LIB_SPEC"')"
-      # Since 2.7.6, 3.3.3, 3.4.0 (Issue #1584): --with-tcltk-includes + --with-tcltk-libs Configure options
-      # Since 3.11.0 (bpo-45847): `pkg-config` call, TCLTK_CFLAGS + TCLTK_LIBS override
-      if [[ -n "$PYTHON_BUILD_TCLTK_USE_PKGCONFIG" ]]; then
-        # pkg-config is not present out of the box in MacOS.
-        # There's no way to provide a fallback only if it's is not present
-        # and Configure's logic of detecting if it's present is complicated.
-        # So we just override it always
-        export TCLTK_CFLAGS="$tcltk_includes${tcltk_cflags:+ $tcltk_cflags}"
-        export TCLTK_LIBS="$tcltk_libs"
-      else
-        package_option python configure --with-tcltk-includes="$tcltk_includes"
-        package_option python configure --with-tcltk-libs="$tcltk_libs"
-        [[ -n $tcltk_cflags ]] && export CFLAGS="${tcltk_cflags}${CFLAGS:+ $CFLAGS}"
-      fi
-      #set in either case as a failsafe
+      configure_tcltk_flags "$tcltk_prefix"
+      # set PKG_CONFIG_PATH as a failsafe
       export PKG_CONFIG_PATH="${tcltk_prefix}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-
       lock_in homebrew
       return 0
     fi
   done
+  return 1
+}
+
+use_pixi_tcltk() {
+  can_use_pixi || return 1
+
+  local env_name="${PYTHON_BUILD_PIXI_ENV:-python-deps}"
+
+  # Check if tk is actually installed there
+  if pixi global list --environment "$env_name" 2>/dev/null | grep -q "^tk"; then
+    echo "python-build: use tk from pixi (${env_name})"
+    local prefix="$(pixi_env_prefix)" || return 1
+    configure_tcltk_flags "$prefix"
+    lock_in pixi
+    return 0
+  fi
   return 1
 }
 
