@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.6.21
+* Add GraalPy 25.0.2 by @msimacek in https://github.com/pyenv/pyenv/pull/3395
+* Add CPython 3.14.3 by @github-actions[bot] in https://github.com/pyenv/pyenv/pull/3400
+
 ## Release v2.6.20
 * CI: adjust CPython PR generation logic by @native-api in https://github.com/pyenv/pyenv/pull/3392
 * Add CPython 3.15.0a5 by @nedbat in https://github.com/pyenv/pyenv/pull/3393
