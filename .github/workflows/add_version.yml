@@ -43,3 +43,4 @@ jobs:
         with:
           branch: ${{ env.branch_name }}
           title: ${{ env.pr_name }}
+          token: ${{ secrets.TOKEN_AUTO_PR }}
