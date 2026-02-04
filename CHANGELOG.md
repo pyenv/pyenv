@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.6.22
+* Add CPython 3.13.12 by @github-actions[bot] in https://github.com/pyenv/pyenv/pull/3401
+
 ## Release v2.6.21
 * Add GraalPy 25.0.2 by @msimacek in https://github.com/pyenv/pyenv/pull/3395
 * Add CPython 3.14.3 by @github-actions[bot] in https://github.com/pyenv/pyenv/pull/3400
