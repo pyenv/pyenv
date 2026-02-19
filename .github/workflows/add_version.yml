@@ -15,13 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6     
+      - uses: actions/setup-python@v6
         with:
           python-version: 3
           cache: 'pip'
           cache-dependency-path: plugins/python-build/scripts/requirements.txt
       - run: pip install -r plugins/python-build/scripts/requirements.txt
-      
+
       - name: check for a release
         run: |
           python plugins/python-build/scripts/add_cpython.py --verbose >added_versions.lst && rc=$? || rc=$?
@@ -37,11 +37,18 @@ jobs:
             f.write(f'branch_name=auto_add_version/{"_".join(versions)}\n')
             f.write(f'pr_name=Add CPython {", ".join(versions)}\n')
           os.remove("added_versions.lst")
-      
+
+      # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
+      - name: Generate Github token
+        uses: actions/create-github-app-token@v2
+        id: generate-token
+        with:
+          app-id: ${{ secrets.PYENV_BOT_APP_ID }}
+          private-key: ${{ secrets.PYENV_BOT_PRIVATE_KEY }}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
         if: env.rc == 0
         with:
           branch: ${{ env.branch_name }}
           title: ${{ env.pr_name }}
-          token: ${{ secrets.TOKEN_AUTO_PR }}
+          token: ${{ steps.generate-token.outputs.token }}
