@@ -175,9 +175,6 @@ def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
                               "mv",
                               previous_thunk_name,
                               thunk_name))
-    else:
-        logger.info(f"Deleting {previous_thunk_path}")
-        previous_thunk_path.unlink()
 
     logger.info(f"Writing {thunk_path}")
     thunk_path.write_text(T_THUNK, encoding='utf-8')
