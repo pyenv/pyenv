@@ -43,7 +43,7 @@ jobs:
         uses: actions/create-github-app-token@v2
         id: generate-token
         with:
-          app-id: ${{ secrets.PYENV_BOT_APP_ID }}
+          app-id: ${{ vars.PYENV_BOT_APP_ID }}
           private-key: ${{ secrets.PYENV_BOT_PRIVATE_KEY }}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
