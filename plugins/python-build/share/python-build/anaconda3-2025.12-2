@@ -1,0 +1,19 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Anaconda3-2025.12-2-Linux-aarch64" "https://repo.anaconda.com/archive/Anaconda3-2025.12-2-Linux-aarch64.sh#be13a20f31d82508a061984fa3555369cfd8e4692643721415c19e7dc2e9e0f9" "anaconda" verify_py313
+  ;;
+"Linux-x86_64" )
+  install_script "Anaconda3-2025.12-2-Linux-x86_64" "https://repo.anaconda.com/archive/Anaconda3-2025.12-2-Linux-x86_64.sh#57b2b48cc5b8665e25fce7011f0389d47c1288288007844b3b1ba482d4f39029" "anaconda" verify_py313
+  ;;
+"MacOSX-arm64" )
+  install_script "Anaconda3-2025.12-2-MacOSX-arm64" "https://repo.anaconda.com/archive/Anaconda3-2025.12-2-MacOSX-arm64.sh#8d0b858358456d4ee159feb0c4ee6d635590b777f8b9ffa4aa7553c469aae2b6" "anaconda" verify_py313
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Anaconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
