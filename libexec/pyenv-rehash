@@ -196,7 +196,7 @@ shopt -s nullglob
 create_prototype_shim
 remove_outdated_shims
 # shellcheck disable=SC2046
-make_shims $(list_executable_names | sort -u)
+make_shims $(list_executable_names)
 
 
 # Allow plugins to register shims.
