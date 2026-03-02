@@ -26,6 +26,29 @@ for arg; do
   esac
 done
 
+# Fast path for --bare --skip-aliases: skip sort and full realpath resolution
+if [[ -n "$bare" && -n "$skip_aliases" ]]; then
+  versions_dir="${PYENV_ROOT}/versions"
+  if [ -d "$versions_dir" ]; then
+    shopt -s dotglob nullglob
+    for path in "$versions_dir"/*/; do
+      path="${path%/}"
+      if [ -L "$path" ]; then
+        # Relative link = internal alias → skip; absolute = external → keep
+        [[ "$(readlink "$path")" == /* ]] || continue
+      fi
+      echo "${path##*/}"
+      if [[ -z "$skip_envs" ]]; then
+        for env_path in "${path}/envs/"*; do
+          [ -d "$env_path" ] && echo "${env_path#${versions_dir}/}"
+        done
+      fi
+    done
+    shopt -u dotglob nullglob
+  fi
+  exit 0
+fi
+
 versions_dir="${PYENV_ROOT}/versions"
 
 if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; then
