@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.6.25
+* Add miniforge3-26.1.0-0 by @native-api in https://github.com/pyenv/pyenv/pull/3413
+* Add CPython 3.12.13 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3414
+
 ## Release v2.6.24
 * CI: add_version: use Github App token to create PR by @native-api in https://github.com/pyenv/pyenv/pull/3406
 * Add Anaconda3-2025.12-2 by @binbjz in https://github.com/pyenv/pyenv/pull/3408
