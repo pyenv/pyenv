@@ -1,5 +1,11 @@
 # Version History
 
+## Release v2.6.24
+* CI: add_version: use Github App token to create PR by @native-api in https://github.com/pyenv/pyenv/pull/3406
+* Add Anaconda3-2025.12-2 by @binbjz in https://github.com/pyenv/pyenv/pull/3408
+* rehash: Drop redundant sort -u from make_shims call by @jakelodwick in https://github.com/pyenv/pyenv/pull/3410
+* Add CPython 3.10.20, 3.11.15 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3412
+
 ## Release v2.6.23
 * Add CPython 3.15.0a6 by @native-api in https://github.com/pyenv/pyenv/pull/3403
 
