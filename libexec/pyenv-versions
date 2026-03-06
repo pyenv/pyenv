@@ -3,6 +3,11 @@
 # Usage: pyenv versions [--bare] [--skip-aliases] [--skip-envs]
 #
 # Lists all Python versions found in `$PYENV_ROOT/versions/*'.
+#
+#   --bare            List just the names, omit `system'
+#   --skip-aliases    Skip symlinks to other versions and to virtual environments
+#   --skip-envs       Skip virtual environments (under <version>/envs)
+#
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
