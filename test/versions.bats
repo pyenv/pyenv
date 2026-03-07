@@ -188,7 +188,7 @@ OUT
   create_alt_executable_in_version "3.6.0/envs/bar" "python_bar"
   create_alias "bar" "3.6.0/envs/bar"
   mkdir moo
-  create_alias "bar" "${PWD}/moo"
+  create_alias "moo" "${PWD}/moo"
   create_executable "${PWD}/moo" "moopython"
 
   run pyenv-versions --skip-aliases --skip-envs --executables
