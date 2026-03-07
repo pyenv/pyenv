@@ -180,6 +180,28 @@ OUT
 OUT
 }
 
+@test "--executables lists executables everywhere and overrides other switches" {
+  create_alt_executable_in_version "3.5.0" "python"
+  create_alt_executable_in_version "3.5.0" "python1"
+  create_alt_executable_in_version "3.6.0" "python"
+  create_alt_executable_in_version "3.5.0/envs/foo" "python_foo"
+  create_alt_executable_in_version "3.6.0/envs/bar" "python_bar"
+  create_alias "bar" "3.6.0/envs/bar"
+  mkdir moo
+  create_alias "bar" "${PWD}/moo"
+  create_executable "${PWD}/moo" "moopython"
+
+  run pyenv-versions --skip-aliases --skip-envs --executables
+  assert_success
+  assert_output <<OUT
+moopython
+python
+python1
+python_bar
+python_foo
+OUT
+}
+
 @test "lists dot directories under versions" {
   create_version ".venv"
 
