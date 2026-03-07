@@ -11,6 +11,11 @@ create_alias() {
   ln -s "$2" "${PYENV_ROOT}/versions/$1"
 }
 
+create_external_version() {
+  mkdir -p "$PYENV_TEST_DIR/${1:?}"
+  create_alias "${1:?}" "$PYENV_TEST_DIR/${1:?}"
+}
+
 _setup() {
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
@@ -168,8 +173,7 @@ OUT
 @test "doesn't list symlink aliases when --skip-aliases" {
   create_version "1.8.7"
   create_alias "1.8" "1.8.7"
-  mkdir moo
-  create_alias "1.9" "${PWD}/moo"
+  create_external_version "moo"
 
   run pyenv-versions --bare --skip-aliases
   assert_success
@@ -187,9 +191,8 @@ OUT
   create_alt_executable_in_version "3.5.0/envs/foo" "python_foo"
   create_alt_executable_in_version "3.6.0/envs/bar" "python_bar"
   create_alias "bar" "3.6.0/envs/bar"
-  mkdir moo
-  create_alias "moo" "${PWD}/moo"
-  create_executable "${PWD}/moo" "moopython"
+  create_external_version "moo"
+  create_alt_executable_in_version "moo" "moopython"
 
   run pyenv-versions --skip-aliases --skip-envs --executables
   assert_success
