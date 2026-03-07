@@ -196,7 +196,11 @@ OUT
 
   run pyenv-versions --skip-aliases --skip-envs --executables
   assert_success
-  assert_output <<OUT
+  #The sort order does not matter for this functionality. However,
+  #MacOS `sort` sorts differently that Linux's due to different LC_COLLATE definition for en-US:
+  #https://unix.stackexchange.com/questions/362728/why-does-gnu-sort-sort-differently-on-my-osx-machine-and-linux-machine
+  #So to get a match, have to check against the same order that the local `sort` produces
+  sort <<OUT | assert_output
 moopython
 python
 python1
