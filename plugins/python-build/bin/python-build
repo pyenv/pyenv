@@ -1663,12 +1663,20 @@ prefer_openssl11() {
   # Allow overriding the preference of OpenSSL version per definition basis (#1302, #1325, #1326)
   PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@1.1 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
+
+  PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl11 openssl3 openssl}"
+  export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
+
 }
 
 prefer_openssl3() {
   # Allow overriding the preference of OpenSSL version per definition basis (#1302, #1325, #1326)
   PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@1.1 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
+  
+  # Set MacPorts OpenSSL formula names for MacPorts environment
+  PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3 openssl openssl11}"
+  export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
 }
 
 build_package_mac_readline() {
@@ -1727,7 +1735,8 @@ use_macports_openssl() {
   command -v port >/dev/null || return 1
   local port_location="$(command -v port)"
   local prefix="${port_location%/bin/port}"
-  for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
+  # MacPorts uses a different package naming convention and does not use the @ symbol.
+  for openssl in ${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3 openssl}; do
     if [[ $(port -q installed ${openssl} | awk '{print $3}') == "(active)" ]]; then
       echo "python-build: use ${openssl} from MacPorts"
       if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
