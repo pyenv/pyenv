@@ -22,7 +22,9 @@ jobs:
           if test "$RUNNER_OS" == "macOS"; then
             brew install coreutils fish
           fi
-      - run: pwd
+      - run: |
+          pwd
+          locale
       - env:
           PYENV_ROOT: /home/runner/work/pyenv/pyenv
         run: |
