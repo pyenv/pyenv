@@ -22,6 +22,12 @@ jobs:
           pwd
           locale
           sort --version
+          set
+          echo 'moopython
+          python
+          python1
+          python_bar
+          python_foo' | sort
       - env:
           PYENV_ROOT: /home/runner/work/pyenv/pyenv
         run: |
