@@ -8,9 +8,8 @@
 #   --skip-aliases    Skip symlinks to other versions and to virtual environments
 #   --skip-envs       Skip virtual environments (under <version>/envs)
 #   --executables     Internal. Overrides other options.
-#                     Print a deduplicated list of all executables in Pyenv-managed
-#                     versions and environments. May cut corners and produce incorrect results
-#                     in some cases that don't matter for `pyenv rehash'
+#                     Optimally get a deduplicated list of all executable names in Pyenv-managed
+#                     versions and environments for `pyenv rehash'
 #
 
 set -e
@@ -39,11 +38,12 @@ done
 
 versions_dir="${PYENV_ROOT}/versions"
 
-# Fast path for --bare --skip-aliases: skip sort and full realpath resolution
+# Fast path for rehash: skip filtering and link resolution
 if [[ -n "$executables" ]]; then
   if [ -d "$versions_dir" ]; then
     shopt -s dotglob nullglob
     # MacOS 12+ and FreeBSD 15 support `xargs -r -0' and `basename -a'
+    # `sort -u` is simpler and a bit faster than `awk '!seen[$0]++'`, with the same result for rehash purposes
     printf '%s\0' "$versions_dir"/*/bin/* "$versions_dir"/*/envs/*/bin/* | xargs -0 -r basename -a | sort -u
     shopt -u dotglob nullglob
   fi
