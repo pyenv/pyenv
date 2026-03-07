@@ -21,6 +21,7 @@ jobs:
       - run: |
           pwd
           locale
+          sort --version
       - env:
           PYENV_ROOT: /home/runner/work/pyenv/pyenv
         run: |
