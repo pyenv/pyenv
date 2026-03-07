@@ -11,6 +11,11 @@ create_alias() {
   ln -s "$2" "${PYENV_ROOT}/versions/$1"
 }
 
+create_external_version() {
+  mkdir -p "$PYENV_TEST_DIR/${1:?}"
+  create_alias "${1:?}" "$PYENV_TEST_DIR/${1:?}"
+}
+
 _setup() {
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
@@ -168,15 +173,39 @@ OUT
 @test "doesn't list symlink aliases when --skip-aliases" {
   create_version "1.8.7"
   create_alias "1.8" "1.8.7"
-  mkdir moo
-  create_alias "1.9" "${PWD}/moo"
+  create_external_version "moo"
 
   run pyenv-versions --bare --skip-aliases
   assert_success
 
   assert_output <<OUT
 1.8.7
-1.9
+moo
+OUT
+}
+
+@test "--executables lists executables everywhere and overrides other switches" {
+  create_alt_executable_in_version "3.5.0" "python"
+  create_alt_executable_in_version "3.5.0" "python1"
+  create_alt_executable_in_version "3.6.0" "python"
+  create_alt_executable_in_version "3.5.0/envs/foo" "python_foo"
+  create_alt_executable_in_version "3.6.0/envs/bar" "python_bar"
+  create_alias "bar" "3.6.0/envs/bar"
+  create_external_version "moo"
+  create_alt_executable_in_version "moo" "moopython"
+
+  run pyenv-versions --skip-aliases --skip-envs --executables
+  assert_success
+  #The sort order does not matter for this functionality. However,
+  #MacOS 15 `sort` sorts differently that Linux's due to a different LC_COLLATE definition for en-US:
+  #https://unix.stackexchange.com/questions/362728/why-does-gnu-sort-sort-differently-on-my-osx-machine-and-linux-machine
+  #So to get a match, we have to check against the same order that the local `sort` produces
+  sort <<OUT | assert_output
+moopython
+python
+python1
+python_bar
+python_foo
 OUT
 }
 

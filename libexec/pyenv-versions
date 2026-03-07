@@ -1,13 +1,21 @@
 #!/usr/bin/env bash
 # Summary: List all Python versions available to pyenv
-# Usage: pyenv versions [--bare] [--skip-aliases] [--skip-envs]
+# Usage: pyenv versions [--bare] [--skip-aliases] [--skip-envs] [--executables]
 #
 # Lists all Python versions found in `$PYENV_ROOT/versions/*'.
+#
+#   --bare            List just the names, omit `system'
+#   --skip-aliases    Skip symlinks to other versions and to virtual environments
+#   --skip-envs       Skip virtual environments (under <version>/envs)
+#   --executables     Internal. Overrides other options.
+#                     Optimally get a deduplicated list of all executable names in Pyenv-managed
+#                     versions and environments for `pyenv rehash'
+#
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-unset bare skip_aliases skip_envs
+unset bare skip_aliases skip_envs executables
 # Provide pyenv completions
 for arg; do
   case "$arg" in
@@ -16,6 +24,7 @@ for arg; do
     echo --skip-aliases
     echo --skip-envs
     exit ;;
+  --executables ) executables=1; break ;;
   --bare ) bare=1 ;;
   --skip-aliases ) skip_aliases=1 ;;
   --skip-envs ) skip_envs=1 ;;
@@ -26,30 +35,20 @@ for arg; do
   esac
 done
 
-# Fast path for --bare --skip-aliases: skip sort and full realpath resolution
-if [[ -n "$bare" && -n "$skip_aliases" ]]; then
-  versions_dir="${PYENV_ROOT}/versions"
+
+versions_dir="${PYENV_ROOT}/versions"
+
+# Fast path for rehash: skip filtering and link resolution
+if [[ -n "$executables" ]]; then
   if [ -d "$versions_dir" ]; then
     shopt -s dotglob nullglob
-    for path in "$versions_dir"/*/; do
-      path="${path%/}"
-      if [ -L "$path" ]; then
-        # Relative link = internal alias → skip; absolute = external → keep
-        [[ "$(readlink "$path")" == /* ]] || continue
-      fi
-      echo "${path##*/}"
-      if [[ -z "$skip_envs" ]]; then
-        for env_path in "${path}/envs/"*; do
-          [ -d "$env_path" ] && echo "${env_path#${versions_dir}/}"
-        done
-      fi
-    done
+    # MacOS 12+ and FreeBSD 15 support `xargs -r -0' and `basename -a'
+    # `sort -u` is simpler and a bit faster than `awk '!seen[$0]++'`, with the same result for rehash purposes
+    printf '%s\0' "$versions_dir"/*/bin/* "$versions_dir"/*/envs/*/bin/* | xargs -0 -r basename -a | sort -u
     shopt -u dotglob nullglob
   fi
   exit 0
 fi
-
-versions_dir="${PYENV_ROOT}/versions"
 
 if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; then
   if [ -n "$PYENV_NATIVE_EXT" ]; then
