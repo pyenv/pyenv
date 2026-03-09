@@ -2,7 +2,7 @@ PROTOTYPE_SOURCE_SHIM_PATH="${SHIM_PATH}/.pyenv-source-shim"
 
 shims=()
 shopt -s nullglob
-for shim in $(cat "${BASH_SOURCE%/*}/source.d/"*".list" | sort | uniq | sed -e 's/#.*$//' | sed -e '/^[[:space:]]*$/d'); do
+for shim in $(sort -u "${BASH_SOURCE%/*}/source.d/"*".list" | sed -e 's/#.*$//' -e '/^[[:space:]]*$/d'); do
   if [ -n "${shim##*/}" ]; then
     shims[${#shims[*]}]="${shim})return 0;;"
   fi
