@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.6.26
+* versions: fast path for --bare --skip-aliases by @jakelodwick in https://github.com/pyenv/pyenv/pull/3411
+* Fix MacPorts OpenSSL formula detection by @tekintian in https://github.com/pyenv/pyenv/pull/3417
+* rehash: streamline executables discovery; fix regression by @native-api in https://github.com/pyenv/pyenv/pull/3418
+* rehash: simplify source.bash pipeline by @jakelodwick in https://github.com/pyenv/pyenv/pull/3419
+* Add CPython 3.15.0a7 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3421
+
 ## Release v2.6.25
 * Add miniforge3-26.1.0-0 by @native-api in https://github.com/pyenv/pyenv/pull/3413
 * Add CPython 3.12.13 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3414
