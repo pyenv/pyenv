@@ -47,9 +47,9 @@ here = Path(__file__).resolve()
 out_dir: Path = here.parent.parent / "share" / "python-build"
 
 def download_sha(url):
-    logger.info('Downloading SHA file %(url)s', locals())
+    logger.info(f'Downloading SHA file {url}')
     tup = tuple(reversed(requests.get(url).text.replace('./', '').rstrip().split()))
-    logger.debug('Got %(tup)s', locals())
+    logger.debug(f'Got {tup}')
     return tup
 
 def create_spec(filename, sha, url):
@@ -72,7 +72,7 @@ def create_spec(filename, sha, url):
         'installer_filename': f'{flavor_with_suffix.lower()}-{version}-{subversion}',
     }
 
-    logger.debug('Created spec %(spec)s', locals())
+    logger.debug(f'Created spec {spec}')
 
     return spec
 
@@ -112,7 +112,7 @@ def add_version(release, distributions):
         if count > 0:
             output_file = out_dir / distribution_specs[0]['installer_filename']
 
-            logger.info('Writing %(count)d specs for %(distribution)s to %(output_file)s', locals())
+            logger.info(f'Writing {count} specs for {distribution} to {output_file}')
 
             script_str = install_script_fmt.format(
                 install_lines="\n".join([install_line_fmt.format_map(s) for s in distribution_specs]),
@@ -122,7 +122,7 @@ def add_version(release, distributions):
             with open(output_file, 'w') as f:
                 f.write(script_str)
         else:
-            logger.info('Did not find specs for %(distribution)s', locals())
+            logger.info(f'Did not find specs for {distribution}')
 
 
 def main():
@@ -132,7 +132,7 @@ def main():
         if version in SKIPPED_RELEASES:
             continue
 
-        logger.info('Looking for %(version)s in %(out_dir)s', locals())
+        logger.info(f'Looking for {version} in {out_dir}')
 
         # mambaforge is retired https://github.com/conda-forge/miniforge/releases/tag/24.11.2-0
         if version_tuple(version) >= (24, 11, 2):
@@ -141,7 +141,7 @@ def main():
             distributions = DISTRIBUTIONS_PRE25
 
         if any(not list(out_dir.glob(f'{distribution}*-{version}')) for distribution in distributions):
-            logger.info('Downloading %(version)s', locals())
+            logger.info(f'Downloading {version}')
             add_version(release, distributions)
 
 if __name__ == '__main__':
