@@ -68,8 +68,8 @@ pyenv: py.test: command not found
 The \`py.test' command exists in these Python versions:
   3.4
 
- Note: See 'pyenv help global' for tips on allowing both
-       python2 and python3 to be found.
+Note: See 'pyenv help global' for tips on allowing multiple
+      Python versions to be found at the same time.
 OUT
 }
 
@@ -85,8 +85,8 @@ pyenv: py.test: command not found
 The \`py.test' command exists in these Python versions:
   3.4
 
- Note: See 'pyenv help global' for tips on allowing both
-       python2 and python3 to be found.
+Note: See 'pyenv help global' for tips on allowing multiple
+      Python versions to be found at the same time.
 OUT
 }
 
@@ -118,8 +118,8 @@ The \`py.test' command exists in these Python versions:
   3.3
   3.4
 
-Note: See 'pyenv help global' for tips on allowing both
-      python2 and python3 to be found.
+Note: See 'pyenv help global' for tips on allowing multiple
+      Python versions to be found at the same time.
 OUT
 }
 
