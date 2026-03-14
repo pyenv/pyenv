@@ -112,8 +112,8 @@ else
         echo "The \`$PYENV_COMMAND' command exists in these Python versions:"
         echo "$versions" | sed 's/^/  /g'
         echo
-        echo "Note: See 'pyenv help global' for tips on allowing both"
-        echo "      python2 and python3 to be found."
+        echo "Note: See 'pyenv help global' for tips on allowing multiple"
+        echo "      Python versions to be found at the same time."
       } >&2
     fi
   fi
