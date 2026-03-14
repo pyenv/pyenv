@@ -33,7 +33,7 @@ if [ -z "$READLINK" ]; then
 fi
 
 resolve_link() {
-  $READLINK "$1"
+  $READLINK -s "$1"
 }
 
 realpath() {
