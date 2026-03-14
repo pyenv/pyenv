@@ -63,7 +63,7 @@ if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; th
   fi
 
   resolve_link() {
-    $READLINK "$1"
+    $READLINK -s "$1"
   }
 
   realpath() {
