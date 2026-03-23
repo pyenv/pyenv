@@ -407,7 +407,7 @@ of the following commands:
 
 * [`pyenv shell <version>`](COMMANDS.md#pyenv-shell) -- select just for current shell session
 * [`pyenv local <version>`](COMMANDS.md#pyenv-local) -- automatically select whenever you are in the current directory (or its subdirectories)
-* [`pyenv global <version>`](COMMANDS.md#pyenv-shell) -- select globally for your user account
+* [`pyenv global <version>`](COMMANDS.md#pyenv-global) -- select globally for your user account
 
 E.g. to select the above-mentioned newly-installed Python 3.10.4 as your preferred version to use:
 
