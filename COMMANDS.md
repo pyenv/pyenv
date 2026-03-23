@@ -40,9 +40,8 @@ Lists all available pyenv commands.
 
 Sets a local application-specific Python version by writing the version
 name to a `.python-version` file in the current directory. This version
-overrides the global version, and can be overridden itself by setting
-the `PYENV_VERSION` environment variable or with the `pyenv shell`
-command.
+overrides the [global version](#pyenv-global), and can be overridden
+itself with the [`pyenv shell`](#pyenv-shell) command.
 
     $ pyenv local 2.7.6
 
@@ -98,9 +97,8 @@ This is mainly useful in special cases like provisioning scripts.
 ## `pyenv global`
 
 Sets the global version of Python to be used in all shells by writing
-the version name to the `~/.pyenv/version` file. This version can be
-overridden by an application-specific `.python-version` file, or by
-setting the `PYENV_VERSION` environment variable.
+the version name to the `$PYENV_ROOT/version` file. This version can be
+overridden with [`pyenv local`](#pyenv-local) or [`pyenv shell`](#pyenv-shell).
 
     $ pyenv global 2.7.6
 
@@ -236,6 +234,7 @@ Then install the desired versions:
 You can also install the latest version of Python in a specific version line by supplying a prefix instead of a complete name:
 
     $ pyenv install 3.10
+    $ pyenv install 3
 
 See the [`pyenv latest` documentation](#pyenv-latest) for details on prefix resolution.
 
@@ -243,9 +242,6 @@ An older option is to use the `:latest` syntax. For example, to install the late
 
     pyenv install 3.8:latest
 
-To install the latest major release for Python 3 try:
-
-    pyenv install 3:latest
 
 ## `pyenv uninstall`
 
