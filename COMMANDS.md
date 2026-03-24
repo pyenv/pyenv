@@ -348,10 +348,9 @@ locations of the currently selected versions.
 
 Displays the latest installed or known version with the given prefix
 
-    Usage: pyenv latest [-k|--known] [-q|--quiet] <prefix>
+    Usage: pyenv latest [-k|--known] <prefix>
 
      -k/--known      Select from all known versions instead of installed
-     -q/--quiet      Do not print an error message on resolution failure
 
 Only full prefixes are searched: in the actual name, the given prefix must be followed by a dot or a dash.
 
