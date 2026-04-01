@@ -41,7 +41,7 @@ jobs:
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
       - name: Generate Github token
         if: env.rc == 0
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         id: generate-token
         with:
           app-id: ${{ vars.PYENV_BOT_APP_ID }}
