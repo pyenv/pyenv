@@ -1,5 +1,13 @@
 # Version History
 
+## Release v2.6.27
+* commands: fast path for --sh, replace sort|uniq with sort -u by @jakelodwick in https://github.com/pyenv/pyenv/pull/3423
+* which: update the `pyenv help global` tip by @native-api in https://github.com/pyenv/pyenv/pull/3424
+* Bump actions/create-github-app-token from 2 to 3 in the github-actions group by @dependabot[bot] in https://github.com/pyenv/pyenv/pull/3428
+* python-build: advise user with no c compiler by @exurd in https://github.com/pyenv/pyenv/pull/3294
+* Add CPython 3.13.13, 3.14.4, 3.15.0a8 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3432
+* Add miniforge3 26.1.1-2, 26.1.1-3 by @native-api in https://github.com/pyenv/pyenv/pull/3433
+
 ## Release v2.6.26
 * versions: fast path for --bare --skip-aliases by @jakelodwick in https://github.com/pyenv/pyenv/pull/3411
 * Fix MacPorts OpenSSL formula detection by @tekintian in https://github.com/pyenv/pyenv/pull/3417
