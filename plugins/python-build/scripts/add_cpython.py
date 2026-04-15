@@ -168,7 +168,6 @@ def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
     thunk_name = (str(version) + "t")
     thunk_path = OUT_DIR / thunk_name
     previous_thunk_name = str(previous_version) + "t"
-    previous_thunk_path = OUT_DIR / previous_thunk_name
     if is_prerelease_upgrade:
         logger.info(f"Git moving {previous_thunk_name} to {thunk_name}")
         subprocess.check_call(("git","-C",OUT_DIR,
