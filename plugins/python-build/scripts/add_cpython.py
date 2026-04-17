@@ -32,9 +32,8 @@ import tqdm
 
 logger = logging.getLogger(__name__)
 
-CUTOFF_VERSION=packaging.version.Version('3.9')
+CUTOFF_VERSION=packaging.version.Version('3.10')
 EXCLUDED_VERSIONS= {
-    packaging.version.Version("3.9.3")  #recalled upstream
 }
 
 here = pathlib.Path(__file__).resolve()
