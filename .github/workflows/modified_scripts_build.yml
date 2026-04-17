@@ -83,7 +83,11 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
-        os: ["macos-14", "macos-15", "macos-15-intel"]
+        os:
+          - macos-14
+          - macos-15
+          - macos-15-intel
+          - macos-26
         exclude: ${{fromJson(needs.discover_modified_scripts.outputs.versions_macos_build_exclude)}}
     runs-on: ${{ matrix.os }}
     steps:
@@ -193,7 +197,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
-        os: ["ubuntu-22.04", "ubuntu-24.04"]
+        os:
+          - ubuntu-22.04
+          - ubuntu-24.04
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
