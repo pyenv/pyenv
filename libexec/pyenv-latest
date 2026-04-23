@@ -10,6 +10,7 @@
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
+
 while [[ $# -gt 0 ]]
 do
     case "$1" in
@@ -38,6 +39,10 @@ exitcode=0
 IFS=$'\n'
 
     if [[ -z $FROM_KNOWN ]]; then
+        if [[ -d $PYENV_ROOT/versions/$prefix ]]; then
+            echo "$prefix"
+            exit $exitcode;
+        fi
         DEFINITION_CANDIDATES=( $(pyenv-versions --bare --skip-envs) )
     else
         DEFINITION_CANDIDATES=( $(python-build --definitions ) )
