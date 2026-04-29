@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.6.28
+* pyenv-latest: fast path for when there is an exact match by @native-api in https://github.com/pyenv/pyenv/pull/3437
+
 ## Release v2.6.27
 * commands: fast path for --sh, replace sort|uniq with sort -u by @jakelodwick in https://github.com/pyenv/pyenv/pull/3423
 * which: update the `pyenv help global` tip by @native-api in https://github.com/pyenv/pyenv/pull/3424
