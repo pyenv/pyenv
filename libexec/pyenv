@@ -33,7 +33,7 @@ else
   [ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
 
   resolve_link() {
-    $READLINK "$1"
+    $READLINK -s "$1"
   }
 
   abs_dirname() {
