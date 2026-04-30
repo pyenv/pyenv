@@ -99,7 +99,7 @@ jobs:
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
       - run: |
           #prerequisites
-          brew install openssl openssl@1.1 readline sqlite3 xz zlib
+          brew install openssl readline sqlite3 xz zlib
           if [[ "${{ matrix.python-version }}" =~ pypy.*-(src|dev) ]]; then
             export PYENV_BOOTSTRAP_VERSION=pypy2.7-7
             echo "PYENV_BOOTSTRAP_VERSION=$PYENV_BOOTSTRAP_VERSION" >> $GITHUB_ENV
