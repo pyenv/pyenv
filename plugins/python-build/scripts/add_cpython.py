@@ -433,7 +433,7 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
             #already retrieved
             return self[max(self.keys())]
 
-        j = requests.get("https://api.github.com/repos/openssl/openssl/releases/latest").json()
+        j = requests.get("https://api.github.com/repos/openssl/openssl/releases/latest", timeout=30).json()
         # noinspection PyTypeChecker
         # urlparse can parse str as well as bytes
         shasum_url = more_itertools.one(
@@ -441,7 +441,7 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
             for asset in j['assets']
             if urllib.parse.urlparse(asset['browser_download_url']).path.split('/')[-1].endswith('.sha256')
         )
-        shasum_text = requests.get(shasum_url).text
+        shasum_text = requests.get(shasum_url, timeout=30).text
         shasum_data = jc.parse("hashsum", shasum_text, quiet=True)[0]
         package_hash, package_filename = shasum_data["hash"], shasum_data["filename"]
         del shasum_data, shasum_text, shasum_url
@@ -536,7 +536,7 @@ class DownloadPage:
         """
         if session is None:
             session = requests_html.HTMLSession()
-        response = session.get(url)
+        response = session.get(url, timeout=30)
         page = response.html
         table = page.find("pre", first=True)
         # some GNU mirrors format entries as a table
@@ -606,7 +606,7 @@ class Url:
             session = requests_html.HTMLSession()
         logger.info(f"Downloading and computing hash of {url}")
         h=hashlib.sha256()
-        r=session.get(url,stream=True)
+        r=session.get(url,stream=True,timeout=30)
         total_bytes=int(r.headers.get('content-length',0)) or float('inf')
         with tqdm.tqdm(total=total_bytes, unit='B', unit_scale=True, unit_divisor=1024) as t:
             for c in r.iter_content(1024):
