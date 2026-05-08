@@ -2276,6 +2276,11 @@ build_package_verify_py315() {
   build_package_verify_py314 "$1" "${2:-3.15}"
 }
 
+# Post-install check for Python 3.16.x
+build_package_verify_py316() {
+  build_package_verify_py315 "$1" "${2:-3.16}"
+}
+
 # Post-install check for Python 3.x rolling release scripts
 # XXX: Will need splitting into project-specific ones if there emerge
 # multiple rolling-release scripts with different checks needed
