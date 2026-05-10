@@ -1,0 +1,258 @@
+From b9eb9f73e0f77acdc89bd85773a13f95bcc2d81b Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Wed, 25 Mar 2026 07:44:47 +0100
+Subject: [PATCH] gh-146207: Add support for OpenSSL 4.0.0 alpha1 (GH-146217)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+OpenSSL 4.0.0 alpha1 removed these functions:
+
+* SSLv3_method()
+* TLSv1_method()
+* TLSv1_1_method()
+* TLSv1_2_method()
+
+Other changes:
+
+* Update test_openssl_version().
+* Update multissltests.py for OpenSSL 4.
+* Add const qualifier to fix compiler warnings.
+(cherry picked from commit 3364e7e62fa24d0e19133fb0f90b1c24ef1110c5)
+
+Co-authored-by: Victor Stinner <vstinner@python.org>
+Co-authored-by: Bénédikt Tran <10796600+picnixz@users.noreply.github.com>
+---
+ Lib/test/test_ssl.py       | 52 ++++++++++++++++++++------------------
+ Modules/_ssl.c             | 27 ++++++++++++++++----
+ Modules/_ssl/cert.c        |  3 ++-
+ Tools/ssl/multissltests.py |  7 ++++-
+ 4 files changed, 58 insertions(+), 31 deletions(-)
+
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index 423d0292b4e..0eced257a55 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -380,7 +380,7 @@ def test_constants(self):
+         ssl.OP_NO_COMPRESSION
+         self.assertEqual(ssl.HAS_SNI, True)
+         self.assertEqual(ssl.HAS_ECDH, True)
+-        self.assertEqual(ssl.HAS_TLSv1_2, True)
++        self.assertIsInstance(ssl.HAS_TLSv1_2, bool)
+         self.assertEqual(ssl.HAS_TLSv1_3, True)
+         ssl.OP_NO_SSLv2
+         ssl.OP_NO_SSLv3
+@@ -571,11 +571,11 @@ def test_openssl_version(self):
+         # Some sanity checks follow
+         # >= 1.1.1
+         self.assertGreaterEqual(n, 0x10101000)
+-        # < 4.0
+-        self.assertLess(n, 0x40000000)
++        # < 5.0
++        self.assertLess(n, 0x50000000)
+         major, minor, fix, patch, status = t
+         self.assertGreaterEqual(major, 1)
+-        self.assertLess(major, 4)
++        self.assertLess(major, 5)
+         self.assertGreaterEqual(minor, 0)
+         self.assertLess(minor, 256)
+         self.assertGreaterEqual(fix, 0)
+@@ -641,12 +641,14 @@ def test_openssl111_deprecations(self):
+             ssl.OP_NO_TLSv1_2,
+             ssl.OP_NO_TLSv1_3
+         ]
+-        protocols = [
+-            ssl.PROTOCOL_TLSv1,
+-            ssl.PROTOCOL_TLSv1_1,
+-            ssl.PROTOCOL_TLSv1_2,
+-            ssl.PROTOCOL_TLS
+-        ]
++        protocols = []
++        if hasattr(ssl, 'PROTOCOL_TLSv1'):
++            protocols.append(ssl.PROTOCOL_TLSv1)
++        if hasattr(ssl, 'PROTOCOL_TLSv1_1'):
++            protocols.append(ssl.PROTOCOL_TLSv1_1)
++        if hasattr(ssl, 'PROTOCOL_TLSv1_2'):
++            protocols.append(ssl.PROTOCOL_TLSv1_2)
++        protocols.append(ssl.PROTOCOL_TLS)
+         versions = [
+             ssl.TLSVersion.SSLv3,
+             ssl.TLSVersion.TLSv1,
+@@ -1140,6 +1142,7 @@ def test_min_max_version(self):
+                 ssl.TLSVersion.TLSv1,
+                 ssl.TLSVersion.TLSv1_1,
+                 ssl.TLSVersion.TLSv1_2,
++                ssl.TLSVersion.TLSv1_3,
+                 ssl.TLSVersion.SSLv3,
+             }
+         )
+@@ -1153,7 +1156,7 @@ def test_min_max_version(self):
+         with self.assertRaises(ValueError):
+             ctx.minimum_version = 42
+ 
+-        if has_tls_protocol(ssl.PROTOCOL_TLSv1_1):
++        if has_tls_protocol('PROTOCOL_TLSv1_1'):
+             ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_1)
+ 
+             self.assertIn(
+@@ -1605,23 +1608,24 @@ def test__create_stdlib_context(self):
+         self.assertFalse(ctx.check_hostname)
+         self._assert_context_options(ctx)
+ 
+-        if has_tls_protocol(ssl.PROTOCOL_TLSv1):
++        if has_tls_protocol('PROTOCOL_TLSv1'):
+             with warnings_helper.check_warnings():
+                 ctx = ssl._create_stdlib_context(ssl.PROTOCOL_TLSv1)
+             self.assertEqual(ctx.protocol, ssl.PROTOCOL_TLSv1)
+             self.assertEqual(ctx.verify_mode, ssl.CERT_NONE)
+             self._assert_context_options(ctx)
+ 
+-        with warnings_helper.check_warnings():
+-            ctx = ssl._create_stdlib_context(
+-                ssl.PROTOCOL_TLSv1_2,
+-                cert_reqs=ssl.CERT_REQUIRED,
+-                check_hostname=True
+-            )
+-        self.assertEqual(ctx.protocol, ssl.PROTOCOL_TLSv1_2)
+-        self.assertEqual(ctx.verify_mode, ssl.CERT_REQUIRED)
+-        self.assertTrue(ctx.check_hostname)
+-        self._assert_context_options(ctx)
++        if has_tls_protocol('PROTOCOL_TLSv1_2'):
++            with warnings_helper.check_warnings():
++                ctx = ssl._create_stdlib_context(
++                    ssl.PROTOCOL_TLSv1_2,
++                    cert_reqs=ssl.CERT_REQUIRED,
++                    check_hostname=True
++                )
++            self.assertEqual(ctx.protocol, ssl.PROTOCOL_TLSv1_2)
++            self.assertEqual(ctx.verify_mode, ssl.CERT_REQUIRED)
++            self.assertTrue(ctx.check_hostname)
++            self._assert_context_options(ctx)
+ 
+         ctx = ssl._create_stdlib_context(purpose=ssl.Purpose.CLIENT_AUTH)
+         self.assertEqual(ctx.protocol, ssl.PROTOCOL_TLS_SERVER)
+@@ -3517,10 +3521,10 @@ def test_protocol_tlsv1_2(self):
+                            client_options=ssl.OP_NO_TLSv1_2)
+ 
+         try_protocol_combo(ssl.PROTOCOL_TLS, ssl.PROTOCOL_TLSv1_2, 'TLSv1.2')
+-        if has_tls_protocol(ssl.PROTOCOL_TLSv1):
++        if has_tls_protocol('PROTOCOL_TLSv1'):
+             try_protocol_combo(ssl.PROTOCOL_TLSv1_2, ssl.PROTOCOL_TLSv1, False)
+             try_protocol_combo(ssl.PROTOCOL_TLSv1, ssl.PROTOCOL_TLSv1_2, False)
+-        if has_tls_protocol(ssl.PROTOCOL_TLSv1_1):
++        if has_tls_protocol('PROTOCOL_TLSv1_1'):
+             try_protocol_combo(ssl.PROTOCOL_TLSv1_2, ssl.PROTOCOL_TLSv1_1, False)
+             try_protocol_combo(ssl.PROTOCOL_TLSv1_1, ssl.PROTOCOL_TLSv1_2, False)
+ 
+diff --git a/Modules/_ssl.c b/Modules/_ssl.c
+index a24b6b30b2f..60a3d3f6a8f 100644
+--- a/Modules/_ssl.c
++++ b/Modules/_ssl.c
+@@ -134,6 +134,17 @@ static void _PySSLFixErrno(void) {
+ #error Unsupported OpenSSL version
+ #endif
+ 
++#if (OPENSSL_VERSION_NUMBER >= 0x40000000L)
++#  define OPENSSL_NO_SSL3
++#  define OPENSSL_NO_TLS1
++#  define OPENSSL_NO_TLS1_1
++#  define OPENSSL_NO_TLS1_2
++#  define OPENSSL_NO_SSL3_METHOD
++#  define OPENSSL_NO_TLS1_METHOD
++#  define OPENSSL_NO_TLS1_1_METHOD
++#  define OPENSSL_NO_TLS1_2_METHOD
++#endif
++
+ /* OpenSSL API 1.1.0+ does not include version methods */
+ #ifndef OPENSSL_NO_SSL3_METHOD
+ extern const SSL_METHOD *SSLv3_method(void);
+@@ -1133,7 +1144,7 @@ _asn1obj2py(_sslmodulestate *state, const ASN1_OBJECT *name, int no_name)
+ 
+ static PyObject *
+ _create_tuple_for_attribute(_sslmodulestate *state,
+-                            ASN1_OBJECT *name, ASN1_STRING *value)
++                            const ASN1_OBJECT *name, const ASN1_STRING *value)
+ {
+     Py_ssize_t buflen;
+     PyObject *pyattr;
+@@ -1162,16 +1173,16 @@ _create_tuple_for_attribute(_sslmodulestate *state,
+ }
+ 
+ static PyObject *
+-_create_tuple_for_X509_NAME (_sslmodulestate *state, X509_NAME *xname)
++_create_tuple_for_X509_NAME(_sslmodulestate *state, const X509_NAME *xname)
+ {
+     PyObject *dn = NULL;    /* tuple which represents the "distinguished name" */
+     PyObject *rdn = NULL;   /* tuple to hold a "relative distinguished name" */
+     PyObject *rdnt;
+     PyObject *attr = NULL;   /* tuple to hold an attribute */
+     int entry_count = X509_NAME_entry_count(xname);
+-    X509_NAME_ENTRY *entry;
+-    ASN1_OBJECT *name;
+-    ASN1_STRING *value;
++    const X509_NAME_ENTRY *entry;
++    const ASN1_OBJECT *name;
++    const ASN1_STRING *value;
+     int index_counter;
+     int rdn_level = -1;
+     int retcode;
+@@ -6510,9 +6521,15 @@ sslmodule_init_constants(PyObject *m)
+     ADD_INT_CONST("PROTOCOL_TLS", PY_SSL_VERSION_TLS);
+     ADD_INT_CONST("PROTOCOL_TLS_CLIENT", PY_SSL_VERSION_TLS_CLIENT);
+     ADD_INT_CONST("PROTOCOL_TLS_SERVER", PY_SSL_VERSION_TLS_SERVER);
++#ifndef OPENSSL_NO_TLS1
+     ADD_INT_CONST("PROTOCOL_TLSv1", PY_SSL_VERSION_TLS1);
++#endif
++#ifndef OPENSSL_NO_TLS1_1
+     ADD_INT_CONST("PROTOCOL_TLSv1_1", PY_SSL_VERSION_TLS1_1);
++#endif
++#ifndef OPENSSL_NO_TLS1_2
+     ADD_INT_CONST("PROTOCOL_TLSv1_2", PY_SSL_VERSION_TLS1_2);
++#endif
+ 
+ #define ADD_OPTION(NAME, VALUE) if (sslmodule_add_option(m, NAME, (VALUE)) < 0) return -1
+ 
+diff --git a/Modules/_ssl/cert.c b/Modules/_ssl/cert.c
+index f2e7be89668..061b0fb3171 100644
+--- a/Modules/_ssl/cert.c
++++ b/Modules/_ssl/cert.c
+@@ -128,7 +128,8 @@ _ssl_Certificate_get_info_impl(PySSLCertificate *self)
+ }
+ 
+ static PyObject*
+-_x509name_print(_sslmodulestate *state, X509_NAME *name, int indent, unsigned long flags)
++_x509name_print(_sslmodulestate *state, const X509_NAME *name,
++                int indent, unsigned long flags)
+ {
+     PyObject *res;
+     BIO *biobuf;
+diff --git a/Tools/ssl/multissltests.py b/Tools/ssl/multissltests.py
+index 86baf8a3a74..9019b2bcf38 100755
+--- a/Tools/ssl/multissltests.py
++++ b/Tools/ssl/multissltests.py
+@@ -414,9 +414,11 @@ class BuildOpenSSL(AbstractBuilder):
+     def _post_install(self):
+         if self.version.startswith("3."):
+             self._post_install_3xx()
++        elif self.version.startswith("4."):
++            self._post_install_4xx()
+ 
+     def _build_src(self, config_args=()):
+-        if self.version.startswith("3."):
++        if self.version.startswith(("3.", "4.")):
+             config_args += ("enable-fips",)
+         super()._build_src(config_args)
+ 
+@@ -432,6 +434,9 @@ def _post_install_3xx(self):
+             lib64 = self.lib_dir + "64"
+             os.symlink(lib64, self.lib_dir)
+ 
++    def _post_install_4xx(self):
++        self._post_install_3xx()
++
+     @property
+     def short_version(self):
+         """Short version for OpenSSL download URL"""
+-- 
+2.46.2.windows.1
+
