@@ -1,6 +1,9 @@
 prefer_openssl3
 export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
 export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
+# Avoid a compilation error when linking against OpenSSL 4.0.0
+# it deprecates the `no-ssl3' configure option and no longer defines OPENSSL_NO_SSL3_METHOD
+export PYTHON_CFLAGS="-DOPENSSL_NO_SSL3${PYTHON_CFLAGS:+ $PYTHON_CFLAGS}"
 install_package "openssl-4.0.0" "https://github.com/openssl/openssl/releases/download/openssl-4.0.0/openssl-4.0.0.tar.gz#c32cf49a959c4f345f9606982dd36e7d28f7c58b19c2e25d75624d2b3d2f79ac" mac_openssl --if has_broken_mac_openssl
 install_package "readline-8.3" "https://ftpmirror.gnu.org/readline/readline-8.3.tar.gz#fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc" mac_readline --if has_broken_mac_readline
 if has_tar_xz_support; then
