@@ -1,0 +1,31 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Miniforge3-26.3.2-1-Linux-aarch64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-Linux-aarch64.sh#22b8f855a3934c105a05a164d23f9a4c770dd127ec1ae26ad43114625585d9f2" "miniconda" verify_py312
+  ;;
+"Linux-ppc64le" )
+  install_script "Miniforge3-26.3.2-1-Linux-ppc64le.sh" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-Linux-ppc64le.sh#d00248a68f2083bc1bea9c157191ba2f6be43756bf5b0d6021b70f1f9372843e" "miniconda" verify_py312
+  ;;
+"Linux-x86_64" )
+  install_script "Miniforge3-26.3.2-1-Linux-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-Linux-x86_64.sh#0e80314f5f5088fb10bc06139ac6a097644ee009500e74b627192c93362b4502" "miniconda" verify_py312
+  ;;
+"MacOSX-arm64.pkg" )
+  install_script "Miniforge3-26.3.2-1-MacOSX-arm64.pkg" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-MacOSX-arm64.pkg#2b23a8ed7e3827d6882d88d8260a1a06055e09832e91fb37fef1185d491941fb" "miniconda" verify_py312
+  ;;
+"MacOSX-arm64" )
+  install_script "Miniforge3-26.3.2-1-MacOSX-arm64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-MacOSX-arm64.sh#031cc06de7287d1d69d6419bea0daf1a4a8bb8108711f859b1c351aa722d7281" "miniconda" verify_py312
+  ;;
+"MacOSX-x86_64.pkg" )
+  install_script "Miniforge3-26.3.2-1-MacOSX-x86_64.pkg" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-MacOSX-x86_64.pkg#d0b10344beda4cbd2e06d793c4ca2a41719447a6ca225d092e352cea309bcb1f" "miniconda" verify_py312
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniforge3-26.3.2-1-MacOSX-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-MacOSX-x86_64.sh#720022a19b363b55eadb27c807dfbba6607dc0cc7b312fb39574bdb616f5cc19" "miniconda" verify_py312
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniforge is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
