@@ -86,6 +86,9 @@ def py_version(version):
     # transition points:
     # https://github.com/conda-forge/miniforge/blame/main/Miniforge3/construct.yaml
     # look for "- python <version>" in non-pypy branch and which tag the commit is first in
+    if version_tuple_ >= (26,1):
+        # https://github.com/conda-forge/miniforge/commit/0016367731e52c67234d6d0e7e6a24c6bf7673e4
+        return "313"
     if version_tuple_ >= (24,5):
         # yes, they jumped from 3.10 directly to 3.12
         # https://github.com/conda-forge/miniforge/commit/bddad0baf22b37cfe079e47fd1680fdfb2183590

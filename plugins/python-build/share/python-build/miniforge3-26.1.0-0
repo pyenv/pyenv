@@ -1,18 +1,18 @@
 case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-aarch64" )
-  install_script "Miniforge3-26.1.0-0-Linux-aarch64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-Linux-aarch64.sh#8baf8844ecf13e1458f81659ea286251d04b2d5ed90040efb77f158adedb2d95" "miniconda" verify_py312
+  install_script "Miniforge3-26.1.0-0-Linux-aarch64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-Linux-aarch64.sh#8baf8844ecf13e1458f81659ea286251d04b2d5ed90040efb77f158adedb2d95" "miniconda" verify_py313
   ;;
 "Linux-ppc64le" )
-  install_script "Miniforge3-26.1.0-0-Linux-ppc64le.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-Linux-ppc64le.sh#902190ad825b74b78a6a2816364453bb4d6989a599172aa3785d4afd0ebeb917" "miniconda" verify_py312
+  install_script "Miniforge3-26.1.0-0-Linux-ppc64le.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-Linux-ppc64le.sh#902190ad825b74b78a6a2816364453bb4d6989a599172aa3785d4afd0ebeb917" "miniconda" verify_py313
   ;;
 "Linux-x86_64" )
-  install_script "Miniforge3-26.1.0-0-Linux-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-Linux-x86_64.sh#127b5e14cfe6c83b787f624487cdc2168645ed82fdca1b0c1937caa086aed6d5" "miniconda" verify_py312
+  install_script "Miniforge3-26.1.0-0-Linux-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-Linux-x86_64.sh#127b5e14cfe6c83b787f624487cdc2168645ed82fdca1b0c1937caa086aed6d5" "miniconda" verify_py313
   ;;
 "MacOSX-arm64" )
-  install_script "Miniforge3-26.1.0-0-MacOSX-arm64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-MacOSX-arm64.sh#219b9e0d733fa2086d7d094a5ed830db146ccf22ae32c330b2da5df5c9604b78" "miniconda" verify_py312
+  install_script "Miniforge3-26.1.0-0-MacOSX-arm64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-MacOSX-arm64.sh#219b9e0d733fa2086d7d094a5ed830db146ccf22ae32c330b2da5df5c9604b78" "miniconda" verify_py313
   ;;
 "MacOSX-x86_64" )
-  install_script "Miniforge3-26.1.0-0-MacOSX-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-MacOSX-x86_64.sh#90a41a28ad0221fbaf728ca1267f6243638a56c579fba8a1b970edfee4062d53" "miniconda" verify_py312
+  install_script "Miniforge3-26.1.0-0-MacOSX-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.1.0-0/Miniforge3-26.1.0-0-MacOSX-x86_64.sh#90a41a28ad0221fbaf728ca1267f6243638a56c579fba8a1b970edfee4062d53" "miniconda" verify_py313
   ;;
 * )
   { echo
