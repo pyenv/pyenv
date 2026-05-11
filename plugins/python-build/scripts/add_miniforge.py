@@ -95,7 +95,7 @@ def py_version(version):
     raise ValueError("Bundled Python version unknown for release `%s'"%version)
 
 def supported(filename):
-    return ('pypy' not in filename) and ('Windows' not in filename)
+    return ('pypy' not in filename) and ('Windows' not in filename) and (not filename.endswith('.pkg'))
 
 def add_version(release, distributions):
     tag_name = release['tag_name']

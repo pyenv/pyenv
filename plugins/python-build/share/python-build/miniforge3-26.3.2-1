@@ -8,14 +8,8 @@ case "$(anaconda_architecture 2>/dev/null || true)" in
 "Linux-x86_64" )
   install_script "Miniforge3-26.3.2-1-Linux-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-Linux-x86_64.sh#0e80314f5f5088fb10bc06139ac6a097644ee009500e74b627192c93362b4502" "miniconda" verify_py312
   ;;
-"MacOSX-arm64.pkg" )
-  install_script "Miniforge3-26.3.2-1-MacOSX-arm64.pkg" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-MacOSX-arm64.pkg#2b23a8ed7e3827d6882d88d8260a1a06055e09832e91fb37fef1185d491941fb" "miniconda" verify_py312
-  ;;
 "MacOSX-arm64" )
   install_script "Miniforge3-26.3.2-1-MacOSX-arm64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-MacOSX-arm64.sh#031cc06de7287d1d69d6419bea0daf1a4a8bb8108711f859b1c351aa722d7281" "miniconda" verify_py312
-  ;;
-"MacOSX-x86_64.pkg" )
-  install_script "Miniforge3-26.3.2-1-MacOSX-x86_64.pkg" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-MacOSX-x86_64.pkg#d0b10344beda4cbd2e06d793c4ca2a41719447a6ca225d092e352cea309bcb1f" "miniconda" verify_py312
   ;;
 "MacOSX-x86_64" )
   install_script "Miniforge3-26.3.2-1-MacOSX-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.3.2-1/Miniforge3-26.3.2-1-MacOSX-x86_64.sh#720022a19b363b55eadb27c807dfbba6607dc0cc7b312fb39574bdb616f5cc19" "miniconda" verify_py312
