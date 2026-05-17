@@ -40,7 +40,7 @@ pyenv: cannot rehash: couldn't acquire lock ${PYENV_ROOT}/shims/.pyenv-shim for 
 
 @test "stale lockfile is removed" {
   mkdir -p "${PYENV_ROOT}/shims"
-  touch -t "$(date --date '-10 min' '+%Y%m%d%H%M.%S' 2>/dev/null || date -v-10M '+%Y%m%d%H%M.%S')" "${PYENV_ROOT}/shims/.pyenv-shim"
+  touch -t 200001010000.00 "${PYENV_ROOT}/shims/.pyenv-shim"
   run pyenv-rehash
   assert_success ""
   assert [ ! -e "${PYENV_ROOT}/shims/.pyenv-shim" ]
