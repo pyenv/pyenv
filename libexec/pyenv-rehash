@@ -19,7 +19,7 @@ acquire_lock() {
   local ret
   set -o noclobber
   # Assuming an old lockfile is stale
-  # Unknowns why this happens for some users but this at least unblocks them
+  # Unknown why this happens for some users but this at least unblocks them
   last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" \
     || { find "$PROTOTYPE_SHIM_PATH" -mmin +10 -exec rm -f {} \; ; ret=1; }
   set +o noclobber
