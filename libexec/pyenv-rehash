@@ -2,7 +2,7 @@
 # Summary: Rehash pyenv shims (run this after installing executables)
 
 set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+[[ -n "$PYENV_DEBUG" ]] && set -x
 
 SHIM_PATH="${PYENV_ROOT}/shims"
 PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
@@ -15,13 +15,15 @@ declare last_acquire_error
 acquire_lock() {
   # Ensure only one instance of pyenv-rehash is running at a time by
   # setting the shell's `noclobber` option and attempting to write to
-  # the prototype shim file. If the file already exists, print a warning
-  # to stderr and exit with a non-zero status.
+  # the prototype shim file.
   local ret
   set -o noclobber
-  last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" || ret=1
+  # Assuming an old lockfile is stale
+  # Unknown why this happens for some users but this at least unblocks them
+  last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" \
+    || { find "$PROTOTYPE_SHIM_PATH" -mmin +10 -exec rm -f {} \; ; ret=1; }
   set +o noclobber
-  [ -z "${ret}" ]
+  [[ -z "${ret}" ]]
 }
 
 remove_prototype_shim() {

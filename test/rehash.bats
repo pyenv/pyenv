@@ -38,6 +38,18 @@ pyenv: cannot rehash: couldn't acquire lock ${PYENV_ROOT}/shims/.pyenv-shim for 
   assert_success
 }
 
+@test "stale lockfile is removed" {
+  mkdir -p "${PYENV_ROOT}/shims"
+  #GNU and BSD `date` support generating relative dates via different syntax
+  # but BusyBox `date` used in Bash Docker images doesn't
+  touch -t 200001010000.00 "${PYENV_ROOT}/shims/.pyenv-shim"
+  run pyenv-rehash
+  assert_success ""
+  assert [ ! -e "${PYENV_ROOT}/shims/.pyenv-shim" ]
+}
+
+
+
 @test "creates shims" {
   create_alt_executable_in_version "2.7" "python"
   create_alt_executable_in_version "2.7" "fab"
