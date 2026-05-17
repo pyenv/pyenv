@@ -38,6 +38,16 @@ pyenv: cannot rehash: couldn't acquire lock ${PYENV_ROOT}/shims/.pyenv-shim for 
   assert_success
 }
 
+@test "stale lockfile is removed" {
+  mkdir -p "${PYENV_ROOT}/shims"
+  touch -t "$(date --date '-10 min' '+%Y%m%d%H%M.%S' 2>/dev/null || date -v-10M '+%Y%m%d%H%M.%S')" "${PYENV_ROOT}/shims/.pyenv-shim"
+  run pyenv-rehash
+  assert_success ""
+  assert [ ! -e "${PYENV_ROOT}/shims/.pyenv-shim" ]
+}
+
+
+
 @test "creates shims" {
   create_alt_executable_in_version "2.7" "python"
   create_alt_executable_in_version "2.7" "fab"
