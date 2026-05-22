@@ -56,7 +56,7 @@ jobs:
               if name == 'anaconda3' and version >= packaging.version.Version('2025.12'):
                 result.append({'os':'macos-15-intel','python-version':line})
           
-            if m:=re.match(r'graalpy-(community-)?-(\d+\.\d+.\d+)', line):
+            if m:=re.match(r'graalpy-(community-)?(\d+\.\d+.\d+)', line):
               version = packaging.version.Version(m.group(2))
               
               # GraalPy dropped MacOS x64 support
