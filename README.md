@@ -190,6 +190,10 @@ automatically:
 This uses the same shell detection as `pyenv init` and skips lines that are
 already present.
 
+For Bash, avoid the automatic `--append` path if your `BASH_ENV` points to
+`.bashrc`; use the manual Bash instructions below so the `eval "$(pyenv init - bash)"`
+line only goes in your login startup file.
+
 #### Bash
   <details>
 

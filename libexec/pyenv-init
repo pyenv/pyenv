@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
-# Usage: eval "$(pyenv init [-|--path] [--append] [--no-push-path] [--detect-shell] [--no-rehash] [<shell>])"
+# Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--no-rehash] [<shell>])"
+#        pyenv init --append [<shell>]
+#        pyenv init --detect-shell [<shell>]
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -254,21 +256,20 @@ function append_shell_startup_files() {
 function append_lines() {
   local file="$1"
   local lines="$2"
-  local line
+  local sentinel_line
+
+  sentinel_line="$(printf '%s\n' "$lines" | tail -n 1)"
+  if grep -Fqx "$sentinel_line" "$file" 2>/dev/null; then
+    return 0
+  fi
 
   mkdir -p "${file%/*}"
   touch "$file"
 
-  while IFS= read -r line; do
-    if ! grep -Fqx "$line" "$file" 2>/dev/null; then
-      if [ -s "$file" ] && [ -n "$(tail -c 1 "$file" 2>/dev/null)" ]; then
-        echo >> "$file"
-      fi
-      echo "$line" >> "$file"
-    fi
-  done <<EOS
-$lines
-EOS
+  if [ -s "$file" ] && [ -n "$(tail -c 1 "$file" 2>/dev/null)" ]; then
+    echo >> "$file"
+  fi
+  printf '%s\n' "$lines" >> "$file"
 }
 
 function init_dirs() {

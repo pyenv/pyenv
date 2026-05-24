@@ -152,6 +152,17 @@ OUT
   assert_equal "1" "$(grep -Fc 'eval "$(pyenv init - bash)"' "$HOME/.bashrc")"
 }
 
+@test "append setup keeps fish block intact when generic lines already exist" {
+  mkdir -p "$HOME/.config/fish"
+  echo "end" > "$HOME/.config/fish/config.fish"
+
+  run pyenv-init --append fish
+  assert_success
+
+  expected_setup=$'end\nset -gx PYENV_ROOT $HOME/.pyenv\nif test -d $PYENV_ROOT/bin; and not contains -- $PYENV_ROOT/bin $PATH\n  set -gx PATH $PYENV_ROOT/bin $PATH\nend\npyenv init - fish | source'
+  assert_equal "$expected_setup" "$(cat "$HOME/.config/fish/config.fish")"
+}
+
 @test "option to skip rehash" {
   run pyenv-init - --no-rehash
   assert_success

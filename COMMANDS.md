@@ -392,7 +392,9 @@ List existing pyenv shims.
 
 Configure the shell environment for pyenv
 
-    Usage: eval "$(pyenv init [-|--path] [--append] [--no-push-path] [--detect-shell] [--no-rehash] [<shell>])"
+    Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--no-rehash] [<shell>])"
+           pyenv init --append [<shell>]
+           pyenv init --detect-shell [<shell>]
 
       -                    Initialize shims directory, print PYENV_SHELL variable, completions path
                            and shell function
