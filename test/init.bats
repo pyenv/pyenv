@@ -79,6 +79,79 @@ OUT
   assert_line "PYENV_SHELL_DETECT=bash"
 }
 
+@test "completion includes append option" {
+  run pyenv-init --complete
+  assert_success
+  assert_line "--append"
+}
+
+@test "append setup for bash startup files" {
+  mkdir -p "$HOME"
+
+  run pyenv-init --append bash
+  assert_success
+
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
+  assert_equal "$expected_setup" "$(cat "$HOME/.bashrc")"
+  assert_equal "$expected_setup" "$(cat "$HOME/.profile")"
+}
+
+@test "append setup for bash uses existing bash_profile" {
+  mkdir -p "$HOME"
+  touch "$HOME/.bash_profile"
+
+  run pyenv-init --append bash
+  assert_success
+
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
+  assert_equal "$expected_setup" "$(cat "$HOME/.bashrc")"
+  assert_equal "$expected_setup" "$(cat "$HOME/.bash_profile")"
+  assert [ ! -e "$HOME/.profile" ]
+}
+
+@test "append setup for zsh startup files" {
+  mkdir -p "$HOME"
+
+  run pyenv-init --append zsh
+  assert_success
+
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - zsh)"'
+  assert_equal "$expected_setup" "$(cat "$HOME/.zshrc")"
+  assert_equal "$expected_setup" "$(cat "$HOME/.zprofile")"
+}
+
+@test "append setup for fish startup file" {
+  mkdir -p "$HOME"
+
+  run pyenv-init --append fish
+  assert_success
+
+  expected_setup=$'set -gx PYENV_ROOT $HOME/.pyenv\nif test -d $PYENV_ROOT/bin; and not contains -- $PYENV_ROOT/bin $PATH\n  set -gx PATH $PYENV_ROOT/bin $PATH\nend\npyenv init - fish | source'
+  assert_equal "$expected_setup" "$(cat "$HOME/.config/fish/config.fish")"
+}
+
+@test "append setup for pwsh startup file" {
+  mkdir -p "$HOME"
+
+  run pyenv-init --append pwsh
+  assert_success
+
+  expected_setup=$'$Env:PYENV_ROOT="$Env:HOME/.pyenv"\nif (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {\n  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }\niex ((pyenv init -) -join "`n")'
+  assert_equal "$expected_setup" "$(cat "$HOME/.config/powershell/profile.ps1")"
+}
+
+@test "append setup is idempotent" {
+  mkdir -p "$HOME"
+
+  run pyenv-init --append bash
+  assert_success
+  run pyenv-init --append bash
+  assert_success
+
+  assert_equal "1" "$(grep -Fc 'export PYENV_ROOT="$HOME/.pyenv"' "$HOME/.bashrc")"
+  assert_equal "1" "$(grep -Fc 'eval "$(pyenv init - bash)"' "$HOME/.bashrc")"
+}
+
 @test "option to skip rehash" {
   run pyenv-init - --no-rehash
   assert_success

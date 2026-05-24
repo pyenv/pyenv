@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
-# Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--detect-shell] [--no-rehash] [<shell>])"
+# Usage: eval "$(pyenv init [-|--path] [--append] [--no-push-path] [--detect-shell] [--no-rehash] [<shell>])"
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -9,6 +9,7 @@ set -e
 if [ "$1" = "--complete" ]; then
   echo -
   echo --path
+  echo --append
   echo --no-push-path
   echo --no-rehash
   echo --detect-shell
@@ -29,6 +30,9 @@ while [ "$#" -gt 0 ]; do
       ;;
     --path)
       mode="path"
+      ;;
+    --append)
+      mode="append"
       ;;
     --detect-shell)
       mode="detect-shell"
@@ -85,6 +89,10 @@ function main() {
     print_detect_shell
     exit 0
     ;;
+  "append")
+    append_shell_startup_files
+    exit 0
+    ;;
   esac
   # should never get here
   exit 2
@@ -95,21 +103,28 @@ function detect_profile() {
 
   case "$shell" in
   bash )
-    if [ -e '~/.bash_profile' ]; then
+    if [ -e "${HOME}/.bash_profile" ]; then
       profile='~/.bash_profile'
+      profile_path="${HOME}/.bash_profile"
     else
       profile='~/.profile'
+      profile_path="${HOME}/.profile"
     fi
     profile_explain="~/.bash_profile if it exists, otherwise ~/.profile"
     rc='~/.bashrc'
+    rc_path="${HOME}/.bashrc"
     ;;
   pwsh )
     profile='~/.config/powershell/profile.ps1'
+    profile_path="${HOME}/.config/powershell/profile.ps1"
     rc='~/.config/powershell/profile.ps1'
+    rc_path="${HOME}/.config/powershell/profile.ps1"
     ;;
   zsh )
     profile='~/.zprofile'
+    profile_path="${HOME}/.zprofile"
     rc='~/.zshrc'
+    rc_path="${HOME}/.zshrc"
     ;;
   ksh | ksh93 | mksh )
     # There are two implementations of Korn shell: AT&T (ksh93) and Mir (mksh).
@@ -118,7 +133,9 @@ function detect_profile() {
     # (subsumed by mksh) are not included, since they are unlikely to still
     # be in use as interactive shells anywhere.
     profile='~/.profile'
+    profile_path="${HOME}/.profile"
     rc='~/.profile'
+    rc_path="${HOME}/.profile"
     ;;
   * )
     if [ -n "$detect_for_detect_shell" ]; then
@@ -175,15 +192,83 @@ function help_() {
         echo "# and $rc (for interactive shells) :"
       fi
       echo
-      echo 'export PYENV_ROOT="$HOME/.pyenv"'
-      echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
-      echo 'eval "$(pyenv init - '$shell')"'
+      print_posix_shell_setup
       ;;
     esac
     echo
     echo '# Restart your shell for the changes to take effect.'
     echo
   } >&2
+}
+
+function print_posix_shell_setup() {
+  echo 'export PYENV_ROOT="$HOME/.pyenv"'
+  echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
+  echo 'eval "$(pyenv init - '$shell')"'
+}
+
+function print_fish_shell_setup() {
+  echo 'set -gx PYENV_ROOT $HOME/.pyenv'
+  echo 'if test -d $PYENV_ROOT/bin; and not contains -- $PYENV_ROOT/bin $PATH'
+  echo '  set -gx PATH $PYENV_ROOT/bin $PATH'
+  echo 'end'
+  echo 'pyenv init - fish | source'
+}
+
+function print_pwsh_shell_setup() {
+  echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"'
+  echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {'
+  echo '  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }'
+  echo 'iex ((pyenv init -) -join "`n")'
+}
+
+function append_shell_startup_files() {
+  if [ -z "$HOME" ]; then
+    echo "pyenv: HOME must be set to configure shell startup files" >&2
+    return 1
+  fi
+
+  detect_profile
+
+  case "$shell" in
+  bash | zsh | ksh | ksh93 | mksh )
+    append_lines "$rc_path" "$(print_posix_shell_setup)"
+    if [ "$profile_path" != "$rc_path" ]; then
+      append_lines "$profile_path" "$(print_posix_shell_setup)"
+    fi
+    ;;
+  fish )
+    rc_path="${HOME}/.config/fish/config.fish"
+    append_lines "$rc_path" "$(print_fish_shell_setup)"
+    ;;
+  pwsh )
+    append_lines "$rc_path" "$(print_pwsh_shell_setup)"
+    ;;
+  * )
+    echo "pyenv: cannot automatically configure startup files for $shell" >&2
+    return 1
+    ;;
+  esac
+}
+
+function append_lines() {
+  local file="$1"
+  local lines="$2"
+  local line
+
+  mkdir -p "${file%/*}"
+  touch "$file"
+
+  while IFS= read -r line; do
+    if ! grep -Fqx "$line" "$file" 2>/dev/null; then
+      if [ -s "$file" ] && [ -n "$(tail -c 1 "$file" 2>/dev/null)" ]; then
+        echo >> "$file"
+      fi
+      echo "$line" >> "$file"
+    fi
+  done <<EOS
+$lines
+EOS
 }
 
 function init_dirs() {
