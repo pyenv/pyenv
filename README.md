@@ -179,18 +179,21 @@ which does install native Windows Python versions.
 The below setup should work for the vast majority of users for common use cases.
 See [Advanced configuration](#advanced-configuration) for details and more configuration options.
 
-If you installed Pyenv into `~/.pyenv` with the automatic installer or the basic
-GitHub checkout, you can append the relevant shell startup commands
-automatically:
+If `pyenv` is already on `PATH`, you can configure the relevant shell startup
+files automatically:
 
 ```sh
-~/.pyenv/bin/pyenv init --append
+pyenv init --install
 ```
 
-This uses the same shell detection as `pyenv init` and skips lines that are
-already present.
+If `pyenv` is not on `PATH` yet, run the same command through the `pyenv`
+executable in your chosen installation directory.
 
-For Bash, avoid the automatic `--append` path if your `BASH_ENV` points to
+This uses the same shell detection as `pyenv init`. If a startup file already
+contains Pyenv-related configuration, the command refuses to edit it; review the
+file manually and run `pyenv init <shell>` to see the suggested setup.
+
+For Bash, avoid the automatic `--install` path if your `BASH_ENV` points to
 `.bashrc`; use the manual Bash instructions below so the `eval "$(pyenv init - bash)"`
 line only goes in your login startup file.
 
