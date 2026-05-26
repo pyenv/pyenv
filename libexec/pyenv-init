@@ -287,6 +287,11 @@ function check_startup_file() {
     return 0
   fi
 
+  if [[ ! -f $file || ! -r $file ]]; then
+    echo "pyenv: failed to inspect $file" >&2
+    return 1
+  fi
+
   if grep -Fi pyenv "$file" >/dev/null; then
     echo "pyenv: cannot automatically apply changes to $file: it appears to already contain Pyenv-related code." >&2
     echo "pyenv: review the file's contents and apply changes manually if necessary." >&2
