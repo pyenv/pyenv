@@ -1,0 +1,86 @@
+From b1925a29fb0e8d4a71479a3583afcd95aa2b9235 Mon Sep 17 00:00:00 2001
+From: "Miss Islington (bot)"
+ <31488909+miss-islington@users.noreply.github.com>
+Date: Sat, 22 Nov 2025 19:53:06 +0100
+Subject: [PATCH 1/2] [3.14] gh-141801: Use accessors for ASN1_STRING fields in
+ libssl (GH-141802) (#141847)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+gh-141801: Use accessors for ASN1_STRING fields in libssl (GH-141802)
+
+* gh-141801: Use accessors for ASN1_STRING fields
+
+While ASN1_STRING is currently exposed, it is better to use the
+accessors. See https://github.com/openssl/openssl/issues/29117 where, if
+the type were opaque, OpenSSL's X509 objects could be much more
+memory-efficient.
+
+* Update Modules/_ssl.c
+
+
+
+* Update Modules/_ssl.c
+
+
+
+---------
+(cherry picked from commit c41fce08a5d7aae8fd9e3fa25e0ba521600e097c)
+
+Co-authored-by: David Benjamin <davidben@davidben.net>
+Co-authored-by: Bénédikt Tran <10796600+picnixz@users.noreply.github.com>
+---
+ Modules/_ssl.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/Modules/_ssl.c b/Modules/_ssl.c
+index 21c399123aa..aa7d5d14dfa 100644
+--- a/Modules/_ssl.c
++++ b/Modules/_ssl.c
+@@ -1406,14 +1406,14 @@ _get_peer_alt_names (_sslmodulestate *state, X509 *certificate) {
+                 }
+                 PyTuple_SET_ITEM(t, 0, v);
+ 
+-                if (name->d.ip->length == 4) {
+-                    unsigned char *p = name->d.ip->data;
++                if (ASN1_STRING_length(name->d.ip) == 4) {
++                    const unsigned char *p = ASN1_STRING_get0_data(name->d.ip);
+                     v = PyUnicode_FromFormat(
+                         "%d.%d.%d.%d",
+                         p[0], p[1], p[2], p[3]
+                     );
+-                } else if (name->d.ip->length == 16) {
+-                    unsigned char *p = name->d.ip->data;
++                } else if (ASN1_STRING_length(name->d.ip) == 16) {
++                    const unsigned char *p = ASN1_STRING_get0_data(name->d.ip);
+                     v = PyUnicode_FromFormat(
+                         "%X:%X:%X:%X:%X:%X:%X:%X",
+                         p[0] << 8 | p[1],
+@@ -1544,8 +1544,9 @@ _get_aia_uri(X509 *certificate, int nid) {
+             continue;
+         }
+         uri = ad->location->d.uniformResourceIdentifier;
+-        ostr = PyUnicode_FromStringAndSize((char *)uri->data,
+-                                           uri->length);
++        ostr = PyUnicode_FromStringAndSize(
++                   (const char *)ASN1_STRING_get0_data(uri),
++                   ASN1_STRING_length(uri));
+         if (ostr == NULL) {
+             goto fail;
+         }
+@@ -1611,8 +1612,9 @@ _get_crl_dp(X509 *certificate) {
+                 continue;
+             }
+             uri = gn->d.uniformResourceIdentifier;
+-            ouri = PyUnicode_FromStringAndSize((char *)uri->data,
+-                                               uri->length);
++            ouri = PyUnicode_FromStringAndSize(
++                       (const char *)ASN1_STRING_get0_data(uri),
++                       ASN1_STRING_length(uri));
+             if (ouri == NULL)
+                 goto done;
+ 
+-- 
+2.46.2.windows.1
+
