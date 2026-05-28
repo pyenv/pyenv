@@ -1721,22 +1721,28 @@ use_homebrew_openssl() {
     local ssldir="$(brew --prefix "${openssl}" || true)"
     if [ -d "$ssldir" ]; then
       echo "python-build: use ${openssl} from homebrew"
+      # Since 970acdcad3be4262451e9a5180a385dd2158eda3 (openssl@3 3.1.1),
+      # Homebrew's openssl@3 is no longer keg-only.
+      # Python's --with-openssl* appends flags to the compiler's command line,
+      # which in combination with adding Homebrew's general dir to flags
+      # always causes the build to link to the non-keg `openssl'
+      # when the non-keg-only formula is installed.
+      # To counter that, we have to prepend the openssl path to flags
+      # regardless of using Configure options.
       if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
         # configure script of newer CPython versions support `--with-openssl`
         # https://bugs.python.org/issue21541
         package_option python configure --with-openssl="${ssldir}"
-      else
-        export CPPFLAGS="-I$ssldir/include ${CPPFLAGS:+ $CPPFLAGS}"
-        export LDFLAGS="-L$ssldir/lib${LDFLAGS:+ $LDFLAGS}"
       fi
       # 3.10.0+ (https://github.com/python/cpython/pull/24820)
       # but has no effect until 3.11.0 (b9e9292d75fdea621e05e39b8629e6935d282d0d)
       # and broken in MacOS until 3.12.2 (cc13eabc7ce08accf49656e258ba500f74a1dae8)
       if [[ -n $PYTHON_BUILD_CONFIGURE_WITH_OPENSSL_RPATH ]]; then
         package_option python configure --with-openssl-rpath="${ssldir}/lib"
-      else
-        prepend_ldflags_libs "-Wl,-rpath,${ssldir}/lib"
       fi
+      export CPPFLAGS="-I${ssldir}/include ${CPPFLAGS:+ $CPPFLAGS}"
+      export LDFLAGS="-L${ssldir}/lib -Wl,-rpath,${ssldir}/lib${LDFLAGS:+ $LDFLAGS}"
+
       
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
       lock_in homebrew
