@@ -1,6 +1,6 @@
 prefer_openssl3
 export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
-export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL_RPATH=1
 export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
 export PYTHON_BUILD_CONFIGURE_WITH_DSYMUTIL=1
 install_package "openssl-3.6.0" "https://github.com/openssl/openssl/releases/download/openssl-3.6.0/openssl-3.6.0.tar.gz#b6a5f44b7eb69e3fa35dbf15524405b44837a481d43d81daddde3ff21fcbb8e9" mac_openssl --if has_broken_mac_openssl

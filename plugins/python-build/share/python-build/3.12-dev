@@ -1,5 +1,6 @@
 prefer_openssl3
 export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL_RPATH=1
 export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
 export PYTHON_BUILD_CONFIGURE_WITH_DSYMUTIL=1
 install_package "openssl-3.1.2" "https://www.openssl.org/source/openssl-3.1.2.tar.gz#a0ce69b8b97ea6a35b96875235aa453b966ba3cba8af2de23657d8b6767d6539" mac_openssl --if has_broken_mac_openssl

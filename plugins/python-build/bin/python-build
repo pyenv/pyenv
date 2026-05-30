@@ -1729,6 +1729,15 @@ use_homebrew_openssl() {
         export CPPFLAGS="-I$ssldir/include ${CPPFLAGS:+ $CPPFLAGS}"
         export LDFLAGS="-L$ssldir/lib${LDFLAGS:+ $LDFLAGS}"
       fi
+      # 3.10.0+ (https://github.com/python/cpython/pull/24820)
+      # but has no effect until 3.11.0 (b9e9292d75fdea621e05e39b8629e6935d282d0d)
+      # and broken in MacOS until 3.12.2 (cc13eabc7ce08accf49656e258ba500f74a1dae8)
+      if [[ -n $PYTHON_BUILD_CONFIGURE_WITH_OPENSSL_RPATH ]]; then
+        package_option python configure --with-openssl-rpath="${ssldir}/lib"
+      else
+        prepend_ldflags_libs "-Wl,-rpath,${ssldir}/lib"
+      fi
+      
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
       lock_in homebrew
       return 0
