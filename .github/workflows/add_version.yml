@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   add_cpython:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6

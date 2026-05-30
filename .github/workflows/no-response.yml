@@ -15,7 +15,7 @@ jobs:
     permissions:
       issues: write  #  to update issues (lee-dohm/no-response)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: lee-dohm/no-response@v0.5.0
         with:
