@@ -1,7 +1,7 @@
 From 2ba24f0a3739670ee84407ae3a92010a9657750b Mon Sep 17 00:00:00 2001
 From: Damien George <damien.p.george@gmail.com>
 Date: Thu, 21 May 2020 11:27:09 +1000
-Subject: [PATCH 4/4] py/py.mk: Use additional CFLAGS to compile string0.c.
+Subject: [PATCH 4/5] py/py.mk: Use additional CFLAGS to compile string0.c.
 
 Otherwise functions like memset might get optimised to call themselves (eg
 with gcc 10).  And provide CFLAGS_BUILTIN so these options can be changed

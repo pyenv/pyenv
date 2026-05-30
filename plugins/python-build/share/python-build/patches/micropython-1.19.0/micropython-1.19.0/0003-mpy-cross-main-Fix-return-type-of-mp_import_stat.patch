@@ -1,0 +1,28 @@
+From 816a39d543e44c90c17039d9b830e287a5887299 Mon Sep 17 00:00:00 2001
+From: Damien George <damien@micropython.org>
+Date: Tue, 7 Mar 2023 14:46:22 +1100
+Subject: [PATCH 3/3] mpy-cross/main: Fix return type of mp_import_stat.
+
+Fixes issue #10951.
+
+Signed-off-by: Damien George <damien@micropython.org>
+---
+ mpy-cross/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mpy-cross/main.c b/mpy-cross/main.c
+index f3ffff61f..d7ff09c0d 100644
+--- a/mpy-cross/main.c
++++ b/mpy-cross/main.c
+@@ -330,7 +330,7 @@ int main(int argc, char **argv) {
+     return main_(argc, argv);
+ }
+ 
+-uint mp_import_stat(const char *path) {
++mp_import_stat_t mp_import_stat(const char *path) {
+     (void)path;
+     return MP_IMPORT_STAT_NO_EXIST;
+ }
+-- 
+2.46.2.windows.1
+
