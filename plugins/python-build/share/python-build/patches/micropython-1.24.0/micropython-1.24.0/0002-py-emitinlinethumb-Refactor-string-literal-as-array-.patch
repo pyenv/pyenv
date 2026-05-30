@@ -1,0 +1,158 @@
+From 3f9037e0f94acff12c53bb59068dadc731e8b7c3 Mon Sep 17 00:00:00 2001
+From: Angus Gratton <angus@redyak.com.au>
+Date: Fri, 9 May 2025 13:36:05 +1000
+Subject: [PATCH 2/5] py/emitinlinethumb: Refactor string literal as array
+ initializer.
+
+Avoids the new Wunterminated-string-literal when compiled with gcc 15.1.
+
+This work was funded through GitHub Sponsors.
+
+Signed-off-by: Angus Gratton <angus@redyak.com.au>
+---
+ py/emitinlinethumb.c | 108 +++++++++++++++++++++----------------------
+ 1 file changed, 54 insertions(+), 54 deletions(-)
+
+diff --git a/py/emitinlinethumb.c b/py/emitinlinethumb.c
+index 7818bb4f4..d6596337a 100644
+--- a/py/emitinlinethumb.c
++++ b/py/emitinlinethumb.c
+@@ -150,27 +150,27 @@ typedef struct _reg_name_t { byte reg;
+                              byte name[3];
+ } reg_name_t;
+ static const reg_name_t reg_name_table[] = {
+-    {0, "r0\0"},
+-    {1, "r1\0"},
+-    {2, "r2\0"},
+-    {3, "r3\0"},
+-    {4, "r4\0"},
+-    {5, "r5\0"},
+-    {6, "r6\0"},
+-    {7, "r7\0"},
+-    {8, "r8\0"},
+-    {9, "r9\0"},
+-    {10, "r10"},
+-    {11, "r11"},
+-    {12, "r12"},
+-    {13, "r13"},
+-    {14, "r14"},
+-    {15, "r15"},
+-    {10, "sl\0"},
+-    {11, "fp\0"},
+-    {13, "sp\0"},
+-    {14, "lr\0"},
+-    {15, "pc\0"},
++    {0, {'r', '0' }},
++    {1, {'r', '1' }},
++    {2, {'r', '2' }},
++    {3, {'r', '3' }},
++    {4, {'r', '4' }},
++    {5, {'r', '5' }},
++    {6, {'r', '6' }},
++    {7, {'r', '7' }},
++    {8, {'r', '8' }},
++    {9, {'r', '9' }},
++    {10, {'r', '1', '0' }},
++    {11, {'r', '1', '1' }},
++    {12, {'r', '1', '2' }},
++    {13, {'r', '1', '3' }},
++    {14, {'r', '1', '4' }},
++    {15, {'r', '1', '5' }},
++    {10, {'s', 'l' }},
++    {11, {'f', 'p' }},
++    {13, {'s', 'p' }},
++    {14, {'l', 'r' }},
++    {15, {'p', 'c' }},
+ };
+ 
+ #define MAX_SPECIAL_REGISTER_NAME_LENGTH 7
+@@ -368,20 +368,20 @@ typedef struct _cc_name_t { byte cc;
+                             byte name[2];
+ } cc_name_t;
+ static const cc_name_t cc_name_table[] = {
+-    { ASM_THUMB_CC_EQ, "eq" },
+-    { ASM_THUMB_CC_NE, "ne" },
+-    { ASM_THUMB_CC_CS, "cs" },
+-    { ASM_THUMB_CC_CC, "cc" },
+-    { ASM_THUMB_CC_MI, "mi" },
+-    { ASM_THUMB_CC_PL, "pl" },
+-    { ASM_THUMB_CC_VS, "vs" },
+-    { ASM_THUMB_CC_VC, "vc" },
+-    { ASM_THUMB_CC_HI, "hi" },
+-    { ASM_THUMB_CC_LS, "ls" },
+-    { ASM_THUMB_CC_GE, "ge" },
+-    { ASM_THUMB_CC_LT, "lt" },
+-    { ASM_THUMB_CC_GT, "gt" },
+-    { ASM_THUMB_CC_LE, "le" },
++    { ASM_THUMB_CC_EQ, { 'e', 'q' }},
++    { ASM_THUMB_CC_NE, { 'n', 'e' }},
++    { ASM_THUMB_CC_CS, { 'c', 's' }},
++    { ASM_THUMB_CC_CC, { 'c', 'c' }},
++    { ASM_THUMB_CC_MI, { 'm', 'i' }},
++    { ASM_THUMB_CC_PL, { 'p', 'l' }},
++    { ASM_THUMB_CC_VS, { 'v', 's' }},
++    { ASM_THUMB_CC_VC, { 'v', 'c' }},
++    { ASM_THUMB_CC_HI, { 'h', 'i' }},
++    { ASM_THUMB_CC_LS, { 'l', 's' }},
++    { ASM_THUMB_CC_GE, { 'g', 'e' }},
++    { ASM_THUMB_CC_LT, { 'l', 't' }},
++    { ASM_THUMB_CC_GT, { 'g', 't' }},
++    { ASM_THUMB_CC_LE, { 'l', 'e' }},
+ };
+ 
+ typedef struct _format_4_op_t { byte op;
+@@ -389,21 +389,21 @@ typedef struct _format_4_op_t { byte op;
+ } format_4_op_t;
+ #define X(x) (((x) >> 4) & 0xff) // only need 1 byte to distinguish these ops
+ static const format_4_op_t format_4_op_table[] = {
+-    { X(ASM_THUMB_FORMAT_4_EOR), "eor" },
+-    { X(ASM_THUMB_FORMAT_4_LSL), "lsl" },
+-    { X(ASM_THUMB_FORMAT_4_LSR), "lsr" },
+-    { X(ASM_THUMB_FORMAT_4_ASR), "asr" },
+-    { X(ASM_THUMB_FORMAT_4_ADC), "adc" },
+-    { X(ASM_THUMB_FORMAT_4_SBC), "sbc" },
+-    { X(ASM_THUMB_FORMAT_4_ROR), "ror" },
+-    { X(ASM_THUMB_FORMAT_4_TST), "tst" },
+-    { X(ASM_THUMB_FORMAT_4_NEG), "neg" },
+-    { X(ASM_THUMB_FORMAT_4_CMP), "cmp" },
+-    { X(ASM_THUMB_FORMAT_4_CMN), "cmn" },
+-    { X(ASM_THUMB_FORMAT_4_ORR), "orr" },
+-    { X(ASM_THUMB_FORMAT_4_MUL), "mul" },
+-    { X(ASM_THUMB_FORMAT_4_BIC), "bic" },
+-    { X(ASM_THUMB_FORMAT_4_MVN), "mvn" },
++    { X(ASM_THUMB_FORMAT_4_EOR), {'e', 'o', 'r' }},
++    { X(ASM_THUMB_FORMAT_4_LSL), {'l', 's', 'l' }},
++    { X(ASM_THUMB_FORMAT_4_LSR), {'l', 's', 'r' }},
++    { X(ASM_THUMB_FORMAT_4_ASR), {'a', 's', 'r' }},
++    { X(ASM_THUMB_FORMAT_4_ADC), {'a', 'd', 'c' }},
++    { X(ASM_THUMB_FORMAT_4_SBC), {'s', 'b', 'c' }},
++    { X(ASM_THUMB_FORMAT_4_ROR), {'r', 'o', 'r' }},
++    { X(ASM_THUMB_FORMAT_4_TST), {'t', 's', 't' }},
++    { X(ASM_THUMB_FORMAT_4_NEG), {'n', 'e', 'g' }},
++    { X(ASM_THUMB_FORMAT_4_CMP), {'c', 'm', 'p' }},
++    { X(ASM_THUMB_FORMAT_4_CMN), {'c', 'm', 'n' }},
++    { X(ASM_THUMB_FORMAT_4_ORR), {'o', 'r', 'r' }},
++    { X(ASM_THUMB_FORMAT_4_MUL), {'m', 'u', 'l' }},
++    { X(ASM_THUMB_FORMAT_4_BIC), {'b', 'i', 'c' }},
++    { X(ASM_THUMB_FORMAT_4_MVN), {'m', 'v', 'n' }},
+ };
+ #undef X
+ 
+@@ -428,10 +428,10 @@ typedef struct _format_vfp_op_t {
+     char name[3];
+ } format_vfp_op_t;
+ static const format_vfp_op_t format_vfp_op_table[] = {
+-    { 0x30, "add" },
+-    { 0x34, "sub" },
+-    { 0x20, "mul" },
+-    { 0x80, "div" },
++    { 0x30, {'a', 'd', 'd' }},
++    { 0x34, {'s', 'u', 'b' }},
++    { 0x20, {'m', 'u', 'l' }},
++    { 0x80, {'d', 'i', 'v' }},
+ };
+ 
+ // shorthand alias for whether we allow ARMv7-M instructions
+-- 
+2.46.2.windows.1
+
