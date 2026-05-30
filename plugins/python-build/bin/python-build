@@ -2101,10 +2101,12 @@ build_package_symlink_version_suffix() {
 
 verify_python() {
   build_package_symlink_version_suffix
+  
+  local python_bin="${PYTHON_BIN%/*}/python${1:?}"
 
-  if [ ! -x "${PYTHON_BIN}" ]; then
+  if [ ! -x "${python_bin}" ]; then
     { colorize 1 "ERROR"
-      echo ": invalid Python executable: ${PYTHON_BIN}"
+      echo ": invalid Python executable: ${python_bin}"
       echo
       echo "The python-build could not find proper executable of Python after successful build."
       echo "Please open an issue for future improvements."
