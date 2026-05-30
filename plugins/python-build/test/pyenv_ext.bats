@@ -259,7 +259,7 @@ OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 echo "PYTHON_CONFIGURE_OPTS=(\${PYTHON_CONFIGURE_OPTS})"
 echo "CONFIGURE_OPTS=(\${CONFIGURE_OPTS})"
-verify_python python3.4
+verify_python 3.4
 OUT
   assert_success
   assert_output <<EOS
