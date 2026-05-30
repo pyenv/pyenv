@@ -1,0 +1,31 @@
+From 086852ac5aeb169835a924f1962fdaeea3c7414e Mon Sep 17 00:00:00 2001
+From: Damien George <damien.p.george@gmail.com>
+Date: Wed, 6 Feb 2019 01:12:51 +1100
+Subject: [PATCH 3/3] lib/utils/printf: Exclude __GI_vsnprintf alias for gcc 9
+ and above.
+
+See issue #4457.
+---
+ lib/utils/printf.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lib/utils/printf.c b/lib/utils/printf.c
+index 1ceeea39f..0c21fc4c0 100644
+--- a/lib/utils/printf.c
++++ b/lib/utils/printf.c
+@@ -99,9 +99,11 @@ STATIC void strn_print_strn(void *data, const char *str, size_t len) {
+     strn_print_env->remain -= len;
+ }
+ 
+-#if defined(__GNUC__) && !defined(__clang__)
++#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 9
+ // uClibc requires this alias to be defined, or there may be link errors
+ // when linkings against it statically.
++// GCC 9 gives a warning about missing attributes so it's excluded until
++// uClibc+GCC9 support is needed.
+ int __GI_vsnprintf(char *str, size_t size, const char *fmt, va_list ap) __attribute__((weak, alias ("vsnprintf")));
+ #endif
+ 
+-- 
+2.46.2.windows.1
+
