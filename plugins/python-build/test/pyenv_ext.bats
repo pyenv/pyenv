@@ -233,7 +233,7 @@ OUT
   chmod +x "${INSTALL_ROOT}/bin/python3.4-config"
 
   TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
-verify_python python3.4
+verify_python 3.4
 OUT
   assert_success
 
