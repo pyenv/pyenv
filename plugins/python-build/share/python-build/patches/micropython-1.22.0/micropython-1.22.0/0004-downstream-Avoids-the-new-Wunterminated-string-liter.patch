@@ -1,7 +1,7 @@
 From 933867777002e4652a8e73efe8dafd5f48db771e Mon Sep 17 00:00:00 2001
 From: Ivan Pozdeev <vano@mail.mipt.ru>
 Date: Sat, 30 May 2026 13:26:40 +0300
-Subject: [PATCH 4/4] (downstream) Avoids the new Wunterminated-string-literal
+Subject: [PATCH 4/5] (downstream) Avoids the new Wunterminated-string-literal
  when compiled with gcc 15.1.
 
 ---

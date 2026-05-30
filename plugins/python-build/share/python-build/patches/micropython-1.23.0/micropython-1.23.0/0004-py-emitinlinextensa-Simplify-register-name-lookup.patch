@@ -1,7 +1,7 @@
 From acd88980b95f8e6e331310b9f6154f6423464840 Mon Sep 17 00:00:00 2001
 From: Alessandro Gatti <a.gatti@frob.it>
 Date: Tue, 28 Jan 2025 14:58:29 +0100
-Subject: [PATCH 4/4] py/emitinlinextensa: Simplify register name lookup.
+Subject: [PATCH 4/5] py/emitinlinextensa: Simplify register name lookup.
 
 This commit changes the Xtensa inline assembly parser to use a slightly
 simpler (and probably a tiny bit more efficient) way to look up register
