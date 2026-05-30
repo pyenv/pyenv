@@ -1,7 +1,7 @@
 From 5692229faee3b5cb8beca027e3240662e4f31629 Mon Sep 17 00:00:00 2001
 From: Angus Gratton <angus@redyak.com.au>
 Date: Fri, 9 May 2025 13:34:37 +1000
-Subject: [PATCH 3/3] extmod/moductypes: Refactor string literal as array
+Subject: [PATCH 3/4] extmod/moductypes: Refactor string literal as array
  initializer.
 
 Avoids the new Wunterminated-string-literal when compiled with gcc 15.1.
