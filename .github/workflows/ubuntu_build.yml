@@ -18,6 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2      
+        with:
+            create-symlink: true
+            key: ${{ github.job }}-${{ matrix.python-version }}
       - run: |
           sudo apt-get update -q; sudo apt install -yq make build-essential libssl-dev zlib1g-dev \
           libbz2-dev libreadline-dev libsqlite3-dev curl \
