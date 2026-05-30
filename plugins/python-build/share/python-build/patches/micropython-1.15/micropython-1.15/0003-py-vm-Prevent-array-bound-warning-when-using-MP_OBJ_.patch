@@ -1,7 +1,7 @@
 From 927374e5a639cb19095774bcdf6e9dfc5928b3d6 Mon Sep 17 00:00:00 2001
 From: Damien George <damien@micropython.org>
 Date: Thu, 31 Mar 2022 10:57:34 +1100
-Subject: [PATCH 3/4] py/vm: Prevent array bound warning when using
+Subject: [PATCH 3/5] py/vm: Prevent array bound warning when using
  -MP_OBJ_ITER_BUF_NSLOTS.
 
 This warning can happen on clang 13.0.1 building mpy-cross:

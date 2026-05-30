@@ -1,7 +1,7 @@
 From 2502e4f856bf68a83fe2f5d269c9c19775218899 Mon Sep 17 00:00:00 2001
 From: Damien George <damien.p.george@gmail.com>
 Date: Wed, 6 Feb 2019 01:12:51 +1100
-Subject: [PATCH 4/5] lib/utils/printf: Exclude __GI_vsnprintf alias for gcc 9
+Subject: [PATCH 4/6] lib/utils/printf: Exclude __GI_vsnprintf alias for gcc 9
  and above.
 
 See issue #4457.

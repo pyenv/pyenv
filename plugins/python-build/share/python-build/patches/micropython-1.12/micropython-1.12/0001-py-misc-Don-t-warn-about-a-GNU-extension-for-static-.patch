@@ -1,7 +1,7 @@
 From c6cd2ee8359ca96d71ee8489927830fd80cca5e6 Mon Sep 17 00:00:00 2001
 From: Jeff Epler <jepler@unpythonic.net>
 Date: Sat, 27 Sep 2025 19:29:49 -0500
-Subject: [PATCH 1/5] py/misc: Don't warn about a GNU extension for static
+Subject: [PATCH 1/6] py/misc: Don't warn about a GNU extension for static
  assert macro.
 
 This warning was enabled by default on clang 17.0.0 on macOS 26.  Disable

@@ -1,7 +1,7 @@
 From 1dd54366b4ad01b2b9312f767eebf1e5ae0c6109 Mon Sep 17 00:00:00 2001
 From: Damien George <damien@micropython.org>
 Date: Tue, 7 Mar 2023 14:46:22 +1100
-Subject: [PATCH 5/5] mpy-cross/main: Fix return type of mp_import_stat.
+Subject: [PATCH 5/6] mpy-cross/main: Fix return type of mp_import_stat.
 
 Fixes issue #10951.
 
