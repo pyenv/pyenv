@@ -14,8 +14,11 @@ jobs:
         run: >
           versions=$(git diff "origin/$GITHUB_BASE_REF" --name-only -z
           | perl -ne 'BEGIN {$\="\n";$/="\0";} chomp;
-            if (/^plugins\/python-build\/share\/python-build\/(?:([^\/]+)|patches\/([^\/]+)\/.*)$/ and -e $& )
-                { print $1.$2; }' \
+            if (/^(plugins\/python-build\/share\/python-build\/)(?:([^\/]+)|patches\/([^\/]+)\/.*)$/ and -e $& )
+                {
+                  print $2.$3;
+                  if ( -e $1.$2.$3.t ) { print $2.$3.t; }
+                }' \
           | sort -u);
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64);
           echo "versions<<$EOF" >> $GITHUB_ENV;
