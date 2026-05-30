@@ -1,7 +1,7 @@
 From 3f9037e0f94acff12c53bb59068dadc731e8b7c3 Mon Sep 17 00:00:00 2001
 From: Angus Gratton <angus@redyak.com.au>
 Date: Fri, 9 May 2025 13:36:05 +1000
-Subject: [PATCH 2/2] py/emitinlinethumb: Refactor string literal as array
+Subject: [PATCH 2/4] py/emitinlinethumb: Refactor string literal as array
  initializer.
 
 Avoids the new Wunterminated-string-literal when compiled with gcc 15.1.
