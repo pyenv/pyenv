@@ -1,7 +1,7 @@
 From 84b63c426da324dc4cf6b139057862f79ec3d3e4 Mon Sep 17 00:00:00 2001
 From: Damien George <damien@micropython.org>
 Date: Wed, 3 May 2023 15:23:24 +1000
-Subject: [PATCH 2/2] py/stackctrl: Add gcc pragmas to ignore dangling-pointer
+Subject: [PATCH 2/3] py/stackctrl: Add gcc pragmas to ignore dangling-pointer
  warning.
 
 This warning became apparent in gcc 13.
