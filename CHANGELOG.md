@@ -1,5 +1,19 @@
 # Version History
 
+## Release v2.6.32
+* Add miniconda3 26.3.2-2, miniforge3 26.3.2-0, 26.3.2-1 by @native-api in https://github.com/pyenv/pyenv/pull/3445
+* miniforge3 26.1, 26.3, add_miniforge: exclude .pkg installers by @native-api in https://github.com/pyenv/pyenv/pull/3446
+* miniforge 26, CI: switch check to 3.13 by @native-api in https://github.com/pyenv/pyenv/pull/3447
+* 2.7, 3.4: force C99 standard; 2.7.14-18: force OpenSSL 1 formula by @native-api in https://github.com/pyenv/pyenv/pull/3448
+* rehash: detect and remove a stale lockfile by @native-api in https://github.com/pyenv/pyenv/pull/3450
+* Add GraalPy 25.0.3 by @msimacek in https://github.com/pyenv/pyenv/pull/3452
+* 3.11.0+: Use the `--with-openssl-rpath' Configure option when possible by @native-api in https://github.com/pyenv/pyenv/pull/3458
+* python_build: Make `verify_python` verify `pythonX.Y' suffix by @native-api in https://github.com/pyenv/pyenv/pull/3459
+* Add micropython 1.22.0 to 1.28.0; add downstream patches to fix compilation errors by @native-api in https://github.com/pyenv/pyenv/pull/3460
+* Fix linking against a keg_only Homebrew OpenSSL when a a non-keg_only one is also installed by @native-api in https://github.com/pyenv/pyenv/pull/3462
+* Add missing CPython 3.14.2t by @native-api in https://github.com/pyenv/pyenv/pull/3464
+* 3.14.0-5: Support building against OpenSSL 4 by @native-api in https://github.com/pyenv/pyenv/pull/3463
+
 ## Release v2.6.31
 * CI: add_cpython: Support prereleases for non-initial CPython releases by @native-api in https://github.com/pyenv/pyenv/pull/3443
 * Add CPython 3.14.5 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3444
