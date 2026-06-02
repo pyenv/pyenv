@@ -2678,7 +2678,7 @@ if [ -z "${GET_PIP_URL}" ]; then
     2.6 | 2.6.* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/2.6/get-pip.py"
       ;;
-    2.7 | 2.7.* | pypy2.7 | pypy2.7-* )
+    2.7 | 2.7.* | pypy2.7 | pypy2.7-* | pypy-c-jit-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/2.7/get-pip.py"
       ;;
     3.2 | 3.2.* )
