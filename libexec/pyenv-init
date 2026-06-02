@@ -137,7 +137,6 @@ function detect_profile() {
     rc=
     profile_explain='your shell'\''s login startup file'
     rc_explain='your shell'\''s interactive startup file'
-    fi
     ;;
   esac
 }
