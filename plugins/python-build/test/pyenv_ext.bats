@@ -391,32 +391,35 @@ OUT
 @test "use custom GET_PIP_URLs" {
 
   declare -a name_subdir=(\
-  (2.6)
-  (2.7)
-  (3.2)
-  (3.3)
-  (3.4)
-  (3.5)
-  (3.6)
-  (3.7)
-  (3.8)
-  (3.9)
-  (pypy2.7-7.3.12 2.7)
-  (pypy3.5-7.0.0 3.5)
-  (pypy3.6-7.3.3 3.6)
-  (pypy3.8-7.3.3 3.8)
-  (pypy3.9-7.3.8 3.9)
-  (pypy3.9-7.3.16 3.9)
-  (pyston-2.3.5 3.8)
+  2.6
+  2.7
+  3.2
+  3.3
+  3.4
+  3.5
+  3.6
+  3.7
+  3.8
+  3.9
+
+  "pypy2.7-7.3.12   2.7"
+  "pypy3.5-7.0.0    3.5"
+  "pypy3.6-7.3.3    3.6"
+  "pypy3.7-7.3.3    3.7"
+  "pypy3.8-7.3.8    3.8"
+  "pypy3.9-7.3.16   3.9"
+
+  "pyston-2.3.5     3.8"
   )
 
-  for item in "${name_subdir[@]}"; do
+  for item_s in "${name_subdir[@]}"; do
+    item=($item_s)
     name="${item[0]}"
     subdir="${item[1]:-$name}"
     run_inline_definition_with_name --name="$name" <<OUT
-echo "\${GET_PIP_URL}"
+echo "\${DEFINITION_PATH##*/}:\${GET_PIP_URL}"
 OUT
-    assert_output "https://bootstrap.pypa.io/pip/$subdir/get-pip.py"
+    assert_output "$name:https://bootstrap.pypa.io/pip/$subdir/get-pip.py"
     assert_success
   done
 }

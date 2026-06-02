@@ -2703,7 +2703,7 @@ if [ -z "${GET_PIP_URL}" ]; then
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.8/get-pip.py"
       ;;
     3.9 | 3.9.* | pypy3.9 | pypy3.9-* )
-      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.8/get-pip.py"
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.9/get-pip.py"
       ;;
     * )
       GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
