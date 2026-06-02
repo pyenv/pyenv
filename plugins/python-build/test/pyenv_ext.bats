@@ -403,6 +403,7 @@ OUT
   3.9
 
   "pypy2.7-7.3.12   2.7"
+  "pypy-c-jit-latest-linux    2.7"
   "pypy3.5-7.0.0    3.5"
   "pypy3.6-7.3.3    3.6"
   "pypy3.7-7.3.3    3.7"
