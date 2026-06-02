@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Summary: Configure the shell environment for pyenv
-# Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--detect-shell] [--no-rehash] [<shell>])"
+# Usage: eval "$(pyenv init [-|--path] [--no-push-path] [--no-rehash] [<shell>])"
+#        pyenv init --install [<shell>]
+#        pyenv init --detect-shell [<shell>]
 
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -9,6 +11,7 @@ set -e
 if [ "$1" = "--complete" ]; then
   echo -
   echo --path
+  echo --install
   echo --no-push-path
   echo --no-rehash
   echo --detect-shell
@@ -29,6 +32,9 @@ while [ "$#" -gt 0 ]; do
       ;;
     --path)
       mode="path"
+      ;;
+    --install)
+      mode="install"
       ;;
     --detect-shell)
       mode="detect-shell"
@@ -81,8 +87,12 @@ function main() {
     exit 0
     ;;
   "detect-shell")
-    detect_profile 1
+    detect_profile
     print_detect_shell
+    exit 0
+    ;;
+  "install")
+    install_shell_startup_files
     exit 0
     ;;
   esac
@@ -91,17 +101,19 @@ function main() {
 }
 
 function detect_profile() {
-  local detect_for_detect_shell="$1"
-
   case "$shell" in
   bash )
-    if [ -e '~/.bash_profile' ]; then
+    if [ -e "${HOME}/.bash_profile" ]; then
       profile='~/.bash_profile'
     else
       profile='~/.profile'
     fi
     profile_explain="~/.bash_profile if it exists, otherwise ~/.profile"
     rc='~/.bashrc'
+    ;;
+  fish )
+    profile='~/.config/fish/config.fish'
+    rc='~/.config/fish/config.fish'
     ;;
   pwsh )
     profile='~/.config/powershell/profile.ps1'
@@ -121,13 +133,10 @@ function detect_profile() {
     rc='~/.profile'
     ;;
   * )
-    if [ -n "$detect_for_detect_shell" ]; then
-      profile=
-      rc=
-    else
-      profile='your shell'\''s login startup file'
-      rc='your shell'\''s interactive startup file'
-    fi
+    profile=
+    rc=
+    profile_explain='your shell'\''s login startup file'
+    rc_explain='your shell'\''s interactive startup file'
     ;;
   esac
 }
@@ -146,44 +155,186 @@ function help_() {
       echo "# Add pyenv executable to PATH by running"
       echo "# the following interactively:"
       echo
-      echo 'set -Ux PYENV_ROOT $HOME/.pyenv'
-      echo 'set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths'
+      print_fish_user_path_setup
       echo
       echo "# Load pyenv automatically by appending"
       echo "# the following to ~/.config/fish/config.fish:"
       echo
-      echo 'pyenv init - fish | source'
+      print_fish_shell_setup
       echo
       ;;
     pwsh )
       echo '# Load pyenv automatically by appending'
       echo "# the following to $profile :"
       echo
-      echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"'
-      echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {'
-      echo '  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }'
-      echo 'iex ((pyenv init -) -join "`n")'
+      print_pwsh_shell_setup
       ;;
     * )
       echo '# Load pyenv automatically by appending'
       echo -n "# the following to "
-      if [ "$profile" == "$rc" ]; then
-        echo "$profile :"
+      if [[ "$profile" == "$rc" && -z $rc_explain ]]; then
+        echo "${profile_explain:-$profile} :"
       else
         echo
         echo "# ${profile_explain:-$profile} (for login shells)"
-        echo "# and $rc (for interactive shells) :"
+        echo "# and ${rc_explain:-$rc} (for interactive shells) :"
       fi
       echo
-      echo 'export PYENV_ROOT="$HOME/.pyenv"'
-      echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
-      echo 'eval "$(pyenv init - '$shell')"'
+      print_posix_shell_setup
       ;;
     esac
     echo
     echo '# Restart your shell for the changes to take effect.'
     echo
   } >&2
+}
+
+function print_posix_shell_setup() {
+  echo 'export PYENV_ROOT="$HOME/.pyenv"'
+  echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
+  echo 'eval "$(pyenv init - '$shell')"'
+}
+
+function print_fish_shell_setup() {
+  echo 'pyenv init - fish | source'
+}
+
+function print_fish_user_path_setup() {
+  echo 'set -Ux PYENV_ROOT $HOME/.pyenv'
+  echo 'if functions -q fish_add_path'
+  echo '  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin'
+  echo 'else'
+  echo '  test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths'
+  echo 'end'
+}
+
+function print_pwsh_shell_setup() {
+  echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"'
+  echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {'
+  echo '  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }'
+  echo 'iex ((pyenv init -) -join "`n")'
+}
+
+function expand_home_path() {
+  local path="$1"
+  printf '%s\n' "${path/#\~/$HOME}"
+}
+
+function install_shell_startup_files() {
+  if [[ -z $HOME ]]; then
+    echo "pyenv: HOME must be set to configure shell startup files" >&2
+    return 1
+  fi
+
+  detect_profile
+
+  local files=()
+  local lines=()
+  local profile_path rc_path setup
+
+  case "$shell" in
+  bash | zsh | ksh | ksh93 | mksh )
+    rc_path="$(expand_home_path "$rc")"
+    profile_path="$(expand_home_path "$profile")"
+    setup="$(print_posix_shell_setup)"
+    files=("$rc_path")
+    lines=("$setup")
+    if [[ $profile_path != "$rc_path" ]]; then
+      files+=("$profile_path")
+      lines+=("$setup")
+    fi
+    ;;
+  fish )
+    rc_path="$(expand_home_path "$rc")"
+    files=("$rc_path")
+    lines=("$(print_fish_shell_setup)")
+    ;;
+  pwsh )
+    rc_path="$(expand_home_path "$rc")"
+    files=("$rc_path")
+    lines=("$(print_pwsh_shell_setup)")
+    ;;
+  * )
+    echo "pyenv: cannot automatically configure startup files for $shell" >&2
+    return 1
+    ;;
+  esac
+
+  local index
+  for ((index = 0; index < ${#files[@]}; index++)); do
+    check_startup_file "${files[$index]}" || return 1
+  done
+
+  if [[ $shell == fish ]]; then
+    install_fish_user_paths || return 1
+  fi
+
+  for ((index = 0; index < ${#files[@]}; index++)); do
+    append_lines "${files[$index]}" "${lines[$index]}"
+  done
+}
+
+function check_startup_file() {
+  local file="$1"
+  local grep_status
+
+  if [[ ! -e $file ]]; then
+    return 0
+  fi
+
+  if [[ ! -f $file || ! -r $file ]]; then
+    echo "pyenv: failed to inspect $file" >&2
+    return 1
+  fi
+
+  if grep -Fi pyenv "$file" >/dev/null; then
+    echo "pyenv: cannot automatically apply changes to $file: it appears to already contain Pyenv-related code." >&2
+    echo "pyenv: review the file's contents and apply changes manually if necessary." >&2
+    echo "pyenv: run \`pyenv init $shell\` to see the suggested setup." >&2
+    return 1
+  else
+    grep_status=$?
+    if [[ $grep_status == 1 ]]; then
+      return 0
+    fi
+    echo "pyenv: failed to inspect $file" >&2
+    return "$grep_status"
+  fi
+}
+
+function install_fish_user_paths() {
+  local fish_setup
+
+  if ! command -v fish >/dev/null; then
+    echo "pyenv: fish is not available to configure fish universal variables" >&2
+    return 1
+  fi
+
+  fish_setup="$(print_fish_user_path_setup)"
+  if ! fish -c "$fish_setup"; then
+    echo "pyenv: failed to configure fish universal variables" >&2
+    return 1
+  fi
+}
+
+function append_lines() {
+  local file="$1"
+  local lines="$2"
+  local dir last_char
+
+  dir="${file%/*}"
+  if [[ $dir != "$file" ]]; then
+    mkdir -p "$dir"
+  fi
+
+  if [[ -s $file ]]; then
+    last_char="$(tail -c 1 "$file")" || return 1
+    if [[ -n $last_char ]]; then
+      echo >> "$file"
+    fi
+  fi
+
+  printf '%s\n' "$lines" >> "$file"
 }
 
 function init_dirs() {

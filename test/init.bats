@@ -79,6 +79,134 @@ OUT
   assert_line "PYENV_SHELL_DETECT=bash"
 }
 
+@test "shell detection for fish startup file" {
+  run pyenv-init --detect-shell fish
+  assert_success
+  assert_line "PYENV_SHELL_DETECT=fish"
+  assert_line "PYENV_PROFILE_DETECT=~/.config/fish/config.fish"
+  assert_line "PYENV_RC_DETECT=~/.config/fish/config.fish"
+}
+
+@test "completion includes install option" {
+  run pyenv-init --complete
+  assert_success
+  assert_line "--install"
+}
+
+@test "install setup for detected shell startup files" {
+  mkdir -p "$HOME"
+
+  run pyenv-init --install
+  assert_success
+
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
+  assert_equal "$expected_setup" "$(cat "$HOME/.bashrc")"
+  assert_equal "$expected_setup" "$(cat "$HOME/.profile")"
+}
+
+@test "install setup for bash uses existing bash_profile" {
+  mkdir -p "$HOME"
+  touch "$HOME/.bash_profile"
+
+  run pyenv-init --install bash
+  assert_success
+
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
+  assert_equal "$expected_setup" "$(cat "$HOME/.bashrc")"
+  assert_equal "$expected_setup" "$(cat "$HOME/.bash_profile")"
+  assert [ ! -e "$HOME/.profile" ]
+}
+
+@test "install setup for zsh startup files" {
+  mkdir -p "$HOME"
+
+  run pyenv-init --install zsh
+  assert_success
+
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - zsh)"'
+  assert_equal "$expected_setup" "$(cat "$HOME/.zshrc")"
+  assert_equal "$expected_setup" "$(cat "$HOME/.zprofile")"
+}
+
+@test "install setup for fish startup file" {
+  mkdir -p "$HOME"
+  create_stub fish <<OUT
+printf '%s\n' "\$2" > "$PYENV_TEST_DIR/fish-script"
+OUT
+
+  run pyenv-init --install fish
+  assert_success
+
+  expected_fish_script=$'set -Ux PYENV_ROOT $HOME/.pyenv\nif functions -q fish_add_path\n  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin\nelse\n  test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths\nend'
+  expected_setup='pyenv init - fish | source'
+  assert_equal "$expected_fish_script" "$(cat "$PYENV_TEST_DIR/fish-script")"
+  assert_equal "$expected_setup" "$(cat "$HOME/.config/fish/config.fish")"
+}
+
+@test "install setup for pwsh startup file" {
+  mkdir -p "$HOME"
+
+  run pyenv-init --install pwsh
+  assert_success
+
+  expected_setup=$'$Env:PYENV_ROOT="$Env:HOME/.pyenv"\nif (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {\n  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }\niex ((pyenv init -) -join "`n")'
+  assert_equal "$expected_setup" "$(cat "$HOME/.config/powershell/profile.ps1")"
+}
+
+@test "install refuses to modify files with pyenv-related code" {
+  mkdir -p "$HOME"
+  echo 'eval "$(pyenv init -)"' > "$HOME/.bashrc"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: cannot automatically apply changes to $HOME/.bashrc: it appears to already contain Pyenv-related code."
+  assert_line "pyenv: review the file's contents and apply changes manually if necessary."
+  assert_line "pyenv: run \`pyenv init bash\` to see the suggested setup."
+
+  assert_equal 'eval "$(pyenv init -)"' "$(cat "$HOME/.bashrc")"
+  assert [ ! -e "$HOME/.profile" ]
+}
+
+@test "install treats PYENV_ROOT as pyenv-related code" {
+  mkdir -p "$HOME"
+  echo 'export PYENV_ROOT="$HOME/tools/python-env"' > "$HOME/.bashrc"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: cannot automatically apply changes to $HOME/.bashrc: it appears to already contain Pyenv-related code."
+}
+
+@test "install refuses unreadable startup file without partial writes" {
+  mkdir -p "$HOME/.bashrc"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: failed to inspect $HOME/.bashrc"
+
+  assert [ ! -e "$HOME/.profile" ]
+}
+
+@test "install setup keeps fish block intact when generic lines already exist" {
+  mkdir -p "$HOME/.config/fish"
+  create_stub fish <<OUT
+exit 0
+OUT
+  echo "end" > "$HOME/.config/fish/config.fish"
+
+  run pyenv-init --install fish
+  assert_success
+
+  expected_setup=$'end\npyenv init - fish | source'
+  assert_equal "$expected_setup" "$(cat "$HOME/.config/fish/config.fish")"
+}
+
+@test "install setup fails gracefully for unsupported shell" {
+  mkdir -p "$HOME"
+
+  run pyenv-init --install nu
+  assert_failure "pyenv: cannot automatically configure startup files for nu"
+}
+
 @test "option to skip rehash" {
   run pyenv-init - --no-rehash
   assert_success
