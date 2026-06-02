@@ -1,0 +1,64 @@
+From cc13eabc7ce08accf49656e258ba500f74a1dae8 Mon Sep 17 00:00:00 2001
+From: Ronald Oussoren <ronaldoussoren@mac.com>
+Date: Thu, 28 Dec 2023 09:42:05 +0100
+Subject: [PATCH] gh-110459: Make sure --with-openssl-rpath works on macOS
+ (#113441)
+
+* gh-110459: Make sure --with-openssl-rpath works on macOS
+
+On macOS the `-rpath` linker flag is spelled differently
+than on on platforms.
+---
+ .../macOS/2023-12-23-22-41-07.gh-issue-110459.NaMBJy.rst   | 2 ++
+ configure                                                  | 7 ++++++-
+ configure.ac                                               | 7 ++++++-
+ 3 files changed, 14 insertions(+), 2 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/macOS/2023-12-23-22-41-07.gh-issue-110459.NaMBJy.rst
+
+diff --git a/Misc/NEWS.d/next/macOS/2023-12-23-22-41-07.gh-issue-110459.NaMBJy.rst b/Misc/NEWS.d/next/macOS/2023-12-23-22-41-07.gh-issue-110459.NaMBJy.rst
+new file mode 100644
+index 00000000000..44ffd857785
+--- /dev/null
++++ b/Misc/NEWS.d/next/macOS/2023-12-23-22-41-07.gh-issue-110459.NaMBJy.rst
+@@ -0,0 +1,2 @@
++Running ``configure ... --with-openssl-rpath=X/Y/Z`` no longer fails to detect
++OpenSSL on macOS.
+diff --git a/configure b/configure
+index 7e50abc29d0..6d65d3abc18 100755
+--- a/configure
++++ b/configure
+@@ -27478,7 +27478,12 @@ then :
+ 
+ else $as_nop
+ 
+-  rpath_arg="-Wl,-rpath="
++  if test "$ac_sys_system" = "Darwin"
++  then
++     rpath_arg="-Wl,-rpath,"
++  else
++     rpath_arg="-Wl,-rpath="
++  fi
+ 
+ fi
+ 
+diff --git a/configure.ac b/configure.ac
+index e064848af9e..bfdabc4474e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -6808,7 +6808,12 @@ AX_CHECK_OPENSSL([have_openssl=yes],[have_openssl=no])
+ AS_VAR_IF([GNULD], [yes], [
+   rpath_arg="-Wl,--enable-new-dtags,-rpath="
+ ], [
+-  rpath_arg="-Wl,-rpath="
++  if test "$ac_sys_system" = "Darwin"
++  then
++     rpath_arg="-Wl,-rpath,"
++  else
++     rpath_arg="-Wl,-rpath="
++  fi
+ ])
+ 
+ AC_MSG_CHECKING([for --with-openssl-rpath])
+-- 
+2.46.2.windows.1
+

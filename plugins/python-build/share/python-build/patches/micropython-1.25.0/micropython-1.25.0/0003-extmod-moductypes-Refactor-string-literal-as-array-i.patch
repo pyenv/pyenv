@@ -1,0 +1,46 @@
+From 5692229faee3b5cb8beca027e3240662e4f31629 Mon Sep 17 00:00:00 2001
+From: Angus Gratton <angus@redyak.com.au>
+Date: Fri, 9 May 2025 13:34:37 +1000
+Subject: [PATCH 3/4] extmod/moductypes: Refactor string literal as array
+ initializer.
+
+Avoids the new Wunterminated-string-literal when compiled with gcc 15.1.
+
+Also split out the duplicate string to a top-level array (probably the
+duplicate string literal was interned, so unlikely to have any impact.)
+
+This work was funded through GitHub Sponsors.
+
+Signed-off-by: Angus Gratton <angus@redyak.com.au>
+---
+ extmod/moductypes.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/extmod/moductypes.c b/extmod/moductypes.c
+index bf4579765..54abce79e 100644
+--- a/extmod/moductypes.c
++++ b/extmod/moductypes.c
+@@ -277,15 +277,18 @@ static mp_obj_t uctypes_struct_sizeof(size_t n_args, const mp_obj_t *args) {
+ }
+ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(uctypes_struct_sizeof_obj, 1, 2, uctypes_struct_sizeof);
+ 
++static const char type2char[16] = {
++    'B', 'b', 'H', 'h', 'I', 'i', 'Q', 'q',
++    '-', '-', '-', '-', '-', '-', 'f', 'd'
++};
++
+ static inline mp_obj_t get_unaligned(uint val_type, byte *p, int big_endian) {
+     char struct_type = big_endian ? '>' : '<';
+-    static const char type2char[16] = "BbHhIiQq------fd";
+     return mp_binary_get_val(struct_type, type2char[val_type], p, &p);
+ }
+ 
+ static inline void set_unaligned(uint val_type, byte *p, int big_endian, mp_obj_t val) {
+     char struct_type = big_endian ? '>' : '<';
+-    static const char type2char[16] = "BbHhIiQq------fd";
+     mp_binary_set_val(struct_type, type2char[val_type], val, p, &p);
+ }
+ 
+-- 
+2.46.2.windows.1
+
