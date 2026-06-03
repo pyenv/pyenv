@@ -21,7 +21,7 @@ acquire_lock() {
   # Assuming an old lockfile is stale
   # Unknown why this happens for some users but this at least unblocks them
   last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" \
-    || { find "$PROTOTYPE_SHIM_PATH" -mmin +10 -exec rm -f {} \; ; ret=1; }
+    || { find "$PROTOTYPE_SHIM_PATH" -mmin +2 -exec rm -f {} \; ; ret=1; }
   set +o noclobber
   [[ -z "${ret}" ]]
 }
@@ -35,6 +35,19 @@ release_lock() {
 }
 
 if [ ! -w "$SHIM_PATH" ]; then
+  echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2
+  exit 1
+fi
+
+# Remove any stale lock file (> 2 min old) before entering the wait loop.
+# A healthy rehash completes in well under 2 minutes on any normal system.
+# This prevents a full 60 s hang caused by a lock left by a previously crashed process.
+find "$PROTOTYPE_SHIM_PATH" -mmin +2 -exec rm -f {} \; 2>/dev/null || true
+
+# Verify actual write capability before the loop (catches Landlock/Seatbelt
+# sandbox restrictions that fool the -w test above).
+if ! _tmpfile="$(TMPDIR="$SHIM_PATH" mktemp 2>/dev/null)" || \
+   ! rm -f "$_tmpfile" 2>/dev/null; then
   echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2
   exit 1
 fi
