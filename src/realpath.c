@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int realpath_builtin(list)
-WORD_LIST *list;
+int realpath_builtin(WORD_LIST *list)
 {
 	int es;
 	char *realbuf, *p;
