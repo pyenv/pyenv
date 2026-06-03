@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.7.1
+* Support 3.9 EOL Pip URL, consolidate tests by @native-api in https://github.com/pyenv/pyenv/pull/3465
+* Update URLs for PyPy nightly; Remove pypy3.5 and pypy3.7 nightly by @native-api in https://github.com/pyenv/pyenv/pull/3466
+* Add CPython 3.15.0b2 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3467
+* init: add --install for shell setup by @macayu17 in https://github.com/pyenv/pyenv/pull/3454
+* realpath.c: fix obsolete syntax warning by @native-api in https://github.com/pyenv/pyenv/pull/3468
+
 ## Release v2.6.32
 * Add miniconda3 26.3.2-2, miniforge3 26.3.2-0, 26.3.2-1 by @native-api in https://github.com/pyenv/pyenv/pull/3445
 * miniforge3 26.1, 26.3, add_miniforge: exclude .pkg installers by @native-api in https://github.com/pyenv/pyenv/pull/3446
