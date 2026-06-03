@@ -13,15 +13,24 @@ mkdir -p "$SHIM_PATH"
 declare last_acquire_error
 
 acquire_lock() {
-  # Ensure only one instance of pyenv-rehash is running at a time by
-  # setting the shell's `noclobber` option and attempting to write to
-  # the prototype shim file.
   local ret
   set -o noclobber
-  # Assuming an old lockfile is stale
-  # Unknown why this happens for some users but this at least unblocks them
   last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" \
-    || { find "$PROTOTYPE_SHIM_PATH" -mmin +2 -exec rm -f {} \; ; ret=1; }
+    || {
+      # Remove stale lock file if older than 2 minutes.
+      # No healthy rehash takes this long; cleanup prevents hangs from crashed processes.
+      find "$PROTOTYPE_SHIM_PATH" -mmin +2 -exec rm -f {} \;
+      # On first failure, verify actual write capability.
+      # Catches Landlock/Seatbelt sandbox restrictions that fool the -w test.
+      if [[ -z $tested_for_other_write_errors ]]; then
+        ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm "$t" ) \
+          && tested_for_other_write_errors=1 \
+          || { echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2
+               set +o noclobber
+               exit 1; }
+      fi
+      ret=1
+    }
   set +o noclobber
   [[ -z "${ret}" ]]
 }
@@ -39,19 +48,6 @@ if [ ! -w "$SHIM_PATH" ]; then
   exit 1
 fi
 
-# Remove any stale lock file (> 2 min old) before entering the wait loop.
-# A healthy rehash completes in well under 2 minutes on any normal system.
-# This prevents a full 60 s hang caused by a lock left by a previously crashed process.
-find "$PROTOTYPE_SHIM_PATH" -mmin +2 -exec rm -f {} \; 2>/dev/null || true
-
-# Verify actual write capability before the loop (catches Landlock/Seatbelt
-# sandbox restrictions that fool the -w test above).
-if ! _tmpfile="$(TMPDIR="$SHIM_PATH" mktemp 2>/dev/null)" || \
-   ! rm -f "$_tmpfile" 2>/dev/null; then
-  echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2
-  exit 1
-fi
-
 declare acquired tested_for_other_write_errors
 declare start=$SECONDS
 PYENV_REHASH_TIMEOUT=${PYENV_REHASH_TIMEOUT:-60}
@@ -65,15 +61,6 @@ while (( SECONDS <= start + PYENV_REHASH_TIMEOUT )); do
 
     break
   else
-    #Landlock sandbox subsystem in the Linux kernel returns false information in access() as of 6.14.0,
-    # making -w "$SHIM_PATH" not catch the fact that the shims dir is not writable in this case.
-    #Bash doesn't provide access to errno to check for non-EEXIST error code in acquire_lock.
-    #So check for writablity by trying to write to a different file,
-    # in a way that taxes the usual use case as little as possible.
-    if [[ -z $tested_for_other_write_errors ]]; then
-      ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm "$t" ) && tested_for_other_write_errors=1 ||
-        { echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2; break; }
-    fi
     # POSIX sleep(1) doesn't provide subsecond precision, but many others do
     sleep 0.1 2>/dev/null || sleep 1
   fi
