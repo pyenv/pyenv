@@ -29,6 +29,13 @@ pyenv: cannot rehash: couldn't acquire lock ${PYENV_ROOT}/shims/.pyenv-shim for 
 !
 }
 
+@test "rehash clears stale lock file older than 2 minutes and succeeds" {
+     mkdir -p "${PYENV_ROOT}/shims"
+     touch -d "3 minutes ago" "${PYENV_ROOT}/shims/.pyenv-shim"
+     run pyenv-rehash
+     assert_success
+}
+
 @test "wait until lock acquisition" {
   export PYENV_REHASH_TIMEOUT=5
   mkdir -p "${PYENV_ROOT}/shims"
