@@ -13,15 +13,29 @@ mkdir -p "$SHIM_PATH"
 declare last_acquire_error
 
 acquire_lock() {
-  # Ensure only one instance of pyenv-rehash is running at a time by
-  # setting the shell's `noclobber` option and attempting to write to
-  # the prototype shim file.
   local ret
+  # An old lock file is presumed stale. We assume no healthy rehash takes this long.
+  # The time is picked very small so that a killed rehash holds up new shell sessions
+  # for as little as possible
+  find "$PROTOTYPE_SHIM_PATH" -mmin +2 -exec rm -f {} \; 2>/dev/null || true
   set -o noclobber
-  # Assuming an old lockfile is stale
-  # Unknown why this happens for some users but this at least unblocks them
   last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" \
-    || { find "$PROTOTYPE_SHIM_PATH" -mmin +10 -exec rm -f {} \; ; ret=1; }
+    && trap release_lock EXIT \
+    || {
+      # Linux Landlock and MacOS Seatbelt sandbox subsystems return false information in access(),
+      # making -w "$SHIM_PATH" not catch the fact that the shims dir is not writable in this case.
+      # Bash doesn't provide access to errno to check for non-EEXIST error code in `echo >'.
+      # So check for writablity by trying to write to a different file,
+      # in a way that taxes the usual use case as little as possible.
+      if [[ -z $tested_for_other_write_errors ]]; then
+        ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm "$t" ) \
+          && tested_for_other_write_errors=1 \
+          || { echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2
+               set +o noclobber
+               exit 1; }
+      fi
+      ret=1
+    }
   set +o noclobber
   [[ -z "${ret}" ]]
 }
@@ -32,6 +46,7 @@ remove_prototype_shim() {
 
 release_lock() {
   remove_prototype_shim
+  trap - EXIT
 }
 
 if [ ! -w "$SHIM_PATH" ]; then
@@ -45,22 +60,8 @@ PYENV_REHASH_TIMEOUT=${PYENV_REHASH_TIMEOUT:-60}
 while (( SECONDS <= start + PYENV_REHASH_TIMEOUT )); do
   if acquire_lock; then
     acquired=1
-
-    # If we were able to obtain a lock, register a trap to clean up the
-    # prototype shim when the process exits.
-    trap release_lock EXIT
-
     break
   else
-    #Landlock sandbox subsystem in the Linux kernel returns false information in access() as of 6.14.0,
-    # making -w "$SHIM_PATH" not catch the fact that the shims dir is not writable in this case.
-    #Bash doesn't provide access to errno to check for non-EEXIST error code in acquire_lock.
-    #So check for writablity by trying to write to a different file,
-    # in a way that taxes the usual use case as little as possible.
-    if [[ -z $tested_for_other_write_errors ]]; then
-      ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm "$t" ) && tested_for_other_write_errors=1 ||
-        { echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2; break; }
-    fi
     # POSIX sleep(1) doesn't provide subsecond precision, but many others do
     sleep 0.1 2>/dev/null || sleep 1
   fi

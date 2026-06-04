@@ -38,17 +38,16 @@ pyenv: cannot rehash: couldn't acquire lock ${PYENV_ROOT}/shims/.pyenv-shim for 
   assert_success
 }
 
-@test "stale lockfile is removed" {
+@test "removes stale lockfile" {
   mkdir -p "${PYENV_ROOT}/shims"
-  #GNU and BSD `date` support generating relative dates via different syntax
-  # but BusyBox `date` used in Bash Docker images doesn't
+  # A portable code to set mtime to "N minutes ago" is long and unwieldy,
+  # see https://unix.stackexchange.com/questions/806015/portably-set-a-files-time-to-n-minutes-ago
+  # Using a fixed timestamp far in the past is infinitely simpler and good enough for the test
   touch -t 200001010000.00 "${PYENV_ROOT}/shims/.pyenv-shim"
   run pyenv-rehash
   assert_success ""
   assert [ ! -e "${PYENV_ROOT}/shims/.pyenv-shim" ]
 }
-
-
 
 @test "creates shims" {
   create_alt_executable_in_version "2.7" "python"
