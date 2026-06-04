@@ -16,7 +16,7 @@ acquire_lock() {
   local ret
   # Remove stale lock file (> 2 min) before attempting to create our own.
   # No healthy rehash takes this long; avoids a failed write on the first attempt.
-  find "$PROTOTYPE_SHIM_PATH" -mmin +2 -exec rm -f {} \;
+  find "$PROTOTYPE_SHIM_PATH" -mmin +2 -exec rm -f {} \; 2>/dev/null || true
   set -o noclobber
   last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" \
     || {
