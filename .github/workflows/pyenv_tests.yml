@@ -1,5 +1,8 @@
 name: pyenv_tests
-on: [pull_request, push]
+on:
+  push:
+    branches: [master]
+  pull_request: {}
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)
