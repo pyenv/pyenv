@@ -1,5 +1,11 @@
 # Version History
 
+## Release v2.7.2
+* fix(rehash): prevent terminal hang caused by stale or sandbox-blocked lock file by @anupddas in https://github.com/pyenv/pyenv/pull/3469
+* 3.6.x: Fix verify_* calls by @native-api in https://github.com/pyenv/pyenv/commit/6c0c5cfa9619e4a7a90102d8bee6c771c4739836
+* Add CPython 3.14.6 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3472
+* Add CPython 3.13.14 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3473
+
 ## Release v2.7.1
 * Support 3.9 EOL Pip URL, consolidate tests by @native-api in https://github.com/pyenv/pyenv/pull/3465
 * Update URLs for PyPy nightly; Remove pypy3.5 and pypy3.7 nightly by @native-api in https://github.com/pyenv/pyenv/pull/3466
