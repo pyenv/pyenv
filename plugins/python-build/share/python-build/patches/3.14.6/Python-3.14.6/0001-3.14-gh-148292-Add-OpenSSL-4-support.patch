@@ -1,4 +1,4 @@
-From 7b4d175d3325b4904efb8ea18fb7022cc23583a2 Mon Sep 17 00:00:00 2001
+From f399d160f46b95a89910d3fbd7739095ae51686d Mon Sep 17 00:00:00 2001
 From: Victor Stinner <vstinner@python.org>
 Date: Wed, 25 Mar 2026 09:44:47 +0300
 Subject: [PATCH] [3.14] gh-148292: Add OpenSSL 4 support
@@ -12,7 +12,7 @@ Subject: [PATCH] [3.14] gh-148292: Add OpenSSL 4 support
  Modules/_ssl/cert.c                           |    3 +-
  Modules/_ssl_data_40.h                        | 9357 +++++++++++++++++
  Tools/ssl/multissltests.py                    |    8 +-
- 9 files changed, 9551 insertions(+), 35 deletions(-)
+ 8 files changed, 9550 insertions(+), 35 deletions(-)
  create mode 100644 Misc/NEWS.d/next/Library/2026-04-28-17-47-55.gh-issue-148292.oIq3ml.rst
  create mode 100644 Misc/NEWS.d/next/Tests/2026-04-21-12-33-14.gh-issue-148600.vnTb3t.rst
  create mode 100644 Modules/_ssl_data_40.h
@@ -40,7 +40,7 @@ index ef2da97f867..1b9ec3393cb 100644
                                    timeout=test_support.LOOPBACK_TIMEOUT)
          resp = self.client.stls(context=ctx)
 diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
-index 10615365a27..6445f122b42 100644
+index dd4c657d0cf..0878d738690 100644
 --- a/Lib/test/test_ssl.py
 +++ b/Lib/test/test_ssl.py
 @@ -396,7 +396,7 @@ def test_constants(self):
@@ -105,7 +105,7 @@ index 10615365a27..6445f122b42 100644
              ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_1)
  
              self.assertIn(
-@@ -1664,23 +1667,24 @@ def test__create_stdlib_context(self):
+@@ -1717,23 +1720,24 @@ def test__create_stdlib_context(self):
          self.assertFalse(ctx.check_hostname)
          self._assert_context_options(ctx)
  
@@ -141,7 +141,7 @@ index 10615365a27..6445f122b42 100644
  
          ctx = ssl._create_stdlib_context(purpose=ssl.Purpose.CLIENT_AUTH)
          self.assertEqual(ctx.protocol, ssl.PROTOCOL_TLS_SERVER)
-@@ -2707,6 +2711,36 @@ def close(self):
+@@ -2760,6 +2764,36 @@ def close(self):
      def stop(self):
          self.active = False
  
@@ -178,7 +178,7 @@ index 10615365a27..6445f122b42 100644
  class AsyncoreEchoServer(threading.Thread):
  
      # this one's based on asyncore.dispatcher
-@@ -3576,10 +3610,10 @@ def test_protocol_tlsv1_2(self):
+@@ -3629,10 +3663,10 @@ def test_protocol_tlsv1_2(self):
                             client_options=ssl.OP_NO_TLSv1_2)
  
          try_protocol_combo(ssl.PROTOCOL_TLS, ssl.PROTOCOL_TLSv1_2, 'TLSv1.2')
@@ -191,7 +191,7 @@ index 10615365a27..6445f122b42 100644
              try_protocol_combo(ssl.PROTOCOL_TLSv1_2, ssl.PROTOCOL_TLSv1_1, False)
              try_protocol_combo(ssl.PROTOCOL_TLSv1_1, ssl.PROTOCOL_TLSv1_2, False)
  
-@@ -4428,7 +4462,9 @@ def cb_raising(ssl_sock, server_name, initial_context):
+@@ -4481,7 +4515,9 @@ def cb_raising(ssl_sock, server_name, initial_context):
                                             sni_name='supermessage')
  
              # Allow for flexible libssl error messages.
@@ -202,7 +202,7 @@ index 10615365a27..6445f122b42 100644
              self.assertRegex(cm.exception.reason, regex)
              self.assertEqual(catch.unraisable.exc_type, ZeroDivisionError)
  
-@@ -4741,6 +4777,50 @@ def background(sock):
+@@ -4794,6 +4830,50 @@ def background(sock):
                      if cm.exc_value is not None:
                          raise cm.exc_value
  
@@ -274,10 +274,10 @@ index 00000000000..a7d4c0cc80a
 @@ -0,0 +1 @@
 +Add OpenSSL 4.0.0 support to test configurations.
 diff --git a/Modules/_ssl.c b/Modules/_ssl.c
-index 1235eff72f7..376df32b7cb 100644
+index 5258df3958a..2c2edbed882 100644
 --- a/Modules/_ssl.c
 +++ b/Modules/_ssl.c
-@@ -121,8 +121,10 @@ static void _PySSLFixErrno(void) {
+@@ -122,8 +122,10 @@ static void _PySSLFixErrno(void) {
  #endif
  
  /* Include generated data (error codes) */
@@ -290,7 +290,7 @@ index 1235eff72f7..376df32b7cb 100644
  #include "_ssl_data_35.h"
  #elif (OPENSSL_VERSION_NUMBER >= 0x30100000L)
  #include "_ssl_data_340.h"
-@@ -134,6 +136,17 @@ static void _PySSLFixErrno(void) {
+@@ -135,6 +137,17 @@ static void _PySSLFixErrno(void) {
  #error Unsupported OpenSSL version
  #endif
  
@@ -308,7 +308,7 @@ index 1235eff72f7..376df32b7cb 100644
  /* OpenSSL API 1.1.0+ does not include version methods */
  #ifndef OPENSSL_NO_SSL3_METHOD
  extern const SSL_METHOD *SSLv3_method(void);
-@@ -339,6 +352,16 @@ typedef struct {
+@@ -340,6 +353,16 @@ typedef struct {
       * and shutdown methods check for chained exceptions.
       */
      PyObject *exc;
@@ -325,7 +325,7 @@ index 1235eff72f7..376df32b7cb 100644
  } PySSLSocket;
  
  #define PySSLSocket_CAST(op)    ((PySSLSocket *)(op))
-@@ -486,6 +509,10 @@ fill_and_set_sslerror(_sslmodulestate *state,
+@@ -487,6 +510,10 @@ fill_and_set_sslerror(_sslmodulestate *state,
      PyObject *init_value, *msg, *key;
      PyUnicodeWriter *writer = NULL;
  
@@ -336,7 +336,7 @@ index 1235eff72f7..376df32b7cb 100644
      if (errcode != 0) {
          int lib, reason;
  
-@@ -641,6 +668,18 @@ PySSL_ChainExceptions(PySSLSocket *sslsock) {
+@@ -642,6 +669,18 @@ PySSL_ChainExceptions(PySSLSocket *sslsock) {
      return -1;
  }
  
@@ -355,7 +355,7 @@ index 1235eff72f7..376df32b7cb 100644
  static PyObject *
  PySSL_SetError(PySSLSocket *sslsock, const char *filename, int lineno)
  {
-@@ -888,6 +927,7 @@ newPySSLSocket(PySSLContext *sslctx, PySocketSockObject *sock,
+@@ -889,6 +928,7 @@ newPySSLSocket(PySSLContext *sslctx, PySocketSockObject *sock,
      self->server_hostname = NULL;
      self->err = err;
      self->exc = NULL;
@@ -363,7 +363,7 @@ index 1235eff72f7..376df32b7cb 100644
  
      /* Make sure the SSL error state is initialized */
      ERR_clear_error();
-@@ -1028,6 +1068,11 @@ _ssl__SSLSocket_do_handshake_impl(PySSLSocket *self)
+@@ -1029,6 +1069,11 @@ _ssl__SSLSocket_do_handshake_impl(PySSLSocket *self)
          BIO_set_nbio(SSL_get_wbio(self->ssl), nonblocking);
      }
  
@@ -375,7 +375,7 @@ index 1235eff72f7..376df32b7cb 100644
      timeout = GET_SOCKET_TIMEOUT(sock);
      has_timeout = (timeout > 0);
      if (has_timeout) {
-@@ -1133,7 +1178,7 @@ _asn1obj2py(_sslmodulestate *state, const ASN1_OBJECT *name, int no_name)
+@@ -1134,7 +1179,7 @@ _asn1obj2py(_sslmodulestate *state, const ASN1_OBJECT *name, int no_name)
  
  static PyObject *
  _create_tuple_for_attribute(_sslmodulestate *state,
@@ -384,7 +384,7 @@ index 1235eff72f7..376df32b7cb 100644
  {
      Py_ssize_t buflen;
      PyObject *pyattr;
-@@ -1162,16 +1207,16 @@ _create_tuple_for_attribute(_sslmodulestate *state,
+@@ -1163,16 +1208,16 @@ _create_tuple_for_attribute(_sslmodulestate *state,
  }
  
  static PyObject *
@@ -405,7 +405,7 @@ index 1235eff72f7..376df32b7cb 100644
      int index_counter;
      int rdn_level = -1;
      int retcode;
-@@ -2491,6 +2536,11 @@ _ssl__SSLSocket_write_impl(PySSLSocket *self, Py_buffer *b)
+@@ -2493,6 +2538,11 @@ _ssl__SSLSocket_write_impl(PySSLSocket *self, Py_buffer *b)
          BIO_set_nbio(SSL_get_wbio(self->ssl), nonblocking);
      }
  
@@ -417,7 +417,7 @@ index 1235eff72f7..376df32b7cb 100644
      timeout = GET_SOCKET_TIMEOUT(sock);
      has_timeout = (timeout > 0);
      if (has_timeout) {
-@@ -2631,6 +2681,11 @@ _ssl__SSLSocket_read_impl(PySSLSocket *self, Py_ssize_t len,
+@@ -2633,6 +2683,11 @@ _ssl__SSLSocket_read_impl(PySSLSocket *self, Py_ssize_t len,
          Py_INCREF(sock);
      }
  
@@ -429,7 +429,7 @@ index 1235eff72f7..376df32b7cb 100644
      if (!group_right_1) {
          dest = PyBytes_FromStringAndSize(NULL, len);
          if (dest == NULL)
-@@ -6506,9 +6561,15 @@ sslmodule_init_constants(PyObject *m)
+@@ -6513,9 +6568,15 @@ sslmodule_init_constants(PyObject *m)
      ADD_INT_CONST("PROTOCOL_TLS", PY_SSL_VERSION_TLS);
      ADD_INT_CONST("PROTOCOL_TLS_CLIENT", PY_SSL_VERSION_TLS_CLIENT);
      ADD_INT_CONST("PROTOCOL_TLS_SERVER", PY_SSL_VERSION_TLS_SERVER);
@@ -9823,13 +9823,13 @@ index 00000000000..ea615f655bb
 +    {NULL, 0, 0}  /* sentinel */
 +};
 diff --git a/Tools/ssl/multissltests.py b/Tools/ssl/multissltests.py
-index 85a8cd38f41..3c956ebbba7 100755
+index 68bd6e0860d..92c7c4115f5 100755
 --- a/Tools/ssl/multissltests.py
 +++ b/Tools/ssl/multissltests.py
 @@ -54,6 +54,7 @@
-     "3.4.5",
-     "3.5.6",
-     "3.6.2",
+     "3.4.6",
+     "3.5.7",
+     "3.6.3",
 +    "4.0.0",
      # See make_ssl_data.py for notes on adding a new version.
  ]
@@ -9858,5 +9858,5 @@ index 85a8cd38f41..3c956ebbba7 100755
      def short_version(self):
          """Short version for OpenSSL download URL"""
 -- 
-2.46.2.windows.1
+2.54.0.windows.1
 
