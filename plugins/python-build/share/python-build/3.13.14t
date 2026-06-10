@@ -1,0 +1,2 @@
+export PYTHON_BUILD_FREE_THREADING=1
+source "${BASH_SOURCE[0]%t}"
