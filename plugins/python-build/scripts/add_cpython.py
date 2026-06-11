@@ -233,10 +233,14 @@ def main():
     try:
         ls_remote = subprocess.check_output(
             ["git", "-C", OUT_DIR, "ls-remote", "origin", "refs/heads/auto_add_version/*"],
-            text=True
+            text=True,
+            timeout=30
         )
         for line in ls_remote.splitlines():
-            branch = line.split("\t")[1].replace("refs/heads/auto_add_version/", "")
+            parts = line.split("\t", 1)
+            if len(parts) < 2:
+                continue
+            branch = parts[1].replace("refs/heads/auto_add_version/", "")
             for v_str in branch.split("_"):
                 try:
                     pending_versions.add(packaging.version.Version(v_str))
@@ -484,12 +488,21 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
             #already retrieved
             return self[max(self.keys())]
 
-        j = requests.get("https://api.github.com/repos/openssl/openssl/releases", timeout=30).json()
+        response = requests.get("https://api.github.com/repos/openssl/openssl/releases", timeout=30)
+        response.raise_for_status()
+        j = response.json()
+        if not isinstance(j, list):
+            raise ValueError(f"Unexpected GitHub API response: {j}")
+            
         releases = [r for r in j if not r.get('prerelease')]
+        if not releases:
+            raise ValueError("No non-prerelease OpenSSL versions found")
+            
         if prefix:
             releases_prefix = [r for r in releases if r.get('tag_name', '').startswith(f"openssl-{prefix}")]
-            if releases_prefix:
-                releases = releases_prefix
+            if not releases_prefix:
+                raise ValueError(f"No OpenSSL release found matching prefix {prefix}")
+            releases = releases_prefix
         
         j_release = releases[0]
 
