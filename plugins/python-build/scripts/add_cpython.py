@@ -488,23 +488,38 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
             #already retrieved
             return self[max(self.keys())]
 
-        response = requests.get("https://api.github.com/repos/openssl/openssl/releases", timeout=30)
-        response.raise_for_status()
-        j = response.json()
-        if not isinstance(j, list):
-            raise ValueError(f"Unexpected GitHub API response: {j}")
+        url = "https://api.github.com/repos/openssl/openssl/releases?per_page=100"
+        releases = []
+        releases_prefix = []
+        
+        while url:
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            j = response.json()
+            if not isinstance(j, list):
+                raise ValueError(f"Unexpected GitHub API response: {j}")
+                
+            page_releases = [r for r in j if not r.get('prerelease')]
+            releases.extend(page_releases)
             
-        releases = [r for r in j if not r.get('prerelease')]
-        if not releases:
+            if prefix:
+                releases_prefix = [r for r in page_releases if r.get('tag_name', '').startswith(f"openssl-{prefix}")]
+                if releases_prefix:
+                    break
+            elif releases:
+                break
+                
+            if 'next' in response.links:
+                url = response.links['next']['url']
+            else:
+                url = None
+
+        if prefix and not releases_prefix:
+            raise ValueError(f"No OpenSSL release found matching prefix {prefix}")
+        if not releases and not prefix:
             raise ValueError("No non-prerelease OpenSSL versions found")
             
-        if prefix:
-            releases_prefix = [r for r in releases if r.get('tag_name', '').startswith(f"openssl-{prefix}")]
-            if not releases_prefix:
-                raise ValueError(f"No OpenSSL release found matching prefix {prefix}")
-            releases = releases_prefix
-        
-        j_release = releases[0]
+        j_release = releases_prefix[0] if prefix else releases[0]
 
         # noinspection PyTypeChecker
         # urlparse can parse str as well as bytes
