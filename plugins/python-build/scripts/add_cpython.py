@@ -176,6 +176,8 @@ def handle_version_patches(
         logger.info(f"Copying patches from {previous_version} to {version}")
         shutil.copytree(previous_patches, new_patches)
 
+    # Subdir rename as a separate step from upper dir copying/moving
+    # in case there are patches for dependency packages as well
     previous_package_patches = new_patches / f"Python-{previous_version}"
     new_package_patches = new_patches / f"Python-{version}"
     if is_prerelease_upgrade:
