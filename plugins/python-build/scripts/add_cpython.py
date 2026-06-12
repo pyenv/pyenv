@@ -270,6 +270,11 @@ def main():
         VersionDirectory.available.get_store_available_source_downloads(release, True)
         del release
 
+    # Excluding versions for which there already are PRs
+    # will prevent us from using advanced features of
+    # peter-evans/create-pull-request Github Action
+    # like updating a PR and closing a superceded PR
+    # but we don't really need them as of this writing
     versions_to_add = sorted(
         VersionDirectory.available.keys()
         - VersionDirectory.existing.keys()
@@ -293,9 +298,8 @@ def get_pending_versions() -> typing.Set[packaging.version.Version]:
 
     pending_versions = set()
     for line in ls_remote.splitlines():
-        match = AUTO_ADD_VERSION_REF_RE.fullmatch(line)
-        if not match:
-            raise ValueError(f"Unexpected git ls-remote output: {line!r}")
+        if not (match := AUTO_ADD_VERSION_REF_RE.fullmatch(line)):
+            raise ValueError(f"Unexpected git ls-remote output line: {line!r}")
         pending_versions.update(
             packaging.version.Version(version)
             for version in match.group("versions").split("_")
@@ -533,7 +537,7 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
         if matching:
             return max(matching, key=lambda release: release.version)
 
-        url = "https://api.github.com/repos/openssl/openssl/releases?per_page=100"
+        url = "https://api.github.com/repos/openssl/openssl/releases"
         while url:
             response = requests.get(url, timeout=30)
             response.raise_for_status()
