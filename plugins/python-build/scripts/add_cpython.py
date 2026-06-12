@@ -17,6 +17,7 @@ import os.path
 import pathlib
 import pprint
 import re
+import shutil
 import subprocess
 import sys
 import typing
@@ -45,6 +46,14 @@ EXCLUDED_VERSIONS= {
 
 here = pathlib.Path(__file__).resolve()
 OUT_DIR: pathlib.Path = here.parent.parent / "share" / "python-build"
+
+AUTO_ADD_VERSION_REF_RE = re.compile(
+    r"^(?P<object_id>[0-9a-f]{40,64})\t"
+    r"refs/heads/auto_add_version/(?P<versions>\S+)$"
+)
+OPENSSL_RELEASE_TAG_RE = re.compile(
+    r"^openssl-(?P<major>\d+)\.\d+(?:\.\d+)*(?:[a-z]+\d*)?$"
+)
 
 T_THUNK=\
 '''export PYTHON_BUILD_FREE_THREADING=1
@@ -83,15 +92,13 @@ def adapt_script(version: packaging.version.Version,
                                  url=new_package_url+'#'+new_package_hash,
                                  verify_py_suffix=verify_py_suffix)
 
-        elif m:=re.match(r'\s*install_package\s+"(?P<package>openssl-\S+)"\s+'
-                       r'"(?P<url>\S+)"\s.*$',
+        elif m:=re.match(r'\s*install_package\s+'
+                         r'"(?P<package>openssl-(?P<openssl_major>\d+)\.\S+)"\s+'
+                         r'"(?P<url>\S+)"\s.*$',
                          line):
-            existing_version_str = m.group('package').split('-')[1]
-            if existing_version_str.startswith('1.1.1'):
-                prefix = '1.1.1'
-            else:
-                prefix = '.'.join(existing_version_str.split('.')[:2])
-            item = VersionDirectory.openssl.get_store_latest_release(prefix)
+            item = VersionDirectory.openssl.get_store_latest_release(
+                int(m.group('openssl_major'))
+            )
 
             line = Re.sub_groups(m,
                                package=item.package_name,
@@ -134,17 +141,7 @@ def add_version(version: packaging.version.Version):
         return False
     VersionDirectory.existing.append(_CPythonExistingScriptInfo(version,str(new_path)))
 
-    if previous_version.major == version.major and previous_version.minor == version.minor:
-        import shutil
-        prev_patches = OUT_DIR / "patches" / str(previous_version)
-        new_patches = OUT_DIR / "patches" / str(version)
-        if prev_patches.exists() and not new_patches.exists():
-            if is_prerelease_upgrade:
-                logger.info(f"Git moving patches from {previous_version} to {version}")
-                subprocess.check_call(("git", "-C", OUT_DIR, "mv", f"patches/{previous_version}", f"patches/{version}"))
-            else:
-                logger.info(f"Copying patches from {previous_version} to {version}")
-                shutil.copytree(prev_patches, new_patches)
+    handle_version_patches(version, previous_version, is_prerelease_upgrade)
 
     cleanup_prerelease_upgrade(is_prerelease_upgrade, previous_version, version)
 
@@ -152,6 +149,51 @@ def add_version(version: packaging.version.Version):
 
     print(version)
     return True
+
+
+def handle_version_patches(
+        version: packaging.version.Version,
+        previous_version: packaging.version.Version,
+        is_prerelease_upgrade: bool)\
+        -> None:
+    if (previous_version.major, previous_version.minor) != (version.major, version.minor):
+        return
+
+    patches_dir = OUT_DIR / "patches"
+    previous_patches = patches_dir / str(previous_version)
+    if not previous_patches.exists():
+        return
+
+    new_patches = patches_dir / str(version)
+    if is_prerelease_upgrade:
+        logger.info(f"Git moving patches from {previous_version} to {version}")
+        subprocess.check_call((
+            "git", "-C", OUT_DIR, "mv",
+            f"patches/{previous_version}",
+            f"patches/{version}",
+        ))
+    else:
+        logger.info(f"Copying patches from {previous_version} to {version}")
+        shutil.copytree(previous_patches, new_patches)
+
+    previous_package_patches = new_patches / f"Python-{previous_version}"
+    new_package_patches = new_patches / f"Python-{version}"
+    if is_prerelease_upgrade:
+        subprocess.check_call((
+            "git", "-C", OUT_DIR, "mv",
+            f"patches/{version}/Python-{previous_version}",
+            f"patches/{version}/Python-{version}",
+        ))
+    else:
+        previous_package_patches.rename(new_package_patches)
+
+    previous_t_patches = patches_dir / f"{previous_version}t"
+    if previous_t_patches.exists() or previous_t_patches.is_symlink():
+        if is_prerelease_upgrade:
+            previous_t_patches.unlink()
+        (patches_dir / f"{version}t").symlink_to(
+            str(version), target_is_directory=True
+        )
 
 
 def cleanup_prerelease_upgrade(
@@ -228,34 +270,38 @@ def main():
         VersionDirectory.available.get_store_available_source_downloads(release, True)
         del release
 
-    import subprocess
-    pending_versions = set()
-    try:
-        ls_remote = subprocess.check_output(
-            ["git", "-C", OUT_DIR, "ls-remote", "origin", "refs/heads/auto_add_version/*"],
-            text=True,
-            timeout=30
-        )
-        for line in ls_remote.splitlines():
-            parts = line.split("\t", 1)
-            if len(parts) < 2:
-                continue
-            branch = parts[1].replace("refs/heads/auto_add_version/", "")
-            for v_str in branch.split("_"):
-                try:
-                    pending_versions.add(packaging.version.Version(v_str))
-                except ValueError:
-                    pass
-    except Exception as e:
-        logger.warning(f"Failed to fetch pending PR branches: {e}")
-
-    versions_to_add = sorted(VersionDirectory.available.keys() - VersionDirectory.existing.keys() - pending_versions)
+    versions_to_add = sorted(
+        VersionDirectory.available.keys()
+        - VersionDirectory.existing.keys()
+        - get_pending_versions()
+    )
 
     logger.info("Versions to add:\n"+pprint.pformat(versions_to_add))
     result = False
     for version_to_add in versions_to_add:
         result = add_version(version_to_add) or result
     return int(not result)
+
+
+def get_pending_versions() -> typing.Set[packaging.version.Version]:
+    ls_remote = subprocess.check_output(
+        ("git", "-C", OUT_DIR, "ls-remote", "origin",
+         "refs/heads/auto_add_version/*"),
+        text=True,
+        timeout=30,
+    )
+
+    pending_versions = set()
+    for line in ls_remote.splitlines():
+        match = AUTO_ADD_VERSION_REF_RE.fullmatch(line)
+        if not match:
+            raise ValueError(f"Unexpected git ls-remote output: {line!r}")
+        pending_versions.update(
+            packaging.version.Version(version)
+            for version in match.group("versions").split("_")
+        )
+    return pending_versions
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -478,48 +524,35 @@ class _OpenSSLVersionInfo(typing.NamedTuple):
 class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.Version]):
     key_field = "version"
 
-    def get_store_latest_release(self, prefix=None) \
+    def get_store_latest_release(self, major: int) \
             -> _OpenSSLVersionInfo:
-        if prefix:
-            matching = [v for v in self.values() if str(v.version).startswith(prefix)]
-            if matching:
-                return max(matching, key=lambda v: v.version)
-        elif self:
-            #already retrieved
-            return self[max(self.keys())]
+        matching = [
+            release for release in self.values()
+            if release.version.major == major
+        ]
+        if matching:
+            return max(matching, key=lambda release: release.version)
 
         url = "https://api.github.com/repos/openssl/openssl/releases?per_page=100"
-        releases = []
-        releases_prefix = []
-        
         while url:
             response = requests.get(url, timeout=30)
             response.raise_for_status()
-            j = response.json()
-            if not isinstance(j, list):
-                raise ValueError(f"Unexpected GitHub API response: {j}")
-                
-            page_releases = [r for r in j if not r.get('prerelease')]
-            releases.extend(page_releases)
-            
-            if prefix:
-                releases_prefix = [r for r in page_releases if r.get('tag_name', '').startswith(f"openssl-{prefix}")]
-                if releases_prefix:
-                    break
-            elif releases:
+            matching = [
+                release
+                for release in response.json()
+                if not release['draft']
+                and not release['prerelease']
+                and (match := OPENSSL_RELEASE_TAG_RE.fullmatch(
+                    release['tag_name']
+                ))
+                and int(match.group('major')) == major
+            ]
+            if matching:
+                j_release = matching[0]
                 break
-                
-            if 'next' in response.links:
-                url = response.links['next']['url']
-            else:
-                url = None
-
-        if prefix and not releases_prefix:
-            raise ValueError(f"No OpenSSL release found matching prefix {prefix}")
-        if not releases and not prefix:
-            raise ValueError("No non-prerelease OpenSSL versions found")
-            
-        j_release = releases_prefix[0] if prefix else releases[0]
+            url = response.links.get('next', {}).get('url')
+        else:
+            raise ValueError(f"No OpenSSL {major}.x release found")
 
         # noinspection PyTypeChecker
         # urlparse can parse str as well as bytes
