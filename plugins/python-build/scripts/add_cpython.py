@@ -187,10 +187,9 @@ def handle_version_patches(
     else:
         previous_package_patches.rename(new_package_patches)
 
-    previous_t_patches = patches_dir / f"{previous_version}t"
-    if previous_t_patches.exists() or previous_t_patches.is_symlink():
-        if is_prerelease_upgrade:
-            previous_t_patches.unlink()
+    if uses_t_thunks(previous_version) and is_prerelease_upgrade:
+        patches_dir / f"{previous_version}t".unlink(missing_ok=True)
+    if uses_t_thunks(version):
         (patches_dir / f"{version}t").symlink_to(
             str(version), target_is_directory=True
         )
@@ -225,7 +224,7 @@ def cleanup_prerelease_upgrade(
 
 
 def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
-    if (version.major, version.minor) < (3, 13):
+    if not uses_t_thunks(version):
         return
 
     # an old thunk may have older version-specific code
@@ -242,6 +241,10 @@ def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
 
     logger.info(f"Writing {thunk_path}")
     thunk_path.write_text(T_THUNK, encoding='utf-8')
+
+
+def uses_t_thunks(version: packaging.version.Version) -> bool:
+    return (version.major, version.minor) >= (3, 13)
 
 
 Arguments: argparse.Namespace
