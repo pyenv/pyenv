@@ -31,13 +31,6 @@ import requests_html
 import sortedcontainers
 import tqdm
 
-#CI uses exit code 1 as a signal that no new version is found
-#so have to produce a different exit code on an exception
-def _excepthook(type,value,traceback):
-    logging.error("Unhandled exception occured",exc_info=(type,value,traceback))
-    sys.exit(2)
-sys.excepthook = _excepthook
-
 logger = logging.getLogger(__name__)
 
 CUTOFF_VERSION=packaging.version.Version('3.10')
@@ -267,19 +260,20 @@ def main():
     # So until we know the release is out, its directory is a potential prerelease directory.
     # Normally, prereleases are only made for initial releases (x.y.0) --
     # but rarely, they may make them for other releases (e.g. 3.14.5).
-    for release in (v for v in frozenset(VersionDirectory.available.keys())     #refining changes the
+    for release in (v for v in frozenset(VersionDirectory.available.keys())     #refining alters the
                                                                                 #corresponding directory key
                                                                                 #which breaks iteration
+                                                                                #over the directory --
                                                                                 #so have to iterate over a copy
                             if v not in VersionDirectory.existing):
         VersionDirectory.available.get_store_available_source_downloads(release, True)
         del release
 
-    # Excluding versions for which there already are PRs
-    # will prevent us from using advanced features of
+    # Excluding versions for which there already are PRs.
+    # This will prevent us from using advanced features of
     # peter-evans/create-pull-request Github Action
-    # like updating a PR and closing a superceded PR
-    # but we don't really need them as of this writing
+    # like updating a PR and closing a superseded PR
+    # but we don't really need them as of this writing.
     versions_to_add = sorted(
         VersionDirectory.available.keys()
         - VersionDirectory.existing.keys()
@@ -462,8 +456,9 @@ class CPythonAvailableVersionsDirectory(KeyedList[_CPythonAvailableVersionInfo, 
             download_version = packaging.version.Version(m.group("version"))
             if download_version != version:
                 if not refine_mode:
-                    raise ValueError(f"Unexpectedly found a download {name} ({download_version}) "
+                    logger.warning(f"Ignoring download {name} ({download_version}) "
                                      f"for {version} at page {entry.download_page_url}")
+                    continue
                 entry_to_fill = additional_versions_found.get_or_create(
                     download_version,
                     download_page_url=entry.download_page_url
@@ -666,6 +661,7 @@ class DownloadPage:
         if session is None:
             session = requests_html.HTMLSession()
         response = session.get(url, timeout=30)
+        response.raise_for_status()
         page = response.html
         table = page.find("pre", first=True)
         # some GNU mirrors format entries as a table
@@ -745,4 +741,9 @@ class Url:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    #sys.excepthook seems to have no effect in Github Actions
+    try:
+        sys.exit(main())
+    except Exception:
+        logging.exception("Unhandled exception occured")
+        sys.exit(2)
