@@ -527,7 +527,7 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
     def get_store_latest_release(self, major: int) \
             -> _OpenSSLVersionInfo:
         matching = [
-            release for release in self.values()
+            release for release in self
             if release.version.major == major
         ]
         if matching:
