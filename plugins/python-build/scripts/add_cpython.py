@@ -17,6 +17,7 @@ import os.path
 import pathlib
 import pprint
 import re
+import shutil
 import subprocess
 import sys
 import typing
@@ -45,6 +46,14 @@ EXCLUDED_VERSIONS= {
 
 here = pathlib.Path(__file__).resolve()
 OUT_DIR: pathlib.Path = here.parent.parent / "share" / "python-build"
+
+AUTO_ADD_VERSION_REF_RE = re.compile(
+    r"^(?P<object_id>[0-9a-f]{40,64})\t"
+    r"refs/heads/auto_add_version/(?P<versions>\S+)$"
+)
+OPENSSL_RELEASE_TAG_RE = re.compile(
+    r"^openssl-(?P<major>\d+)\.\d+(?:\.\d+)*(?:[a-z]+\d*)?$"
+)
 
 T_THUNK=\
 '''export PYTHON_BUILD_FREE_THREADING=1
@@ -83,10 +92,13 @@ def adapt_script(version: packaging.version.Version,
                                  url=new_package_url+'#'+new_package_hash,
                                  verify_py_suffix=verify_py_suffix)
 
-        elif m:=re.match(r'\s*install_package\s+"(?P<package>openssl-\S+)"\s+'
-                       r'"(?P<url>\S+)"\s.*$',
+        elif m:=re.match(r'\s*install_package\s+'
+                         r'"(?P<package>openssl-(?P<openssl_major>\d+)\.\S+)"\s+'
+                         r'"(?P<url>\S+)"\s.*$',
                          line):
-            item = VersionDirectory.openssl.get_store_latest_release()
+            item = VersionDirectory.openssl.get_store_latest_release(
+                int(m.group('openssl_major'))
+            )
 
             line = Re.sub_groups(m,
                                package=item.package_name,
@@ -129,12 +141,59 @@ def add_version(version: packaging.version.Version):
         return False
     VersionDirectory.existing.append(_CPythonExistingScriptInfo(version,str(new_path)))
 
+    handle_version_patches(version, previous_version, is_prerelease_upgrade)
+
     cleanup_prerelease_upgrade(is_prerelease_upgrade, previous_version, version)
 
     handle_t_thunks(version, previous_version, is_prerelease_upgrade)
 
     print(version)
     return True
+
+
+def handle_version_patches(
+        version: packaging.version.Version,
+        previous_version: packaging.version.Version,
+        is_prerelease_upgrade: bool)\
+        -> None:
+    if (previous_version.major, previous_version.minor) != (version.major, version.minor):
+        return
+
+    patches_dir = OUT_DIR / "patches"
+    previous_patches = patches_dir / str(previous_version)
+    if not previous_patches.exists():
+        return
+
+    new_patches = patches_dir / str(version)
+    if is_prerelease_upgrade:
+        logger.info(f"Git moving patches from {previous_version} to {version}")
+        subprocess.check_call((
+            "git", "-C", OUT_DIR, "mv",
+            f"patches/{previous_version}",
+            f"patches/{version}",
+        ))
+    else:
+        logger.info(f"Copying patches from {previous_version} to {version}")
+        shutil.copytree(previous_patches, new_patches)
+
+    previous_package_patches = new_patches / f"Python-{previous_version}"
+    new_package_patches = new_patches / f"Python-{version}"
+    if is_prerelease_upgrade:
+        subprocess.check_call((
+            "git", "-C", OUT_DIR, "mv",
+            f"patches/{version}/Python-{previous_version}",
+            f"patches/{version}/Python-{version}",
+        ))
+    else:
+        previous_package_patches.rename(new_package_patches)
+
+    previous_t_patches = patches_dir / f"{previous_version}t"
+    if previous_t_patches.exists() or previous_t_patches.is_symlink():
+        if is_prerelease_upgrade:
+            previous_t_patches.unlink()
+        (patches_dir / f"{version}t").symlink_to(
+            str(version), target_is_directory=True
+        )
 
 
 def cleanup_prerelease_upgrade(
@@ -211,13 +270,38 @@ def main():
         VersionDirectory.available.get_store_available_source_downloads(release, True)
         del release
 
-    versions_to_add = sorted(VersionDirectory.available.keys() - VersionDirectory.existing.keys())
+    versions_to_add = sorted(
+        VersionDirectory.available.keys()
+        - VersionDirectory.existing.keys()
+        - get_pending_versions()
+    )
 
     logger.info("Versions to add:\n"+pprint.pformat(versions_to_add))
     result = False
     for version_to_add in versions_to_add:
         result = add_version(version_to_add) or result
     return int(not result)
+
+
+def get_pending_versions() -> typing.Set[packaging.version.Version]:
+    ls_remote = subprocess.check_output(
+        ("git", "-C", OUT_DIR, "ls-remote", "origin",
+         "refs/heads/auto_add_version/*"),
+        text=True,
+        timeout=30,
+    )
+
+    pending_versions = set()
+    for line in ls_remote.splitlines():
+        match = AUTO_ADD_VERSION_REF_RE.fullmatch(line)
+        if not match:
+            raise ValueError(f"Unexpected git ls-remote output: {line!r}")
+        pending_versions.update(
+            packaging.version.Version(version)
+            for version in match.group("versions").split("_")
+        )
+    return pending_versions
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -440,18 +524,41 @@ class _OpenSSLVersionInfo(typing.NamedTuple):
 class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.Version]):
     key_field = "version"
 
-    def get_store_latest_release(self) \
+    def get_store_latest_release(self, major: int) \
             -> _OpenSSLVersionInfo:
-        if self:
-            #already retrieved
-            return self[max(self.keys())]
+        matching = [
+            release for release in self
+            if release.version.major == major
+        ]
+        if matching:
+            return max(matching, key=lambda release: release.version)
 
-        j = requests.get("https://api.github.com/repos/openssl/openssl/releases/latest", timeout=30).json()
+        url = "https://api.github.com/repos/openssl/openssl/releases?per_page=100"
+        while url:
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            matching = [
+                release
+                for release in response.json()
+                if not release['draft']
+                and not release['prerelease']
+                and (match := OPENSSL_RELEASE_TAG_RE.fullmatch(
+                    release['tag_name']
+                ))
+                and int(match.group('major')) == major
+            ]
+            if matching:
+                j_release = matching[0]
+                break
+            url = response.links.get('next', {}).get('url')
+        else:
+            raise ValueError(f"No OpenSSL {major}.x release found")
+
         # noinspection PyTypeChecker
         # urlparse can parse str as well as bytes
         shasum_url = more_itertools.one(
             asset['browser_download_url']
-            for asset in j['assets']
+            for asset in j_release['assets']
             if urllib.parse.urlparse(asset['browser_download_url']).path.split('/')[-1].endswith('.sha256')
         )
         shasum_text = requests.get(shasum_url, timeout=30).text
@@ -467,7 +574,7 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
 
         package_url = more_itertools.one(
             asset['browser_download_url']
-            for asset in j['assets']
+            for asset in j_release['assets']
             if urllib.parse.urlparse(asset['browser_download_url']).path.split('/')[-1] == package_filename
         )
 
