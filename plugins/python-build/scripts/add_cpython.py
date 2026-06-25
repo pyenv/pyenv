@@ -471,7 +471,10 @@ class CPythonAvailableVersionsDirectory(KeyedList[_CPythonAvailableVersionInfo, 
                 m.group("extension"), m.group('package'), url
             ))
 
-        if not exact_download_found:
+        # XXX: Exact download not found in non-refine mode never happens now
+        # 'cuz we first call the function in refine mode.
+        # Decide what's best to do if it starts to after a logic change.
+        if not exact_download_found and refine_mode:
             actual_version = max(additional_versions_found.keys())
             logger.debug(f"Refining available version {version} to {actual_version}")
             del self[version]
