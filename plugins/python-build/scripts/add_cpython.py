@@ -183,7 +183,7 @@ def handle_version_patches(
         previous_package_patches.rename(new_package_patches)
 
     if uses_t_thunks(previous_version) and is_prerelease_upgrade:
-        patches_dir / f"{previous_version}t".unlink(missing_ok=True)
+        (patches_dir / f"{previous_version}t").unlink(missing_ok=True)
     if uses_t_thunks(version):
         (patches_dir / f"{version}t").symlink_to(
             str(version), target_is_directory=True
