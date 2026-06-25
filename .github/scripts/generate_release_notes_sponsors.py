@@ -176,22 +176,41 @@ def github_sponsors(since: datetime.date) -> typing.List[typing.Dict]:
             raise SponsorDataError(
                 "GitHub Sponsors query returned an unexpected response shape."
             ) from exc
-        for node in sponsorships["nodes"]:
-            created = datetime.datetime.fromisoformat(
-                node["createdAt"].replace("Z", "+00:00")
-            )
+        try:
+            nodes = sponsorships["nodes"]
+            page_info = sponsorships["pageInfo"]
+        except (TypeError, KeyError) as exc:
+            raise SponsorDataError(
+                "GitHub Sponsors query returned incomplete pagination data."
+            ) from exc
+
+        for node in nodes:
+            try:
+                created = datetime.datetime.fromisoformat(
+                    node["createdAt"].replace("Z", "+00:00")
+                )
+                entity = node["sponsorEntity"]
+                login = entity["login"]
+            except (AttributeError, KeyError, TypeError, ValueError) as exc:
+                raise SponsorDataError(
+                    "GitHub Sponsors query returned an unexpected sponsor record."
+                ) from exc
             if created < since_dt:
                 return sponsors
-            entity = node["sponsorEntity"]
             sponsors.append({
-                "login": entity["login"],
-                "name": entity.get("name") or entity["login"],
+                "login": login,
+                "name": entity.get("name") or login,
             })
 
-        page_info = sponsorships["pageInfo"]
-        if not page_info["hasNextPage"]:
+        try:
+            has_next_page = page_info["hasNextPage"]
+            cursor = page_info["endCursor"]
+        except (TypeError, KeyError) as exc:
+            raise SponsorDataError(
+                "GitHub Sponsors query returned incomplete pagination data."
+            ) from exc
+        if not has_next_page:
             return sponsors
-        cursor = page_info["endCursor"]
 
 
 def opencollective_sponsors(since: datetime.date) -> typing.List[typing.Dict]:
