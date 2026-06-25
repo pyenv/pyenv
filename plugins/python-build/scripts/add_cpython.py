@@ -87,7 +87,7 @@ def adapt_script(version: packaging.version.Version,
 
         elif m:=re.match(r'\s*install_package\s+'
                          r'"(?P<package>openssl-(?P<openssl_major>\d+)\.\S+)"\s+'
-                         r'"(?P<url>\S+)"\s.*$',
+                       r'"(?P<url>\S+)"\s.*$',
                          line):
             item = VersionDirectory.openssl.get_store_latest_release(
                 int(m.group('openssl_major'))
@@ -743,7 +743,7 @@ class Url:
 if __name__ == "__main__":
     #sys.excepthook seems to have no effect in Github Actions
     try:
-        sys.exit(main())
+    sys.exit(main())
     except Exception:
         logging.exception("Unhandled exception occured")
         sys.exit(2)

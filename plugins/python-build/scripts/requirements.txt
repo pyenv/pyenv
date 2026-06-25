@@ -6,4 +6,4 @@ packaging
 requests
 sortedcontainers
 tqdm
-jc @ git+https://github.com/native-api/jc@haslib_mode
+jc
