@@ -31,13 +31,6 @@ import requests_html
 import sortedcontainers
 import tqdm
 
-#CI uses exit code 1 as a signal that no new version is found
-#so have to produce a different exit code on an exception
-def _excepthook(type,value,traceback):
-    logging.error("Unhandled exception occured",exc_info=(type,value,traceback))
-    sys.exit(2)
-sys.excepthook = _excepthook
-
 logger = logging.getLogger(__name__)
 
 CUTOFF_VERSION=packaging.version.Version('3.10')
@@ -176,6 +169,8 @@ def handle_version_patches(
         logger.info(f"Copying patches from {previous_version} to {version}")
         shutil.copytree(previous_patches, new_patches)
 
+    # Subdir rename as a separate step from upper dir copying/moving
+    # in case there are patches for dependency packages as well
     previous_package_patches = new_patches / f"Python-{previous_version}"
     new_package_patches = new_patches / f"Python-{version}"
     if is_prerelease_upgrade:
@@ -187,10 +182,9 @@ def handle_version_patches(
     else:
         previous_package_patches.rename(new_package_patches)
 
-    previous_t_patches = patches_dir / f"{previous_version}t"
-    if previous_t_patches.exists() or previous_t_patches.is_symlink():
-        if is_prerelease_upgrade:
-            previous_t_patches.unlink()
+    if uses_t_thunks(previous_version) and is_prerelease_upgrade:
+        (patches_dir / f"{previous_version}t").unlink(missing_ok=True)
+    if uses_t_thunks(version):
         (patches_dir / f"{version}t").symlink_to(
             str(version), target_is_directory=True
         )
@@ -225,7 +219,7 @@ def cleanup_prerelease_upgrade(
 
 
 def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
-    if (version.major, version.minor) < (3, 13):
+    if not uses_t_thunks(version):
         return
 
     # an old thunk may have older version-specific code
@@ -242,6 +236,10 @@ def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
 
     logger.info(f"Writing {thunk_path}")
     thunk_path.write_text(T_THUNK, encoding='utf-8')
+
+
+def uses_t_thunks(version: packaging.version.Version) -> bool:
+    return (version.major, version.minor) >= (3, 13)
 
 
 Arguments: argparse.Namespace
@@ -262,14 +260,20 @@ def main():
     # So until we know the release is out, its directory is a potential prerelease directory.
     # Normally, prereleases are only made for initial releases (x.y.0) --
     # but rarely, they may make them for other releases (e.g. 3.14.5).
-    for release in (v for v in frozenset(VersionDirectory.available.keys())     #refining changes the
+    for release in (v for v in frozenset(VersionDirectory.available.keys())     #refining alters the
                                                                                 #corresponding directory key
                                                                                 #which breaks iteration
+                                                                                #over the directory --
                                                                                 #so have to iterate over a copy
                             if v not in VersionDirectory.existing):
         VersionDirectory.available.get_store_available_source_downloads(release, True)
         del release
 
+    # Excluding versions for which there already are PRs.
+    # This will prevent us from using advanced features of
+    # peter-evans/create-pull-request Github Action
+    # like updating a PR and closing a superseded PR
+    # but we don't really need them as of this writing.
     versions_to_add = sorted(
         VersionDirectory.available.keys()
         - VersionDirectory.existing.keys()
@@ -293,9 +297,8 @@ def get_pending_versions() -> typing.Set[packaging.version.Version]:
 
     pending_versions = set()
     for line in ls_remote.splitlines():
-        match = AUTO_ADD_VERSION_REF_RE.fullmatch(line)
-        if not match:
-            raise ValueError(f"Unexpected git ls-remote output: {line!r}")
+        if not (match := AUTO_ADD_VERSION_REF_RE.fullmatch(line)):
+            raise ValueError(f"Unexpected git ls-remote output line: {line!r}")
         pending_versions.update(
             packaging.version.Version(version)
             for version in match.group("versions").split("_")
@@ -453,8 +456,9 @@ class CPythonAvailableVersionsDirectory(KeyedList[_CPythonAvailableVersionInfo, 
             download_version = packaging.version.Version(m.group("version"))
             if download_version != version:
                 if not refine_mode:
-                    raise ValueError(f"Unexpectedly found a download {name} ({download_version}) "
+                    logger.warning(f"Ignoring download {name} ({download_version}) "
                                      f"for {version} at page {entry.download_page_url}")
+                    continue
                 entry_to_fill = additional_versions_found.get_or_create(
                     download_version,
                     download_page_url=entry.download_page_url
@@ -467,7 +471,10 @@ class CPythonAvailableVersionsDirectory(KeyedList[_CPythonAvailableVersionInfo, 
                 m.group("extension"), m.group('package'), url
             ))
 
-        if not exact_download_found:
+        # XXX: Exact download not found in non-refine mode never happens now
+        # 'cuz we first call the function in refine mode.
+        # Decide what's best to do if it starts to after a logic change.
+        if not exact_download_found and refine_mode:
             actual_version = max(additional_versions_found.keys())
             logger.debug(f"Refining available version {version} to {actual_version}")
             del self[version]
@@ -533,7 +540,7 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
         if matching:
             return max(matching, key=lambda release: release.version)
 
-        url = "https://api.github.com/repos/openssl/openssl/releases?per_page=100"
+        url = "https://api.github.com/repos/openssl/openssl/releases"
         while url:
             response = requests.get(url, timeout=30)
             response.raise_for_status()
@@ -657,6 +664,7 @@ class DownloadPage:
         if session is None:
             session = requests_html.HTMLSession()
         response = session.get(url, timeout=30)
+        response.raise_for_status()
         page = response.html
         table = page.find("pre", first=True)
         # some GNU mirrors format entries as a table
@@ -736,4 +744,9 @@ class Url:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    #sys.excepthook seems to have no effect in Github Actions
+    try:
+        sys.exit(main())
+    except Exception:
+        logging.exception("Unhandled exception occured")
+        sys.exit(2)
