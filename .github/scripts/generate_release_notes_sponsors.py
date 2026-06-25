@@ -26,6 +26,10 @@ GITHUB_ORG = "pyenv"
 OPENCOLLECTIVE_MEMBERS_URL = "https://opencollective.com/pyenv/members.json"
 
 
+class SponsorDataError(RuntimeError):
+    """Raised when a sponsors data source cannot be queried or parsed."""
+
+
 def parse_date(value: str) -> datetime.date:
     return datetime.datetime.fromisoformat(value).date()
 
@@ -46,6 +50,7 @@ def one_month_ago(today: typing.Optional[datetime.date] = None) -> datetime.date
 
 def latest_release_date() -> datetime.date:
     """Return the publish date of the latest GitHub release."""
+    latest_release_error = None
     try:
         result = subprocess.run(
             ["gh", "api", f"repos/{GITHUB_ORG}/{GITHUB_ORG}/releases/latest"],
@@ -56,8 +61,13 @@ def latest_release_date() -> datetime.date:
         data = json.loads(result.stdout)
         published = data["published_at"].replace("Z", "+00:00")
         return datetime.datetime.fromisoformat(published).date()
-    except (subprocess.CalledProcessError, OSError):
-        pass
+    except (
+        subprocess.CalledProcessError,
+        OSError,
+        json.JSONDecodeError,
+        KeyError,
+    ) as exc:
+        latest_release_error = exc
 
     try:
         tag = subprocess.run(
@@ -74,9 +84,13 @@ def latest_release_date() -> datetime.date:
         ).stdout.strip()
         return datetime.datetime.fromisoformat(date_str).date()
     except (subprocess.CalledProcessError, OSError) as exc:
-        raise RuntimeError(
+        detail = ""
+        if latest_release_error is not None:
+            detail = f" GitHub release lookup failed first: {latest_release_error}."
+        raise SponsorDataError(
             "Could not determine the latest release date. "
             "Pass --since explicitly or run from a clone with release tags."
+            f"{detail}"
         ) from exc
 
 
@@ -136,15 +150,32 @@ def github_sponsors(since: datetime.date) -> typing.List[typing.Dict]:
             text=True,
         )
         if result.returncode != 0:
-            raise RuntimeError(
-                f"gh API call failed (exit {result.returncode}): {result.stderr.strip()}"
+            detail = result.stderr.strip() or result.stdout.strip() or "no output"
+            raise SponsorDataError(
+                "GitHub Sponsors query failed. "
+                "Check that `gh auth status` shows access to the pyenv org "
+                "and that the token has the scopes required to read sponsorships. "
+                f"`gh api graphql` exited {result.returncode}: {detail}"
             )
 
-        data = json.loads(result.stdout)
-        if "errors" in data:
-            raise RuntimeError(f"GitHub GraphQL error: {data['errors']}")
+        try:
+            data = json.loads(result.stdout)
+        except json.JSONDecodeError as exc:
+            raise SponsorDataError(
+                "GitHub Sponsors query returned invalid JSON."
+            ) from exc
 
-        sponsorships = data["data"]["organization"]["sponsorshipsAsMaintainer"]
+        if "errors" in data:
+            raise SponsorDataError(
+                f"GitHub Sponsors query returned errors: {data['errors']}"
+            )
+
+        try:
+            sponsorships = data["data"]["organization"]["sponsorshipsAsMaintainer"]
+        except (TypeError, KeyError) as exc:
+            raise SponsorDataError(
+                "GitHub Sponsors query returned an unexpected response shape."
+            ) from exc
         for node in sponsorships["nodes"]:
             created = datetime.datetime.fromisoformat(
                 node["createdAt"].replace("Z", "+00:00")
@@ -169,18 +200,38 @@ def opencollective_sponsors(since: datetime.date) -> typing.List[typing.Dict]:
         f"{OPENCOLLECTIVE_MEMBERS_URL}?limit=1000",
         headers={"User-Agent": f"{GITHUB_ORG}/release-notes-sponsors"},
     )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        members = json.loads(resp.read())
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            members = json.loads(resp.read())
+    except urllib.error.HTTPError as exc:
+        raise SponsorDataError(
+            f"OpenCollective sponsors query failed for {OPENCOLLECTIVE_MEMBERS_URL}: "
+            f"HTTP {exc.code} {exc.reason}"
+        ) from exc
+    except urllib.error.URLError as exc:
+        raise SponsorDataError(
+            f"OpenCollective sponsors query failed for {OPENCOLLECTIVE_MEMBERS_URL}: "
+            f"{exc.reason}"
+        ) from exc
+    except json.JSONDecodeError as exc:
+        raise SponsorDataError(
+            "OpenCollective sponsors query returned invalid JSON."
+        ) from exc
 
     since_dt = datetime.datetime.combine(since, datetime.time.min)
     sponsors = []
     for member in members:
         if member.get("role") != "BACKER":
             continue
-        created = datetime.datetime.strptime(member["createdAt"], "%Y-%m-%d %H:%M")
+        try:
+            created = datetime.datetime.strptime(member["createdAt"], "%Y-%m-%d %H:%M")
+            profile = member["profile"].rstrip("/")
+        except (KeyError, TypeError, ValueError) as exc:
+            raise SponsorDataError(
+                "OpenCollective sponsors query returned an unexpected member record."
+            ) from exc
         if created < since_dt:
             continue
-        profile = member["profile"].rstrip("/")
         slug = profile.split("/")[-1]
         if slug == "github-sponsors":
             # Listed separately under GitHub Sponsors.
@@ -256,7 +307,7 @@ def main() -> int:
     try:
         since = compute_since_date(args.since)
         section = render(since, github_sponsors(since), opencollective_sponsors(since))
-    except (RuntimeError, OSError, urllib.error.URLError, json.JSONDecodeError) as exc:
+    except SponsorDataError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
