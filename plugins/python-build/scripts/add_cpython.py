@@ -743,7 +743,7 @@ class Url:
 if __name__ == "__main__":
     #sys.excepthook seems to have no effect in Github Actions
     try:
-    sys.exit(main())
+        sys.exit(main())
     except Exception:
         logging.exception("Unhandled exception occured")
         sys.exit(2)
