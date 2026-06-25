@@ -87,7 +87,7 @@ def adapt_script(version: packaging.version.Version,
 
         elif m:=re.match(r'\s*install_package\s+'
                          r'"(?P<package>openssl-(?P<openssl_major>\d+)\.\S+)"\s+'
-                       r'"(?P<url>\S+)"\s.*$',
+                         r'"(?P<url>\S+)"\s.*$',
                          line):
             item = VersionDirectory.openssl.get_store_latest_release(
                 int(m.group('openssl_major'))
