@@ -28,6 +28,8 @@ acquire_lock() {
       # So check for writablity by trying to write to a different file,
       # in a way that taxes the usual use case as little as possible.
       if [[ -z $tested_for_other_write_errors ]]; then
+        # if lots of (50+) rehashes run concurrentlty, another concurrent rehash
+        # may delete the temporary file in remove_*_shims() before we do so
         ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm -f "$t" ) \
           && tested_for_other_write_errors=1 \
           || { echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2
