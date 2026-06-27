@@ -321,11 +321,19 @@ def main() -> int:
         metavar="FILE",
         help="Write the section to FILE instead of stdout.",
     )
+    parser.add_argument(
+        "--skip-opencollective",
+        action="store_true",
+        help="Skip OpenCollective backers if the members endpoint is unavailable.",
+    )
     args = parser.parse_args()
 
     try:
         since = compute_since_date(args.since)
-        section = render(since, github_sponsors(since), opencollective_sponsors(since))
+        oc_sponsors = []
+        if not args.skip_opencollective:
+            oc_sponsors = opencollective_sponsors(since)
+        section = render(since, github_sponsors(since), oc_sponsors)
     except SponsorDataError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

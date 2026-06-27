@@ -14,6 +14,7 @@ Type the would-be tag name in the "Choose a tag" field and press "Generate relea
   Paste the output at the end of the release notes.
   * This lists new GitHub Sponsors and OpenCollective backers since the last release or within the last month, whichever is longer.
   * The GitHub Sponsors query requires the `gh` CLI with the `read:user` scope.
+  * If OpenCollective is unavailable, pass `--skip-opencollective` and add those backers manually.
 * Update `CHANGELOG.md` with the new version number and the edited summary (only the changes section)
 * Push the version number in `libexec/pyenv---version` and `plugins/python-build/bin/python-build`
   * Minor version is pushed if there are significant functional changes (not e.g. bugfixes/formula adaptations/supporting niche use cases).
