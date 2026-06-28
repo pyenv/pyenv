@@ -214,7 +214,7 @@ def github_sponsors(since: datetime.date) -> typing.List[typing.Dict]:
 
 
 def opencollective_sponsors(since: datetime.date) -> typing.List[typing.Dict]:
-    """Return OpenCollective backers created on or after *since*."""
+    """Return OpenCollective backers active on or after *since*."""
     req = urllib.request.Request(
         f"{OPENCOLLECTIVE_MEMBERS_URL}?limit=1000",
         headers={"User-Agent": f"{GITHUB_ORG}/release-notes-sponsors"},
@@ -243,13 +243,13 @@ def opencollective_sponsors(since: datetime.date) -> typing.List[typing.Dict]:
         if member.get("role") != "BACKER":
             continue
         try:
-            created = datetime.datetime.strptime(member["createdAt"], "%Y-%m-%d %H:%M")
+            last_transaction_at = datetime.datetime.strptime(member["lastTransactionAt"], "%Y-%m-%d %H:%M")
             profile = member["profile"].rstrip("/")
         except (KeyError, TypeError, ValueError) as exc:
             raise SponsorDataError(
                 "OpenCollective sponsors query returned an unexpected member record."
             ) from exc
-        if created < since_dt:
+        if last_transaction_at < since_dt:
             continue
         slug = profile.split("/")[-1]
         if slug == "github-sponsors":
