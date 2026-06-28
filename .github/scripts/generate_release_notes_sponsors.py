@@ -15,6 +15,7 @@ import argparse
 import calendar
 import datetime
 import json
+import pathlib
 import subprocess
 import sys
 import typing
@@ -213,25 +214,28 @@ def github_sponsors(since: datetime.date) -> typing.List[typing.Dict]:
             return sponsors
 
 
-def opencollective_sponsors(since: datetime.date) -> typing.List[typing.Dict]:
+def opencollective_sponsors(since: datetime.date, data: typing.Union[str, None]) -> typing.List[typing.Dict]:
     """Return OpenCollective backers active on or after *since*."""
-    req = urllib.request.Request(
-        f"{OPENCOLLECTIVE_MEMBERS_URL}?limit=1000",
-        headers={"User-Agent": f"{GITHUB_ORG}/release-notes-sponsors"},
-    )
+    if data is None:
+        req = urllib.request.Request(
+            f"{OPENCOLLECTIVE_MEMBERS_URL}?limit=1000",
+            headers={"User-Agent": f"{GITHUB_ORG}/release-notes-sponsors"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = resp.read()
+        except urllib.error.HTTPError as exc:
+            raise SponsorDataError(
+                f"OpenCollective sponsors query failed for {OPENCOLLECTIVE_MEMBERS_URL}: "
+                f"HTTP {exc.code} {exc.reason}"
+            ) from exc
+        except urllib.error.URLError as exc:
+            raise SponsorDataError(
+                f"OpenCollective sponsors query failed for {OPENCOLLECTIVE_MEMBERS_URL}: "
+                f"{exc.reason}"
+            ) from exc
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            members = json.loads(resp.read())
-    except urllib.error.HTTPError as exc:
-        raise SponsorDataError(
-            f"OpenCollective sponsors query failed for {OPENCOLLECTIVE_MEMBERS_URL}: "
-            f"HTTP {exc.code} {exc.reason}"
-        ) from exc
-    except urllib.error.URLError as exc:
-        raise SponsorDataError(
-            f"OpenCollective sponsors query failed for {OPENCOLLECTIVE_MEMBERS_URL}: "
-            f"{exc.reason}"
-        ) from exc
+        members = json.loads(data)
     except json.JSONDecodeError as exc:
         raise SponsorDataError(
             "OpenCollective sponsors query returned invalid JSON."
@@ -326,13 +330,22 @@ def main() -> int:
         action="store_true",
         help="Skip OpenCollective backers if the members endpoint is unavailable.",
     )
+    parser.add_argument(
+        "--opencollective-data",
+        metavar="FILE",
+        help="Take OpenCollective API reply from FILE.",
+    )
     args = parser.parse_args()
 
     try:
         since = compute_since_date(args.since)
         oc_sponsors = []
         if not args.skip_opencollective:
-            oc_sponsors = opencollective_sponsors(since)
+            manual_data = (
+                pathlib.Path(args.opencollective_data).read_text()) \
+                if args.opencollective_data \
+                else None
+            oc_sponsors = opencollective_sponsors(since, manual_data)
         section = render(since, github_sponsors(since), oc_sponsors)
     except SponsorDataError as exc:
         print(f"error: {exc}", file=sys.stderr)
