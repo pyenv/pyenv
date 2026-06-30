@@ -202,8 +202,8 @@ or, if you prefer 3.3.3 over 2.7.6,
 
 Install a Python version (using [`python-build`](https://github.com/pyenv/pyenv/tree/master/plugins/python-build)).
 
-    Usage: pyenv install [-f] [-kvp] <version>
-           pyenv install [-f] [-kvp] <definition-file>
+    Usage: pyenv install [-f] [-kvp] <version>[:<alias>]
+           pyenv install [-f] [-kvp] <definition-file>[:<alias>]
            pyenv install -l|--list
 
       -l/--list             List all available versions
