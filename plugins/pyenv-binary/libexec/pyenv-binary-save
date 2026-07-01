@@ -27,6 +27,15 @@ if [ -z "$version" ]; then
   exit 1
 fi
 
+# A version is a single directory name under versions/. Reject a name with a
+# slash or a dot-dot component so it cannot point outside there.
+case "$version" in
+*/* | *..* )
+  echo "pyenv-binary: invalid version name \`${version}'" >&2
+  exit 1
+  ;;
+esac
+
 prefix="${PYENV_ROOT}/versions/${version}"
 if [ ! -d "${prefix}/bin" ]; then
   echo "pyenv-binary: version \`${version}' is not installed" >&2
@@ -58,7 +67,7 @@ system_deps() {
   local f
   {
     for f in "${prefix}"/bin/python*; do
-      [ -e "$f" ] && readlink -f "$f"
+      [ -e "$f" ] && printf '%s\n' "$f"
     done
     find "${prefix}" -type f \( -name '*.so' -o -name '*.so.*' -o -name '*.dylib' \)
   } | sort -u | while IFS= read -r f; do
