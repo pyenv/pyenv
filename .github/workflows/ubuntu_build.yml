@@ -20,7 +20,7 @@ jobs:
           - "3.14"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: |
           sudo apt-get update -q; sudo apt install -yq make build-essential libssl-dev zlib1g-dev \
           libbz2-dev libreadline-dev libsqlite3-dev curl \
