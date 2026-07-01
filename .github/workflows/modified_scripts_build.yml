@@ -8,7 +8,7 @@ jobs:
       versions_cpython_only: ${{steps.modified-versions.outputs.versions_cpython_only}}
       versions_macos_build_exclude: ${{steps.modified-versions.outputs.versions_macos_build_exclude}}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: git fetch origin "$GITHUB_BASE_REF"
       - shell: bash
         run: >
@@ -94,7 +94,7 @@ jobs:
         exclude: ${{fromJson(needs.discover_modified_scripts.outputs.versions_macos_build_exclude)}}
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"
@@ -156,7 +156,7 @@ jobs:
         os: ["macos-14", "macos-15", "macos-15-intel"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"
@@ -205,7 +205,7 @@ jobs:
           - ubuntu-24.04
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"
@@ -268,7 +268,7 @@ jobs:
         os: ["ubuntu-latest"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: |
           #envvars
           export PYENV_ROOT="$GITHUB_WORKSPACE"

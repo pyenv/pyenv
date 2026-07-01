@@ -20,7 +20,7 @@ jobs:
           - "3.14"
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: |
           brew install openssl readline sqlite3 xz tcl-tk@8 libb2 zstd
       - run: |
