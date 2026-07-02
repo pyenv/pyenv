@@ -2,4 +2,5 @@
 !/.gitignore
 !/version-ext-compat
 !/python-build
+!/pyenv-binary
 /python-build/test/build

@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+#
+# Summary: Package an installed Python version as a relocatable binary (experimental)
+#
+# Usage: pyenv binary <command> [<args>]
+#
+# `pyenv binary` packages an already-installed Python version into a relocatable
+# archive that can be installed on another machine. It is experimental and does
+# not touch `pyenv install' or any other command.
+#
+# Run `pyenv binary' to list its commands, or `pyenv binary <command> --help'
+# for command-specific help.
+#
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+libexec="${BASH_SOURCE%/*}/../libexec"
+
+list_commands() {
+  local path
+  for path in "$libexec"/pyenv-binary-*; do
+    [ -e "$path" ] && echo "${path##*/pyenv-binary-}"
+  done
+}
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  shift
+  if [ -z "$1" ]; then
+    list_commands
+  else
+    command_path="${libexec}/pyenv-binary-$1"
+    shift
+    [ -x "$command_path" ] && exec "$command_path" --complete "$@"
+  fi
+  exit
+fi
+
+subcommand="$1"
+if [ -z "$subcommand" ]; then
+  { pyenv-help binary
+    echo
+    echo "Commands:"
+    list_commands | sed 's/^/   /'
+  } >&2
+  exit 1
+fi
+shift
+
+command_path="${libexec}/pyenv-binary-${subcommand}"
+if [ ! -x "$command_path" ]; then
+  echo "pyenv-binary: no such command \`${subcommand}'" >&2
+  exit 1
+fi
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  # `pyenv help' looks the command up on PATH; the subcommands live in libexec.
+  PATH="${libexec}:${PATH}" exec pyenv-help "binary-${subcommand}"
+fi
+
+exec "$command_path" "$@"
