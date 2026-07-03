@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+#
+# Summary: Save an installed Python version as a relocatable archive
+#
+# Usage: pyenv binary save <version> [<output-dir>]
+#
+#   Packs an installed version into a relocatable .tar.gz (relative paths) and
+#   writes a metadata file listing the build platform and the system libraries
+#   it links against, so an installer can check compatibility before unpacking.
+#
+#   <version>      An installed version, as listed by `pyenv versions --bare'.
+#   <output-dir>   Where to write the archive and metadata (default: `.').
+#
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  exec pyenv-versions --bare
+fi
+
+version="$1"
+output_dir="${2:-$PWD}"
+
+if [ -z "$version" ]; then
+  echo "Usage: pyenv binary save <version> [<output-dir>]" >&2
+  exit 1
+fi
+
+# A version is a single directory name under versions/. With no slash allowed,
+# the only remaining names that could point elsewhere are `.' and `..'.
+case "$version" in
+*/* | .. | . )
+  echo "pyenv-binary: invalid version name \`${version}'" >&2
+  exit 1
+  ;;
+esac
+
+prefix="${PYENV_ROOT}/versions/${version}"
+if [ ! -d "${prefix}/bin" ]; then
+  echo "pyenv-binary: version \`${version}' is not installed" >&2
+  exit 1
+fi
+
+os="$(uname -s)"
+arch="$(uname -m)"
+platform="$(printf '%s' "$os" | tr '[:upper:]' '[:lower:]')-${arch}"
+
+# Record the distro and libc version. Platform and arch alone are too coarse to
+# judge compatibility: a build is only portable to a matching libc (e.g. a
+# glibc 2.36 build will not load on an older glibc, nor on musl at all).
+distro=""
+libc=""
+if [ -r /etc/os-release ]; then
+  distro="$( . /etc/os-release && printf '%s %s' "${ID:-}" "${VERSION_ID:-}" )"
+elif [ "$os" = "Darwin" ]; then
+  distro="macos $(sw_vers -productVersion 2>/dev/null)"
+fi
+if [ "$os" = "Linux" ]; then
+  libc="$(getconf GNU_LIBC_VERSION 2>/dev/null || true)"
+fi
+
+# List the external shared libraries the install links against: those that
+# resolve outside its own prefix, so they must already exist on the target.
+# The interpreter plus every bundled shared object are inspected.
+system_deps() {
+  local f
+  {
+    for f in "${prefix}"/bin/python*; do
+      [ -e "$f" ] && printf '%s\n' "$f"
+    done
+    # CPython ships its extension modules as *.so (and *.dylib on macOS). A
+    # bare *.so.* is unusual for CPython itself, but the odd build carries a
+    # versioned copy alongside, so match it too rather than miss a dependency.
+    find "${prefix}" -type f \( -name '*.so' -o -name '*.so.*' -o -name '*.dylib' \)
+  } | sort -u | while IFS= read -r f; do
+    if [ "$os" = "Darwin" ]; then
+      otool -L "$f" 2>/dev/null | tail -n +2 | awk -v pfx="${prefix}/" \
+        '$1 !~ /^@/ && substr($1, 1, length(pfx)) != pfx { print $1 }'
+    else
+      ldd "$f" 2>/dev/null | awk -v pfx="${prefix}/" \
+        '$2 == "=>" && $3 ~ /^\// && substr($3, 1, length(pfx)) != pfx { print $1 }'
+    fi
+  done | sort -u
+}
+
+mkdir -p "$output_dir"
+archive="${version}-${platform}.tar.gz"
+metadata="${version}-${platform}.meta"
+
+tar -C "$prefix" -czf "${output_dir}/${archive}" .
+
+{
+  echo "# pyenv-binary metadata"
+  echo "version=${version}"
+  echo "os=${os}"
+  echo "arch=${arch}"
+  echo "platform=${platform}"
+  [ -n "$distro" ] && echo "distro=${distro}"
+  [ -n "$libc" ] && echo "libc=${libc}"
+  echo "archive=${archive}"
+  system_deps | while IFS= read -r dep; do
+    [ -n "$dep" ] && echo "dep=${dep}"
+  done
+} > "${output_dir}/${metadata}"
+
+echo "Saved ${archive} and ${metadata} to ${output_dir}"
