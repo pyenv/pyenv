@@ -27,10 +27,10 @@ if [ -z "$version" ]; then
   exit 1
 fi
 
-# A version is a single directory name under versions/. Reject a name with a
-# slash or a dot-dot component so it cannot point outside there.
+# A version is a single directory name under versions/. With no slash allowed,
+# the only remaining names that could point elsewhere are `.' and `..'.
 case "$version" in
-*/* | *..* )
+*/* | .. | . )
   echo "pyenv-binary: invalid version name \`${version}'" >&2
   exit 1
   ;;
@@ -69,6 +69,9 @@ system_deps() {
     for f in "${prefix}"/bin/python*; do
       [ -e "$f" ] && printf '%s\n' "$f"
     done
+    # CPython ships its extension modules as *.so (and *.dylib on macOS). A
+    # bare *.so.* is unusual for CPython itself, but the odd build carries a
+    # versioned copy alongside, so match it too rather than miss a dependency.
     find "${prefix}" -type f \( -name '*.so' -o -name '*.so.*' -o -name '*.dylib' \)
   } | sort -u | while IFS= read -r f; do
     if [ "$os" = "Darwin" ]; then
