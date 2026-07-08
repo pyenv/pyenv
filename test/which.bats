@@ -181,7 +181,7 @@ exit
   assert_success "version=3.4.2"
 }
 
-@test "skip advice supresses error messages" {
+@test "skip advice suppresses error messages" {
   bats_require_minimum_version 1.5.0
   create_alt_executable_in_version "2.7" "python"
   create_alt_executable_in_version "3.3" "py.test"

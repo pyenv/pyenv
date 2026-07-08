@@ -506,7 +506,7 @@ class CPythonExistingScriptsDirectory(KeyedList[_CPythonExistingScriptInfo, pack
                 v = packaging.version.Version(entry_name)
                 if v < CUTOFF_VERSION:
                     continue
-                # branch tip scrpts are different from release scripts and thus unusable as a pattern
+                # branch tip scripts are different from release scripts and thus unusable as a pattern
                 if v.dev is not None:
                     continue
                 logger.debug(f"Existing version {v}")
@@ -748,5 +748,5 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except Exception:
-        logging.exception("Unhandled exception occured")
+        logging.exception("Unhandled exception occurred")
         sys.exit(2)

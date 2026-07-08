@@ -269,7 +269,7 @@ would be to make symlinks at the mirror's root:
 ```
 
 The rationale is to abstract away difference between directory structures of sites
-of various Python flavors and their occasional changes as well as to accomodate
+of various Python flavors and their occasional changes as well as to accommodate
 people who only wish to cache some select downloads. This also allows to mirror multiple sites at once.
 
 If the mirror being used does not have the same checksum (*e.g.* with a
