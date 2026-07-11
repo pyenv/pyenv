@@ -20,7 +20,7 @@ _setup() {
 }
 
 @test "version with glob characters is handled correctly" {
-  touch 1.1
+  cd "$BATS_TEST_TMPDIR"; touch 1.1
   echo "[1-9].?*" > .python-version
   run pyenv-local
   assert_success "[1-9].?*"

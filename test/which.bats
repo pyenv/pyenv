@@ -92,7 +92,7 @@ OUT
 
 @test "version with glob characters is handled correctly" {
   bats_require_minimum_version 1.5.0
-  touch 1.1
+  cd "$BATS_TEST_TMPDIR"; touch 1.1
   PATH="$(path_without foo)" PYENV_VERSION="[1-9].?*" run -127 pyenv-which foo
   assert_failure
   assert_output <<!
