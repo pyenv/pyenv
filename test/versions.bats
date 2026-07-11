@@ -66,7 +66,7 @@ OUT
 @test "version with glob characters is handled correctly" {
   stub_system_python
   create_version "[1-9].?*"
-  touch 1.1
+  cd "$BATS_TEST_TMPDIR"; touch 1.1
   run pyenv-versions
   assert_success
   assert_output <<OUT
