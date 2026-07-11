@@ -46,19 +46,21 @@ versions=()
 OLDIFS="$IFS"
 { IFS=:
   any_not_installed=0
+  normalization_done=
   # Unquoted $VAR does glob expansion (against the current dir's contents) after IFS-splitting
   # which is undesired
   set -f
   for version in ${PYENV_VERSION}; do
     # Remove the explicit 'python-' prefix from versions like 'python-3.12'.
     normalised_version="${version#python-}"
-    if version_exists "${version}" || [ "$version" = "system" ]; then
-      versions+=("${version}")
-    elif version_exists "${normalised_version}"; then
+    [[ $version != "${normalised_version}" ]] && normalization_done=1
+    if [[ $version == "system" ]] || version_exists "${normalised_version}" ; then
       versions+=("${normalised_version}")
-    elif resolved_version="$(pyenv-latest -b "${version}")"; then
-      versions+=("${resolved_version}")
+    elif [[ -n $normalization_done ]] && version_exists "${version}"; then
+      versions+=("${version}")
     elif resolved_version="$(pyenv-latest -b "${normalised_version}")"; then
+      versions+=("${resolved_version}")
+    elif [[ -n $normalization_done ]] && resolved_version="$(pyenv-latest -b "${version}")"; then
       versions+=("${resolved_version}")
     else
       if [[ -n $FORCE ]]; then
