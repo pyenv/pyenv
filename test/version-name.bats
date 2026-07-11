@@ -23,7 +23,7 @@ _setup() {
 }
 
 @test "version with glob characters is handled correctly" {
-  touch 1.1
+  cd "$BATS_TEST_TMPDIR"; touch 1.1
   PYENV_VERSION="[1-9].?*" run pyenv-version-name
   assert_failure <<'!'
 pyenv: version `[1-9].?*' is not installed (set by PYENV_VERSION environment variable)
