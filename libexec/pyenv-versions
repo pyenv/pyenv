@@ -99,6 +99,9 @@ else
   miss_prefix="  "
   OLDIFS="$IFS"
   IFS=:
+  # VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
+  # which is undesired
+  set -f
   if ((${BASH_VERSINFO[0]} > 3)); then
     for i in $(pyenv-version-name || true); do
       current_versions["$i"]="1"
@@ -106,6 +109,7 @@ else
   else
     current_versions=($(pyenv-version-name || true))
   fi
+  set +f
   IFS="$OLDIFS"
   include_system="1"
 fi
@@ -161,11 +165,15 @@ versions_dir_entries=("$versions_dir"/*)
 if sort --version-sort </dev/null >/dev/null 2>&1; then
     # system sort supports version sorting
     OLDIFS="$IFS"
+    # VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
+    # which is undesired
+    set -f
     IFS=$'\n'
     versions_dir_entries=($(
         printf "%s\n" "${versions_dir_entries[@]}" |
         sort --version-sort
     ))
+    set +f
     IFS="$OLDIFS"
 fi
 

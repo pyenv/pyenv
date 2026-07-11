@@ -28,6 +28,9 @@ fi
 PYENV_PREFIX_PATHS=()
 OLDIFS="$IFS"
 { IFS=:
+  # Unquoted $VAR does glob expansion (against the current dir's contents) after IFS-splitting
+  # which is undesired
+  set -f
   for version in ${PYENV_VERSION}; do
     if [ "$version" = "system" ]; then
       if PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python --skip-advice 2>/dev/null)" || \
@@ -52,6 +55,7 @@ OLDIFS="$IFS"
       exit 1
     fi
   done
+  set +f
 }
 IFS="$OLDIFS"
 

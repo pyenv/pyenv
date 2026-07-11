@@ -46,6 +46,9 @@ versions=()
 OLDIFS="$IFS"
 { IFS=:
   any_not_installed=0
+  # Unquoted $VAR does glob expansion (against the current dir's contents) after IFS-splitting
+  # which is undesired
+  set -f
   for version in ${PYENV_VERSION}; do
     # Remove the explicit 'python-' prefix from versions like 'python-3.12'.
     normalised_version="${version#python-}"
@@ -66,6 +69,7 @@ OLDIFS="$IFS"
       fi
     fi
   done
+  set +f
 }
 IFS="$OLDIFS"
 

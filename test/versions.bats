@@ -63,6 +63,18 @@ OUT
   assert_success "3.3"
 }
 
+@test "version with glob characters is handled correctly" {
+  stub_system_python
+  create_version "[1-9].?*"
+  touch 1.1
+  run pyenv-versions
+  assert_success
+  assert_output <<OUT
+* system (set by ${PYENV_ROOT}/version)
+  [1-9].?*
+OUT
+}
+
 @test "multiple versions and envs" {
   stub_system_python
   create_version "2.7.6"

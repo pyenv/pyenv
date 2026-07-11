@@ -63,7 +63,11 @@ if [ -z "$PYENV_COMMAND" ]; then
 fi
 
 OLDIFS="$IFS"
+# Unquoted $VAR or VAR=() of unquoted value does glob expansion (against the current dir's contents)
+# after IFS-splitting which is undesired
+set -f
 IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name -f)})
+set +f
 IFS="$OLDIFS"
 
 declare -a nonexistent_versions

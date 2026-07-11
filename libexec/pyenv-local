@@ -59,7 +59,11 @@ elif [ -n "$versions" ]; then
   pyenv-version-file-write ${FORCE:+-f }.python-version "${versions[@]}"
 else
   if version_file="$(pyenv-version-file "$PWD")"; then
+    # VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
+    # which is undesired
+    set -f
     IFS=: versions=($(pyenv-version-file-read "$version_file"))
+    set +f
     for version in "${versions[@]}"; do
       echo "$version"
     done

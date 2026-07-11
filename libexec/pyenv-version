@@ -9,7 +9,11 @@ set -e
 
 exitcode=0
 OLDIFS="$IFS"
+# VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
+# which is undesired
+set -f
 IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name)) || exitcode=$?
+set +f
 IFS="$OLDIFS"
 
 unset bare

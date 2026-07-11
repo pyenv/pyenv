@@ -36,12 +36,16 @@ if [ -n "$versions" ]; then
   pyenv-version-file-write "$PYENV_VERSION_FILE" "${versions[@]}"
 else
   OLDIFS="$IFS"
+  # VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
+  # which is undesired
+  set -f
   IFS=: versions=($(
     pyenv-version-file-read "$PYENV_VERSION_FILE" ||
     pyenv-version-file-read "${PYENV_ROOT}/global" ||
     pyenv-version-file-read "${PYENV_ROOT}/default" ||
     echo system
   ))
+  set +f
   IFS="$OLDIFS"
   for version in "${versions[@]}"; do
     echo "$version"
