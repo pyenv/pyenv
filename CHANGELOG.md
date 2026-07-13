@@ -1,5 +1,19 @@
 # Version History
 
+## Release v2.8.0
+* CI: add_version enhancements by @native-api in https://github.com/pyenv/pyenv/pull/3480
+* Add miniforge3-26.3.2-2, 26.3.2-3 by @native-api in https://github.com/pyenv/pyenv/pull/3481
+* rehash: fix race condition in landlock writability check by @Sheile in https://github.com/pyenv/pyenv/pull/3483
+* Add script to generate sponsors section for release notes by @macayu17 in https://github.com/pyenv/pyenv/pull/3478
+* install: Add an ability to install a version under an alias by @macayu17 in https://github.com/pyenv/pyenv/pull/3484
+* Add graalpy-3.12-25.1.3 by @msimacek in https://github.com/pyenv/pyenv/pull/3485
+* Bump actions/checkout from 6 to 7 in the github-actions group by @dependabot[bot] in https://github.com/pyenv/pyenv/pull/3486
+* Add an experimental pyenv-binary plugin with a save command by @macayu17 in https://github.com/pyenv/pyenv/pull/3487
+* CI: dependabot: set cooldown by @orbisai0security in https://github.com/pyenv/pyenv/pull/3489
+* Fix typos in docs, scripts, and tests by @maxtaran2010 in https://github.com/pyenv/pyenv/pull/3490
+* Add miniconda3 26.5.3-1 by @native-api in https://github.com/pyenv/pyenv/pull/3491
+* version-name: skip redundant checks by @native-api in https://github.com/pyenv/pyenv/pull/3492
+
 ## Release v2.7.3
 * CI: add_version enhancements by @macayu17 in https://github.com/pyenv/pyenv/pull/3475
 * Add CPython 3.15.0b3 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3479

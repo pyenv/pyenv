@@ -14,7 +14,7 @@
 #   -g/--debug       Build a debug version
 #
 
-PYTHON_BUILD_VERSION="2.7.3"
+PYTHON_BUILD_VERSION="2.8.0"
 
 OLDIFS="$IFS"
 
