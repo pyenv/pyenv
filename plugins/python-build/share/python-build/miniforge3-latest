@@ -9,10 +9,10 @@ case "$(anaconda_architecture 2>/dev/null || true)" in
   install_script "Miniforge3-Linux-aarch64" "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh" "miniconda" verify_py3_latest
   ;;
 "MacOSX-arm64" )
-  install_script "Miniforge3-MacOSX-arm64" "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-arm64.sh" "miniconda" verify_py3_latest
+  install_script "Miniforge3-Darwin-arm64" "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Darwin-arm64.sh" "miniconda" verify_py3_latest
   ;;
 "MacOSX-x86_64" )
-  install_script "Miniforge3-MacOSX-x86_64" "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-MacOSX-x86_64.sh" "miniconda" verify_py3_latest
+  install_script "Miniforge3-Darwin-x86_64" "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Darwin-x86_64.sh" "miniconda" verify_py3_latest
   ;;
 * )
   { echo
