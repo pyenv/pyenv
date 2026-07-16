@@ -33,40 +33,39 @@ platform() {
 @test "packages an installed version" {
   create_version "3.12.7"
   local out="${BATS_TEST_TMPDIR}/dist"
+  local archive="${out}/3.12.7-$(platform).tar.gz"
+
   run pyenv-binary-save "3.12.7" "$out"
   assert_success "Saved 3.12.7-$(platform).tar.gz and 3.12.7-$(platform).meta to $out"
-  assert [ -f "${out}/3.12.7-$(platform).tar.gz" ]
+  assert [ -f "$archive" ]
   assert [ -f "${out}/3.12.7-$(platform).meta" ]
+  run tar -tzf "$archive"
+  assert_success
+  assert_line 0 "3.12.7/"
 }
 
 @test "records the platform in the metadata" {
   create_version "3.12.7"
   local out="${BATS_TEST_TMPDIR}/dist"
   pyenv-binary-save "3.12.7" "$out" >/dev/null
+
   run cat "${out}/3.12.7-$(platform).meta"
   assert_success
-  assert_output_contains "version=3.12.7"
-  assert_output_contains "platform=$(platform)"
-  assert_output_contains "archive=3.12.7-$(platform).tar.gz"
-}
-
-# Put an executable on PATH that stands in for a system tool during the test.
-stub() {
-  local name="$1"
-  local dir="${BATS_TEST_TMPDIR}/stubs"
-  mkdir -p "$dir"
-  { echo "#!/usr/bin/env bash"; cat -; } > "${dir}/${name}"
-  chmod +x "${dir}/${name}"
-  export PATH="${dir}:$PATH"
+  assert_line "version=3.12.7"
+  assert_line "platform=$(platform)"
+  assert_line "archive=3.12.7-$(platform).tar.gz"
 }
 
 @test "records only the libraries ldd resolves outside the prefix" {
   create_version "3.12.7"
   touch "${PYENV_ROOT}/versions/3.12.7/bin/python3.12"
-
-  # A realistic ldd listing: the vdso and the loader have no `=>' mapping,
-  # libpython resolves inside the prefix, and libc/libm are external.
-  stub ldd <<'STUB'
+  create_path_executable uname <<'STUB'
+case "$1" in
+  -s) echo Linux ;;
+  -m) echo x86_64 ;;
+esac
+STUB
+  create_path_executable ldd <<'STUB'
 prefix="${PYENV_ROOT}/versions/3.12.7"
 cat <<EOF
 	linux-vdso.so.1 (0x00007ffd1adfe000)
@@ -79,7 +78,6 @@ STUB
 
   run pyenv-binary-save "3.12.7" "${BATS_TEST_TMPDIR}/dist"
   assert_success
-
   run grep '^dep=' "${BATS_TEST_TMPDIR}/dist/"*.meta
   assert_output "dep=libc.so.6
 dep=libm.so.6"
@@ -88,18 +86,13 @@ dep=libm.so.6"
 @test "records only the libraries otool resolves outside the prefix" {
   create_version "3.12.7"
   touch "${PYENV_ROOT}/versions/3.12.7/bin/python3.12"
-
-  # Take the macOS path by faking the platform, then feed a realistic otool
-  # listing: the first line names the file, @rpath and in-prefix entries are
-  # bundled, and libSystem is the one external dependency.
-  stub uname <<'STUB'
+  create_path_executable uname <<'STUB'
 case "$1" in
   -s) echo Darwin ;;
   -m) echo arm64 ;;
-  *) exec /usr/bin/uname "$@" ;;
 esac
 STUB
-  stub otool <<'STUB'
+  create_path_executable otool <<'STUB'
 prefix="${PYENV_ROOT}/versions/3.12.7"
 cat <<EOF
 ${2}:
@@ -111,7 +104,6 @@ STUB
 
   run pyenv-binary-save "3.12.7" "${BATS_TEST_TMPDIR}/dist"
   assert_success
-
   run grep '^dep=' "${BATS_TEST_TMPDIR}/dist/"*.meta
   assert_output "dep=/usr/lib/libSystem.B.dylib"
 }

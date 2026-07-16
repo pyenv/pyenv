@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+#
+# Summary: Rewrite an unpacked Python's rpaths so it runs from its prefix
+#
+# Usage: pyenv binary relocate <prefix>
+#
+#   Rewrites the rpaths of a Python tree that was unpacked into <prefix> so the
+#   interpreter and its extension modules load the bundled libraries from their
+#   new location rather than the path it was built at. Requires patchelf.
+#
+#   The definition that `pyenv binary generate-installer' produces calls this
+#   after `install_package ... copy' has laid the tree down.
+#
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+if [ "$1" = "--complete" ]; then
+  exit
+fi
+
+prefix="$1"
+if [ -z "$prefix" ]; then
+  pyenv-help --usage binary-relocate >&2
+  exit 1
+fi
+
+# patchelf can add an rpath and write one of any length; chrpath can only shorten
+# an existing one, which is not enough to relocate every build, so require it.
+if ! command -v patchelf >/dev/null 2>&1; then
+  echo "pyenv-binary: need patchelf to relocate the binary" >&2
+  exit 1
+fi
+
+# The interpreter loads libpython from ../lib. Patch every ELF binary in bin/ so
+# this holds whatever the interpreter is named (python3, python2.7, ...); the
+# scripts alongside it (pip, idle) are not ELF, so `--print-rpath' fails on them
+# and they are skipped. A tree with no interpreter at all did not unpack the way
+# we expect, so treat that as an error rather than quietly relocating nothing.
+found=0
+for file in "$prefix"/bin/*; do
+  [[ -f $file && -x $file && ! -L $file ]] || continue
+  patchelf --print-rpath "$file" >/dev/null 2>&1 || continue
+  patchelf --set-rpath "$prefix/lib" "$file"
+  found=1
+done
+if [ "$found" -eq 0 ]; then
+  echo "pyenv-binary: found no interpreter to relocate under \`${prefix}/bin'" >&2
+  exit 1
+fi
+
+# The extension modules CPython built are the only other objects with an rpath
+# into the old prefix, so point them at lib/ as well. Anything a wheel installed
+# carries an rpath of its own, often into a bundled library directory beside it,
+# and would stop loading if we overwrote it. Each match is an ELF object we expect
+# to patch, so let a failure stop us rather than swallow it.
+while IFS= read -r so; do
+  patchelf --set-rpath "$prefix/lib" "$so"
+done < <(find "$prefix" -path '*/lib-dynload/*.so')

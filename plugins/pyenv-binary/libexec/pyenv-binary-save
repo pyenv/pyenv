@@ -88,7 +88,7 @@ mkdir -p "$output_dir"
 archive="${version}-${platform}.tar.gz"
 metadata="${version}-${platform}.meta"
 
-tar -C "$prefix" -czf "${output_dir}/${archive}" .
+tar -C "$(dirname "$prefix")" -czf "${output_dir}/${archive}" "$(basename "$prefix")"
 
 {
   echo "# pyenv-binary metadata"
