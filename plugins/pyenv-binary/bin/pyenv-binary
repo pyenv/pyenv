@@ -16,6 +16,11 @@ set -e
 
 libexec="${BASH_SOURCE%/*}/../libexec"
 
+# The pyenv launcher only puts a plugin's bin on PATH, but `pyenv-help' looks a
+# command up there. Add our libexec so the subcommands, and the help text they
+# print, can be found.
+export PATH="${libexec}:${PATH}"
+
 list_commands() {
   local path
   for path in "$libexec"/pyenv-binary-*; do
@@ -54,8 +59,7 @@ if [ ! -x "$command_path" ]; then
 fi
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-  # `pyenv help' looks the command up on PATH; the subcommands live in libexec.
-  PATH="${libexec}:${PATH}" exec pyenv-help "binary-${subcommand}"
+  exec pyenv-help "binary-${subcommand}"
 fi
 
 exec "$command_path" "$@"
