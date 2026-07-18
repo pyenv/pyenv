@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.8.1
+* pyenv-binary: add the `generate-installer` subcommand by @macayu17 in https://github.com/pyenv/pyenv/pull/3488
+* Add CPython 3.15.0b4 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3495
+
 ## Release v2.8.0
 * CI: add_version enhancements by @native-api in https://github.com/pyenv/pyenv/pull/3480
 * Add miniforge3-26.3.2-2, 26.3.2-3 by @native-api in https://github.com/pyenv/pyenv/pull/3481
