@@ -212,16 +212,19 @@ make install
 OUT
 }
 
-@test "Homebrew and port are tried if both are present in PATH in MacOS" {
+@test "Homebrew, port, and pixi are tried if all are present in PATH in MacOS" {
   cached_tarball "Python-3.6.2"
 
   BREW_PREFIX="$BATS_TEST_TMPDIR/homebrew-prefix"
+  PIXI_PREFIX="$BATS_TEST_TMPDIR/pixi-prefix"
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
   for i in {1..5}; do stub brew false; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
   for i in {1..3}; do stub port false; done
+  stub pixi "info : echo 'Environment dir: $PIXI_PREFIX'"
+  for i in {1..4}; do stub pixi false; done
   stub_make_install
 
   export PYENV_DEBUG=1
@@ -234,6 +237,7 @@ DEF
   unstub sw_vers
   unstub brew
   unstub port
+  unstub pixi
   unstub make
 
   assert_build_log <<OUT
@@ -300,6 +304,38 @@ DEF
 
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I$PORT_PREFIX/include -I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L$PORT_PREFIX/lib -Wl,-rpath,$PORT_PREFIX/lib -L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${BATS_TEST_TMPDIR}/lib/pkgconfig"
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "pixi is used if Homebrew and MacPorts were not picked" {
+  cached_tarball "Python-3.6.2"
+
+  PIXI_ENV_DIR="$BATS_TEST_TMPDIR/pixi-envs"
+  mkdir -p "$PIXI_ENV_DIR/python-deps"
+
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub pixi "info : echo 'Environment dir: $PIXI_ENV_DIR'"
+  for i in {1..4}; do stub pixi false; done
+  stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub pixi
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${PIXI_ENV_DIR}/python-deps/include -I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${PIXI_ENV_DIR}/python-deps/lib -Wl,-rpath,${PIXI_ENV_DIR}/python-deps/lib -L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${PIXI_ENV_DIR}/python-deps/lib/pkgconfig"
 Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
 make -j 2
 make install
@@ -483,6 +519,107 @@ make install
 OUT
 }
 
+@test "yaml is linked from pixi" {
+  cached_tarball "Python-3.6.2"
+
+  PIXI_ENV_DIR="$BATS_TEST_TMPDIR/pixi-envs"
+  mkdir -p "$PIXI_ENV_DIR/python-deps"
+
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub pixi "info : echo 'Environment dir: $PIXI_ENV_DIR'"
+  stub pixi "global list --environment python-deps : echo yaml"
+  for i in {1..4}; do stub pixi false; done
+  stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  install_fixture definitions/needs-yaml
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub pixi
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${PIXI_ENV_DIR}/python-deps/include -I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${PIXI_ENV_DIR}/python-deps/lib -Wl,-rpath,${PIXI_ENV_DIR}/python-deps/lib -L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${PIXI_ENV_DIR}/python-deps/lib/pkgconfig"
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "readline is linked from pixi" {
+  cached_tarball "Python-3.6.2"
+
+  PIXI_ENV_DIR="$BATS_TEST_TMPDIR/pixi-envs"
+  mkdir -p "$PIXI_ENV_DIR/python-deps"
+
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub pixi "info : echo 'Environment dir: $PIXI_ENV_DIR'"
+  stub pixi false
+  stub pixi "global list --environment python-deps : echo readline"
+  stub pixi false
+  stub pixi false
+  stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub pixi
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${PIXI_ENV_DIR}/python-deps/include -I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${PIXI_ENV_DIR}/python-deps/lib -Wl,-rpath,${PIXI_ENV_DIR}/python-deps/lib -L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${PIXI_ENV_DIR}/python-deps/lib/pkgconfig"
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "ncurses is linked from pixi" {
+  cached_tarball "Python-3.6.2"
+
+  PIXI_ENV_DIR="$BATS_TEST_TMPDIR/pixi-envs"
+  mkdir -p "$PIXI_ENV_DIR/python-deps"
+
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub pixi "info : echo 'Environment dir: $PIXI_ENV_DIR'"
+  stub pixi false
+  stub pixi false
+  stub pixi "global list --environment python-deps : echo ncurses"
+  stub pixi false
+  stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub pixi
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${PIXI_ENV_DIR}/python-deps/include -I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${PIXI_ENV_DIR}/python-deps/lib -Wl,-rpath,${PIXI_ENV_DIR}/python-deps/lib -L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${PIXI_ENV_DIR}/python-deps/lib/pkgconfig"
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
 @test "openssl is linked from Ports in FreeBSD if present" {
   cached_tarball "Python-3.6.2"
 
@@ -595,6 +732,36 @@ DEF
 
   unstub uname
   unstub port
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib
+make -j 2
+make install
+OUT
+}
+
+@test "pixi is not touched if PYTHON_BUILD_SKIP_PIXI is set" {
+  cached_tarball "Python-3.6.2"
+
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub brew false
+  stub port false
+  stub pixi true; pixi
+  stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+  export PYTHON_BUILD_SKIP_PIXI=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub pixi
   unstub make
 
   assert_build_log <<OUT
@@ -996,6 +1163,42 @@ DEF
   assert_build_log <<OUT
 Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib/pkgconfig"
 Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib
+make -j 2
+make install
+OUT
+}
+
+@test "tcl-tk is linked from pixi via --with-tcl-*" {
+  cached_tarball "Python-3.6.2"
+
+  PIXI_ENV_DIR="$BATS_TEST_TMPDIR/pixi-envs"
+  mkdir -p "$PIXI_ENV_DIR/python-deps"
+  stub_tcltk "$PIXI_ENV_DIR/python-deps"
+
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub pixi "info : echo 'Environment dir: $PIXI_ENV_DIR'"
+  stub pixi "global list --environment python-deps : echo tk"
+  stub pixi false
+  stub pixi false
+  stub pixi false
+  stub_make_install
+  export PYTHON_BUILD_SKIP_HOMEBREW=1
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<DEF
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+
+  unstub uname
+  unstub sw_vers
+  unstub pixi
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${PIXI_ENV_DIR}/python-deps/include -I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${PIXI_ENV_DIR}/python-deps/lib -Wl,-rpath,${PIXI_ENV_DIR}/python-deps/lib -L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${PIXI_ENV_DIR}/python-deps/lib/pkgconfig"
+Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib --with-tcltk-includes=-I${PIXI_ENV_DIR}/python-deps/include -I${PIXI_ENV_DIR}/python-deps/include --with-tcltk-libs=-L${PIXI_ENV_DIR}/python-deps/lib -ltclX.Y -L${PIXI_ENV_DIR}/python-deps/lib -ltkX.Y
 make -j 2
 make install
 OUT
