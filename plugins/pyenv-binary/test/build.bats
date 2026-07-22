@@ -55,6 +55,12 @@ stub_build_environment() {
   assert_failure "pyenv-binary: \`latest' cannot be used as an entry name"
 }
 
+@test "refuses to build on macOS before compiling anything" {
+  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  run pyenv-binary-build 3.12.7:3.12.7-test --archive-url http://x/b
+  assert_failure "pyenv-binary: macOS archives are not supported yet"
+}
+
 @test "builds under the entry name and writes the archive and definition" {
   stub_build_environment
   cd "${BATS_TEST_TMPDIR}"
