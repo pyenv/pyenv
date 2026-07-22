@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+#
+# Summary: Build a Python version and package it as an installable binary
+#
+# Usage: pyenv binary build <version>:<entry> --archive-url <url>
+#
+#   Builds <version> from source under the separate name <entry>, packages the
+#   result with `pyenv binary save', then emits a python-build definition for
+#   it with `pyenv binary generate-installer'. The archive, metadata and
+#   definition are written to the current directory, named after <entry>.
+#
+#   <version>             A version `pyenv install' knows how to build.
+#   <entry>               The name to build under and to install the binary
+#                         as, e.g. `3.13.14-debian-12'. Keeping it distinct
+#                         from <version> lets the binary sit alongside a
+#                         normal source install of the same version.
+#   --archive-url <url>   Where the archive will be hosted; the definition
+#                         downloads it from <url>/<archive-name>.
+#
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions. Only the definitions are useful here: the options
+# `pyenv install' takes are not accepted.
+if [ "$1" = "--complete" ]; then
+  echo --archive-url
+  exec python-build --definitions
+fi
+
+spec=""
+archive_url=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+  --archive-url )
+    [ $# -ge 2 ] || { echo "pyenv-binary: --archive-url needs a value" >&2; exit 1; }
+    archive_url="$2"; shift 2 ;;
+  -* )
+    echo "pyenv-binary: unknown option \`$1'" >&2; exit 1 ;;
+  * )
+    [ -z "$spec" ] || { echo "pyenv-binary: unexpected argument \`$1'" >&2; exit 1; }
+    spec="$1"; shift ;;
+  esac
+done
+
+if [ -z "$spec" ] || [ -z "$archive_url" ]; then
+  pyenv-help --usage binary-build >&2
+  exit 1
+fi
+
+case "$spec" in
+*?:?* ) ;;
+* )
+  echo "pyenv-binary: expected <version>:<entry>, e.g. \`3.13.14:3.13.14-debian-12'" >&2
+  exit 1
+  ;;
+esac
+entry="${spec##*:}"
+
+case "$entry" in
+# `pyenv install' reads a trailing `:latest' as part of the version rather than
+# as an alias, so nothing would end up installed under that name.
+latest )
+  echo "pyenv-binary: \`latest' cannot be used as an entry name" >&2
+  exit 1
+  ;;
+# The entry becomes a directory name under versions/. `pyenv install' does not
+# validate the alias, and `save' only checks once the build is done, so refuse
+# a name that could point elsewhere before compiling anything.
+*/* | .. | . )
+  echo "pyenv-binary: invalid entry name \`${entry}'" >&2
+  exit 1
+  ;;
+esac
+
+# `pyenv install' puts a `<version>:<alias>' build under versions/<alias>.
+pyenv-install "$spec"
+pyenv-binary-save "$entry"
+
+# Name the metadata and the archive the way `save' just named them.
+platform="$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)"
+pyenv-binary-generate-installer "${entry}-${platform}.meta" \
+  --archive-url "${archive_url%/}/${entry}-${platform}.tar.gz" -o "$entry"
