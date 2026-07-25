@@ -11,11 +11,15 @@ stub_build_environment() {
   create_stub getconf 'echo "glibc 2.17"'
 }
 
-@test "completion lists the option and the buildable versions" {
-  create_stub python-build 'echo 3.12.7'
+@test "completion lists definitions provided by another plugin" {
+  mkdir -p "${PYENV_ROOT}/plugins/example/share/python-build"
+  touch "${PYENV_ROOT}/plugins/example/share/python-build/3.12.7-example"
+  PATH="${BATS_TEST_DIRNAME}/../../python-build/bin:${PATH}"
+
   run pyenv-binary-build --complete
-  assert_success "--archive-url
-3.12.7"
+  assert_success
+  assert_line "--archive-url"
+  assert_line "3.12.7-example"
 }
 
 @test "fails with no arguments" {

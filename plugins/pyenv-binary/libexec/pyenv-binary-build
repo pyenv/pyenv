@@ -21,8 +21,16 @@ set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 # Provide pyenv completions. Only the definitions are useful here: the options
-# `pyenv install' takes are not accepted.
+# `pyenv install' takes are not accepted. Include definitions from other
+# plugins just as `pyenv install' does.
 if [ "$1" = "--complete" ]; then
+  shopt -s nullglob
+  for plugin_path in "$PYENV_ROOT"/plugins/*/share/python-build; do
+    PYTHON_BUILD_DEFINITIONS="${PYTHON_BUILD_DEFINITIONS}:${plugin_path}"
+  done
+  export PYTHON_BUILD_DEFINITIONS
+  shopt -u nullglob
+
   echo --archive-url
   exec python-build --definitions
 fi
