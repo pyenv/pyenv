@@ -672,7 +672,7 @@ to `PATH` in the `<command>`'s environment, the same as what e.g. RVM does.
 ### Running nested shells from Python-based programs
 
 In addition to altering `PATH`, `pyenv exec` sets `PYENV_VERSION` in the
-executed program's environment to ensure that it won't spontaneouly switch to
+executed program's environment to ensure that it won't spontaneously switch to
 using a different Python version.
 
 Some Python-based programs (e.g. Jupyter) can spawn nested shell sessions.
