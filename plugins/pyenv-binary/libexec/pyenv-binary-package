@@ -1,48 +1,41 @@
 #!/usr/bin/env bash
 #
-# Summary: Build a Python version and package it as an installable binary
+# Summary: Create an installable binary package from a Python version
 #
-# Usage: pyenv binary build <version>:<entry> --archive-url <url>
+# Usage: pyenv binary package <version>:<entry> --archive-base-url <url>
 #
-#   Builds <version> from source under the separate name <entry>, packages the
-#   result with `pyenv binary save', then emits a python-build definition for
-#   it with `pyenv binary generate-installer'. The archive, metadata and
-#   definition are written to the current directory, named after <entry>.
+#   Installs <version> from source under the separate name <entry>, saves it as
+#   a binary package, then emits a python-build definition for that package.
+#   The archive, metadata and definition are written to the current directory
+#   as <entry>.tar.gz, <entry>.meta and <entry>.
 #
 #   <version>             A version `pyenv install' knows how to build.
 #   <entry>               The name to build under and to install the binary
 #                         as, e.g. `3.13.14-debian-12'. Keeping it distinct
 #                         from <version> lets the binary sit alongside a
 #                         normal source install of the same version.
-#   --archive-url <url>   Where the archive will be hosted; the definition
-#                         downloads it from <url>/<archive-name>.
+#   --archive-base-url <url>
+#                         Where the archive will be hosted; the definition
+#                         downloads it from <url>/<entry>.tar.gz.
 #
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
-# Provide pyenv completions. Only the definitions are useful here: the options
-# `pyenv install' takes are not accepted. Include definitions from other
-# plugins just as `pyenv install' does.
+# Provide pyenv completions
 if [ "$1" = "--complete" ]; then
-  shopt -s nullglob
-  for plugin_path in "$PYENV_ROOT"/plugins/*/share/python-build; do
-    PYTHON_BUILD_DEFINITIONS="${PYTHON_BUILD_DEFINITIONS}:${plugin_path}"
-  done
-  export PYTHON_BUILD_DEFINITIONS
-  shopt -u nullglob
-
-  echo --archive-url
-  exec python-build --definitions
+  echo --archive-base-url
+  pyenv-install --list | sed '1d; s/^  //'
+  exit
 fi
 
 spec=""
-archive_url=""
+archive_base_url=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
-  --archive-url )
-    [ $# -ge 2 ] || { echo "pyenv-binary: --archive-url needs a value" >&2; exit 1; }
-    archive_url="$2"; shift 2 ;;
+  --archive-base-url )
+    [ $# -ge 2 ] || { echo "pyenv-binary: --archive-base-url needs a value" >&2; exit 1; }
+    archive_base_url="$2"; shift 2 ;;
   -* )
     echo "pyenv-binary: unknown option \`$1'" >&2; exit 1 ;;
   * )
@@ -51,8 +44,8 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ -z "$spec" ] || [ -z "$archive_url" ]; then
-  pyenv-help --usage binary-build >&2
+if [ -z "$spec" ] || [ -z "$archive_base_url" ]; then
+  pyenv-help --usage binary-package >&2
   exit 1
 fi
 
@@ -84,7 +77,7 @@ esac
 os="$(uname -s)"
 
 # `generate-installer' refuses a macOS archive, so the last step here cannot
-# succeed on one. Give up before the build rather than after it.
+# succeed on one. Give up before compiling rather than after it.
 if [ "$os" = "Darwin" ]; then
   echo "pyenv-binary: macOS archives are not supported yet" >&2
   exit 1
@@ -92,9 +85,7 @@ fi
 
 # `pyenv install' puts a `<version>:<alias>' build under versions/<alias>.
 pyenv-install "$spec"
-pyenv-binary-save "$entry"
+pyenv-binary-save "$entry" "$PWD" --name "$entry"
 
-# Name the metadata and the archive the way `save' just named them.
-platform="$(printf '%s' "$os" | tr '[:upper:]' '[:lower:]')-$(uname -m)"
-pyenv-binary-generate-installer "${entry}-${platform}.meta" \
-  --archive-url "${archive_url%/}/${entry}-${platform}.tar.gz" -o "$entry"
+pyenv-binary-generate-installer "${entry}.meta" \
+  --archive-url "${archive_base_url%/}/${entry}.tar.gz" -o "$entry"

@@ -2,7 +2,7 @@
 #
 # Summary: Save an installed Python version as a relocatable archive
 #
-# Usage: pyenv binary save <version> [<output-dir>]
+# Usage: pyenv binary save <version> [<output-dir>] [--name <name>]
 #
 #   Packs an installed version into a relocatable .tar.gz (relative paths) and
 #   writes a metadata file listing the build platform and the system libraries
@@ -10,20 +10,46 @@
 #
 #   <version>      An installed version, as listed by `pyenv versions --bare'.
 #   <output-dir>   Where to write the archive and metadata (default: `.').
+#   --name <name>  Use <name> as the archive and metadata base name instead of
+#                  <version>-<platform>.
 #
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
+  echo --name
   exec pyenv-versions --bare
 fi
 
-version="$1"
-output_dir="${2:-$PWD}"
+version=""
+output_dir=""
+package_name=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+  --name )
+    [ $# -ge 2 ] && [ -n "$2" ] || { echo "pyenv-binary: --name needs a value" >&2; exit 1; }
+    package_name="$2"; shift 2 ;;
+  -* )
+    echo "pyenv-binary: unknown option \`$1'" >&2; exit 1 ;;
+  * )
+    if [ -z "$version" ]; then
+      version="$1"
+    elif [ -z "$output_dir" ]; then
+      output_dir="$1"
+    else
+      echo "pyenv-binary: unexpected argument \`$1'" >&2
+      exit 1
+    fi
+    shift ;;
+  esac
+done
+
+output_dir="${output_dir:-$PWD}"
 
 if [ -z "$version" ]; then
-  echo "Usage: pyenv binary save <version> [<output-dir>]" >&2
+  echo "Usage: pyenv binary save <version> [<output-dir>] [--name <name>]" >&2
   exit 1
 fi
 
@@ -32,6 +58,13 @@ fi
 case "$version" in
 */* | .. | . )
   echo "pyenv-binary: invalid version name \`${version}'" >&2
+  exit 1
+  ;;
+esac
+
+case "$package_name" in
+*/* | .. | . )
+  echo "pyenv-binary: invalid package name \`${package_name}'" >&2
   exit 1
   ;;
 esac
@@ -85,8 +118,9 @@ system_deps() {
 }
 
 mkdir -p "$output_dir"
-archive="${version}-${platform}.tar.gz"
-metadata="${version}-${platform}.meta"
+package_name="${package_name:-${version}-${platform}}"
+archive="${package_name}.tar.gz"
+metadata="${package_name}.meta"
 
 tar -C "$(dirname "$prefix")" -czf "${output_dir}/${archive}" "$(basename "$prefix")"
 
