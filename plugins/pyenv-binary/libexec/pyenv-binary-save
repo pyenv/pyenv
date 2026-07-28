@@ -63,7 +63,7 @@ case "$version" in
 esac
 
 case "$package_name" in
-*/* | .. | . )
+*/* | .. | . | *[[:cntrl:]]* )
   echo "pyenv-binary: invalid package name \`${package_name}'" >&2
   exit 1
   ;;
