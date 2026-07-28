@@ -160,6 +160,22 @@ OUT
   unstub python-build
 }
 
+@test "list available versions with --bare" {
+  stub_python_build_lib
+  stub_python_build "--definitions : echo 2.6.9 2.7.9-rc1 2.7.9-rc2 3.4.2 | tr ' ' $'\\n'"
+
+  run pyenv-install --list --bare
+  assert_success
+  assert_output <<OUT
+2.6.9
+2.7.9-rc1
+2.7.9-rc2
+3.4.2
+OUT
+
+  unstub python-build
+}
+
 @test "upgrade instructions given for a nonexistent version" {
   stub brew false
   stub_python_build_lib
@@ -265,6 +281,7 @@ OUT
   run pyenv-install --complete
   assert_success
   assert_output <<OUT
+--bare
 --list
 --force
 --skip-existing

@@ -4,7 +4,7 @@
 #
 # Usage: pyenv install [-f] [-kvp] <version>[:<alias>]...
 #        pyenv install [-f] [-kvp] <definition-file>[:<alias>]
-#        pyenv install -l|--list
+#        pyenv install -l|--list [--bare]
 #        pyenv install --version
 #
 #   -l/--list          List all available versions
@@ -45,6 +45,7 @@ shopt -u nullglob
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
+  echo --bare
   echo --list
   echo --force
   echo --skip-existing
@@ -79,6 +80,8 @@ unset KEEP
 unset VERBOSE
 unset HAS_PATCH
 unset DEBUG
+unset BARE
+unset LIST
 
 [ -n "$PYENV_DEBUG" ] && VERBOSE="-v"
 
@@ -88,10 +91,11 @@ for option in "${OPTIONS[@]}"; do
   "h" | "help" )
     usage 0
     ;;
+  "bare" )
+    BARE=1
+    ;;
   "l" | "list" )
-    echo "Available versions:"
-    definitions | indent
-    exit
+    LIST=1
     ;;
   "f" | "force" )
     FORCE=true
@@ -119,6 +123,16 @@ for option in "${OPTIONS[@]}"; do
     ;;
   esac
 done
+
+if [[ -n $LIST ]]; then
+  if [[ -n $BARE ]]; then
+    definitions
+  else
+    echo "Available versions:"
+    definitions | indent
+  fi
+  exit
+fi
 
 unset VERSION_NAME
 

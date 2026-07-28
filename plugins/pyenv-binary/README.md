@@ -16,11 +16,29 @@ and dependency metadata exist to catch that.
 
 ## Commands
 
-### `pyenv binary save <version> [<output-dir>]`
+### `pyenv binary package <version>:<entry> --archive-base-url <url>`
+
+Installs `<version>` from source under the separate name `<entry>`, packages
+that install with `save`, then emits a python-build definition for it with
+`generate-installer`. The archive, metadata and definition land in the current
+directory, named after the entry; host the archive under `<url>` and drop the
+definition into python-build's definition directory. Keeping the entry name
+distinct from the version lets the binary sit alongside a normal source
+install of the same version.
+
+```sh
+pyenv binary package 3.12.7:3.12.7-debian-12 \
+  --archive-base-url https://example.com/binaries
+# writes 3.12.7-debian-12.tar.gz, its .meta file and
+# a `3.12.7-debian-12' definition
+```
+
+### `pyenv binary save <version> [<output-dir>] [--name <name>]`
 
 Packs an installed version into `<version>-<platform>.tar.gz` (relative paths)
 and writes `<version>-<platform>.meta` describing the build platform (OS, arch,
-distro and libc version) and the system libraries the build links against.
+distro and libc version) and the system libraries the build links against. Use
+`--name` to set a different base name for both files.
 
 ```sh
 pyenv binary save 3.12.7 ./dist

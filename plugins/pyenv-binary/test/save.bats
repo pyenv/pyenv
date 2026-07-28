@@ -12,7 +12,7 @@ platform() {
 
 @test "fails with no version given" {
   run pyenv-binary-save
-  assert_failure "Usage: pyenv binary save <version> [<output-dir>]"
+  assert_failure "Usage: pyenv binary save <version> [<output-dir>] [--name <name>]"
 }
 
 @test "fails for a version that is not installed" {
@@ -42,6 +42,29 @@ platform() {
   run tar -tzf "$archive"
   assert_success
   assert_line 0 "3.12.7/"
+}
+
+@test "uses an explicit package name" {
+  create_version "3.12.7"
+  local out="${BATS_TEST_TMPDIR}/dist"
+
+  run pyenv-binary-save "3.12.7" "$out" --name "custom"
+  assert_success "Saved custom.tar.gz and custom.meta to $out"
+  assert [ -f "${out}/custom.tar.gz" ]
+  run grep '^archive=' "${out}/custom.meta"
+  assert_success "archive=custom.tar.gz"
+}
+
+@test "fails when --name has no value" {
+  run pyenv-binary-save "3.12.7" --name
+  assert_failure "pyenv-binary: --name needs a value"
+}
+
+@test "rejects an invalid package name" {
+  create_version "3.12.7"
+
+  run pyenv-binary-save "3.12.7" --name "foo/bar"
+  assert_failure "pyenv-binary: invalid package name \`foo/bar'"
 }
 
 @test "records the platform in the metadata" {
