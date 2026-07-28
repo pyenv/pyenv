@@ -24,8 +24,7 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   echo --archive-base-url
-  pyenv-install --list | sed '1d; s/^  //'
-  exit
+  exec pyenv-install --list --bare
 fi
 
 spec=""
