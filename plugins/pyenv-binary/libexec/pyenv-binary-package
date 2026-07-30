@@ -2,18 +2,17 @@
 #
 # Summary: Create an installable binary package from a Python version
 #
-# Usage: pyenv binary package <version>:<entry> --archive-base-url <url>
+# Usage: pyenv binary package <version>[:<entry>] --archive-base-url <url>
 #
-#   Installs <version> from source under the separate name <entry>, saves it as
-#   a binary package, then emits a python-build definition for that package.
+#   Installs <version> from source under a separate entry name, saves it as a
+#   binary package, then emits a python-build definition for that package.
 #   The archive, metadata and definition are written to the current directory
 #   as <entry>.tar.gz, <entry>.meta and <entry>.
 #
 #   <version>             A version `pyenv install' knows how to build.
-#   <entry>               The name to build under and to install the binary
-#                         as, e.g. `3.13.14-debian-12'. Keeping it distinct
-#                         from <version> lets the binary sit alongside a
-#                         normal source install of the same version.
+#   <entry>               The optional name to build under and install the
+#                         binary as. If omitted, a name is generated from the
+#                         current platform, platform version and architecture.
 #   --archive-base-url <url>
 #                         Where the archive will be hosted; the definition
 #                         downloads it from <url>/<entry>.tar.gz.
@@ -49,13 +48,9 @@ if [ -z "$spec" ] || [ -z "$archive_base_url" ]; then
 fi
 
 case "$spec" in
-*?:?* ) ;;
-* )
-  echo "pyenv-binary: expected <version>:<entry>, e.g. \`3.13.14:3.13.14-debian-12'" >&2
-  exit 1
-  ;;
+*?:?* ) entry="${spec##*:}" ;;
+* ) entry="$(pyenv-binary-package-name "$spec")"; spec="${spec}:${entry}" ;;
 esac
-entry="${spec##*:}"
 
 case "$entry" in
 # `pyenv install' reads a trailing `:latest' as part of the version rather than
