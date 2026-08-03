@@ -42,9 +42,15 @@ versions_dir="${PYENV_ROOT}/versions"
 if [[ -n "$executables" ]]; then
   if [ -d "$versions_dir" ]; then
     shopt -s dotglob nullglob
-    # MacOS 12+ and FreeBSD 15 support `xargs -r -0' and `basename -a'
-    # `sort -u` is simpler and a bit faster than `awk '!seen[$0]++'`, with the same result for rehash purposes
-    printf '%s\0' "$versions_dir"/*/bin/* "$versions_dir"/*/envs/*/bin/* | xargs -0 -r basename -a | sort -u
+    # Fast path for rehash: skip filtering and link resolution.
+    # Discover executables directly from the versions directory and
+    # deduplicate their basenames. Use bash 3.2 conventions to keep code portable.
+    for path in \
+      "$versions_dir"/*/bin/* \
+      "$versions_dir"/*/envs/*/bin/*
+    do
+      printf '%s\n' "${path##*/}"
+    done | sort -u
     shopt -u dotglob nullglob
   fi
   exit 0
