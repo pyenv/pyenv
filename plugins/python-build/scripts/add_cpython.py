@@ -542,8 +542,7 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
 
         url = "https://api.github.com/repos/openssl/openssl/releases"
         while url:
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
+            response = Requests.get(url)
             matching = [
                 release
                 for release in response.json()
@@ -568,7 +567,7 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
             for asset in j_release['assets']
             if urllib.parse.urlparse(asset['browser_download_url']).path.split('/')[-1].endswith('.sha256')
         )
-        shasum_text = requests.get(shasum_url, timeout=30).text
+        shasum_text = Requests.get(shasum_url).text
         shasum_data = jc.parse("hashsum", shasum_text, quiet=True)[0]
         package_hash, package_filename = shasum_data["hash"], shasum_data["filename"]
         del shasum_data, shasum_text, shasum_url
@@ -741,6 +740,13 @@ class Url:
                 t.update(len(c))
                 h.update(c)
         return h.hexdigest()
+
+class Requests:
+    @staticmethod
+    def get(url: str) -> requests.Response:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        return response
 
 
 if __name__ == "__main__":
