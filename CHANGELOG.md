@@ -1,5 +1,13 @@
 # Version History
 
+## Release v2.8.2
+* pyenv-binary: add the `package` subcommand; add `pyenv install --list --bare` by @macayu17 in https://github.com/pyenv/pyenv/pull/3498
+* Add graalpy3.12-25.2.4 by @msimacek in https://github.com/pyenv/pyenv/pull/3502
+* Bump actions/setup-python from 6 to 7 in the github-actions group by @dependabot[bot] in https://github.com/pyenv/pyenv/pull/3505
+* add_cpython: refactor extra Requests logic by @anupamme in https://github.com/pyenv/pyenv/pull/3507
+* Add CPython 3.15.0rc1 by @jsirois in https://github.com/pyenv/pyenv/pull/3510
+* pyenv-binary: generate platform-specific package names by @macayu17 in https://github.com/pyenv/pyenv/pull/3504
+
 ## Release v2.8.1
 * pyenv-binary: add the `generate-installer` subcommand by @macayu17 in https://github.com/pyenv/pyenv/pull/3488
 * Add CPython 3.15.0b4 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3495
