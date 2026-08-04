@@ -21,7 +21,6 @@ int realpath_builtin(WORD_LIST *list)
 		} else {
 			printf("%s\n", realbuf);
 			free(realbuf);
-			realbuf = NULL;
 		}
 	}
 	return es;
