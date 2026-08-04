@@ -45,9 +45,18 @@ stub_build_environment() {
   assert_failure "pyenv-binary: unexpected argument \`extra'"
 }
 
-@test "rejects a bare version without an entry name" {
-  run pyenv-binary-package 3.12.7 --archive-base-url http://x/b
-  assert_failure "pyenv-binary: expected <version>:<entry>, e.g. \`3.13.14:3.13.14-debian-12'"
+@test "generates an entry name for a bare version" {
+  stub_build_environment
+  create_stub lsb_release 'case "$1" in -si) echo Debian;; -sr) echo 12;; esac'
+  cd "${BATS_TEST_TMPDIR}"
+
+  run pyenv-binary-package 3.12.7 --archive-base-url http://example.com/binaries
+  assert_success
+  assert [ -d "${PYENV_ROOT}/versions/3.12.7-debian-12-x86_64" ]
+  assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.tar.gz" ]
+  assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.meta" ]
+  run grep '^ARCHIVE_URL=' "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64"
+  assert_success "ARCHIVE_URL=http://example.com/binaries/3.12.7-debian-12-x86_64.tar.gz"
 }
 
 @test "rejects an entry name containing a slash" {

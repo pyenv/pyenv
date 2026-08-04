@@ -16,21 +16,38 @@ and dependency metadata exist to catch that.
 
 ## Commands
 
-### `pyenv binary package <version>:<entry> --archive-base-url <url>`
+### `pyenv binary package <version>[:<entry>] --archive-base-url <url>`
 
-Installs `<version>` from source under the separate name `<entry>`, packages
-that install with `save`, then emits a python-build definition for it with
-`generate-installer`. The archive, metadata and definition land in the current
-directory, named after the entry; host the archive under `<url>` and drop the
-definition into python-build's definition directory. Keeping the entry name
-distinct from the version lets the binary sit alongside a normal source
-install of the same version.
+Installs `<version>` from source under a separate name, packages that install
+with `save`, then emits a python-build definition for it with
+`generate-installer`. With no explicit entry, the name is generated from the
+current platform, platform version and architecture. An explicit entry keeps
+the existing custom-build workflow.
 
 ```sh
-pyenv binary package 3.12.7:3.12.7-debian-12 \
+pyenv binary package 3.12.7 \
   --archive-base-url https://example.com/binaries
-# writes 3.12.7-debian-12.tar.gz, its .meta file and
-# a `3.12.7-debian-12' definition
+# On Debian 12 x86_64, writes 3.12.7-debian-12-x86_64.tar.gz,
+# its .meta file and a `3.12.7-debian-12-x86_64' definition.
+
+pyenv binary package 3.12.7:company-python \
+  --archive-base-url https://example.com/binaries
+```
+
+The archive, metadata and definition land in the current directory, named after
+the entry. Host the archive under `<url>` and drop the definition into
+python-build's definition directory.
+
+### `pyenv binary package-name <version>`
+
+Prints the automatically generated entry name without building anything. Linux
+uses the distribution name and version, macOS uses the macOS version, and other
+systems use the name and release reported by `uname`. All names include the
+architecture.
+
+```sh
+pyenv binary package-name 3.12.7
+# 3.12.7-debian-12-x86_64
 ```
 
 ### `pyenv binary save <version> [<output-dir>] [--name <name>]`

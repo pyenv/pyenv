@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+#
+# Summary: Generate a binary package name for the current platform
+#
+# Usage: pyenv binary package-name <version>
+#
+#   Prints a package name containing the Python version, platform name,
+#   platform version and architecture.
+#
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+if [ "$1" = "--complete" ]; then
+  exec pyenv-install --list --bare
+fi
+
+if [ $# -ne 1 ]; then
+  pyenv-help --usage binary-package-name >&2
+  exit 1
+fi
+
+version="$1"
+
+case "$version" in
+*/* | .. | . | *[[:cntrl:]]* )
+  echo "pyenv-binary: invalid version name \`${version}'" >&2
+  exit 1
+  ;;
+esac
+
+os="$(uname -s)"
+arch="$(uname -m)"
+distro=""
+distro_version=""
+
+case "$os" in
+Linux )
+  if type -p lsb_release >/dev/null; then
+    distro="$(lsb_release -si)"
+    distro_version="$(lsb_release -sr)"
+  elif [ -r /etc/os-release ]; then
+    distro="$(. /etc/os-release && printf '%s' "${ID:-}")"
+    distro_version="$(. /etc/os-release && printf '%s' "${VERSION_ID:-}")"
+  fi
+  ;;
+Darwin )
+  distro="macos"
+  distro_version="$(sw_vers -productVersion)"
+  ;;
+* )
+  distro="$os"
+  distro_version="$(uname -r)"
+  ;;
+esac
+
+slug() {
+  printf '%s' "$1" |
+    tr '[:upper:] ' '[:lower:]-' |
+    tr -cd 'a-z0-9._-'
+}
+
+distro="$(slug "$distro")"
+distro_version="$(slug "$distro_version")"
+arch="$(slug "$arch")"
+
+if [ -z "$distro" ] || [ -z "$distro_version" ] || [ -z "$arch" ]; then
+  echo "pyenv-binary: could not determine the package platform" >&2
+  exit 1
+fi
+
+printf '%s-%s-%s-%s\n' "$version" "$distro" "$distro_version" "$arch"
