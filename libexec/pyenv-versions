@@ -45,12 +45,10 @@ if [[ -n "$executables" ]]; then
     # Fast path for rehash: skip filtering and link resolution.
     # Discover executables directly from the versions directory and
     # deduplicate their basenames. Use bash 3.2 conventions to keep code portable.
-    for path in \
-      "$versions_dir"/*/bin/* \
-      "$versions_dir"/*/envs/*/bin/*
-    do
-      printf '%s\n' "${path##*/}"
-    done | sort -u
+    paths=( "$versions_dir"/*/bin/* "$versions_dir"/*/envs/*/bin/* )
+    if [ "${#paths[@]}" -gt 0 ]; then
+      printf '%s\n' "${paths[@]##*/}" | sort -u
+    fi
     shopt -u dotglob nullglob
   fi
   exit 0
