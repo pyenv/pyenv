@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.8.3
+* Add CPython 3.13.15, 3.14.7 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3512
+
 ## Release v2.8.2
 * pyenv-binary: add the `package` subcommand; add `pyenv install --list --bare` by @macayu17 in https://github.com/pyenv/pyenv/pull/3498
 * Add graalpy3.12-25.2.4 by @msimacek in https://github.com/pyenv/pyenv/pull/3502
