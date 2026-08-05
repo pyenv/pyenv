@@ -43,28 +43,32 @@ jobs:
           import packaging.version
           
           result=[]
+          def exclude_macos_intel(result, python_version):
+            result.append({'os':'macos-15-intel','python-version':python_version})
+            result.append({'os':'macos-26-intel','python-version':python_version})          
+          
           
           for line in os.environ['versions'].splitlines():
-            if m:=re.match(r'([^-]+)-(\d+\.\d+)-(\d+\.\d+.\d+)', line):
-              name, version = m.group(1), packaging.version.Version(m.group(3))
+            if m:=re.match(r'miniconda3-\d+\.\d+-(\d+\.\d+.\d+)', line):
+              version = packaging.version.Version(m.group(1))
               
               # Miniconda dropped MacOS x64 support
-              if (name == 'miniconda3' and version >= packaging.version.Version('25.9.1')):
-                result.append({'os':'macos-15-intel','python-version':line})
+              if version >= packaging.version.Version('25.9.1'):
+                exclude_macos_intel(result, line)
             
-            if m:=re.match(r'([^-]+)-(\d+\.\d+)', line):
-              name, version = m.group(1), packaging.version.Version(m.group(2))
+            if m:=re.match(r'anaconda3-(\d+\.\d+)', line):
+              version = packaging.version.Version(m.group(1))
               
               # Anaconda dropped MacOS x64 support
-              if name == 'anaconda3' and version >= packaging.version.Version('2025.12'):
-                result.append({'os':'macos-15-intel','python-version':line})
+              if version >= packaging.version.Version('2025.12'):
+                exclude_macos_intel(result, line)
           
             if m:=re.match(r'graalpy[^-]*-(community-)?(\d+\.\d+.\d+)', line):
               version = packaging.version.Version(m.group(2))
               
               # GraalPy dropped MacOS x64 support
               if version >= packaging.version.Version('25.0.2'):
-                result.append({'os':'macos-15-intel','python-version':line})
+                exclude_macos_intel(result, line)
               
           
           EOF = str(random.getrandbits(15*8))
@@ -91,6 +95,7 @@ jobs:
           - macos-15
           - macos-15-intel
           - macos-26
+          - macos-26-intel
         exclude: ${{fromJson(needs.discover_modified_scripts.outputs.versions_macos_build_exclude)}}
     runs-on: ${{ matrix.os }}
     steps:
@@ -153,7 +158,12 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions_cpython_only)}}
-        os: ["macos-14", "macos-15", "macos-15-intel"]
+        os:
+          - macos-14
+          - macos-15
+          - macos-15-intel
+          - macos-26
+          - macos-26-intel
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -165,7 +175,7 @@ jobs:
       - run: |
           #prerequisites
           brew install sqlite3 xz tcl-tk@8 libb2 zstd
-          "$GITHUB_WORKSPACE/.github/workflows/scripts/brew-uninstall-cascade.sh" openssl@3 openssl@1.1 readline
+          "$GITHUB_WORKSPACE/.github/workflows/scripts/brew-uninstall-cascade.sh" $(brew list | grep -E '^openssl(@|$)') readline
           if [[ "${{ matrix.python-version }}" =~ pypy.*-(src|dev) ]]; then
             export PYENV_BOOTSTRAP_VERSION=pypy2.7-7
             echo "PYENV_BOOTSTRAP_VERSION=$PYENV_BOOTSTRAP_VERSION" >> $GITHUB_ENV
