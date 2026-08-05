@@ -155,10 +155,23 @@ case "$EXPECT_LIBC" in
   ;;
 esac
 
-# Required system libraries must already be present on the target. ldconfig -p
-# lists each library as "<soname> (...) => <path>"; match the soname column
-# exactly so a longer name like libc.so.6.1 does not satisfy libc.so.6.
-if command -v ldconfig &>/dev/null && cache="$(ldconfig -p)"; then
+# Required system libraries must already be present on the target. Linux lists
+# the soname first; FreeBSD lists it in the resolved path, so normalize that
+# path before matching exact names.
+cache=""
+if command -v ldconfig &>/dev/null; then
+  case "$os" in
+  FreeBSD )
+    cache="$(ldconfig -r 2>/dev/null)" &&
+      cache="$(printf '%s\n' "$cache" | awk -F ' *=> *' '{ sub(/^.*\//, "", $2); print $2 }')" \
+      || cache=""
+    ;;
+  * )
+    cache="$(ldconfig -p 2>/dev/null)" || cache=""
+    ;;
+  esac
+fi
+if [ -n "$cache" ]; then
   missing=""
   for dep in $DEPS; do
     printf '%s\n' "$cache" | awk -v d="$dep" '$1 == d { found = 1 } END { exit !found }' \
@@ -169,7 +182,7 @@ if command -v ldconfig &>/dev/null && cache="$(ldconfig -p)"; then
     exit 1
   fi
 elif [ -n "$DEPS" ]; then
-  echo "pyenv-binary: cannot check required system libraries (ldconfig with -p not found)" >&2
+  echo "pyenv-binary: cannot check required system libraries (ldconfig cache unavailable)" >&2
 fi
 
 build_package_relocate() {

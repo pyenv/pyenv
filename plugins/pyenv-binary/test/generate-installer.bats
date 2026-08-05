@@ -93,6 +93,19 @@ create_meta() {
   assert_failure "pyenv-binary: archive needs glibc 99.0 or newer, but this system has 2.31"
 }
 
+@test "checks required libraries in the FreeBSD ldconfig cache" {
+  local out="${BATS_TEST_TMPDIR}/definition"
+  local meta="$(create_meta FreeBSD amd64 '')"
+  printf 'dep=libc.so.7\ndep=libmissing.so.1\n' >> "$meta"
+  pyenv-binary-generate-installer "$meta" \
+    --archive-url http://example.com/a.tar.gz -o "$out"
+  create_stub uname 'case "$1" in -s) echo FreeBSD;; -m) echo amd64;; esac'
+  create_stub ldconfig '[ "$1" = "-r" ] && echo "0:-lc.7=>/lib/libc.so.7"'
+
+  run bash "$out"
+  assert_failure "pyenv-binary: missing required system libraries: libmissing.so.1"
+}
+
 @test "fails when the archive is not beside the metadata" {
   local meta="$(create_meta)"
   rm "${BATS_TEST_TMPDIR}/3.12.7.tar.gz"
