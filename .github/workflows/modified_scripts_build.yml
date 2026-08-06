@@ -49,7 +49,7 @@ jobs:
           
           
           for line in os.environ['versions'].splitlines():
-            if m:=re.match(r'miniconda3-\d+\.\d+-(\d+\.\d+.\d+)', line):
+            if m:=re.match(r'miniconda3-\d+\.\d+-(\d+\.\d+\.\d+)', line):
               version = packaging.version.Version(m.group(1))
               
               # Miniconda dropped MacOS x64 support
@@ -63,7 +63,7 @@ jobs:
               if version >= packaging.version.Version('2025.12'):
                 exclude_macos_intel(result, line)
           
-            if m:=re.match(r'graalpy[^-]*-(community-)?(\d+\.\d+.\d+)', line):
+            if m:=re.match(r'graalpy[^-]*-(community-)?(\d+\.\d+\.\d+)', line):
               version = packaging.version.Version(m.group(2))
               
               # GraalPy dropped MacOS x64 support
