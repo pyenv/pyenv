@@ -2,7 +2,7 @@ name: modified_scripts
 on: [pull_request]
 jobs:
   discover_modified_scripts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       versions: ${{steps.modified-versions.outputs.versions}}
       versions_cpython_only: ${{steps.modified-versions.outputs.versions_cpython_only}}
