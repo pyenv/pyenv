@@ -279,7 +279,7 @@ jobs:
           export PYENV_ROOT="$GITHUB_WORKSPACE"
           echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
-          echo "_PYTHON_BUILD_FORCE_SKIP_XZ=1" >> $GITHUB_PATH
+          echo "_PYTHON_BUILD_FORCE_SKIP_XZ=1" >> $GITHUB_ENV
       - run: |
           #prerequisites
           sudo apt-get update -q; sudo apt-get install -yq make build-essential \
