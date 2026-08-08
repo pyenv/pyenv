@@ -7,6 +7,7 @@ load test_helper
 # `generate-installer' behave the same on any test host.
 stub_build_environment() {
   create_stub pyenv-install 'mkdir -p "${PYENV_ROOT}/versions/${1##*:}/bin"'
+  create_stub pyenv-latest '[ "$1" = "-f" ] && [ "$2" = "-k" ] && shift 2 && echo "$*"'
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub getconf 'echo "glibc 2.17"'
 }

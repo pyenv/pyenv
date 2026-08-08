@@ -2,6 +2,10 @@
 
 load test_helper
 
+_setup() {
+  create_stub pyenv-latest '[ "$1" = "-f" ] && [ "$2" = "-k" ] && shift 2 && echo "$*"'
+}
+
 @test "completion lists installable versions" {
   create_stub pyenv-install \
     '[ "$*" = "--list --bare" ] && echo 3.13.14'
@@ -40,12 +44,13 @@ load test_helper
   assert_success "3.13.14-macos-15.5-arm64"
 }
 
-@test "generates a package name for FreeBSD" {
+@test "resolves a version prefix when generating a package name" {
+  create_stub pyenv-latest '[ "$*" = "-f -k 3" ] && echo 3.14.7'
   create_stub uname \
     'case "$1" in -s) echo FreeBSD;; -m) echo amd64;; -r) echo 14.2-RELEASE-p3;; esac'
 
-  run pyenv-binary-package-name 3.13.14
-  assert_success "3.13.14-freebsd-14.2-release-p3-amd64"
+  run pyenv-binary-package-name 3
+  assert_success "3.14.7-freebsd-14.2-release-p3-amd64"
 }
 
 @test "rejects an invalid version name" {
