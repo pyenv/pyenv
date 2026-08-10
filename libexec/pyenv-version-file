@@ -17,6 +17,7 @@ find_local_version_file() {
   # (https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap04.html#tag_04_16)
   # even though few UNIX variants do that
   local unc; [[ $root =~ ^//[^/] && ! / -ef // ]] && unc=1
+  root="${root%/}"
   # when testing root, $root is ""
   while true; do
     # don't test //.python-version if // is special
