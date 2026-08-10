@@ -11,12 +11,24 @@ find_local_version_file() {
   # Nonexistent paths are UB as of this writing.
   # Relative ones cause a failure but absolute ones don't
   [[ $root != /* ]] && root=$(CDPATH= cd -- "$root" && pwd)
-  while ! [[ "$root" =~ ^//[^/]*$ ]]; do
-    if [ -f "${root}/.python-version" ]; then
-      echo "${root}/.python-version"
+  # Original Rbenv code supports UNC notaion for Cygwin/MinGW
+  # (https://github.com/rbenv/rbenv/pull/529)
+  # POSIX.1-2024 still allows to treat //<name> in implementation-specific manner
+  # (https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap04.html#tag_04_16)
+  # even though few UNIX variants do that
+  local unc; [[ $root =~ ^//[^/] && ! / -ef // ]] && unc=1
+  # when testing root, $root is ""
+  while true; do
+    # don't test //.python-version if // is special
+    # as it's pointless and possibly very slow
+    # if it e.g. leads to a network search
+    [[ $unc && $root == / ]] && break
+    
+    if [[ -f $root/.python-version ]]; then
+      echo "$root/.python-version"
       return 0
     fi
-    [ -n "$root" ] || break
+    [[ -n $root ]] || break
     root="${root%/*}"
   done
   return 1
