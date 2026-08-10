@@ -6,10 +6,22 @@ load test_helper
 # the platform tools report a fixed Linux target so the real `save' and
 # `generate-installer' behave the same on any test host.
 stub_build_environment() {
-  create_stub pyenv-install 'mkdir -p "${PYENV_ROOT}/versions/${1##*:}/bin"'
-  create_stub pyenv-latest '[ "$1" = "-f" ] && [ "$2" = "-k" ] && shift 2 && echo "$*"'
+  create_stub pyenv-install 'echo "${0##*/} $*"; mkdir -p "${PYENV_ROOT}/versions/${1##*:}/bin"'
+  create_stub pyenv-latest 'while (($#)); do case "$1" in -f|-k);; *)break;; esac; shift; done; echo "$*"'
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub getconf 'echo "glibc 2.17"'
+}
+
+@test "-v|--verbose runs pyenv install verbosely" {
+  stub_build_environment
+  create_stub pyenv-binary-save true
+  create_stub pyenv-binary-generate-installer true
+
+  for opt in "" -v --verbose; do 
+    run pyenv-binary-package $opt 3.12.7:3.12.7-test \
+      --archive-base-url http://example.com/binaries
+    assert_success "pyenv-install ${opt:+--verbose }3.12.7:3.12.7-test"
+  done
 }
 
 @test "completion lists the option and definitions provided by another plugin" {
@@ -20,6 +32,7 @@ stub_build_environment() {
   run pyenv-binary-package --complete
   assert_success
   assert_line "--archive-base-url"
+  assert_line "--verbose"
   assert_line "3.12.7-example"
   refute_line "Available versions:"
 }
@@ -92,7 +105,6 @@ stub_build_environment() {
 
 @test "strips a trailing slash from the archive base url" {
   stub_build_environment
-  cd "${BATS_TEST_TMPDIR}"
 
   run pyenv-binary-package 3.12.7:3.12.7-test \
     --archive-base-url http://example.com/binaries/

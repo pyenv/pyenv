@@ -16,13 +16,15 @@ and dependency metadata exist to catch that.
 
 ## Commands
 
-### `pyenv binary package <version>[:<entry>] --archive-base-url <url>`
+### `pyenv binary package [-v|--verbose] <version>[:<entry>] --archive-base-url <url>`
 
 Installs `<version>` from source under a separate name, packages that install
 with `save`, then emits a python-build definition for it with
 `generate-installer`. With no explicit entry, the name is generated from the
 current platform, platform version and architecture. An explicit entry keeps
 the existing custom-build workflow.
+
+Pass `-v` to show build progress from `pyenv install`.
 
 ```sh
 pyenv binary package 3.12.7 \
