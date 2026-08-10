@@ -74,8 +74,7 @@ assert_failure() {
 
 assert_equal() {
   if [ "$1" != "$2" ]; then
-    { echo "expected: \`$1'"
-      echo "actual:   \`$2'"
+    { diff -u --label expected --label actual <(echo "$1") <(echo "$2") | cat -te
     } | flunk
   fi
 }
