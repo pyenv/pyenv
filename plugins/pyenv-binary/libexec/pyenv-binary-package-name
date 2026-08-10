@@ -28,6 +28,8 @@ case "$version" in
   ;;
 esac
 
+version="$(pyenv-latest -f -k "$version")"
+
 os="$(uname -s)"
 arch="$(uname -m)"
 distro=""
