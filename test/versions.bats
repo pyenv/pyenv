@@ -83,8 +83,7 @@ OUT
   create_version "3.4.0/envs/bar"
   create_version "3.5.2"
   run pyenv-versions
-  assert_success
-  assert_output <<OUT
+  assert_success <<OUT
 * system (set by ${PYENV_ROOT}/version)
   2.7.6
   3.4.0
@@ -95,6 +94,7 @@ OUT
 }
 
 @test "skips envs with --skip-envs" {
+  stub_system_python
   create_version "3.3.3"
   create_version "3.4.0"
   create_version "3.4.0/envs/foo"
@@ -102,7 +102,7 @@ OUT
   create_version "3.5.0"
 
   run pyenv-versions --skip-envs
-    assert_success <<OUT
+  assert_success <<OUT
 * system (set by ${PYENV_ROOT}/version)
   3.3.3
   3.4.0
@@ -188,9 +188,7 @@ OUT
   create_external_version "moo"
 
   run pyenv-versions --bare --skip-aliases
-  assert_success
-
-  assert_output <<OUT
+  assert_success <<OUT
 1.8.7
 moo
 OUT

@@ -23,7 +23,8 @@ load test_helper
   touch "${PYENV_ROOT}/shims/.pyenv-shim"
   #avoid failure due to a localized error message
   LANG=C run pyenv-rehash
-  assert_failure <<!
+  assert_failure
+  assert_output_glob <<!
 pyenv: cannot rehash: couldn't acquire lock ${PYENV_ROOT}/shims/.pyenv-shim for 1 seconds. Last error message:
 */pyenv-rehash: line *: ${PYENV_ROOT}/shims/.pyenv-shim: cannot overwrite existing file
 !

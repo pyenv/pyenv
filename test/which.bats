@@ -64,7 +64,7 @@ load test_helper
   assert_failure <<OUT
 pyenv: version \`3.3' is not installed (set by PYENV_VERSION environment variable)
 pyenv: py.test: command not found
-   
+
 The \`py.test' command exists in these Python versions:
   3.4
 
@@ -81,7 +81,7 @@ OUT
 pyenv: version \`2.7' is not installed (set by PYENV_VERSION environment variable)
 pyenv: version \`3.3' is not installed (set by PYENV_VERSION environment variable)
 pyenv: py.test: command not found
-   
+
 The \`py.test' command exists in these Python versions:
   3.4
 
