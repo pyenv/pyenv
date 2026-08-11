@@ -2,7 +2,7 @@
 #
 # Summary: Create an installable binary package from a Python version
 #
-# Usage: pyenv binary package <version>[:<entry>] --archive-base-url <url>
+# Usage: pyenv binary package [-v|--verbose] <version>[:<entry>] --archive-base-url <url>
 #
 #   Installs <version> from source under a separate entry name, saves it as a
 #   binary package, then emits a python-build definition for that package.
@@ -13,6 +13,7 @@
 #   <entry>               The optional name to build under and install the
 #                         binary as. If omitted, a name is generated from the
 #                         current platform, platform version and architecture.
+#   -v,--verbose          Show build progress from `pyenv install'.
 #   --archive-base-url <url>
 #                         Where the archive will be hosted; the definition
 #                         downloads it from <url>/<entry>.tar.gz.
@@ -23,23 +24,29 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   echo --archive-base-url
+  echo --verbose
   exec pyenv-install --list --bare
 fi
 
 spec=""
 archive_base_url=""
+verbose=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
   --archive-base-url )
-    [ $# -ge 2 ] || { echo "pyenv-binary: --archive-base-url needs a value" >&2; exit 1; }
-    archive_base_url="$2"; shift 2 ;;
+    [ $# -lt 2 ] && { echo "pyenv-binary: --archive-base-url needs a value" >&2; exit 1; }
+    archive_base_url="$2"; shift ;;
+  -v|--verbose)
+    verbose=1 ;;
   -* )
     echo "pyenv-binary: unknown option \`$1'" >&2; exit 1 ;;
   * )
     [ -z "$spec" ] || { echo "pyenv-binary: unexpected argument \`$1'" >&2; exit 1; }
-    spec="$1"; shift ;;
+    spec="$1"
+    ;;
   esac
+  shift
 done
 
 if [ -z "$spec" ] || [ -z "$archive_base_url" ]; then
@@ -78,7 +85,7 @@ if [ "$os" = "Darwin" ]; then
 fi
 
 # `pyenv install' puts a `<version>:<alias>' build under versions/<alias>.
-pyenv-install "$spec"
+pyenv-install ${verbose:+--verbose} "$spec"
 pyenv-binary-save "$entry" "$PWD" --name "$entry"
 
 pyenv-binary-generate-installer "${entry}.meta" \

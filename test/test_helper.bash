@@ -58,34 +58,64 @@ assert_success() {
   if [ "$status" -ne 0 ]; then
     flunk "command failed with exit status $status" $'\n'\
     "output: $output"
-  elif [ "$#" -gt 0 ]; then
-    assert_output "$1"
   fi
+  _assert_output_if_provided "$@"
 }
 
 assert_failure() {
   if [ "$status" -eq 0 ]; then
     flunk "expected failed exit status" $'\n'\
     "output: $output"
-  elif [ "$#" -gt 0 ]; then
-    assert_output "$1"
   fi
+  _assert_output_if_provided "$@"
 }
 
 assert_equal() {
-  if [ "$1" != "$2" ]; then
-    { echo "expected: \`$1'"
-      echo "actual:   \`$2'"
+  _assert_equal_as text "$@"
+}
+
+_assert_equal_as() {
+  if case "$1" in
+    text)
+      [[ "$2" != "$3" ]];;
+    glob)
+      [[ "$3" != $2 ]];;
+    *)
+      echo "invalid comparison type: \`$1'" >&2; return 1;;
+    esac
+  then
+    { diff -u --label expected --label actual <(echo "$2") <(echo "$3") | cat -te
     } | flunk
   fi
 }
 
-assert_output() {
-  local expected
-  if [ $# -eq 0 ]; then expected="$(cat -)"
-  else expected="$1"
+_assert_output_if_provided() {
+  if [ "$#" -gt 0 ]; then
+    assert_output "$1"
+  elif [ ! -t 0 ]; then
+    local expected=$(cat -)
+    if [[ -n $expected ]]; then
+      assert_output "$expected"
+    fi
   fi
-  assert_equal "$expected" "$output"
+}
+
+assert_output() {
+  _assert_output_as text "$@"
+}
+
+assert_output_glob() {
+  _assert_output_as glob "$@"
+}
+
+_assert_output_as() {
+  local kind="${1:?}"; shift
+  local expected
+  if [ $# -eq 0 ]
+    then expected="$(cat -)"
+    else expected="$1"
+  fi
+  _assert_equal_as "$kind" "$expected" "$output"
 }
 
 assert_line() {

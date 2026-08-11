@@ -106,6 +106,17 @@ create_meta() {
   assert_failure "pyenv-binary: missing required system libraries: libmissing.so.1"
 }
 
+@test "checks for patchelf before installing the archive" {
+  local out="${BATS_TEST_TMPDIR}/definition"
+  pyenv-binary-generate-installer "$(create_meta)" \
+    --archive-url http://example.com/a.tar.gz -o "$out"
+  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
+  create_stub getconf 'echo "glibc 2.31"'
+
+  PATH="$(path_without patchelf)" run bash "$out"
+  assert_failure "pyenv-binary: need patchelf to relocate the binary"
+}
+
 @test "fails when the archive is not beside the metadata" {
   local meta="$(create_meta)"
   rm "${BATS_TEST_TMPDIR}/3.12.7.tar.gz"
@@ -125,6 +136,7 @@ create_meta() {
   mkdir -p "$cache"
   cp "$archive" "${cache}/Python-3.12.7-binary.tar.gz"
   create_stub pyenv 'echo "pyenv $*"'
+  create_path_executable patchelf "exit 0"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
 
   PYTHON_BUILD_CACHE_PATH="$cache" run \

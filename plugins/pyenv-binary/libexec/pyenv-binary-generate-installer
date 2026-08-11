@@ -185,6 +185,11 @@ elif [ -n "$DEPS" ]; then
   echo "pyenv-binary: cannot check required system libraries (ldconfig cache unavailable)" >&2
 fi
 
+if ! command -v patchelf >/dev/null 2>&1; then
+  echo "pyenv-binary: need patchelf to relocate the binary" >&2
+  exit 1
+fi
+
 build_package_relocate() {
   pyenv binary relocate "$PREFIX_PATH"
 }

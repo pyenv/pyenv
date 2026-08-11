@@ -6,22 +6,33 @@ load test_helper
 # the platform tools report a fixed Linux target so the real `save' and
 # `generate-installer' behave the same on any test host.
 stub_build_environment() {
-  create_stub pyenv-install 'mkdir -p "${PYENV_ROOT}/versions/${1##*:}/bin"'
-  create_stub pyenv-latest '[ "$1" = "-f" ] && [ "$2" = "-k" ] && shift 2 && echo "$*"'
+  create_stub pyenv-install 'echo "${0##*/} $*"; mkdir -p "${PYENV_ROOT}/versions/${1##*:}/bin"'
+  create_stub pyenv-latest 'while (($#)); do case "$1" in -f|-k);; *)break;; esac; shift; done; echo "$*"'
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub getconf 'echo "glibc 2.17"'
 }
 
-@test "completion lists the option and definitions provided by another plugin" {
-  mkdir -p "${PYENV_ROOT}/plugins/example/share/python-build"
-  touch "${PYENV_ROOT}/plugins/example/share/python-build/3.12.7-example"
-  PATH="${BATS_TEST_DIRNAME}/../../python-build/bin:${PATH}"
+@test "-v|--verbose runs pyenv install verbosely" {
+  stub_build_environment
+  create_stub pyenv-binary-save true
+  create_stub pyenv-binary-generate-installer true
+
+  for opt in "" -v --verbose; do 
+    run pyenv-binary-package $opt 3.12.7:3.12.7-test \
+      --archive-base-url http://example.com/binaries
+    assert_success "pyenv-install ${opt:+--verbose }3.12.7:3.12.7-test"
+  done
+}
+
+@test "completions" {
+  create_stub pyenv-install 'echo "${0##*/} $*"'
 
   run pyenv-binary-package --complete
-  assert_success
-  assert_line "--archive-base-url"
-  assert_line "3.12.7-example"
-  refute_line "Available versions:"
+  assert_success <<!
+--archive-base-url
+--verbose
+pyenv-install --list --bare
+!
 }
 
 @test "fails with no arguments" {
@@ -76,7 +87,7 @@ stub_build_environment() {
   assert_failure "pyenv-binary: macOS archives are not supported yet"
 }
 
-@test "writes the archive, metadata and definition under the entry name" {
+@test "writes the archive, metadata and definition under the entry name (integration)" {
   stub_build_environment
   cd "${BATS_TEST_TMPDIR}"
 
@@ -90,13 +101,24 @@ stub_build_environment() {
   assert_success "ARCHIVE_URL=http://example.com/binaries/3.12.7-test.tar.gz"
 }
 
-@test "strips a trailing slash from the archive base url" {
+@test "correctly joins archive base url with a trailing slash" {
   stub_build_environment
-  cd "${BATS_TEST_TMPDIR}"
+  create_stub pyenv-binary-save true
+  create_stub pyenv-binary-generate-installer <<'!'
+echo -n "${0##*/} "
+while (($#)); do
+  case $1 in
+    --archive-url)
+      echo "$1 ${2:?}"
+      break
+      ;;
+  esac
+  shift
+done
+!
 
   run pyenv-binary-package 3.12.7:3.12.7-test \
     --archive-base-url http://example.com/binaries/
   assert_success
-  run grep '^ARCHIVE_URL=' "${BATS_TEST_TMPDIR}/3.12.7-test"
-  assert_success "ARCHIVE_URL=http://example.com/binaries/3.12.7-test.tar.gz"
+  assert_line "pyenv-binary-generate-installer --archive-url http://example.com/binaries/3.12.7-test.tar.gz"
 }
