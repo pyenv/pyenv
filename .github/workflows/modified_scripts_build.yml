@@ -207,7 +207,9 @@ jobs:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
         os:
           - ubuntu-22.04
+          - ubuntu-22.04-arm
           - ubuntu-24.04
+          - ubuntu-24.04-arm
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
