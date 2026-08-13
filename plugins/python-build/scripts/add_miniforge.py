@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 'Adds the latest miniforge and mambaforge releases.'
 from pathlib import Path
+import argparse
 import logging
 import os
 import string
@@ -8,7 +9,7 @@ import string
 import requests
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=os.environ.get('LOGLEVEL', 'INFO'))
+logging.basicConfig(level=logging.INFO)
 
 MINIFORGE_REPO = 'conda-forge/miniforge'
 DISTRIBUTIONS = ['miniforge']
@@ -21,6 +22,8 @@ SKIPPED_RELEASES = [
     '22.11.1-2',    #MacOS packages are broken (have broken dep tarballs, downloading them fails with 403)
     '25.3.0-0',     #marked as prerelease, no Linux version
     '25.11.0-0',    #regression reported in constructor, re-released as 25.11.0-1 with hotfix bumping to constructor>=3.14 (was >=3.12, 3.13 implicit)
+    '26.1.1-0',     #prerelease, no binary assets
+    '26.1.1-1',     #prerelease, no binary assets
 ]
 
 install_script_fmt = """
@@ -136,7 +139,7 @@ def main():
         if version in SKIPPED_RELEASES:
             continue
 
-        logger.info(f'Looking for {version} in {out_dir}')
+        logger.debug(f'Looking for {version} in {out_dir}')
 
         # mambaforge is retired https://github.com/conda-forge/miniforge/releases/tag/24.11.2-0
         if version_tuple(version) >= (24, 11, 2):
@@ -149,4 +152,17 @@ def main():
             add_version(release, distributions)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "-d", "--dry-run", action="store_true",
+        help="Do not write scripts, just report them to stdout",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", default=0,
+        help="Increase verbosity of logging",
+    )
+    parsed = parser.parse_args()
+    
+    if parsed.verbose: logging.getLogger.setLevel(logging.DEBUG)
+    
     main()
