@@ -220,6 +220,8 @@ class CondaVersion(NamedTuple):
                 raise ValueError("Miniconda 4.8+ is supposed to specify a Python version explicitly")
         if self.flavor == "anaconda":
             # https://www.anaconda.com/docs/tools/anaconda-org/release-notes
+            if v >= (2026,7):
+                return PyVersion.PY314
             if v >= (2025,6):
                 return PyVersion.PY313
             if v >= (2024,6):
