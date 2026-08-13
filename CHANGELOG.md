@@ -1,5 +1,14 @@
 # Version History
 
+## Release v2.8.4
+* CI: Add macos_26_intel by @native-api in https://github.com/pyenv/pyenv/pull/3514
+* pyenv-binary: check FreeBSD system libraries by @macayu17 in https://github.com/pyenv/pyenv/pull/3511
+* version-file: Fix infinite loop for a relative path argument by @fudianchn in https://github.com/pyenv/pyenv/pull/3515
+* pyenv-binary: check patchelf early and add --verbose by @macayu17 in https://github.com/pyenv/pyenv/pull/3516
+* CI: add ubuntu ARM images by @native-api in https://github.com/pyenv/pyenv/pull/3517
+* Add CPython 3.10.21, 3.11.16, 3.12.14 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3518
+* Add anaconda3-2026.07-1, miniconda3 26.5.3-2 by @native-api in https://github.com/pyenv/pyenv/pull/3519
+
 ## Release v2.8.3
 * Add CPython 3.13.15, 3.14.7 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3512
 
