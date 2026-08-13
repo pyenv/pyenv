@@ -219,7 +219,10 @@ class CondaVersion(NamedTuple):
                 # since 4.8, Miniconda specifies versions explicitly in the file name
                 raise ValueError("Miniconda 4.8+ is supposed to specify a Python version explicitly")
         if self.flavor == "anaconda":
-            # https://www.anaconda.com/docs/tools/anaconda-org/release-notes
+            # Info about the bundled Python version
+            # https://www.anaconda.com/docs/getting-started/anaconda/release-notes
+            if v >= (2026,7):
+                return PyVersion.PY314
             if v >= (2025,6):
                 return PyVersion.PY313
             if v >= (2024,6):
