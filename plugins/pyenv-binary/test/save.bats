@@ -2,6 +2,10 @@
 
 load test_helper
 
+_setup() {
+  create_path_executable readelf "exit 0"
+}
+
 create_version() {
   mkdir -p "${PYENV_ROOT}/versions/$1/bin"
 }
@@ -79,7 +83,15 @@ platform() {
   assert_line "archive=3.12.7-$(platform).tar.gz"
 }
 
-@test "records only the libraries ldd resolves outside the prefix" {
+@test "fails when readelf is not available" {
+  create_version "3.12.7"
+
+  PATH="$(path_without readelf)" run pyenv-binary-save "3.12.7" "${BATS_TEST_TMPDIR}/dist"
+  assert_failure "pyenv-binary: need readelf to inspect shared libraries"
+  assert [ ! -e "${BATS_TEST_TMPDIR}/dist/3.12.7-$(platform).tar.gz" ]
+}
+
+@test "records only direct libraries resolved outside the prefix" {
   create_version "3.12.7"
   touch "${PYENV_ROOT}/versions/3.12.7/bin/python3.12"
   create_path_executable uname <<'STUB'
@@ -98,12 +110,17 @@ cat <<EOF
 	/lib64/ld-linux-x86-64.so.2 (0x00007f4a3c200000)
 EOF
 STUB
+  create_path_executable readelf <<'STUB'
+cat <<EOF
+ 0x0000000000000001 (NEEDED)             Shared library: [libpython3.12.so.1.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+EOF
+STUB
 
   run pyenv-binary-save "3.12.7" "${BATS_TEST_TMPDIR}/dist"
   assert_success
   run grep '^dep=' "${BATS_TEST_TMPDIR}/dist/"*.meta
-  assert_output "dep=libc.so.6
-dep=libm.so.6"
+  assert_output "dep=libm.so.6"
 }
 
 @test "records only the libraries otool resolves outside the prefix" {

@@ -92,12 +92,16 @@ fi
 if [ "$os" = "Linux" ]; then
   libc="$(getconf GNU_LIBC_VERSION 2>/dev/null || true)"
 fi
+if [ "$os" != "Darwin" ] && ! LC_ALL=C readelf --version >/dev/null 2>&1; then
+  echo "pyenv-binary: need readelf to inspect shared libraries" >&2
+  exit 1
+fi
 
 # List the external shared libraries the install links against: those that
 # resolve outside its own prefix, so they must already exist on the target.
 # The interpreter plus every bundled shared object are inspected.
 system_deps() {
-  local f
+  local f needed
   {
     for f in "${prefix}"/bin/python*; do
       [ -e "$f" ] && printf '%s\n' "$f"
@@ -111,8 +115,15 @@ system_deps() {
       otool -L "$f" 2>/dev/null | tail -n +2 | awk -v pfx="${prefix}/" \
         '$1 !~ /^@/ && substr($1, 1, length(pfx)) != pfx { print $1 }'
     else
-      ldd "$f" 2>/dev/null | awk -v pfx="${prefix}/" \
-        '$2 == "=>" && $3 ~ /^\// && substr($3, 1, length(pfx)) != pfx { print $1 }'
+      needed="$(LC_ALL=C readelf -dW "$f" 2>/dev/null | awk \
+        '$2 == "(NEEDED)" || $2 == "NEEDED" { sub(/^.*\[/, ""); sub(/\].*$/, ""); print }' | tr '\n' ' ')"
+      LC_ALL=C ldd "$f" 2>/dev/null | awk -v needed="$needed" -v pfx="${prefix}/" '
+        BEGIN {
+          split(needed, deps, " ")
+          for (i in deps) direct[deps[i]] = 1
+        }
+        $1 in direct && $2 == "=>" && $3 ~ /^\// && substr($3, 1, length(pfx)) != pfx { print $1 }
+      '
     fi
   done | sort -u
 }
