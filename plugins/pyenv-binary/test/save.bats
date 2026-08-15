@@ -85,6 +85,7 @@ platform() {
 
 @test "fails when readelf is not available" {
   create_version "3.12.7"
+  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
 
   PATH="$(path_without readelf)" run pyenv-binary-save "3.12.7" "${BATS_TEST_TMPDIR}/dist"
   assert_failure "pyenv-binary: need readelf to inspect shared libraries"
