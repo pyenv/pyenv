@@ -12,7 +12,7 @@ FROM bash:$BASH
     apk add sed coreutils findutils \
   ;fi
   # Bats
-  RUN apk add --update parallel ncurses git \
+  RUN apk add --update parallel ncurses git binutils \
         && mkdir -p ~/.parallel \
         && touch ~/.parallel/will-cite
   COPY --from=bats /root/bats-core /root/bats-core

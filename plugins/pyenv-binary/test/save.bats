@@ -2,10 +2,6 @@
 
 load test_helper
 
-_setup() {
-  create_path_executable readelf "exit 0"
-}
-
 create_version() {
   mkdir -p "${PYENV_ROOT}/versions/$1/bin"
 }

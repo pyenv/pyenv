@@ -92,7 +92,7 @@ fi
 if [ "$os" = "Linux" ]; then
   libc="$(getconf GNU_LIBC_VERSION 2>/dev/null || true)"
 fi
-if [ "$os" != "Darwin" ] && ! LC_ALL=C readelf --version >/dev/null 2>&1; then
+if [ "$os" != "Darwin" ] && ! LC_ALL=C readelf --version &>/dev/null; then
   echo "pyenv-binary: need readelf to inspect shared libraries" >&2
   exit 1
 fi
