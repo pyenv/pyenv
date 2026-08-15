@@ -10,6 +10,7 @@ stub_build_environment() {
   create_stub pyenv-latest 'while (($#)); do case "$1" in -f|-k);; *)break;; esac; shift; done; echo "$*"'
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub getconf 'echo "glibc 2.17"'
+  create_stub readelf true
 }
 
 @test "-v|--verbose runs pyenv install verbosely" {
