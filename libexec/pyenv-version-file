@@ -11,7 +11,7 @@ find_local_version_file() {
   # Nonexistent paths are UB as of this writing.
   # Relative ones cause a failure but absolute ones don't
   [[ $root != /* ]] && root=$(CDPATH= cd -- "$root" && pwd)
-  # Original Rbenv code supports UNC notaion for Cygwin/MinGW
+  # Original Rbenv code supports UNC notation for Cygwin/MinGW
   # (https://github.com/rbenv/rbenv/pull/529)
   # POSIX.1-2024 still allows to treat //<name> in implementation-specific manner
   # (https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap04.html#tag_04_16)
