@@ -1,8 +1,7 @@
 name: Build a Python version
 description: >
   Install python-build's system dependencies for the current runner's OS, build
-  the requested version from source with `pyenv install`, and check that the
-  interpreter that comes out is the one that was asked for.
+  and check the requested version.
 inputs:
   python-version:
     description: A version as accepted by `pyenv install`.
