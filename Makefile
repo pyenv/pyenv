@@ -62,7 +62,8 @@ $(TEST_PYTHON_BUILD_DOCKER_TARGETS): $(TEST_PYTHON_BUILD_DOCKER_PREFIX)-% : $(TE
 		$${CI+-e CI="$${CI}"} \
 		$(INTERACTIVE) \
 		$(DOCKER_IMAGE):$(DOCKER_TAG) \
-		bats $${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} plugins/python-build/test/$${BATS_FILE_FILTER}
+		bats $${CI:+-F "/code/test/libexec/bats-format-tap-suite"} \
+		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} plugins/python-build/test/$${BATS_FILE_FILTER}
 
 .PHONY: $(TEST_BINARY_DOCKER_PREFIX)
 $(TEST_BINARY_DOCKER_PREFIX): $(TEST_BINARY_DOCKER_TARGETS)
@@ -84,7 +85,8 @@ $(TEST_BINARY_DOCKER_TARGETS): $(TEST_BINARY_DOCKER_PREFIX)-% : $(TEST_BATS_IMAG
 		$${CI+-e CI="$${CI}"} \
 		$(INTERACTIVE) \
 		$(DOCKER_IMAGE):$(DOCKER_TAG) \
-		bats $${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} plugins/pyenv-binary/test/$${BATS_FILE_FILTER}
+		bats $${CI:+-F "/code/test/libexec/bats-format-tap-suite"} \
+		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} plugins/pyenv-binary/test/$${BATS_FILE_FILTER}
 
 # Build all images needed for bats under docker
 .PHONY: $(TEST_BATS_IMAGE_PREFIX)
@@ -120,10 +122,12 @@ test-unit: bats
 	PATH="./bats/bin:$$PATH" test/run
 	
 test-python-build: bats
-	cd plugins/python-build && $(PWD)/bats/bin/bats $${CI:+--tap} $${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
+	cd plugins/python-build && $(PWD)/bats/bin/bats $${CI:+-F "$(PWD)/test/libexec/bats-format-tap-suite"} \
+		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
 
 test-binary: bats
-	cd plugins/pyenv-binary && $(PWD)/bats/bin/bats $${CI:+--tap} $${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
+	cd plugins/pyenv-binary && $(PWD)/bats/bin/bats $${CI:+-F "$(PWD)/test/libexec/bats-format-tap-suite"} \
+		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
 
 .SECONDARY: bats-$(TEST_BATS_VERSION)
 bats-$(TEST_BATS_VERSION):
