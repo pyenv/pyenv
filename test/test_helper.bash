@@ -223,3 +223,8 @@ create_hook() {
     cat > "${PYENV_HOOK_PATH}/$1/$2"
   fi
 }
+
+skip_if_nonposix_security() {
+  true "${1:?}" "${2:?}"
+  test "$@" && skip "UNIX permission bits are being overridden" || true
+}

@@ -162,3 +162,7 @@ path_without() {
   echo "$path"
 }
 
+skip_if_nonposix_security() {
+  true "${1:?}" "${2:?}"
+  test "$@" && skip "UNIX permission bits are being overridden" || true
+}

@@ -1276,6 +1276,7 @@ OUT
   mkdir -p "$INSTALL_ROOT/bin"
   touch "$INSTALL_ROOT/bin/package"
   chmod -w "$INSTALL_ROOT/bin/package"
+  skip_if_nonposix_security -w "$INSTALL_ROOT/bin/package"
 
   install_fixture definitions/without-checksum
   assert_success
@@ -1288,6 +1289,7 @@ OUT
   export TMPDIR="${BATS_TEST_TMPDIR}/build"
   mkdir -p "$TMPDIR"
   chmod -w "$TMPDIR"
+  skip_if_nonposix_security -w "$TMPDIR"
 
   touch "${BATS_TEST_TMPDIR}/build-definition"
   run python-build "${BATS_TEST_TMPDIR}/build-definition" "$INSTALL_ROOT"
@@ -1298,6 +1300,7 @@ OUT
   export TMPDIR="${BATS_TEST_TMPDIR}/build"
   mkdir -p "$TMPDIR"
   chmod -x "$TMPDIR"
+  skip_if_nonposix_security -x "$TMPDIR"
 
   touch "${BATS_TEST_TMPDIR}/build-definition"
   run python-build "${BATS_TEST_TMPDIR}/build-definition" "$INSTALL_ROOT"
