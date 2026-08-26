@@ -13,6 +13,8 @@ load test_helper
 @test "non-writable shims directory" {
   mkdir -p "${PYENV_ROOT}/shims"
   chmod -w "${PYENV_ROOT}/shims"
+  skip_if_nonposix_security -w "${PYENV_ROOT}/shims"
+
   run pyenv-rehash
   assert_failure "pyenv: cannot rehash: ${PYENV_ROOT}/shims isn't writable"
 }
