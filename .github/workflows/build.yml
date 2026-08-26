@@ -1,0 +1,62 @@
+name: build
+on:
+  push:
+    branches: [master]
+  pull_request: {}
+
+permissions:
+  contents: read
+
+jobs:
+  discover_build_logic_change:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-slim
+    env:
+      FULL_OS_MATRIX: '[
+        "macos-14",
+        "macos-15",
+        "macos-15-intel",
+        "macos-26",
+        "macos-26-intel",
+        "ubuntu-22.04",
+        "ubuntu-22.04-arm",
+        "ubuntu-24.04",
+        "ubuntu-24.04-arm"
+      ]'
+    outputs:
+      os: ${{ steps.detect.outputs.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - run: git fetch origin "$GITHUB_BASE_REF"
+      - id: detect
+        shell: bash
+        run: |
+          if [[ -n $(git diff --name-only "origin/$GITHUB_BASE_REF" -- \
+                       plugins/python-build/bin/python-build \
+                       .github/actions/build-python/action.yml \
+                       .github/workflows/build.yml) ]]
+          then
+            printf "%s\n" "os<<!" "$FULL_OS_MATRIX" "!" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: discover_build_logic_change
+    # Run when the detection job succeeded *or was skipped* -- but not failed
+    if: ${{ !cancelled() && !failure() }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ${{ fromJson(needs.discover_build_logic_change.outputs.os || '["macos-latest","ubuntu-latest"]') }}
+        python-version:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/build-python
+        with:
+          python-version: ${{ matrix.python-version }}
+
