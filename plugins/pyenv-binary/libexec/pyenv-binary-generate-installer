@@ -14,7 +14,7 @@
 #   into the definition; `pyenv binary save' writes the two together.
 #
 #   <metadata-file>       A .meta file written by `pyenv binary save'.
-#                         The corresponsing binary package written by `pyenv binary save'
+#                         The corresponding binary package written by `pyenv binary save'
 #                         needs to be present alongside it.
 #   --archive-url <url>   The URL for the resulting installation script to download
 #                         the package from.
