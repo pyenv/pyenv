@@ -39,7 +39,7 @@ if [ -n "$target_dir" ]; then
   find_local_version_file "$target_dir"
 else
   # In tests, PYENV_DIR is not set, ultimately leading to "cd: null directory" in OpenSUSE
-  # While most `cd` implemntations treat an empty argument the same as missing, that's still wrong
+  # While most `cd` implementations treat an empty argument the same as missing, that's still wrong
   find_local_version_file "${PYENV_DIR:=$PWD}" || {
     [ "$PYENV_DIR" != "$PWD" ] && find_local_version_file "$PWD"
   } || echo "${PYENV_ROOT}/version"
