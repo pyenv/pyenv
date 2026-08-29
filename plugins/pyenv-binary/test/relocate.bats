@@ -66,14 +66,17 @@ case "$1" in
   esac
   ;;
 -D )
-  echo "${file}:"
   case "$file" in
   */lib/libpython3.12.dylib )
+    echo "${file}:"
     if [ -n "$OTOOL_RELOCATED" ]; then
       echo '@rpath/libpython3.12.dylib'
     else
       echo "${old}/lib/libpython3.12.dylib"
     fi
+    ;;
+  * )
+    exit 1
     ;;
   esac
   ;;

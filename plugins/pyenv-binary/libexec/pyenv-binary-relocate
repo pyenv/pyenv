@@ -43,7 +43,7 @@ if [ "$(uname -s)" = "Darwin" ]; then
     local load_commands install_ids rpaths dependency install_id rpath replacement
 
     load_commands="$(otool -L "$file")"
-    install_ids="$(otool -D "$file")"
+    install_ids="$(otool -D "$file" 2>/dev/null || true)"
     rpaths="$(otool -l "$file")"
     install_id="$(printf '%s\n' "$install_ids" | sed -n '2s/^[[:space:]]*//p')"
 

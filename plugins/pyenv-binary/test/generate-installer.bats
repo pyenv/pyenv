@@ -137,7 +137,7 @@ create_meta() {
   create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
   create_path_executable install_name_tool true
 
-  PATH="${BATS_TEST_TMPDIR}/stubs:${PYENV_TEST_DIR}/bin:/bin" run bash "$out"
+  PATH="$(path_without otool)" run bash "$out"
   assert_failure "pyenv-binary: need otool to relocate the binary"
 }
 
@@ -149,7 +149,7 @@ create_meta() {
   create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
   create_path_executable otool true
 
-  PATH="${BATS_TEST_TMPDIR}/stubs:${PYENV_TEST_DIR}/bin:/bin" run bash "$out"
+  PATH="$(path_without install_name_tool)" run bash "$out"
   assert_failure "pyenv-binary: need install_name_tool to relocate the binary"
 }
 
@@ -165,6 +165,8 @@ create_meta() {
   cp "$archive" "${cache}/Python-3.12.7-binary.tar.gz"
   create_stub pyenv 'printf "argc=%s\narg1=%s\narg2=%s\narg3=%s\narg4=%s\n" "$#" "$1" "$2" "$3" "$4"'
   create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  create_stub sw_vers 'echo 15.5'
+  create_stub ldconfig true
   create_path_executable otool true
   create_path_executable install_name_tool true
 
