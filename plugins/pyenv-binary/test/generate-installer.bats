@@ -6,6 +6,7 @@ create_meta() {
   local os="${1-Linux}"
   local arch="${2-x86_64}"
   local libc="${3-glibc 2.17}"
+  local build_prefix="${4-}"
   local archive="${BATS_TEST_TMPDIR}/3.12.7.tar.gz"
   local meta="${BATS_TEST_TMPDIR}/sample.meta"
 
@@ -20,6 +21,7 @@ create_meta() {
     echo "os=${os}"
     echo "arch=${arch}"
     [ -z "$libc" ] || echo "libc=${libc}"
+    [ -z "$build_prefix" ] || echo "build_prefix=${build_prefix}"
     echo "archive=${archive##*/}"
   } > "$meta"
   echo "$meta"
@@ -58,10 +60,20 @@ create_meta() {
   assert_failure
 }
 
-@test "refuses macOS metadata" {
+@test "fails when macOS metadata is missing the build prefix" {
   run pyenv-binary-generate-installer "$(create_meta Darwin arm64 '')" \
     --archive-url http://x/a.tar.gz
-  assert_failure "pyenv-binary: macOS archives are not supported yet"
+  assert_failure "pyenv-binary: metadata is missing \`build_prefix'"
+}
+
+@test "quotes the macOS build prefix in the generated definition" {
+  local out="${BATS_TEST_TMPDIR}/definition"
+  pyenv-binary-generate-installer \
+    "$(create_meta Darwin arm64 '' '/build prefix/$name')" \
+    --archive-url http://example.com/a.tar.gz -o "$out"
+
+  run grep '^BUILD_PREFIX=' "$out"
+  assert_success 'BUILD_PREFIX=/build\ prefix/\$name'
 }
 
 @test "fails when required metadata is missing" {
@@ -115,6 +127,56 @@ create_meta() {
 
   PATH="$(path_without patchelf)" run bash "$out"
   assert_failure "pyenv-binary: need patchelf to relocate the binary"
+}
+
+@test "checks for otool before installing a macOS archive" {
+  local out="${BATS_TEST_TMPDIR}/definition"
+  pyenv-binary-generate-installer \
+    "$(create_meta Darwin arm64 '' /build/3.12.7)" \
+    --archive-url http://example.com/a.tar.gz -o "$out"
+  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  create_path_executable install_name_tool true
+
+  PATH="${BATS_TEST_TMPDIR}/stubs:${PYENV_TEST_DIR}/bin:/bin" run bash "$out"
+  assert_failure "pyenv-binary: need otool to relocate the binary"
+}
+
+@test "checks for install_name_tool before installing a macOS archive" {
+  local out="${BATS_TEST_TMPDIR}/definition"
+  pyenv-binary-generate-installer \
+    "$(create_meta Darwin arm64 '' /build/3.12.7)" \
+    --archive-url http://example.com/a.tar.gz -o "$out"
+  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  create_path_executable otool true
+
+  PATH="${BATS_TEST_TMPDIR}/stubs:${PYENV_TEST_DIR}/bin:/bin" run bash "$out"
+  assert_failure "pyenv-binary: need install_name_tool to relocate the binary"
+}
+
+@test "the generated macOS definition preserves both relocation arguments" {
+  local archive="${BATS_TEST_TMPDIR}/3.12.7.tar.gz"
+  local cache="${BATS_TEST_TMPDIR}/cache"
+  local definition="${BATS_TEST_TMPDIR}/definition"
+  local prefix="${BATS_TEST_TMPDIR}/install"
+  pyenv-binary-generate-installer \
+    "$(create_meta Darwin arm64 '' '/build prefix/$name')" \
+    --archive-url http://example.com/3.12.7.tar.gz -o "$definition"
+  mkdir -p "$cache"
+  cp "$archive" "${cache}/Python-3.12.7-binary.tar.gz"
+  create_stub pyenv 'printf "argc=%s\narg1=%s\narg2=%s\narg3=%s\narg4=%s\n" "$#" "$1" "$2" "$3" "$4"'
+  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  create_path_executable otool true
+  create_path_executable install_name_tool true
+
+  PYTHON_BUILD_CACHE_PATH="$cache" run \
+    "${BATS_TEST_DIRNAME}/../../python-build/bin/python-build" "$definition" "$prefix"
+  assert_success
+  assert_line "argc=4"
+  assert_line "arg1=binary"
+  assert_line "arg2=relocate"
+  assert_line "arg3=${prefix}"
+  assert_line 'arg4=/build prefix/$name'
+  assert_line "Installed Python-3.12.7-binary to ${prefix}"
 }
 
 @test "fails when the archive is not beside the metadata" {

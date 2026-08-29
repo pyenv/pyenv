@@ -82,10 +82,16 @@ pyenv-install --list --bare
   assert_failure "pyenv-binary: \`latest' cannot be used as an entry name"
 }
 
-@test "refuses to package on macOS before compiling anything" {
+@test "packages on macOS" {
   create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  create_stub pyenv-install 'echo install'
+  create_stub pyenv-binary-save 'echo save'
+  create_stub pyenv-binary-generate-installer 'echo generate-installer'
+
   run pyenv-binary-package 3.12.7:3.12.7-test --archive-base-url http://x/b
-  assert_failure "pyenv-binary: macOS archives are not supported yet"
+  assert_success "install
+save
+generate-installer"
 }
 
 @test "writes the archive, metadata and definition under the entry name (integration)" {

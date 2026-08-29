@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 #
-# Summary: Rewrite an unpacked Python's rpaths so it runs from its prefix
+# Summary: Rewrite an unpacked Python's library paths so it runs from its prefix
 #
-# Usage: pyenv binary relocate <prefix>
+# Usage: pyenv binary relocate <prefix> [<build-prefix>]
 #
-#   Rewrites the rpaths of a Python tree that was unpacked into <prefix> so the
-#   interpreter and its extension modules load the bundled libraries from their
-#   new location rather than the path it was built at. Requires patchelf.
+#   Rewrites the library paths of a Python tree that was unpacked into <prefix>
+#   so the interpreter and its extension modules load the bundled libraries from
+#   their new location rather than the path it was built at. Requires patchelf on
+#   Linux and FreeBSD, or otool and install_name_tool on macOS.
 #
 #   The definition that `pyenv binary generate-installer' produces calls this
 #   after `install_package ... copy' has laid the tree down.
@@ -22,6 +23,84 @@ prefix="$1"
 if [ -z "$prefix" ]; then
   pyenv-help --usage binary-relocate >&2
   exit 1
+fi
+
+if [ "$(uname -s)" = "Darwin" ]; then
+  build_prefix="${2%/}"
+  if [ -z "$build_prefix" ]; then
+    echo "pyenv-binary: need the original build prefix to relocate a macOS binary" >&2
+    exit 1
+  fi
+  for tool in otool install_name_tool; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+      echo "pyenv-binary: need ${tool} to relocate the binary" >&2
+      exit 1
+    fi
+  done
+
+  relocate_macho() {
+    local file="$1" new_rpath="$2"
+    local load_commands install_ids rpaths dependency install_id rpath replacement
+
+    load_commands="$(otool -L "$file")"
+    install_ids="$(otool -D "$file")"
+    rpaths="$(otool -l "$file")"
+    install_id="$(printf '%s\n' "$install_ids" | sed -n '2s/^[[:space:]]*//p')"
+
+    while IFS= read -r dependency; do
+      case "$dependency" in
+      "$build_prefix"/lib/* )
+        if [ "$dependency" != "$install_id" ]; then
+          replacement="@rpath/${dependency#"$build_prefix"/lib/}"
+          install_name_tool -change "$dependency" "$replacement" "$file"
+        fi
+        ;;
+      esac
+    done < <(printf '%s\n' "$load_commands" | tail -n +2 | sed -E \
+      's/^[[:space:]]*//; s/[[:space:]]+\(compatibility version.*$//')
+
+    case "$install_id" in
+    "$build_prefix"/lib/* )
+      replacement="@rpath/${install_id#"$build_prefix"/lib/}"
+      install_name_tool -id "$replacement" "$file"
+      ;;
+    esac
+
+    while IFS= read -r rpath; do
+      if [ "$rpath" = "$build_prefix/lib" ]; then
+        install_name_tool -rpath "$rpath" "$new_rpath" "$file"
+      fi
+    done < <(printf '%s\n' "$rpaths" | awk '
+      /cmd LC_RPATH/ { found = 1; next }
+      found && /^[[:space:]]*path / {
+        sub(/^[[:space:]]*path /, "")
+        sub(/ \(offset [0-9]+\)$/, "")
+        print
+        found = 0
+      }
+    ')
+  }
+
+  found=0
+  for file in "$prefix"/bin/*; do
+    [[ -f $file && -x $file && ! -L $file ]] || continue
+    otool -L "$file" >/dev/null 2>&1 || continue
+    relocate_macho "$file" '@executable_path/../lib'
+    found=1
+  done
+  if [ "$found" -eq 0 ]; then
+    echo "pyenv-binary: found no interpreter to relocate under \`${prefix}/bin'" >&2
+    exit 1
+  fi
+
+  for file in "$prefix"/lib/*.dylib; do
+    [[ -f $file && ! -L $file ]] || continue
+    relocate_macho "$file" '@loader_path'
+  done
+  while IFS= read -r so; do
+    relocate_macho "$so" '@loader_path/../..'
+  done < <(find "$prefix" -type f -path '*/lib/python*/lib-dynload/*.so')
+  exit
 fi
 
 # patchelf can add an rpath and write one of any length; chrpath can only shorten
