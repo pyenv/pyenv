@@ -1,5 +1,14 @@
 # Version History
 
+## Release v2.8.5
+* pyenv-binary: record direct system dependencies in Linux/FreeBSD by @macayu17 in https://github.com/pyenv/pyenv/pull/3520
+* tests: Fix "cd: null directory" in OpenSUSE by @native-api in https://github.com/pyenv/pyenv/pull/3524
+* Test improvements by @native-api in https://github.com/pyenv/pyenv/pull/3525
+* CI: test on all runners when the build logic changes by @sujeito-operator in https://github.com/pyenv/pyenv/pull/3522
+* Add GraalPy 25.3.4.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3529
+* Add CPython 3.15.0rc2 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3530
+* pyenv-binary: support relocating macOS archives by @macayu17 in https://github.com/pyenv/pyenv/pull/3528
+
 ## Release v2.8.4
 * CI: Add macos_26_intel by @native-api in https://github.com/pyenv/pyenv/pull/3514
 * pyenv-binary: check FreeBSD system libraries by @macayu17 in https://github.com/pyenv/pyenv/pull/3511
