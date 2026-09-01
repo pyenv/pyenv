@@ -75,15 +75,6 @@ latest )
   ;;
 esac
 
-os="$(uname -s)"
-
-# `generate-installer' refuses a macOS archive, so the last step here cannot
-# succeed on one. Give up before compiling rather than after it.
-if [ "$os" = "Darwin" ]; then
-  echo "pyenv-binary: macOS archives are not supported yet" >&2
-  exit 1
-fi
-
 # `pyenv install' puts a `<version>:<alias>' build under versions/<alias>.
 pyenv-install ${verbose:+--verbose} "$spec"
 pyenv-binary-save "$entry" "$PWD" --name "$entry"

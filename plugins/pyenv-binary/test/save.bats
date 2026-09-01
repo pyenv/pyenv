@@ -79,6 +79,15 @@ platform() {
   assert_line "archive=3.12.7-$(platform).tar.gz"
 }
 
+@test "records the original installation prefix" {
+  create_version "3.12.7"
+  local out="${BATS_TEST_TMPDIR}/dist"
+  pyenv-binary-save "3.12.7" "$out" >/dev/null
+
+  run grep '^build_prefix=' "${out}/3.12.7-$(platform).meta"
+  assert_success "build_prefix=${PYENV_ROOT}/versions/3.12.7"
+}
+
 @test "fails when readelf is not available" {
   create_version "3.12.7"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'

@@ -55,7 +55,7 @@ if [ -z "$metadata" ] || [ -z "$archive_url" ]; then
   exit 1
 fi
 
-version="" os="" arch="" distro="" libc="" archive=""
+version="" os="" arch="" distro="" libc="" build_prefix="" archive=""
 deps=""
 while IFS='=' read -r key value; do
   case "$key" in
@@ -64,6 +64,7 @@ while IFS='=' read -r key value; do
   arch ) arch="$value" ;;
   distro ) distro="$value" ;;
   libc ) libc="$value" ;;
+  build_prefix ) build_prefix="$value" ;;
   archive ) archive="$value" ;;
   dep ) deps="${deps:+$deps }$value" ;;
   esac
@@ -78,10 +79,9 @@ for field in version os arch archive; do
   fi
 done
 
-# macOS relocation needs install_name_tool and a different rpath scheme, so it is
-# not supported yet. Other systems relocate with patchelf.
-if [ "$os" = "Darwin" ]; then
-  echo "pyenv-binary: macOS archives are not supported yet" >&2
+# Mach-O load commands contain the prefix where Python was built.
+if [ "$os" = "Darwin" ] && [ -z "$build_prefix" ]; then
+  echo "pyenv-binary: metadata is missing \`build_prefix'" >&2
   exit 1
 fi
 
@@ -122,6 +122,7 @@ emit() {
     printf 'EXPECT_OS=%q\n' "$os"
     printf 'EXPECT_ARCH=%q\n' "$arch"
     printf 'EXPECT_LIBC=%q\n' "$libc"
+    printf 'BUILD_PREFIX=%q\n' "$build_prefix"
     printf 'VERSION=%q\n' "$version"
     printf 'ARCHIVE_URL=%q\n' "$archive_url"
     printf 'SHA256=%q\n' "$sha256"
@@ -185,13 +186,29 @@ elif [ -n "$DEPS" ]; then
   echo "pyenv-binary: cannot check required system libraries (ldconfig cache unavailable)" >&2
 fi
 
-if ! command -v patchelf >/dev/null 2>&1; then
-  echo "pyenv-binary: need patchelf to relocate the binary" >&2
-  exit 1
-fi
+case "$os" in
+Darwin )
+  for tool in otool install_name_tool; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+      echo "pyenv-binary: need ${tool} to relocate the binary" >&2
+      exit 1
+    fi
+  done
+  ;;
+* )
+  if ! command -v patchelf >/dev/null 2>&1; then
+    echo "pyenv-binary: need patchelf to relocate the binary" >&2
+    exit 1
+  fi
+  ;;
+esac
 
 build_package_relocate() {
-  pyenv binary relocate "$PREFIX_PATH"
+  if [ "$os" = "Darwin" ]; then
+    pyenv binary relocate "$PREFIX_PATH" "$BUILD_PREFIX"
+  else
+    pyenv binary relocate "$PREFIX_PATH"
+  fi
 }
 
 install_package "Python-${VERSION}-binary" "${ARCHIVE_URL}#${SHA256}" copy relocate

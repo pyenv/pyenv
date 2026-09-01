@@ -147,6 +147,7 @@ tar -C "$(dirname "$prefix")" -czf "${output_dir}/${archive}" "$(basename "$pref
   echo "platform=${platform}"
   [ -n "$distro" ] && echo "distro=${distro}"
   [ -n "$libc" ] && echo "libc=${libc}"
+  echo "build_prefix=${prefix}"
   echo "archive=${archive}"
   system_deps | while IFS= read -r dep; do
     [ -n "$dep" ] && echo "dep=${dep}"
