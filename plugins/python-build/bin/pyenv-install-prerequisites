@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#
+# Summary: Install Python build prerequisites on Debian-based systems
+#
+# Usage: pyenv install-prerequisites
+#
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+  exit
+fi
+
+usage() {
+  pyenv-help install-prerequisites 2>/dev/null
+  [ -z "$1" ] || exit "$1"
+}
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  usage 0
+fi
+
+[ "$#" -eq 0 ] || usage 1 >&2
+
+if ! command -v apt-get >/dev/null; then
+  echo "pyenv: installing build prerequisites is not supported on this system" >&2
+  exit 1
+fi
+
+prerequisites=(
+  make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev
+  libsqlite3-dev curl git llvm libncurses5-dev libncursesw5-dev xz-utils
+  tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libzstd-dev
+)
+
+if [ "$(id -u)" -eq 0 ]; then
+  apt_get=(apt-get)
+elif command -v sudo >/dev/null; then
+  apt_get=(sudo apt-get)
+else
+  echo "pyenv: sudo is required to install build prerequisites" >&2
+  exit 1
+fi
+
+"${apt_get[@]}" update -q
+"${apt_get[@]}" install -yq "${prerequisites[@]}"

@@ -2,6 +2,7 @@ setup() {
   export PYTHON_BUILD_CURL_OPTS=
   export PYTHON_BUILD_HTTP_CLIENT="curl"
 
+  export PYENV_TEST_DIR="${BATS_TEST_TMPDIR}/pyenv"
   export FIXTURE_ROOT="${BATS_TEST_DIRNAME}/fixtures"
   export INSTALL_ROOT="${BATS_TEST_TMPDIR}/install"
   PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -148,7 +149,7 @@ path_without() {
       if [ "$found" != "${PYENV_ROOT}/shims" ]; then
         alt="${PYENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
         mkdir -p "$alt"
-        for util in bash head cut readlink greadlink; do
+        for util in bash head cut readlink greadlink tr; do
           if [ -x "${found}/$util" ]; then
             ln -s "${found}/$util" "${alt}/$util"
           fi

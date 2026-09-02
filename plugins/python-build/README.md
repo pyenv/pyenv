@@ -54,8 +54,11 @@ Or, if you would like to install the latest development release:
 
 ## Usage
 
-Before you begin, you should ensure that your build environment has the proper
-system dependencies for compiling the wanted Python Version (see our [recommendations](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)).
+On Ubuntu, Debian, and Mint, install the recommended build dependencies with:
+
+    pyenv install-prerequisites
+
+For other environments, see our [build environment recommendations](https://github.com/pyenv/pyenv/wiki#suggested-build-environment).
 
 ### Using `pyenv install` with pyenv
 
@@ -361,4 +364,3 @@ git diff --name-only master \
 - Filter out any which don't live where python-build keeps its build scripts
 - Look only at the file name (i.e. the python version name)
 - Run a new docker container for each, building that version
-
