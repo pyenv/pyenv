@@ -220,10 +220,7 @@ jobs:
           echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
       - run: |
           #prerequisites
-          sudo apt-get update -q; sudo apt-get install -yq make build-essential \
-            libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
-            curl llvm libncurses5-dev libncursesw5-dev \
-            xz-utils tk-dev libffi-dev liblzma-dev
+          pyenv install-prerequisites
           if [[ "${{ matrix.python-version }}" =~ pypy.*-(src|dev) ]]; then
             export PYENV_BOOTSTRAP_VERSION=pypy2.7-7
             echo "PYENV_BOOTSTRAP_VERSION=$PYENV_BOOTSTRAP_VERSION" >> $GITHUB_ENV
@@ -283,10 +280,7 @@ jobs:
           echo "_PYTHON_BUILD_FORCE_SKIP_XZ=1" >> $GITHUB_ENV
       - run: |
           #prerequisites
-          sudo apt-get update -q; sudo apt-get install -yq make build-essential \
-            libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
-            curl libncursesw5-dev \
-            xz-utils tk-dev libffi-dev liblzma-dev
+          pyenv install-prerequisites
       - run: |
           #build
           pyenv --debug install ${{ matrix.python-version }} && rc=$? || rc=$?
