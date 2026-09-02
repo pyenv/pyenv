@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 VERSION='25.3.4.1'
+RELEASE_TAG='graal-25.3.4'
 
 colorize 1 "GraalPy 23.1 and later installed by python-build use the faster Oracle GraalVM distribution" && echo
 colorize 1 "Oracle GraalVM uses the GFTC license, which is free for development and production use, see https://medium.com/graalvm/161527df3d76" && echo
@@ -46,4 +47,4 @@ case "$graalpy_arch" in
   ;;
 esac
 
-install_package "graalpy3.13-${VERSION}" "https://github.com/oracle/graalpython/releases/download/graal-${VERSION}/graalpy3.13-${VERSION}-${graalpy_arch}.tar.gz#${checksum}" "copy" ensurepip
+install_package "graalpy3.13-${VERSION}" "https://github.com/oracle/graalpython/releases/download/${RELEASE_TAG}/graalpy3.13-${VERSION}-${graalpy_arch}.tar.gz#${checksum}" "copy" ensurepip

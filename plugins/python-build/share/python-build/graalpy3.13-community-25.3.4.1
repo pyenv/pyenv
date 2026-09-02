@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 VERSION='25.3.4.1'
+RELEASE_TAG='graal-25.3.4'
 
 graalpy_arch="$(graalpy_architecture 2>/dev/null || true)"
 
@@ -41,4 +42,4 @@ case "$graalpy_arch" in
   ;;
 esac
 
-install_package "graalpy3.13-community-${VERSION}" "https://github.com/oracle/graalpython/releases/download/graal-${VERSION}/graalpy3.13-community-${VERSION}-${graalpy_arch}.tar.gz#${checksum}" "copy" ensurepip
+install_package "graalpy3.13-community-${VERSION}" "https://github.com/oracle/graalpython/releases/download/${RELEASE_TAG}/graalpy3.13-community-${VERSION}-${graalpy_arch}.tar.gz#${checksum}" "copy" ensurepip
