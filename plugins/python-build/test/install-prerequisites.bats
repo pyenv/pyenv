@@ -13,9 +13,10 @@ liblzma-dev libzstd-dev"
 @test "completion does not install packages" {
   stub apt-get
 
-  run pyenv-install-prerequisites --complete
+  PATH="${BATS_TEST_DIRNAME}/../../../libexec:$PATH" \
+    run pyenv completions install-prerequisites
 
-  assert_success
+  assert_success "--help"
   unstub apt-get
 }
 
