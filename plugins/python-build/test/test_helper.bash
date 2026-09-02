@@ -2,6 +2,7 @@ setup() {
   export PYTHON_BUILD_CURL_OPTS=
   export PYTHON_BUILD_HTTP_CLIENT="curl"
 
+  export PYENV_TEST_DIR="${BATS_TEST_TMPDIR}/pyenv"
   export FIXTURE_ROOT="${BATS_TEST_DIRNAME}/fixtures"
   export INSTALL_ROOT="${BATS_TEST_TMPDIR}/install"
   PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
