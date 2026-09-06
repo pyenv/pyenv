@@ -13,6 +13,8 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 
 * Lets you **change the global Python version** on a per-user basis.
 * Provides support for **per-project Python versions**.
+* Supports **multiple Python distributions**: CPython, PyPy, Stackless Python, Jython, and more.
+  See the [full list of available versions](https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build).
 * Allows you to **override the Python version** with an environment
   variable.
 * Searches for commands from **multiple versions of Python at a time**.
