@@ -98,16 +98,18 @@ fi
 exec "$(command -v pyenv)" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
+  local LC_ALL=C
+  IFS= read -r -d '' PROTOTYPE_SHIM_CONTENTS < "$PROTOTYPE_SHIM_PATH" || true
+  PROTOTYPE_SHIM_READ_SIZE=$((${#PROTOTYPE_SHIM_CONTENTS} + 1))
 }
 
-# Install each registered shim, replacing an existing copy if it was
-# overwritten. Only registered names are checked, including hidden ones.
+# Install a shim when it is first registered, replacing an existing copy
+# if it was overwritten. Hooks can then customize it without a later
+# registration overwriting their changes.
 install_shims() {
-  local shim file prototype_contents shim_contents read_size
+  local shim file shim_contents
   # Count bytes consistently across Bash versions, including multibyte paths.
   local LC_ALL=C
-  IFS= read -r -d '' prototype_contents < "$PROTOTYPE_SHIM_PATH" || true
-  read_size=$((${#prototype_contents} + 1))
   for shim; do
     file="${SHIM_PATH}/${shim}"
     if [[ -f "$file" || ( -L "$file" && ! -e "$file" ) ]]; then
@@ -115,7 +117,7 @@ install_shims() {
       # Read with a builtin to avoid a subprocess per shim. A successful
       # read means a NUL or extra character was found. Limit the read in
       # case a large file was accidentally written over a shim.
-      if IFS= read -r -d '' -n "$read_size" shim_contents 2>/dev/null < "$file" || [[ $shim_contents != "$prototype_contents" ]]; then
+      if IFS= read -r -d '' -n "$PROTOTYPE_SHIM_READ_SIZE" shim_contents 2>/dev/null < "$file" || [[ $shim_contents != "$PROTOTYPE_SHIM_CONTENTS" ]]; then
         rm -f "$file"
       fi
     fi
@@ -140,12 +142,19 @@ if ((${BASH_VERSINFO[0]} > 3)); then
 
   # Registers the name of a shim to be generated.
   register_shim() {
-    registered_shims["$1"]=1
+    if [[ ! ${registered_shims["$1"]} ]]; then
+      install_shims "$1"
+      registered_shims["$1"]=1
+    fi
   }
 
   # Install all shims registered via `make_shims` or `register_shim` directly.
   install_registered_shims() {
-    install_shims "${!registered_shims[@]}"
+    local shim file
+    for shim in "${!registered_shims[@]}"; do
+      file="${SHIM_PATH}/${shim}"
+      [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
+    done
   }
 
   # Once the registered shims have been installed, we make a second pass
@@ -166,11 +175,18 @@ else # Same for bash < 4.
     registered_shims=" "
 
     register_shim() {
-      registered_shims="${registered_shims}${1} "
+      if [[ "$registered_shims" != *" ${1} "* ]]; then
+        install_shims "$1"
+        registered_shims="${registered_shims}${1} "
+      fi
     }
 
     install_registered_shims() {
-      install_shims $registered_shims
+      local shim file
+      for shim in $registered_shims; do
+        file="${SHIM_PATH}/${shim}"
+        [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
+      done
     }
 
     remove_stale_shims() {

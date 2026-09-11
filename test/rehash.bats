@@ -202,6 +202,56 @@ SH
   assert cmp "${PYENV_ROOT}/shims/aaa" "${PYENV_ROOT}/shims/python"
 }
 
+@test "preserves sourceable shims from the built-in rehash hook" {
+  export PYENV_HOOK_PATH="${_PYENV_INSTALL_PREFIX}/pyenv.d"
+  export PYENV_VERSION=3.4
+  create_alt_executable_in_version "3.4" "aaa"
+  create_alt_executable_in_version "3.4" "activate" <<'SH'
+export PYENV_ACTIVATED=yes
+SH
+  create_alt_executable_in_version "3.4" "activate.fish"
+  create_alt_executable_in_version "3.4" "gettext.sh"
+
+  pyenv-rehash
+  run pyenv-rehash
+  assert_success ""
+  assert cmp "${PYENV_ROOT}/shims/activate" "${PYENV_ROOT}/shims/activate.fish"
+  assert cmp "${PYENV_ROOT}/shims/activate" "${PYENV_ROOT}/shims/gettext.sh"
+
+  run bash -c '. "$PYENV_ROOT/shims/activate"; echo "$PYENV_ACTIVATED"'
+  assert_success "yes"
+}
+
+@test "does not overwrite hook customizations when a shim is registered again" {
+  create_alt_executable_in_version "3.4" "python"
+  create_hook rehash custom.bash <<'SH'
+register_shim .foo
+printf 'custom\n' > "$SHIM_PATH/.foo"
+printf 'custom\n' > "$SHIM_PATH/python"
+register_shim python
+register_shim .foo
+SH
+
+  run pyenv-rehash
+  assert_success ""
+  run cat "${PYENV_ROOT}/shims/python"
+  assert_success "custom"
+  run cat "${PYENV_ROOT}/shims/.foo"
+  assert_success "custom"
+}
+
+@test "repairs existing shims before rehash hooks invoke them" {
+  create_alt_executable_in_version "3.4" "python" "echo works"
+  pyenv-rehash
+  printf '2\n' > "${PYENV_ROOT}/shims/python"
+  create_hook rehash invoke.bash <<'SH'
+PYENV_VERSION=3.4 "$SHIM_PATH/python"
+SH
+
+  run pyenv-rehash
+  assert_success "works"
+}
+
 @test "binary install locations containing spaces" {
   create_alt_executable_in_version "dirname1 p247" "python"
   create_alt_executable_in_version "dirname2 preview1" "py.test"
