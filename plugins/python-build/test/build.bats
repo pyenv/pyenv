@@ -743,6 +743,108 @@ make install
 OUT
 }
 
+assert_explicit_openssl() {
+  local configure_opts="$1"
+  local definition_opts="$2"
+  cached_tarball "Python-3.6.2"
+
+  local openssl_libdir="$BATS_TEST_TMPDIR/homebrew-openssl"
+  mkdir -p "$openssl_libdir"
+  executable "$BATS_TEST_TMPDIR/bin/brew" <<OUT
+#!$BASH
+if [ "\$*" = '--prefix openssl' ]; then
+  echo '$openssl_libdir'
+else
+  exit 1
+fi
+OUT
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub_make_install
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<DEF
+function /usr/bin/openssl() { echo "LibreSSL 3.3.6"; }
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL_RPATH=1
+$definition_opts
+install_package "openssl-1.1.1" "https://example.com/openssl-1.1.1.tar.gz" mac_openssl --if has_broken_mac_openssl
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+  [[ "$output" != *"use openssl from homebrew"* ]]
+
+  unstub uname
+  unstub sw_vers
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib $configure_opts
+make -j 2
+make install
+OUT
+}
+
+@test "explicit OpenSSL in CONFIGURE_OPTS bypasses automatic selection" {
+  export CONFIGURE_OPTS="--with-openssl=$BATS_TEST_TMPDIR/custom-openssl"
+  assert_explicit_openssl "$CONFIGURE_OPTS"
+}
+
+@test "explicit OpenSSL in PYTHON_CONFIGURE_OPTS bypasses automatic selection" {
+  export PYTHON_CONFIGURE_OPTS="--with-openssl=$BATS_TEST_TMPDIR/custom-openssl"
+  assert_explicit_openssl "$PYTHON_CONFIGURE_OPTS"
+}
+
+@test "explicit OpenSSL with a separate argument bypasses automatic selection" {
+  export PYTHON_CONFIGURE_OPTS="--with-openssl $BATS_TEST_TMPDIR/custom-openssl"
+  assert_explicit_openssl "$PYTHON_CONFIGURE_OPTS"
+}
+
+@test "explicit OpenSSL in package options bypasses automatic selection" {
+  local openssl_libdir="$BATS_TEST_TMPDIR/custom openssl"
+  assert_explicit_openssl "--with-openssl=$openssl_libdir" \
+    "package_option python configure '--with-openssl=$openssl_libdir'"
+}
+
+@test "OpenSSL rpath alone does not bypass Homebrew selection" {
+  local openssl_libdir="$BATS_TEST_TMPDIR/homebrew-openssl"
+  mkdir -p "$openssl_libdir"
+  stub uname '-s : echo Darwin'
+  stub brew "--prefix openssl : echo '$openssl_libdir'"
+  export PYTHON_CONFIGURE_OPTS="--with-openssl-rpath=auto"
+
+  run_inline_definition <<'DEF'
+function /usr/bin/openssl() { echo "LibreSSL 3.3.6"; }
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+has_broken_mac_openssl || true
+printf '%s\n' "${PYTHON_CONFIGURE_OPTS_ARRAY[@]}"
+DEF
+  assert_success
+  assert_output <<OUT
+python-build: use openssl from homebrew
+--enable-shared
+--libdir=$INSTALL_ROOT/lib
+--with-openssl=$openssl_libdir
+OUT
+  unstub uname
+  unstub brew
+}
+
+@test "bundled OpenSSL is still needed without an explicit or package-manager installation" {
+  stub uname '-s : echo Darwin'
+  stub brew '--prefix openssl : false'
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<'DEF'
+function /usr/bin/openssl() { echo "LibreSSL 3.3.6"; }
+has_broken_mac_openssl && echo "bundled OpenSSL needed"
+DEF
+  assert_success "bundled OpenSSL needed"
+  unstub uname
+  unstub brew
+}
+
 @test "readline is not linked from Homebrew when explicitly defined" {
   cached_tarball "Python-3.6.2"
 

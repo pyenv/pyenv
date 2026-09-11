@@ -1707,6 +1707,11 @@ build_package_mac_readline() {
 
 has_broken_mac_openssl() {
   is_mac || return 1
+  # Respect an explicit OpenSSL location instead of adding flags for another one.
+  local arg
+  for arg in ${CONFIGURE_OPTS} ${PYTHON_CONFIGURE_OPTS} "${PYTHON_CONFIGURE_OPTS_ARRAY[@]}"; do
+    [[ "$arg" = --with-openssl || "$arg" = --with-openssl=* ]] && return 1
+  done
   local openssl_version="$(/usr/bin/openssl version 2>/dev/null || true)"
   if [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]]; then
     if can_use_homebrew; then
