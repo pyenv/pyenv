@@ -171,6 +171,37 @@ OUT
   assert [ "${PYENV_ROOT}/shims/python" -ot "${PYENV_TEST_DIR}/newer" ]
 }
 
+@test "repairs explicitly registered hidden shims and preserves other dotfiles" {
+  create_hook rehash hidden.bash <<'SH'
+register_shim .foo
+register_shim python
+SH
+  pyenv-rehash
+  printf 'keep\n' > "${PYENV_ROOT}/shims/.keep"
+  printf '2\n' > "${PYENV_ROOT}/shims/.foo"
+
+  run pyenv-rehash
+  assert_success ""
+  assert cmp "${PYENV_ROOT}/shims/python" "${PYENV_ROOT}/shims/.foo"
+  run cat "${PYENV_ROOT}/shims/.keep"
+  assert_success "keep"
+  assert [ ! -e "${PYENV_ROOT}/shims/.pyenv-shim" ]
+}
+
+@test "replaces a dangling registered symlink without writing through it" {
+  create_alt_executable_in_version "3.4" "aaa"
+  create_alt_executable_in_version "3.4" "python"
+  pyenv-rehash
+  rm "${PYENV_ROOT}/shims/python"
+  ln -s "${PYENV_TEST_DIR}/missing/python" "${PYENV_ROOT}/shims/python"
+
+  run pyenv-rehash
+  assert_success ""
+  assert [ ! -L "${PYENV_ROOT}/shims/python" ]
+  assert [ ! -e "${PYENV_TEST_DIR}/missing/python" ]
+  assert cmp "${PYENV_ROOT}/shims/aaa" "${PYENV_ROOT}/shims/python"
+}
+
 @test "binary install locations containing spaces" {
   create_alt_executable_in_version "dirname1 p247" "python"
   create_alt_executable_in_version "dirname2 preview1" "py.test"

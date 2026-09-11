@@ -100,23 +100,26 @@ SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
 }
 
-# Check every shim: they are separate copies, so an individual shim may
-# have been overwritten even when the first shim is still up to date.
-remove_outdated_shims() {
-  local shim prototype_contents shim_contents read_size
+# Install each registered shim, replacing an existing copy if it was
+# overwritten. Only registered names are checked, including hidden ones.
+install_shims() {
+  local shim file prototype_contents shim_contents read_size
   # Count bytes consistently across Bash versions, including multibyte paths.
   local LC_ALL=C
   IFS= read -r -d '' prototype_contents < "$PROTOTYPE_SHIM_PATH" || true
   read_size=$((${#prototype_contents} + 1))
-  for shim in "$SHIM_PATH"/*; do
-    [[ -f "$shim" ]] || continue
-    shim_contents=
-    # Read with a builtin to avoid a subprocess per shim. A successful
-    # read means a NUL or extra character was found. Limit the read in
-    # case a large file was accidentally written over a shim.
-    if IFS= read -r -d '' -n "$read_size" shim_contents 2>/dev/null < "$shim" || [[ $shim_contents != "$prototype_contents" ]]; then
-      rm -f "$shim"
+  for shim; do
+    file="${SHIM_PATH}/${shim}"
+    if [[ -f "$file" || ( -L "$file" && ! -e "$file" ) ]]; then
+      shim_contents=
+      # Read with a builtin to avoid a subprocess per shim. A successful
+      # read means a NUL or extra character was found. Limit the read in
+      # case a large file was accidentally written over a shim.
+      if IFS= read -r -d '' -n "$read_size" shim_contents 2>/dev/null < "$file" || [[ $shim_contents != "$prototype_contents" ]]; then
+        rm -f "$file"
+      fi
     fi
+    [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
   done
 }
 
@@ -142,11 +145,7 @@ if ((${BASH_VERSINFO[0]} > 3)); then
 
   # Install all shims registered via `make_shims` or `register_shim` directly.
   install_registered_shims() {
-    local shim file
-    for shim in "${!registered_shims[@]}"; do
-      file="${SHIM_PATH}/${shim}"
-      [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
-    done
+    install_shims "${!registered_shims[@]}"
   }
 
   # Once the registered shims have been installed, we make a second pass
@@ -171,11 +170,7 @@ else # Same for bash < 4.
     }
 
     install_registered_shims() {
-      local shim file
-      for shim in $registered_shims; do
-        file="${SHIM_PATH}/${shim}"
-        [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
-      done
+      install_shims $registered_shims
     }
 
     remove_stale_shims() {
@@ -193,7 +188,6 @@ shopt -s nullglob
 # Create the prototype shim, then register shims for all known
 # executables.
 create_prototype_shim
-remove_outdated_shims
 # shellcheck disable=SC2046
 make_shims $(pyenv-versions --executables)
 
