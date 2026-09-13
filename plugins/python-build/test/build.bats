@@ -807,6 +807,67 @@ OUT
     "package_option python configure '--with-openssl=$openssl_libdir'"
 }
 
+assert_openssl_selection_skipped() {
+  local selector="$1"
+  local definition_opts="$2"
+  local preceding_check="$3"
+  local openssl_libdir="$BATS_TEST_TMPDIR/automatic-openssl"
+  mkdir -p "$openssl_libdir"
+  executable "$BATS_TEST_TMPDIR/bin/brew" <<OUT
+#!$BASH
+echo called >> '$BATS_TEST_TMPDIR/openssl-search'
+echo '$openssl_libdir'
+OUT
+  executable "$BATS_TEST_TMPDIR/bin/port" <<OUT
+#!$BASH
+echo called >> '$BATS_TEST_TMPDIR/openssl-search'
+echo 'openssl3 @3.0.0 (active)'
+OUT
+  export PYTHON_BUILD_USE_HOMEBREW=1
+  export PYTHON_BUILD_USE_MACPORTS=1
+
+  run_inline_definition <<DEF
+function /usr/bin/openssl() { echo "LibreSSL 3.3.6"; }
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL_RPATH=1
+$definition_opts
+$preceding_check
+before_opts="\${PYTHON_CONFIGURE_OPTS_ARRAY[*]}"
+before_flags="\$CPPFLAGS|\$LDFLAGS|\$PKG_CONFIG_PATH"
+$selector
+[[ "\${PYTHON_CONFIGURE_OPTS_ARRAY[*]}" = "\$before_opts" ]] || exit 1
+[[ "\$CPPFLAGS|\$LDFLAGS|\$PKG_CONFIG_PATH" = "\$before_flags" ]] || exit 1
+DEF
+  assert_success ""
+  refute test -e "$BATS_TEST_TMPDIR/openssl-search"
+}
+
+@test "explicit OpenSSL bypasses direct Homebrew selection without a broken-system check" {
+  export CONFIGURE_OPTS="--with-openssl=$BATS_TEST_TMPDIR/custom-openssl"
+  assert_openssl_selection_skipped use_homebrew_openssl
+}
+
+@test "explicit OpenSSL bypasses direct MacPorts selection without a broken-system check" {
+  export PYTHON_CONFIGURE_OPTS="--with-openssl $BATS_TEST_TMPDIR/custom-openssl"
+  assert_openssl_selection_skipped use_macports_openssl
+}
+
+@test "explicit package OpenSSL bypasses repeated Homebrew selection" {
+  stub uname '-s : echo Darwin'
+  assert_openssl_selection_skipped use_homebrew_openssl \
+    "package_option python configure '--with-openssl=$BATS_TEST_TMPDIR/custom openssl'" \
+    'has_broken_mac_openssl || true'
+  unstub uname
+}
+
+@test "explicit package OpenSSL bypasses repeated MacPorts selection" {
+  stub uname '-s : echo Darwin'
+  assert_openssl_selection_skipped use_macports_openssl \
+    "package_option python configure '--with-openssl=$BATS_TEST_TMPDIR/custom openssl'" \
+    'has_broken_mac_openssl || true'
+  unstub uname
+}
+
 @test "OpenSSL rpath alone does not bypass Homebrew selection" {
   local openssl_libdir="$BATS_TEST_TMPDIR/homebrew-openssl"
   mkdir -p "$openssl_libdir"

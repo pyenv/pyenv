@@ -1705,13 +1705,17 @@ build_package_mac_readline() {
   build_package_standard "$@"
 }
 
-has_broken_mac_openssl() {
-  is_mac || return 1
-  # Respect an explicit OpenSSL location instead of adding flags for another one.
+configured_with_openssl() {
   local arg
   for arg in ${CONFIGURE_OPTS} ${PYTHON_CONFIGURE_OPTS} "${PYTHON_CONFIGURE_OPTS_ARRAY[@]}"; do
-    [[ "$arg" = --with-openssl || "$arg" = --with-openssl=* ]] && return 1
+    [[ "$arg" = --with-openssl || "$arg" = --with-openssl=* ]] && return 0
   done
+  return 1
+}
+
+has_broken_mac_openssl() {
+  is_mac || return 1
+  configured_with_openssl && return 1
   local openssl_version="$(/usr/bin/openssl version 2>/dev/null || true)"
   if [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]]; then
     if can_use_homebrew; then
@@ -1725,6 +1729,7 @@ has_broken_mac_openssl() {
 }
 
 use_homebrew_openssl() {
+  configured_with_openssl && return 0
   can_use_homebrew || return 1
   command -v brew >/dev/null || return 1
   for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
@@ -1763,6 +1768,7 @@ use_homebrew_openssl() {
 }
 
 use_macports_openssl() {
+  configured_with_openssl && return 0
   can_use_macports || return 1
   command -v port >/dev/null || return 1
   local port_location="$(command -v port)"
