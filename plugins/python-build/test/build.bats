@@ -834,7 +834,9 @@ $definition_opts
 $preceding_check
 before_opts="\${PYTHON_CONFIGURE_OPTS_ARRAY[*]}"
 before_flags="\$CPPFLAGS|\$LDFLAGS|\$PKG_CONFIG_PATH"
-$selector
+selection_status=0
+$selector || selection_status=\$?
+[[ \$selection_status -eq 1 ]] || exit 1
 [[ "\${PYTHON_CONFIGURE_OPTS_ARRAY[*]}" = "\$before_opts" ]] || exit 1
 [[ "\$CPPFLAGS|\$LDFLAGS|\$PKG_CONFIG_PATH" = "\$before_flags" ]] || exit 1
 DEF
