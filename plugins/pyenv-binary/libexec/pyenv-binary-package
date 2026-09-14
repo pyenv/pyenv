@@ -7,7 +7,7 @@
 #   Installs <version> from source under a separate entry name, saves it as a
 #   binary package, then emits a python-build definition for that package.
 #   The archive, metadata and definition are written to the current directory
-#   as <entry>.tar.gz, <entry>.meta and <entry>.
+#   as <entry>.tar.xz, <entry>.meta and <entry>.
 #
 #   <version>             A version `pyenv install' knows how to build.
 #   <entry>               The optional name to build under and install the
@@ -16,7 +16,7 @@
 #   -v,--verbose          Show build progress from `pyenv install'.
 #   --archive-base-url <url>
 #                         Where the archive will be hosted; the definition
-#                         downloads it from <url>/<entry>.tar.gz.
+#                         downloads it from <url>/<entry>.tar.xz.
 #
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -80,4 +80,4 @@ pyenv-install ${verbose:+--verbose} "$spec"
 pyenv-binary-save "$entry" "$PWD" --name "$entry"
 
 pyenv-binary-generate-installer "${entry}.meta" \
-  --archive-url "${archive_base_url%/}/${entry}.tar.gz" -o "$entry"
+  --archive-url "${archive_base_url%/}/${entry}.tar.xz" -o "$entry"

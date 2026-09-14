@@ -29,7 +29,7 @@ Pass `-v` to show build progress from `pyenv install`.
 ```sh
 pyenv binary package 3.12.7 \
   --archive-base-url https://example.com/binaries
-# On Debian 12 x86_64, writes 3.12.7-debian-12-x86_64.tar.gz,
+# On Debian 12 x86_64, writes 3.12.7-debian-12-x86_64.tar.xz,
 # its .meta file and a `3.12.7-debian-12-x86_64' definition.
 
 pyenv binary package 3.12.7:company-python \
@@ -54,7 +54,7 @@ pyenv binary package-name 3.12.7
 
 ### `pyenv binary save <version> [<output-dir>] [--name <name>]`
 
-Packs an installed version into `<version>-<platform>.tar.gz` (relative paths)
+Packs an installed version into `<version>-<platform>.tar.xz` (relative paths)
 and writes `<version>-<platform>.meta` describing the build platform (OS, arch,
 distro and libc version) and the system libraries the build links against. Use
 `--name` to set a different base name for both files.
@@ -78,7 +78,7 @@ needs are present.
 
 ```sh
 pyenv binary generate-installer ./dist/3.12.7-linux-x86_64.meta \
-  --archive-url https://example.com/3.12.7-linux-x86_64.tar.gz \
+  --archive-url https://example.com/3.12.7-linux-x86_64.tar.xz \
   -o "$(pyenv root)/plugins/python-build/share/python-build/3.12.7-linux-x86_64"
 
 pyenv install 3.12.7-linux-x86_64
