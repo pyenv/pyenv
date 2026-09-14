@@ -14,6 +14,9 @@ architecture and a compatible libc) and have the recorded system libraries. It
 is not portable across, say, glibc and musl, or to an older glibc; the platform
 and dependency metadata exist to catch that.
 
+Installing a binary package requires `tar` with xz support (typically provided
+by the `xz` package).
+
 ## Commands
 
 ### `pyenv binary package [-v|--verbose] <version>[:<entry>] --archive-base-url <url>`
