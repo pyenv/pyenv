@@ -52,7 +52,7 @@ jobs:
       - name: Update downloads
         run: |
           mkdir -p site/pythons/binaries
-          cp "dist/$entry.tar.gz" "dist/$entry.meta" "dist/$entry" \
+          cp "dist/$entry.tar.xz" "dist/$entry.meta" "dist/$entry" \
             site/pythons/binaries/
           cd site/pythons
           ./update.sh
