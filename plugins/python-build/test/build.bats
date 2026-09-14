@@ -219,8 +219,10 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
+  stub brew '--prefix openssl : false'
   for i in {1..5}; do stub brew false; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
+  stub port '-q installed openssl3 : false' '-q installed openssl : false'
   for i in {1..3}; do stub port false; done
   stub_make_install
 
@@ -253,6 +255,7 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
+  stub brew '--prefix openssl : false'
   for i in {1..5}; do stub brew false; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
   stub_make_install
@@ -282,6 +285,7 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
+  stub port '-q installed openssl3 : false' '-q installed openssl : false'
   for i in {1..3}; do stub port false; done
   stub_make_install
   export PYTHON_BUILD_SKIP_HOMEBREW=1
@@ -315,6 +319,7 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
   stub brew "--prefix libyaml : echo '$brew_libdir'"
+  stub brew '--prefix openssl : false'
   for i in {1..6}; do stub brew false; done
   stub_make_install
 
@@ -341,6 +346,7 @@ OUT
   mkdir -p "$readline_libdir"
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
+  stub brew '--prefix openssl : false'
   for i in {1..2}; do stub brew false; done
   stub brew "--prefix readline : echo '$readline_libdir'"
   for i in {1..3}; do stub brew false; done
@@ -371,6 +377,7 @@ OUT
   mkdir -p "$ncurses_libdir"
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
+  stub brew '--prefix openssl : false'
   for i in {1..3}; do stub brew false; done
   stub brew "--prefix ncurses : echo '$ncurses_libdir'"
   for i in {1..2}; do stub brew false; done
@@ -400,6 +407,7 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
   stub port "-q installed libyaml : echo '  libyaml @0.2.5_0 (active)'"
+  stub port '-q installed openssl3 : false' '-q installed openssl : false'
   for i in {1..3}; do stub port false; done
   stub_make_install
   export PYTHON_BUILD_SKIP_HOMEBREW=1
@@ -427,6 +435,7 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
+  stub port '-q installed openssl3 : false' '-q installed openssl : false'
   stub port "-q installed readline : echo '  readline @8.2.013_0 (active)'"
   for i in {1..2}; do stub port false; done
   stub_make_install
@@ -457,6 +466,7 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
+  stub port '-q installed openssl3 : false' '-q installed openssl : false'
   stub port false
   stub port "-q installed ncurses : echo '$ncurses_libdir'"
   stub port false
@@ -634,6 +644,7 @@ OUT
 
   stub uname '-s : echo Linux'
   stub brew false
+  stub port '-q installed openssl3 : false' '-q installed openssl : false'
   for i in {1..3}; do stub port false; done
   PORT_PREFIX="$(which port)"
   PORT_PREFIX="${PORT_PREFIX%/bin/port}"
@@ -664,6 +675,7 @@ OUT
   mkdir -p "$BREW_PREFIX"
 
   stub uname '-s : echo Linux'
+  stub brew '--prefix openssl : false'
   for i in {1..5}; do stub brew false; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
   stub_make_install
@@ -695,6 +707,7 @@ OUT
 
   stub uname '-s : echo Linux'
   stub brew "--prefix : echo '$BREW_PREFIX'"
+  stub brew '--prefix openssl : false'
   for i in {1..5}; do stub brew false; done
   stub brew "--prefix : echo '$BREW_PREFIX'"
   stub_make_install
@@ -743,6 +756,218 @@ make install
 OUT
 }
 
+assert_explicit_openssl() {
+  local configure_opts="$1"
+  local definition_opts="$2"
+  cached_tarball "Python-3.6.2"
+
+  local openssl_libdir="$BATS_TEST_TMPDIR/homebrew-openssl"
+  mkdir -p "$openssl_libdir"
+  executable "$BATS_TEST_TMPDIR/bin/brew" <<OUT
+#!$BASH
+if [ "\$*" = '--prefix openssl' ]; then
+  echo '$openssl_libdir'
+else
+  exit 1
+fi
+OUT
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub_make_install
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<DEF
+function /usr/bin/openssl() { echo "LibreSSL 3.3.6"; }
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL_RPATH=1
+$definition_opts
+install_package "openssl-1.1.1" "https://example.com/openssl-1.1.1.tar.gz" mac_openssl --if has_broken_mac_openssl
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+  [[ "$output" != *"use openssl from homebrew"* ]]
+
+  unstub uname
+  unstub sw_vers
+  unstub make
+
+  assert_build_log <<OUT
+Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH=""
+Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib $configure_opts
+make -j 2
+make install
+OUT
+}
+
+@test "explicit OpenSSL in CONFIGURE_OPTS bypasses automatic selection" {
+  export CONFIGURE_OPTS="--with-openssl=$BATS_TEST_TMPDIR/custom-openssl"
+  assert_explicit_openssl "$CONFIGURE_OPTS"
+}
+
+@test "explicit OpenSSL in PYTHON_CONFIGURE_OPTS bypasses automatic selection" {
+  export PYTHON_CONFIGURE_OPTS="--with-openssl=$BATS_TEST_TMPDIR/custom-openssl"
+  assert_explicit_openssl "$PYTHON_CONFIGURE_OPTS"
+}
+
+@test "explicit OpenSSL with a separate argument bypasses automatic selection" {
+  export PYTHON_CONFIGURE_OPTS="--with-openssl $BATS_TEST_TMPDIR/custom-openssl"
+  assert_explicit_openssl "$PYTHON_CONFIGURE_OPTS"
+}
+
+@test "explicit OpenSSL in package options bypasses automatic selection" {
+  local openssl_libdir="$BATS_TEST_TMPDIR/custom openssl"
+  assert_explicit_openssl "--with-openssl=$openssl_libdir" \
+    "package_option python configure '--with-openssl=$openssl_libdir'"
+}
+
+assert_standard_build_openssl_selection() {
+  local manager="$1"
+  local expected_opts="$2"
+  local definition_opts="$3"
+  local preceding_check="$4"
+  local expected_searches="${5:-0}"
+  local openssl_libdir="$BATS_TEST_TMPDIR/automatic-openssl"
+  cached_tarball "Python-3.6.2"
+  mkdir -p "$openssl_libdir"
+  executable "$BATS_TEST_TMPDIR/bin/brew" <<OUT
+#!$BASH
+if [ "\$*" = '--prefix openssl' ]; then
+  echo called >> '$BATS_TEST_TMPDIR/openssl-search'
+  echo '$openssl_libdir'
+else
+  exit 1
+fi
+OUT
+  executable "$BATS_TEST_TMPDIR/bin/port" <<OUT
+#!$BASH
+if [ "\$*" = '-q installed openssl3' ]; then
+  echo called >> '$BATS_TEST_TMPDIR/openssl-search'
+  echo 'openssl3 @3.0.0 (active)'
+else
+  exit 1
+fi
+OUT
+  if [ "$manager" = homebrew ]; then
+    export PYTHON_BUILD_USE_HOMEBREW=1
+    export PYTHON_BUILD_SKIP_MACPORTS=1
+  else
+    export PYTHON_BUILD_SKIP_HOMEBREW=1
+    export PYTHON_BUILD_USE_MACPORTS=1
+  fi
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub_make_install
+
+  run_inline_definition <<DEF
+function /usr/bin/openssl() { echo "LibreSSL 3.3.6"; }
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+$definition_opts
+$preceding_check
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+  unstub uname
+  unstub sw_vers
+  unstub make
+
+  run cat "$INSTALL_ROOT/build.log"
+  assert_output_contains "Python-3.6.2: --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib $expected_opts"
+  if [ "$expected_searches" -eq 0 ]; then
+    refute test -e "$BATS_TEST_TMPDIR/openssl-search"
+  else
+    run cat "$BATS_TEST_TMPDIR/openssl-search"
+    assert_success "called"
+  fi
+}
+
+@test "explicit OpenSSL bypasses Homebrew selection in a standard build" {
+  export CONFIGURE_OPTS="--with-openssl=$BATS_TEST_TMPDIR/custom-openssl"
+  assert_standard_build_openssl_selection homebrew "$CONFIGURE_OPTS"
+}
+
+@test "explicit OpenSSL bypasses MacPorts selection in a standard build" {
+  export PYTHON_CONFIGURE_OPTS="--with-openssl $BATS_TEST_TMPDIR/custom-openssl"
+  assert_standard_build_openssl_selection macports "$PYTHON_CONFIGURE_OPTS"
+}
+
+@test "explicit package OpenSSL bypasses repeated Homebrew selection" {
+  local configure_opts="--with-openssl=$BATS_TEST_TMPDIR/custom openssl"
+  assert_standard_build_openssl_selection homebrew "$configure_opts" \
+    "package_option python configure '$configure_opts'" \
+    'has_broken_mac_openssl || true'
+}
+
+@test "explicit package OpenSSL bypasses repeated MacPorts selection" {
+  local configure_opts="--with-openssl=$BATS_TEST_TMPDIR/custom openssl"
+  assert_standard_build_openssl_selection macports "$configure_opts" \
+    "package_option python configure '$configure_opts'" \
+    'has_broken_mac_openssl || true'
+}
+
+@test "standard build selects Homebrew OpenSSL without a broken-system check" {
+  assert_standard_build_openssl_selection homebrew \
+    "--with-openssl=$BATS_TEST_TMPDIR/automatic-openssl" '' '' 1
+}
+
+@test "standard build selects MacPorts OpenSSL without a broken-system check" {
+  assert_standard_build_openssl_selection macports \
+    "--with-openssl=$BATS_TEST_TMPDIR" '' '' 1
+}
+
+@test "standard build does not probe Homebrew OpenSSL again after selection" {
+  assert_standard_build_openssl_selection homebrew \
+    "--with-openssl=$BATS_TEST_TMPDIR/automatic-openssl" '' \
+    'has_broken_mac_openssl || true' 1
+}
+
+@test "standard build does not probe MacPorts OpenSSL again after selection" {
+  assert_standard_build_openssl_selection macports \
+    "--with-openssl=$BATS_TEST_TMPDIR" '' \
+    'has_broken_mac_openssl || true' 1
+}
+
+@test "OpenSSL rpath alone does not bypass Homebrew selection" {
+  local openssl_libdir="$BATS_TEST_TMPDIR/homebrew-openssl"
+  mkdir -p "$openssl_libdir"
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub brew "--prefix openssl : echo '$openssl_libdir'"
+  export PYTHON_CONFIGURE_OPTS="--with-openssl-rpath=auto"
+
+  run_inline_definition <<'DEF'
+function /usr/bin/openssl() { echo "LibreSSL 3.3.6"; }
+export PYTHON_BUILD_CONFIGURE_WITH_OPENSSL=1
+has_broken_mac_openssl || true
+printf '%s\n' "${PYTHON_CONFIGURE_OPTS_ARRAY[@]}"
+DEF
+  assert_success
+  assert_output <<OUT
+python-build: use openssl from homebrew
+--enable-shared
+--libdir=$INSTALL_ROOT/lib
+--with-openssl=$openssl_libdir
+OUT
+  unstub uname
+  unstub sw_vers
+  unstub brew
+}
+
+@test "bundled OpenSSL is still needed without an explicit or package-manager installation" {
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+  stub brew '--prefix openssl : false'
+  export PYTHON_BUILD_SKIP_MACPORTS=1
+
+  run_inline_definition <<'DEF'
+function /usr/bin/openssl() { echo "LibreSSL 3.3.6"; }
+has_broken_mac_openssl && echo "bundled OpenSSL needed"
+DEF
+  assert_success "bundled OpenSSL needed"
+  unstub uname
+  unstub sw_vers
+  unstub brew
+}
+
 @test "readline is not linked from Homebrew when explicitly defined" {
   cached_tarball "Python-3.6.2"
 
@@ -753,6 +978,7 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
 
+  stub brew '--prefix openssl : false'
   for i in {1..5}; do stub brew false; done
   stub_make_install
 
@@ -782,6 +1008,7 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
 
+  stub brew '--prefix openssl : false'
   stub brew "--prefix tcl-tk@8 : echo '$tcl_tk_libdir'"
   for i in {1..4}; do stub brew false; done
 
@@ -815,6 +1042,7 @@ TCL_DEFS='-DSMTH -DTCL_WITH_EXTERNAL_TOMMATH=1 -DSMTH_ELSE'
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
 
+  stub brew '--prefix openssl : false'
   stub brew "--prefix tcl-tk@8 : echo '$tcl_tk_libdir'"
   for i in {1..4}; do stub brew false; done
 
@@ -845,6 +1073,7 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
 
+  stub brew '--prefix openssl : false'
   stub brew "--prefix tcl-tk-custom : echo '$tcl_tk_libdir'"
   for i in {1..4}; do stub brew false; done
 
@@ -876,6 +1105,7 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
 
+  stub brew '--prefix openssl : false'
   stub brew "--prefix tcl-tk@8 : echo '$tcl_tk_libdir'"
   for i in {1..4}; do stub brew false; done
 
@@ -911,6 +1141,7 @@ TCL_DEFS='-DSMTH -DTCL_WITH_EXTERNAL_TOMMATH=1 -DSMTH_ELSE'
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
 
+  stub brew '--prefix openssl : false'
   stub brew "--prefix tcl-tk@8 : echo '$tcl_tk_libdir'"
   for i in {1..4}; do stub brew false; done
 
@@ -946,6 +1177,7 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
 
+  stub brew '--prefix openssl : false'
   for i in {1..4}; do stub brew false; done
   stub_make_install
 
@@ -977,6 +1209,7 @@ OUT
   tcl_tk_libdir="$BATS_TEST_TMPDIR/homebrew-tcl-tk"
   mkdir -p "$tcl_tk_libdir/lib"
 
+  stub brew '--prefix openssl : false'
   stub brew "--prefix tcl-tk@8 : echo '${tcl_tk_libdir}'"
   for i in {1..4}; do stub brew false; done
 
@@ -1006,6 +1239,7 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
+  stub brew '--prefix openssl : false'
   for i in {1..6}; do stub brew false; done
 
   stub sysctl false
@@ -1035,6 +1269,7 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
+  stub brew '--prefix openssl : false'
   for i in {1..6}; do stub brew false; done
 
   stub sysctl '-n hw.ncpu : echo 4'
@@ -1141,6 +1376,7 @@ OUT
 
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 1010'
+  stub brew '--prefix openssl : false'
   for i in {1..6}; do stub brew false; done
   stub_make_install
 
