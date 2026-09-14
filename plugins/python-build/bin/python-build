@@ -873,6 +873,7 @@ build_package_standard_build() {
 
   if [ "$package_var_name" = "PYTHON" ]; then
     if can_use_homebrew; then
+      configured_with_openssl || use_homebrew_openssl || true
       use_custom_tcltk || use_homebrew_tcltk || true
       use_homebrew_readline || true
       use_homebrew_ncurses || true
@@ -885,6 +886,7 @@ build_package_standard_build() {
       fi
     fi
     if can_use_macports; then
+      configured_with_openssl || use_macports_openssl || true
       use_custom_tcltk || true
       use_macports_readline || true
       use_macports_ncurses || true
@@ -1729,7 +1731,6 @@ has_broken_mac_openssl() {
 }
 
 use_homebrew_openssl() {
-  configured_with_openssl && return 1
   can_use_homebrew || return 1
   command -v brew >/dev/null || return 1
   for openssl in ${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl}; do
@@ -1768,7 +1769,6 @@ use_homebrew_openssl() {
 }
 
 use_macports_openssl() {
-  configured_with_openssl && return 1
   can_use_macports || return 1
   command -v port >/dev/null || return 1
   local port_location="$(command -v port)"
