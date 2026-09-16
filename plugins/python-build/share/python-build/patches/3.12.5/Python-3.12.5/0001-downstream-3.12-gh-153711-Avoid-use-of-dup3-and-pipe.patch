@@ -1,0 +1,119 @@
+From 16d9ac47e5e6b6e8020049622c697e8118999480 Mon Sep 17 00:00:00 2001
+From: Ned Deily <nad@python.org>
+Date: Wed, 5 Aug 2026 10:30:17 +0300
+Subject: [PATCH] (downstream) [3.12] gh-153711: Avoid use of dup3 and pipe2
+ calls introduced in macOS 27 (#155211)
+
+---
+ ...-08-05-02-02-33.gh-issue-153711.pO9fFb.rst |  3 ++
+ configure                                     | 33 +++++++++++--------
+ configure.ac                                  | 11 +++++--
+ 3 files changed, 32 insertions(+), 15 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
+
+diff --git a/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst b/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
+new file mode 100644
+index 00000000000..90804c179a4
+--- /dev/null
++++ b/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
+@@ -0,0 +1,3 @@
++On macOS, do not attempt to use the :manpage:`dup3(2)` and
++:manpage:`pipe2(2)` system calls introduced in
++macOS 27 to prevent problems when running on older systems.
+diff --git a/configure b/configure
+index 4dfaeecfc0b..bec4c9ac763 100755
+--- a/configure
++++ b/configure
+@@ -17591,13 +17591,7 @@ fi
+ ac_fn_c_check_func "$LINENO" "dup" "ac_cv_func_dup"
+ if test "x$ac_cv_func_dup" = xyes
+ then :
+-  printf "%s\n" "#define HAVE_DUP 1" >>confdefs.h
+-
+-fi
+-ac_fn_c_check_func "$LINENO" "dup3" "ac_cv_func_dup3"
+-if test "x$ac_cv_func_dup3" = xyes
+-then :
+-  printf "%s\n" "#define HAVE_DUP3 1" >>confdefs.h
++  printf '%s\n' "#define HAVE_DUP 1" >>confdefs.h
+ 
+ fi
+ ac_fn_c_check_func "$LINENO" "execv" "ac_cv_func_execv"
+@@ -18067,12 +18061,6 @@ if test "x$ac_cv_func_pipe" = xyes
+ then :
+   printf "%s\n" "#define HAVE_PIPE 1" >>confdefs.h
+ 
+-fi
+-ac_fn_c_check_func "$LINENO" "pipe2" "ac_cv_func_pipe2"
+-if test "x$ac_cv_func_pipe2" = xyes
+-then :
+-  printf "%s\n" "#define HAVE_PIPE2 1" >>confdefs.h
+-
+ fi
+ ac_fn_c_check_func "$LINENO" "plock" "ac_cv_func_plock"
+ if test "x$ac_cv_func_plock" = xyes
+@@ -18647,6 +18635,25 @@ fi
+ 
+ fi
+ 
++# macOS introduced dup3 and pipe2 in macOS 27, late in the
++# lifetime of this version of Python. Rather than adding weaklinking
++# support for them, just continue to ignore them.
++if test "$ac_sys_system" != "Darwin"; then
++  ac_fn_c_check_func "$LINENO" "dup3" "ac_cv_func_dup3"
++if test "x$ac_cv_func_dup3" = xyes
++then :
++  printf '%s\n' "#define HAVE_DUP3 1" >>confdefs.h
++
++fi
++ac_fn_c_check_func "$LINENO" "pipe2" "ac_cv_func_pipe2"
++if test "x$ac_cv_func_pipe2" = xyes
++then :
++  printf '%s\n' "#define HAVE_PIPE2 1" >>confdefs.h
++
++fi
++
++fi
++
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CC options needed to detect all undeclared functions" >&5
+ printf %s "checking for $CC options needed to detect all undeclared functions... " >&6; }
+ if test ${ac_cv_c_undeclared_builtin_options+y}
+diff --git a/configure.ac b/configure.ac
+index 0d6df8e24e4..cbf749da60b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4896,7 +4896,7 @@ fi
+ # checks for library functions
+ AC_CHECK_FUNCS([ \
+   accept4 alarm bind_textdomain_codeset chmod chown clock close_range confstr \
+-  copy_file_range ctermid dup dup3 execv explicit_bzero explicit_memset \
++  copy_file_range ctermid dup execv explicit_bzero explicit_memset \
+   faccessat fchmod fchmodat fchown fchownat fdopendir fdwalk fexecve \
+   fork fork1 fpathconf fstatat ftime ftruncate futimens futimes futimesat \
+   gai_strerror getegid getentropy geteuid getgid getgrgid getgrgid_r \
+@@ -4906,7 +4906,7 @@ AC_CHECK_FUNCS([ \
+   getspnam getuid getwd if_nameindex initgroups kill killpg lchown linkat \
+   lockf lstat lutimes madvise mbrtowc memrchr mkdirat mkfifo mkfifoat \
+   mknod mknodat mktime mmap mremap nice openat opendir pathconf pause pipe \
+-  pipe2 plock poll posix_fadvise posix_fallocate posix_spawn posix_spawnp \
++  plock poll posix_fadvise posix_fallocate posix_spawn posix_spawnp \
+   pread preadv preadv2 pthread_condattr_setclock pthread_init pthread_kill \
+   pwrite pwritev pwritev2 readlink readlinkat readv realpath renameat \
+   rtpSpawn sched_get_priority_max sched_rr_get_interval sched_setaffinity \
+@@ -4928,6 +4928,13 @@ if test "$MACHDEP" != linux; then
+   AC_CHECK_FUNCS([lchmod])
+ fi
+ 
++# macOS introduced dup3 and pipe2 in macOS 27, late in the
++# lifetime of this version of Python. Rather than adding weaklinking
++# support for them, just continue to ignore them.
++if test "$ac_sys_system" != "Darwin"; then
++  AC_CHECK_FUNCS([dup3 pipe2])
++fi
++
+ AC_CHECK_DECL([dirfd],
+               [AC_DEFINE([HAVE_DIRFD], [1],
+                          [Define if you have the 'dirfd' function or macro.])],
+-- 
+2.55.0.windows.3
+
