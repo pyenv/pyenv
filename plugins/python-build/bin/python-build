@@ -1203,6 +1203,7 @@ anaconda_architecture() {
     "aarch64" ) echo "Linux-aarch64" ;;
     "i386" | "i486" | "i586" | "i686" | "i786" ) echo "Linux-x86" ;;
     "ppc64le" ) echo "Linux-ppc64le" ;;
+    "riscv64" ) echo "Linux-riscv64" ;;
     "x86_64" ) echo "Linux-x86_64" ;;
     * ) return 1 ;;
     esac

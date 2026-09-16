@@ -89,6 +89,9 @@ def py_version(version):
     # transition points:
     # https://github.com/conda-forge/miniforge/blame/main/Miniforge3/construct.yaml
     # look for "- python <version>" in non-pypy branch and which tag the commit is first in
+    if version_tuple_ >= (26,5,3):
+        # https://github.com/conda-forge/miniforge/commit/8ae029d5f17e34e93fec2d9bfe708ba9175adf08
+        return "314"
     if version_tuple_ >= (26,1):
         # https://github.com/conda-forge/miniforge/commit/0016367731e52c67234d6d0e7e6a24c6bf7673e4
         return "313"
