@@ -1,14 +1,14 @@
-From 410d662e00328865cddd8fca1b95b5ac1ee549b9 Mon Sep 17 00:00:00 2001
+From d92ec3351dd6a0cc2e2fe10bae23ffdb817de42d Mon Sep 17 00:00:00 2001
 From: Ned Deily <nad@python.org>
-Date: Wed, 5 Aug 2026 00:30:17 -0700
+Date: Wed, 5 Aug 2026 10:30:17 +0300
 Subject: [PATCH] (downstream) [3.12] gh-153711: Avoid use of dup3 and pipe2
  calls introduced in macOS 27 (#155211)
 
 ---
- ...-08-05-02-02-33.gh-issue-153711.pO9fFb.rst |  3 +++
- configure                                     | 27 ++++++++++++++-----
- configure.ac                                  | 11 ++++++--
- 3 files changed, 32 insertions(+), 9 deletions(-)
+ ...-08-05-02-02-33.gh-issue-153711.pO9fFb.rst |  3 ++
+ configure                                     | 33 +++++++++++--------
+ configure.ac                                  | 11 +++++--
+ 3 files changed, 32 insertions(+), 15 deletions(-)
  create mode 100644 Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
 
 diff --git a/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst b/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
@@ -21,7 +21,7 @@ index 00000000000..90804c179a4
 +:manpage:`pipe2(2)` system calls introduced in
 +macOS 27 to prevent problems when running on older systems.
 diff --git a/configure b/configure
-index 241cf8f3d4a..179d5058014 100755
+index 241cf8f3d4a..62575e79243 100755
 --- a/configure
 +++ b/configure
 @@ -17594,13 +17594,7 @@ fi
@@ -39,7 +39,20 @@ index 241cf8f3d4a..179d5058014 100755
  
  fi
  ac_fn_c_check_func "$LINENO" "execv" "ac_cv_func_execv"
-@@ -18650,6 +18644,25 @@ fi
+@@ -18070,12 +18064,6 @@ if test "x$ac_cv_func_pipe" = xyes
+ then :
+   printf "%s\n" "#define HAVE_PIPE 1" >>confdefs.h
+ 
+-fi
+-ac_fn_c_check_func "$LINENO" "pipe2" "ac_cv_func_pipe2"
+-if test "x$ac_cv_func_pipe2" = xyes
+-then :
+-  printf "%s\n" "#define HAVE_PIPE2 1" >>confdefs.h
+-
+ fi
+ ac_fn_c_check_func "$LINENO" "plock" "ac_cv_func_plock"
+ if test "x$ac_cv_func_plock" = xyes
+@@ -18650,6 +18638,25 @@ fi
  
  fi
  

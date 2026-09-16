@@ -1,14 +1,14 @@
-From 0ffa2aeae5c0b29a2df4ca3ce6871c78fcb4b875 Mon Sep 17 00:00:00 2001
+From ac12d63bf188f9497f8453c0447b9bc599acbf22 Mon Sep 17 00:00:00 2001
 From: Ned Deily <nad@python.org>
-Date: Wed, 5 Aug 2026 00:30:17 -0700
+Date: Wed, 5 Aug 2026 10:30:17 +0300
 Subject: [PATCH] (downstream) [3.12] gh-153711: Avoid use of dup3 and pipe2
  calls introduced in macOS 27 (#155211)
 
 ---
- ...-08-05-02-02-33.gh-issue-153711.pO9fFb.rst |  3 +++
- configure                                     | 27 ++++++++++++++-----
- configure.ac                                  | 11 ++++++--
- 3 files changed, 32 insertions(+), 9 deletions(-)
+ ...-08-05-02-02-33.gh-issue-153711.pO9fFb.rst |  3 ++
+ configure                                     | 33 +++++++++++--------
+ configure.ac                                  | 11 +++++--
+ 3 files changed, 32 insertions(+), 15 deletions(-)
  create mode 100644 Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
 
 diff --git a/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst b/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
@@ -21,10 +21,10 @@ index 00000000000..90804c179a4
 +:manpage:`pipe2(2)` system calls introduced in
 +macOS 27 to prevent problems when running on older systems.
 diff --git a/configure b/configure
-index 89edc42f45c..4bbe849ea12 100755
+index b6f90bcd8c7..b93aab935ce 100755
 --- a/configure
 +++ b/configure
-@@ -17614,13 +17614,7 @@ fi
+@@ -17552,13 +17552,7 @@ fi
  ac_fn_c_check_func "$LINENO" "dup" "ac_cv_func_dup"
  if test "x$ac_cv_func_dup" = xyes
  then :
@@ -39,7 +39,20 @@ index 89edc42f45c..4bbe849ea12 100755
  
  fi
  ac_fn_c_check_func "$LINENO" "execv" "ac_cv_func_execv"
-@@ -18670,6 +18664,25 @@ fi
+@@ -18028,12 +18022,6 @@ if test "x$ac_cv_func_pipe" = xyes
+ then :
+   printf "%s\n" "#define HAVE_PIPE 1" >>confdefs.h
+ 
+-fi
+-ac_fn_c_check_func "$LINENO" "pipe2" "ac_cv_func_pipe2"
+-if test "x$ac_cv_func_pipe2" = xyes
+-then :
+-  printf "%s\n" "#define HAVE_PIPE2 1" >>confdefs.h
+-
+ fi
+ ac_fn_c_check_func "$LINENO" "plock" "ac_cv_func_plock"
+ if test "x$ac_cv_func_plock" = xyes
+@@ -18608,6 +18596,25 @@ fi
  
  fi
  
@@ -66,10 +79,10 @@ index 89edc42f45c..4bbe849ea12 100755
  printf %s "checking for $CC options needed to detect all undeclared functions... " >&6; }
  if test ${ac_cv_c_undeclared_builtin_options+y}
 diff --git a/configure.ac b/configure.ac
-index 1a02d19f1b2..f2b58421d74 100644
+index ba768aea930..92049fb2889 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4920,7 +4920,7 @@ fi
+@@ -4860,7 +4860,7 @@ fi
  # checks for library functions
  AC_CHECK_FUNCS([ \
    accept4 alarm bind_textdomain_codeset chmod chown clock close_range confstr \
@@ -78,7 +91,7 @@ index 1a02d19f1b2..f2b58421d74 100644
    faccessat fchmod fchmodat fchown fchownat fdopendir fdwalk fexecve \
    fork fork1 fpathconf fstatat ftime ftruncate futimens futimes futimesat \
    gai_strerror getegid getentropy geteuid getgid getgrgid getgrgid_r \
-@@ -4930,7 +4930,7 @@ AC_CHECK_FUNCS([ \
+@@ -4870,7 +4870,7 @@ AC_CHECK_FUNCS([ \
    getspnam getuid getwd if_nameindex initgroups kill killpg lchown linkat \
    lockf lstat lutimes madvise mbrtowc memrchr mkdirat mkfifo mkfifoat \
    mknod mknodat mktime mmap mremap nice openat opendir pathconf pause pipe \
@@ -87,7 +100,7 @@ index 1a02d19f1b2..f2b58421d74 100644
    pread preadv preadv2 pthread_condattr_setclock pthread_init pthread_kill \
    pwrite pwritev pwritev2 readlink readlinkat readv realpath renameat \
    rtpSpawn sched_get_priority_max sched_rr_get_interval sched_setaffinity \
-@@ -4952,6 +4952,13 @@ if test "$MACHDEP" != linux; then
+@@ -4892,6 +4892,13 @@ if test "$MACHDEP" != linux; then
    AC_CHECK_FUNCS([lchmod])
  fi
  
