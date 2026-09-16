@@ -96,6 +96,7 @@ jobs:
           - macos-15-intel
           - macos-26
           - macos-26-intel
+          - xcode-27
         exclude: ${{fromJson(needs.discover_modified_scripts.outputs.versions_macos_build_exclude)}}
     runs-on: ${{ matrix.os }}
     steps:
@@ -164,6 +165,7 @@ jobs:
           - macos-15-intel
           - macos-26
           - macos-26-intel
+          - xcode-27
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
