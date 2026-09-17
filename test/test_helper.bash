@@ -2,8 +2,14 @@ unset PYENV_VERSION
 unset PYENV_DIR
 
 setup() {
-  export _PYENV_INSTALL_PREFIX="${BATS_TEST_DIRNAME%/*}"
   export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+
+  export _PYENV_INSTALL_PREFIX="${BATS_TEST_DIRNAME%/*}"
+  local PLUGIN_PREFIX
+  if [[ $_PYENV_INSTALL_PREFIX =~ /plugins/[^/]+$ ]]; then
+    PLUGIN_PREFIX="$_PYENV_INSTALL_PREFIX"
+    _PYENV_INSTALL_PREFIX="${_PYENV_INSTALL_PREFIX::${#_PYENV_INSTALL_PREFIX}-${#BASH_REMATCH[0]}}"
+  fi
   if ! enable -f "${_PYENV_INSTALL_PREFIX}"/libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
     if [ -n "$PYENV_NATIVE_EXT" ]; then
       echo "pyenv: failed to load \`realpath' builtin" >&2
@@ -27,6 +33,9 @@ setup() {
   PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin
   PATH="${PYENV_TEST_DIR}/bin:$PATH"
   PATH="${_PYENV_INSTALL_PREFIX}/libexec:$PATH"
+  if [[ -n $PLUGIN_PREFIX ]]; then
+    PATH="${PLUGIN_PREFIX}/libexec:${PLUGIN_PREFIX}/bin:$PATH"
+  fi
   PATH="${BATS_TEST_DIRNAME}/libexec:$PATH"
   PATH="${PYENV_ROOT}/shims:$PATH"
   PATH="${BATS_TEST_TMPDIR}/stubs:$PATH"
@@ -39,6 +48,7 @@ setup() {
   # Powershell 7.5.4 erroneously prints ANSI escape sequences
   # even if its output is redirected, breaking the comparison logic
   export NO_COLOR=1
+
 
   # If test specific setup exist, run it
   if [[ $(type -t _setup) == function ]];then

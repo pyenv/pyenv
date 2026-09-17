@@ -1,0 +1,70 @@
+name: Publish a binary package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: A CPython version accepted by `pyenv install`
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish_ubuntu:
+    runs-on: ubuntu-24.04
+    env:
+      PYENV_ROOT: ${{ github.workspace }}
+      VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install build prerequisites
+        run: ./bin/pyenv install-prerequisites
+      - name: Build package
+        env:
+          PYTHON_CONFIGURE_OPTS: --enable-optimizations
+        run: |
+          VERSION="${VERSION%%:*}"
+          entry="$(./bin/pyenv binary package-name "$VERSION")"
+          echo "entry=$entry" >> "$GITHUB_ENV"
+          mkdir dist
+          cd dist
+          "$GITHUB_WORKSPACE/bin/pyenv" binary package --verbose \
+            "$VERSION:$entry" \
+            --archive-base-url https://pyenv.github.io/pythons/binaries
+
+      - name: Generate GitHub token
+        uses: actions/create-github-app-token@v3
+        id: generate-token
+        with:
+          app-id: ${{ vars.PYENV_BOT_APP_ID }}
+          private-key: ${{ secrets.PYENV_BOT_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: pyenv.github.io
+          permission-contents: write
+          permission-pull-requests: write
+      - uses: actions/checkout@v7
+        with:
+          repository: pyenv/pyenv.github.io
+          token: ${{ steps.generate-token.outputs.token }}
+          path: site
+      - name: Update downloads
+        run: |
+          mkdir -p site/pythons/binaries
+          cp "dist/$entry.tar.xz" "dist/$entry.meta" "dist/$entry" \
+            site/pythons/binaries/
+          cd site/pythons
+          ./update.sh
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          path: site
+          branch: auto_add_binary/${{ env.entry }}
+          title: Add CPython ${{ env.entry }}
+          commit-message: Add CPython ${{ env.entry }}
+          body: |
+            Built from pyenv/pyenv@${{ github.sha }} with profile-guided optimization enabled.
+
+            Part of pyenv/pyenv#2334.
+          token: ${{ steps.generate-token.outputs.token }}

@@ -33,13 +33,13 @@ platform() {
 @test "packages an installed version" {
   create_version "3.12.7"
   local out="${BATS_TEST_TMPDIR}/dist"
-  local archive="${out}/3.12.7-$(platform).tar.gz"
+  local archive="${out}/3.12.7-$(platform).tar.xz"
 
   run pyenv-binary-save "3.12.7" "$out"
-  assert_success "Saved 3.12.7-$(platform).tar.gz and 3.12.7-$(platform).meta to $out"
+  assert_success "Saved 3.12.7-$(platform).tar.xz and 3.12.7-$(platform).meta to $out"
   assert [ -f "$archive" ]
   assert [ -f "${out}/3.12.7-$(platform).meta" ]
-  run tar -tzf "$archive"
+  run tar -tJf "$archive"
   assert_success
   assert_line 0 "3.12.7/"
 }
@@ -49,10 +49,10 @@ platform() {
   local out="${BATS_TEST_TMPDIR}/dist"
 
   run pyenv-binary-save "3.12.7" "$out" --name "custom"
-  assert_success "Saved custom.tar.gz and custom.meta to $out"
-  assert [ -f "${out}/custom.tar.gz" ]
+  assert_success "Saved custom.tar.xz and custom.meta to $out"
+  assert [ -f "${out}/custom.tar.xz" ]
   run grep '^archive=' "${out}/custom.meta"
-  assert_success "archive=custom.tar.gz"
+  assert_success "archive=custom.tar.xz"
 }
 
 @test "fails when --name has no value" {
@@ -76,7 +76,7 @@ platform() {
   assert_success
   assert_line "version=3.12.7"
   assert_line "platform=$(platform)"
-  assert_line "archive=3.12.7-$(platform).tar.gz"
+  assert_line "archive=3.12.7-$(platform).tar.xz"
 }
 
 @test "records the original installation prefix" {
@@ -94,7 +94,7 @@ platform() {
 
   PATH="$(path_without readelf)" run pyenv-binary-save "3.12.7" "${BATS_TEST_TMPDIR}/dist"
   assert_failure "pyenv-binary: need readelf to inspect shared libraries"
-  assert [ ! -e "${BATS_TEST_TMPDIR}/dist/3.12.7-$(platform).tar.gz" ]
+  assert [ ! -e "${BATS_TEST_TMPDIR}/dist/3.12.7-$(platform).tar.xz" ]
 }
 
 @test "records only direct libraries resolved outside the prefix" {

@@ -10,11 +10,14 @@ TEST_PYTHON_BUILD_DOCKER_TARGETS = $(foreach bash,$(TEST_BASH_VERSIONS),$(addsuf
 TEST_BINARY_DOCKER_PREFIX = test-binary-docker
 TEST_BINARY_DOCKER_TARGETS = $(foreach bash,$(TEST_BASH_VERSIONS),$(addsuffix -$(bash),$(TEST_BINARY_DOCKER_PREFIX)) $(addsuffix -gnu-$(bash),$(TEST_BINARY_DOCKER_PREFIX)))
 
+TEST_LINK_DOCKER_PREFIX = test-link-docker
+TEST_LINK_DOCKER_TARGETS = $(foreach bash,$(TEST_BASH_VERSIONS),$(addsuffix -$(bash),$(TEST_LINK_DOCKER_PREFIX)) $(addsuffix -gnu-$(bash),$(TEST_LINK_DOCKER_PREFIX)))
+
 TEST_BATS_IMAGE_PREFIX = test-pyenv-docker-image
 TEST_BATS_IMAGE_TARGETS = $(foreach bash,$(TEST_BASH_VERSIONS),$(addsuffix -$(bash),$(TEST_BATS_IMAGE_PREFIX)) $(addsuffix -gnu-$(bash),$(TEST_BATS_IMAGE_PREFIX)))
 
 .PHONY: test-docker
-test-docker: $(TEST_UNIT_DOCKER_PREFIX) $(TEST_PYTHON_BUILD_DOCKER_PREFIX) $(TEST_BINARY_DOCKER_PREFIX)
+test-docker: $(TEST_UNIT_DOCKER_PREFIX) $(TEST_PYTHON_BUILD_DOCKER_PREFIX) $(TEST_BINARY_DOCKER_PREFIX) $(TEST_LINK_DOCKER_PREFIX)
 
 .PHONY: $(TEST_UNIT_DOCKER_PREFIX)
 $(TEST_UNIT_DOCKER_PREFIX): $(TEST_UNIT_DOCKER_TARGETS)
@@ -88,6 +91,29 @@ $(TEST_BINARY_DOCKER_TARGETS): $(TEST_BINARY_DOCKER_PREFIX)-% : $(TEST_BATS_IMAG
 		bats $${CI:+-F "/code/test/libexec/bats-format-tap-suite"} \
 		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} plugins/pyenv-binary/test/$${BATS_FILE_FILTER}
 
+.PHONY: $(TEST_LINK_DOCKER_PREFIX)
+$(TEST_LINK_DOCKER_PREFIX): $(TEST_LINK_DOCKER_TARGETS)
+
+.PHONY: $(TEST_LINK_DOCKER_TARGETS)
+$(TEST_LINK_DOCKER_TARGETS): DOCKER_IMAGE = $(TEST_BATS_IMAGE_PREFIX)
+$(TEST_LINK_DOCKER_TARGETS): GNU = $(if $(findstring -gnu-,$@),True,False)
+$(TEST_LINK_DOCKER_TARGETS): BASH = $(filter $(TEST_BASH_VERSIONS),$(subst -, ,$@))
+$(TEST_LINK_DOCKER_TARGETS): DOCKER_TAG = bash-$(BASH)-gnu-$(GNU)
+$(TEST_LINK_DOCKER_TARGETS): INTERACTIVE = $(if $(findstring true,$(CI)),,-ti)
+$(TEST_LINK_DOCKER_TARGETS): $(TEST_LINK_DOCKER_PREFIX)-% : $(TEST_BATS_IMAGE_PREFIX)-%
+	$(info Running test with docker image '$(DOCKER_IMAGE):$(DOCKER_TAG)')
+	docker run \
+		--init \
+		-v $(PWD):/code:ro \
+		-v /etc/passwd:/etc/passwd:ro \
+		-v /etc/group:/etc/group:ro \
+		-u "$$(id -u $$(whoami)):$$(id -g $$(whoami))" \
+		$${CI+-e CI="$${CI}"} \
+		$(INTERACTIVE) \
+		$(DOCKER_IMAGE):$(DOCKER_TAG) \
+		bats $${CI:+-F "/code/test/libexec/bats-format-tap-suite"} \
+		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} plugins/pyenv-link/test/$${BATS_FILE_FILTER}
+
 # Build all images needed for bats under docker
 .PHONY: $(TEST_BATS_IMAGE_PREFIX)
 $(TEST_BATS_IMAGE_PREFIX): $(TEST_BATS_IMAGE_TARGETS)
@@ -110,13 +136,13 @@ $(TEST_BATS_IMAGE_TARGETS):
 		./ ; \
 	fi
 
-.PHONY: test test-unit test-python-build test-binary
+.PHONY: test test-unit test-python-build test-binary test-link
 
 # Do not pass in user flags to build tests.
 unexport PYTHON_CFLAGS
 unexport PYTHON_CONFIGURE_OPTS
 
-test: test-unit test-python-build test-binary
+test: test-unit test-python-build test-binary test-link
 
 test-unit: bats
 	PATH="./bats/bin:$$PATH" test/run
@@ -127,6 +153,10 @@ test-python-build: bats
 
 test-binary: bats
 	cd plugins/pyenv-binary && $(PWD)/bats/bin/bats $${CI:+-F "$(PWD)/test/libexec/bats-format-tap-suite"} \
+		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
+
+test-link: bats
+	cd plugins/pyenv-link && $(PWD)/bats/bin/bats $${CI:+-F "$(PWD)/test/libexec/bats-format-tap-suite"} \
 		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
 
 .SECONDARY: bats-$(TEST_BATS_VERSION)

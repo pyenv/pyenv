@@ -9,6 +9,12 @@ inputs:
 runs:
   using: composite
   steps:
+    - shell: bash
+      run: |
+        #envvars
+        export PYENV_ROOT="$GITHUB_WORKSPACE"
+        echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
+        echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
     # The two OSes differ only in this step.
     - if: runner.os == 'macOS'
       shell: bash
@@ -19,15 +25,7 @@ runs:
       shell: bash
       run: |
         #prerequisites
-        sudo apt-get update -q; sudo apt install -yq make build-essential libssl-dev zlib1g-dev \
-        libbz2-dev libreadline-dev libsqlite3-dev curl \
-        libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-    - shell: bash
-      run: |
-        #envvars
-        export PYENV_ROOT="$GITHUB_WORKSPACE"
-        echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
-        echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+        pyenv install-prerequisites
     - shell: bash
       run: |
         #build

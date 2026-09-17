@@ -873,6 +873,7 @@ build_package_standard_build() {
 
   if [ "$package_var_name" = "PYTHON" ]; then
     if can_use_homebrew; then
+      configured_with_openssl || use_homebrew_openssl || true
       use_custom_tcltk || use_homebrew_tcltk || true
       use_homebrew_readline || true
       use_homebrew_ncurses || true
@@ -885,6 +886,7 @@ build_package_standard_build() {
       fi
     fi
     if can_use_macports; then
+      configured_with_openssl || use_macports_openssl || true
       use_custom_tcltk || true
       use_macports_readline || true
       use_macports_ncurses || true
@@ -1705,8 +1707,17 @@ build_package_mac_readline() {
   build_package_standard "$@"
 }
 
+configured_with_openssl() {
+  local arg
+  for arg in ${CONFIGURE_OPTS} ${PYTHON_CONFIGURE_OPTS} "${PYTHON_CONFIGURE_OPTS_ARRAY[@]}"; do
+    [[ "$arg" =~ ^--with-openssl(=|$) ]] && return 0
+  done
+  return 1
+}
+
 has_broken_mac_openssl() {
   is_mac || return 1
+  configured_with_openssl && return 1
   local openssl_version="$(/usr/bin/openssl version 2>/dev/null || true)"
   if [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]]; then
     if can_use_homebrew; then

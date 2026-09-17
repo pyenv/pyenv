@@ -66,10 +66,10 @@ pyenv-install --list --bare
   run pyenv-binary-package 3.12.7 --archive-base-url http://example.com/binaries
   assert_success
   assert [ -d "${PYENV_ROOT}/versions/3.12.7-debian-12-x86_64" ]
-  assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.tar.gz" ]
+  assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.tar.xz" ]
   assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.meta" ]
   run grep '^ARCHIVE_URL=' "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64"
-  assert_success "ARCHIVE_URL=http://example.com/binaries/3.12.7-debian-12-x86_64.tar.gz"
+  assert_success "ARCHIVE_URL=http://example.com/binaries/3.12.7-debian-12-x86_64.tar.xz"
 }
 
 @test "rejects an entry name containing a slash" {
@@ -102,10 +102,10 @@ generate-installer"
     --archive-base-url http://example.com/binaries
   assert_success
   assert [ -d "${PYENV_ROOT}/versions/3.12.7-test" ]
-  assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-test.tar.gz" ]
+  assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-test.tar.xz" ]
   assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-test.meta" ]
   run grep '^ARCHIVE_URL=' "${BATS_TEST_TMPDIR}/3.12.7-test"
-  assert_success "ARCHIVE_URL=http://example.com/binaries/3.12.7-test.tar.gz"
+  assert_success "ARCHIVE_URL=http://example.com/binaries/3.12.7-test.tar.xz"
 }
 
 @test "correctly joins archive base url with a trailing slash" {
@@ -127,5 +127,5 @@ done
   run pyenv-binary-package 3.12.7:3.12.7-test \
     --archive-base-url http://example.com/binaries/
   assert_success
-  assert_line "pyenv-binary-generate-installer --archive-url http://example.com/binaries/3.12.7-test.tar.gz"
+  assert_line "pyenv-binary-generate-installer --archive-url http://example.com/binaries/3.12.7-test.tar.xz"
 }

@@ -4,7 +4,7 @@
 #
 # Usage: pyenv binary save <version> [<output-dir>] [--name <name>]
 #
-#   Packs an installed version into a relocatable .tar.gz (relative paths) and
+#   Packs an installed version into a relocatable .tar.xz (relative paths) and
 #   writes a metadata file listing the build platform and the system libraries
 #   it links against, so an installer can check compatibility before unpacking.
 #
@@ -134,10 +134,10 @@ system_deps() {
 
 mkdir -p "$output_dir"
 package_name="${package_name:-${version}-${platform}}"
-archive="${package_name}.tar.gz"
+archive="${package_name}.tar.xz"
 metadata="${package_name}.meta"
 
-tar -C "$(dirname "$prefix")" -czf "${output_dir}/${archive}" "$(basename "$prefix")"
+tar -C "$(dirname "$prefix")" -cJf "${output_dir}/${archive}" "$(basename "$prefix")"
 
 {
   echo "# pyenv-binary metadata"
