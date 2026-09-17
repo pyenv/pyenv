@@ -1,0 +1,25 @@
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Miniforge3-26.5.3-0-Linux-aarch64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.5.3-0/Miniforge3-26.5.3-0-Linux-aarch64.sh#0391e42075a7632e9665d6e728387ee6b905f6c3e704d3513e1c1133d0d69b89" "miniconda" verify_py314
+  ;;
+"Linux-ppc64le" )
+  install_script "Miniforge3-26.5.3-0-Linux-ppc64le.sh" "https://github.com/conda-forge/miniforge/releases/download/26.5.3-0/Miniforge3-26.5.3-0-Linux-ppc64le.sh#a77ac9485c7ae7287b2c8eaa38caf44d661509eb0134643f10a7e816ce414ac2" "miniconda" verify_py314
+  ;;
+"Linux-x86_64" )
+  install_script "Miniforge3-26.5.3-0-Linux-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.5.3-0/Miniforge3-26.5.3-0-Linux-x86_64.sh#14db468222ad564658656f769506056209b6dc375f5e7dfd31eb5ebbf08fa529" "miniconda" verify_py314
+  ;;
+"MacOSX-arm64" )
+  install_script "Miniforge3-26.5.3-0-MacOSX-arm64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.5.3-0/Miniforge3-26.5.3-0-MacOSX-arm64.sh#0d765919d3ccfd1f89147aa1cf8133bfc55b3a3c13f5bacdcc091c33132fddd2" "miniconda" verify_py314
+  ;;
+"MacOSX-x86_64" )
+  install_script "Miniforge3-26.5.3-0-MacOSX-x86_64.sh" "https://github.com/conda-forge/miniforge/releases/download/26.5.3-0/Miniforge3-26.5.3-0-MacOSX-x86_64.sh#0266a7bfeb12165286133145717bef0d88070f1b76710beb6a62fec4e88371a1" "miniconda" verify_py314
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniforge is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
