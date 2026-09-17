@@ -80,10 +80,8 @@ fi
 unset tested_for_other_write_errors
 
 # The prototype shim file is a script that re-execs itself, passing
-# its filename and any arguments to `pyenv exec`. This file is
-# hard-linked for every executable and then removed. The linking
-# technique is fast, uses less disk space than unique files, and also
-# serves as a locking mechanism.
+# its filename and any arguments to `pyenv exec`. This file is copied
+# for every executable and then removed. It also serves as a lock.
 create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
@@ -100,18 +98,30 @@ fi
 exec "$(command -v pyenv)" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
+  local LC_ALL=C
+  IFS= read -r -d '' PROTOTYPE_SHIM_CONTENTS < "$PROTOTYPE_SHIM_PATH" || true
+  PROTOTYPE_SHIM_READ_SIZE=$((${#PROTOTYPE_SHIM_CONTENTS} + 1))
 }
 
-# If the contents of the prototype shim file differ from the contents
-# of the first shim in the shims directory, assume pyenv has been
-# upgraded and the existing shims need to be removed.
-remove_outdated_shims() {
-  local shim
-  for shim in "$SHIM_PATH"/*; do
-    if ! diff "$PROTOTYPE_SHIM_PATH" "$shim" >/dev/null 2>&1; then
-      rm -f "$SHIM_PATH"/*
+# Install a shim when it is first registered, replacing an existing copy
+# if it was overwritten. Hooks can then customize it without a later
+# registration overwriting their changes.
+install_shims() {
+  local shim file shim_contents
+  # Count bytes consistently across Bash versions, including multibyte paths.
+  local LC_ALL=C
+  for shim; do
+    file="${SHIM_PATH}/${shim}"
+    if [[ -f "$file" || ( -L "$file" && ! -e "$file" ) ]]; then
+      shim_contents=
+      # Read with a builtin to avoid a subprocess per shim. A successful
+      # read means a NUL or extra character was found. Limit the read in
+      # case a large file was accidentally written over a shim.
+      if IFS= read -r -d '' -n "$PROTOTYPE_SHIM_READ_SIZE" shim_contents 2>/dev/null < "$file" || [[ $shim_contents != "$PROTOTYPE_SHIM_CONTENTS" ]]; then
+        rm -f "$file"
+      fi
     fi
-    break
+    [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
   done
 }
 
@@ -132,7 +142,10 @@ if ((${BASH_VERSINFO[0]} > 3)); then
 
   # Registers the name of a shim to be generated.
   register_shim() {
-    registered_shims["$1"]=1
+    if [[ ! ${registered_shims["$1"]} ]]; then
+      install_shims "$1"
+      registered_shims["$1"]=1
+    fi
   }
 
   # Install all shims registered via `make_shims` or `register_shim` directly.
@@ -162,7 +175,10 @@ else # Same for bash < 4.
     registered_shims=" "
 
     register_shim() {
-      registered_shims="${registered_shims}${1} "
+      if [[ "$registered_shims" != *" ${1} "* ]]; then
+        install_shims "$1"
+        registered_shims="${registered_shims}${1} "
+      fi
     }
 
     install_registered_shims() {
@@ -188,7 +204,6 @@ shopt -s nullglob
 # Create the prototype shim, then register shims for all known
 # executables.
 create_prototype_shim
-remove_outdated_shims
 # shellcheck disable=SC2046
 make_shims $(pyenv-versions --executables)
 
