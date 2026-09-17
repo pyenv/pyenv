@@ -1,5 +1,21 @@
 # Version History
 
+
+## Release v2.8.6
+* Update graalpy URLs for 25.3.4.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3533
+* python-build: add build prerequisite installer by @macayu17 in https://github.com/pyenv/pyenv/pull/3532
+* docs: Add link to list of available Python distributions by @michaelbnewman in https://github.com/pyenv/pyenv/pull/3535
+* Incorporate the `pyenv-link` plugin by @macayu17 in https://github.com/pyenv/pyenv/pull/3538
+* CI: publish Ubuntu binary packages by @macayu17 in https://github.com/pyenv/pyenv/pull/3539
+* python-build: honor explicitly configured OpenSSL on macOS by @aprylewu in https://github.com/pyenv/pyenv/pull/3541
+* pyenv-binary: use xz compression for archives by @macayu17 in https://github.com/pyenv/pyenv/pull/3543
+* Backport XCode 27 support to 3.14 by @native-api in https://github.com/pyenv/pyenv/pull/3545
+* Backport XCode 27 support to 3.13; add missing 3.13.11t by @native-api in https://github.com/pyenv/pyenv/pull/3546
+* Backport XCode 27 support to 3.12 by @native-api in https://github.com/pyenv/pyenv/pull/3547
+* Backport XCode 27 support to 3.11 by @native-api in https://github.com/pyenv/pyenv/pull/3548
+* Backport XCode 27 support to 3.10 by @native-api in https://github.com/pyenv/pyenv/pull/3549
+* Add miniconda3 26.7.1-0, 26.7.1-1 and miniforge3 26.5.3-0, 26.7.2-0 by @13steinj in https://github.com/pyenv/pyenv/pull/3550
+
 ## Release v2.8.5
 * pyenv-binary: record direct system dependencies in Linux/FreeBSD by @macayu17 in https://github.com/pyenv/pyenv/pull/3520
 * tests: Fix "cd: null directory" in OpenSUSE by @native-api in https://github.com/pyenv/pyenv/pull/3524
