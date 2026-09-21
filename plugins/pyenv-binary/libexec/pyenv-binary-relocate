@@ -100,6 +100,22 @@ if [ "$(uname -s)" = "Darwin" ]; then
   while IFS= read -r so; do
     relocate_macho "$so" '@loader_path/../..'
   done < <(find "$prefix" -type f -path '*/lib/python*/lib-dynload/*.so')
+
+  # CPython records its installation prefix in generated scripts and build
+  # metadata. Bytecode can also retain source filenames from the build tree.
+  build_prefix_pattern="$(printf '%s\n' "$build_prefix" | sed 's/[][\\.^$*|]/\\&/g')"
+  prefix_replacement="$(printf '%s\n' "$prefix" | sed 's/[\\&|]/\\&/g')"
+  while IFS= read -r file; do
+    if LC_ALL=C grep -IqF "$build_prefix" "$file"; then
+      sed -i.bak "s|${build_prefix_pattern}|${prefix_replacement}|g" "$file"
+      rm -f "${file}.bak"
+    fi
+  done < <(find "$prefix" -type f ! -name '*.pyc' ! -name '*.pyo')
+  while IFS= read -r file; do
+    if LC_ALL=C grep -aqF "$build_prefix" "$file"; then
+      rm -f "$file"
+    fi
+  done < <(find "$prefix" -type f \( -name '*.pyc' -o -name '*.pyo' \))
   exit
 fi
 
