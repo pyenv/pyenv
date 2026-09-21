@@ -39,7 +39,9 @@ create_macos_tree() {
   printf 'prefix=%s\n' "$old" > "${prefix}/lib/pkgconfig/python-3.12.pc"
   printf 'prefix=/build prefix/3x12x7\n' > "${prefix}/lib/pkgconfig/unrelated.pc"
   printf 'prefix = "%s"\n' "$old" > "${lib}/_sysconfigdata.py"
-  touch "${lib}/__pycache__/module.cpython-312.pyc"
+  printf '\0bytecode:%s/module.py\n' "$old" > "${lib}/__pycache__/module.cpython-312.pyc"
+  printf '\0bytecode:%s/legacy.py\n' "$old" > "${lib}/legacy.pyo"
+  printf '\0sourceless bytecode\n' > "${lib}/sourceless.pyc"
   touch "${prefix}/lib/libpython3.12.dylib"
   touch "${lib}/lib-dynload/_ssl.cpython-312-darwin.so"
   touch "${lib}/site-packages/numpy/_multiarray.so"
@@ -221,6 +223,8 @@ EOF
   run cat "${lib}/_sysconfigdata.py"
   assert_output "prefix = \"${prefix}\""
   assert [ ! -e "${lib}/__pycache__/module.cpython-312.pyc" ]
+  assert [ ! -e "${lib}/legacy.pyo" ]
+  assert [ -e "${lib}/sourceless.pyc" ]
 }
 
 @test "skips already relocated macOS load commands" {
