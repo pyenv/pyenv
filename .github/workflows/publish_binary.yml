@@ -7,20 +7,32 @@ on:
         description: A CPython version accepted by `pyenv install`
         required: true
         type: string
+      platform:
+        description: Platform to build on
+        required: true
+        type: choice
+        default: ubuntu-24.04
+        options:
+          - ubuntu-24.04
+          - macos-15
 
 permissions:
   contents: read
 
 jobs:
-  publish_ubuntu:
-    runs-on: ubuntu-24.04
+  publish:
+    runs-on: ${{ inputs.platform }}
     env:
       PYENV_ROOT: ${{ github.workspace }}
       VERSION: ${{ inputs.version }}
     steps:
       - uses: actions/checkout@v7
-      - name: Install build prerequisites
+      - name: Install Ubuntu build prerequisites
+        if: runner.os == 'Linux'
         run: ./bin/pyenv install-prerequisites
+      - name: Install macOS build prerequisites
+        if: runner.os == 'macOS'
+        run: brew install openssl readline sqlite3 xz tcl-tk@8 libb2 zstd
       - name: Build package
         env:
           PYTHON_CONFIGURE_OPTS: --enable-optimizations
