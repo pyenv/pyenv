@@ -38,7 +38,11 @@ jobs:
           PYTHON_CONFIGURE_OPTS: --enable-optimizations
         run: |
           VERSION="${VERSION%%:*}"
-          entry="$(./bin/pyenv binary package-name "$VERSION")"
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            entry="${VERSION}-${{ inputs.platform }}-$(uname -m)"
+          else
+            entry="$(./bin/pyenv binary package-name "$VERSION")"
+          fi
           echo "entry=$entry" >> "$GITHUB_ENV"
           mkdir dist
           cd dist
