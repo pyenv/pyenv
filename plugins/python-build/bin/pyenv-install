@@ -261,7 +261,7 @@ for i in "${!DEFINITIONS[@]}"; do
         PYENV_BOOTSTRAP_VERSION="${PYENV_RPYTHON_VERSION}"
       else
         for version in $(pyenv-versions --bare | sort -r); do
-          if [[ "${version}" == "2.7"* ]]; then
+          if [[ "${version}" =~ ^(2\.7|pypy2\.7) ]]; then
             PYENV_BOOTSTRAP_VERSION="$version"
             break
           fi
@@ -275,7 +275,7 @@ for i in "${!DEFINITIONS[@]}"; do
           fi
         done
       else
-        echo "pyenv-install: $VERSION_NAME: PyPy requires Python 2.7 to build from source." >&2
+        echo "pyenv-install: $VERSION_NAME: PyPy requires Python 2.7 to build from source. You can specify the version to use by setting the PYENV_BOOTSTRAP_VERSION environment variable."  >&2
         exit 1
       fi
       ;;
