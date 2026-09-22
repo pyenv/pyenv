@@ -2,7 +2,14 @@
 #
 # Summary: Run an executable with the selected Python version
 #
-# Usage: pyenv exec <command> [arg1 arg2...]
+# Usage: pyenv exec [-N|--environment] <command> [arg1 arg2...]
+#
+#    -N  Set PYTHONHOME and LD_LIBRARY_PATH envvars for the running command.
+#        This allows to run programs that embed Python without using rpath or
+#        exact library path.
+#        WARNING! For the running command and its child processes, this will
+#        break linkage for programs that expect to be linked to system libpython!
+#        This option is Linux only.
 #
 # Runs an executable by first preparing PATH so that the selected Python
 # version's `bin' directory is at the front.
@@ -18,7 +25,14 @@ set -e
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
+  echo --environment
   exec pyenv-shims --short
+fi
+
+unset MODIFY_ENV
+if [ "$1" = "-N" ] || [ "$1" = "--environment" ]; then
+  MODIFY_ENV=true
+  shift
 fi
 
 PYENV_VERSION="$(pyenv-version-name -f)"
@@ -53,5 +67,25 @@ shift 1
 if [ "${PYENV_BIN_PATH#${PYENV_ROOT}}" != "${PYENV_BIN_PATH}" ]; then
   # Only add to $PATH for non-system version.
   export PATH="${PYENV_BIN_PATH}:${PATH}"
+fi
+if [ -n "$MODIFY_ENV" ]; then
+  if [ "$(uname -s)" != Linux ]; then
+    echo 'Error: the --environment option is supported only on Linux' >&2
+    exit 1
+  fi
+
+  # Check if multiple Python versions are selected
+  VERSIONS=$(pyenv-prefix)
+  if [[ "$VERSIONS" == *:* ]]; then
+    echo 'Warning: multiple Python versions are selected' >&2
+    VERSION="${VERSIONS%%:*}"
+    echo "Using the first one available (${VERSION##*/})" >&2
+  else
+    VERSION="$VERSIONS"
+  fi
+
+  # Assign the correct version of PYTHONHOME
+  export PYTHONHOME="$VERSION"
+  export LD_LIBRARY_PATH="${PYTHONHOME}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
 fi
 exec "$PYENV_COMMAND_PATH" "$@"
