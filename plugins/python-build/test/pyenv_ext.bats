@@ -243,6 +243,27 @@ OUT
   [[ "$(resolve_link "${INSTALL_ROOT}/bin/python-config")" == "python3.4-config" ]]
 }
 
+@test "pyston: create python* symlinks" {
+  mkdir -p "${BATS_TEST_TMPDIR}/pyston_2.3.5/bin"
+  cd "${BATS_TEST_TMPDIR}/pyston_2.3.5"
+  executable bin/real_interpreter_name <<OUT
+#!$BASH
+echo 3.8
+OUT
+  ln -s real_interpreter_name bin/pyston
+  ln -s real_interpreter_name bin/pyston3
+
+  TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+build_package_pyston
+verify_python 3.8
+OUT
+  assert_success
+  
+  for name in python python3 python3.8; do
+    assert_equal "$(resolve_link "${INSTALL_ROOT}/bin/$name")" "real_interpreter_name"
+  done
+}
+
 @test "enable framework" {
   framework_path="${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin"
   mkdir -p "$framework_path"

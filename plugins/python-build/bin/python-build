@@ -998,27 +998,18 @@ build_package_jython_builder() {
   ( cd "dist" && build_package_jython )
 }
 
-build_package_pyston2_2() {
-  # currently supported version 2.2 and 2.3
-  build_package_copy
-  mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
-  local bin
-  shopt -s nullglob
-  for bin in "bin/"*; do
-    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
-      case "${bin##*/}" in
-      "pyston"* )
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
-        ;;
-      esac
-    fi
-  done
-  shopt -u nullglob
-}
-
 build_package_pyston() {
-  # currently supported version 2.3.1v2 and higher
   build_package_copy
+
+  # Pyston tarballs provide an executable with a version-specific naming scheme
+  # and `pyston` and `pyston3` symlinks to it.
+  # Add the `python', `pythonX' and `pythonX.Y' symlinks as per PEP 394.
+  local real_interpreter version_suffix
+  real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/pyston" || echo pyston)
+  version_suffix=$("${PREFIX_PATH}/bin/pyston" -c 'import sys; print("%d.%d" % sys.version_info[:2])' 2>&4)
+  for name in python "python${version_suffix%.*}" "python${version_suffix}"; do
+    ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
+  done
 }
 
 build_package_ironpython() {
