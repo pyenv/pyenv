@@ -11,7 +11,7 @@ set -e
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
-  --all
+  echo --all
 fi
 
 usage() {

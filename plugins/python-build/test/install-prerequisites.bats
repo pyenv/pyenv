@@ -14,10 +14,9 @@ _setup() {
 @test "completions" {
   stub apt-get
 
-  run pyenv-completions install-prerequisites
+  run pyenv-install-prerequisites --complete
 
   assert_success <<!
---help
 --all
 !
   unstub apt-get
