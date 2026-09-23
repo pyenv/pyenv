@@ -61,4 +61,4 @@ else
 fi
 
 "${apt_get[@]}" update -q
-"${apt_get[@]}" install -yq "${prerequisites[@]}" "${all:+${optional[@]}}"
+"${apt_get[@]}" install -yq "${prerequisites[@]}" ${all:+"${optional[@]}"}
