@@ -57,7 +57,7 @@ _setup() {
   stub id '-u : echo 0'
   stub apt-get \
     'update -q : true' \
-    "install -yq ${prerequisites} ${optional}: true"
+    "install -yq ${prerequisites} ${optional} : true"
 
   run pyenv-install-prerequisites --all
 
