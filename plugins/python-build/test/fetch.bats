@@ -17,6 +17,23 @@ _setup() {
   assert_output_contains "error: failed to download package-1.0.0.tar.gz"
 }
 
+@test "interactive download progress is logged" {
+  command -v script >/dev/null || skip "script is required to allocate a terminal"
+  export TMPDIR="$BATS_TEST_TMPDIR"
+  stub curl "-q -o * -sSLf --progress-bar http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${6##*/} \$3"
+
+  if script -q /dev/null true </dev/null >/dev/null 2>&1; then
+    run script -q /dev/null python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
+  else
+    local script_command
+    printf -v script_command '%q ' python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
+    run script -qec "$script_command" /dev/null
+  fi
+  assert_success
+  assert grep -F download-progress "$BATS_TEST_TMPDIR"/python-build.*.log
+  unstub curl
+}
+
 @test "using aria2c if available" {
   export PYTHON_BUILD_ARIA2_OPTS=
   export -n PYTHON_BUILD_HTTP_CLIENT
