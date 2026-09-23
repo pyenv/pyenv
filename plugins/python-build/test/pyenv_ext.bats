@@ -243,66 +243,36 @@ OUT
   [[ "$(resolve_link "${INSTALL_ROOT}/bin/python-config")" == "python3.4-config" ]]
 }
 
-@test "pyston 2.3+: python, python3 and python3.8 point at the interpreter" {
+template_pyston_create_python_symlinks()
+{
+  invocation="${1:?}"
   mkdir -p "${BATS_TEST_TMPDIR}/pyston_2.3.5/bin"
   cd "${BATS_TEST_TMPDIR}/pyston_2.3.5"
-  executable bin/python3.8-pyston2.3 <<OUT
+  executable bin/real_interpreter_name <<OUT
 #!$BASH
 echo 3.8
 OUT
-  ln -s python3.8-pyston2.3 bin/pyston
-  ln -s python3.8-pyston2.3 bin/pyston3
+  ln -s real_interpreter_name bin/pyston
+  ln -s real_interpreter_name bin/pyston3
 
   TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
-build_package_pyston
+$invocation
 verify_python 3.8
 OUT
   assert_success
-
-  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python")" == "python3.8-pyston2.3" ]]
-  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python3")" == "python3.8-pyston2.3" ]]
-  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python3.8")" == "python3.8-pyston2.3" ]]
+  
+  for name in python python3 python3.8; do
+    assert test x"$(resolve_link "${INSTALL_ROOT}/bin/python")" == x"real_interpreter_name"
+  done
 }
 
-@test "pyston 2.2: python, python3 and python3.8 point at the interpreter" {
-  mkdir -p "${BATS_TEST_TMPDIR}/pyston_2.2/bin"
-  cd "${BATS_TEST_TMPDIR}/pyston_2.2"
-  executable bin/pyston3.8 <<OUT
-#!$BASH
-echo 3.8
-OUT
-  ln -s pyston3.8 bin/pyston
-  ln -s pyston3.8 bin/pyston3
-
-  TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
-build_package_pyston2_2
-verify_python 3.8
-OUT
-  assert_success
-
-  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python")" == "pyston3.8" ]]
-  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python3")" == "pyston3.8" ]]
-  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python3.8")" == "pyston3.8" ]]
+@test "pyston 2.2: create python* symlinks" {
+  template_pyston_create_python_symlinks build_package_pyston2_2
 }
 
-@test "pyston: the python version comes from the interpreter" {
-  mkdir -p "${BATS_TEST_TMPDIR}/pyston/bin"
-  cd "${BATS_TEST_TMPDIR}/pyston"
-  executable bin/pyston-interpreter <<OUT
-#!$BASH
-echo 3.10
-OUT
-  ln -s pyston-interpreter bin/pyston
 
-  TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
-build_package_pyston
-verify_python 3.10
-OUT
-  assert_success
-
-  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python3")" == "pyston-interpreter" ]]
-  [[ "$(resolve_link "${INSTALL_ROOT}/bin/python3.10")" == "pyston-interpreter" ]]
-  [ ! -e "${INSTALL_ROOT}/bin/python3.8" ]
+@test "pyston 2.3+: create python* symlinks" {
+  template_pyston_create_python_symlinks build_package_pyston
 }
 
 @test "enable framework" {

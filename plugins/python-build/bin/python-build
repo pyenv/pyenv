@@ -1011,13 +1011,16 @@ build_package_pyston() {
   pyston_symlink_python
 }
 
-# Pyston tarballs only ship the interpreter plus `pyston' and `pyston3'
-# symlinks to it. Add the `python', `pythonX' and `pythonX.Y' names (PEP 394).
+# Pyston tarballs provide an executable with a version-specific naming scheme
+# and `pyston` and `pyston3` symlinks to it.
+# Add the `python', `pythonX' and `pythonX.Y' symlinks as per PEP 394.
 pyston_symlink_python() {
-  local interpreter version
-  interpreter="$(resolve_link "${PREFIX_PATH}/bin/pyston" || echo pyston)"
-  version="$("${PREFIX_PATH}/bin/pyston" -c 'import sys; print("%d.%d" % sys.version_info[:2])' 2>&4)"
-  ( cd "${PREFIX_PATH}/bin" && ln -fs "${interpreter}" python && ln -fs "${interpreter}" "python${version%%.*}" && ln -fs "${interpreter}" "python${version}" )
+  local real_interpreter version_suffix
+  real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/pyston" || echo pyston)
+  version_suffix=$("${PREFIX_PATH}/bin/pyston" -c 'import sys; print("%d.%d" % sys.version_info[:2])' 2>&4)
+  for name in python "python${version_suffix%.*}" "python${version_suffix}"; do
+    ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
+  done
 }
 
 build_package_ironpython() {
