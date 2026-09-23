@@ -2,14 +2,16 @@
 #
 # Summary: Install Python build prerequisites on Debian-based systems
 #
-# Usage: pyenv install-prerequisites
+# Usage: pyenv install-prerequisites [-a|--all]
+#
+#   -a/--all       Also install optional dependencies (for rarely used modules)
 #
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
-  exit
+  --all
 fi
 
 usage() {
@@ -17,11 +19,22 @@ usage() {
   [ -z "$1" ] || exit "$1"
 }
 
-if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-  usage 0
-fi
+all=
 
-[ "$#" -eq 0 ] || usage 1 >&2
+while (($#)); do
+  case "$1" in
+    -h|--help)
+      usage 0
+      ;;
+    -a|--all)
+      all=1
+      ;;
+    *)
+      usage 1 >&2
+      ;;
+  esac
+  shift
+fi
 
 if ! command -v apt-get >/dev/null; then
   echo "pyenv: installing build prerequisites is not supported on this system" >&2
@@ -32,6 +45,9 @@ prerequisites=(
   make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev
   libsqlite3-dev curl git llvm libncurses5-dev libncursesw5-dev xz-utils
   tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libzstd-dev
+)
+optional=(
+  libgdbm-dev
 )
 
 if [ "$(id -u)" -eq 0 ]; then
@@ -44,4 +60,4 @@ else
 fi
 
 "${apt_get[@]}" update -q
-"${apt_get[@]}" install -yq "${prerequisites[@]}"
+"${apt_get[@]}" install -yq "${prerequisites[@]}" "${all:+${optional[@]}}"
