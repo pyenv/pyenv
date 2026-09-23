@@ -34,7 +34,7 @@ while (($#)); do
       ;;
   esac
   shift
-fi
+done
 
 if ! command -v apt-get >/dev/null; then
   echo "pyenv: installing build prerequisites is not supported on this system" >&2
