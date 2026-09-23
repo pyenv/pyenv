@@ -260,7 +260,7 @@ OUT
   assert_success
   
   for name in python python3 python3.8; do
-    assert_equal "$(resolve_link "${INSTALL_ROOT}/bin/python")" "real_interpreter_name"
+    assert_equal "$(resolve_link "${INSTALL_ROOT}/bin/$name")" "real_interpreter_name"
   done
 }
 
