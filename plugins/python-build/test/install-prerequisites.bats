@@ -4,18 +4,21 @@ load test_helper
 
 _setup() {
   prerequisites="make build-essential libssl-dev zlib1g-dev libbz2-dev \
-libreadline-dev libsqlite3-dev curl git llvm libncurses5-dev \
-libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev \
-liblzma-dev libzstd-dev"
+  libreadline-dev libsqlite3-dev curl git llvm libncurses5-dev \
+  libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev \
+  liblzma-dev libzstd-dev"
+  
+  optional="libgdbm-dev"
 }
 
-@test "completion does not install packages" {
+@test "completions" {
   stub apt-get
 
-  PATH="${BATS_TEST_DIRNAME}/../../../libexec:$PATH" \
-    run pyenv completions install-prerequisites
+  run pyenv-install-prerequisites --complete
 
-  assert_success "--help"
+  assert_success <<!
+--all
+!
   unstub apt-get
 }
 
@@ -28,7 +31,7 @@ liblzma-dev libzstd-dev"
   unstub pyenv-help
 }
 
-@test "rejects arguments" {
+@test "invalid arguments" {
   stub pyenv-help 'install-prerequisites : echo "Usage: pyenv install-prerequisites"'
 
   run pyenv-install-prerequisites unexpected
@@ -44,6 +47,19 @@ liblzma-dev libzstd-dev"
     "install -yq ${prerequisites} : true"
 
   run pyenv-install-prerequisites
+
+  assert_success
+  unstub apt-get
+  unstub id
+}
+
+@test "installs optional prerequisites with --all" {
+  stub id '-u : echo 0'
+  stub apt-get \
+    'update -q : true' \
+    "install -yq ${prerequisites} ${optional} : true"
+
+  run pyenv-install-prerequisites --all
 
   assert_success
   unstub apt-get
