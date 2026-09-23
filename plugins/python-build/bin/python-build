@@ -1010,7 +1010,8 @@ build_package_make_python_symlinks() {
   seeder="${1:?}"
   local real_interpreter version_suffix
   real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/$seeder" || echo $seeder)
-  version_suffix=$("${PREFIX_PATH}/bin/$seeder" -c 'import sys; print("%d.%d" % sys.version_info[:2])' 2>&4)
+  # Use syntax accepted in both Py2 and Py3. Even though current Py2 holdouts (e.g. PyPy) support e.g. print()
+  version_suffix=$("${PREFIX_PATH}/bin/$seeder" -c 'import sys; sys.stdout.write("%d.%d\n" % sys.version_info[:2])' 2>&4)
   for name in python "python${version_suffix%.*}" "python${version_suffix}"; do
     [[ -e "${PREFIX_PATH}/bin/$name" ]] || ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
   done
