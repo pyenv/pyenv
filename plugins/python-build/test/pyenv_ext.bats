@@ -275,7 +275,7 @@ OUT
 
   TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
 build_package_pypy
-verify_py311
+build_package_verify_py311
 OUT
   assert_success
   
