@@ -265,8 +265,8 @@ OUT
 }
 
 @test "pypy: create python* symlinks" {
-  mkdir -p "${BATS_TEST_TMPDIR}/pyston_2.3.5/bin"
-  cd "${BATS_TEST_TMPDIR}/pyston_2.3.5"
+  mkdir -p "${BATS_TEST_TMPDIR}/pypy/bin"
+  cd "${BATS_TEST_TMPDIR}/pypy"
   executable bin/real_interpreter_name <<OUT
 #!$BASH
 echo 3.11
