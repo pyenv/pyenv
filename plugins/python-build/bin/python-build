@@ -1000,17 +1000,21 @@ build_package_jython_builder() {
 
 build_package_pyston() {
   build_package_copy
-
   # Pyston tarballs provide an executable with a version-specific naming scheme
   # and `pyston` and `pyston3` symlinks to it.
-  # Add the `python', `pythonX' and `pythonX.Y' symlinks as per PEP 394.
-  local real_interpreter version_suffix
-  real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/pyston" || echo pyston)
-  version_suffix=$("${PREFIX_PATH}/bin/pyston" -c 'import sys; print("%d.%d" % sys.version_info[:2])' 2>&4)
-  for name in python "python${version_suffix%.*}" "python${version_suffix}"; do
-    ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
-  done
+  build_package_make_python_symlinks pyston
 }
+
+# Add missing `python', `pythonX' and `pythonX.Y' symlinks as per PEP 394.
+build_package_make_python_symlinks() {
+  seeder="${1:?}"
+  local real_interpreter version_suffix
+  real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/$seeder" || echo $seeder)
+  version_suffix=$("${PREFIX_PATH}/bin/$seeder" -c 'import sys; print("%d.%d" % sys.version_info[:2])' 2>&4)
+  for name in python "python${version_suffix%.*}" "python${version_suffix}"; do
+    [[ -e "${PREFIX_PATH}/bin/$name" ]] || ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
+  done
+
 
 build_package_ironpython() {
   mkdir -p "${PREFIX_PATH}/bin"
@@ -1110,22 +1114,15 @@ build_package_graalpython() {
 
 build_package_pypy() {
   build_package_copy
-  mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
   local bin
   shopt -s nullglob
-  for bin in "bin/"*; do
-    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
-      case "${bin##*/}" in
-      "libpypy"* )
-        ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/${bin##*/}" "${bin##*/}" )
-        ;;
-      "pypy"* )
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
-        ;;
-      esac
+  for bin in "bin/libpypy"*; do
+    if [[ -f "${bin}" && -x "${bin}" && ! -L "${bin}" ]]; then
+        ln -fs "../bin/${bin##*/}" "${PREFIX_PATH}/lib/${bin##*/}"
     fi
   done
   shopt -u nullglob
+  build_package_make_python_symlinks "pypy"
 }
 
 build_package_pypy_builder() {
