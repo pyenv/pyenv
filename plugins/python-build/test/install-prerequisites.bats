@@ -2,13 +2,13 @@
 
 load test_helper
 
-prerequisites="make build-essential libssl-dev zlib1g-dev libbz2-dev \
-libreadline-dev libsqlite3-dev curl git llvm libncurses5-dev \
-libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev \
-liblzma-dev libzstd-dev"
-optional="libgdbm-dev"
-
 _setup() {
+  prerequisites="make build-essential libssl-dev zlib1g-dev libbz2-dev \
+  libreadline-dev libsqlite3-dev curl git llvm libncurses5-dev \
+  libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev \
+  liblzma-dev libzstd-dev"
+  
+  optional="libgdbm-dev"
 }
 
 @test "completions" {
