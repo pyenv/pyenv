@@ -243,9 +243,7 @@ OUT
   [[ "$(resolve_link "${INSTALL_ROOT}/bin/python-config")" == "python3.4-config" ]]
 }
 
-template_pyston_create_python_symlinks()
-{
-  invocation="${1:?}"
+@test "pyston: create python* symlinks" {
   mkdir -p "${BATS_TEST_TMPDIR}/pyston_2.3.5/bin"
   cd "${BATS_TEST_TMPDIR}/pyston_2.3.5"
   executable bin/real_interpreter_name <<OUT
@@ -256,23 +254,14 @@ OUT
   ln -s real_interpreter_name bin/pyston3
 
   TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
-$invocation
+build_package_pyston
 verify_python 3.8
 OUT
   assert_success
   
   for name in python python3 python3.8; do
-    assert test x"$(resolve_link "${INSTALL_ROOT}/bin/python")" == x"real_interpreter_name"
+    assert_equal "$(resolve_link "${INSTALL_ROOT}/bin/python")" "real_interpreter_name"
   done
-}
-
-@test "pyston 2.2: create python* symlinks" {
-  template_pyston_create_python_symlinks build_package_pyston2_2
-}
-
-
-@test "pyston 2.3+: create python* symlinks" {
-  template_pyston_create_python_symlinks build_package_pyston
 }
 
 @test "enable framework" {
