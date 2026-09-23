@@ -447,7 +447,9 @@ http_get_aria2c() {
     dir_out="$HOME"
   fi
 
-  if aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
+  local aria2c_output=4
+  if [ -t 3 ]; then aria2c_output=3; fi
+  if aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1" >&$aria2c_output 2>&$aria2c_output; then
     [ -n "$2" ] || cat "${dir_out:-.}/${out}"
   else
     false
@@ -471,7 +473,13 @@ http_get_curl() {
   local curl_is_snap;
   if [[ $(command -v curl) == "/snap/"* ]]; then curl_is_snap=1; fi
   if [[ -n $2 && -n $curl_is_snap ]]; then out="$HOME/$(basename "$2")"; else out="$2"; fi
-  curl -q -o "${out:--}" -sSLf ${CURL_OPTS} "$1" || return $?
+  local curl_stderr=2
+  local curl_progress=
+  if [ -t 3 ]; then
+    curl_stderr=3
+    curl_progress="--progress-bar"
+  fi
+  curl -q -o "${out:--}" -sSLf ${CURL_OPTS} ${curl_progress} "$1" 2>&$curl_stderr || return $?
   if [[ -n $out && -n $curl_is_snap ]]; then mv "$out" "$2"; fi
 }
 
@@ -480,7 +488,13 @@ http_head_wget() {
 }
 
 http_get_wget() {
-  wget -nv ${WGET_OPTS} -O "${2:--}" "$1"
+  local wget_stderr=2
+  local wget_progress="-nv"
+  if [ -t 3 ]; then
+    wget_stderr=3
+    wget_progress="--progress=bar:force:noscroll"
+  fi
+  wget ${WGET_OPTS} ${wget_progress} -O "${2:--}" "$1" 2>&$wget_stderr
 }
 
 fetch_tarball() {
