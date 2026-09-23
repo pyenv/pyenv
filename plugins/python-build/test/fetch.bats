@@ -22,12 +22,17 @@ _setup() {
   export TMPDIR="$BATS_TEST_TMPDIR"
   stub curl "-q -o * -sSLf --progress-bar http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${6##*/} \$3"
 
-  if script -q /dev/null true </dev/null >/dev/null 2>&1; then
+  local script_command
+  if script -q /dev/null touch "$BATS_TEST_TMPDIR/script-args" </dev/null >/dev/null 2>&1 &&
+      [ -e "$BATS_TEST_TMPDIR/script-args" ]; then
     run script -q /dev/null python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
-  else
-    local script_command
+  elif printf -v script_command '%q ' touch "$BATS_TEST_TMPDIR/script-command" &&
+      script -qec "$script_command" /dev/null </dev/null >/dev/null 2>&1 &&
+      [ -e "$BATS_TEST_TMPDIR/script-command" ]; then
     printf -v script_command '%q ' python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
     run script -qec "$script_command" /dev/null
+  else
+    skip "script cannot run a command in a pseudo-terminal"
   fi
   assert_success
   assert grep -F download-progress "$BATS_TEST_TMPDIR"/python-build.*.log
