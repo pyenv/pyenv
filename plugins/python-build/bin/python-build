@@ -1014,7 +1014,7 @@ build_package_make_python_symlinks() {
   for name in python "python${version_suffix%.*}" "python${version_suffix}"; do
     [[ -e "${PREFIX_PATH}/bin/$name" ]] || ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
   done
-
+}
 
 build_package_ironpython() {
   mkdir -p "${PREFIX_PATH}/bin"
