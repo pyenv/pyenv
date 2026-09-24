@@ -264,14 +264,13 @@ OUT
   done
 }
 
-@test "pypy: create python* symlinks" {
+@test "pypy: create pypy* and python* symlinks" {
   mkdir -p "${BATS_TEST_TMPDIR}/pypy/bin"
   cd "${BATS_TEST_TMPDIR}/pypy"
-  executable bin/real_interpreter_name <<OUT
+  executable bin/pypywhatever <<OUT
 #!$BASH
 echo 3.11
 OUT
-  ln -s real_interpreter_name bin/pypy
 
   TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
 build_package_pypy
@@ -279,8 +278,8 @@ build_package_verify_py311
 OUT
   assert_success
   
-  for name in python python3 python3.11; do
-    assert_equal "$(resolve_link "${INSTALL_ROOT}/bin/$name")" "real_interpreter_name"
+  for name in pypy pypy3 pypy3.11 python python3 python3.11; do
+    assert_equal "$(resolve_link "${INSTALL_ROOT}/bin/$name")" "pypywhatever"
   done
 }
 
