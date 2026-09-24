@@ -9,5 +9,4 @@ hash=829cef413d84383563488f0234b3cc537a8034e43fda13e0530500dad2d5dc3b
 ver="pypy${PYVER}-v${VERSION}-src"
 url="https://downloads.python.org/pypy/${ver}.tar.gz"
 
-install_package "openssl-4.0.2" "https://github.com/openssl/openssl/releases/download/openssl-4.0.2/openssl-4.0.2.tar.gz#736b467530f916737b7031310ccb21d8218c6229e61e8e160cd1d3458cd543a8" mac_openssl --if has_broken_mac_openssl
 install_package "${ver}" "${url}#${hash}" 'pypy_builder' "verify_py${PYVER//./}" 'ensurepip'
