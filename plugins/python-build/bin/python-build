@@ -1002,18 +1002,24 @@ build_package_pyston() {
   build_package_copy
   # Pyston tarballs provide an executable with a version-specific naming scheme
   # and `pyston` and `pyston3` symlinks to it.
-  build_package_make_python_symlinks pyston
+  make_python_symlinks pyston
 }
 
 # Add missing `python', `pythonX' and `pythonX.Y' symlinks as per PEP 394.
-build_package_make_python_symlinks() {
-  seeder="${1:?}"
-  local real_interpreter version_suffix
-  real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/$seeder" || echo $seeder)
+make_python_symlinks() {
+  local seeder_basename version_suffix real_interpreter
+  local -a interpreter_names
+  seeder_basename="${1:?}"; shift
+  (($#)) && interpreter_names=("$@") || interpreter_names=(python)
+  
+  local real_interpreter
+  real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/$seeder_basename" || echo $seeder_basename)
   # Use syntax accepted in both Py2 and Py3. Even though current Py2 holdouts (e.g. PyPy) support e.g. print()
-  version_suffix=$("${PREFIX_PATH}/bin/$seeder" -c 'import sys; sys.stdout.write("%d.%d\n" % sys.version_info[:2])' 2>&4)
-  for name in python "python${version_suffix%.*}" "python${version_suffix}"; do
-    [[ -e "${PREFIX_PATH}/bin/$name" ]] || ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
+  version_suffix=$("${PREFIX_PATH}/bin/$seeder_basename" -c 'import sys; sys.stdout.write("%d.%d\n" % sys.version_info[:2])')
+  for interpreter_name in "${interpreter_names[@]}"; do
+    for name in "$interpreter_name" "$interpreter_name${version_suffix%.*}" "$interpreter_name${version_suffix}"; do
+      [[ -e "${PREFIX_PATH}/bin/$name" ]] || ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
+    done
   done
 }
 
@@ -1122,8 +1128,21 @@ build_package_pypy() {
         ln -fs "../bin/${bin##*/}" "${PREFIX_PATH}/lib/${bin##*/}"
     fi
   done
+
+  # PyPy source builds may create only a pypy* executable with a version-sepecific name
+  local seeder= seeder_candidate
+  for seeder_candidate in "${PREFIX_PATH}/bin/"pypy*; do
+    if [[ -f $seeder_candidate && -x $seeder_candidate ]]; then
+      seeder="${seeder_candidate##*/}"
+      break
+    fi
+  done
   shopt -u nullglob
-  build_package_make_python_symlinks "pypy"
+  [[ -n $seeder ]] || {
+    echo "python-build: Cannot find a valid PyPy executable in \`${PREFIX_PATH}/bin'" >&4
+    exit 1
+  }
+  make_python_symlinks "$seeder" pypy python
 }
 
 build_package_pypy_builder() {
