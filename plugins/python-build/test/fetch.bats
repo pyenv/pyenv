@@ -25,12 +25,12 @@ _setup() {
   local script_command
   if script -q /dev/null touch "$BATS_TEST_TMPDIR/script-args" </dev/null >/dev/null 2>&1 &&
       [ -e "$BATS_TEST_TMPDIR/script-args" ]; then
-    run script -q /dev/null python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
+    run script -q /dev/null python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT" </dev/null
   elif printf -v script_command '%q ' touch "$BATS_TEST_TMPDIR/script-command" &&
       script -qec "$script_command" /dev/null </dev/null >/dev/null 2>&1 &&
       [ -e "$BATS_TEST_TMPDIR/script-command" ]; then
     printf -v script_command '%q ' python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
-    run script -qec "$script_command" /dev/null
+    run script -qec "$script_command" /dev/null </dev/null
   else
     skip "script cannot run a command in a pseudo-terminal"
   fi
