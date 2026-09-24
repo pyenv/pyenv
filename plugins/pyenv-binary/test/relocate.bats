@@ -23,11 +23,25 @@ create_interpreter() {
 }
 
 create_macos_tree() {
-  local prefix="${BATS_TEST_TMPDIR}/prefix"
+  local prefix="${BATS_TEST_TMPDIR}/prefix&target"
   local lib="${prefix}/lib/python3.12"
-  mkdir -p "${prefix}/bin" "${lib}/lib-dynload" "${lib}/site-packages/numpy"
+  local old="/build prefix/3.12.7"
+  mkdir -p \
+    "${prefix}/bin" \
+    "${prefix}/lib/pkgconfig" \
+    "${lib}/__pycache__" \
+    "${lib}/lib-dynload" \
+    "${lib}/site-packages/numpy"
   printf '#!/bin/sh\n' > "${prefix}/bin/python3.12"
   chmod +x "${prefix}/bin/python3.12"
+  printf '#!%s/bin/python3.12\n' "$old" > "${prefix}/bin/pip3"
+  chmod +x "${prefix}/bin/pip3"
+  printf 'prefix=%s\n' "$old" > "${prefix}/lib/pkgconfig/python-3.12.pc"
+  printf 'prefix=/build prefix/3x12x7\n' > "${prefix}/lib/pkgconfig/unrelated.pc"
+  printf 'prefix = "%s"\n' "$old" > "${lib}/_sysconfigdata.py"
+  printf '\0bytecode:%s/module.py\n' "$old" > "${lib}/__pycache__/module.cpython-312.pyc"
+  printf '\0bytecode:%s/legacy.py\n' "$old" > "${lib}/legacy.pyo"
+  printf '\0sourceless bytecode\n' > "${lib}/sourceless.pyc"
   touch "${prefix}/lib/libpython3.12.dylib"
   touch "${lib}/lib-dynload/_ssl.cpython-312-darwin.so"
   touch "${lib}/site-packages/numpy/_multiarray.so"
@@ -45,6 +59,9 @@ case "$1" in
 -L )
   echo "${file}:"
   case "$file" in
+  */bin/pip3 )
+    exit 1
+    ;;
   */bin/python3.12 )
     if [ -n "$OTOOL_RELOCATED" ]; then
       echo "    @rpath/libpython3.12.dylib (compatibility version 3.12.0, current version 3.12.0)"
@@ -179,7 +196,7 @@ STUB
 }
 
 @test "relocates macOS load commands without changing unrelated entries" {
-  local prefix="${BATS_TEST_TMPDIR}/prefix"
+  local prefix="${BATS_TEST_TMPDIR}/prefix&target"
   local old="/build prefix/3.12.7"
   local lib="${prefix}/lib/python3.12"
   create_macos_tree
@@ -197,10 +214,21 @@ STUB
 EOF
   run grep -F "${lib}/site-packages/numpy/_multiarray.so" "${BATS_TEST_TMPDIR}/otool.log"
   assert_failure
+  run head -n 1 "${prefix}/bin/pip3"
+  assert_output "#!${prefix}/bin/python3.12"
+  run cat "${prefix}/lib/pkgconfig/python-3.12.pc"
+  assert_output "prefix=${prefix}"
+  run cat "${prefix}/lib/pkgconfig/unrelated.pc"
+  assert_output "prefix=/build prefix/3x12x7"
+  run cat "${lib}/_sysconfigdata.py"
+  assert_output "prefix = \"${prefix}\""
+  assert [ ! -e "${lib}/__pycache__/module.cpython-312.pyc" ]
+  assert [ ! -e "${lib}/legacy.pyo" ]
+  assert [ -e "${lib}/sourceless.pyc" ]
 }
 
 @test "skips already relocated macOS load commands" {
-  local prefix="${BATS_TEST_TMPDIR}/prefix"
+  local prefix="${BATS_TEST_TMPDIR}/prefix&target"
   create_macos_tree
   stub_macos_tools
   export OTOOL_RELOCATED=1
@@ -211,7 +239,7 @@ EOF
 }
 
 @test "fails when install_name_tool cannot modify a selected file" {
-  local prefix="${BATS_TEST_TMPDIR}/prefix"
+  local prefix="${BATS_TEST_TMPDIR}/prefix&target"
   create_macos_tree
   stub_macos_tools
   create_path_executable install_name_tool 'exit 1'

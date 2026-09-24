@@ -998,27 +998,29 @@ build_package_jython_builder() {
   ( cd "dist" && build_package_jython )
 }
 
-build_package_pyston2_2() {
-  # currently supported version 2.2 and 2.3
+build_package_pyston() {
   build_package_copy
-  mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
-  local bin
-  shopt -s nullglob
-  for bin in "bin/"*; do
-    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
-      case "${bin##*/}" in
-      "pyston"* )
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
-        ;;
-      esac
-    fi
-  done
-  shopt -u nullglob
+  # Pyston tarballs provide an executable with a version-specific naming scheme
+  # and `pyston` and `pyston3` symlinks to it.
+  make_python_symlinks pyston
 }
 
-build_package_pyston() {
-  # currently supported version 2.3.1v2 and higher
-  build_package_copy
+# Add missing `python', `pythonX' and `pythonX.Y' symlinks as per PEP 394.
+make_python_symlinks() {
+  local seeder_basename version_suffix real_interpreter
+  local -a interpreter_names
+  seeder_basename="${1:?}"; shift
+  (($#)) && interpreter_names=("$@") || interpreter_names=(python)
+  
+  local real_interpreter
+  real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/$seeder_basename" || echo $seeder_basename)
+  # Use syntax accepted in both Py2 and Py3. Even though current Py2 holdouts (e.g. PyPy) support e.g. print()
+  version_suffix=$("${PREFIX_PATH}/bin/$seeder_basename" -c 'import sys; sys.stdout.write("%d.%d\n" % sys.version_info[:2])')
+  for interpreter_name in "${interpreter_names[@]}"; do
+    for name in "$interpreter_name" "$interpreter_name${version_suffix%.*}" "$interpreter_name${version_suffix}"; do
+      [[ -e "${PREFIX_PATH}/bin/$name" ]] || ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
+    done
+  done
 }
 
 build_package_ironpython() {
@@ -1119,22 +1121,28 @@ build_package_graalpython() {
 
 build_package_pypy() {
   build_package_copy
-  mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
   local bin
   shopt -s nullglob
-  for bin in "bin/"*; do
-    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
-      case "${bin##*/}" in
-      "libpypy"* )
-        ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/${bin##*/}" "${bin##*/}" )
-        ;;
-      "pypy"* )
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
-        ;;
-      esac
+  for bin in "bin/libpypy"*; do
+    if [[ -f "${bin}" && -x "${bin}" && ! -L "${bin}" ]]; then
+        ln -fs "../bin/${bin##*/}" "${PREFIX_PATH}/lib/${bin##*/}"
+    fi
+  done
+
+  # PyPy source builds may create only a pypy* executable with a version-sepecific name
+  local seeder= seeder_candidate
+  for seeder_candidate in "${PREFIX_PATH}/bin/"pypy*; do
+    if [[ -f $seeder_candidate && -x $seeder_candidate ]]; then
+      seeder="${seeder_candidate##*/}"
+      break
     fi
   done
   shopt -u nullglob
+  [[ -n $seeder ]] || {
+    echo "python-build: Cannot find a valid PyPy executable in \`${PREFIX_PATH}/bin'" >&4
+    exit 1
+  }
+  make_python_symlinks "$seeder" pypy python
 }
 
 build_package_pypy_builder() {
