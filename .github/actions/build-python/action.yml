@@ -20,12 +20,12 @@ runs:
       shell: bash
       run: |
         #prerequisites
-        brew install openssl readline sqlite3 xz tcl-tk@8 libb2 zstd
+        brew install openssl readline sqlite3 xz tcl-tk@8 libb2 zstd gdbm
     - if: runner.os == 'Linux'
       shell: bash
       run: |
         #prerequisites
-        pyenv install-prerequisites
+        pyenv install-prerequisites --all
     - shell: bash
       run: |
         #build
