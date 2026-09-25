@@ -18,12 +18,8 @@ import sys
 from requests_html import HTMLSession
 
 # https://downloads.python.org/pypy/versions.json doesn't contain
-# checksums, so I decided to use checksums.html instead. Of course,
-# it *would* make sense to generate them from the downloaded contents,
-# but since PyPy's website has the checksums in a convenient location,
-# and the possiblity for bad actors to hijack the downloads, why not
-# just use the checksums.html and verify with it? Just my two cents,
-# if add_cpython's way is more preferred then so be it. :)
+# checksums, so using checksums.html instead.
+# More convenient than calculating them from downloads.
 PYPY_REPO = "https://downloads.python.org/pypy/"
 PYPY_CHECKSUMS = "https://pypy.org/checksums.html"
 
@@ -33,8 +29,6 @@ OUT_DIR: Path = here.parent.parent / "share" / "python-build"
 EXCLUDED_RELEASES = []  # none for now
 
 # Note: Remember to escape/unescape curly braces when editing the bash script
-# TODO: THERE WILL BE A SIMPLIER, REFACTORED CODE THAT MAKES IT SMALLER AND
-#       INSIDE python-build. REPLACE THIS WITH THAT ONE WHEN IT'S AVAILABLE.
 SCRIPT_BIN = """
 VERSION='{version_pypy}'
 PYVER='{version_python}'
