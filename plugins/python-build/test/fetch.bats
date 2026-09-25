@@ -1,11 +1,20 @@
 #!/usr/bin/env bats
 
+load ../../../test/test_helper
 load test_helper
 _setup() {
   export PYTHON_BUILD_SKIP_MIRROR=1
   export PYTHON_BUILD_CACHE_PATH=
   export PYTHON_BUILD_BUILD_PATH="${BATS_TEST_TMPDIR}/source"
   mkdir -p "${PYTHON_BUILD_BUILD_PATH}"
+}
+
+run_with_tty() {
+  local command
+  case "$(uname -s)" in
+    Linux) printf -v command '%q ' "$@"; script -qec "$command" /dev/null ;;
+    *) script -q /dev/null "$@" ;;
+  esac </dev/null
 }
 
 @test "failed download displays error message" {
@@ -22,21 +31,13 @@ _setup() {
   export TMPDIR="$BATS_TEST_TMPDIR"
   stub curl "-q -o * -sSLf --progress-bar http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${6##*/} \$3"
 
-  local script_command
-  if script -q /dev/null touch "$BATS_TEST_TMPDIR/script-args" </dev/null >/dev/null 2>&1 &&
-      [ -e "$BATS_TEST_TMPDIR/script-args" ]; then
-    run script -q /dev/null python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT" </dev/null
-  elif printf -v script_command '%q ' touch "$BATS_TEST_TMPDIR/script-command" &&
-      script -qec "$script_command" /dev/null </dev/null >/dev/null 2>&1 &&
-      [ -e "$BATS_TEST_TMPDIR/script-command" ]; then
-    printf -v script_command '%q ' python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
-    run script -qec "$script_command" /dev/null </dev/null
-  else
-    skip "script cannot run a command in a pseudo-terminal"
-  fi
+  run run_with_tty python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
   assert_success
-  assert grep -F download-progress "$BATS_TEST_TMPDIR"/python-build.*.log
   unstub curl
+
+  run cat "$BATS_TEST_TMPDIR"/python-build.*.log
+  assert_success
+  assert_line download-progress
 }
 
 @test "using aria2c if available" {
