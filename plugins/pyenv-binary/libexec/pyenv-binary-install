@@ -32,10 +32,10 @@ arch="$(uname -m)"
 
 case "$os" in
 Linux )
-  if type -p lsb_release >/dev/null; then
-    distro="$(lsb_release -si) $(lsb_release -sr)"
-  elif [ -r /etc/os-release ]; then
+  if [ -r /etc/os-release ]; then
     distro="$(. /etc/os-release && printf '%s %s' "${ID:-}" "${VERSION_ID:-}")"
+  elif type -p lsb_release >/dev/null; then
+    distro="$(lsb_release -si) $(lsb_release -sr)"
   fi
   distro="$(printf '%s' "$distro" | tr '[:upper:]' '[:lower:]')"
   ;;
@@ -62,7 +62,7 @@ while IFS=$'\t' read -r source_version name target_os target_arch target_distro;
   "" | *[!A-Za-z0-9._-]* ) continue ;;
   esac
   case "$os" in
-  Linux ) [ "$target_distro" = "$distro" ] || continue ;;
+  Linux ) [ "$(printf '%s' "$target_distro" | tr '[:upper:]' '[:lower:]')" = "$distro" ] || continue ;;
   Darwin )
     target_version="${target_distro#macos }"
     [ "$target_version" != "$target_distro" ] || continue

@@ -24,7 +24,8 @@ by the `xz` package).
 Installs a matching published package from pyenv.github.io under `<version>`.
 The command selects by OS, architecture and distribution; on macOS, an archive
 built on an older major release can also be used. The package definition checks
-its system-library requirements before installation.
+its system-library requirements when an `ldconfig` cache is available; otherwise,
+it warns and proceeds.
 
 ```sh
 pyenv binary install 3.14.7
@@ -107,4 +108,4 @@ the path the archive was built at. Linux uses `patchelf`; macOS requires the
 original `<build-prefix>`. The generated definition calls this; you rarely run
 it by hand.
 
-Relocation is implemented for Linux and macOS.
+Relocation is implemented for Linux, FreeBSD and macOS.

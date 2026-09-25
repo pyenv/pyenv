@@ -35,7 +35,7 @@ while [ $# -gt 0 ]; do
     [ $# -ge 2 ] && [ -n "$2" ] || { echo "pyenv-binary: --name needs a value" >&2; exit 1; }
     package_name="$2"; shift 2 ;;
   --source-version )
-    [ $# -ge 2 ] && [ -n "$2" ] || { echo "pyenv-binary: --source-version needs a value" >&2; exit 1; }
+    [ $# -ge 2 ] && [ -n "$2" ] && [ "${2#-}" = "$2" ] || { echo "pyenv-binary: --source-version needs a value" >&2; exit 1; }
     source_version="$2"; shift 2 ;;
   -* )
     echo "pyenv-binary: unknown option \`$1'" >&2; exit 1 ;;
@@ -55,7 +55,7 @@ done
 output_dir="${output_dir:-$PWD}"
 
 if [ -z "$version" ]; then
-  echo "Usage: pyenv binary save <version> [<output-dir>] [--name <name>]" >&2
+  echo "Usage: pyenv binary save <version> [<output-dir>] [--name <name>] [--source-version <version>]" >&2
   exit 1
 fi
 
@@ -75,14 +75,13 @@ case "$package_name" in
   ;;
 esac
 
+source_version="${source_version:-$version}"
 case "$source_version" in
 */* | .. | . | *[[:cntrl:]]* )
   echo "pyenv-binary: invalid source version \`${source_version}'" >&2
   exit 1
   ;;
 esac
-
-source_version="${source_version:-$version}"
 
 prefix="${PYENV_ROOT}/versions/${version}"
 if [ ! -d "${prefix}/bin" ]; then

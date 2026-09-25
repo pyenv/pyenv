@@ -12,7 +12,7 @@ platform() {
 
 @test "fails with no version given" {
   run pyenv-binary-save
-  assert_failure "Usage: pyenv binary save <version> [<output-dir>] [--name <name>]"
+  assert_failure "Usage: pyenv binary save <version> [<output-dir>] [--name <name>] [--source-version <version>]"
 }
 
 @test "fails for a version that is not installed" {
@@ -64,6 +64,17 @@ platform() {
   assert_success
   run grep '^source_version=' "${out}/3.12.7-ubuntu-24.04-x86_64.meta"
   assert_success "source_version=3.12.7"
+}
+
+@test "rejects an option as the source version" {
+  run pyenv-binary-save "3.12.7" --source-version --name custom
+  assert_failure "pyenv-binary: --source-version needs a value"
+}
+
+@test "rejects control characters in the default source version" {
+  run pyenv-binary-save $'3.12.7\nsource_version=other'
+  assert_failure
+  [[ "$output" == "pyenv-binary: invalid source version"* ]]
 }
 
 @test "fails when --name has no value" {

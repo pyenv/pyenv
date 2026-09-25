@@ -2,6 +2,15 @@
 
 load test_helper
 
+host_distro() {
+  if [ -r /etc/os-release ]; then
+    . /etc/os-release
+    printf '%s %s' "$ID" "$VERSION_ID" | tr '[:upper:]' '[:lower:]'
+  else
+    printf '%s %s' "$(lsb_release -si)" "$(lsb_release -sr)" | tr '[:upper:]' '[:lower:]'
+  fi
+}
+
 stub_downloads() {
   create_stub curl <<'STUB'
 output=""
@@ -28,14 +37,14 @@ STUB
 }
 
 @test "installs a matching published binary under the requested version" {
-  cat > "${BATS_TEST_TMPDIR}/index.tsv" <<'EOF'
+  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
+  cat > "${BATS_TEST_TMPDIR}/index.tsv" <<EOF
 source_version	entry	os	arch	distro
 3.14.7	3.14.7-macos-15-arm64	Darwin	arm64	macos 15.7.9
-3.14.7	3.14.7-ubuntu-24.04-x86_64	Linux	x86_64	ubuntu 24.04
+3.14.7	3.14.7-ubuntu-24.04-x86_64	Linux	x86_64	$(host_distro | tr '[:lower:]' '[:upper:]')
 EOF
   stub_downloads
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
-  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
   create_stub pyenv-install <<'STUB'
 definition="${1%:*}"
 printf '%s:%s\n' "${definition##*/}" "${1##*:}"
@@ -48,14 +57,14 @@ definition"
 }
 
 @test "a version prefix selects the latest published binary" {
-  cat > "${BATS_TEST_TMPDIR}/index.tsv" <<'EOF'
+  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
+  cat > "${BATS_TEST_TMPDIR}/index.tsv" <<EOF
 source_version	entry	os	arch	distro
-3.14.10	3.14.10-ubuntu-24.04-x86_64	Linux	x86_64	ubuntu 24.04
-3.14.7	3.14.7-ubuntu-24.04-x86_64	Linux	x86_64	ubuntu 24.04
+3.14.10	3.14.10-ubuntu-24.04-x86_64	Linux	x86_64	$(host_distro)
+3.14.7	3.14.7-ubuntu-24.04-x86_64	Linux	x86_64	$(host_distro)
 EOF
   stub_downloads
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
-  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
   create_stub pyenv-install 'echo "${1##*:}"'
 
   run pyenv-binary-install 3.14
