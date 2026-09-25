@@ -139,7 +139,7 @@ assert_output_contains() {
 }
 
 assert_line() {
-  if (($#>1)); then
+  if [ "$1" -ge 0 ] 2>/dev/null; then
     assert_equal "$2" "${lines[$1]}"
   else
     local line
@@ -147,8 +147,7 @@ assert_line() {
       if [ "$line" = "$1" ]; then return 0; fi
     done
     flunk "expected line \`$1'" $'\n'\
-    "output: $output" 2>&1 | cat -te >&2
-    return 1
+    "output: $output"
   fi
 }
 
