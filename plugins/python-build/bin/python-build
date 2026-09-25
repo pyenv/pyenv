@@ -497,7 +497,7 @@ http_get_curl() {
   if [[ -n $2 && -n $curl_is_snap ]]; then out="$HOME/$(basename "$2")"; else out="$2"; fi
   local curl_progress=
   if [ -t 3 ]; then
-    curl_progress="--no-silent --progress-bar"
+    curl_progress="--no-silent"
   fi
   local cmd
   cmd=(curl -q -o "${out:--}" -sSLf ${CURL_OPTS} ${curl_progress} "$1")

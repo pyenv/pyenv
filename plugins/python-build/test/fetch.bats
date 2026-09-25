@@ -35,7 +35,7 @@ run_with_script() {
 @test "interactive download progress is both shown and logged" {
   check_script_available
   export TMPDIR="$BATS_TEST_TMPDIR"
-  stub curl "-q -o * -sSLf --no-silent --progress-bar http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${7##*/} \$3"
+  stub curl "-q -o * -sSLf --no-silent http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${7##*/} \$3"
 
   run run_with_script python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
   assert_success
