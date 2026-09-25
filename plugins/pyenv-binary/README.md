@@ -23,9 +23,11 @@ by the `xz` package).
 
 Installs a matching published package from pyenv.github.io under `<version>`.
 The command selects by OS, architecture and distribution; on macOS, an archive
-built on an older major release can also be used. The package definition checks
-its system-library requirements when an `ldconfig` cache is available; otherwise,
-it warns and proceeds.
+built on an older major release can also be used. Available packages and their
+definition checksums are recorded in `share/pyenv-binary/versions`. Add an entry
+there when publishing a new package. The definition checks its system-library
+requirements when an `ldconfig` cache is available; otherwise, it warns and
+proceeds.
 
 ```sh
 pyenv binary install 3.14.7
@@ -104,8 +106,8 @@ pyenv install 3.12.7-linux-x86_64
 
 Rewrites the rpaths of a Python tree unpacked into `<prefix>` so the interpreter
 and its extension modules load the bundled libraries from there rather than from
-the path the archive was built at. Linux uses `patchelf`; macOS requires the
-original `<build-prefix>`. The generated definition calls this; you rarely run
-it by hand.
+the path the archive was built at. Linux and FreeBSD use `patchelf`; macOS
+requires the original `<build-prefix>`. The generated definition calls this;
+you rarely run it by hand.
 
 Relocation is implemented for Linux, FreeBSD and macOS.

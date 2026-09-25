@@ -1,0 +1,3 @@
+source_version	entry	os	arch	distro	sha256
+3.14.7	3.14.7-macos-15-arm64	Darwin	arm64	macos 15.7.9	8a8ff86b520c3b5da00b49e04a5345b7a28f2f9e8da5a9ae43b8ac309e8f3e55
+3.14.7	3.14.7-ubuntu-24.04-x86_64	Linux	x86_64	ubuntu 24.04	e63dbcb981ec9ba83a2bc9b4d8b369620cec4aa45394559d719c5606ee9ff718
