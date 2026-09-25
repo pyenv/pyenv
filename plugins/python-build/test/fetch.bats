@@ -64,6 +64,22 @@ OUT
   unstub aria2c
 }
 
+@test "interactive aria2c progress is updated every second" {
+  check_script_available
+  export TMPDIR="$BATS_TEST_TMPDIR"
+  export -n PYTHON_BUILD_HTTP_CLIENT
+  stub aria2c "--allow-overwrite=true --no-conf=true -d * -o * --summary-interval=1 http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${8##*/} \$6"
+
+  run run_with_script python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
+  assert_success
+  unstub aria2c
+
+  assert_line download-progress
+  run cat "$BATS_TEST_TMPDIR"/python-build.*.log
+  assert_success
+  assert_line download-progress
+}
+
 @test "fetching from git repository" {
   stub git "clone --depth 1 --branch master http://example.com/packages/package.git package-dev : mkdir package-dev"
 

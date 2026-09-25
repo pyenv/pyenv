@@ -460,12 +460,14 @@ http_get_aria2c() {
   fi
 
   local cmd
-  cmd=(aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1")
+  cmd=(aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS})
 
   if [ -t 3 ]; then
+    cmd+=(--summary-interval=1 "$1")
     "${cmd[@]}" 2>&1 | interactive_output
     ret=${PIPESTATUS[0]}
   else
+    cmd+=("$1")
     "${cmd[@]}" >&4
     ret=$?
   fi
