@@ -67,6 +67,7 @@ OUT
 @test "interactive aria2c progress is updated every second" {
   check_script_available
   export TMPDIR="$BATS_TEST_TMPDIR"
+  export PYTHON_BUILD_ARIA2_OPTS=
   export -n PYTHON_BUILD_HTTP_CLIENT
   stub aria2c "--allow-overwrite=true --no-conf=true -d * -o * --summary-interval=1 http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${8##*/} \$6"
 
