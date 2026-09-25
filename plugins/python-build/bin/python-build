@@ -430,7 +430,11 @@ http_head_aria2c() {
 # Usage:
 # command <switches forcing interactive output to non-terminal> 2>&1 | interactive_output; rc=${PIPESTATUS[0]}
 interactive_output() {
-  tee -a "$LOG_PATH" >&3
+  if [ -n "$VERBOSE" ]; then
+    tee -a "$LOG_PATH" >/dev/null
+  else
+    tee -a "$LOG_PATH" >&3
+  fi
 }
 
 http_get_aria2c() {
@@ -457,7 +461,7 @@ http_get_aria2c() {
 
   local cmd
   cmd=(aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1")
-  
+
   if [ -t 3 ]; then
     "${cmd[@]}" 2>&1 | interactive_output
     ret=${PIPESTATUS[0]}
