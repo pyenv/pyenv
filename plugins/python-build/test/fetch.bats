@@ -1,6 +1,5 @@
 #!/usr/bin/env bats
 
-load ../../../test/test_helper
 load test_helper
 _setup() {
   export PYTHON_BUILD_SKIP_MIRROR=1
@@ -9,11 +8,17 @@ _setup() {
   mkdir -p "${PYTHON_BUILD_BUILD_PATH}"
 }
 
-run_with_tty() {
+check_script_available() {
+  command -v script >/dev/null || skip "'script' not installed"
+}
+
+run_with_script() {
   local command
+  # `script' outputs CRLF because ttys do so under the hood
+  # https://unix.stackexchange.com/questions/343324/why-in-the-output-of-script-1-the-newline-is-cr-lf-dos-style
   case "$(uname -s)" in
-    Linux) printf -v command '%q ' "$@"; script -qec "$command" /dev/null ;;
-    *) script -q /dev/null "$@" ;;
+    Linux) printf -v command '%q ' "$@"; script -qec "$command" /dev/stdout | tr -d $'\r' ;;
+    *) script -q /dev/stdout "$@" | tr -d $'\r' ;;
   esac </dev/null
 }
 
@@ -26,14 +31,16 @@ run_with_tty() {
   assert_output_contains "error: failed to download package-1.0.0.tar.gz"
 }
 
-@test "interactive download progress is logged" {
-  command -v script >/dev/null || skip "script is required to allocate a terminal"
+@test "interactive download progress is both shown and logged" {
+  check_script_available
   export TMPDIR="$BATS_TEST_TMPDIR"
   stub curl "-q -o * -sSLf --progress-bar http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${6##*/} \$3"
 
-  run run_with_tty python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
+  run run_with_script python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
   assert_success
   unstub curl
+
+  assert_line download-progress
 
   run cat "$BATS_TEST_TMPDIR"/python-build.*.log
   assert_success

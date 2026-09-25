@@ -138,6 +138,20 @@ assert_output_contains() {
   }
 }
 
+assert_line() {
+  if (($#>1)); then
+    assert_equal "$2" "${lines[$1]}"
+  else
+    local line
+    for line in "${lines[@]}"; do
+      if [ "$line" = "$1" ]; then return 0; fi
+    done
+    flunk "expected line \`$1'" $'\n'\
+    "output: $output" 2>&1 | cat -te >&2
+    return 1
+  fi
+}
+
 # Output a modified PATH that ensures that the given executable is not present,
 # but in which system utils necessary for pyenv operation are still available.
 path_without() {
