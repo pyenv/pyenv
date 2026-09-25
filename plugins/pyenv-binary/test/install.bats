@@ -57,13 +57,14 @@ STUB
   assert_success ""
 }
 
-@test "installs a matching published binary under the requested version" {
+@test "installs a matching published binary with an uppercase checksum" {
   create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
   use_manifest
+  local uppercase_sha="$(printf '%s' "$definition_sha" | tr '[:lower:]' '[:upper:]')"
   printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
     "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
   printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
-    "$(host_distro | tr '[:lower:]' '[:upper:]')" "$definition_sha" \
+    "$(host_distro | tr '[:lower:]' '[:upper:]')" "$uppercase_sha" \
     >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
   stub_downloads
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'

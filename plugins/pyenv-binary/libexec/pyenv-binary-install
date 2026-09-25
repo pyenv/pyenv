@@ -104,6 +104,7 @@ if ! [[ "$expected_sha" =~ ^[0-9a-fA-F]{64}$ ]]; then
   echo "pyenv-binary: invalid checksum for $entry" >&2
   exit 1
 fi
+expected_sha="$(printf '%s' "$expected_sha" | tr '[:upper:]' '[:lower:]')"
 
 curl -fsSL -o "$tmpdir/$entry" "$base_url/$entry"
 if command -v sha256sum >/dev/null 2>&1; then
