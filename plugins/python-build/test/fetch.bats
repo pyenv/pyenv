@@ -20,6 +20,7 @@ run_with_script() {
     Linux) printf -v command '%q ' "$@"; script -qec "$command" /dev/stdout | tr -d $'\r' ;;
     *) script -q /dev/stdout "$@" | tr -d $'\r' ;;
   esac </dev/null
+  return ${PIPESTATUS[0]}
 }
 
 @test "failed download displays error message" {
