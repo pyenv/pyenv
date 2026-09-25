@@ -2804,7 +2804,8 @@ else
   BUILD_PATH="$PYTHON_BUILD_BUILD_PATH"
 fi
 
-exec 4>> "$LOG_PATH" # open the log file for append at fd 4
+# Append mode needed to be able to `tee` to it at the same time
+exec 4>> "$LOG_PATH"
 if [ -n "$VERBOSE" ]; then
   tail -f "$LOG_PATH" &
   TAIL_PID=$!
