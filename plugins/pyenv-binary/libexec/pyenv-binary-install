@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+#
+# Summary: Install a published binary package
+#
+# Usage: pyenv binary install <version>
+#
+#   Selects a compatible package from pyenv.github.io and installs it under
+#   <version>. Ordinary `pyenv install' is unchanged.
+#
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+if [ "$1" = "--complete" ]; then
+  exit
+fi
+
+if [ "$#" -ne 1 ]; then
+  pyenv-help --usage binary-install >&2
+  exit 1
+fi
+
+case "$1" in
+*/* | .. | . | *[[:cntrl:]]* )
+  echo "pyenv-binary: invalid version name \`$1'" >&2
+  exit 1
+  ;;
+esac
+
+requested="$1"
+os="$(uname -s)"
+arch="$(uname -m)"
+
+case "$os" in
+Linux )
+  if type -p lsb_release >/dev/null; then
+    distro="$(lsb_release -si) $(lsb_release -sr)"
+  elif [ -r /etc/os-release ]; then
+    distro="$(. /etc/os-release && printf '%s %s' "${ID:-}" "${VERSION_ID:-}")"
+  fi
+  distro="$(printf '%s' "$distro" | tr '[:upper:]' '[:lower:]')"
+  ;;
+Darwin )
+  distro="macos $(sw_vers -productVersion)"
+  ;;
+esac
+
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+base_url="https://pyenv.github.io/pythons/binaries"
+curl -fsSL -o "$tmpdir/index.tsv" "$base_url/index.tsv"
+
+matches="$tmpdir/matches"
+: > "$matches"
+while IFS=$'\t' read -r source_version name target_os target_arch target_distro; do
+  case "$source_version" in
+  "$requested" | "$requested".* ) ;;
+  * ) continue ;;
+  esac
+  [[ "$source_version" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]] || continue
+  [ "$target_os" = "$os" ] && [ "$target_arch" = "$arch" ] || continue
+  case "$name" in
+  "" | *[!A-Za-z0-9._-]* ) continue ;;
+  esac
+  case "$os" in
+  Linux ) [ "$target_distro" = "$distro" ] || continue ;;
+  Darwin )
+    target_version="${target_distro#macos }"
+    [ "$target_version" != "$target_distro" ] || continue
+    host_version="${distro#macos }"
+    [[ "$target_version" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]] || continue
+    [[ "$host_version" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]] || continue
+    IFS=. read -r target_major target_minor target_patch <<< "$target_version"
+    IFS=. read -r host_major host_minor host_patch <<< "$host_version"
+    target_patch="${target_patch:-0}"
+    host_patch="${host_patch:-0}"
+    [ "$host_major" -ge "$target_major" ] || continue
+    if [ "$host_major" -eq "$target_major" ]; then
+      [ "$host_minor" -ge "$target_minor" ] || continue
+      if [ "$host_minor" -eq "$target_minor" ]; then
+        [ "$host_patch" -ge "$target_patch" ] || continue
+      fi
+    fi
+    ;;
+  * ) continue ;;
+  esac
+  printf '%s\t%s\n' "$source_version" "$name" >> "$matches"
+done < "$tmpdir/index.tsv"
+
+selection="$(sort -t. -k1,1nr -k2,2nr -k3,3nr "$matches" | head -n1)"
+version="${selection%%$'\t'*}"
+entry="${selection#*$'\t'}"
+if [ -z "$entry" ]; then
+  echo "pyenv-binary: no binary available for $requested on $os/$arch" >&2
+  exit 1
+fi
+
+curl -fsSL -o "$tmpdir/$entry" "$base_url/$entry"
+pyenv-install "$tmpdir/$entry:$version"

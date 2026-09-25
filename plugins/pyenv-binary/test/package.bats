@@ -68,8 +68,22 @@ pyenv-install --list --bare
   assert [ -d "${PYENV_ROOT}/versions/3.12.7-debian-12-x86_64" ]
   assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.tar.xz" ]
   assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.meta" ]
+  run grep '^source_version=' "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.meta"
+  assert_success "source_version=3.12.7"
   run grep '^ARCHIVE_URL=' "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64"
   assert_success "ARCHIVE_URL=http://example.com/binaries/3.12.7-debian-12-x86_64.tar.xz"
+}
+
+@test "records the definition name when packaging from a file" {
+  stub_build_environment
+  cd "${BATS_TEST_TMPDIR}"
+  printf 'install_package "foo"\n' > custom-python
+
+  run pyenv-binary-package "${BATS_TEST_TMPDIR}/custom-python:custom-build" \
+    --archive-base-url http://example.com/binaries
+  assert_success
+  run grep '^source_version=' custom-build.meta
+  assert_success "source_version=custom-python"
 }
 
 @test "rejects an entry name containing a slash" {
@@ -84,6 +98,7 @@ pyenv-install --list --bare
 
 @test "packages on macOS" {
   create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  create_stub pyenv-latest 'echo 3.12.7'
   create_stub pyenv-install 'echo install'
   create_stub pyenv-binary-save 'echo save'
   create_stub pyenv-binary-generate-installer 'echo generate-installer'

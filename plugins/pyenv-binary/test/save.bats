@@ -55,6 +55,17 @@ platform() {
   assert_success "archive=custom.tar.xz"
 }
 
+@test "records the source version for a renamed build" {
+  create_version "3.12.7-ubuntu-24.04-x86_64"
+  local out="${BATS_TEST_TMPDIR}/dist"
+
+  run pyenv-binary-save "3.12.7-ubuntu-24.04-x86_64" "$out" \
+    --name "3.12.7-ubuntu-24.04-x86_64" --source-version "3.12.7"
+  assert_success
+  run grep '^source_version=' "${out}/3.12.7-ubuntu-24.04-x86_64.meta"
+  assert_success "source_version=3.12.7"
+}
+
 @test "fails when --name has no value" {
   run pyenv-binary-save "3.12.7" --name
   assert_failure "pyenv-binary: --name needs a value"

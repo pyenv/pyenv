@@ -2,7 +2,7 @@
 #
 # Summary: Save an installed Python version as a relocatable archive
 #
-# Usage: pyenv binary save <version> [<output-dir>] [--name <name>]
+# Usage: pyenv binary save <version> [<output-dir>] [--name <name>] [--source-version <version>]
 #
 #   Packs an installed version into a relocatable .tar.xz (relative paths) and
 #   writes a metadata file listing the build platform and the system libraries
@@ -12,6 +12,7 @@
 #   <output-dir>   Where to write the archive and metadata (default: `.').
 #   --name <name>  Use <name> as the archive and metadata base name instead of
 #                  <version>-<platform>.
+#   --source-version <version>  Record the version used to build a renamed install.
 #
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -19,18 +20,23 @@ set -e
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
   echo --name
+  echo --source-version
   exec pyenv-versions --bare
 fi
 
 version=""
 output_dir=""
 package_name=""
+source_version=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
   --name )
     [ $# -ge 2 ] && [ -n "$2" ] || { echo "pyenv-binary: --name needs a value" >&2; exit 1; }
     package_name="$2"; shift 2 ;;
+  --source-version )
+    [ $# -ge 2 ] && [ -n "$2" ] || { echo "pyenv-binary: --source-version needs a value" >&2; exit 1; }
+    source_version="$2"; shift 2 ;;
   -* )
     echo "pyenv-binary: unknown option \`$1'" >&2; exit 1 ;;
   * )
@@ -68,6 +74,15 @@ case "$package_name" in
   exit 1
   ;;
 esac
+
+case "$source_version" in
+*/* | .. | . | *[[:cntrl:]]* )
+  echo "pyenv-binary: invalid source version \`${source_version}'" >&2
+  exit 1
+  ;;
+esac
+
+source_version="${source_version:-$version}"
 
 prefix="${PYENV_ROOT}/versions/${version}"
 if [ ! -d "${prefix}/bin" ]; then
@@ -142,6 +157,7 @@ tar -C "$(dirname "$prefix")" -cJf "${output_dir}/${archive}" "$(basename "$pref
 {
   echo "# pyenv-binary metadata"
   echo "version=${version}"
+  echo "source_version=${source_version}"
   echo "os=${os}"
   echo "arch=${arch}"
   echo "platform=${platform}"
