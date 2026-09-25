@@ -431,7 +431,7 @@ http_head_aria2c() {
 # command <switches forcing interactive output to non-terminal> 2>&1 | interactive_output; rc=${PIPESTATUS[0]}
 interactive_output() {
   if [ -n "$VERBOSE" ]; then
-    tee -a "$LOG_PATH" >/dev/null
+    cat >> "$LOG_PATH"
   else
     tee -a "$LOG_PATH" >&3
   fi
