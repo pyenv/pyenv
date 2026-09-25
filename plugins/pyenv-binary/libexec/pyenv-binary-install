@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+#
+# Summary: Install a published binary package
+#
+# Usage: pyenv binary install <version>
+#
+#   Selects a compatible package from pyenv.github.io and installs it under
+#   <version>. Ordinary `pyenv install' is unchanged.
+#
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+if [ "$1" = "--complete" ]; then
+  exit
+fi
+
+if [ "$#" -ne 1 ]; then
+  pyenv-help --usage binary-install >&2
+  exit 1
+fi
+
+case "$1" in
+*/* | .. | . | *[[:cntrl:]]* )
+  echo "pyenv-binary: invalid version name \`$1'" >&2
+  exit 1
+  ;;
+esac
+
+requested="$1"
+os="$(uname -s)"
+arch="$(uname -m)"
+
+case "$os" in
+Linux )
+  if [ -r /etc/os-release ]; then
+    distro="$(. /etc/os-release && printf '%s %s' "${ID:-}" "${VERSION_ID:-}")"
+  elif type -p lsb_release >/dev/null; then
+    distro="$(lsb_release -si) $(lsb_release -sr)"
+  fi
+  distro="$(printf '%s' "$distro" | tr '[:upper:]' '[:lower:]')"
+  ;;
+Darwin )
+  distro="macos $(sw_vers -productVersion)"
+  ;;
+esac
+
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+base_url="https://pyenv.github.io/pythons/binaries"
+manifest_dir="$(dirname "${BASH_SOURCE[0]}")/../share/pyenv-binary/versions"
+case "$requested" in
+*.*.* ) manifests=( "$manifest_dir/${requested%.*}" ) ;;
+*.* ) manifests=( "$manifest_dir/$requested" ) ;;
+* ) manifests=( "$manifest_dir/$requested".* ) ;;
+esac
+
+matches="$tmpdir/matches"
+: > "$matches"
+for manifest in "${manifests[@]}"; do
+  [ -f "$manifest" ] || continue
+  while IFS=$'\t' read -r source_version name target_os target_arch target_distro sha256; do
+    case "$source_version" in
+    "$requested" | "$requested".* ) ;;
+    * ) continue ;;
+    esac
+    [[ "$source_version" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]] || continue
+    [ "$target_os" = "$os" ] && [ "$target_arch" = "$arch" ] || continue
+    case "$name" in
+    "" | . | .. | *[!A-Za-z0-9._-]* ) continue ;;
+    esac
+    case "$os" in
+    Linux ) [ "$(printf '%s' "$target_distro" | tr '[:upper:]' '[:lower:]')" = "$distro" ] || continue ;;
+    Darwin )
+      target_version="${target_distro#macos }"
+      [ "$target_version" != "$target_distro" ] || continue
+      host_version="${distro#macos }"
+      [[ "$target_version" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]] || continue
+      [[ "$host_version" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]] || continue
+      IFS=. read -r target_major target_minor target_patch <<< "$target_version"
+      IFS=. read -r host_major host_minor host_patch <<< "$host_version"
+      target_patch="${target_patch:-0}"
+      host_patch="${host_patch:-0}"
+      [ "$host_major" -ge "$target_major" ] || continue
+      if [ "$host_major" -eq "$target_major" ]; then
+        [ "$host_minor" -ge "$target_minor" ] || continue
+        if [ "$host_minor" -eq "$target_minor" ]; then
+          [ "$host_patch" -ge "$target_patch" ] || continue
+        fi
+      fi
+      ;;
+    * ) continue ;;
+    esac
+    printf '%s\t%s\t%s\n' "$source_version" "$name" "$sha256" >> "$matches"
+  done < "$manifest"
+done
+
+selection="$(sort -t. -k1,1nr -k2,2nr -k3,3nr "$matches" | head -n1)"
+IFS=$'\t' read -r version entry expected_sha <<< "$selection"
+if [ -z "$entry" ]; then
+  echo "pyenv-binary: no binary available for $requested on $os/$arch" >&2
+  exit 1
+fi
+if ! [[ "$expected_sha" =~ ^[0-9a-fA-F]{64}$ ]]; then
+  echo "pyenv-binary: invalid checksum for $entry" >&2
+  exit 1
+fi
+expected_sha="$(printf '%s' "$expected_sha" | tr '[:upper:]' '[:lower:]')"
+
+curl -fsSL -o "$tmpdir/$entry" "$base_url/$entry"
+if command -v sha256sum >/dev/null 2>&1; then
+  actual_sha="$(sha256sum "$tmpdir/$entry")"; actual_sha="${actual_sha%% *}"
+elif command -v shasum >/dev/null 2>&1; then
+  actual_sha="$(shasum -a 256 "$tmpdir/$entry")"; actual_sha="${actual_sha%% *}"
+elif command -v openssl >/dev/null 2>&1; then
+  actual_sha="$(openssl dgst -sha256 "$tmpdir/$entry")"; actual_sha="${actual_sha##* }"
+else
+  echo "pyenv-binary: need sha256sum, shasum or openssl to verify $entry" >&2
+  exit 1
+fi
+if [ "$actual_sha" != "$expected_sha" ]; then
+  echo "pyenv-binary: checksum mismatch for $entry" >&2
+  exit 1
+fi
+pyenv-install "$tmpdir/$entry:$version"

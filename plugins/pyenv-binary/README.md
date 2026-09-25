@@ -19,6 +19,20 @@ by the `xz` package).
 
 ## Commands
 
+### `pyenv binary install <version>`
+
+Installs a matching published package from pyenv.github.io under `<version>`.
+The command selects by OS, architecture and distribution; on macOS, an archive
+built on an older major release can also be used. Available packages and their
+definition checksums are recorded in `share/pyenv-binary/versions`. Add an entry
+there when publishing a new package. The definition checks its system-library
+requirements when an `ldconfig` cache is available; otherwise, it warns and
+proceeds.
+
+```sh
+pyenv binary install 3.14.7
+```
+
 ### `pyenv binary package [-v|--verbose] <version>[:<entry>] --archive-base-url <url>`
 
 Installs `<version>` from source under a separate name, packages that install
@@ -55,12 +69,13 @@ pyenv binary package-name 3.12.7
 # 3.12.7-debian-12-x86_64
 ```
 
-### `pyenv binary save <version> [<output-dir>] [--name <name>]`
+### `pyenv binary save <version> [<output-dir>] [--name <name>] [--source-version <version>]`
 
 Packs an installed version into `<version>-<platform>.tar.xz` (relative paths)
 and writes `<version>-<platform>.meta` describing the build platform (OS, arch,
 distro and libc version) and the system libraries the build links against. Use
-`--name` to set a different base name for both files.
+`--name` to set a different base name for both files. `--source-version` records
+the source version when the installed version has a different name.
 
 ```sh
 pyenv binary save 3.12.7 ./dist
@@ -87,11 +102,12 @@ pyenv binary generate-installer ./dist/3.12.7-linux-x86_64.meta \
 pyenv install 3.12.7-linux-x86_64
 ```
 
-### `pyenv binary relocate <prefix>`
+### `pyenv binary relocate <prefix> [<build-prefix>]`
 
 Rewrites the rpaths of a Python tree unpacked into `<prefix>` so the interpreter
 and its extension modules load the bundled libraries from there rather than from
-the path the archive was built at. Uses `patchelf`. The generated definition
-calls this; you rarely run it by hand.
+the path the archive was built at. Linux and FreeBSD use `patchelf`; macOS
+requires the original `<build-prefix>`. The generated definition calls this;
+you rarely run it by hand.
 
-Relocation is implemented for Linux; macOS is not wired up yet.
+Relocation is implemented for Linux, FreeBSD and macOS.

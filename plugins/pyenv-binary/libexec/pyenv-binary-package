@@ -77,7 +77,9 @@ esac
 
 # `pyenv install' puts a `<version>:<alias>' build under versions/<alias>.
 pyenv-install ${verbose:+--verbose} "$spec"
-pyenv-binary-save "$entry" "$PWD" --name "$entry"
+source_version="$(pyenv-latest -f -k "${spec%%:*}")"
+source_version="${source_version##*/}"
+pyenv-binary-save "$entry" "$PWD" --name "$entry" --source-version "$source_version"
 
 pyenv-binary-generate-installer "${entry}.meta" \
   --archive-url "${archive_base_url%/}/${entry}.tar.xz" -o "$entry"
