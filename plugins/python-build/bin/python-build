@@ -1557,7 +1557,7 @@ use_homebrew() {
   if command -v brew &>/dev/null; then
     local brew_prefix="$(brew --prefix 2>/dev/null || true)"
     # /usr/local/lib:/usr/lib is the default library search path
-    if [[ -n $brew_prefix && ( ( $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ) 
+    if [[ -n $brew_prefix && ( ( $brew_prefix != "/usr" && $brew_prefix != "/usr/local" )
         #when -isysroot is passed to Apple CLang, /usr/(local) are excluded from the default search path
         || ( is_mac && osx_using_default_compiler && $CFLAGS =~ (^|\ )-isysroot\  ) ) ]]; then
       export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${brew_prefix}/include"
