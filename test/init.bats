@@ -99,7 +99,7 @@ OUT
   run pyenv-init --install
   assert_success
 
-  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
+  expected_setup=$'export PYENV_ROOT="'${PYENV_ROOT}'"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
   assert_equal "$expected_setup" "$(cat "$HOME/.bashrc")"
   assert_equal "$expected_setup" "$(cat "$HOME/.profile")"
 }
@@ -111,7 +111,7 @@ OUT
   run pyenv-init --install bash
   assert_success
 
-  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
+  expected_setup=$'export PYENV_ROOT="'${PYENV_ROOT}'"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
   assert_equal "$expected_setup" "$(cat "$HOME/.bashrc")"
   assert_equal "$expected_setup" "$(cat "$HOME/.bash_profile")"
   assert [ ! -e "$HOME/.profile" ]
@@ -123,7 +123,7 @@ OUT
   run pyenv-init --install zsh
   assert_success
 
-  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - zsh)"'
+  expected_setup=$'export PYENV_ROOT="'${PYENV_ROOT}'"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - zsh)"'
   assert_equal "$expected_setup" "$(cat "$HOME/.zshrc")"
   assert_equal "$expected_setup" "$(cat "$HOME/.zprofile")"
 }
@@ -137,7 +137,7 @@ OUT
   run pyenv-init --install fish
   assert_success
 
-  expected_fish_script=$'set -Ux PYENV_ROOT $HOME/.pyenv\nif functions -q fish_add_path\n  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin\nelse\n  test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths\nend'
+  expected_fish_script=$'set -Ux PYENV_ROOT '${PYENV_ROOT}'\nif functions -q fish_add_path\n  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin\nelse\n  test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths\nend'
   expected_setup='pyenv init - fish | source'
   assert_equal "$expected_fish_script" "$(cat "$PYENV_TEST_DIR/fish-script")"
   assert_equal "$expected_setup" "$(cat "$HOME/.config/fish/config.fish")"
@@ -149,7 +149,7 @@ OUT
   run pyenv-init --install pwsh
   assert_success
 
-  expected_setup=$'$Env:PYENV_ROOT="$Env:HOME/.pyenv"\nif (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {\n  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }\niex ((pyenv init -) -join "`n")'
+  expected_setup=$'$Env:PYENV_ROOT="'${PYENV_ROOT}'"\nif (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {\n  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }\niex ((pyenv init -) -join "`n")'
   assert_equal "$expected_setup" "$(cat "$HOME/.config/powershell/profile.ps1")"
 }
 
@@ -379,4 +379,18 @@ echo
   assert_success
   refute_line '  switch "$command"'
   refute_line '  case "$command" in'
+}
+
+@test "init tips honor custom PYENV_ROOT (#2637)" {
+  run pyenv-init bash
+  assert [ "$status" -eq 1 ]
+  assert_line "export PYENV_ROOT=\"${PYENV_ROOT}\""
+  refute_line 'export PYENV_ROOT="$HOME/.pyenv"'
+}
+
+@test "init tips keep portable default when PYENV_ROOT is \$HOME/.pyenv" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  run pyenv-init bash
+  assert [ "$status" -eq 1 ]
+  assert_line 'export PYENV_ROOT="$HOME/.pyenv"'
 }

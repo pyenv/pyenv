@@ -189,8 +189,21 @@ function help_() {
   } >&2
 }
 
+function pyenv_root_setup_literal() {
+  # Prefer a portable $HOME/.pyenv when that is the active root; otherwise emit
+  # the actual PYENV_ROOT so custom installs (see #2637) get correct tips.
+  local default_root="${HOME}/.pyenv"
+  if [ -n "${PYENV_ROOT}" ] && [ "${PYENV_ROOT}" != "${default_root}" ]; then
+    printf '%s\n' "${PYENV_ROOT}"
+  else
+    printf '%s\n' '$HOME/.pyenv'
+  fi
+}
+
 function print_posix_shell_setup() {
-  echo 'export PYENV_ROOT="$HOME/.pyenv"'
+  local root_literal
+  root_literal="$(pyenv_root_setup_literal)"
+  echo "export PYENV_ROOT=\"${root_literal}\""
   echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
   echo 'eval "$(pyenv init - '$shell')"'
 }
@@ -200,7 +213,9 @@ function print_fish_shell_setup() {
 }
 
 function print_fish_user_path_setup() {
-  echo 'set -Ux PYENV_ROOT $HOME/.pyenv'
+  local root_literal
+  root_literal="$(pyenv_root_setup_literal)"
+  echo "set -Ux PYENV_ROOT ${root_literal}"
   echo 'if functions -q fish_add_path'
   echo '  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin'
   echo 'else'
@@ -209,7 +224,13 @@ function print_fish_user_path_setup() {
 }
 
 function print_pwsh_shell_setup() {
-  echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"'
+  local root_literal
+  root_literal="$(pyenv_root_setup_literal)"
+  if [ "${root_literal}" = '$HOME/.pyenv' ]; then
+    echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"'
+  else
+    echo "\$Env:PYENV_ROOT=\"${root_literal}\""
+  fi
   echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {'
   echo '  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }'
   echo 'iex ((pyenv init -) -join "`n")'
