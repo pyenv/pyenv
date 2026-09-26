@@ -8,6 +8,21 @@ _setup() {
   mkdir -p "${PYTHON_BUILD_BUILD_PATH}"
 }
 
+check_script_available() {
+  command -v script >/dev/null || skip "'script' not installed"
+}
+
+run_with_script() {
+  local command
+  # `script' outputs CRLF because ttys do so under the hood
+  # https://unix.stackexchange.com/questions/343324/why-in-the-output-of-script-1-the-newline-is-cr-lf-dos-style
+  case "$(uname -s)" in
+    Linux) printf -v command '%q ' "$@"; script -qec "$command" /dev/stdout | tr -d $'\r' ;;
+    *) script -q /dev/stdout "$@" | tr -d $'\r' ;;
+  esac </dev/null
+  return ${PIPESTATUS[0]}
+}
+
 @test "failed download displays error message" {
   stub curl false
 
@@ -15,6 +30,22 @@ _setup() {
   assert_failure
   assert_output_contains "> http://example.com/packages/package-1.0.0.tar.gz"
   assert_output_contains "error: failed to download package-1.0.0.tar.gz"
+}
+
+@test "interactive download progress is both shown and logged" {
+  check_script_available
+  export TMPDIR="$BATS_TEST_TMPDIR"
+  stub curl "-q -o * -sSLf --no-silent http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${6##*/} \$3"
+
+  run run_with_script python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
+  assert_success
+  unstub curl
+
+  assert_line download-progress
+
+  run cat "$BATS_TEST_TMPDIR"/python-build.*.log
+  assert_success
+  assert_line download-progress
 }
 
 @test "using aria2c if available" {
@@ -31,6 +62,23 @@ Installing package-1.0.0...
 Installed package-1.0.0 to ${BATS_TEST_TMPDIR}/install
 OUT
   unstub aria2c
+}
+
+@test "interactive aria2c progress is updated every second" {
+  check_script_available
+  export TMPDIR="$BATS_TEST_TMPDIR"
+  export PYTHON_BUILD_ARIA2_OPTS=
+  export -n PYTHON_BUILD_HTTP_CLIENT
+  stub aria2c "--allow-overwrite=true --no-conf=true -d * -o * --summary-interval=1 http://example.com/* : echo download-progress >&2; cp $FIXTURE_ROOT/\${8##*/} \$6"
+
+  run run_with_script python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
+  assert_success
+  unstub aria2c
+
+  assert_line download-progress
+  run cat "$BATS_TEST_TMPDIR"/python-build.*.log
+  assert_success
+  assert_line download-progress
 }
 
 @test "fetching from git repository" {

@@ -425,6 +425,18 @@ http_head_aria2c() {
   aria2c --dry-run --no-conf=true ${ARIA2_OPTS} "$1" >&4 2>&1
 }
 
+# Shows interactive output of a program
+# while also logging it.
+# Usage:
+# command <switches forcing interactive output to non-terminal> 2>&1 | interactive_output; rc=${PIPESTATUS[0]}
+interactive_output() {
+  if [ -n "$VERBOSE" ]; then
+    cat >> "$LOG_PATH"
+  else
+    tee -a "$LOG_PATH" >&3
+  fi
+}
+
 http_get_aria2c() {
   # aria2c always treats -o argument as a relative path
   local out dir_out;
@@ -447,7 +459,19 @@ http_get_aria2c() {
     dir_out="$HOME"
   fi
 
-  if aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
+  local cmd
+  cmd=(aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS})
+
+  if [ -t 3 ]; then
+    cmd+=(--summary-interval=1 "$1")
+    "${cmd[@]}" 2>&1 | interactive_output
+    ret=${PIPESTATUS[0]}
+  else
+    cmd+=("$1")
+    "${cmd[@]}" >&4
+    ret=$?
+  fi
+  if [ "$ret" -eq 0 ]; then
     [ -n "$2" ] || cat "${dir_out:-.}/${out}"
   else
     false
@@ -471,7 +495,21 @@ http_get_curl() {
   local curl_is_snap;
   if [[ $(command -v curl) == "/snap/"* ]]; then curl_is_snap=1; fi
   if [[ -n $2 && -n $curl_is_snap ]]; then out="$HOME/$(basename "$2")"; else out="$2"; fi
-  curl -q -o "${out:--}" -sSLf ${CURL_OPTS} "$1" || return $?
+  local curl_progress=
+  if [ -t 3 ]; then
+    curl_progress="--no-silent"
+  fi
+  local cmd
+  cmd=(curl -q -o "${out:--}" -sSLf ${CURL_OPTS} ${curl_progress} "$1")
+  if [ -t 3 ]; then
+    exec 5>&1
+    "${cmd[@]}" 3>&1 1>&5 2>&3 3>&- | interactive_output
+    ret=${PIPESTATUS[0]}
+    exec 5>&-
+    [ "$ret" -eq 0 ] || return "$ret"
+  else
+    "${cmd[@]}" || return $?
+  fi
   if [[ -n $out && -n $curl_is_snap ]]; then mv "$out" "$2"; fi
 }
 
@@ -480,7 +518,21 @@ http_head_wget() {
 }
 
 http_get_wget() {
-  wget -nv ${WGET_OPTS} -O "${2:--}" "$1"
+  local wget_progress="-nv"
+  if [ -t 3 ]; then
+    wget_progress="-nv --show-progress --progress=bar:force:noscroll"
+  fi
+  local cmd
+  cmd=(wget ${WGET_OPTS} ${wget_progress} -O "${2:--}" "$1")
+  if [ -t 3 ]; then
+    exec 5>&1
+    "${cmd[@]}" 3>&1 1>&5 2>&3 3>&- | interactive_output
+    ret=${PIPESTATUS[0]}
+    exec 5>&-
+    return "$ret"
+  else
+    "${cmd[@]}"
+  fi
 }
 
 fetch_tarball() {
@@ -1526,7 +1578,7 @@ use_homebrew() {
   if command -v brew &>/dev/null; then
     local brew_prefix="$(brew --prefix 2>/dev/null || true)"
     # /usr/local/lib:/usr/lib is the default library search path
-    if [[ -n $brew_prefix && ( ( $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ) 
+    if [[ -n $brew_prefix && ( ( $brew_prefix != "/usr" && $brew_prefix != "/usr/local" )
         #when -isysroot is passed to Apple CLang, /usr/(local) are excluded from the default search path
         || ( is_mac && osx_using_default_compiler && $CFLAGS =~ (^|\ )-isysroot\  ) ) ]]; then
       export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${brew_prefix}/include"
@@ -2777,7 +2829,8 @@ else
   BUILD_PATH="$PYTHON_BUILD_BUILD_PATH"
 fi
 
-exec 4<> "$LOG_PATH" # open the log file at fd 4
+# Append mode needed to be able to `tee` to it at the same time
+exec 4>> "$LOG_PATH"
 if [ -n "$VERBOSE" ]; then
   tail -f "$LOG_PATH" &
   TAIL_PID=$!
