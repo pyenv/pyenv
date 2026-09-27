@@ -1,0 +1,12 @@
+VERSION='8.0.0'
+PYVER='3.12'
+
+# https://www.pypy.org/checksums.html
+hash=eb406334e413828901034544d0033d67452c3cf2f11f77fd2daae0cd4fbb0a7b
+
+### end of manual settings - following lines same for every download
+
+ver="pypy${PYVER}-v${VERSION}-src"
+url="https://downloads.python.org/pypy/${ver}.tar.gz"
+
+install_package "${ver}" "${url}#${hash}" 'pypy_builder' "verify_py${PYVER//./}" 'ensurepip'
