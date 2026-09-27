@@ -1,8 +1,9 @@
 VERSION='7.3.8'
 PYVER='3.8'
+MIN_OSX_VERSION='10.14'
 
 # https://www.pypy.org/checksums.html
-aarch64_hash=fe41df391f87239925e573e195e631a9d03d37f471eb1479790ee13ca47a28af
+aarch64_hash=0210536e9f1841ba283c13b04783394050837bb3e6f4091c9f1bd9c7f2b94b55  
 linux32_hash=bea4b275decd492af6462157d293dd6fcf08a949859f8aec0959537b40afd032
 linux64_hash=089f8e3e357d6130815964ddd3507c13bd53e4976ccf0a89b5c36a9a6775a188
 osx64_hash=de1b283ff112d76395c0162a1cf11528e192bdc230ee3f1b237f7694c7518dee
@@ -28,7 +29,7 @@ function pypy_pkg_data {
     case "${pkg}" in
     'linux-aarch64' )
       hash="${aarch64_hash}"
-      url="${baseurl}-aarch64.tar.bz2" # diff url
+      url="${baseurl}-aarch64-portable.tar.bz2" # diff url
       ;;
     'linux' )
       hash="${linux32_hash}"
@@ -39,12 +40,12 @@ function pypy_pkg_data {
       hash="${linux64_hash}"
       ;;
     'osx64' )
-      if require_osx_version "10.13"; then
+      if require_osx_version "${MIN_OSX_VERSION}"; then
         hash="${osx64_hash}"
       else
         { echo
           colorize 1 "ERROR"
-          echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < 10.13."
+          echo ": The binary distribution of PyPy is not available for $(pypy_architecture 2>/dev/null || true), OS X < ${MIN_OSX_VERSION}."
           echo "try '${basesrc}' to build from source."
           echo
         } >&2
