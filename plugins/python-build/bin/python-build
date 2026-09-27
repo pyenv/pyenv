@@ -1146,6 +1146,8 @@ build_package_pypy() {
 }
 
 build_package_pypy_builder() {
+  use_homebrew_openssl || use_macports_openssl || true
+  
   if [ -f "rpython/bin/rpython" ]; then # pypy 2.x
     if [ -z "${PYPY_OPTS}" ]; then
       local PYPY_OPTS="--opt=jit --batch --make-jobs=$(num_cpu_cores)"
