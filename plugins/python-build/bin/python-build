@@ -1175,7 +1175,7 @@ pyston_architecture() {
 # Note: not used by graalpy >= 23.3.0 anymore
 build_package_graalpython() {
     build_package_copy
-    ln -fs "${PREFIX_PATH}/bin/graalpython" "${PREFIX_PATH}/bin/python"
+    make_python_symlinks graalpython
 }
 
 build_package_pypy() {
