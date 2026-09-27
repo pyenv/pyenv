@@ -51,8 +51,7 @@ run_with_script() {
 @test "using aria2c if available" {
   export PYTHON_BUILD_ARIA2_OPTS=
   export -n PYTHON_BUILD_HTTP_CLIENT
-  stub aria2c "--allow-overwrite=true --no-conf=true -d * -o * http://example.com/* : cp $FIXTURE_ROOT/\${7##*/} \$6"
-
+  stub aria2c ': "$FIXTURE_ROOT/fake_downloader" aria2c "$@"'
   install_fixture definitions/without-checksum
   assert_success
   assert_output <<OUT
