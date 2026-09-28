@@ -158,6 +158,22 @@ OUT
   assert_equal "$expected_setup" "$(cat "$HOME/.config/powershell/profile.ps1")"
 }
 
+@test "init honors custom PYENV_ROOT and quotes it according to each shell's rules" {
+  export PYENV_ROOT='/tmp/pyenv$root/"quote"'
+  run pyenv-init bash
+  assert [ "$status" -eq 1 ]
+  assert_line 'export PYENV_ROOT="/tmp/pyenv\$root/\"quote\""'
+
+  run pyenv-init fish
+  assert [ "$status" -eq 1 ]
+  assert_line 'set -Ux PYENV_ROOT "/tmp/pyenv\$root/\"quote\""'
+
+  export PYENV_ROOT="/tmp/pyenv'root"
+  run pyenv-init pwsh
+  assert [ "$status" -eq 1 ]
+  assert_line "\$Env:PYENV_ROOT='/tmp/pyenv''root'"
+}
+
 @test "install refuses to modify files with pyenv-related code" {
   mkdir -p "$HOME"
   echo 'eval "$(pyenv init -)"' > "$HOME/.bashrc"
@@ -384,20 +400,4 @@ echo
   assert_success
   refute_line '  switch "$command"'
   refute_line '  case "$command" in'
-}
-
-@test "init honors custom PYENV_ROOT and quotes it according to each shell's rules" {
-  export PYENV_ROOT='/tmp/pyenv$root/"quote"'
-  run pyenv-init bash
-  assert [ "$status" -eq 1 ]
-  assert_line 'export PYENV_ROOT="/tmp/pyenv\$root/\"quote\""'
-
-  run pyenv-init fish
-  assert [ "$status" -eq 1 ]
-  assert_line 'set -Ux PYENV_ROOT "/tmp/pyenv\$root/\"quote\""'
-
-  export PYENV_ROOT="/tmp/pyenv'root"
-  run pyenv-init pwsh
-  assert [ "$status" -eq 1 ]
-  assert_line "\$Env:PYENV_ROOT='/tmp/pyenv''root'"
 }
