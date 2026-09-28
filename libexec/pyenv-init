@@ -191,7 +191,7 @@ function help_() {
 
 # True when tips/install should keep the portable default root form.
 function pyenv_root_is_default() {
-  [ -z "${PYENV_ROOT}" ] || [ "${PYENV_ROOT}" = "${HOME}/.pyenv" ]
+  [[ ${PYENV_ROOT} == "${HOME}/.pyenv" ]]
 }
 
 # Escape a value for inclusion inside double quotes in a POSIX shell script.
