@@ -93,44 +93,47 @@ OUT
   assert_line "--install"
 }
 
-@test "install setup for detected shell startup files" {
-  mkdir -p "$HOME"
+@test "install setup for detected shell startup files (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
 
   run pyenv-init --install
   assert_success
 
-  # Custom test PYENV_ROOT is emitted as a double-quoted POSIX literal.
-  printf -v expected_setup 'export PYENV_ROOT="%s"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"' "$PYENV_ROOT"
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
   assert_equal "$expected_setup" "$(cat "$HOME/.bashrc")"
   assert_equal "$expected_setup" "$(cat "$HOME/.profile")"
 }
 
-@test "install setup for bash uses existing bash_profile" {
-  mkdir -p "$HOME"
+@test "install setup for bash uses existing bash_profile (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
   touch "$HOME/.bash_profile"
 
   run pyenv-init --install bash
   assert_success
 
-  printf -v expected_setup 'export PYENV_ROOT="%s"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"' "$PYENV_ROOT"
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
   assert_equal "$expected_setup" "$(cat "$HOME/.bashrc")"
   assert_equal "$expected_setup" "$(cat "$HOME/.bash_profile")"
   assert [ ! -e "$HOME/.profile" ]
 }
 
-@test "install setup for zsh startup files" {
-  mkdir -p "$HOME"
+@test "install setup for zsh startup files (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
 
   run pyenv-init --install zsh
   assert_success
 
-  printf -v expected_setup 'export PYENV_ROOT="%s"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - zsh)"' "$PYENV_ROOT"
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - zsh)"'
   assert_equal "$expected_setup" "$(cat "$HOME/.zshrc")"
   assert_equal "$expected_setup" "$(cat "$HOME/.zprofile")"
 }
 
-@test "install setup for fish startup file" {
-  mkdir -p "$HOME"
+@test "install setup for fish startup file (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
   create_stub fish <<OUT
 printf '%s\n' "\$2" > "$PYENV_TEST_DIR/fish-script"
 OUT
@@ -138,20 +141,20 @@ OUT
   run pyenv-init --install fish
   assert_success
 
-  printf -v expected_fish_script 'set -Ux PYENV_ROOT "%s"\nif functions -q fish_add_path\n  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin\nelse\n  test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths\nend' "$PYENV_ROOT"
+  expected_fish_script=$'set -Ux PYENV_ROOT $HOME/.pyenv\nif functions -q fish_add_path\n  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin\nelse\n  test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths\nend'
   expected_setup='pyenv init - fish | source'
   assert_equal "$expected_fish_script" "$(cat "$PYENV_TEST_DIR/fish-script")"
   assert_equal "$expected_setup" "$(cat "$HOME/.config/fish/config.fish")"
 }
 
-@test "install setup for pwsh startup file" {
-  mkdir -p "$HOME"
+@test "install setup for pwsh startup file (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
 
   run pyenv-init --install pwsh
   assert_success
 
-  # Custom roots use a single-quoted PowerShell literal.
-  printf -v expected_setup "\$Env:PYENV_ROOT='%s'\nif (Test-Path -LP \"\$Env:PYENV_ROOT/bin\" -PathType Container) {\n  \$Env:PATH=\"\$Env:PYENV_ROOT/bin:\$Env:PATH\" }\niex ((pyenv init -) -join \"\`n\")" "$PYENV_ROOT"
+  expected_setup=$'$Env:PYENV_ROOT="$Env:HOME/.pyenv"\nif (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {\n  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }\niex ((pyenv init -) -join "`n")'
   assert_equal "$expected_setup" "$(cat "$HOME/.config/powershell/profile.ps1")"
 }
 
@@ -383,21 +386,7 @@ echo
   refute_line '  case "$command" in'
 }
 
-@test "init tips honor custom PYENV_ROOT (#2637)" {
-  run pyenv-init bash
-  assert [ "$status" -eq 1 ]
-  assert_line "export PYENV_ROOT=\"${PYENV_ROOT}\""
-  refute_line 'export PYENV_ROOT="$HOME/.pyenv"'
-}
-
-@test "init tips keep portable default when PYENV_ROOT is \$HOME/.pyenv" {
-  export PYENV_ROOT="$HOME/.pyenv"
-  run pyenv-init bash
-  assert [ "$status" -eq 1 ]
-  assert_line 'export PYENV_ROOT="$HOME/.pyenv"'
-}
-
-@test "init tips shell-quote custom PYENV_ROOT with metacharacters" {
+@test "init honors custom PYENV_ROOT and quotes it according to each shell's rules" {
   export PYENV_ROOT='/tmp/pyenv$root/"quote"'
   run pyenv-init bash
   assert [ "$status" -eq 1 ]
