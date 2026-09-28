@@ -93,8 +93,9 @@ OUT
   assert_line "--install"
 }
 
-@test "install setup for detected shell startup files" {
-  mkdir -p "$HOME"
+@test "install setup for detected shell startup files (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
 
   run pyenv-init --install
   assert_success
@@ -104,8 +105,9 @@ OUT
   assert_equal "$expected_setup" "$(cat "$HOME/.profile")"
 }
 
-@test "install setup for bash uses existing bash_profile" {
-  mkdir -p "$HOME"
+@test "install setup for bash uses existing bash_profile (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
   touch "$HOME/.bash_profile"
 
   run pyenv-init --install bash
@@ -117,8 +119,9 @@ OUT
   assert [ ! -e "$HOME/.profile" ]
 }
 
-@test "install setup for zsh startup files" {
-  mkdir -p "$HOME"
+@test "install setup for zsh startup files (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
 
   run pyenv-init --install zsh
   assert_success
@@ -128,8 +131,9 @@ OUT
   assert_equal "$expected_setup" "$(cat "$HOME/.zprofile")"
 }
 
-@test "install setup for fish startup file" {
-  mkdir -p "$HOME"
+@test "install setup for fish startup file (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
   create_stub fish <<OUT
 printf '%s\n' "\$2" > "$PYENV_TEST_DIR/fish-script"
 OUT
@@ -143,14 +147,31 @@ OUT
   assert_equal "$expected_setup" "$(cat "$HOME/.config/fish/config.fish")"
 }
 
-@test "install setup for pwsh startup file" {
-  mkdir -p "$HOME"
+@test "install setup for pwsh startup file (default PYENV_ROOT)" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT"
 
   run pyenv-init --install pwsh
   assert_success
 
   expected_setup=$'$Env:PYENV_ROOT="$Env:HOME/.pyenv"\nif (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {\n  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }\niex ((pyenv init -) -join "`n")'
   assert_equal "$expected_setup" "$(cat "$HOME/.config/powershell/profile.ps1")"
+}
+
+@test "init honors custom PYENV_ROOT and quotes it according to each shell's rules" {
+  export PYENV_ROOT='/tmp/pyenv$root/"quote"'
+  run pyenv-init bash
+  assert [ "$status" -eq 1 ]
+  assert_line 'export PYENV_ROOT="/tmp/pyenv\$root/\"quote\""'
+
+  run pyenv-init fish
+  assert [ "$status" -eq 1 ]
+  assert_line 'set -Ux PYENV_ROOT "/tmp/pyenv\$root/\"quote\""'
+
+  export PYENV_ROOT="/tmp/pyenv'root"
+  run pyenv-init pwsh
+  assert [ "$status" -eq 1 ]
+  assert_line "\$Env:PYENV_ROOT='/tmp/pyenv''root'"
 }
 
 @test "install refuses to modify files with pyenv-related code" {

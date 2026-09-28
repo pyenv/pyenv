@@ -189,8 +189,76 @@ function help_() {
   } >&2
 }
 
+# True when tips/install should keep the portable default root form.
+function pyenv_root_is_default() {
+  [[ ${PYENV_ROOT} == "${HOME}/.pyenv" ]]
+}
+
+# Escape a value for inclusion inside double quotes in a POSIX shell script.
+function escape_for_double_quoted_posix() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//\$/\\\$}"
+  s="${s//\`/\\\`}"
+  printf '%s' "$s"
+}
+
+# Escape a value for inclusion inside double quotes in a fish script.
+function escape_for_double_quoted_fish() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//\$/\\\$}"
+  printf '%s' "$s"
+}
+
+# Escape a value for inclusion inside single quotes in a PowerShell script.
+function escape_for_single_quoted_pwsh() {
+  local s="$1"
+  # Bash 3.2 (macOS / CI docker): avoid \' in ${//} replacement —
+  # it becomes a literal backslash. Double single-quotes via a var instead.
+  local q="'"
+  s="${s//${q}/${q}${q}}"
+  printf '%s' "$s"
+}
+
+# Emit the PYENV_ROOT assignment line for tips/--install (posix|fish|pwsh).
+# Portable default keeps $HOME / $Env:HOME; custom roots are quoted per target shell.
+function print_pyenv_root_assignment() {
+  case "$1" in
+  posix )
+    if pyenv_root_is_default; then
+      echo 'export PYENV_ROOT="$HOME/.pyenv"'
+    else
+      printf 'export PYENV_ROOT="%s"\n' "$(escape_for_double_quoted_posix "${PYENV_ROOT}")"
+    fi
+    ;;
+  fish )
+    if pyenv_root_is_default; then
+      # Keep master's expandable $HOME form (fish expands unquoted $HOME).
+      echo 'set -Ux PYENV_ROOT $HOME/.pyenv'
+    else
+      printf 'set -Ux PYENV_ROOT "%s"\n' "$(escape_for_double_quoted_fish "${PYENV_ROOT}")"
+    fi
+    ;;
+  pwsh )
+    if pyenv_root_is_default; then
+      echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"'
+    else
+      # Single-quoted PowerShell literal: no $ / backtick expansion.
+      printf "\$Env:PYENV_ROOT='%s'\n" "$(escape_for_single_quoted_pwsh "${PYENV_ROOT}")"
+    fi
+    ;;
+  * )
+    echo "pyenv: internal error: unknown shell family for PYENV_ROOT assignment: $1" >&2
+    return 1
+    ;;
+  esac
+}
+
 function print_posix_shell_setup() {
-  echo 'export PYENV_ROOT="$HOME/.pyenv"'
+  print_pyenv_root_assignment posix
   echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
   echo 'eval "$(pyenv init - '$shell')"'
 }
@@ -200,7 +268,7 @@ function print_fish_shell_setup() {
 }
 
 function print_fish_user_path_setup() {
-  echo 'set -Ux PYENV_ROOT $HOME/.pyenv'
+  print_pyenv_root_assignment fish
   echo 'if functions -q fish_add_path'
   echo '  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin'
   echo 'else'
@@ -209,7 +277,7 @@ function print_fish_user_path_setup() {
 }
 
 function print_pwsh_shell_setup() {
-  echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"'
+  print_pyenv_root_assignment pwsh
   echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) {'
   echo '  $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }'
   echo 'iex ((pyenv init -) -join "`n")'
