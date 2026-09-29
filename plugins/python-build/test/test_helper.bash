@@ -95,14 +95,6 @@ assert_success() {
   fi
 }
 
-assert_failure() {
-  if [ "$status" -eq 0 ]; then
-    flunk "expected failed exit status"
-  elif [ "$#" -gt 0 ]; then
-    assert_output "$1"
-  fi
-}
-
 assert_output_contains() {
   local expected="$1"
   if [ -z "$expected" ]; then

@@ -68,6 +68,7 @@ assert_success() {
   if [ "$status" -ne 0 ]; then
     flunk "command failed with exit status $status" $'\n'\
     "output: $output"
+    return 1
   fi
   _assert_output_if_provided "$@"
 }
@@ -76,6 +77,7 @@ assert_failure() {
   if [ "$status" -eq 0 ]; then
     flunk "expected failed exit status" $'\n'\
     "output: $output"
+    return 1
   fi
   _assert_output_if_provided "$@"
 }
