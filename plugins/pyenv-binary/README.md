@@ -19,6 +19,13 @@ by the `xz` package).
 
 ## Commands
 
+### `pyenv binary find <version>`
+
+Prints the matching source version, package entry and definition checksum,
+separated by tabs. Uses the same platform and version selection as `install`,
+without downloading or installing anything. Exits unsuccessfully if no package
+matches.
+
 ### `pyenv binary install <version>`
 
 Installs a matching published package from pyenv.github.io under `<version>`.

@@ -14,7 +14,7 @@ host_distro() {
 use_manifest() {
   local plugin="${BATS_TEST_TMPDIR}/plugin"
   mkdir -p "$plugin/libexec" "$plugin/share/pyenv-binary/versions"
-  cp "${BATS_TEST_DIRNAME}/../libexec/pyenv-binary-install" "$plugin/libexec/"
+  cp "${BATS_TEST_DIRNAME}/../libexec/pyenv-binary-"{install,find} "$plugin/libexec/"
   PATH="$plugin/libexec:$PATH"
   printf 'source_version\tentry\tos\tarch\tdistro\tsha256\n' > "$plugin/share/pyenv-binary/versions/3.14"
   definition_sha="4c4ed1afbfdaa1e4c3bf7bbb82d730cecb7e384da91eea4f3cc093fd545524d6"
@@ -35,6 +35,28 @@ case "$url" in
 * ) exit 1 ;;
 esac
 STUB
+}
+
+@test "finds a published binary without downloading or installing it" {
+  use_manifest
+  printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
+    "$(host_distro)" "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
+  create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
+  create_stub pyenv-install 'touch "$BATS_TEST_TMPDIR/installed"; exit 1'
+
+  run pyenv-binary-find 3.14
+  assert_success "$(printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\t%s' "$definition_sha")"
+  [ ! -e "$BATS_TEST_TMPDIR/downloaded" ]
+  [ ! -e "$BATS_TEST_TMPDIR/installed" ]
+}
+
+@test "find fails when no published binary matches the host" {
+  use_manifest
+  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
+
+  run pyenv-binary-find 3.14.7
+  assert_failure "pyenv-binary: no binary available for 3.14.7 on Linux/x86_64"
 }
 
 @test "rejects a modified published definition" {
