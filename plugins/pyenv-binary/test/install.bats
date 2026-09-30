@@ -38,6 +38,7 @@ STUB
 }
 
 @test "finds a published binary without downloading or installing it" {
+  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
   use_manifest
   printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
     "$(host_distro)" "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
@@ -53,6 +54,8 @@ STUB
 
 @test "find fails when no published binary matches the host" {
   use_manifest
+  printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
+    "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
 
   run pyenv-binary-find 3.14.7
