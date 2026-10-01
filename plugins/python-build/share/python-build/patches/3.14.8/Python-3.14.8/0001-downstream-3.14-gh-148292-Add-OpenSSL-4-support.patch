@@ -1,7 +1,7 @@
-From f399d160f46b95a89910d3fbd7739095ae51686d Mon Sep 17 00:00:00 2001
-From: Victor Stinner <vstinner@python.org>
-Date: Wed, 25 Mar 2026 09:44:47 +0300
-Subject: [PATCH] [3.14] gh-148292: Add OpenSSL 4 support
+From 46a7dfcb4b2aa7aba7b0a531d62caded93d4e300 Mon Sep 17 00:00:00 2001
+From: Ivan Pozdeev <vano@mail.mipt.ru>
+Date: Thu, 1 Oct 2026 04:41:07 +0300
+Subject: [PATCH] (downstream) [3.14] gh-148292: Add OpenSSL 4 support
 
 ---
  Lib/test/test_poplib.py                       |    4 +-
@@ -40,10 +40,10 @@ index ef2da97f867..1b9ec3393cb 100644
                                    timeout=test_support.LOOPBACK_TIMEOUT)
          resp = self.client.stls(context=ctx)
 diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
-index dd4c657d0cf..0878d738690 100644
+index d1486a46526..fb68e3d7bbf 100644
 --- a/Lib/test/test_ssl.py
 +++ b/Lib/test/test_ssl.py
-@@ -396,7 +396,7 @@ def test_constants(self):
+@@ -424,7 +424,7 @@ def test_constants(self):
          ssl.OP_NO_COMPRESSION
          self.assertEqual(ssl.HAS_SNI, True)
          self.assertEqual(ssl.HAS_ECDH, True)
@@ -52,7 +52,7 @@ index dd4c657d0cf..0878d738690 100644
          self.assertEqual(ssl.HAS_TLSv1_3, True)
          ssl.OP_NO_SSLv2
          ssl.OP_NO_SSLv3
-@@ -587,11 +587,11 @@ def test_openssl_version(self):
+@@ -615,11 +615,11 @@ def test_openssl_version(self):
          # Some sanity checks follow
          # >= 1.1.1
          self.assertGreaterEqual(n, 0x10101000)
@@ -67,7 +67,7 @@ index dd4c657d0cf..0878d738690 100644
          self.assertGreaterEqual(minor, 0)
          self.assertLess(minor, 256)
          self.assertGreaterEqual(fix, 0)
-@@ -657,12 +657,14 @@ def test_openssl111_deprecations(self):
+@@ -685,12 +685,14 @@ def test_openssl111_deprecations(self):
              ssl.OP_NO_TLSv1_2,
              ssl.OP_NO_TLSv1_3
          ]
@@ -88,7 +88,7 @@ index dd4c657d0cf..0878d738690 100644
          versions = [
              ssl.TLSVersion.SSLv3,
              ssl.TLSVersion.TLSv1,
-@@ -1156,6 +1158,7 @@ def test_min_max_version(self):
+@@ -1184,6 +1186,7 @@ def test_min_max_version(self):
                  ssl.TLSVersion.TLSv1,
                  ssl.TLSVersion.TLSv1_1,
                  ssl.TLSVersion.TLSv1_2,
@@ -96,7 +96,7 @@ index dd4c657d0cf..0878d738690 100644
                  ssl.TLSVersion.SSLv3,
              }
          )
-@@ -1169,7 +1172,7 @@ def test_min_max_version(self):
+@@ -1197,7 +1200,7 @@ def test_min_max_version(self):
          with self.assertRaises(ValueError):
              ctx.minimum_version = 42
  
@@ -105,7 +105,7 @@ index dd4c657d0cf..0878d738690 100644
              ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_1)
  
              self.assertIn(
-@@ -1717,23 +1720,24 @@ def test__create_stdlib_context(self):
+@@ -1749,23 +1752,24 @@ def test__create_stdlib_context(self):
          self.assertFalse(ctx.check_hostname)
          self._assert_context_options(ctx)
  
@@ -141,7 +141,7 @@ index dd4c657d0cf..0878d738690 100644
  
          ctx = ssl._create_stdlib_context(purpose=ssl.Purpose.CLIENT_AUTH)
          self.assertEqual(ctx.protocol, ssl.PROTOCOL_TLS_SERVER)
-@@ -2760,6 +2764,36 @@ def close(self):
+@@ -2990,6 +2994,36 @@ def close(self):
      def stop(self):
          self.active = False
  
@@ -178,7 +178,7 @@ index dd4c657d0cf..0878d738690 100644
  class AsyncoreEchoServer(threading.Thread):
  
      # this one's based on asyncore.dispatcher
-@@ -3629,10 +3663,10 @@ def test_protocol_tlsv1_2(self):
+@@ -3863,10 +3897,10 @@ def test_protocol_tlsv1_2(self):
                             client_options=ssl.OP_NO_TLSv1_2)
  
          try_protocol_combo(ssl.PROTOCOL_TLS, ssl.PROTOCOL_TLSv1_2, 'TLSv1.2')
@@ -191,7 +191,7 @@ index dd4c657d0cf..0878d738690 100644
              try_protocol_combo(ssl.PROTOCOL_TLSv1_2, ssl.PROTOCOL_TLSv1_1, False)
              try_protocol_combo(ssl.PROTOCOL_TLSv1_1, ssl.PROTOCOL_TLSv1_2, False)
  
-@@ -4481,7 +4515,9 @@ def cb_raising(ssl_sock, server_name, initial_context):
+@@ -4715,7 +4749,9 @@ def cb_raising(ssl_sock, server_name, initial_context):
                                             sni_name='supermessage')
  
              # Allow for flexible libssl error messages.
@@ -202,7 +202,7 @@ index dd4c657d0cf..0878d738690 100644
              self.assertRegex(cm.exception.reason, regex)
              self.assertEqual(catch.unraisable.exc_type, ZeroDivisionError)
  
-@@ -4794,6 +4830,50 @@ def background(sock):
+@@ -5031,6 +5067,50 @@ def background(sock):
                      if cm.exc_value is not None:
                          raise cm.exc_value
  
@@ -274,7 +274,7 @@ index 00000000000..a7d4c0cc80a
 @@ -0,0 +1 @@
 +Add OpenSSL 4.0.0 support to test configurations.
 diff --git a/Modules/_ssl.c b/Modules/_ssl.c
-index 5258df3958a..2c2edbed882 100644
+index 90bcb6fd5dc..ef726426df9 100644
 --- a/Modules/_ssl.c
 +++ b/Modules/_ssl.c
 @@ -122,8 +122,10 @@ static void _PySSLFixErrno(void) {
@@ -429,7 +429,7 @@ index 5258df3958a..2c2edbed882 100644
      if (!group_right_1) {
          dest = PyBytes_FromStringAndSize(NULL, len);
          if (dest == NULL)
-@@ -6513,9 +6568,15 @@ sslmodule_init_constants(PyObject *m)
+@@ -6529,9 +6584,15 @@ sslmodule_init_constants(PyObject *m)
      ADD_INT_CONST("PROTOCOL_TLS", PY_SSL_VERSION_TLS);
      ADD_INT_CONST("PROTOCOL_TLS_CLIENT", PY_SSL_VERSION_TLS_CLIENT);
      ADD_INT_CONST("PROTOCOL_TLS_SERVER", PY_SSL_VERSION_TLS_SERVER);
@@ -9823,18 +9823,18 @@ index 00000000000..ea615f655bb
 +    {NULL, 0, 0}  /* sentinel */
 +};
 diff --git a/Tools/ssl/multissltests.py b/Tools/ssl/multissltests.py
-index 68bd6e0860d..92c7c4115f5 100755
+index 99e2a3f33c5..427bc4a4d30 100755
 --- a/Tools/ssl/multissltests.py
 +++ b/Tools/ssl/multissltests.py
 @@ -54,6 +54,7 @@
-     "3.4.6",
-     "3.5.7",
-     "3.6.3",
+     "3.4.8",
+     "3.5.9",
+     "3.6.5",
 +    "4.0.0",
      # See make_ssl_data.py for notes on adding a new version.
  ]
  
-@@ -414,9 +415,11 @@ class BuildOpenSSL(AbstractBuilder):
+@@ -422,9 +423,11 @@ class BuildOpenSSL(AbstractBuilder):
      def _post_install(self):
          if self.version.startswith("3."):
              self._post_install_3xx()
@@ -9847,7 +9847,7 @@ index 68bd6e0860d..92c7c4115f5 100755
              config_args += ("enable-fips",)
          super()._build_src(config_args)
  
-@@ -432,6 +435,9 @@ def _post_install_3xx(self):
+@@ -440,6 +443,9 @@ def _post_install_3xx(self):
              lib64 = self.lib_dir + "64"
              os.symlink(lib64, self.lib_dir)
  
@@ -9858,5 +9858,5 @@ index 68bd6e0860d..92c7c4115f5 100755
      def short_version(self):
          """Short version for OpenSSL download URL"""
 -- 
-2.54.0.windows.1
+2.55.0.windows.3
 
