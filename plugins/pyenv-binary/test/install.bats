@@ -52,7 +52,15 @@ STUB
   [ ! -e "$BATS_TEST_TMPDIR/installed" ]
 }
 
-@test "find fails when no published binary matches the host" {
+@test "find fails when no published version matches" {
+  use_manifest
+  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
+
+  run pyenv-binary-find 3.14.7
+  assert_failure "pyenv-binary: no binary available for 3.14.7 on Linux/x86_64"
+}
+
+@test "find rejects a package for another platform" {
   use_manifest
   printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
     "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
