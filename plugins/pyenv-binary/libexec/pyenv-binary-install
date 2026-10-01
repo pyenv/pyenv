@@ -100,7 +100,7 @@ if [ -z "$entry" ]; then
   echo "pyenv-binary: no binary available for $requested on $os/$arch" >&2
   exit 1
 fi
-definitions="$(pyenv-install --list --bare)"
+definitions="$(pyenv-install --list --bare)" || definitions=""
 if printf '%s\n' "$definitions" | grep -qxF -- "$entry"; then
   pyenv-install "$entry:$version"
   exit

@@ -102,13 +102,13 @@ STUB
   [ ! -e "$BATS_TEST_TMPDIR/downloaded" ]
 }
 
-@test "rejects an invalid published checksum without a local definition" {
+@test "rejects an invalid published checksum when definition lookup fails" {
   create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
   use_manifest
   printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\tinvalid\n' \
     "$(host_distro)" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
-  create_stub pyenv-install '[ "$1" = --list ] && exit; exit 1'
+  create_stub pyenv-install 'exit 1'
   create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
 
   run pyenv-binary-install 3.14.7
