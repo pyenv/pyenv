@@ -315,7 +315,7 @@ Lists all Python versions with the given command installed.
 
 ## `pyenv exec`
 
-    Usage: pyenv exec <command> [arg1 arg2...]
+    Usage: pyenv exec [-N|--environment] <command> [arg1 arg2...]
 
 Runs an executable by first preparing PATH so that the selected Python
 version's `bin` directory is at the front.
@@ -326,7 +326,11 @@ For example, if the currently selected Python version is 3.9.7:
     
 is equivalent to:
 
-    PATH="$PYENV_ROOT/versions/3.9.7/bin:$PATH" pip install -r requirements.txt
+    PYENV_VERSION="3.9.7" PATH="$PYENV_ROOT/versions/3.9.7/bin:$PATH" pip install -r requirements.txt
+    
+The --environment option sets PYTHONHOME and LD_LIBRARY_PATH (DYLD_LIBRARY_PATH) in the program's environment.
+This is needed to run programs that embed Python by loading `libpython` without rpath or explicit path.
+This breaks programs that expect to link to a different `libpython` with the same name -- so it's not on by default.
 
 ## `pyenv root`
 

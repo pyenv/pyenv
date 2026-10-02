@@ -150,10 +150,16 @@ echo LD_LIBRARY_PATH="\$LD_LIBRARY_PATH"
 !
   create_path_executable uname "echo Linux"
 
-  run pyenv-exec -N print_env
+  LD_LIBRARY_PATH= run pyenv-exec -N print_env
   assert_output_glob <<!
 PYTHONHOME=*/test
 LD_LIBRARY_PATH=*/test/lib
+!
+
+  LD_LIBRARY_PATH=/foo/bar run pyenv-exec -N print_env
+  assert_output_glob <<!
+PYTHONHOME=*/test
+LD_LIBRARY_PATH=*/test/lib:/foo/bar
 !
 }
 
@@ -171,9 +177,16 @@ echo DYLD_LIBRARY_PATH="\$DYLD_LIBRARY_PATH"
 !
   create_path_executable uname "echo Darwin"
 
-  run pyenv-exec -N print_env
+  DYLD_LIBRARY_PATH= run pyenv-exec -N print_env
   assert_output_glob <<!
 PYTHONHOME=*/test
 DYLD_LIBRARY_PATH=*/test/lib
+!
+
+
+  DYLD_LIBRARY_PATH=/foo/bar run pyenv-exec -N print_env
+  assert_output_glob <<!
+PYTHONHOME=*/test
+DYLD_LIBRARY_PATH=*/test/lib:/foo/bar
 !
 }
