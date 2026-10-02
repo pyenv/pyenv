@@ -10,7 +10,7 @@
 #                   exact library path to libpython.
 #                   WARNING: For the running command and its child processes, this will
 #                   break linkage for programs that expect to be linked to a different
-#                   libpython instnace with the same name!
+#                   libpython instance with the same name!
 #                   WARNING: In macOS, DYLD_LIBRARY_PATH will be unset by the system for
 #                   processes covered by System Integrity Protection.
 #
