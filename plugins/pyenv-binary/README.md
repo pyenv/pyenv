@@ -33,6 +33,11 @@ proceeds.
 pyenv binary install 3.14.7
 ```
 
+A definition with the selected package entry's name in a plugin's
+`share/python-build` directory overrides the published definition. The normal
+Python-Build search order applies, including `PYTHON_BUILD_DEFINITIONS`.
+Local definitions are installed without downloading the stock definition.
+
 ### `pyenv binary package [-v|--verbose] <version>[:<entry>] --archive-base-url <url>`
 
 Installs `<version>` from source under a separate name, packages that install
