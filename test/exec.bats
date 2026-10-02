@@ -141,7 +141,7 @@ _PYENV_SHIM_PATH=
 !
 }
 
-@test "fails on non-Linux system" {
+@test "--environment only works in Linux" {
   # Make sure to use the system version of Python
   mkdir -p "$PYENV_TEST_DIR"
   cd "$PYENV_TEST_DIR"
@@ -150,11 +150,9 @@ _PYENV_SHIM_PATH=
   run uname -s
   if [ "$output" != Linux ]; then
     run pyenv-exec -N env
-    assert_failure
-    assert_output 'Error: the --environment option is supported only on Linux'
+    assert_failure 'Error: the --environment option is supported only on Linux'
   else
     run pyenv-exec -N env
-    echo "$status"
     assert_success
   fi
 }
