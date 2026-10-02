@@ -141,18 +141,39 @@ _PYENV_SHIM_PATH=
 !
 }
 
-@test "--environment only works in Linux" {
-  # Make sure to use the system version of Python
-  mkdir -p "$PYENV_TEST_DIR"
-  cd "$PYENV_TEST_DIR"
-  echo '' > .python-version
+@test "--environment sets envvars in Linux" {
+  export PYENV_VERSION="test"
+  create_alt_executable print_env <<!
+#!$BASH
+echo PYTHONHOME="\$PYTHONHOME"
+echo LD_LIBRARY_PATH="\$LD_LIBRARY_PATH"
+!
+  create_path_executable uname "echo Linux"
 
-  run uname -s
-  if [ "$output" != Linux ]; then
-    run pyenv-exec -N env
-    assert_failure 'Error: the --environment option is supported only on Linux'
-  else
-    run pyenv-exec -N env
-    assert_success
+  run pyenv-exec -N print_env
+  assert_output_glob <<!
+PYTHONHOME=*/test
+LD_LIBRARY_PATH=*/test/lib
+!
+}
+
+@test "--environment sets envvars in macOS" {
+  if [[ $(uname -s) == "Darwin" && $BASH == "/bin/bash" \
+      && $(LC_ALL=C csrutil status) == *"enabled." ]]; then
+    skip "macOS with Bash covered by SIP"
   fi
+  
+  export PYENV_VERSION="test"
+  create_alt_executable print_env <<!
+#!$BASH
+echo PYTHONHOME="\$PYTHONHOME"
+echo DYLD_LIBRARY_PATH="\$DYLD_LIBRARY_PATH"
+!
+  create_path_executable uname "echo Darwin"
+
+  run pyenv-exec -N print_env
+  assert_output_glob <<!
+PYTHONHOME=*/test
+DYLD_LIBRARY_PATH=*/test/lib
+!
 }
