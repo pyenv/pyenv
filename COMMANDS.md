@@ -333,7 +333,7 @@ This is needed to run programs that embed Python by loading `libpython` without 
 This breaks linking for programs that expect to link to a different `libpython` with the same name as one
 in selected Python -- thus it's not done by default.
 
-In macOS, System Environment Protection (SIP) removes `DYLD_LIBRARY_PATH` from a process' environment
+In macOS, System Integrity Protection (SIP) removes `DYLD_LIBRARY_PATH` from a process' environment
 upon `exec` (not `fork`) if the executable being run is protected. The protection covers preinstalled system software
 (including preinstalled shells) and does not cover user-installed apps and 3rd-party software. See
 [About System Integrity Protection on your Mac - Apple Support](https://support.apple.com/en-us/102149)
