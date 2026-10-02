@@ -315,7 +315,7 @@ Lists all Python versions with the given command installed.
 
 ## `pyenv exec`
 
-    Usage: pyenv exec <command> [arg1 arg2...]
+    Usage: pyenv exec [-N|--environment] <command> [arg1 arg2...]
 
 Runs an executable by first preparing PATH so that the selected Python
 version's `bin` directory is at the front.
@@ -326,7 +326,18 @@ For example, if the currently selected Python version is 3.9.7:
     
 is equivalent to:
 
-    PATH="$PYENV_ROOT/versions/3.9.7/bin:$PATH" pip install -r requirements.txt
+    PYENV_VERSION="3.9.7" PATH="$PYENV_ROOT/versions/3.9.7/bin:$PATH" pip install -r requirements.txt
+    
+The `--environment` option sets `PYTHONHOME` and `LD_LIBRARY_PATH` (`DYLD_LIBRARY_PATH` in macOS) in the program's environment.
+This is needed to run programs that embed Python by loading `libpython` without specifying rpath or an explicit path.
+This breaks linking for programs that expect to link to a different `libpython` with the same name as one
+in selected Python -- thus it's not done by default.
+
+In macOS, System Integrity Protection (SIP) removes `DYLD_LIBRARY_PATH` from a process' environment
+upon `exec` (not `fork`) if the executable being run is protected. The protection covers preinstalled system software
+(including preinstalled shells) and does not cover user-installed apps and 3rd-party software. See
+[About System Integrity Protection on your Mac - Apple Support](https://support.apple.com/en-us/102149)
+for details.
 
 ## `pyenv root`
 

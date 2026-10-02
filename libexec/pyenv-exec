@@ -2,7 +2,17 @@
 #
 # Summary: Run an executable with the selected Python version
 #
-# Usage: pyenv exec <command> [arg1 arg2...]
+# Usage: pyenv exec [-N|--environment] <command> [arg1 arg2...]
+#
+#    -N/--environment   Set PYTHONHOME and LD_LIBRARY_PATH (DYLD_LIBRARY_PATH in macOS)
+#                   envvars for the running command.
+#                   This allows to run programs that embed Python without using rpath or
+#                   exact library path to libpython.
+#                   WARNING: For the running command and its child processes, this will
+#                   break linkage for programs that expect to be linked to a different
+#                   libpython instance with the same name!
+#                   WARNING: In macOS, DYLD_LIBRARY_PATH will be unset by the system for
+#                   processes covered by System Integrity Protection.
 #
 # Runs an executable by first preparing PATH so that the selected Python
 # version's `bin' directory is at the front.
@@ -18,7 +28,14 @@ set -e
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
+  echo --environment
   exec pyenv-shims --short
+fi
+
+unset MODIFY_ENV
+if [ "$1" = "-N" ] || [ "$1" = "--environment" ]; then
+  MODIFY_ENV=true
+  shift
 fi
 
 PYENV_VERSION="$(pyenv-version-name -f)"
@@ -53,5 +70,28 @@ shift 1
 if [ "${PYENV_BIN_PATH#${PYENV_ROOT}}" != "${PYENV_BIN_PATH}" ]; then
   # Only add to $PATH for non-system version.
   export PATH="${PYENV_BIN_PATH}:${PATH}"
+fi
+if [ -n "$MODIFY_ENV" ]; then
+
+  # Check if multiple Python versions are selected
+  VERSIONS=$(pyenv-prefix)
+  if [[ "$VERSIONS" == *:* ]]; then
+    VERSION="${VERSIONS%%:*}"
+    echo "pyenv: Warning: multiple Python versions are selected." \
+    "Setting environment variables for the first one, (${VERSION#$PYENV_ROOT})" >&2
+  else
+    VERSION="$VERSIONS"
+  fi
+
+  # Assign the correct version of PYTHONHOME
+  export PYTHONHOME="$VERSION"
+  case "$(uname -s)" in
+    Darwin)
+      export DYLD_LIBRARY_PATH="${PYTHONHOME}/lib${DYLD_LIBRARY_PATH:+:${DYLD_LIBRARY_PATH}}"
+      ;;
+    *)
+      export LD_LIBRARY_PATH="${PYTHONHOME}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+      ;;
+  esac
 fi
 exec "$PYENV_COMMAND_PATH" "$@"
