@@ -1100,6 +1100,8 @@ make -j 2
 make install
 OUT
 
+  rm "$INSTALL_ROOT/build.log"
+
   done
 }
 
