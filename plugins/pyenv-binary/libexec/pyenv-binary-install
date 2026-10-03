@@ -7,8 +7,8 @@
 #   Selects a compatible package from pyenv.github.io and installs it under
 #   <version>. Ordinary `pyenv install' is unchanged.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 if [ "$1" = "--complete" ]; then
   exit
@@ -101,7 +101,7 @@ if [ -z "$entry" ]; then
   exit 1
 fi
 definitions="$(pyenv-install --list --bare)" || definitions=""
-if printf '%s\n' "$definitions" | grep -qxF -- "$entry"; then
+if printf '%s\n' "${definitions:-}" | grep -qxF -- "$entry" || true; then
   pyenv-install "$entry:$version"
   exit
 fi

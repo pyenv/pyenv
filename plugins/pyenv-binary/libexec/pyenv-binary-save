@@ -14,11 +14,11 @@
 #                  <version>-<platform>.
 #   --source-version <version>  Record the version used to build a renamed install.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --name
   echo --source-version
   exec pyenv-versions --bare
