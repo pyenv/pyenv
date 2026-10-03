@@ -14,7 +14,7 @@
 #   -g/--debug       Build a debug version
 #
 
-PYTHON_BUILD_VERSION="2.8.7"
+PYTHON_BUILD_VERSION="2.8.8"
 
 OLDIFS="$IFS"
 
@@ -2006,9 +2006,14 @@ use_homebrew_tcltk() {
   can_use_homebrew || return 1
   local tcltk_formula
   # Since https://github.com/Homebrew/homebrew-core/commit/f10e88617b41555193c22fdcba6109fe82155ee2 (10.11.2024),
-  # tcl-tk is 9.0. It's supported in CPython since 3.14.0a1 (gh-124111) but is not officially supported as of 3.14.0
-  # so we prefer 8
-  for tcltk_formula in ${PYTHON_BUILD_TCLTK_FORMULA:-tcl-tk@8 tcl-tk}; do
+  # tcl-tk is 9.0. It's supported in CPython since 3.14.0a1 (gh-124111) but is not officially supported as of 3.14.0,
+  # as of 3.15.0rc3, there are still test failures.
+  # So we prefer 8.
+  if [[ -n $PYTHON_BUILD_TCLTK_FORMULA ]]; then
+    export PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-$PYTHON_BUILD_TCLTK_FORMULA}"
+    echo "warning: the PYTHON_BUILD_TCLTK_FORMULA envvar has been renamed to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA" >&2
+  fi
+  for tcltk_formula in ${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-tcl-tk@8 tcl-tk}; do
     local tcltk_prefix="$(brew --prefix "${tcltk_formula}" 2>/dev/null || true)"
     if [ -d "$tcltk_prefix" ]; then
       echo "python-build: use ${tcltk_formula} from homebrew"
