@@ -19,11 +19,11 @@
 # environment variable gets unset, restoring the environment to the
 # state before the first `pyenv shell` call.
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --unset
   echo system
   exec pyenv-versions --bare
@@ -32,8 +32,8 @@ fi
 versions=("$@")
 shell="$(basename "${PYENV_SHELL:-$SHELL}")"
 
-if [ -z "$versions" ]; then
-  if [ -z "$PYENV_VERSION" ]; then
+if [ ${#versions[@]} -eq 0 ]; then
+  if [ -z "${PYENV_VERSION:-}" ]; then
     echo "pyenv: no shell-specific version configured" >&2
     exit 1
   else
@@ -42,7 +42,7 @@ if [ -z "$versions" ]; then
   fi
 fi
 
-if [ "$versions" = "--unset" ]; then
+if [ "${versions[0]:-}" = "--unset" ]; then
   case "$shell" in
   fish )
     echo 'set -gu PYENV_VERSION_OLD "$PYENV_VERSION"'
@@ -59,7 +59,7 @@ if [ "$versions" = "--unset" ]; then
   exit
 fi
 
-if [ "$versions" = "-" ]; then
+if [ "${versions[0]:-}" = "-" ]; then
   case "$shell" in
   fish )
     cat <<EOS
@@ -116,7 +116,7 @@ if pyenv-prefix "${versions[@]}" >/dev/null; then
   OLDIFS="$IFS"
   IFS=: version="${versions[*]}"
   IFS="$OLDIFS"
-  if [ "$version" != "$PYENV_VERSION" ]; then
+  if [ "$version" != "${PYENV_VERSION:-}" ]; then
     case "$shell" in
     fish )
       echo 'set -gu PYENV_VERSION_OLD "$PYENV_VERSION"'

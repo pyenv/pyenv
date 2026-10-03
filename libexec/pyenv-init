@@ -4,11 +4,11 @@
 #        pyenv init --install [<shell>]
 #        pyenv init --detect-shell [<shell>]
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo -
   echo --path
   echo --install
@@ -53,7 +53,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 # If shell is not provided, detect it.
-if [ -z "$shell" ]; then
+if [ -z "${shell:-}" ]; then
   if shell=$(tr '\0' ' ' 2>/dev/null </proc/"$PPID"/cmdline);then
   	  :
   else
@@ -412,7 +412,7 @@ function init_dirs() {
 function print_path() {
   # if no_push_path is set, guard the PATH manipulation with a check on whether
   # the shim is already in the PATH.
-  if [ -n "$no_push_path" ]; then
+  if [ -n "${no_push_path:-}" ]; then
     case "$shell" in
       fish )
           echo 'if not contains -- "'"${PYENV_ROOT}/shims"'" $PATH'
@@ -503,7 +503,7 @@ function print_completion() {
 }
 
 function print_rehash() {
-  if [ -z "$no_rehash" ]; then
+  if [ -z "${no_rehash:-}" ]; then
     case "$shell" in
     pwsh )
       echo '& pyenv rehash'
@@ -525,7 +525,7 @@ function print_shell_function() {
   set -e argv[1]
 
   switch "$command"
-  case '"${commands[*]}"'
+  case '"${commands[*]:-}"'
     source (pyenv "sh-$command" $argv|psub)
   case "*"
     command pyenv "$command" $argv

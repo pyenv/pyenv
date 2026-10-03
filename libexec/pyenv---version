@@ -9,8 +9,8 @@
 # where `num_commits` is the number of commits since `version` was
 # tagged.
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 version="2.8.7"
 git_revision=""

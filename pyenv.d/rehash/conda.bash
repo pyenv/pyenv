@@ -8,7 +8,7 @@ conda_exists() {
   shopt -s dotglob nullglob
   local condas=($(echo "${PYENV_ROOT}/versions/"*"/bin/conda" "${PYENV_ROOT}/versions/"*"/envs/"*"/bin/conda"))
   shopt -u dotglob nullglob
-  [ -n "${condas}" ]
+  [ "${#condas[@]}" -gt 0 ]
 }
 
 if conda_exists; then
@@ -17,16 +17,21 @@ if conda_exists; then
   # from `conda.d/default.list` and creates a function
   # `conda_shim` to skip creating shims for those binaries.
   build_conda_exclusion_list() {
-    shims=()
+    local shims=()
+    local shim
     for shim in $(sed 's/#.*$//; /^[[:space:]]*$/d' "${BASH_SOURCE%/*}/conda.d/default.list"); do
       if [ -n "${shim##*/}" ]; then
         shims[${#shims[*]}]="${shim})return 0;;"
       fi
     done
+    if [ ${#shims[@]} -eq 0 ]; then
+      shims=("*__no_match__*")
+    fi
+
     eval \
 "conda_shim() {
   case \"\${1##*/}\" in
-    ${shims[@]}
+    ${shims[0]:-}
     *) return 1;;
   esac
 }"
@@ -52,7 +57,7 @@ if conda_exists; then
     if declare -p registered_shims 2> /dev/null | grep -Eq '^(declare|typeset) -A'; then
       for shim in ${!registered_shims[*]}; do
         if conda_shim "${shim}" 1>&2; then
-          unset registered_shims[${shim}]
+          unset registered_shims[$shim]
         fi
       done
     else
@@ -63,7 +68,7 @@ if conda_exists; then
           shims[${#shims[*]}]="${shim}"
         fi
       done
-      registered_shims=" ${shims[@]} "
+      registered_shims=" ${shims[@]:-} "
     fi
   }
 
