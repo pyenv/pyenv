@@ -151,13 +151,17 @@ if ((${BASH_VERSINFO[0]} > 3)); then
   }
 
   # Install all shims registered via `make_shims` or `register_shim` directly.
+  declare -A registered_shims
+
   install_registered_shims() {
-        local shim file
-        for shim in $registered_shims; do
-          file="${SHIM_PATH}/${shim}"
-          [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
-        done
-      }
+    local shim file
+    if [ "${#registered_shims[@]}" -gt 0 ]; then
+      for shim in "${!registered_shims[@]}"; do
+        file="${SHIM_PATH}/${shim}"
+        [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
+      done
+    fi
+  }
 
   # Once the registered shims have been installed, we make a second pass
   # over the contents of the shims directory. Any file that is present
@@ -185,11 +189,11 @@ else # Same for bash < 4.
 
     install_registered_shims() {
       local shim file
-      for shim in ${!registered_shims[@]+"${!registered_shims[@]}"}; do
+      for shim in $registered_shims; do
         file="${SHIM_PATH}/${shim}"
         [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
-      done
-    }
+        done
+      }
 
     remove_stale_shims() {
       local shim
