@@ -1066,7 +1066,7 @@ make install
 OUT
 }
 
-@test "tcl-tk is linked from Homebrew with PYTHON_BUILD_TCLTK_FORMULA" {
+@test "tcl-tk is linked from Homebrew with PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA" {
   cached_tarball "Python-3.6.2"
   stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
 
@@ -1080,7 +1080,7 @@ OUT
   stub_make_install
 
   run_inline_definition <<DEF
-PYTHON_BUILD_TCLTK_FORMULA=tcl-tk-custom
+PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA=tcl-tk-custom
 install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
 DEF
   assert_success
@@ -1096,6 +1096,24 @@ Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BA
 make -j 2
 make install
 OUT
+}
+
+@test "PYTHON_BUILD_TCLTK_FORMULA produces a deprecation warning" {
+  cached_tarball "Python-3.6.2"
+
+  stub uname '-s : echo Darwin'
+  stub sw_vers '-productVersion : echo 1010'
+
+  stub brew false
+
+  stub_make_install
+
+  run_inline_definition <<DEF
+PYTHON_BUILD_TCLTK_FORMULA=tcl-tk-whatever
+install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.tar.gz"
+DEF
+  assert_success
+  assert_line "warning: the PYTHON_BUILD_TCLTK_FORMULA envvar has been renamed to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA"
 }
 
 @test "tcl-tk is linked from Homebrew via pkg-config and override vars" {
