@@ -151,7 +151,6 @@ if ((${BASH_VERSINFO[0]} > 3)); then
   }
 
   # Install all shims registered via `make_shims` or `register_shim` directly.
-  declare -A registered_shims
 
   install_registered_shims() {
     local shim file

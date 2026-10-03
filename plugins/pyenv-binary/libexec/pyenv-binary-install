@@ -37,7 +37,7 @@ Linux )
   elif type -p lsb_release >/dev/null; then
     distro="$(lsb_release -si) $(lsb_release -sr)"
   fi
-  distro="$(printf '%s' "$distro" | tr '[:upper:]' '[:lower:]')"
+  distro="$(printf '%s' "${distro:-}" | tr '[:upper:]' '[:lower:]')"
   ;;
 Darwin )
   distro="macos $(sw_vers -productVersion)"
