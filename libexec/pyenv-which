@@ -100,6 +100,8 @@ done
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks which`)
 IFS="$OLDIFS"
+nonexistent_versions=()
+
 for script in ${scripts[@]+"${scripts[@]}"}; do
   source "$script"
 done
