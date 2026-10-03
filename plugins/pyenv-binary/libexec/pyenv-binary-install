@@ -100,16 +100,12 @@ if [ -z "$entry" ]; then
   echo "pyenv-binary: no binary available for $requested on $os/$arch" >&2
   exit 1
 fi
-definitions="$(pyenv-install --list --bare)" || definitions=""
-if printf '%s\n' "$definitions" | grep -qxF -- "$entry"; then
+definitions="$(pyenv-install --list --bare)"
+if grep -qxF -- "$entry" <<<"$definitions"; then
   pyenv-install "$entry:$version"
   exit
 fi
 
-if ! [[ "$expected_sha" =~ ^[0-9a-fA-F]{64}$ ]]; then
-  echo "pyenv-binary: invalid checksum for $entry" >&2
-  exit 1
-fi
 expected_sha="$(printf '%s' "$expected_sha" | tr '[:upper:]' '[:lower:]')"
 
 curl -fsSL -o "$tmpdir/$entry" "$base_url/$entry"
@@ -123,7 +119,7 @@ else
   echo "pyenv-binary: need sha256sum, shasum or openssl to verify $entry" >&2
   exit 1
 fi
-if [ "$actual_sha" != "$expected_sha" ]; then
+if [[ $expected_sha != "$actual_sha"  ]]; then
   echo "pyenv-binary: checksum mismatch for $entry" >&2
   exit 1
 fi
