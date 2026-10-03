@@ -24,9 +24,6 @@ if conda_exists; then
         shims[${#shims[*]}]="${shim})return 0;;"
       fi
     done
-    if [ ${#shims[@]} -eq 0 ]; then
-      shims=("*__no_match__*")
-    fi
 
     eval \
     "conda_shim() {

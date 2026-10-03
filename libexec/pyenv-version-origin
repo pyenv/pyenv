@@ -3,7 +3,6 @@
 set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
-PYENV_VERSION_ORIGIN=""
 unset PYENV_VERSION_ORIGIN
 
 set +u

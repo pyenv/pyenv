@@ -71,6 +71,7 @@ set +f
 IFS="$OLDIFS"
 
 declare -a nonexistent_versions
+PYENV_COMMAND_PATH=""
 
 for version in "${versions[@]}" "$system"; do
   if [ "$version" = "system" ]; then

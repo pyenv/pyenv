@@ -52,7 +52,7 @@ realpath() {
 }
 fi
 
-IFS=: hook_paths=(${PYENV_HOOK_PATH:-})
+IFS=: read -r -a hook_paths <<< "${PYENV_HOOK_PATH:-}"
 
 shopt -s nullglob
 for path in "${hook_paths[@]+"${hook_paths[@]}"}"; do

@@ -56,7 +56,7 @@ READLINK="$(type -P readlink || true)"
 fi
 
 if [ -z "${PYENV_ROOT:-}" ]; then
-  PYENV_ROOT="${HOME}/.pyenv"
+  PYENV_ROOT="${HOME:-}/.pyenv"
 else
   PYENV_ROOT="${PYENV_ROOT%/}"
 fi
