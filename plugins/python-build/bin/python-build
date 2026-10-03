@@ -2010,7 +2010,7 @@ use_homebrew_tcltk() {
   # as of 3.15.0rc3, there are still test failures.
   # So we prefer 8.
   if [[ -n $PYTHON_BUILD_TCLTK_FORMULA ]]; then
-    export PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="$PYTHON_BUILD_TCLTK_FORMULA"
+    export PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-$PYTHON_BUILD_TCLTK_FORMULA}"
     echo "warning: the PYTHON_BUILD_TCLTK_FORMULA envvar has been renamed to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA" >&2
   fi
   for tcltk_formula in ${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-tcl-tk@8 tcl-tk}; do
