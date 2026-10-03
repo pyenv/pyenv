@@ -1,5 +1,9 @@
 # Version History
 
+## Release v2.8.8
+* pyenv-binary: allow local definitions to override published packages by @macayu17 in https://github.com/pyenv/pyenv/pull/3577
+* exec: add the `--environment` option for programs that embed `libpython` without a path by @Romwierz in https://github.com/pyenv/pyenv/pull/3537
+* Add CPython 3.15.0rc3 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3578
 
 ## Release v2.8.7
 * Fix rehash repair of individually corrupted shims by @aprylewu in https://github.com/pyenv/pyenv/pull/3540
