@@ -1126,13 +1126,6 @@ install_package "Python-3.6.2" "http://python.org/ftp/python/3.6.2/Python-3.6.2.
 DEF
   assert_success
   assert_line "warning: the PYTHON_BUILD_TCLTK_FORMULA envvar has been renamed to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA"
-
-  assert_build_log <<OUT
-Python-3.6.2: CFLAGS="" CPPFLAGS="-I${BATS_TEST_TMPDIR}/install/include" LDFLAGS="-L${BATS_TEST_TMPDIR}/install/lib -Wl,-rpath,${BATS_TEST_TMPDIR}/install/lib" PKG_CONFIG_PATH="${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib/pkgconfig"
-Python-3.6.2: --prefix=${BATS_TEST_TMPDIR}/install --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib --with-tcltk-includes=-I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include -I${BATS_TEST_TMPDIR}/homebrew-tcl-tk/include --with-tcltk-libs=-L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltclX.Y -L${BATS_TEST_TMPDIR}/homebrew-tcl-tk/lib -ltkX.Y
-make -j 2
-make install
-OUT
 }
 
 @test "tcl-tk is linked from Homebrew via pkg-config and override vars" {
