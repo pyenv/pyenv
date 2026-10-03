@@ -41,7 +41,7 @@ acquire_lock() {
       ret=1
     }
   set +o noclobber
-  [[ -z "${ret}" ]]
+  [[ -z "${ret:-}" ]]
 }
 
 remove_prototype_shim() {
@@ -144,7 +144,7 @@ if ((${BASH_VERSINFO[0]} > 3)); then
 
   # Registers the name of a shim to be generated.
   register_shim() {
-    if [[ ! ${registered_shims["$1"]} ]]; then
+    if [[ ! ${registered_shims["$1"]:-} ]]; then
       install_shims "$1"
       registered_shims["$1"]=1
     fi

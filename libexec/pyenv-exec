@@ -60,12 +60,15 @@ PYENV_BIN_PATH="${PYENV_COMMAND_PATH%/*}"
 export PYENV_VERSION
 
 scripts=()
+
+set +eu
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks exec`)
 IFS="$OLDIFS"
 for script in "${scripts[@]+"${scripts[@]}"}"; do
   source "$script"
 done
+set -eu
 
 shift 1
 if [ "${PYENV_BIN_PATH#${PYENV_ROOT}}" != "${PYENV_BIN_PATH}" ]; then

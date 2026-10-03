@@ -30,9 +30,9 @@ if [ "${1:-}" = "--complete" ]; then
 fi
 
 versions=("$@")
-shell="$(basename "${PYENV_SHELL:-$SHELL}")"
+shell="$(basename "${PYENV_SHELL:-${SHELL:-}}")"
 
-if [ ${#versions[@]} -eq 0 ]; then
+if [ "$#" -eq 0 ]; then
   if [ -z "${PYENV_VERSION:-}" ]; then
     echo "pyenv: no shell-specific version configured" >&2
     exit 1

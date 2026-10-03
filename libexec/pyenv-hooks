@@ -55,7 +55,7 @@ fi
 IFS=: hook_paths=(${PYENV_HOOK_PATH:-})
 
 shopt -s nullglob
-for path in "${hook_paths[@]}"; do
+for path in "${hook_paths[@]+"${hook_paths[@]}"}"; do
   for script in "$path/${PYENV_COMMAND:-}"/*.bash; do
     realpath "$script"
   done

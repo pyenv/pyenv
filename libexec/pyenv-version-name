@@ -29,9 +29,11 @@ fi
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks version-name`)
 IFS="$OLDIFS"
+set +u
 for script in ${scripts[@]+"${scripts[@]}"}; do
   source "$script"
 done
+set -u
 
 if [ -z "${PYENV_VERSION:-}" ] || [ "${PYENV_VERSION:-}" = "system" ]; then
   echo "system"
@@ -82,6 +84,6 @@ OLDIFS="$IFS"
 }
 IFS="$OLDIFS"
 
-if [ "$any_not_installed" = 1 ]; then
+if [ "${any_not_installed:-0}" = 1 ]; then
   exit 1
 fi

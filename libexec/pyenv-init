@@ -61,7 +61,7 @@ if [ -z "${shell:-}" ]; then
   fi
   shell="${shell%% *}"
   shell="${shell##-}"
-  shell="${shell:-$SHELL}"
+  shell="${shell:-${SHELL:-}}"
   shell="${shell##*/}"
   shell="${shell%%-*}"
 fi
@@ -103,7 +103,7 @@ function main() {
 function detect_profile() {
   case "$shell" in
   bash )
-    if [ -e "${HOME}/.bash_profile" ]; then
+    if [ -e "${HOME:-}/.bash_profile" ]; then
       profile='~/.bash_profile'
     else
       profile='~/.profile'
@@ -172,7 +172,7 @@ function help_() {
     * )
       echo '# Load pyenv automatically by appending'
       echo -n "# the following to "
-      if [[ "$profile" == "$rc" && -z $rc_explain ]]; then
+      if [[ "$profile" == "$rc" && -z "${rc_explain:-}" ]]; then
         echo "${profile_explain:-$profile} :"
       else
         echo
@@ -191,7 +191,7 @@ function help_() {
 
 # True when tips/install should keep the portable default root form.
 function pyenv_root_is_default() {
-  [[ ${PYENV_ROOT} == "${HOME}/.pyenv" ]]
+  [[ ${PYENV_ROOT} == "${HOME:-}/.pyenv" ]]
 }
 
 # Escape a value for inclusion inside double quotes in a POSIX shell script.
@@ -289,7 +289,7 @@ function expand_home_path() {
 }
 
 function install_shell_startup_files() {
-  if [[ -z $HOME ]]; then
+  if [[ -z "${HOME:-}" ]]; then
     echo "pyenv: HOME must be set to configure shell startup files" >&2
     return 1
   fi

@@ -6,12 +6,14 @@ set -euo pipefail
 PYENV_VERSION_ORIGIN=""
 unset PYENV_VERSION_ORIGIN
 
+set +u
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks version-origin`)
 IFS="$OLDIFS"
 for script in ${scripts[@]+"${scripts[@]}"}; do
   source "$script"
 done
+set -u
 
 if [ -n "${PYENV_VERSION_ORIGIN:-}" ]; then
   echo "$PYENV_VERSION_ORIGIN"

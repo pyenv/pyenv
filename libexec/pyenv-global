@@ -32,7 +32,7 @@ fi
 versions=("$@")
 PYENV_VERSION_FILE="${PYENV_ROOT}/version"
 
-if [ "${#versions[@]}" -gt 0 ]; then
+if [ "$#" -gt 0 ]; then
   pyenv-version-file-write "$PYENV_VERSION_FILE" "${versions[@]}"
 else
   OLDIFS="$IFS"
