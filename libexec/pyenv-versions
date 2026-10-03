@@ -146,7 +146,7 @@ print_version() {
   else
     version_repr="$version"
   fi
-  if [[ ${BASH_VERSINFO[0]} -ge 4 && ${current_versions["$1"]} ]]; then
+  if [[ ${BASH_VERSINFO[0]} -ge 4 && ${current_versions["$1"]:-} ]]; then
     echo "${hit_prefix}${version_repr} (set by $(pyenv-version-origin))"
   elif (( ${BASH_VERSINFO[0]} <= 3 )) && exists "$1" "${current_versions[@]}"; then
     echo "${hit_prefix}${version_repr} (set by $(pyenv-version-origin))"

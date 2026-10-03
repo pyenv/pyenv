@@ -29,12 +29,12 @@ if conda_exists; then
     fi
 
     eval \
-"conda_shim() {
-  case \"\${1##*/}\" in
-    ${shims[0]:-}
-    *) return 1;;
-  esac
-}"
+    "conda_shim() {
+      case \"\${1##*/}\" in
+        ${shims[@]:-}
+        *) return 1;;
+      esac
+    }"
   }
 
   # override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`

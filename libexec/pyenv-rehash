@@ -13,6 +13,7 @@ mkdir -p "$SHIM_PATH"
 last_acquire_error=""
 tested_for_other_write_errors=""
 
+ret=""
 acquire_lock() {
   local ret
   # An old lock file is presumed stale. We assume no healthy rehash takes this long.
