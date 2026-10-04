@@ -1,6 +1,4 @@
 
----
-
 ## 3️⃣ `CLAUDE.md`
 
 ```markdown
