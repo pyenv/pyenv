@@ -101,9 +101,11 @@ OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks which`)
 IFS="$OLDIFS"
 
+set +u
 for script in ${scripts[@]+"${scripts[@]}"}; do
   source "$script"
 done
+set -u
 
 if [ -x "$PYENV_COMMAND_PATH" ]; then
   echo "$PYENV_COMMAND_PATH"

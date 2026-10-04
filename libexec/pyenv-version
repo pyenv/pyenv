@@ -35,7 +35,7 @@ PYENV_VERSION_NAMES=($version_output)
 IFS="$OLDIFS"
 set +f
 
-if [ "${#PYENV_VERSION_NAMES[@]}" -gt 0 ]; then
+if [ -n "$version_output" ]; then
   for PYENV_VERSION_NAME in "${PYENV_VERSION_NAMES[@]}"; do
     if [ -n "$bare" ]; then
       echo "$PYENV_VERSION_NAME"

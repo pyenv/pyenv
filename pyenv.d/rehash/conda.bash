@@ -8,7 +8,7 @@ conda_exists() {
   shopt -s dotglob nullglob
   local condas=($(echo "${PYENV_ROOT}/versions/"*"/bin/conda" "${PYENV_ROOT}/versions/"*"/envs/"*"/bin/conda"))
   shopt -u dotglob nullglob
-  [ "${#condas[@]}" -gt 0 ]
+  [ -n "${condas[*]:-}" ]
 }
 
 if conda_exists; then
@@ -55,7 +55,7 @@ if conda_exists; then
       if [ "${#registered_shims[@]}" -gt 0 ]; then
         for shim in "${!registered_shims[@]}"; do
           if conda_shim "${shim}" 1>&2; then
-            unset registered_shims[$shim]
+            unset "registered_shims[$shim]"
           fi
         done
       fi
