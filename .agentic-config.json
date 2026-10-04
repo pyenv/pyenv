@@ -17,13 +17,14 @@
     "development": {
       "setup_command": null,
       "test_command": "make test",
-      "build_command": "make",
+      "build_command": "src/configure && make -C src",
       "linting_tools": [],
       "type_checking": false
     },
     "testing": {
       "framework": "bats",
-      "total_tests": 26,
+      "total_test_files": 26,
+      "total_tests": 270,
       "pass_rate": null,
       "run_command": "make test"
     },
@@ -37,7 +38,7 @@
     "workflow": [
       "Fork repository",
       "Create feature branch",
-      "Make changes in libexec/ or plugins/",
+      "Make changes in libexec/, plugins/, or src/",
       "Run `make test`",
       "Submit PR with clear description"
     ],

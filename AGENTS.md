@@ -19,37 +19,50 @@ Clone the repository:
 ```bash
 git clone https://github.com/pyenv/pyenv.git
 cd pyenv
+```
 No additional installation needed; run directly or add `./bin` to your PATH.
-Running Tests
+
+## Running Tests
+```
 make test                 # Run all Bats tests
 make test-<test-name>    # Run specific test
+```
 The test suite uses [Bats](https://github.com/bats-core/bats-core) (Bash Automated Testing System).
-Code Style
+
+## Building the C Extension
+```
+src/configure && make -C src
+```
+
+## Code Style
 - Shell scripts: Follow POSIX shell conventions where possible, with bash-specific features where needed
 - Naming: Use snake_case for variables and functions
 - Comments: Document non-obvious logic; avoid stating the obvious
 - C code (in `src/`): Keep minimal; use for performance-critical detection logic only
-Contribution Workflow
+## Contribution Workflow
 Fork and create a feature branch
-Make changes to shell scripts in `libexec/` or plugins
+Make changes to shell scripts in `libexec/`, plugins, or `src/`
 Run `make test` to validate
 Submit a pull request with a clear description
-Key Commands
-- `make` - Build C extension
+
+## Key Commands
+- `src/configure && make -C src` - Build C extension
 - `make test` - Run full Bats test suite
-- `make install` - Install to prefix
+- `make test-<test-name>` - Run specific test
 - `./bin/pyenv versions` - List installed Python versions
-Testing Guidelines
+## Testing Guidelines
 - Write Bats tests for new features in `test/`
 - Each test file focuses on a specific subsystem
 - Use `bats-core` assertions and helpers
 - Ensure all tests pass before submitting PRs
-Plugin Development
+- See `test/README.md` for test documentation
+
+## Plugin Development
 pyenv's plugin system allows extending functionality:
 - Place plugins in `plugins/<plugin-name>/`
 - Document expected hooks and environment variables
 - Follow shell script conventions from the main codebase
-Conventions
+## Conventions
 - Branches: Use `feature/` prefix for new features, `fix/` for fixes
 - Commits: Write clear, descriptive messages
 - PRs: Reference related issues; include testing notes

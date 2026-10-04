@@ -5,7 +5,7 @@ pyenv is a Bash (shell) project with a small C companion in `src/`. It enables u
 
 Key Development Commands
 - `make test` - Run Bats test suite
-- `make` - Build C extension
+- `src/configure && make -C src` - Build C extension
 - `./bin/pyenv` - Test the implementation locally
 
 Code Style Rules
@@ -24,6 +24,7 @@ C Code (in `src/`):
   - Keep minimal; use only for performance-critical paths
   - Follow existing style in the codebase
   - Ensure builds on supported platforms
+  - Build with: `src/configure && make -C src`
 
 File Organization:
   - `libexec/` - Core shell implementation
@@ -39,7 +40,9 @@ Before submitting a PR:
 - Changes are focused; no unrelated refactoring
 
 Important Notes
-- pyenv is shell-based; changes go in `libexec/` or plugins
+- pyenv is shell-based; changes go in `libexec/`, `plugins/`, or `src/`
 - The test framework is Bats, not pytest
 - No Python linting (ruff, mypy) is used
-- Documentation updates go in README.md
+- C extension builds with `src/configure && make -C src`
+- Do NOT run bare `make` (it runs Docker tests)
+- Documentation: project info in `README.md`, plugins in `plugins/*/README.md`, tests in `test/README.md`

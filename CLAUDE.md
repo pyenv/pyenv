@@ -16,12 +16,13 @@ This project uses AGENTS.md as the standard agent context. Claude Code loads it 
 ```bash
 make test              # Run all tests
 make test-<name>       # Run specific test suite
-make                   # Build C extension
+src/configure && make -C src  # Build C extension
 ```
 
 See AGENTS.md for full documentation.
 
 ## Commit Attribution
 
-All commits must include authorship:
-Co-Authored-By: Your Name <your.email@example.com>
+All commits must include a `Co-Authored-By` trailer with a real, verified
+contributor name and email. Do not use placeholder values such as
+`Your Name <your.email@example.com>`.
