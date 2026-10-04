@@ -58,3 +58,109 @@ This section provides architectural context and agent-understanding for the code
 
 
 ### Project Structure
+pyenv/
+├── Makefile
+├── src/ # Source code
+├── tests/ # Test suite (66 files)
+└── README.md # Project documentation
+
+### Architecture Overview
+#### Key Components
+- **Main Entry:** Standard layout
+- **Test Suite:** 66 test files
+- **Build Configuration:** Makefile
+#### Design Principles
+1. **Modularity** - Code organized by functionality with clear separation of concerns
+2. **Testability** - Comprehensive test coverage across critical paths
+3. **Clarity** - Explicit naming and structure for AI agent understanding
+4. **Consistency** - Uniform patterns and conventions throughout codebase
+5. **Maintainability** - Well-documented code with clear intent
+### Directory Map
+| Directory | Purpose |
+|-----------|----------|
+| `src/` | Source code |
+| `test/` | Test suite |
+### Development Workflow
+#### Initial Setup
+```bash
+git clone https://github.com/jaykrishna316/pyenv
+cd pyenv
+# Add ./bin to your PATH
+export PATH="$PWD/bin:$PATH"
+Development Commands
+Running Tests:
+
+make test                 # Run all Bats tests
+BATS_FILE_FILTER=test-<name>.bats make test  # Run specific test
+Code Quality
+shellcheck ./**/*.sh      # Lint shell scripts
+chmod +x ./bin/*         # Ensure scripts executable
+Code Style & Conventions
+Naming: Use Shell conventions (snake_case for functions, PascalCase for classes)
+Type Hints: Yes (strongly encouraged)
+Error Handling: Yes - handle errors at boundaries; let exceptions propagate when another layer owns recovery
+Logging: Yes
+Testing: Yes - write tests alongside code changes
+Testing Strategy
+Framework: Bats
+Test Files: 66 found
+
+Before committing:
+
+Run the full Bats test suite: make test
+Lint all shell scripts: shellcheck ./**/*.sh
+Verify scripts are executable: ls -la ./bin/
+Test locally to confirm behavior
+Writing Documentation
+When updating docs:
+
+Always include explanatory text before code snippets
+Describe why and what before showing how
+Keep sections focused on a single concept
+Use clear, concrete examples
+Contributing Guidelines
+This project has a detailed contribution guide at CONTRIBUTING.md.
+
+Key Requirements:
+
+Performance Work: Requires benchmarks and performance metrics in PR description
+Before submitting:
+
+Read CONTRIBUTING.md in full
+Check recent merged PRs for patterns
+Follow the specific requirements above
+Common Patterns
+When contributing to this project:
+
+Read existing code in the area you're modifying
+Follow the established patterns and style
+Write tests for new functionality
+Use clear, descriptive variable and function names
+Add docstrings for public APIs
+Update tests when changing behavior
+What We Value
+✅ Well-tested code with clear intent
+✅ Consistent code style and naming conventions
+✅ Code that is easy for AI agents to understand
+✅ Clear, descriptive commit messages
+✅ Modular, reusable components
+✅ Comprehensive documentation
+
+What We Avoid
+❌ Large functions doing multiple things
+❌ Commented-out dead code
+❌ Inconsistent naming or patterns
+❌ Unclear error messages
+❌ Unexplained magic numbers or strings
+❌ Skipped tests or test TODOs
+
+
+Before making changes:
+
+Read relevant source files to understand the existing code
+Look at existing tests for similar functionality
+Follow the patterns you see in the codebase
+Write tests for your changes
+Run make test to verify nothing breaks
+Run linter: shellcheck ./**/*.sh
+Ensure scripts are executable: chmod +x ./bin/*
