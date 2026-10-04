@@ -1,0 +1,45 @@
+pyenv Cursor Rules
+
+What This Project Does
+pyenv is a Bash (shell) project with a small C companion in `src/`. It enables users to manage multiple Python versions and switch between them seamlessly.
+
+Key Development Commands
+- `make test` - Run Bats test suite
+- `make` - Build C extension
+- `./bin/pyenv` - Test the implementation locally
+
+Code Style Rules
+Shell Scripts:
+  - Use POSIX-compatible shell where possible
+  - Prefer `sh` over bash-specific features unless necessary
+  - Use snake_case for function and variable names
+  - Comment only non-obvious logic
+
+Testing:
+  - Write tests in Bats format (see `test/` directory)
+  - Run `make test` before submitting PRs
+  - Each feature should have corresponding test coverage
+
+C Code (in `src/`):
+  - Keep minimal; use only for performance-critical paths
+  - Follow existing style in the codebase
+  - Ensure builds on supported platforms
+
+File Organization:
+  - `libexec/` - Core shell implementation
+  - `plugins/` - Plugin system
+  - `test/` - Bats test suite
+  - `src/` - C code
+
+Pre-commit Checks
+Before submitting a PR:
+- Run `make test` - all tests pass
+- Code follows shell scripting conventions
+- Comments are minimal and explain 'why', not 'what'
+- Changes are focused; no unrelated refactoring
+
+Important Notes
+- pyenv is shell-based; changes go in `libexec/` or plugins
+- The test framework is Bats, not pytest
+- No Python linting (ruff, mypy) is used
+- Documentation updates go in README.md

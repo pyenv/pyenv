@@ -1,0 +1,47 @@
+{
+  "project_metadata": {
+    "name": "pyenv",
+    "description": "Simple Python version management",
+    "github_url": "https://github.com/pyenv/pyenv",
+    "primary_language": "shell",
+    "languages": ["shell", "c"],
+    "project_type": "version-manager"
+  },
+  "ai_readiness": {
+    "documentation": {
+      "agents_md": true,
+      "claude_md": true,
+      "readme_quality": "good",
+      "code_comments": "minimal"
+    },
+    "development": {
+      "setup_command": null,
+      "test_command": "make test",
+      "build_command": "make",
+      "linting_tools": [],
+      "type_checking": false
+    },
+    "testing": {
+      "framework": "bats",
+      "total_tests": 26,
+      "pass_rate": null,
+      "run_command": "make test"
+    },
+    "code_style": {
+      "linter": "none",
+      "formatter": "none",
+      "naming_convention": "snake_case"
+    }
+  },
+  "contribution": {
+    "workflow": [
+      "Fork repository",
+      "Create feature branch",
+      "Make changes in libexec/ or plugins/",
+      "Run `make test`",
+      "Submit PR with clear description"
+    ],
+    "testing_required": true,
+    "code_review": "peer-reviewed"
+  }
+}
