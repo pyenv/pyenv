@@ -1,9 +1,9 @@
 
+---
+
 ## 3️⃣ `CLAUDE.md`
 
 ```markdown
-# CLAUDE.md
-
 @AGENTS.md
 
 This project uses AGENTS.md as the standard agent context. Claude Code loads it automatically via the @AGENTS.md import above.
