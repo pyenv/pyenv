@@ -20,7 +20,7 @@ abort() {
   exit 1
 }
 
-if enable -f "${BASH_SOURCE%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
+if [ "${PYENV_NATIVE_EXT:-}" != "0" ] && enable -f "${BASH_SOURCE%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev/null; then
   abs_dirname() {
     local path
     path="$(realpath "$1")"
@@ -56,7 +56,10 @@ READLINK="$(type -P readlink || true)"
 fi
 
 if [ -z "${PYENV_ROOT:-}" ]; then
-  PYENV_ROOT="${HOME:-}/.pyenv"
+  if [ -z "${HOME:-}" ]; then
+    abort "\$HOME not set"
+  fi
+  PYENV_ROOT="${HOME}/.pyenv"
 else
   PYENV_ROOT="${PYENV_ROOT%/}"
 fi
@@ -66,7 +69,7 @@ if [ -z "${PYENV_DIR:-}" ]; then
   PYENV_DIR="$PWD"
 fi
 
-if [ ! -d "${PYENV_DIR:-}" ] || [ ! -e "${PYENV_DIR:-}" ]; then
+if [ ! -d "$PYENV_DIR" ] || [ ! -e "$PYENV_DIR" ]; then
   abort "cannot change working directory to \`$PYENV_DIR'"
 fi
 

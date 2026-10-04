@@ -12,6 +12,9 @@ if [[ ${1:-} = "--complete" ]]; then
   exit
 fi
 
+sh=""
+nosh=""
+
 if [[ ${1:-} = "--sh" ]]; then
   sh=1
   shift
@@ -25,7 +28,7 @@ IFS=: paths=($PATH)
 shopt -s nullglob
 
 { 
-  if [[ -n "${sh:-}" ]]; then
+  if [[ -n "$sh" ]]; then
     for path in "${paths[@]}"; do
       for command in "${path}"/pyenv-sh-*; do
         echo "${command##*/pyenv-sh-}"
@@ -35,7 +38,7 @@ shopt -s nullglob
     for path in "${paths[@]}"; do
       for command in "${path}"/pyenv-*; do
         command="${command##*/pyenv-}"
-        if [[ -n "${nosh:-}" ]]; then
+        if [[ -n "$nosh" ]]; then
           if [[ ${command:0:3} != "sh-" ]]; then
             echo "$command"
           fi

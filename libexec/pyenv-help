@@ -99,7 +99,7 @@ documentation_for() {
 
 print_summary() {
   local command="$1"
-    local summary="" usage="" help=""
+  local summary usage help
   eval "$(documentation_for "$command")"
 
   if [ -n "$summary" ]; then
@@ -115,7 +115,7 @@ print_summaries() {
 
 print_help() {
   local command="$1"
-    local summary="" usage="" help=""
+  local summary usage help
   eval "$(documentation_for "$command")"
   [ -n "$help" ] || help="$summary"
 
@@ -138,7 +138,7 @@ print_help() {
 
 print_usage() {
   local command="$1"
-    local summary="" usage="" help=""
+  local summary usage help
   eval "$(documentation_for "$command")"
   [ -z "$usage" ] || echo "$usage"
 }
