@@ -101,7 +101,7 @@ if [ -z "$entry" ]; then
   exit 1
 fi
 definitions="$(pyenv-install --list --bare)" || definitions=""
-if printf '%s\n' "${definitions:-}" | grep -qxF -- "$entry" >/dev/null; then
+if grep -qxF -- "$entry" <<< "${definitions:-}"; then
   pyenv-install "$entry:$version"
   exit
 fi
