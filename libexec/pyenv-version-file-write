@@ -27,7 +27,7 @@ shift || true
 versions=("$@")
 
 if [ ${#versions[@]} -eq 0 ] || [ -z "${PYENV_VERSION_FILE:-}" ] || [ -z "${versions[0]:-}" ]; then
-  echo "Usage: pyenv version-file-write [-f|--force] <file> <version> [...]" >&2
+  pyenv-help --usage version-file-write >&2
   exit 1
 fi
 

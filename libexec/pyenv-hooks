@@ -26,33 +26,33 @@ if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; th
     echo "pyenv: failed to load \`realpath' builtin" >&2
     exit 1
   fi
-fi
 
-READLINK="$(type -P readlink || true)"
 
-if [ -z "$READLINK" ]; then
-  echo "pyenv: cannot find readlink - are you missing GNU coreutils?" >&2
-  exit 1
-fi
+  READLINK="$(type -P readlink || true)"
 
-resolve_link() {
-  "$READLINK" "$1"
-}
+  if [ -z "$READLINK" ]; then
+    echo "pyenv: cannot find readlink - are you missing GNU coreutils?" >&2
+    exit 1
+  fi
 
-realpath() {
-  local path="$1"
-  local name
-  # Use a subshell to avoid changing the current path
-  (
-  while [ -n "$path" ]; do
-    name="${path##*/}"
-    [ "$name" = "$path" ] || cd "${path%/*}"
-    path="$(resolve_link "$name" || true)"
-  done
+  resolve_link() {
+    "$READLINK" "$1"
+  }
 
-  echo "${PWD}/$name"
-  )
-}
+  realpath() {
+    local path="$1"
+    local name
+    # Use a subshell to avoid changing the current path
+    (
+    while [ -n "$path" ]; do
+      name="${path##*/}"
+      [ "$name" = "$path" ] || cd "${path%/*}"
+      path="$(resolve_link "$name" || true)"
+    done
+
+    echo "${PWD}/$name"
+    )
+  }
 fi
 
 IFS=: read -r -a hook_paths <<< "${PYENV_HOOK_PATH:-}"

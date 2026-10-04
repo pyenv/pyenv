@@ -60,14 +60,14 @@ if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; th
     exit 1
   fi
 
-  READLINK=$(type -P readlink)
-  if [ -z "${READLINK:-}" ]; then
+  READLINK="$(type -P readlink || true)"
+  if [ -z "${READLINK}" ]; then
     echo "pyenv: cannot find readlink - are you missing GNU coreutils?" >&2
     exit 1
   fi
 
   resolve_link() {
-    $READLINK "$1"
+    "$READLINK" "$1"
   }
 
   realpath() {
@@ -92,7 +92,7 @@ if [ -d "${versions_dir:-}" ]; then
 fi
 
 if ((${BASH_VERSINFO[0]} > 3)); then
-  declare -A current_versions
+  declare -A current_versions=()
 else
   current_versions=()
 fi
@@ -181,8 +181,8 @@ if sort --version-sort </dev/null >/dev/null 2>&1; then
     IFS="$OLDIFS"
 fi
 
-for path in "${versions_dir_entries[@]:-}"; do
-  if [ -d "${path:-}" ]; then
+for path in ${versions_dir_entries[@]+"${versions_dir_entries[@]}"}; do
+  if [ -d "$path" ]; then
     if [ -n "${skip_aliases:-}" ] && [ -L "$path" ]; then
       target="$(realpath "$path")"
       [ "${target%/*}" == "$versions_dir" ] && continue

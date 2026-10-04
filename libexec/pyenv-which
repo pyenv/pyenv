@@ -43,9 +43,9 @@ done
 
 remove_from_path() {
   local -a paths_to_remove
-  IFS=: paths_to_remove=($1)
+  IFS=: read -r -a paths_to_remove <<< "$1"
   local path_to_remove path_before
-  local result=":${PATH//\~/$HOME}:"
+  local result=":${PATH//\~/${HOME:-}}:"
   for path_to_remove in "${paths_to_remove[@]}"; do
     while true; do
       path_before="$result"

@@ -22,11 +22,12 @@ for arg; do
 done
 
 exitcode=0
-# VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
-# which is undesired
 
 version_output="$(pyenv-version-name)" || exitcode=$?
 OLDIFS="$IFS"
+
+# VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
+# which is undesired
 set -f
 IFS=:
 PYENV_VERSION_NAMES=($version_output)

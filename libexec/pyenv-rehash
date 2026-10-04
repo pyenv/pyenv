@@ -29,7 +29,7 @@ acquire_lock() {
       # Bash doesn't provide access to errno to check for non-EEXIST error code in `echo >'.
       # So check for writablity by trying to write to a different file,
       # in a way that taxes the usual use case as little as possible.
-      if [[ -z "${tested_for_other_write_errors:-}" ]]; then
+      if [[ -z "${tested_for_other_write_errors}" ]]; then
         # if lots of (50+) rehashes run concurrently, another concurrent rehash
         # may delete the temporary file in remove_*_shims() before we do so
         ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm -f "$t" ) \
@@ -194,8 +194,8 @@ else # Same for bash < 4.
       for shim in $registered_shims; do
         file="${SHIM_PATH}/${shim}"
         [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
-        done
-      }
+      done
+    }
 
     remove_stale_shims() {
       local shim
@@ -212,9 +212,10 @@ shopt -s nullglob
 # Create the prototype shim, then register shims for all known
 # executables.
 create_prototype_shim
+set -f
 # shellcheck disable=SC2046
 make_shims $(pyenv-versions --executables)
-
+set +f
 
 # Allow plugins to register shims.
 OLDIFS="$IFS"
