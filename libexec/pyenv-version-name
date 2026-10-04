@@ -3,12 +3,13 @@
 #
 #   -f/--force    (Internal) If a version doesn't exist, print it as is rather than produce an error
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
+FORCE=""
 while [[ $# -gt 0 ]]
 do
-    case "$1" in
+    case "${1:-}" in
         -f|--force)
             FORCE=1
             shift
@@ -20,7 +21,7 @@ do
 done
 
 
-if [ -z "$PYENV_VERSION" ]; then
+if [ -z "${PYENV_VERSION:-}" ]; then
   PYENV_VERSION_FILE="$(pyenv-version-file)"
   PYENV_VERSION="$(pyenv-version-file-read "$PYENV_VERSION_FILE" || true)"
 fi
@@ -28,11 +29,13 @@ fi
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks version-name`)
 IFS="$OLDIFS"
-for script in "${scripts[@]}"; do
+set +u
+for script in ${scripts[@]+"${scripts[@]}"}; do
   source "$script"
 done
+set -u
 
-if [ -z "$PYENV_VERSION" ] || [ "$PYENV_VERSION" = "system" ]; then
+if [ -z "${PYENV_VERSION:-}" ] || [ "${PYENV_VERSION:-}" = "system" ]; then
   echo "system"
   exit
 fi
@@ -56,14 +59,14 @@ OLDIFS="$IFS"
     [[ $version != "${normalised_version}" ]] && normalization_done=1
     if [[ $version == "system" ]] || version_exists "${normalised_version}" ; then
       versions+=("${normalised_version}")
-    elif [[ -n $normalization_done ]] && version_exists "${version}"; then
+    elif [[ -n ${normalization_done:-} ]] && version_exists "${version}"; then
       versions+=("${version}")
     elif resolved_version="$(pyenv-latest -b "${normalised_version}")"; then
       versions+=("${resolved_version}")
-    elif [[ -n $normalization_done ]] && resolved_version="$(pyenv-latest -b "${version}")"; then
+    elif [[ -n ${normalization_done:-} ]] && resolved_version="$(pyenv-latest -b "${version}")"; then
       versions+=("${resolved_version}")
     else
-      if [[ -n $FORCE ]]; then
+      if [[ -n ${FORCE:-} ]]; then
         versions+=("${normalised_version}")
       else
         echo "pyenv: version \`$version' is not installed (set by $(pyenv-version-origin))" >&2
@@ -77,10 +80,10 @@ IFS="$OLDIFS"
 
 OLDIFS="$IFS"
 { IFS=:
-  echo "${versions[*]}"
+  echo "${versions[*]:-}"
 }
 IFS="$OLDIFS"
 
-if [ "$any_not_installed" = 1 ]; then
+if [ "${any_not_installed:-0}" = 1 ]; then
   exit 1
 fi

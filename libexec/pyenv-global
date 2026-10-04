@@ -20,11 +20,11 @@
 #
 
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo system
   exec pyenv-versions --bare
 fi
@@ -32,7 +32,7 @@ fi
 versions=("$@")
 PYENV_VERSION_FILE="${PYENV_ROOT}/version"
 
-if [ -n "$versions" ]; then
+if [ "$#" -gt 0 ]; then
   pyenv-version-file-write "$PYENV_VERSION_FILE" "${versions[@]}"
 else
   OLDIFS="$IFS"
@@ -47,7 +47,7 @@ else
   ))
   set +f
   IFS="$OLDIFS"
-  for version in "${versions[@]}"; do
-    echo "$version"
+  for version in "${versions[@]:-}"; do
+    [ -n "$version" ] && echo "$version"
   done
 fi

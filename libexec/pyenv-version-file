@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Usage: pyenv version-file [<dir>]
 # Summary: Detect the file that sets the current pyenv version
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
-target_dir="$1"
+target_dir="${1:-}"
 
 find_local_version_file() {
-  local root="$1"
+  local root="${1:-}"
   # Nonexistent paths are UB as of this writing.
   # Relative ones cause a failure but absolute ones don't
   [[ $root != /* ]] && root=$(CDPATH= cd -- "$root" && pwd)
@@ -23,7 +23,7 @@ find_local_version_file() {
     # don't test //.python-version if // is special
     # as it's pointless and possibly very slow
     # if it e.g. leads to a network search
-    [[ $unc && $root == / ]] && break
+    [[ "${unc:-}" && $root == / ]] && break
     
     if [[ -f $root/.python-version ]]; then
       echo "$root/.python-version"
@@ -42,5 +42,5 @@ else
   # While most `cd` implementations treat an empty argument the same as missing, that's still wrong
   find_local_version_file "${PYENV_DIR:=$PWD}" || {
     [ "$PYENV_DIR" != "$PWD" ] && find_local_version_file "$PWD"
-  } || echo "${PYENV_ROOT}/version"
+  } || echo "${PYENV_ROOT:-}/version"
 fi

@@ -28,11 +28,13 @@
 # 'pyenv local 3.7.0 2.7.15'
 
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
+
+FORCE=""
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --unset
   echo system
   exec pyenv-versions --bare
@@ -40,7 +42,7 @@ fi
 
 while [[ $# -gt 0 ]]
 do
-    case "$1" in
+    case "${1:-}" in
         -f|--force)
             FORCE=1
             shift
@@ -53,9 +55,9 @@ done
 
 versions=("$@")
 
-if [ "$versions" = "--unset" ]; then
+if [ "${versions:-}" = "--unset" ]; then
   rm -f .python-version
-elif [ -n "$versions" ]; then
+elif [ -n "${versions:-}" ]; then
   pyenv-version-file-write ${FORCE:+-f }.python-version "${versions[@]}"
 else
   if version_file="$(pyenv-version-file "$PWD")"; then

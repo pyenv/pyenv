@@ -7,8 +7,8 @@
 #   Selects a compatible package from pyenv.github.io and installs it under
 #   <version>. Ordinary `pyenv install' is unchanged.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 if [ "$1" = "--complete" ]; then
   exit
@@ -37,7 +37,7 @@ Linux )
   elif type -p lsb_release >/dev/null; then
     distro="$(lsb_release -si) $(lsb_release -sr)"
   fi
-  distro="$(printf '%s' "$distro" | tr '[:upper:]' '[:lower:]')"
+  distro="$(printf '%s' "${distro:-}" | tr '[:upper:]' '[:lower:]')"
   ;;
 Darwin )
   distro="macos $(sw_vers -productVersion)"
@@ -100,8 +100,8 @@ if [ -z "$entry" ]; then
   echo "pyenv-binary: no binary available for $requested on $os/$arch" >&2
   exit 1
 fi
-definitions="$(pyenv-install --list --bare)"
-if grep -qxF -- "$entry" <<<"$definitions"; then
+definitions="$(pyenv-install --list --bare)" || definitions=""
+if printf '%s\n' "${definitions:-}" | grep -qxF -- "$entry" >/dev/null; then
   pyenv-install "$entry:$version"
   exit
 fi

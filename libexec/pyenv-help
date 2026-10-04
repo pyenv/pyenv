@@ -12,11 +12,11 @@
 # The remainder of the comment block is displayed as extended
 # documentation.
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --usage
   exec pyenv-commands
 fi
@@ -99,7 +99,7 @@ documentation_for() {
 
 print_summary() {
   local command="$1"
-  local summary usage help
+    local summary="" usage="" help=""
   eval "$(documentation_for "$command")"
 
   if [ -n "$summary" ]; then
@@ -115,7 +115,7 @@ print_summaries() {
 
 print_help() {
   local command="$1"
-  local summary usage help
+    local summary="" usage="" help=""
   eval "$(documentation_for "$command")"
   [ -n "$help" ] || help="$summary"
 
@@ -138,20 +138,20 @@ print_help() {
 
 print_usage() {
   local command="$1"
-  local summary usage help
+    local summary="" usage="" help=""
   eval "$(documentation_for "$command")"
   [ -z "$usage" ] || echo "$usage"
 }
 
 unset usage
-if [ "$1" = "--usage" ]; then
+if [ "${1:-}" = "--usage" ]; then
   usage="1"
   shift
 fi
 
-if [ -z "$1" ] || [ "$1" == "pyenv" ]; then
+if [ -z "${1:-}" ] || [ "${1:-}" == "pyenv" ]; then
   echo "Usage: pyenv <command> [<args>]"
-  [ -z "$usage" ] || exit
+  [ -z "${usage:-}" ] || exit
   echo
   echo "Some useful pyenv commands are:"
   print_summaries $(exec pyenv-commands | sort -u)
@@ -159,9 +159,9 @@ if [ -z "$1" ] || [ "$1" == "pyenv" ]; then
   echo "See \`pyenv help <command>' for information on a specific command."
   echo "For full documentation, see: https://github.com/pyenv/pyenv#readme"
 else
-  command="$1"
+  command="${1:-}"
   if [ -n "$(command_path "$command")" ]; then
-    if [ -n "$usage" ]; then
+    if [ -n "${usage:-}" ]; then
       print_usage "$command"
     else
       print_help "$command"

@@ -20,11 +20,11 @@
 #                         the package from.
 #   -o <output>           Write the definition here (default: stdout).
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --archive-url
   echo -o
   exit

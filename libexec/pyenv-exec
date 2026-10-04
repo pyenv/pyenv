@@ -23,30 +23,30 @@
 # is equivalent to:
 #   PATH="$PYENV_ROOT/versions/2.7.6/bin:$PATH" pip install -r requirements.txt
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --environment
   exec pyenv-shims --short
 fi
 
 unset MODIFY_ENV
-if [ "$1" = "-N" ] || [ "$1" = "--environment" ]; then
+if [ "${1:-}" = "-N" ] || [ "${1:-}" = "--environment" ]; then
   MODIFY_ENV=true
   shift
 fi
 
 PYENV_VERSION="$(pyenv-version-name -f)"
-PYENV_COMMAND="$1"
+PYENV_COMMAND="${1:-}"
 
 if [ -z "$PYENV_COMMAND" ]; then
   pyenv-help --usage exec >&2
   exit 1
 fi
 
-if [[ -n $_PYENV_SHIM_PATH ]]; then
+if [[ -n "${_PYENV_SHIM_PATH:-}" ]]; then
   PROGRAM="$(echo "$PYENV_COMMAND" | tr a-z- A-Z_ | sed 's/[^A-Z0-9_]/_/g')"
   NR_PYENV_SHIM_PATHS_PROGRAM="_PYENV_SHIM_PATHS_${PROGRAM}"
   export -- "$NR_PYENV_SHIM_PATHS_PROGRAM=$_PYENV_SHIM_PATH${!NR_PYENV_SHIM_PATHS_PROGRAM:+:${!NR_PYENV_SHIM_PATHS_PROGRAM}}"
@@ -59,19 +59,23 @@ PYENV_BIN_PATH="${PYENV_COMMAND_PATH%/*}"
 
 export PYENV_VERSION
 
+scripts=()
+
+set +eu
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks exec`)
 IFS="$OLDIFS"
-for script in "${scripts[@]}"; do
+for script in "${scripts[@]+"${scripts[@]}"}"; do
   source "$script"
 done
+set -eu
 
 shift 1
 if [ "${PYENV_BIN_PATH#${PYENV_ROOT}}" != "${PYENV_BIN_PATH}" ]; then
   # Only add to $PATH for non-system version.
   export PATH="${PYENV_BIN_PATH}:${PATH}"
 fi
-if [ -n "$MODIFY_ENV" ]; then
+if [ -n "${MODIFY_ENV:-}" ]; then
 
   # Check if multiple Python versions are selected
   VERSIONS=$(pyenv-prefix)
