@@ -139,8 +139,13 @@ make_shims() {
 }
 
 if ((${BASH_VERSINFO[0]} > 3)); then
+  declare -A registered_shims=()
+else
+  registered_shims=" "
+fi
 
-  declare -A registered_shims
+
+if ((${BASH_VERSINFO[0]} > 3)); then
 
   # Registers the name of a shim to be generated.
   register_shim() {
