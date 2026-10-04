@@ -1,48 +1,89 @@
 {
-  "project_metadata": {
-    "name": "pyenv",
-    "description": "Simple Python version management",
-    "github_url": "https://github.com/pyenv/pyenv",
+  "metadata": {
+    "project_name": "pyenv",
+    "description": "A Shell project with Makefile",
+    "generated_by": "Braxis",
+    "generated_at": "2026-10-04T07:40:26.062800",
+    "schema_version": "1.0"
+  },
+  "project": {
+    "languages": ["c", "shell", "python"],
     "primary_language": "shell",
-    "languages": ["shell", "c"],
-    "project_type": "version-manager"
+    "build_system": "Makefile",
+    "architecture": "single-package",
+    "is_monorepo": false,
+    "monorepo_type": null,
+    "subsystems": []
   },
   "ai_readiness": {
-    "documentation": {
-      "agents_md": true,
-      "claude_md": true,
-      "readme_quality": "good",
-      "code_comments": "minimal"
-    },
-    "development": {
-      "setup_command": null,
-      "test_command": "make test",
-      "build_command": "src/configure && make -C src",
-      "linting_tools": [],
-      "type_checking": false
-    },
-    "testing": {
-      "framework": "bats",
-      "total_test_files": 26,
-      "total_tests": 270,
-      "pass_rate": null,
-      "run_command": "make test"
-    },
-    "code_style": {
-      "linter": "none",
-      "formatter": "none",
-      "naming_convention": "snake_case"
+    "overall_score": 70,
+    "tier": "AI-Native",
+    "dimensions": {
+      "architecture": {"score": 10, "reason": "Code organization and modularity"},
+      "testing": {"score": 15, "reason": "66 test files found"},
+      "dependencies": {"score": 12, "reason": "Dependency management and version pinning"},
+      "conventions": {"score": 6, "reason": "Consistency in naming and patterns"},
+      "entry_points": {"score": 4, "reason": "0 critical files identified"},
+      "security": {"score": 5, "reason": "Input validation and error handling"},
+      "build": {"score": 10, "reason": "Build system clarity and configuration"},
+      "documentation": {"score": 8, "reason": "README and code documentation"}
     }
   },
-  "contribution": {
-    "workflow": [
-      "Fork repository",
-      "Create feature branch",
-      "Make changes in libexec/, plugins/, or src/",
-      "Run `make test`",
-      "Submit PR with clear description"
+  "development": {
+    "setup_command": null,
+    "test_command": "make test",
+    "lint_command": null,
+    "format_command": null,
+    "dev_server_command": null,
+    "prerequisites": {
+      "language_version": "N/A",
+      "package_manager": "npm",
+      "key_tools": ["Bats"],
+      "runtime_tools": ["uv", "uvx"]
+    }
+  },
+  "architecture": {
+    "pattern": "single-package project",
+    "main_entry": "Standard layout",
+    "key_modules": [],
+    "layers": ["CLI interface (if applicable)", "Business logic", "Utilities and helpers"]
+  },
+  "mcp_servers": [],
+  "core_principles": [
+    "Modularity - Code organized by functionality",
+    "Testability - Comprehensive test coverage",
+    "Clarity - Code easy for AI agents to understand",
+    "Consistency - Uniform patterns throughout"
+  ],
+  "contribution_criteria": {
+    "what_we_want": [
+      "Bug fixes with test coverage",
+      "Code quality improvements",
+      "Test coverage increases",
+      "Documentation improvements",
+      "Performance optimizations"
     ],
-    "testing_required": true,
-    "code_review": "peer-reviewed"
+    "what_we_dont_want": [
+      "New dependencies without justification",
+      "Code that reduces test coverage",
+      "Inconsistent naming or style",
+      "Dead code or commented code"
+    ]
+  },
+  "contribution_boundaries": {
+    "project_scale": "large",
+    "suggestion": "This large project should define clear contribution boundaries. Consider LlamaIndex model: 'no new X' policy."
+  },
+  "commands": {
+    "setup": {"command": null, "description": "Install dependencies and set up development environment"},
+    "test": {"command": "make test", "description": "Run all tests"},
+    "lint": {"command": null, "description": "Check code style and quality"},
+    "format": {"command": null, "description": "Format code to project standards"}
+  },
+  "testing": {
+    "framework": "Bats",
+    "total_tests": 519,
+    "pass_rate": 100,
+    "run_command": "make test"
   }
 }
