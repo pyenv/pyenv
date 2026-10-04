@@ -8,6 +8,7 @@
 #   -f/--force      (internal) Same as -b but also do not return a failure exit code
 
 set -euo pipefail
+set -f
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
 
