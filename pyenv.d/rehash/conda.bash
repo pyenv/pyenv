@@ -52,11 +52,13 @@ if conda_exists; then
   deregister_conda_shims() {
     # adapted for Bash 4.x's associative array (#1749)
     if declare -p registered_shims 2> /dev/null | grep -Eq '^(declare|typeset) -A'; then
-      for shim in ${!registered_shims[*]}; do
-        if conda_shim "${shim}" 1>&2; then
-          unset registered_shims[$shim]
-        fi
-      done
+      if [ "${#registered_shims[@]}" -gt 0 ]; then
+        for shim in "${!registered_shims[@]}"; do
+          if conda_shim "${shim}" 1>&2; then
+            unset registered_shims[$shim]
+          fi
+        done
+      fi
     else
       local shim
       local shims=()

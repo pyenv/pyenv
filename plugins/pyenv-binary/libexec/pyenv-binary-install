@@ -10,7 +10,7 @@
 set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   exit
 fi
 
@@ -29,6 +29,7 @@ esac
 requested="$1"
 os="$(uname -s)"
 arch="$(uname -m)"
+distro=""
 
 case "$os" in
 Linux )
@@ -108,6 +109,11 @@ fi
 
 expected_sha="$(printf '%s' "$expected_sha" | tr '[:upper:]' '[:lower:]')"
 
+if ! [[ "$expected_sha" =~ ^[0-9a-fA-F]{64}$ ]]; then
+  echo "pyenv-binary: invalid checksum for $entry" >&2
+  exit 1
+fi
+
 curl -fsSL -o "$tmpdir/$entry" "$base_url/$entry"
 if command -v sha256sum >/dev/null 2>&1; then
   actual_sha="$(sha256sum "$tmpdir/$entry")"; actual_sha="${actual_sha%% *}"
@@ -119,7 +125,7 @@ else
   echo "pyenv-binary: need sha256sum, shasum or openssl to verify $entry" >&2
   exit 1
 fi
-if [[ $expected_sha != "$actual_sha"  ]]; then
+if [ "$actual_sha" != "$expected_sha" ]; then
   echo "pyenv-binary: checksum mismatch for $entry" >&2
   exit 1
 fi
