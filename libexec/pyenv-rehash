@@ -182,8 +182,6 @@ if ((${BASH_VERSINFO[0]} > 3)); then
 
 else # Same for bash < 4.
 
-    registered_shims=" "
-
     register_shim() {
       if [[ "$registered_shims" != *" ${1} "* ]]; then
         install_shims "$1"
