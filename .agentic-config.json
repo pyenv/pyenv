@@ -37,7 +37,7 @@
     "dev_server_command": null,
     "prerequisites": {
       "language_version": "N/A",
-      "package_manager": "npm",
+      "package_manager": null,
       "key_tools": ["Bats"],
       "runtime_tools": ["uv", "uvx"]
     }
