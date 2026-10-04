@@ -1,68 +1,60 @@
 # AGENTS.md
 
+Context file for AI agents working on pyenv.
+
+**Dual Format**: This file combines Category A (Operations Manual) and Category B (Context Guide) for comprehensive agent guidance.
+
 ## Project Overview
 
-pyenv is a Bash (shell) project with a small C companion in `src/`, built via Makefile. It manages Python versions by installing and switching between different Python builds.
+pyenv is a Shell project using Makefile.
 
-## Repository Structure
-pyenv/
-├── bin/ # User-facing executables
-├── shims/ # Version-switch shims
-├── plugins/ # Plugin system (python-build, etc.)
-├── src/ # C extension for version detection
-├── libexec/ # Shell implementation (core logic)
-├── test/ # Bats test suite (26 test files)
-└── Makefile # Build and test targets
-## Development Setup
+**Key Info:**
+- **Primary Language:** Shell
+- **Build System:** Makefile
+- **Test Framework:** Bats
+- **Total Files:** 1762
+- **Test Files:** 66
+- **AI Readiness Score:** 70/100 (AI-Native)
 
-Clone the repository:
-```bash
-git clone https://github.com/pyenv/pyenv.git
-cd pyenv
-```
-No additional installation needed; run directly or add `./bin` to your PATH.
+---
 
-## Running Tests
-```
-make test                 # Run all Bats tests
-make test-<test-name>    # Run specific test
-```
-The test suite uses [Bats](https://github.com/bats-core/bats-core) (Bash Automated Testing System).
+## 🚨 AI Policy & Operations
 
-## Building the C Extension
-```
-src/configure && make -C src
-```
+Extracted from CONTRIBUTING.md - operational constraints and procedures.
 
-## Code Style
-- Shell scripts: Follow POSIX shell conventions where possible, with bash-specific features where needed
-- Naming: Use snake_case for variables and functions
-- Comments: Document non-obvious logic; avoid stating the obvious
-- C code (in `src/`): Keep minimal; use for performance-critical detection logic only
-## Contribution Workflow
-Fork and create a feature branch
-Make changes to shell scripts in `libexec/`, plugins, or `src/`
-Run `make test` to validate
-Submit a pull request with a clear description
+### AI Policy
 
-## Key Commands
-- `src/configure && make -C src` - Build C extension
-- `make test` - Run full Bats test suite
-- `make test-<test-name>` - Run specific test
-- `./bin/pyenv versions` - List installed Python versions
-## Testing Guidelines
-- Write Bats tests for new features in `test/`
-- Each test file focuses on a specific subsystem
-- Use `bats-core` assertions and helpers
-- Ensure all tests pass before submitting PRs
-- See `test/README.md` for test documentation
+- The usual principles of respecting existing conventions and making sure that your changes
+- Must not break or degrade (e.g. disable features) the build in any of the environments that the release officially supports
+- Must not introduce incompatibilities with the vanilla release (including binary incompatibilities)
+- Deprecation policy
+- Such a fix must not add maintenance burden (e.g. add new logic to `python-build` that has to be kept there indefinitely)
 
-## Plugin Development
-pyenv's plugin system allows extending functionality:
-- Place plugins in `plugins/<plugin-name>/`
-- Document expected hooks and environment variables
-- Follow shell script conventions from the main codebase
-## Conventions
-- Branches: Use `feature/` prefix for new features, `fix/` for fixes
-- Commits: Write clear, descriptive messages
-- PRs: Reference related issues; include testing notes
+### Key Requirements
+
+- In addition to the above requirements for release-specific fixes,
+- 1. Select the source to download and other variable parameters as needed.
+
+### Development Procedures
+
+- We strive to keep commit history one-concern-per-commit to keep it meaningful and easy to follow.
+- If a pull request (PR) addresses a single concern (the typical case), we usually squash commits
+- from it together when merging so its commit history doesn't matter.
+- If however a PR addresses multiple separate concerns, each of them should be presented as a separate commit.
+- Adding multiple new Python releases of the same flavor is okay with either a single or multiple commits.
+
+
+
+## 🏗️ Architecture & Context Guide
+
+This section provides architectural context and agent-understanding for the codebase.
+
+### Prerequisites
+
+- **Shell:** None (or applicable language version)
+- **Package Manager:** pip or uv
+- **Test Runner:** Bats
+
+
+
+### Project Structure
