@@ -8,7 +8,9 @@ unset PYENV_VERSION_ORIGIN
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks version-origin`)
 IFS="$OLDIFS"
-set +u  # hooks are third-party code and may read unset variables
+# bash < 4.4 (incl. macOS's 3.2) treats an empty array as unbound under set -u,
+# and hooks are third-party code, so relax nounset while sourcing them
+set +u
 for script in "${scripts[@]}"; do
   source "$script"
 done
