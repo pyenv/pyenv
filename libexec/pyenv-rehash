@@ -221,10 +221,11 @@ set +f
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks rehash`)
 IFS="$OLDIFS"
-
-for script in ${scripts[@]+"${scripts[@]}"}; do
+set +u  # hooks are third-party code and may read unset variables
+for script in "${scripts[@]}"; do
   source "$script"
 done
+set -u
 
 install_registered_shims
 remove_stale_shims

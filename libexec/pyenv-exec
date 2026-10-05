@@ -32,7 +32,7 @@ if [ "${1:-}" = "--complete" ]; then
   exec pyenv-shims --short
 fi
 
-unset MODIFY_ENV
+MODIFY_ENV=""
 if [ "${1:-}" = "-N" ] || [ "${1:-}" = "--environment" ]; then
   MODIFY_ENV=true
   shift
@@ -62,17 +62,18 @@ export PYENV_VERSION
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks exec`)
 IFS="$OLDIFS"
-for script in "${scripts[@]+"${scripts[@]}"}"; do
+set +u  # hooks are third-party code and may read unset variables
+for script in "${scripts[@]}"; do
   source "$script"
 done
+set -u
 
 shift 1
 if [ "${PYENV_BIN_PATH#${PYENV_ROOT}}" != "${PYENV_BIN_PATH}" ]; then
   # Only add to $PATH for non-system version.
   export PATH="${PYENV_BIN_PATH}:${PATH}"
 fi
-if [ -n "${MODIFY_ENV:-}" ]; then
-
+if [ -n "$MODIFY_ENV" ]; then
   # Check if multiple Python versions are selected
   VERSIONS=$(pyenv-prefix)
   if [[ "$VERSIONS" == *:* ]]; then

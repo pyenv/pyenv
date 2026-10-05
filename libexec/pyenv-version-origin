@@ -5,11 +5,11 @@ set -euo pipefail
 
 unset PYENV_VERSION_ORIGIN
 
-set +u
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks version-origin`)
 IFS="$OLDIFS"
-for script in ${scripts[@]+"${scripts[@]}"}; do
+set +u  # hooks are third-party code and may read unset variables
+for script in "${scripts[@]}"; do
   source "$script"
 done
 set -u

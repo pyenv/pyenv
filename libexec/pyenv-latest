@@ -11,6 +11,9 @@ set -euo pipefail
 set -f
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
+FROM_KNOWN=""
+BYPASS=""
+FORCE=""
 
 while [[ $# -gt 0 ]]
 do
@@ -39,7 +42,7 @@ exitcode=0
 
 IFS=$'\n'
 
-    if [[ -z "${FROM_KNOWN:-}" ]]; then
+    if [[ -z "$FROM_KNOWN" ]]; then
         if [[ -d $PYENV_ROOT/versions/$prefix ]]; then
             echo "$prefix"
             exit $exitcode;
@@ -93,12 +96,12 @@ IFS=$'\n'
     if [[ -n "${DEFINITION:-}" ]]; then
         echo "$DEFINITION"
     else
-        if [[ -z "${BYPASS:-}" ]]; then
-            echo "pyenv: no $([[ -z "${FROM_KNOWN:-}" ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
+        if [[ -z "$BYPASS" ]]; then
+            echo "pyenv: no $([[ -z "$FROM_KNOWN" ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
         else
             echo "$prefix"
         fi
-        if [[ -z "${FORCE:-}" ]]; then
+        if [[ -z "$FORCE" ]]; then
             exitcode=1
         fi
     fi

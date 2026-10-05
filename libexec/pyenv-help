@@ -143,7 +143,7 @@ print_usage() {
   [ -z "$usage" ] || echo "$usage"
 }
 
-unset usage
+usage=""
 if [ "${1:-}" = "--usage" ]; then
   usage="1"
   shift
@@ -151,7 +151,7 @@ fi
 
 if [ -z "${1:-}" ] || [ "${1:-}" == "pyenv" ]; then
   echo "Usage: pyenv <command> [<args>]"
-  [ -z "${usage:-}" ] || exit
+  [ -z "$usage" ] || exit
   echo
   echo "Some useful pyenv commands are:"
   print_summaries $(exec pyenv-commands | sort -u)
@@ -161,7 +161,7 @@ if [ -z "${1:-}" ] || [ "${1:-}" == "pyenv" ]; then
 else
   command="${1:-}"
   if [ -n "$(command_path "$command")" ]; then
-    if [ -n "${usage:-}" ]; then
+    if [ -n "$usage" ]; then
       print_usage "$command"
     else
       print_help "$command"

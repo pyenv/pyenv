@@ -100,9 +100,8 @@ done
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks which`)
 IFS="$OLDIFS"
-
-set +u
-for script in ${scripts[@]+"${scripts[@]}"}; do
+set +u  # hooks are third-party code and may read unset variables
+for script in "${scripts[@]}"; do
   source "$script"
 done
 set -u
