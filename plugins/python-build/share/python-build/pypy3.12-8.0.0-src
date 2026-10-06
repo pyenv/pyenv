@@ -1,12 +1,10 @@
 VERSION='8.0.0'
 PYVER='3.12'
 
-# https://www.pypy.org/checksums.html
-hash=eb406334e413828901034544d0033d67452c3cf2f11f77fd2daae0cd4fbb0a7b
+sha=1a041150982230044b8519700d03626e429a782a
 
 ### end of manual settings - following lines same for every download
 
-ver="pypy${PYVER}-v${VERSION}-src"
-url="https://downloads.python.org/pypy/${ver}.tar.gz"
-
-install_package "${ver}" "${url}#${hash}" 'pypy_builder' "verify_py${PYVER//./}" 'ensurepip'
+require_openssl3
+PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-tcl-tk tcl-tk@8}"
+install_git "pypy${PYVER}-v${VERSION}-src" https://github.com/pypy/pypy "release-pypy${PYVER}-v${VERSION}:$sha" pypy_builder "verify_py${PYVER//./}" ensurepip
