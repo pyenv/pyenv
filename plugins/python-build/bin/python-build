@@ -1208,6 +1208,7 @@ build_package_pypy_builder() {
   use_homebrew_openssl || use_macports_openssl || true
   use_homebrew_tcltk || true
   use_homebrew_ncurses || use_macports_ncurses || true
+  use_homebrew || use_macports || true
   
   
   if [ -f "rpython/bin/rpython" ]; then # pypy 2.x
