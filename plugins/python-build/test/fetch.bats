@@ -112,3 +112,84 @@ Installed package-dev to ${BATS_TEST_TMPDIR}/install
 OUT
   unstub git
 }
+
+@test "verifying git ref against a sha1 (not an annotated tag) (match)" {
+  stub git "clone --depth 1 --branch some_tag http://example.com/packages/package.git package-release : mkdir package-release"
+  stub git "describe --exact-match : false"
+  stub git "rev-parse HEAD : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo good_sha1'"
+
+  run_inline_definition <<DEF
+install_git "package-release" "http://example.com/packages/package.git" some_tag:good_sha1 copy
+DEF
+  assert_success
+  unstub git
+}
+
+@test "verifying git ref against a sha1 (not an annotated tag) (no match)" {
+  stub git "clone --depth 1 --branch some_tag http://example.com/packages/package.git package-release : mkdir package-release"
+  stub git "describe --exact-match : false"
+  stub git "rev-parse HEAD : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo bad_sha1'"
+  stub git true
+
+  run_inline_definition <<DEF
+install_git "package-release" "http://example.com/packages/package.git" some_tag:good_sha1 copy
+DEF
+  assert_failure
+  assert_line \
+"error: ref \`some_tag' SHA-1 mismatch: expected good_sha1, got bad_sha1"
+  unstub git
+}
+
+@test "verifying git ref against a sha1 (annotated tag, passing tag sha, other tags present) (success)" {
+  stub git "clone --depth 1 --branch annotated_tag http://example.com/packages/package.git package-release : mkdir package-release"
+  stub git "describe --exact-match : $BASH -ec '[[ \${PWD##*/} == package-release ]]; printf \"%s\\n\" annotated_tag other_tag'"
+  stub git "rev-parse annotated_tag : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo tag_sha1'"
+  stub git "rev-parse HEAD : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo commit_sha1'"
+
+  run_inline_definition <<DEF
+install_git "package-release" "http://example.com/packages/package.git" annotated_tag:tag_sha1 copy
+DEF
+  assert_success
+  unstub git
+}
+
+@test "verifying git ref against a sha1 (annotated tag, passing commit sha) (success)" {
+  stub git "clone --depth 1 --branch annotated_tag http://example.com/packages/package.git package-release : mkdir package-release"
+  stub git "describe --exact-match : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo annotated_tag'"
+  stub git "rev-parse annotated_tag : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo good_tag_sha1'"
+  stub git "rev-parse HEAD : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo commit_sha1'"
+
+  run_inline_definition <<DEF
+install_git "package-release" "http://example.com/packages/package.git" annotated_tag:commit_sha1 copy
+DEF
+  assert_success
+  unstub git
+}
+
+@test "verifying git ref against a sha1 (annotated tag) (no match)" {
+  stub git "clone --depth 1 --branch annotated_tag http://example.com/packages/package.git package-release : mkdir package-release"
+  stub git "describe --exact-match : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo annotated_tag'"
+  stub git "rev-parse annotated_tag : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo bad_tag_sha1'"
+  stub git "rev-parse HEAD : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo bad_commit_sha1'"
+  stub git true
+
+  run_inline_definition <<DEF
+install_git "package-release" "http://example.com/packages/package.git" annotated_tag:good_sha1 copy
+DEF
+  assert_failure
+  assert_line \
+"error: ref \`annotated_tag' SHA-1 mismatch: expected good_sha1, got bad_commit_sha1(commit) and bad_tag_sha1(tag)"
+  unstub git
+}
+
+@test "verifying git ref against a sha1 (unrelated tag matches commit)" {
+  stub git "clone --depth 1 --branch some_tag http://example.com/packages/package.git package-release : mkdir package-release"
+  stub git "describe --exact-match : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo other_tag'"
+  stub git "rev-parse HEAD : $BASH -ec '[[ \${PWD##*/} == package-release ]]; echo commit_sha1'"
+
+  run_inline_definition <<DEF
+install_git "package-release" "http://example.com/packages/package.git" some_tag:commit_sha1 copy
+DEF
+  assert_success
+  unstub git
+}
