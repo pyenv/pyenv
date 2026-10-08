@@ -1237,6 +1237,11 @@ build_package_pypy() {
 
 build_package_pypy_builder() {
   use_homebrew_openssl || use_macports_openssl || true
+  export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
+  use_homebrew_tcltk || true
+  use_homebrew_ncurses || use_macports_ncurses || true
+  use_homebrew || use_macports || true
+  
   
   if [ -f "rpython/bin/rpython" ]; then # pypy 2.x
     if [ -z "${PYPY_OPTS}" ]; then
