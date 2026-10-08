@@ -1,10 +1,6 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.4.0-linux" "https://downloads.python.org/pypy/pypy2-v5.4.0-linux32.tar.bz2#ce581270464b14cdecd13dedb9bd7bf98232f767ac4ac282229a405d8e807af1" "pypy" verify_py27 ensurepip
-  else
-    install_package "pypy-5.4-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.4-linux_i686-portable.tar.bz2#7d7d253f009bb2624f43db6b8caeeb73d29177c4166a643a581a231a099c8689" "pypy" verify_py27 ensurepip
-  fi
+  install_package "pypy-5.4-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.4-linux_i686-portable.tar.bz2#7d7d253f009bb2624f43db6b8caeeb73d29177c4166a643a581a231a099c8689" "pypy" verify_py27 ensurepip
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
@@ -19,11 +15,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "linux64" )
-  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.4.0-linux64" "https://downloads.python.org/pypy/pypy2-v5.4.0-linux64.tar.bz2#bdfea513d59dcd580970cb6f79f3a250d00191fd46b68133d5327e924ca845f8" "pypy" verify_py27 ensurepip
-  else
-    install_package "pypy-5.4-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.4-linux_x86_64-portable.tar.bz2#0a48c7ba7163589b1ade9cfe184f422d1bc9a0f988321b2fdcbd924d90594d9a" "pypy" verify_py27 ensurepip
-  fi
+  install_package "pypy-5.4-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.4-linux_x86_64-portable.tar.bz2#0a48c7ba7163589b1ade9cfe184f422d1bc9a0f988321b2fdcbd924d90594d9a" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
   install_package "pypy2-v5.4.0-osx64" "https://downloads.python.org/pypy/pypy2-v5.4.0-osx64.tar.bz2#3adf21c2bf3432759c99123f21240d71a72aba81d73129e48ef912c34631b723" "pypy" verify_py27 ensurepip
