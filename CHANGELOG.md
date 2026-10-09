@@ -1,5 +1,14 @@
 # Version History
 
+## Release v2.8.9
+* Rename PYTHON_BUILD_TCLTK_FORMULA to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA; deprecate the old name by @native-api in https://github.com/pyenv/pyenv/pull/3580
+* python-build: install_git: Support verifying the checkout by SHA-1 by @native-api in https://github.com/pyenv/pyenv/pull/3586
+* python-build: support additional versioned OpenSSL Homebrew formulae by @native-api in https://github.com/pyenv/pyenv/pull/3588
+* python-build: use more dependencies from Homebrew/MacPorts for PyPy source build by @native-api in https://github.com/pyenv/pyenv/pull/3587
+* PyPy: update sources and dependencies by @native-api in https://github.com/pyenv/pyenv/pull/3585
+* Add CPython 3.15.0 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3589
+* CI: 3.10->3.15; use ubuntu-26.04 by @native-api in https://github.com/pyenv/pyenv/pull/3590
+
 ## Release v2.8.8
 * pyenv-binary: allow local definitions to override published packages by @macayu17 in https://github.com/pyenv/pyenv/pull/3577
 * exec: add the `--environment` option for programs that embed `libpython` without a path by @Romwierz in https://github.com/pyenv/pyenv/pull/3537
