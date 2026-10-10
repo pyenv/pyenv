@@ -66,8 +66,8 @@ Local definitions are installed without downloading the stock definition.
 Installs `<version>` from source under a separate name, packages that install
 with `save`, then emits a python-build definition for it with
 `generate-installer`. With no explicit entry, the name is generated from the
-current platform, architecture and release (major version on macOS). An explicit
-entry keeps the existing custom-build workflow.
+resolved Python version, platform, architecture and release (major version on
+macOS). An explicit entry keeps the existing custom-build workflow.
 
 Pass `-v` to show build progress from `pyenv install`.
 
