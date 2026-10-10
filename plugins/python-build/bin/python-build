@@ -2011,7 +2011,7 @@ use_xcode_sdk_zlib() {
   # If a custom compiler is used, including XCode SDK will likely break it
   osx_using_default_compiler || return 1
 
-  local sdkroot="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
+  local sdkroot="${SDKROOT:-$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)}"
   [[ -z ${sdkroot} || ! -d ${sdkroot} ]] && return 1
 
   # Since Xcode 16 / macOS SDK 15, Apple tightened how the linker uses SDK content:
