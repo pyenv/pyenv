@@ -58,13 +58,11 @@ pyenv-install --list --bare
   assert_failure "pyenv-binary: unexpected argument \`extra'"
 }
 
-@test "generates an entry name for a bare version" {
+@test "uses the generated entry name for a bare version" {
   stub_build_environment
-  create_stub lsb_release 'case "$1" in -si) echo Debian;; -sr) echo 12;; esac'
+  create_stub pyenv-binary-package-name \
+    '[ "$*" = "3.12.7" ] && echo 3.12.7-debian-12-x86_64'
   local entry="3.12.7-debian-12-x86_64"
-  if [ -r /etc/os-release ]; then
-    entry="$(. /etc/os-release && printf '3.12.7-%s-%s-x86_64' "$ID" "$VERSION_ID" | tr '[:upper:]' '[:lower:]')"
-  fi
   cd "${BATS_TEST_TMPDIR}"
 
   run pyenv-binary-package 3.12.7 --archive-base-url http://example.com/binaries

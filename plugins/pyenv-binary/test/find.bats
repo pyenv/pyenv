@@ -25,7 +25,7 @@ _setup() {
 
 @test "find rejects unsafe definition names" {
   local name
-  for name in '' . .. ../3.14.7 $'3.14.7\tother'; do
+  for name in '' . .. ../3.14.7 $'3.14.7\tother' 'custom?python' 'custom python'; do
     run pyenv-binary-find "$name"
     assert_failure "pyenv-binary: invalid version name \`$name'"
   done
@@ -118,6 +118,17 @@ _setup() {
   assert_failure "pyenv-binary: no binary available for 3.14.7 on FreeBSD/amd64"
 }
 
+@test "find reports a Linux distribution without a release as unavailable" {
+  set_platform Linux x86_64 'arch '
+
+  run pyenv-binary-find 3.14.7
+  assert_failure "pyenv-binary: no binary available for 3.14.7 on Linux/x86_64"
+
+  printf 'arch--x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
+  run pyenv-binary-find 3.14.7
+  assert_failure "pyenv-binary: no binary available for 3.14.7 on Linux/x86_64"
+}
+
 @test "find rejects duplicate matching targets" {
   printf 'ubuntu-24.04-x86_64\t%s\nubuntu-24.04-x86_64\t%s\n' \
     "$definition_sha" "$definition_sha" > "$records/3.14.7"
@@ -129,7 +140,7 @@ _setup() {
 @test "find rejects malformed rows and unsafe build suffixes" {
   local row
   for row in ubuntu-24.04-x86_64 $'ubuntu-24.04-x86_64\tchecksum\textra' \
-    $'../ubuntu-24.04-x86_64\tchecksum'; do
+    $'../ubuntu-24.04-x86_64\tchecksum' $'ubuntu?24.04-x86_64\tchecksum'; do
     printf '%s\n' "$row" > "$records/3.14.7"
 
     run pyenv-binary-find 3.14.7
@@ -144,11 +155,11 @@ _setup() {
   assert_success $'3.14.7\t3.14.7-ubuntu-24.04-x86_64\t'
 }
 
-@test "find rejects a build ID that is not safe for a definition URL" {
+@test "find rejects a URL-unsafe definition name even when its record is valid" {
   printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/custom?python"
 
   run pyenv-binary-find 'custom?python'
-  assert_failure "pyenv-binary: invalid binary record for custom?python"
+  assert_failure "pyenv-binary: invalid version name \`custom?python'"
 }
 
 @test "find reads the last row without a trailing newline" {

@@ -21,7 +21,7 @@ fi
 
 version="$1"
 source "${BASH_SOURCE%/*}/../share/pyenv-binary/common.bash"
-if ! is_name_safe "$version"; then
+if ! is_name_safe "$version" || [[ "$version" = *[!A-Za-z0-9._-]* ]]; then
   echo "pyenv-binary: invalid version name \`$version'" >&2
   exit 1
 fi
@@ -29,7 +29,9 @@ fi
 source "${BASH_SOURCE%/*}/../share/pyenv-binary/platform.bash"
 target=""
 case "$os" in
-Linux | Darwin ) target="$(package_suffix "$os" "$distro" "$arch")" ;;
+Linux | Darwin )
+  target="$(package_suffix "$os" "$distro" "$arch" 2>/dev/null)" || target=""
+  ;;
 esac
 
 record_file="${BASH_SOURCE%/*}/../share/pyenv-binary/versions/$version"
@@ -39,7 +41,7 @@ if [ -f "$record_file" ]; then
     IFS=$'\t' read -r suffix sha256 _ <<<"$record"
     # Keep empty checksums for local overrides, but require exactly two fields.
     if [ "$record" != "$suffix"$'\t'"$sha256" ] ||
-       ! is_name_safe "$suffix" || [[ "$version-$suffix" = *[!A-Za-z0-9._-]* ]]; then
+       ! is_name_safe "$suffix" || [[ "$suffix" = *[!A-Za-z0-9._-]* ]]; then
       echo "pyenv-binary: invalid binary record for $version" >&2
       exit 1
     fi
