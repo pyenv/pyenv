@@ -1,6 +1,53 @@
 #!/usr/bin/env bats
 
 load test_helper
+
+@test "Xcode SDK zlib honors SDKROOT and preserves compiler flags" {
+  export SDKROOT="${BATS_TEST_TMPDIR}/selected-sdk"
+  mkdir -p "$SDKROOT"
+  stub xcrun 'false'
+
+  run_inline_definition <<'DEF'
+osx_using_default_compiler() { return 0; }
+export CFLAGS=-O2 LDFLAGS=-custom-linker-flag
+use_xcode_sdk_zlib
+echo "CFLAGS=$CFLAGS"
+echo "LDFLAGS=$LDFLAGS"
+DEF
+
+  assert_success
+  assert_output <<OUT
+python-build: use zlib from xcode sdk
+CFLAGS=-O2 -isysroot $SDKROOT
+LDFLAGS=-custom-linker-flag -isysroot $SDKROOT
+OUT
+  # Explicit SDKROOT must bypass SDK discovery.
+  [ ! -s "$XCRUN_STUB_LOG" ]
+}
+
+@test "Xcode SDK zlib discovers SDK when SDKROOT is empty" {
+  export SDKROOT=
+  local sdkroot="${BATS_TEST_TMPDIR}/discovered-sdk"
+  mkdir -p "$sdkroot"
+  stub xcrun "--sdk macosx --show-sdk-path : echo '$sdkroot'"
+
+  run_inline_definition <<'DEF'
+osx_using_default_compiler() { return 0; }
+unset CFLAGS LDFLAGS
+use_xcode_sdk_zlib
+echo "CFLAGS=$CFLAGS"
+echo "LDFLAGS=$LDFLAGS"
+DEF
+
+  assert_success
+  assert_output <<OUT
+python-build: use zlib from xcode sdk
+CFLAGS=-isysroot $sdkroot
+LDFLAGS=-isysroot $sdkroot
+OUT
+  unstub xcrun
+}
+
 _setup() {
   export MAKE=make
   export MAKE_OPTS='-j 2'
