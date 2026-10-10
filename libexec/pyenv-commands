@@ -2,25 +2,30 @@
 # Summary: List all available pyenv commands
 # Usage: pyenv commands [--sh|--no-sh]
 
-set -e
-[[ -n $PYENV_DEBUG ]] && set -x
+set -euo pipefail
+[[ -n "${PYENV_DEBUG:-}" ]] && set -x
 
 # Provide pyenv completions
-if [[ $1 = "--complete" ]]; then
+if [[ ${1:-} = "--complete" ]]; then
   echo --sh
   echo --no-sh
   exit
 fi
 
-if [[ $1 = "--sh" ]]; then
+sh=""
+nosh=""
+
+if [[ ${1:-} = "--sh" ]]; then
   sh=1
   shift
-elif [[ $1 = "--no-sh" ]]; then
+elif [[ ${1:-} = "--no-sh" ]]; then
   nosh=1
   shift
 fi
 
+set -f
 IFS=: paths=($PATH)
+set +f
 
 shopt -s nullglob
 

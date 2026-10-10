@@ -2,16 +2,16 @@
 # Summary: List all Python versions that contain the given executable
 # Usage: pyenv whence [--path] <command>
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --path
   exec pyenv-shims --short
 fi
 
-if [ "$1" = "--path" ]; then
+if [ "${1:-}" = "--path" ]; then
   print_paths="1"
   shift
 else
@@ -28,7 +28,7 @@ whence() {
   done
 }
 
-PYENV_COMMAND="$1"
+PYENV_COMMAND="${1:-}"
 if [ -z "$PYENV_COMMAND" ]; then
   pyenv-help --usage whence >&2
   exit 1

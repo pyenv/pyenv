@@ -14,11 +14,11 @@
 #                  <version>-<platform>.
 #   --source-version <version>  Record the version used to build a renamed install.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --name
   echo --source-version
   exec pyenv-versions --bare
@@ -127,7 +127,7 @@ system_deps() {
   } | sort -u | while IFS= read -r f; do
     if [ "$os" = "Darwin" ]; then
       otool -L "$f" 2>/dev/null | tail -n +2 | awk -v pfx="${prefix}/" \
-        '$1 !~ /^@/ && substr($1, 1, length(pfx)) != pfx { print $1 }'
+              '$1 !~ /^@/ && substr($1, 1, length(pfx)) != pfx { print $1 }' || true
     else
       # GNU binutils 2.44 writes "(NEEDED) ... [name]"; FreeBSD 15.1 writes
       # "NEEDED ... [name]". readelf(1) documents -d, not its text format.
@@ -135,7 +135,7 @@ system_deps() {
         '$2 == "(NEEDED)" || $2 == "NEEDED" { sub(/^.*\[/, ""); sub(/\].*$/, ""); print }' | tr '\n' ' ')"
       # Linux and FreeBSD ldd write resolved libraries as
       # "name => /absolute/path (address)"; entries without "=>" are ignored.
-      LC_ALL=C ldd "$f" 2>/dev/null | awk -v needed="$needed" -v pfx="${prefix}/" '
+      (LC_ALL=C ldd "$f" 2>/dev/null || true) | awk -v needed="$needed" -v pfx="${prefix}/" '
         BEGIN {
           split(needed, deps, " ")
           for (i in deps) direct[deps[i]] = 1

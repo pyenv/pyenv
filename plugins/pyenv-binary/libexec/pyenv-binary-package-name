@@ -7,10 +7,10 @@
 #   Prints a package name containing the Python version, platform name,
 #   platform version and architecture.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   exec pyenv-install --list --bare
 fi
 

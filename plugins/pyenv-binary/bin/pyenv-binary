@@ -11,8 +11,8 @@
 # Run `pyenv binary' to list its commands, or `pyenv binary <command> --help'
 # for command-specific help.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 libexec="${BASH_SOURCE%/*}/../libexec"
 

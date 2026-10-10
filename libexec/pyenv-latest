@@ -7,9 +7,13 @@
 #                   but rather print the argument unchanged
 #   -f/--force      (internal) Same as -b but also do not return a failure exit code
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+set -f
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
+FROM_KNOWN=""
+BYPASS=""
+FORCE=""
 
 while [[ $# -gt 0 ]]
 do
@@ -33,12 +37,12 @@ do
     esac
 done
 
-prefix=$1
+prefix="${1:-}"
 exitcode=0
 
 IFS=$'\n'
 
-    if [[ -z $FROM_KNOWN ]]; then
+    if [[ -z "$FROM_KNOWN" ]]; then
         if [[ -d $PYENV_ROOT/versions/$prefix ]]; then
             echo "$prefix"
             exit $exitcode;
@@ -48,7 +52,7 @@ IFS=$'\n'
         DEFINITION_CANDIDATES=( $(python-build --definitions ) )
     fi
     
-    if printf '%s\n' "${DEFINITION_CANDIDATES[@]}" 2>/dev/null | grep -qxFe "$prefix"; then
+    if printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" 2>/dev/null | grep -xFe "$prefix" >/dev/null; then
         echo "$prefix"
         exit $exitcode;
     fi
@@ -56,7 +60,7 @@ IFS=$'\n'
     suffix=""
     if [[ $prefix =~ ^(.*[0-9])t$ ]]; then
         suffix="t"
-        prefix="${BASH_REMATCH[1]}"
+        prefix="${BASH_REMATCH[1]:-}"
     fi
     
     # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
@@ -64,18 +68,18 @@ IFS=$'\n'
     suffix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$suffix")"
     # FIXME: more reliable and readable would probably be to loop over them and transform in pure Bash
     DEFINITION_CANDIDATES=(\
-      $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
+      $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
       grep -Ee "^$prefix_re[-.].*$suffix_re\$" || true))
 
     DEFINITION_CANDIDATES=(\
-        $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
+        $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
           sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+$/d' \
-            $(if [[ -z $suffix ]]; then echo "-e /[0-9]t\$/d"; fi)
+            $(if [[ -z "${suffix:-}" ]]; then echo "-e /[0-9]t\$/d"; fi)
         ));
 
     # Compose a sorting key, followed by | and original value
     DEFINITION_CANDIDATES=(\
-        $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" | \
+        $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
           awk \
             '{ if (match($0,"^[[:alnum:]]+-"))
                { print substr($0,0,RLENGTH-1) "." substr($0,RLENGTH+1) "..|" $0; }
@@ -83,21 +87,21 @@ IFS=$'\n'
                { print $0 "...|" $0; }
              }'))
     DEFINITION_CANDIDATES=(\
-        $(printf '%s\n' "${DEFINITION_CANDIDATES[@]}" \
+        $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" \
           | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr \
           | cut -f2 -d $'|' \
         || true))
-    DEFINITION="${DEFINITION_CANDIDATES[0]}"
+    DEFINITION="${DEFINITION_CANDIDATES[0]:-}"
 
-    if [[ -n "$DEFINITION" ]]; then
+    if [[ -n "${DEFINITION:-}" ]]; then
         echo "$DEFINITION"
     else
-        if [[ -z $BYPASS ]]; then
-            echo "pyenv: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
+        if [[ -z "$BYPASS" ]]; then
+            echo "pyenv: no $([[ -z "$FROM_KNOWN" ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
         else
             echo "$prefix"
         fi
-        if [[ -z $FORCE ]]; then
+        if [[ -z "$FORCE" ]]; then
             exitcode=1
         fi
     fi
