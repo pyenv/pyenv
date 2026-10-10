@@ -45,7 +45,7 @@ IFS=$'\n'
         fi
         DEFINITION_CANDIDATES=( $(pyenv-versions --bare --skip-envs) )
     else
-        DEFINITION_CANDIDATES=( $(python-build --definitions ) )
+        DEFINITION_CANDIDATES=( $(pyenv-install --list --bare) )
     fi
     
     if printf '%s\n' "${DEFINITION_CANDIDATES[@]}" 2>/dev/null | grep -qxFe "$prefix"; then

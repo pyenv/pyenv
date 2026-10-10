@@ -1,6 +1,7 @@
 #!/usr/bin/env bats
 
 load test_helper
+load binary_helper
 
 _setup() {
   create_stub pyenv-latest '[ "$1" = "-f" ] && [ "$2" = "-k" ] && shift 2 && echo "$*"'
@@ -29,11 +30,19 @@ _setup() {
 }
 
 @test "generates a package name for Linux" {
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
-  create_stub lsb_release 'case "$1" in -si) echo Debian;; -sr) echo 12;; esac'
+  use_records
+  set_platform Linux x86_64 'Debian 12'
 
   run pyenv-binary-package-name 3.13.14
   assert_success "3.13.14-debian-12-x86_64"
+}
+
+@test "fails to name a Linux package without a distribution release" {
+  use_records
+  set_platform Linux x86_64 'arch '
+
+  run pyenv-binary-package-name 3.13.14
+  assert_failure "pyenv-binary: could not determine the package platform"
 }
 
 @test "generates a package name for macOS" {
@@ -41,7 +50,15 @@ _setup() {
   create_stub sw_vers 'echo 15.5'
 
   run pyenv-binary-package-name 3.13.14
-  assert_success "3.13.14-macos-15.5-arm64"
+  assert_success "3.13.14-macos-15-arm64"
+}
+
+@test "fails when the platform release cannot be determined" {
+  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  create_stub sw_vers 'echo'
+
+  run pyenv-binary-package-name 3.13.14
+  assert_failure "pyenv-binary: could not determine the package platform"
 }
 
 @test "resolves a version prefix when generating a package name" {
@@ -56,4 +73,11 @@ _setup() {
 @test "rejects an invalid version name" {
   run pyenv-binary-package-name ../3.13.14
   assert_failure "pyenv-binary: invalid version name \`../3.13.14'"
+}
+
+@test "rejects an invalid resolved version name" {
+  create_stub pyenv-latest 'echo ../3.14.7'
+
+  run pyenv-binary-package-name 3.14
+  assert_failure "pyenv-binary: invalid version name \`../3.14.7'"
 }

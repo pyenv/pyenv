@@ -19,15 +19,38 @@ by the `xz` package).
 
 ## Commands
 
+### `pyenv binary find <definition>`
+
+Takes an exact definition name and prints it, the matching package entry and
+definition checksum, separated by tabs. Does not resolve version prefixes,
+download or install anything. Exits unsuccessfully if no package matches or
+more than one entry matches the host.
+
 ### `pyenv binary install <version>`
 
-Installs a matching published package from pyenv.github.io under `<version>`.
-The command selects by OS, architecture and distribution; on macOS, an archive
-built on an older major release can also be used. Available packages and their
-definition checksums are recorded in `share/pyenv-binary/versions`. Add an entry
-there when publishing a new package. The definition checks its system-library
-requirements when an `ldconfig` cache is available; otherwise, it warns and
-proceeds.
+Resolves `<version>` using the existing installable-version lookup, then installs
+a matching published package from pyenv.github.io under that resolved name. It
+does not fall back to an older version if the resolved version has no binary.
+Linux requires the same distribution, release and architecture; macOS requires
+the same major version and architecture. These are package-selection rules,
+not a guarantee of runtime compatibility.
+
+Available builds are recorded in `share/pyenv-binary/versions/<definition>`, one
+file per full definition name. Each row contains a build suffix and the SHA256
+of its published Python-Build definition, separated by a tab, with no header.
+For example, `versions/3.14.7` contains:
+
+```text
+ubuntu-24.04-x86_64	e63dbcb981ec9ba83a2bc9b4d8b369620cec4aa45394559d719c5606ee9ff718
+```
+
+The entry name is `<definition>-<suffix>`. Merge record updates only after the
+matching published artifacts are available. This checksum pins the
+definition, not the archive; the verified definition contains the archive's
+checksum.
+
+The definition checks its system-library requirements when an `ldconfig` cache
+is available; otherwise, it warns and proceeds.
 
 ```sh
 pyenv binary install 3.14.7
@@ -43,8 +66,8 @@ Local definitions are installed without downloading the stock definition.
 Installs `<version>` from source under a separate name, packages that install
 with `save`, then emits a python-build definition for it with
 `generate-installer`. With no explicit entry, the name is generated from the
-current platform, platform version and architecture. An explicit entry keeps
-the existing custom-build workflow.
+resolved Python version, platform, architecture and release (major version on
+macOS). An explicit entry keeps the existing custom-build workflow.
 
 Pass `-v` to show build progress from `pyenv install`.
 
@@ -65,7 +88,7 @@ python-build's definition directory.
 ### `pyenv binary package-name <version>`
 
 Prints the automatically generated entry name without building anything. Linux
-uses the distribution name and version, macOS uses the macOS version, and other
+uses the distribution name and version, macOS uses the major version, and other
 systems use the name and release reported by `uname`. All names include the
 architecture.
 

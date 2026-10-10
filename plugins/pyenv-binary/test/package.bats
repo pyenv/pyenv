@@ -58,20 +58,22 @@ pyenv-install --list --bare
   assert_failure "pyenv-binary: unexpected argument \`extra'"
 }
 
-@test "generates an entry name for a bare version" {
+@test "uses the generated entry name for a bare version" {
   stub_build_environment
-  create_stub lsb_release 'case "$1" in -si) echo Debian;; -sr) echo 12;; esac'
+  create_stub pyenv-binary-package-name \
+    '[ "$*" = "3.12.7" ] && echo 3.12.7-debian-12-x86_64'
+  local entry="3.12.7-debian-12-x86_64"
   cd "${BATS_TEST_TMPDIR}"
 
   run pyenv-binary-package 3.12.7 --archive-base-url http://example.com/binaries
   assert_success
-  assert [ -d "${PYENV_ROOT}/versions/3.12.7-debian-12-x86_64" ]
-  assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.tar.xz" ]
-  assert [ -f "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.meta" ]
-  run grep '^source_version=' "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64.meta"
+  assert [ -d "${PYENV_ROOT}/versions/$entry" ]
+  assert [ -f "${BATS_TEST_TMPDIR}/$entry.tar.xz" ]
+  assert [ -f "${BATS_TEST_TMPDIR}/$entry.meta" ]
+  run grep '^source_version=' "${BATS_TEST_TMPDIR}/$entry.meta"
   assert_success "source_version=3.12.7"
-  run grep '^ARCHIVE_URL=' "${BATS_TEST_TMPDIR}/3.12.7-debian-12-x86_64"
-  assert_success "ARCHIVE_URL=http://example.com/binaries/3.12.7-debian-12-x86_64.tar.xz"
+  run grep '^ARCHIVE_URL=' "${BATS_TEST_TMPDIR}/$entry"
+  assert_success "ARCHIVE_URL=http://example.com/binaries/$entry.tar.xz"
 }
 
 @test "records the definition name when packaging from a file" {

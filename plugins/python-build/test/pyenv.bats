@@ -176,6 +176,15 @@ OUT
   unstub python-build
 }
 
+@test "bare listing fails when definition listing fails" {
+  stub_python_build_lib '--definitions : echo "listing failed" >&2; exit 1'
+
+  run pyenv-install --list --bare
+  assert_failure "listing failed"
+
+  unstub python-build
+}
+
 @test "upgrade instructions given for a nonexistent version" {
   stub brew false
   stub_python_build_lib
