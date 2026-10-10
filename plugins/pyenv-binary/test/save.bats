@@ -110,6 +110,17 @@ platform() {
   assert_success "build_prefix=${PYENV_ROOT}/versions/3.12.7"
 }
 
+@test "records macOS distribution metadata" {
+  create_version "3.12.7"
+  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  create_stub sw_vers 'echo 15.5'
+
+  run pyenv-binary-save 3.12.7 "$BATS_TEST_TMPDIR/dist"
+  assert_success
+  run grep '^distro=' "$BATS_TEST_TMPDIR/dist/3.12.7-darwin-arm64.meta"
+  assert_success "distro=macos 15.5"
+}
+
 @test "fails when readelf is not available" {
   create_version "3.12.7"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
@@ -153,6 +164,7 @@ STUB
 
 @test "records only the libraries otool resolves outside the prefix" {
   create_version "3.12.7"
+  create_stub sw_vers 'echo 15.5'
   touch "${PYENV_ROOT}/versions/3.12.7/bin/python3.12"
   create_path_executable uname <<'STUB'
 case "$1" in

@@ -14,7 +14,7 @@
 #   -g/--debug       Build a debug version
 #
 
-PYTHON_BUILD_VERSION="2.8.6"
+PYTHON_BUILD_VERSION="2.8.9"
 
 OLDIFS="$IFS"
 
@@ -681,6 +681,18 @@ fetch_git() {
   local package_name="$1"
   local git_url="$2"
   local git_ref="$3"
+  local git_sha=
+  
+  # Checking the ref's SHA-1 is enough to ensure its authenticity according to Linus Torvalds
+  # https://security.stackexchange.com/questions/67920/how-safe-are-signed-git-tags-only-as-safe-as-sha-1-or-somehow-safer
+  # ":" is illegal in ref names, see git-check-ref-format(1) manpage
+  # https://stackoverflow.com/questions/3651860/which-characters-are-illegal-within-a-branch-name
+  # So we can use it as a delimiter
+  if [[ $git_ref =~ :(.*)$ ]]; then
+    git_sha="${BASH_REMATCH[1]}"
+    # Bash 3.2/Busybox don't support negative length in substring expansion
+    git_ref="${git_ref::${#git_ref}-${#BASH_REMATCH[0]}}"
+  fi
 
   echo "Cloning ${git_url}..." >&2
 
@@ -710,6 +722,25 @@ fetch_git() {
   else
     echo "error: please install \`git\` and try again" >&2
     exit 1
+  fi
+  
+  if [[ -n $git_sha ]]; then
+    #If the tag is annotated, its underlying ("peeled") commit is checked out instead
+    #In this case, we accept either commit's SHA or tag's SHA for convenience
+    (
+      declare tag_sha commit_sha
+      cd "${package_name}";
+      if git describe --exact-match 2>/dev/null | grep -xF "$git_ref" >/dev/null;then
+        tag_sha=$(git rev-parse "$git_ref")
+      fi
+      commit_sha=$(git rev-parse HEAD)
+      if [[ (-z $tag_sha || $git_sha != "$tag_sha") && $git_sha != "$commit_sha" ]]; then
+        echo -n "error: ref \`${git_ref}' SHA-1 mismatch: expected $git_sha, got $commit_sha" >&2
+        if [[ -n $tag_sha ]]; then echo -n "(commit) and $tag_sha(tag)" >&2; fi
+        echo >&2
+        exit 1
+      fi
+    )
   fi
 }
 
@@ -1206,6 +1237,11 @@ build_package_pypy() {
 
 build_package_pypy_builder() {
   use_homebrew_openssl || use_macports_openssl || true
+  export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
+  use_homebrew_tcltk || true
+  use_homebrew_ncurses || use_macports_ncurses || true
+  use_homebrew || use_macports || true
+  
   
   if [ -f "rpython/bin/rpython" ]; then # pypy 2.x
     if [ -z "${PYPY_OPTS}" ]; then
@@ -1739,7 +1775,7 @@ use_macports_ncurses() {
 }
 
 prefer_openssl11() {
-  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@1.1 openssl}"
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@1.1 openssl@3 openssl@3.5 openssl@3.0 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
 
   PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl11 openssl3 openssl}"
@@ -1748,7 +1784,7 @@ prefer_openssl11() {
 }
 
 prefer_openssl3() {
-  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@1.1 openssl}"
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@3.5 openssl@3.0 openssl@1.1 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
   
   PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3 openssl openssl11}"
@@ -1756,10 +1792,18 @@ prefer_openssl3() {
 }
 
 prefer_openssl3_to_4() {
-  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@4 openssl@1.1 openssl}"
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@3.5 openssl@3.0 openssl@4 openssl@1.1 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
   
   PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3 openssl4 openssl openssl11}"
+  export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
+}
+
+require_openssl3() {
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@3.5 openssl@3.0}"
+  export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
+  
+  PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3}"
   export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
 }
 
@@ -2006,9 +2050,14 @@ use_homebrew_tcltk() {
   can_use_homebrew || return 1
   local tcltk_formula
   # Since https://github.com/Homebrew/homebrew-core/commit/f10e88617b41555193c22fdcba6109fe82155ee2 (10.11.2024),
-  # tcl-tk is 9.0. It's supported in CPython since 3.14.0a1 (gh-124111) but is not officially supported as of 3.14.0
-  # so we prefer 8
-  for tcltk_formula in ${PYTHON_BUILD_TCLTK_FORMULA:-tcl-tk@8 tcl-tk}; do
+  # tcl-tk is 9.0. It's supported in CPython since 3.14.0a1 (gh-124111) but is not officially supported as of 3.14.0,
+  # as of 3.15.0rc3, there are still test failures.
+  # So we prefer 8.
+  if [[ -n $PYTHON_BUILD_TCLTK_FORMULA ]]; then
+    export PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-$PYTHON_BUILD_TCLTK_FORMULA}"
+    echo "warning: the PYTHON_BUILD_TCLTK_FORMULA envvar has been renamed to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA" >&2
+  fi
+  for tcltk_formula in ${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-tcl-tk@8 tcl-tk}; do
     local tcltk_prefix="$(brew --prefix "${tcltk_formula}" 2>/dev/null || true)"
     if [ -d "$tcltk_prefix" ]; then
       echo "python-build: use ${tcltk_formula} from homebrew"

@@ -1,8 +1,7 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.8.0-linux32" "https://downloads.python.org/pypy/pypy2-v5.8.0-linux32.tar.bz2#a0b125a5781f7e5ddfc3baca46503b14f4ee6a0e234e8d72bfcf3afdf4120bef" "pypy" verify_py27 ensurepip
-  fi
+  require_distro "Ubuntu 14.04" || true
+  install_package "pypy2-v5.8.0-linux32" "https://downloads.python.org/pypy/pypy2-v5.8.0-linux32.tar.bz2#a0b125a5781f7e5ddfc3baca46503b14f4ee6a0e234e8d72bfcf3afdf4120bef" "pypy" verify_py27 ensurepip
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
@@ -17,11 +16,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "linux64" )
-  if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.8.0-linux64" "https://downloads.python.org/pypy/pypy2-v5.8.0-linux64.tar.bz2#6274292d0e954a2609b15978cde6efa30942ba20aa5d2acbbf1c70c0a54e9b1e" "pypy" verify_py27 ensurepip
-  else
-    install_package "pypy-5.8-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.8-1-linux_x86_64-portable.tar.bz2#52556230af5769c656173ae8a1bdcb2e16aef46e3993ed89f3aec3d220aec862" "pypy" verify_py27 ensurepip
-  fi
+  install_package "pypy-5.8-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.8-1-linux_x86_64-portable.tar.bz2#52556230af5769c656173ae8a1bdcb2e16aef46e3993ed89f3aec3d220aec862" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
   install_package "pypy2-v5.8.0-osx64" "https://downloads.python.org/pypy/pypy2-v5.8.0-osx64.tar.bz2#04b61d1cf13aaca6d0420e854c820b8bd049dc88be16c02542abe8ca26eb075c" "pypy" verify_py27 ensurepip

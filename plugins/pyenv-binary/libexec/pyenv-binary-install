@@ -4,8 +4,8 @@
 #
 # Usage: pyenv binary install <version>
 #
-#   Selects a compatible package from pyenv.github.io and installs it under
-#   <version>. Ordinary `pyenv install' is unchanged.
+#   Selects a matching published package from pyenv.github.io and installs it
+#   under <version>. Ordinary `pyenv install' is unchanged.
 #
 set -e
 [ -n "$PYENV_DEBUG" ] && set -x
@@ -19,9 +19,23 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
-selection="$(pyenv-binary-find "$1")"
+source "${BASH_SOURCE%/*}/../share/pyenv-binary/common.bash"
+if ! is_name_safe "$1"; then
+  echo "pyenv-binary: invalid version name \`$1'" >&2
+  exit 1
+fi
+
+version="$(pyenv-latest -f -k "$1")"
+selection="$(pyenv-binary-find "$version")"
 IFS=$'\t' read -r version entry expected_sha <<< "$selection"
 
+definitions="$(pyenv-install --list --bare)"
+if grep -qxF -- "$entry" <<<"$definitions"; then
+  pyenv-install "$entry:$version"
+  exit
+fi
+
+expected_sha="$(printf '%s' "$expected_sha" | tr '[:upper:]' '[:lower:]')"
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 base_url="https://pyenv.github.io/pythons/binaries"
@@ -37,7 +51,7 @@ else
   echo "pyenv-binary: need sha256sum, shasum or openssl to verify $entry" >&2
   exit 1
 fi
-if [ "$actual_sha" != "$expected_sha" ]; then
+if [[ $expected_sha != "$actual_sha"  ]]; then
   echo "pyenv-binary: checksum mismatch for $entry" >&2
   exit 1
 fi

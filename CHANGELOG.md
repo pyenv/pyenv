@@ -1,5 +1,40 @@
 # Version History
 
+## Release v2.8.9
+* Rename PYTHON_BUILD_TCLTK_FORMULA to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA; deprecate the old name by @native-api in https://github.com/pyenv/pyenv/pull/3580
+* python-build: install_git: Support verifying the checkout by SHA-1 by @native-api in https://github.com/pyenv/pyenv/pull/3586
+* python-build: support additional versioned OpenSSL Homebrew formulae by @native-api in https://github.com/pyenv/pyenv/pull/3588
+* python-build: use more dependencies from Homebrew/MacPorts for PyPy source build by @native-api in https://github.com/pyenv/pyenv/pull/3587
+* PyPy: update sources and dependencies by @native-api in https://github.com/pyenv/pyenv/pull/3585
+* Add CPython 3.15.0 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3589
+* CI: 3.10->3.15; use ubuntu-26.04 by @native-api in https://github.com/pyenv/pyenv/pull/3590
+
+## Release v2.8.8
+* pyenv-binary: allow local definitions to override published packages by @macayu17 in https://github.com/pyenv/pyenv/pull/3577
+* exec: add the `--environment` option for programs that embed `libpython` without a path by @Romwierz in https://github.com/pyenv/pyenv/pull/3537
+* Add CPython 3.15.0rc3 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3578
+
+## Release v2.8.7
+* Fix rehash repair of individually corrupted shims by @aprylewu in https://github.com/pyenv/pyenv/pull/3540
+* CI: publish Apple Silicon macOS binaries by @macayu17 in https://github.com/pyenv/pyenv/pull/3556
+* python-build: create PEP 394 symlinks for Pyston by @dmrlawson in https://github.com/pyenv/pyenv/pull/3557
+* Add GraalPy 3.13 25.4.4 by @msimacek in https://github.com/pyenv/pyenv/pull/3558
+* python-build: create PEP 394 symlinks for PyPy by @native-api in https://github.com/pyenv/pyenv/pull/3559
+* install-prerequisites: add an option for optional dependencies by @native-api in https://github.com/pyenv/pyenv/pull/3560
+* python-build: create pypy* symlinks for PyPy by @native-api in https://github.com/pyenv/pyenv/pull/3562
+* Add PyPy v7.3.23 by @exurd in https://github.com/pyenv/pyenv/pull/3553
+* Add PyPy v7.3.21 by @exurd in https://github.com/pyenv/pyenv/pull/3564
+* python-build: Add `add_pypy.py` for pypy versions by @exurd in https://github.com/pyenv/pyenv/pull/3566
+* pyenv-binary: install published CPython packages by @macayu17 in https://github.com/pyenv/pyenv/pull/3567
+* python-build: show download progress in interactive terminals by @n0tl3ss in https://github.com/pyenv/pyenv/pull/3561
+* Fix minimum macOS version check for PyPy v7.3.8+ by @exurd in https://github.com/pyenv/pyenv/pull/3570
+* Add PyPy v8.0.0 by @exurd in https://github.com/pyenv/pyenv/pull/3552
+* python-build: Speed up permission fix step by @native-api in https://github.com/pyenv/pyenv/pull/3571
+* fix(init): honor custom PYENV_ROOT in init setup tips by @r3wretrhy in https://github.com/pyenv/pyenv/pull/3569
+* tests: python-build: use helpers from core by @macayu17 in https://github.com/pyenv/pyenv/pull/3572
+* Add CPython 3.12.15, 3.13.16 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3575
+* Add CPython 3.14.8 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3574
+* Add CPython 3.10.22, 3.11.17 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3576
 
 ## Release v2.8.6
 * Update graalpy URLs for 25.3.4.1 by @msimacek in https://github.com/pyenv/pyenv/pull/3533

@@ -68,20 +68,17 @@ case "$version" in
   ;;
 esac
 
-case "$package_name" in
-*/* | .. | . | *[[:cntrl:]]* )
+source "${BASH_SOURCE%/*}/../share/pyenv-binary/common.bash"
+if [ -n "$package_name" ] && ! is_name_safe "$package_name"; then
   echo "pyenv-binary: invalid package name \`${package_name}'" >&2
   exit 1
-  ;;
-esac
+fi
 
 source_version="${source_version:-$version}"
-case "$source_version" in
-*/* | .. | . | *[[:cntrl:]]* )
+if ! is_name_safe "$source_version"; then
   echo "pyenv-binary: invalid source version \`${source_version}'" >&2
   exit 1
-  ;;
-esac
+fi
 
 prefix="${PYENV_ROOT}/versions/${version}"
 if [ ! -d "${prefix}/bin" ]; then
@@ -89,20 +86,13 @@ if [ ! -d "${prefix}/bin" ]; then
   exit 1
 fi
 
-os="$(uname -s)"
-arch="$(uname -m)"
+source "${BASH_SOURCE%/*}/../share/pyenv-binary/platform.bash"
 platform="$(printf '%s' "$os" | tr '[:upper:]' '[:lower:]')-${arch}"
 
 # Record the distro and libc version. Platform and arch alone are too coarse to
 # judge compatibility: a build is only portable to a matching libc (e.g. a
 # glibc 2.36 build will not load on an older glibc, nor on musl at all).
-distro=""
 libc=""
-if [ -r /etc/os-release ]; then
-  distro="$( . /etc/os-release && printf '%s %s' "${ID:-}" "${VERSION_ID:-}" )"
-elif [ "$os" = "Darwin" ]; then
-  distro="macos $(sw_vers -productVersion 2>/dev/null)"
-fi
 if [ "$os" = "Linux" ]; then
   libc="$(getconf GNU_LIBC_VERSION 2>/dev/null || true)"
 fi

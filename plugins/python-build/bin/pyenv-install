@@ -126,7 +126,7 @@ done
 
 if [[ -n $LIST ]]; then
   if [[ -n $BARE ]]; then
-    definitions
+    exec python-build --definitions
   else
     echo "Available versions:"
     definitions | indent

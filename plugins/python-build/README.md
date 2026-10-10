@@ -182,13 +182,13 @@ You can set certain environment variables to control the build process.
   their original source URLs instead of using a mirror.
 * `PYTHON_BUILD_HTTP_CLIENT`, explicitly specify the HTTP client type to use. `aria2`, `curl` and `wget` are the supported values and by default, are searched in that order.
 * `PYTHON_BUILD_CURL_OPTS`, `PYTHON_BUILD_WGET_OPTS`, `PYTHON_BUILD_ARIA2_OPTS` pass additional parameters to the corresponding HTTP client.
-* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it would normally will.
-* `PYTHON_BUILD_USE_HOMEBREW`, if set, will search for libraries installed by Homebrew when it would normally not.
+* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it normally would.
+* `PYTHON_BUILD_USE_HOMEBREW`, if set, will search for libraries installed by Homebrew when it normally wouldn't.
 * `PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA`, override the Homebrew OpenSSL formula to use.
 * `PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA`, override the MacPorts OpenSSL formula to use. The default is `openssl3 openssl`.
-* `PYTHON_BUILD_TCLTK_FORMULA`, override the Homebrew Tcl/Tk formula to use.
-* `PYTHON_BUILD_SKIP_MACPORTS`, if set, will not search for libraries installed by MacPorts when it would normally will.
-* `PYTHON_BUILD_USE_MACPORTS`, if set, will search for libraries installed by MacPorts when it would normally not.
+* `PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA`, override the Homebrew Tcl/Tk formula to use.
+* `PYTHON_BUILD_SKIP_MACPORTS`, if set, will not search for libraries installed by MacPorts when it normally would.
+* `PYTHON_BUILD_USE_MACPORTS`, if set, will search for libraries installed by MacPorts when it normally wouldn't.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
   in `share/python-build/` are looked up.
 * `PYTHON_BUILD_DEFINITIONS` can be a list of colon-separated paths that get

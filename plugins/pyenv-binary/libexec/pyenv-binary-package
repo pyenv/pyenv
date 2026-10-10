@@ -12,7 +12,7 @@
 #   <version>             A version `pyenv install' knows how to build.
 #   <entry>               The optional name to build under and install the
 #                         binary as. If omitted, a name is generated from the
-#                         current platform, platform version and architecture.
+#                         platform, architecture and release (major on macOS).
 #   -v,--verbose          Show build progress from `pyenv install'.
 #   --archive-base-url <url>
 #                         Where the archive will be hosted; the definition

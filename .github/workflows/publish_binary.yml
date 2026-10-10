@@ -19,6 +19,11 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.platform }}
+  cancel-in-progress: false
+  queue: max
+
 jobs:
   publish:
     runs-on: ${{ inputs.platform }}
@@ -37,18 +42,15 @@ jobs:
         env:
           PYTHON_CONFIGURE_OPTS: --enable-optimizations
         run: |
-          VERSION="${VERSION%%:*}"
-          if [ "$RUNNER_OS" = "macOS" ]; then
-            entry="${VERSION}-${{ inputs.platform }}-$(uname -m)"
-          else
-            entry="$(./bin/pyenv binary package-name "$VERSION")"
-          fi
-          echo "entry=$entry" >> "$GITHUB_ENV"
+          VERSION="$(./bin/pyenv latest -f -k "${VERSION%%:*}")"
+          entry="$(./bin/pyenv binary package-name "$VERSION")"
           mkdir dist
           cd dist
           "$GITHUB_WORKSPACE/bin/pyenv" binary package --verbose \
             "$VERSION:$entry" \
             --archive-base-url https://pyenv.github.io/pythons/binaries
+          echo "version=$VERSION" >> "$GITHUB_ENV"
+          echo "entry=$entry" >> "$GITHUB_ENV"
 
       - name: Generate GitHub token
         uses: actions/create-github-app-token@v3
@@ -57,7 +59,9 @@ jobs:
           app-id: ${{ vars.PYENV_BOT_APP_ID }}
           private-key: ${{ secrets.PYENV_BOT_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
-          repositories: pyenv.github.io
+          repositories: |
+            pyenv.github.io
+            pyenv
           permission-contents: write
           permission-pull-requests: write
       - uses: actions/checkout@v7
@@ -72,7 +76,8 @@ jobs:
             site/pythons/binaries/
           cd site/pythons
           ./update.sh
-      - name: Create Pull Request
+      - name: Create website Pull Request
+        id: site-pr
         uses: peter-evans/create-pull-request@v8
         with:
           path: site
@@ -81,6 +86,41 @@ jobs:
           commit-message: Add CPython ${{ env.entry }}
           body: |
             Built from pyenv/pyenv@${{ github.sha }} with profile-guided optimization enabled.
+
+            Part of pyenv/pyenv#2334.
+          token: ${{ steps.generate-token.outputs.token }}
+      - uses: actions/checkout@v7
+        with:
+          repository: pyenv/pyenv
+          ref: master
+          token: ${{ steps.generate-token.outputs.token }}
+          path: catalog
+      - name: Update binary record
+        run: |
+          definition_sha="$(bash .github/scripts/update_binary_record.sh \
+            "$version" "dist/$entry" catalog/plugins/pyenv-binary/share/pyenv-binary/versions)"
+          archive_sha="$(shasum -a 256 "dist/$entry.tar.xz")"
+          echo "definition_sha=$definition_sha" >> "$GITHUB_ENV"
+          echo "archive_sha=${archive_sha%% *}" >> "$GITHUB_ENV"
+      - name: Create record Pull Request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          path: catalog
+          add-paths: plugins/pyenv-binary/share/pyenv-binary/versions/${{ env.version }}
+          branch: auto_add_binary/${{ env.entry }}
+          title: 'pyenv-binary: update ${{ env.entry }}'
+          commit-message: 'pyenv-binary: update ${{ env.entry }}'
+          draft: always-true
+          body: |
+            Updates the definition checksum for `${{ env.entry }}`.
+
+            Website update: ${{ steps.site-pr.outputs.pull-request-url || 'No website changes in this run; verify the deployed files.' }}
+            Built from pyenv/pyenv@${{ github.sha }} in [this run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+            Before marking this PR ready and merging it:
+            - [ ] Merge and deploy the website update, if needed.
+            - [ ] Check the SHA256 of the served [definition](https://pyenv.github.io/pythons/binaries/${{ env.entry }}) is `${{ env.definition_sha }}`.
+            - [ ] Check the SHA256 of the served [archive](https://pyenv.github.io/pythons/binaries/${{ env.entry }}.tar.xz) is `${{ env.archive_sha }}`.
 
             Part of pyenv/pyenv#2334.
           token: ${{ steps.generate-token.outputs.token }}
