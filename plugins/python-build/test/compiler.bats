@@ -2,6 +2,14 @@
 
 load test_helper
 
+_setup() {
+  export MAKE=make
+  export MAKE_OPTS='-j 2'
+  export -n CFLAGS
+  export -n CC
+  export -n PYTHON_CONFIGURE_OPTS
+}
+
 @test "Xcode SDK zlib honors SDKROOT and preserves compiler flags" {
   export SDKROOT="${BATS_TEST_TMPDIR}/selected-sdk"
   mkdir -p "$SDKROOT"
@@ -46,14 +54,6 @@ CFLAGS=-isysroot $sdkroot
 LDFLAGS=-isysroot $sdkroot
 OUT
   unstub xcrun
-}
-
-_setup() {
-  export MAKE=make
-  export MAKE_OPTS='-j 2'
-  export -n CFLAGS
-  export -n CC
-  export -n PYTHON_CONFIGURE_OPTS
 }
 
 @test "require_gcc on OS X 10.9" {
