@@ -6,7 +6,7 @@
 set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
-FORCE=""
+FORCE=
 while [[ $# -gt 0 ]]
 do
     case "${1:-}" in

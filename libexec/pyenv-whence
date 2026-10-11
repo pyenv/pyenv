@@ -15,7 +15,7 @@ if [ "${1:-}" = "--path" ]; then
   print_paths="1"
   shift
 else
-  print_paths=""
+  print_paths=
 fi
 
 whence() {

@@ -143,7 +143,7 @@ print_usage() {
   [ -z "$usage" ] || echo "$usage"
 }
 
-usage=""
+usage=
 if [ "${1:-}" = "--usage" ]; then
   usage="1"
   shift

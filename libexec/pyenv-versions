@@ -15,10 +15,10 @@
 set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
-bare=""
-skip_aliases=""
-skip_envs=""
-executables=""
+bare=
+skip_aliases=
+skip_envs=
+executables=
 
 # Provide pyenv completions
 for arg; do
@@ -97,7 +97,7 @@ else
   current_versions=()
 fi
 if [ -n "${bare:-}" ]; then
-  include_system=""
+  include_system=
 else
   hit_prefix="* "
   miss_prefix="  "

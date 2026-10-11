@@ -29,7 +29,7 @@ esac
 requested="$1"
 os="$(uname -s)"
 arch="$(uname -m)"
-distro=""
+distro=
 
 case "$os" in
 Linux )
@@ -101,7 +101,7 @@ if [ -z "$entry" ]; then
   echo "pyenv-binary: no binary available for $requested on $os/$arch" >&2
   exit 1
 fi
-definitions="$(pyenv-install --list --bare)" || definitions=""
+definitions="$(pyenv-install --list --bare)" || definitions=
 if grep -qxF -- "$entry" <<< "${definitions:-}"; then
   pyenv-install "$entry:$version"
   exit

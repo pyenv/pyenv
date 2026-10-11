@@ -13,7 +13,7 @@ set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
 version="2.8.8"
-git_revision=""
+git_revision=
 
 # not using grep -q to avoid SIGPIPE which would fail the condition
 if cd "${BASH_SOURCE%/*}" 2>/dev/null && git remote -v 2>/dev/null | grep pyenv >/dev/null; then

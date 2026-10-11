@@ -11,9 +11,9 @@ set -euo pipefail
 set -f
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
-FROM_KNOWN=""
-BYPASS=""
-FORCE=""
+FROM_KNOWN=
+BYPASS=
+FORCE=
 
 while [[ $# -gt 0 ]]
 do
@@ -57,7 +57,7 @@ IFS=$'\n'
         exit $exitcode;
     fi
     
-    suffix=""
+    suffix=
     if [[ $prefix =~ ^(.*[0-9])t$ ]]; then
         suffix="t"
         prefix="${BASH_REMATCH[1]:-}"

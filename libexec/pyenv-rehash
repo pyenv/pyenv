@@ -10,10 +10,10 @@ PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
 # Create the shims directory if it doesn't already exist.
 mkdir -p "$SHIM_PATH"
 
-last_acquire_error=""
-tested_for_other_write_errors=""
+last_acquire_error=
+tested_for_other_write_errors=
 
-ret=""
+ret=
 acquire_lock() {
   local ret
   # An old lock file is presumed stale. We assume no healthy rehash takes this long.
@@ -58,7 +58,7 @@ if [ ! -w "$SHIM_PATH" ]; then
   exit 1
 fi
 
-acquired=""
+acquired=
 start=$SECONDS
 PYENV_REHASH_TIMEOUT=${PYENV_REHASH_TIMEOUT:-60}
 while (( SECONDS <= start + PYENV_REHASH_TIMEOUT )); do
@@ -79,7 +79,7 @@ if [ -z "${acquired}" ]; then
   fi
   exit 1
 fi
-tested_for_other_write_errors=""
+tested_for_other_write_errors=
 
 # The prototype shim file is a script that re-execs itself, passing
 # its filename and any arguments to `pyenv exec`. This file is copied

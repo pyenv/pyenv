@@ -31,7 +31,7 @@
 set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
-FORCE=""
+FORCE=
 
 # Provide pyenv completions
 if [ "${1:-}" = "--complete" ]; then

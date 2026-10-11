@@ -32,8 +32,8 @@ version="$(pyenv-latest -f -k "$version")"
 
 os="$(uname -s)"
 arch="$(uname -m)"
-distro=""
-distro_version=""
+distro=
+distro_version=
 
 case "$os" in
 Linux )

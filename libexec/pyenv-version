@@ -7,7 +7,7 @@
 set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
-bare=""
+bare=
 for arg; do
     case "$arg" in
         --complete )

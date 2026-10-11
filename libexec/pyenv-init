@@ -24,9 +24,9 @@ if [ "${1:-}" = "--complete" ]; then
 fi
 
 mode="help"
-no_push_path=""
-no_rehash=""
-shell=""
+no_push_path=
+no_rehash=
+shell=
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -538,7 +538,7 @@ end'
   pwsh )
     cat <<EOS
 function pyenv {
-  \$command=""
+  \$command=
   if ( \$args.Count -gt 0 ) {
     \$command, \$args = \$args
   }

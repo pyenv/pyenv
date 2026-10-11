@@ -20,7 +20,7 @@ if [ "${1:-}" = "--complete" ]; then
 fi
 
 system="system"
-SKIP_ADVICE=""
+SKIP_ADVICE=
 PYENV_COMMAND="${1:-}"
 
 while [[ $# -gt 0 ]]
@@ -31,7 +31,7 @@ do
       shift
       ;;
     --nosystem)
-      system=""
+      system=
       shift
       ;;
     *)
@@ -71,13 +71,13 @@ set +f
 IFS="$OLDIFS"
 
 nonexistent_versions=()
-PYENV_COMMAND_PATH=""
+PYENV_COMMAND_PATH=
 
 for version in ${versions[@]+"${versions[@]}"} "$system"; do
   if [ "$version" = "system" ]; then
     PROGRAM="$(echo "$PYENV_COMMAND" | tr a-z- A-Z_ | sed 's/[^A-Z0-9_]/_/g')"
     NR_CUSTOM_SHIM_PATHS="_PYENV_SHIM_PATHS_$PROGRAM"
-    custom_shims=""
+    custom_shims=
     if [ -n "${!NR_CUSTOM_SHIM_PATHS:-}" ]; then
       custom_shims=":${!NR_CUSTOM_SHIM_PATHS}"
     fi

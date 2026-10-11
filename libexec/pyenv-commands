@@ -12,8 +12,8 @@ if [[ ${1:-} = "--complete" ]]; then
   exit
 fi
 
-sh=""
-nosh=""
+sh=
+nosh=
 
 if [[ ${1:-} = "--sh" ]]; then
   sh=1

@@ -15,7 +15,7 @@ load test_helper
 }
 
 @test "default PYENV_ROOT" {
-  PYENV_ROOT="" HOME=/home/mislav run pyenv root
+  PYENV_ROOT= HOME=/home/mislav run pyenv root
   assert_success
   assert_output "/home/mislav/.pyenv"
 }
