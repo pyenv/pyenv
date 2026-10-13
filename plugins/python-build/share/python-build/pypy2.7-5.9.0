@@ -1,8 +1,7 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.9.0-linux32" "https://downloads.python.org/pypy/pypy2-v5.9.0-linux32.tar.bz2#a2431a9e4ef879da1a2b56b111013b4a6efb87d4173a37bf650de47834ac5fe4" "pypy" verify_py27 ensurepip
-  fi
+  require_distro "Ubuntu 14.04" || true
+  install_package "pypy2-v5.9.0-linux32" "https://downloads.python.org/pypy/pypy2-v5.9.0-linux32.tar.bz2#a2431a9e4ef879da1a2b56b111013b4a6efb87d4173a37bf650de47834ac5fe4" "pypy" verify_py27 ensurepip
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
@@ -17,11 +16,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   fi
   ;;
 "linux64" )
-  if require_distro "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy2-v5.9.0-linux64" "https://downloads.python.org/pypy/pypy2-v5.9.0-linux64.tar.bz2#790febd4f09e22d6e2f81154efc7dc4b2feec72712aaf4f82aa91b550abb4b48" "pypy" verify_py27 ensurepip
-  else
-    install_package "pypy-5.9-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.9-linux_x86_64-portable.tar.bz2#8d39eb98df3adf7882a7f3551f47b8c7cff47a0e20d6aabc57bb592f155c2616" "pypy" verify_py27 ensurepip
-  fi
+  install_package "pypy-5.9-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.9-linux_x86_64-portable.tar.bz2#8d39eb98df3adf7882a7f3551f47b8c7cff47a0e20d6aabc57bb592f155c2616" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
   install_package "pypy2-v5.9.0-osx64" "https://downloads.python.org/pypy/pypy2-v5.9.0-osx64.tar.bz2#94de50ed80c7f6392ed356c03fd54cdc84858df43ad21e9e971d1b6da0f6b867" "pypy" verify_py27 ensurepip

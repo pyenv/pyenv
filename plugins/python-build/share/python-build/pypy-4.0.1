@@ -1,10 +1,6 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  if require_distro "Ubuntu 10.04" 1>/dev/null 2>&1; then
-    install_package "pypy-4.0.1-linux" "https://downloads.python.org/pypy/pypy-4.0.1-linux.tar.bz2#721920fcbb6aefc9a98e868e32b7f4ea5fd68b7f9305d08d0a2595327c9c0611" "pypy" verify_py27 ensurepip
-  else
-    install_package "pypy-4.0.1-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-4.0.1-linux_i686-portable.tar.bz2#2a1078bf36372b1c2919c11c418860dd7f0d44c92e6772bb36490eaf793b5c47" "pypy" verify_py27 ensurepip
-  fi
+  install_package "pypy-4.0.1-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-4.0.1-linux_i686-portable.tar.bz2#2a1078bf36372b1c2919c11c418860dd7f0d44c92e6772bb36490eaf793b5c47" "pypy" verify_py27 ensurepip
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
@@ -27,11 +23,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   install_package "pypy-4.0.1-ppc64le" "https://downloads.python.org/pypy/pypy-4.0.1-ppc64le.tar.bz2" "pypy" verify_py27 ensurepip
   ;;
 "linux64" )
-  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy-4.0.1-linux64" "https://downloads.python.org/pypy/pypy-4.0.1-linux64.tar.bz2#0d6090cee59f4b9bab91ddbea76580d0c232b78dae65aaa9e8fa8d4449ba25b4" "pypy" verify_py27 ensurepip
-  else
-    install_package "pypy-4.0.1-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-4.0.1-linux_x86_64-portable.tar.bz2#b3803f6dd9bbb964f7d322aa4aeb93191ff0ebe573428c1d2014ea26da49ff53" "pypy" verify_py27 ensurepip
-  fi
+  install_package "pypy-4.0.1-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-4.0.1-linux_x86_64-portable.tar.bz2#b3803f6dd9bbb964f7d322aa4aeb93191ff0ebe573428c1d2014ea26da49ff53" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
   install_package "pypy-4.0.1-osx64" "https://downloads.python.org/pypy/pypy-4.0.1-osx64.tar.bz2#06be1299691f7ea558bf8e3bdf3d20debb8ba03cd7cadf04f2d6cbd5fd084430" "pypy" verify_py27 ensurepip

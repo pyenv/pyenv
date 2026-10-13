@@ -1,0 +1,82 @@
+From 3f69689b6685b2a901ebfeea27b00549b895c237 Mon Sep 17 00:00:00 2001
+From: Alessandro Gatti <a.gatti@frob.it>
+Date: Tue, 28 Jan 2025 14:58:29 +0100
+Subject: [PATCH 4/5] py/emitinlinextensa: Simplify register name lookup.
+
+This commit changes the Xtensa inline assembly parser to use a slightly
+simpler (and probably a tiny bit more efficient) way to look up register
+names when decoding instruction parameters.
+
+Signed-off-by: Alessandro Gatti <a.gatti@frob.it>
+---
+ py/emitinlinextensa.c | 49 +++++++++----------------------------------
+ 1 file changed, 10 insertions(+), 39 deletions(-)
+
+diff --git a/py/emitinlinextensa.c b/py/emitinlinextensa.c
+index 57056d597..fed259cfc 100644
+--- a/py/emitinlinextensa.c
++++ b/py/emitinlinextensa.c
+@@ -115,50 +115,21 @@ static bool emit_inline_xtensa_label(emit_inline_asm_t *emit, mp_uint_t label_nu
+     return true;
+ }
+ 
+-typedef struct _reg_name_t { byte reg;
+-                             byte name[3];
+-} reg_name_t;
+-static const reg_name_t reg_name_table[] = {
+-    {0, "a0\0"},
+-    {1, "a1\0"},
+-    {2, "a2\0"},
+-    {3, "a3\0"},
+-    {4, "a4\0"},
+-    {5, "a5\0"},
+-    {6, "a6\0"},
+-    {7, "a7\0"},
+-    {8, "a8\0"},
+-    {9, "a9\0"},
+-    {10, "a10"},
+-    {11, "a11"},
+-    {12, "a12"},
+-    {13, "a13"},
+-    {14, "a14"},
+-    {15, "a15"},
++static const qstr_short_t REGISTERS[16] = {
++    MP_QSTR_a0, MP_QSTR_a1, MP_QSTR_a2, MP_QSTR_a3, MP_QSTR_a4, MP_QSTR_a5, MP_QSTR_a6, MP_QSTR_a7,
++    MP_QSTR_a8, MP_QSTR_a9, MP_QSTR_a10, MP_QSTR_a11, MP_QSTR_a12, MP_QSTR_a13, MP_QSTR_a14, MP_QSTR_a15
+ };
+ 
+-// return empty string in case of error, so we can attempt to parse the string
+-// without a special check if it was in fact a string
+-static const char *get_arg_str(mp_parse_node_t pn) {
+-    if (MP_PARSE_NODE_IS_ID(pn)) {
+-        qstr qst = MP_PARSE_NODE_LEAF_ARG(pn);
+-        return qstr_str(qst);
+-    } else {
+-        return "";
+-    }
+-}
+-
+ static mp_uint_t get_arg_reg(emit_inline_asm_t *emit, const char *op, mp_parse_node_t pn) {
+-    const char *reg_str = get_arg_str(pn);
+-    for (mp_uint_t i = 0; i < MP_ARRAY_SIZE(reg_name_table); i++) {
+-        const reg_name_t *r = &reg_name_table[i];
+-        if (reg_str[0] == r->name[0]
+-            && reg_str[1] == r->name[1]
+-            && reg_str[2] == r->name[2]
+-            && (reg_str[2] == '\0' || reg_str[3] == '\0')) {
+-            return r->reg;
++    if (MP_PARSE_NODE_IS_ID(pn)) {
++        qstr node_qstr = MP_PARSE_NODE_LEAF_ARG(pn);
++        for (size_t i = 0; i < MP_ARRAY_SIZE(REGISTERS); i++) {
++            if (node_qstr == REGISTERS[i]) {
++                return i;
++            }
+         }
+     }
++
+     emit_inline_xtensa_error_exc(emit,
+         mp_obj_new_exception_msg_varg(&mp_type_SyntaxError,
+             MP_ERROR_TEXT("'%s' expects a register"), op));
+-- 
+2.46.2.windows.1
+

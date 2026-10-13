@@ -14,7 +14,7 @@
 #   -g/--debug       Build a debug version
 #
 
-PYTHON_BUILD_VERSION="2.6.27"
+PYTHON_BUILD_VERSION="2.8.9"
 
 OLDIFS="$IFS"
 
@@ -425,6 +425,18 @@ http_head_aria2c() {
   aria2c --dry-run --no-conf=true ${ARIA2_OPTS} "$1" >&4 2>&1
 }
 
+# Shows interactive output of a program
+# while also logging it.
+# Usage:
+# command <switches forcing interactive output to non-terminal> 2>&1 | interactive_output; rc=${PIPESTATUS[0]}
+interactive_output() {
+  if [ -n "$VERBOSE" ]; then
+    cat >> "$LOG_PATH"
+  else
+    tee -a "$LOG_PATH" >&3
+  fi
+}
+
 http_get_aria2c() {
   # aria2c always treats -o argument as a relative path
   local out dir_out;
@@ -447,7 +459,26 @@ http_get_aria2c() {
     dir_out="$HOME"
   fi
 
-  if aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${ARIA2_OPTS} "$1" >&4; then
+  local aria2c_progress=
+  # aria2c prints status to stdout rather than stderr.
+  # As a result, when stdout is redirected, it becomes line-buffered,
+  # and status messages (which are divided by CRs) are not seen
+  # until a summary message with some LFs is printed.
+  # So we have to print summaries often as a crutch.
+  # But need to make the interval reasonable because each summary is
+  # several lines long which, made too often, becomes obnoxious.
+  [ -t 3 ] && aria2c_progress="--summary-interval=5"
+  local cmd
+  cmd=(aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${aria2c_progress} ${ARIA2_OPTS} "$1")
+ 
+  if [ -t 3 ]; then
+    "${cmd[@]}" 2>&1 | interactive_output
+    ret=${PIPESTATUS[0]}
+  else
+    "${cmd[@]}" >&4
+    ret=$?
+  fi
+  if [ "$ret" -eq 0 ]; then
     [ -n "$2" ] || cat "${dir_out:-.}/${out}"
   else
     false
@@ -471,7 +502,21 @@ http_get_curl() {
   local curl_is_snap;
   if [[ $(command -v curl) == "/snap/"* ]]; then curl_is_snap=1; fi
   if [[ -n $2 && -n $curl_is_snap ]]; then out="$HOME/$(basename "$2")"; else out="$2"; fi
-  curl -q -o "${out:--}" -sSLf ${CURL_OPTS} "$1" || return $?
+  local curl_progress=
+  if [ -t 3 ]; then
+    curl_progress="--no-silent"
+  fi
+  local cmd
+  cmd=(curl -q -o "${out:--}" -sSLf ${CURL_OPTS} ${curl_progress} "$1")
+  if [ -t 3 ]; then
+    exec 5>&1
+    "${cmd[@]}" 3>&1 1>&5 2>&3 3>&- | interactive_output
+    ret=${PIPESTATUS[0]}
+    exec 5>&-
+    [ "$ret" -eq 0 ] || return "$ret"
+  else
+    "${cmd[@]}" || return $?
+  fi
   if [[ -n $out && -n $curl_is_snap ]]; then mv "$out" "$2"; fi
 }
 
@@ -480,7 +525,21 @@ http_head_wget() {
 }
 
 http_get_wget() {
-  wget -nv ${WGET_OPTS} -O "${2:--}" "$1"
+  local wget_progress="-nv"
+  if [ -t 3 ]; then
+    wget_progress="-nv --show-progress --progress=bar:force:noscroll"
+  fi
+  local cmd
+  cmd=(wget ${WGET_OPTS} ${wget_progress} -O "${2:--}" "$1")
+  if [ -t 3 ]; then
+    exec 5>&1
+    "${cmd[@]}" 3>&1 1>&5 2>&3 3>&- | interactive_output
+    ret=${PIPESTATUS[0]}
+    exec 5>&-
+    return "$ret"
+  else
+    "${cmd[@]}"
+  fi
 }
 
 fetch_tarball() {
@@ -622,6 +681,18 @@ fetch_git() {
   local package_name="$1"
   local git_url="$2"
   local git_ref="$3"
+  local git_sha=
+  
+  # Checking the ref's SHA-1 is enough to ensure its authenticity according to Linus Torvalds
+  # https://security.stackexchange.com/questions/67920/how-safe-are-signed-git-tags-only-as-safe-as-sha-1-or-somehow-safer
+  # ":" is illegal in ref names, see git-check-ref-format(1) manpage
+  # https://stackoverflow.com/questions/3651860/which-characters-are-illegal-within-a-branch-name
+  # So we can use it as a delimiter
+  if [[ $git_ref =~ :(.*)$ ]]; then
+    git_sha="${BASH_REMATCH[1]}"
+    # Bash 3.2/Busybox don't support negative length in substring expansion
+    git_ref="${git_ref::${#git_ref}-${#BASH_REMATCH[0]}}"
+  fi
 
   echo "Cloning ${git_url}..." >&2
 
@@ -651,6 +722,25 @@ fetch_git() {
   else
     echo "error: please install \`git\` and try again" >&2
     exit 1
+  fi
+  
+  if [[ -n $git_sha ]]; then
+    #If the tag is annotated, its underlying ("peeled") commit is checked out instead
+    #In this case, we accept either commit's SHA or tag's SHA for convenience
+    (
+      declare tag_sha commit_sha
+      cd "${package_name}";
+      if git describe --exact-match 2>/dev/null | grep -xF "$git_ref" >/dev/null;then
+        tag_sha=$(git rev-parse "$git_ref")
+      fi
+      commit_sha=$(git rev-parse HEAD)
+      if [[ (-z $tag_sha || $git_sha != "$tag_sha") && $git_sha != "$commit_sha" ]]; then
+        echo -n "error: ref \`${git_ref}' SHA-1 mismatch: expected $git_sha, got $commit_sha" >&2
+        if [[ -n $tag_sha ]]; then echo -n "(commit) and $tag_sha(tag)" >&2; fi
+        echo >&2
+        exit 1
+      fi
+    )
   fi
 }
 
@@ -873,6 +963,7 @@ build_package_standard_build() {
 
   if [ "$package_var_name" = "PYTHON" ]; then
     if can_use_homebrew; then
+      configured_with_openssl || use_homebrew_openssl || true
       use_custom_tcltk || use_homebrew_tcltk || true
       use_homebrew_readline || true
       use_homebrew_ncurses || true
@@ -885,6 +976,7 @@ build_package_standard_build() {
       fi
     fi
     if can_use_macports; then
+      configured_with_openssl || use_macports_openssl || true
       use_custom_tcltk || true
       use_macports_readline || true
       use_macports_ncurses || true
@@ -996,27 +1088,29 @@ build_package_jython_builder() {
   ( cd "dist" && build_package_jython )
 }
 
-build_package_pyston2_2() {
-  # currently supported version 2.2 and 2.3
+build_package_pyston() {
   build_package_copy
-  mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
-  local bin
-  shopt -s nullglob
-  for bin in "bin/"*; do
-    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
-      case "${bin##*/}" in
-      "pyston"* )
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
-        ;;
-      esac
-    fi
-  done
-  shopt -u nullglob
+  # Pyston tarballs provide an executable with a version-specific naming scheme
+  # and `pyston` and `pyston3` symlinks to it.
+  make_python_symlinks pyston
 }
 
-build_package_pyston() {
-  # currently supported version 2.3.1v2 and higher
-  build_package_copy
+# Add missing `python', `pythonX' and `pythonX.Y' symlinks as per PEP 394.
+make_python_symlinks() {
+  local seeder_basename version_suffix real_interpreter
+  local -a interpreter_names
+  seeder_basename="${1:?}"; shift
+  (($#)) && interpreter_names=("$@") || interpreter_names=(python)
+  
+  local real_interpreter
+  real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/$seeder_basename" || echo $seeder_basename)
+  # Use syntax accepted in both Py2 and Py3. Even though current Py2 holdouts (e.g. PyPy) support e.g. print()
+  version_suffix=$("${PREFIX_PATH}/bin/$seeder_basename" -c 'import sys; sys.stdout.write("%d.%d\n" % sys.version_info[:2])')
+  for interpreter_name in "${interpreter_names[@]}"; do
+    for name in "$interpreter_name" "$interpreter_name${version_suffix%.*}" "$interpreter_name${version_suffix}"; do
+      [[ -e "${PREFIX_PATH}/bin/$name" ]] || ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
+    done
+  done
 }
 
 build_package_ironpython() {
@@ -1112,30 +1206,43 @@ pyston_architecture() {
 # Note: not used by graalpy >= 23.3.0 anymore
 build_package_graalpython() {
     build_package_copy
-    ln -fs "${PREFIX_PATH}/bin/graalpython" "${PREFIX_PATH}/bin/python"
+    make_python_symlinks graalpython
 }
 
 build_package_pypy() {
   build_package_copy
-  mkdir -p "${PREFIX_PATH}/bin" "${PREFIX_PATH}/lib"
   local bin
   shopt -s nullglob
-  for bin in "bin/"*; do
-    if [ -f "${bin}" ] && [ -x "${bin}" ] && [ ! -L "${bin}" ]; then
-      case "${bin##*/}" in
-      "libpypy"* )
-        ( cd "${PREFIX_PATH}/lib" && ln -fs "../bin/${bin##*/}" "${bin##*/}" )
-        ;;
-      "pypy"* )
-        ( cd "${PREFIX_PATH}/bin" && ln -fs "${bin##*/}" "python" )
-        ;;
-      esac
+  for bin in "bin/libpypy"*; do
+    if [[ -f "${bin}" && -x "${bin}" && ! -L "${bin}" ]]; then
+        ln -fs "../bin/${bin##*/}" "${PREFIX_PATH}/lib/${bin##*/}"
+    fi
+  done
+
+  # PyPy source builds may create only a pypy* executable with a version-sepecific name
+  local seeder= seeder_candidate
+  for seeder_candidate in "${PREFIX_PATH}/bin/"pypy*; do
+    if [[ -f $seeder_candidate && -x $seeder_candidate ]]; then
+      seeder="${seeder_candidate##*/}"
+      break
     fi
   done
   shopt -u nullglob
+  [[ -n $seeder ]] || {
+    echo "python-build: Cannot find a valid PyPy executable in \`${PREFIX_PATH}/bin'" >&4
+    exit 1
+  }
+  make_python_symlinks "$seeder" pypy python
 }
 
 build_package_pypy_builder() {
+  use_homebrew_openssl || use_macports_openssl || true
+  export PYTHON_BUILD_TCLTK_USE_PKGCONFIG=1
+  use_homebrew_tcltk || true
+  use_homebrew_ncurses || use_macports_ncurses || true
+  use_homebrew || use_macports || true
+  
+  
   if [ -f "rpython/bin/rpython" ]; then # pypy 2.x
     if [ -z "${PYPY_OPTS}" ]; then
       local PYPY_OPTS="--opt=jit --batch --make-jobs=$(num_cpu_cores)"
@@ -1201,6 +1308,7 @@ anaconda_architecture() {
     "aarch64" ) echo "Linux-aarch64" ;;
     "i386" | "i486" | "i586" | "i686" | "i786" ) echo "Linux-x86" ;;
     "ppc64le" ) echo "Linux-ppc64le" ;;
+    "riscv64" ) echo "Linux-riscv64" ;;
     "x86_64" ) echo "Linux-x86_64" ;;
     * ) return 1 ;;
     esac
@@ -1258,7 +1366,7 @@ cleanup_builtin_patches() {
 
 fix_directory_permissions() {
   # Ensure installed directories are not world-writable
-  find "$PREFIX_PATH" -type d \( -perm -020 -o -perm -002 \) -exec chmod go-w {} \;
+  find "$PREFIX_PATH" -type d \( -perm -020 -o -perm -002 \) -exec chmod go-w {} \+
 }
 
 require_java7() {
@@ -1515,7 +1623,7 @@ use_homebrew() {
   if command -v brew &>/dev/null; then
     local brew_prefix="$(brew --prefix 2>/dev/null || true)"
     # /usr/local/lib:/usr/lib is the default library search path
-    if [[ -n $brew_prefix && ( ( $brew_prefix != "/usr" && $brew_prefix != "/usr/local" ) 
+    if [[ -n $brew_prefix && ( ( $brew_prefix != "/usr" && $brew_prefix != "/usr/local" )
         #when -isysroot is passed to Apple CLang, /usr/(local) are excluded from the default search path
         || ( is_mac && osx_using_default_compiler && $CFLAGS =~ (^|\ )-isysroot\  ) ) ]]; then
       export CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I${brew_prefix}/include"
@@ -1667,8 +1775,7 @@ use_macports_ncurses() {
 }
 
 prefer_openssl11() {
-  # Allow overriding the preference of OpenSSL version per definition basis (#1302, #1325, #1326)
-  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@1.1 openssl}"
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@1.1 openssl@3 openssl@3.5 openssl@3.0 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
 
   PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl11 openssl3 openssl}"
@@ -1677,12 +1784,26 @@ prefer_openssl11() {
 }
 
 prefer_openssl3() {
-  # Allow overriding the preference of OpenSSL version per definition basis (#1302, #1325, #1326)
-  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@1.1 openssl}"
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@3.5 openssl@3.0 openssl@1.1 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
   
-  # Set MacPorts OpenSSL formula names for MacPorts environment
   PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3 openssl openssl11}"
+  export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
+}
+
+prefer_openssl3_to_4() {
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@3.5 openssl@3.0 openssl@4 openssl@1.1 openssl}"
+  export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
+  
+  PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3 openssl4 openssl openssl11}"
+  export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
+}
+
+require_openssl3() {
+  PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@3.5 openssl@3.0}"
+  export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
+  
+  PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3}"
   export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
 }
 
@@ -1700,8 +1821,17 @@ build_package_mac_readline() {
   build_package_standard "$@"
 }
 
+configured_with_openssl() {
+  local arg
+  for arg in ${CONFIGURE_OPTS} ${PYTHON_CONFIGURE_OPTS} "${PYTHON_CONFIGURE_OPTS_ARRAY[@]}"; do
+    [[ "$arg" =~ ^--with-openssl(=|$) ]] && return 0
+  done
+  return 1
+}
+
 has_broken_mac_openssl() {
   is_mac || return 1
+  configured_with_openssl && return 1
   local openssl_version="$(/usr/bin/openssl version 2>/dev/null || true)"
   if [[ $openssl_version = "OpenSSL 0.9.8"?* || $openssl_version = "LibreSSL"* ]]; then
     if can_use_homebrew; then
@@ -1721,14 +1851,29 @@ use_homebrew_openssl() {
     local ssldir="$(brew --prefix "${openssl}" || true)"
     if [ -d "$ssldir" ]; then
       echo "python-build: use ${openssl} from homebrew"
+      # Since 970acdcad3be4262451e9a5180a385dd2158eda3 (openssl@3 3.1.1),
+      # Homebrew's openssl@3 is no longer keg-only.
+      # Python's --with-openssl* appends flags to the compiler's command line,
+      # which in combination with adding Homebrew's general dir to flags
+      # always causes the build to link to the non-keg `openssl'
+      # when the non-keg-only formula is installed.
+      # To counter that, we have to prepend the openssl path to flags
+      # regardless of using Configure options.
       if [[ -n "${PYTHON_BUILD_CONFIGURE_WITH_OPENSSL:-}" ]]; then
         # configure script of newer CPython versions support `--with-openssl`
         # https://bugs.python.org/issue21541
         package_option python configure --with-openssl="${ssldir}"
-      else
-        export CPPFLAGS="-I$ssldir/include ${CPPFLAGS:+ $CPPFLAGS}"
-        export LDFLAGS="-L$ssldir/lib${LDFLAGS:+ $LDFLAGS}"
       fi
+      # 3.10.0+ (https://github.com/python/cpython/pull/24820)
+      # but has no effect until 3.11.0 (b9e9292d75fdea621e05e39b8629e6935d282d0d)
+      # and broken in MacOS until 3.12.2 (cc13eabc7ce08accf49656e258ba500f74a1dae8)
+      if [[ -n $PYTHON_BUILD_CONFIGURE_WITH_OPENSSL_RPATH ]]; then
+        package_option python configure --with-openssl-rpath="${ssldir}/lib"
+      fi
+      export CPPFLAGS="-I${ssldir}/include ${CPPFLAGS:+ $CPPFLAGS}"
+      export LDFLAGS="-L${ssldir}/lib -Wl,-rpath,${ssldir}/lib${LDFLAGS:+ $LDFLAGS}"
+
+      
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
       lock_in homebrew
       return 0
@@ -1866,7 +2011,7 @@ use_xcode_sdk_zlib() {
   # If a custom compiler is used, including XCode SDK will likely break it
   osx_using_default_compiler || return 1
 
-  local sdkroot="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
+  local sdkroot="${SDKROOT:-$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)}"
   [[ -z ${sdkroot} || ! -d ${sdkroot} ]] && return 1
 
   # Since Xcode 16 / macOS SDK 15, Apple tightened how the linker uses SDK content:
@@ -1905,9 +2050,14 @@ use_homebrew_tcltk() {
   can_use_homebrew || return 1
   local tcltk_formula
   # Since https://github.com/Homebrew/homebrew-core/commit/f10e88617b41555193c22fdcba6109fe82155ee2 (10.11.2024),
-  # tcl-tk is 9.0. It's supported in CPython since 3.14.0a1 (gh-124111) but is not officially supported as of 3.14.0
-  # so we prefer 8
-  for tcltk_formula in ${PYTHON_BUILD_TCLTK_FORMULA:-tcl-tk@8 tcl-tk}; do
+  # tcl-tk is 9.0. It's supported in CPython since 3.14.0a1 (gh-124111) but is not officially supported as of 3.14.0,
+  # as of 3.15.0rc3, there are still test failures.
+  # So we prefer 8.
+  if [[ -n $PYTHON_BUILD_TCLTK_FORMULA ]]; then
+    export PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-$PYTHON_BUILD_TCLTK_FORMULA}"
+    echo "warning: the PYTHON_BUILD_TCLTK_FORMULA envvar has been renamed to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA" >&2
+  fi
+  for tcltk_formula in ${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-tcl-tk@8 tcl-tk}; do
     local tcltk_prefix="$(brew --prefix "${tcltk_formula}" 2>/dev/null || true)"
     if [ -d "$tcltk_prefix" ]; then
       echo "python-build: use ${tcltk_formula} from homebrew"
@@ -2092,10 +2242,12 @@ build_package_symlink_version_suffix() {
 
 verify_python() {
   build_package_symlink_version_suffix
+  
+  local python_bin="${PYTHON_BIN%/*}/python${1:?}"
 
-  if [ ! -x "${PYTHON_BIN}" ]; then
+  if [ ! -x "${python_bin}" ]; then
     { colorize 1 "ERROR"
-      echo ": invalid Python executable: ${PYTHON_BIN}"
+      echo ": invalid Python executable: ${python_bin}"
       echo
       echo "The python-build could not find proper executable of Python after successful build."
       echo "Please open an issue for future improvements."
@@ -2274,6 +2426,11 @@ build_package_verify_py314() {
 # Post-install check for Python 3.15.x
 build_package_verify_py315() {
   build_package_verify_py314 "$1" "${2:-3.15}"
+}
+
+# Post-install check for Python 3.16.x
+build_package_verify_py316() {
+  build_package_verify_py315 "$1" "${2:-3.16}"
 }
 
 # Post-install check for Python 3.x rolling release scripts
@@ -2465,7 +2622,7 @@ fi
 
 # Check if TMPDIR is accessible and can hold executables.
 tmp_executable="${TMP}/python-build-test.$$"
-noexec=""
+noexec=
 if mkdir -p "$TMP" && touch "$tmp_executable" 2>/dev/null; then
   cat > "$tmp_executable" <<-EOF
 	#!${BASH}
@@ -2651,7 +2808,7 @@ if [ -z "${GET_PIP_URL}" ]; then
     2.6 | 2.6.* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/2.6/get-pip.py"
       ;;
-    2.7 | 2.7.* | pypy2.7 | pypy2.7-* )
+    2.7 | 2.7.* | pypy2.7 | pypy2.7-* | pypy-c-jit-* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/2.7/get-pip.py"
       ;;
     3.2 | 3.2.* )
@@ -2674,6 +2831,9 @@ if [ -z "${GET_PIP_URL}" ]; then
       ;;
     3.8 | 3.8.* | pypy3.8 | pypy3.8-* | pyston* )
       GET_PIP_URL="https://bootstrap.pypa.io/pip/3.8/get-pip.py"
+      ;;
+    3.9 | 3.9.* | pypy3.9 | pypy3.9-* )
+      GET_PIP_URL="https://bootstrap.pypa.io/pip/3.9/get-pip.py"
       ;;
     * )
       GET_PIP_URL="https://bootstrap.pypa.io/get-pip.py"
@@ -2727,7 +2887,8 @@ else
   BUILD_PATH="$PYTHON_BUILD_BUILD_PATH"
 fi
 
-exec 4<> "$LOG_PATH" # open the log file at fd 4
+# Append mode needed to be able to `tee` to it at the same time
+exec 4>> "$LOG_PATH"
 if [ -n "$VERBOSE" ]; then
   tail -f "$LOG_PATH" &
   TAIL_PID=$!

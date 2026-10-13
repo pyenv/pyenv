@@ -79,3 +79,12 @@ OUT
 3.3.3
 OUT
 }
+
+@test "version with glob characters is handled correctly" {
+  cd "$BATS_TEST_TMPDIR"; touch 1.1
+  PYENV_VERSION="[1-9].?*" run pyenv-version
+  assert_failure
+  assert_output <<OUT
+pyenv: version \`[1-9].?*' is not installed (set by PYENV_VERSION environment variable)
+OUT
+}

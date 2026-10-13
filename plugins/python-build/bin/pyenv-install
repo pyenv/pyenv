@@ -2,9 +2,9 @@
 #
 # Summary: Install a Python version using python-build
 #
-# Usage: pyenv install [-f] [-kvp] <version>...
-#        pyenv install [-f] [-kvp] <definition-file>
-#        pyenv install -l|--list
+# Usage: pyenv install [-f] [-kvp] <version>[:<alias>]...
+#        pyenv install [-f] [-kvp] <definition-file>[:<alias>]
+#        pyenv install -l|--list [--bare]
 #        pyenv install --version
 #
 #   -l/--list          List all available versions
@@ -19,6 +19,13 @@
 #   -v/--verbose       Verbose mode: print compilation status to stdout
 #   --version          Show version of python-build
 #   -g/--debug         Build a debug version
+#
+#   Append `:<alias>' to a version to install it under a custom name, so that
+#   several builds of the same version can coexist:
+#
+#       pyenv install 3.12.0:my-3.12
+#
+#   This installs into $PYENV_ROOT/versions/my-3.12.
 #
 # For detailed information on installing Python versions with
 # python-build, including a list of environment variables for adjusting
@@ -38,6 +45,7 @@ shopt -u nullglob
 
 # Provide pyenv completions
 if [ "$1" = "--complete" ]; then
+  echo --bare
   echo --list
   echo --force
   echo --skip-existing
@@ -72,6 +80,8 @@ unset KEEP
 unset VERBOSE
 unset HAS_PATCH
 unset DEBUG
+unset BARE
+unset LIST
 
 [ -n "$PYENV_DEBUG" ] && VERBOSE="-v"
 
@@ -81,10 +91,11 @@ for option in "${OPTIONS[@]}"; do
   "h" | "help" )
     usage 0
     ;;
+  "bare" )
+    BARE=1
+    ;;
   "l" | "list" )
-    echo "Available versions:"
-    definitions | indent
-    exit
+    LIST=1
     ;;
   "f" | "force" )
     FORCE=true
@@ -113,6 +124,16 @@ for option in "${OPTIONS[@]}"; do
   esac
 done
 
+if [[ -n $LIST ]]; then
+  if [[ -n $BARE ]]; then
+    definitions
+  else
+    echo "Available versions:"
+    definitions | indent
+  fi
+  exit
+fi
+
 unset VERSION_NAME
 
 # The first argument contains the definition to install. If the
@@ -122,6 +143,20 @@ unset VERSION_NAME
 DEFINITIONS=("${ARGUMENTS[@]}")
 [[ "${#DEFINITIONS[*]}" -eq 0 ]] && DEFINITIONS=($(pyenv-local 2>/dev/null || true))
 [[ "${#DEFINITIONS[*]}" -eq 0 ]] && usage 1 >&2
+
+# A `<version>:<alias>` argument installs <version> under the custom name
+# <alias>, so that several builds of the same version can coexist. The `latest`
+# suffix is reserved for latest-version resolution (see the `install` hook), so
+# it is left untouched here.
+declare -a ALIASES
+for i in "${!DEFINITIONS[@]}"; do
+  definition="${DEFINITIONS[$i]}"
+  alias="${definition##*:}"
+  if [[ "$definition" == *:* ]] && [ "$alias" != "latest" ]; then
+    DEFINITIONS[$i]="${definition%:*}"
+    ALIASES[$i]="$alias"
+  fi
+done
 
 # Define `before_install` and `after_install` functions that allow
 # plugin hooks to register a string of code for execution before or
@@ -152,7 +187,9 @@ IFS="$OLDIFS"
 for script in "${scripts[@]}"; do source "$script"; done
 
 COMBINED_STATUS=0
-for DEFINITION in "${DEFINITIONS[@]}"; do
+for i in "${!DEFINITIONS[@]}"; do
+  DEFINITION="${DEFINITIONS[$i]}"
+  VERSION_ALIAS="${ALIASES[$i]}"
   STATUS=0
 
   # Try to resolve a prefix if user indeed gave a prefix.
@@ -161,9 +198,12 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
   DEFINITION="$(pyenv-latest -f -k "$DEFINITION")"
 
   # Set VERSION_NAME from $DEFINITION. Then compute the installation prefix.
+  # With a `<version>:<alias>` argument, install under the alias instead;
+  # VERSION_NAME still reflects the real version so version-specific build logic
+  # (e.g. the bootstrap version detection below) keeps working.
   VERSION_NAME="${DEFINITION##*/}"
   [ -n "$DEBUG" ] && VERSION_NAME="${VERSION_NAME}-debug"
-  PREFIX="${PYENV_ROOT}/versions/${VERSION_NAME}"
+  PREFIX="${PYENV_ROOT}/versions/${VERSION_ALIAS:-$VERSION_NAME}"
 
   [ -d "${PREFIX}" ] && PREFIX_EXISTS=1
 
@@ -188,7 +228,7 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
 
   # If PYENV_BUILD_ROOT is set, always pass keep options to python-build.
   if [ -n "${PYENV_BUILD_ROOT}" ]; then
-    export PYTHON_BUILD_BUILD_PATH="${PYENV_BUILD_ROOT}/${VERSION_NAME}"
+    export PYTHON_BUILD_BUILD_PATH="${PYENV_BUILD_ROOT}/${VERSION_ALIAS:-$VERSION_NAME}"
     KEEP="-k"
   fi
 
@@ -221,7 +261,7 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
         PYENV_BOOTSTRAP_VERSION="${PYENV_RPYTHON_VERSION}"
       else
         for version in $(pyenv-versions --bare | sort -r); do
-          if [[ "${version}" == "2.7"* ]]; then
+          if [[ "${version}" =~ ^(2\.7|pypy2\.7) ]]; then
             PYENV_BOOTSTRAP_VERSION="$version"
             break
           fi
@@ -235,7 +275,7 @@ for DEFINITION in "${DEFINITIONS[@]}"; do
           fi
         done
       else
-        echo "pyenv-install: $VERSION_NAME: PyPy requires Python 2.7 to build from source." >&2
+        echo "pyenv-install: $VERSION_NAME: PyPy requires Python 2.7 to build from source. You can specify the version to use by setting the PYENV_BOOTSTRAP_VERSION environment variable."  >&2
         exit 1
       fi
       ;;

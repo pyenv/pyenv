@@ -17,6 +17,7 @@ import os.path
 import pathlib
 import pprint
 import re
+import shutil
 import subprocess
 import sys
 import typing
@@ -32,13 +33,20 @@ import tqdm
 
 logger = logging.getLogger(__name__)
 
-CUTOFF_VERSION=packaging.version.Version('3.9')
+CUTOFF_VERSION=packaging.version.Version('3.10')
 EXCLUDED_VERSIONS= {
-    packaging.version.Version("3.9.3")  #recalled upstream
 }
 
 here = pathlib.Path(__file__).resolve()
 OUT_DIR: pathlib.Path = here.parent.parent / "share" / "python-build"
+
+AUTO_ADD_VERSION_REF_RE = re.compile(
+    r"^(?P<object_id>[0-9a-f]{40,64})\t"
+    r"refs/heads/auto_add_version/(?P<versions>\S+)$"
+)
+OPENSSL_RELEASE_TAG_RE = re.compile(
+    r"^openssl-(?P<major>\d+)\.\d+(?:\.\d+)*(?:[a-z]+\d*)?$"
+)
 
 T_THUNK=\
 '''export PYTHON_BUILD_FREE_THREADING=1
@@ -77,10 +85,13 @@ def adapt_script(version: packaging.version.Version,
                                  url=new_package_url+'#'+new_package_hash,
                                  verify_py_suffix=verify_py_suffix)
 
-        elif m:=re.match(r'\s*install_package\s+"(?P<package>openssl-\S+)"\s+'
-                       r'"(?P<url>\S+)"\s.*$',
+        elif m:=re.match(r'\s*install_package\s+'
+                         r'"(?P<package>openssl-(?P<openssl_major>\d+)\.\S+)"\s+'
+                         r'"(?P<url>\S+)"\s.*$',
                          line):
-            item = VersionDirectory.openssl.get_store_latest_release()
+            item = VersionDirectory.openssl.get_store_latest_release(
+                int(m.group('openssl_major'))
+            )
 
             line = Re.sub_groups(m,
                                package=item.package_name,
@@ -123,12 +134,60 @@ def add_version(version: packaging.version.Version):
         return False
     VersionDirectory.existing.append(_CPythonExistingScriptInfo(version,str(new_path)))
 
+    handle_version_patches(version, previous_version, is_prerelease_upgrade)
+
     cleanup_prerelease_upgrade(is_prerelease_upgrade, previous_version, version)
 
     handle_t_thunks(version, previous_version, is_prerelease_upgrade)
 
     print(version)
     return True
+
+
+def handle_version_patches(
+        version: packaging.version.Version,
+        previous_version: packaging.version.Version,
+        is_prerelease_upgrade: bool)\
+        -> None:
+    if (previous_version.major, previous_version.minor) != (version.major, version.minor):
+        return
+
+    patches_dir = OUT_DIR / "patches"
+    previous_patches = patches_dir / str(previous_version)
+    if not previous_patches.exists():
+        return
+
+    new_patches = patches_dir / str(version)
+    if is_prerelease_upgrade:
+        logger.info(f"Git moving patches from {previous_version} to {version}")
+        subprocess.check_call((
+            "git", "-C", OUT_DIR, "mv",
+            f"patches/{previous_version}",
+            f"patches/{version}",
+        ))
+    else:
+        logger.info(f"Copying patches from {previous_version} to {version}")
+        shutil.copytree(previous_patches, new_patches)
+
+    # Subdir rename as a separate step from upper dir copying/moving
+    # in case there are patches for dependency packages as well
+    previous_package_patches = new_patches / f"Python-{previous_version}"
+    new_package_patches = new_patches / f"Python-{version}"
+    if is_prerelease_upgrade:
+        subprocess.check_call((
+            "git", "-C", OUT_DIR, "mv",
+            f"patches/{version}/Python-{previous_version}",
+            f"patches/{version}/Python-{version}",
+        ))
+    else:
+        previous_package_patches.rename(new_package_patches)
+
+    if uses_t_thunks(previous_version) and is_prerelease_upgrade:
+        (patches_dir / f"{previous_version}t").unlink(missing_ok=True)
+    if uses_t_thunks(version):
+        (patches_dir / f"{version}t").symlink_to(
+            str(version), target_is_directory=True
+        )
 
 
 def cleanup_prerelease_upgrade(
@@ -160,7 +219,7 @@ def cleanup_prerelease_upgrade(
 
 
 def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
-    if (version.major, version.minor) < (3, 13):
+    if not uses_t_thunks(version):
         return
 
     # an old thunk may have older version-specific code
@@ -168,7 +227,6 @@ def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
     thunk_name = (str(version) + "t")
     thunk_path = OUT_DIR / thunk_name
     previous_thunk_name = str(previous_version) + "t"
-    previous_thunk_path = OUT_DIR / previous_thunk_name
     if is_prerelease_upgrade:
         logger.info(f"Git moving {previous_thunk_name} to {thunk_name}")
         subprocess.check_call(("git","-C",OUT_DIR,
@@ -178,6 +236,10 @@ def handle_t_thunks(version, previous_version, is_prerelease_upgrade):
 
     logger.info(f"Writing {thunk_path}")
     thunk_path.write_text(T_THUNK, encoding='utf-8')
+
+
+def uses_t_thunks(version: packaging.version.Version) -> bool:
+    return (version.major, version.minor) >= (3, 13)
 
 
 Arguments: argparse.Namespace
@@ -194,19 +256,55 @@ def main():
     VersionDirectory.existing.populate()
     VersionDirectory.available.populate()
 
-    for initial_release in (v for v in frozenset(VersionDirectory.available.keys())
-                            if v.micro == 0 and v not in VersionDirectory.existing):
-        # may actually be a prerelease
-        VersionDirectory.available.get_store_available_source_downloads(initial_release, True)
-        del initial_release
+    # Prereleases are placed under the same directory as the corresponding release.
+    # So until we know the release is out, its directory is a potential prerelease directory.
+    # Normally, prereleases are only made for initial releases (x.y.0) --
+    # but rarely, they may make them for other releases (e.g. 3.14.5).
+    for release in (v for v in frozenset(VersionDirectory.available.keys())     #refining alters the
+                                                                                #corresponding directory key
+                                                                                #which breaks iteration
+                                                                                #over the directory --
+                                                                                #so have to iterate over a copy
+                            if v not in VersionDirectory.existing):
+        VersionDirectory.available.get_store_available_source_downloads(release, True)
+        del release
 
-    versions_to_add = sorted(VersionDirectory.available.keys() - VersionDirectory.existing.keys())
+    # Excluding versions for which there already are PRs.
+    # This will prevent us from using advanced features of
+    # peter-evans/create-pull-request Github Action
+    # like updating a PR and closing a superseded PR
+    # but we don't really need them as of this writing.
+    versions_to_add = sorted(
+        VersionDirectory.available.keys()
+        - VersionDirectory.existing.keys()
+        - get_pending_versions()
+    )
 
     logger.info("Versions to add:\n"+pprint.pformat(versions_to_add))
     result = False
     for version_to_add in versions_to_add:
         result = add_version(version_to_add) or result
     return int(not result)
+
+
+def get_pending_versions() -> typing.Set[packaging.version.Version]:
+    ls_remote = subprocess.check_output(
+        ("git", "-C", OUT_DIR, "ls-remote", "origin",
+         "refs/heads/auto_add_version/*"),
+        text=True,
+        timeout=30,
+    )
+
+    pending_versions = set()
+    for line in ls_remote.splitlines():
+        if not (match := AUTO_ADD_VERSION_REF_RE.fullmatch(line)):
+            raise ValueError(f"Unexpected git ls-remote output line: {line!r}")
+        pending_versions.update(
+            packaging.version.Version(version)
+            for version in match.group("versions").split("_")
+        )
+    return pending_versions
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -358,8 +456,9 @@ class CPythonAvailableVersionsDirectory(KeyedList[_CPythonAvailableVersionInfo, 
             download_version = packaging.version.Version(m.group("version"))
             if download_version != version:
                 if not refine_mode:
-                    raise ValueError(f"Unexpectedly found a download {name} for {download_version} "
-                                     f"at page {entry.download_page_url} for {version}")
+                    logger.warning(f"Ignoring download {name} ({download_version}) "
+                                     f"for {version} at page {entry.download_page_url}")
+                    continue
                 entry_to_fill = additional_versions_found.get_or_create(
                     download_version,
                     download_page_url=entry.download_page_url
@@ -372,7 +471,10 @@ class CPythonAvailableVersionsDirectory(KeyedList[_CPythonAvailableVersionInfo, 
                 m.group("extension"), m.group('package'), url
             ))
 
-        if not exact_download_found:
+        # XXX: Exact download not found in non-refine mode never happens now
+        # 'cuz we first call the function in refine mode.
+        # Decide what's best to do if it starts to after a logic change.
+        if not exact_download_found and refine_mode:
             actual_version = max(additional_versions_found.keys())
             logger.debug(f"Refining available version {version} to {actual_version}")
             del self[version]
@@ -404,7 +506,7 @@ class CPythonExistingScriptsDirectory(KeyedList[_CPythonExistingScriptInfo, pack
                 v = packaging.version.Version(entry_name)
                 if v < CUTOFF_VERSION:
                     continue
-                # branch tip scrpts are different from release scripts and thus unusable as a pattern
+                # branch tip scripts are different from release scripts and thus unusable as a pattern
                 if v.dev is not None:
                     continue
                 logger.debug(f"Existing version {v}")
@@ -429,21 +531,43 @@ class _OpenSSLVersionInfo(typing.NamedTuple):
 class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.Version]):
     key_field = "version"
 
-    def get_store_latest_release(self) \
+    def get_store_latest_release(self, major: int) \
             -> _OpenSSLVersionInfo:
-        if self:
-            #already retrieved
-            return self[max(self.keys())]
+        matching = [
+            release for release in self
+            if release.version.major == major
+        ]
+        if matching:
+            return max(matching, key=lambda release: release.version)
 
-        j = requests.get("https://api.github.com/repos/openssl/openssl/releases/latest").json()
+        url = "https://api.github.com/repos/openssl/openssl/releases"
+        while url:
+            response = Requests.get(url)
+            matching = [
+                release
+                for release in response.json()
+                if not release['draft']
+                and not release['prerelease']
+                and (match := OPENSSL_RELEASE_TAG_RE.fullmatch(
+                    release['tag_name']
+                ))
+                and int(match.group('major')) == major
+            ]
+            if matching:
+                j_release = matching[0]
+                break
+            url = response.links.get('next', {}).get('url')
+        else:
+            raise ValueError(f"No OpenSSL {major}.x release found")
+
         # noinspection PyTypeChecker
         # urlparse can parse str as well as bytes
         shasum_url = more_itertools.one(
             asset['browser_download_url']
-            for asset in j['assets']
+            for asset in j_release['assets']
             if urllib.parse.urlparse(asset['browser_download_url']).path.split('/')[-1].endswith('.sha256')
         )
-        shasum_text = requests.get(shasum_url).text
+        shasum_text = Requests.get(shasum_url).text
         shasum_data = jc.parse("hashsum", shasum_text, quiet=True)[0]
         package_hash, package_filename = shasum_data["hash"], shasum_data["filename"]
         del shasum_data, shasum_text, shasum_url
@@ -456,7 +580,7 @@ class OpenSSLVersionsDirectory(KeyedList[_OpenSSLVersionInfo, packaging.version.
 
         package_url = more_itertools.one(
             asset['browser_download_url']
-            for asset in j['assets']
+            for asset in j_release['assets']
             if urllib.parse.urlparse(asset['browser_download_url']).path.split('/')[-1] == package_filename
         )
 
@@ -538,7 +662,8 @@ class DownloadPage:
         """
         if session is None:
             session = requests_html.HTMLSession()
-        response = session.get(url)
+        response = session.get(url, timeout=30)
+        response.raise_for_status()
         page = response.html
         table = page.find("pre", first=True)
         # some GNU mirrors format entries as a table
@@ -608,7 +733,7 @@ class Url:
             session = requests_html.HTMLSession()
         logger.info(f"Downloading and computing hash of {url}")
         h=hashlib.sha256()
-        r=session.get(url,stream=True)
+        r=session.get(url,stream=True,timeout=30)
         total_bytes=int(r.headers.get('content-length',0)) or float('inf')
         with tqdm.tqdm(total=total_bytes, unit='B', unit_scale=True, unit_divisor=1024) as t:
             for c in r.iter_content(1024):
@@ -616,6 +741,18 @@ class Url:
                 h.update(c)
         return h.hexdigest()
 
+class Requests:
+    @staticmethod
+    def get(url: str) -> requests.Response:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        return response
+
 
 if __name__ == "__main__":
-    sys.exit(main())
+    #sys.excepthook seems to have no effect in Github Actions
+    try:
+        sys.exit(main())
+    except Exception:
+        logging.exception("Unhandled exception occurred")
+        sys.exit(2)

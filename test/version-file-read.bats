@@ -90,13 +90,13 @@ IN
 }
 
 @test "skips glob path traversal" {
-  cat > my-version <<IN
+  cat > my-version <<'IN'
 ../*
 3.9.3
 IN
   run pyenv-version-file-read my-version
-  assert_success <<OUT
-pyenv: invalid version \`../\*' ignored in \`my-version'
+  assert_success <<'OUT'
+pyenv: invalid version `../*' ignored in `my-version'
 3.9.3
 OUT
 }

@@ -16,6 +16,12 @@ load test_helper
   assert_failure "pyenv: version \`1.2.3' not installed"
 }
 
+@test "version with glob characters is handled correctly" {
+  cd "$BATS_TEST_TMPDIR"; touch 1.1
+  PYENV_VERSION="[1-9].?*" run pyenv-prefix
+  assert_failure "pyenv: version \`[1-9].?*' not installed"
+}
+
 @test "prefix for system" {
   mkdir -p "${PYENV_TEST_DIR}/bin"
   touch "${PYENV_TEST_DIR}/bin/python"

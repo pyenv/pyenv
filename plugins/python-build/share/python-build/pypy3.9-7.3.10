@@ -1,5 +1,6 @@
 VERSION='7.3.10'
 PYVER='3.9'
+MIN_OSX_VERSION='10.14'
 
 # https://www.pypy.org/checksums.html
 aarch64_hash=657a04fd9a5a992a2f116a9e7e9132ea0c578721f59139c9fb2083775f71e514
@@ -52,11 +53,11 @@ function pypy_pkg_data {
       pkg='macos_arm64'
       ;;
     'osx64' )
-      if require_osx_version "10.13"; then
+      if require_osx_version "${MIN_OSX_VERSION}"; then
         hash="${osx64_hash}"
         pkg='macos_x86_64'
       else
-        err_no_binary "${ARCH}, OS X < 10.13"
+        err_no_binary "${ARCH}, OS X < ${MIN_OSX_VERSION}"
       fi
       ;;
     's390x' )

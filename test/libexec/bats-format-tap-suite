@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -e
+
+# Wraps Bats TAP formatter, adding file names to the output
+
+_BATS_FORMATTER_LIB_RELPATH="lib/bats-core/formatter.bash"
+source "$BATS_ROOT/$_BATS_FORMATTER_LIB_RELPATH"
+
+
+# `bats-format-tap` calls this fn at the end
+# We must stub it to be able to source and alter it
+# https://stackoverflow.com/questions/1203583/how-do-i-rename-a-bash-function
+eval orig_"$(declare -f bats_parse_internal_extended_tap)"
+bats_parse_internal_extended_tap() { true; }
+
+
+# stub sourcing lib from `bats-format-tap`
+# as that would've reset the stubbed fn
+FAKE_BATS_ROOT=
+_trap_rm_fakeroot() { rm -rf "$FAKE_BATS_ROOT"; }
+REAL_BATS_ROOT="$BATS_ROOT"
+FAKE_BATS_ROOT=$(mktemp -d)
+trap _trap_rm_fakeroot ERR EXIT
+mkdir -p "$(dirname "$FAKE_BATS_ROOT/$_BATS_FORMATTER_LIB_RELPATH")"
+touch "$FAKE_BATS_ROOT/$_BATS_FORMATTER_LIB_RELPATH"
+BATS_ROOT="$FAKE_BATS_ROOT"
+
+source "$REAL_BATS_ROOT/libexec/bats-core/bats-format-tap"
+
+_trap_rm_fakeroot
+trap - ERR EXIT
+BATS_ROOT="$REAL_BATS_ROOT"
+unset FAKE_BATS_ROOT REAL_BATS_ROOT _trap_rm_fakeroot
+
+
+# Finally, alter `bats-format-tap`'s logic and invoke it
+
+# print as "Anything" line
+bats_tap_stream_suite() { # <file name>
+  # bats only passes --base-name to specific built-in formatters
+  # so we don't have info where the test root is
+  printf '%s\n' "${1##*/}"
+}
+
+orig_bats_parse_internal_extended_tap

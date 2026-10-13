@@ -1,0 +1,34 @@
+From 1e39ecccb5550e3fdcff67582e9e0d8010dbb0aa Mon Sep 17 00:00:00 2001
+From: Jeff Epler <jepler@unpythonic.net>
+Date: Sat, 27 Sep 2025 19:29:49 -0500
+Subject: [PATCH] py/misc: Don't warn about a GNU extension for static assert
+ macro.
+
+This warning was enabled by default on clang 17.0.0 on macOS 26.  Disable
+it, because we want to make these checks at compile-time even if it
+requires an extension.
+
+Fixes issue #18116.
+
+Signed-off-by: Jeff Epler <jepler@unpythonic.net>
+---
+ py/misc.h | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/py/misc.h b/py/misc.h
+index 86ac2ec9a..16e2cf9da 100644
+--- a/py/misc.h
++++ b/py/misc.h
+@@ -56,6 +56,9 @@ typedef unsigned int uint;
+ #define MP_STRINGIFY(x) MP_STRINGIFY_HELPER(x)
+ 
+ // Static assertion macro
++#if __clang__
++#pragma GCC diagnostic ignored "-Wgnu-folding-constant"
++#endif
+ #define MP_STATIC_ASSERT(cond) ((void)sizeof(char[1 - 2 * !(cond)]))
+ // In C++ things like comparing extern const pointers are not constant-expressions so cannot be used
+ // in MP_STATIC_ASSERT. Note that not all possible compiler versions will reject this. Some gcc versions
+-- 
+2.46.2.windows.1
+

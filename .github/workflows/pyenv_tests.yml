@@ -1,5 +1,8 @@
 name: pyenv_tests
-on: [pull_request, push]
+on:
+  push:
+    branches: [master]
+  pull_request: {}
 
 permissions:
   contents: read  #  to fetch code (actions/checkout)
@@ -10,33 +13,33 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-24.04
           - ubuntu-22.04
-          - macos-15-intel
-          - macos-15
+          - ubuntu-22.04-arm
+          - ubuntu-24.04
+          - ubuntu-24.04-arm
           - macos-14
+          - macos-15
+          - macos-15-intel
+          - macos-26
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
-      - run: |
+      - uses: actions/checkout@v7
+      - name: Install prerequisites
+        run: |
           if test "$RUNNER_OS" == "macOS"; then
             brew install coreutils fish
           fi
-      - run: pwd
-      - env:
-          PYENV_ROOT: /home/runner/work/pyenv/pyenv
-        run: |
-          echo $PYENV_ROOT
-          echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
-      - name: Run test on the host
+      - name: Run tests
         run: |
           make test
-      - name: Run test with docker
-        if: ${{ ! contains(matrix.os, 'macos') }}
-        run: |
-          make test-docker
       - env:
           PYENV_NATIVE_EXT: 1
         run: |
           (cd src; ./configure; make)
           bats/bin/bats test/{pyenv,hooks,versions}.bats
+  pyenv_tests_docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: |
+          make test-docker

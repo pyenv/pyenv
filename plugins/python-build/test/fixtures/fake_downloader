@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+aria2c=
+wget=
+src=
+dest=
+dir_=
+
+case "$1" in
+  aria2c)
+    aria2c=1;;
+  wget)
+    wget=1;;
+esac
+while (($#)); do
+  case "$1" in
+    -o)
+      if [[ -z $wget ]]; then
+        dest="$2"
+        shift
+      fi
+      ;;
+    -O)
+      if [[ -n $wget ]]; then
+        dest="$2"
+        shift
+      fi
+      ;;
+    -d)
+      if [[ -n $aria2c ]]; then
+        dir_="$2/"
+        shift
+      fi
+      ;;
+    -*)
+      ;;
+    *)
+      src="$FIXTURE_ROOT/${1##*/}"
+      ;;
+  esac
+  shift
+done
+cp "$src" "${dir_}${dest}"
+

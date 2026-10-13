@@ -31,6 +31,32 @@ stub_python_build() {
   unstub python-build
 }
 
+@test "install a single version under an alias" {
+  stub_python_build_lib
+  stub_python_build
+
+  run pyenv-install 3.4.2:3.4.2-custom
+  assert_success "python-build 3.4.2 ${PYENV_ROOT}/versions/3.4.2-custom"
+
+  unstub python-build
+}
+
+@test "install multiple versions, each under its own alias" {
+  stub_python_build_lib
+  stub_python_build
+  stub_python_build
+
+  run pyenv-install 3.4.1:custom1 3.4.2:custom2
+  assert_success
+  assert_output <<OUT
+python-build 3.4.1 ${PYENV_ROOT}/versions/custom1
+python-build 3.4.2 ${PYENV_ROOT}/versions/custom2
+OUT
+
+  unstub python-build
+  unstub pyenv-latest
+}
+
 @test "install multiple versions" {
   stub_python_build_lib
   stub_python_build
@@ -129,6 +155,22 @@ Available versions:
   2.7.9-rc1
   2.7.9-rc2
   3.4.2
+OUT
+
+  unstub python-build
+}
+
+@test "list available versions with --bare" {
+  stub_python_build_lib
+  stub_python_build "--definitions : echo 2.6.9 2.7.9-rc1 2.7.9-rc2 3.4.2 | tr ' ' $'\\n'"
+
+  run pyenv-install --list --bare
+  assert_success
+  assert_output <<OUT
+2.6.9
+2.7.9-rc1
+2.7.9-rc2
+3.4.2
 OUT
 
   unstub python-build
@@ -239,6 +281,7 @@ OUT
   run pyenv-install --complete
   assert_success
   assert_output <<OUT
+--bare
 --list
 --force
 --skip-existing

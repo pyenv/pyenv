@@ -13,6 +13,8 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
 
 * Lets you **change the global Python version** on a per-user basis.
 * Provides support for **per-project Python versions**.
+* Supports **multiple Python distributions**: CPython, PyPy, Stackless Python, Jython, and more.
+  See the [full list of available versions](https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build).
 * Allows you to **override the Python version** with an environment
   variable.
 * Searches for commands from **multiple versions of Python at a time**.
@@ -69,6 +71,7 @@ This project was forked from [rbenv](https://github.com/rbenv/rbenv) and
   * [Using Pyenv without shims](#using-pyenv-without-shims)
   * [Running nested shells from Python-based programs](#running-nested-shells-from-python-based-programs)
   * [Environment variables](#environment-variables)
+  * [Manual shell setup](#manual-shell-setup)
 * **[Development](#development)**
   * [Contributing](#contributing)
   * [Version History](#version-history)
@@ -177,115 +180,28 @@ which does install native Windows Python versions.
 ----
 
 The below setup should work for the vast majority of users for common use cases.
-See [Advanced configuration](#advanced-configuration) for details and more configuration options.
+See [Advanced configuration](#advanced-configuration)
+and specifically [Manual shell setup](#manual-shell-setup) for details and more configuration options.
 
-#### Bash
-  <details>
+To add the suggested setup code to the startup files of the running shell,
+run `<path/to/pyenv> --install`.
+Specifically:
 
-  Stock Bash startup files vary widely between distributions in which of them source
-  which, under what circumstances, in what order and what additional configuration they perform.
-  As such, the most reliable way to get Pyenv in all environments is to append Pyenv
-  configuration commands to both `.bashrc` (for interactive shells)
-  and the profile file that Bash would use (for login shells).
+* If you installed Pyenv with the installer script:
 
-  1. First, add the commands to `~/.bashrc` by running the following in your terminal:
+```sh
+~/.pyenv/bin/pyenv init --install
+```
 
-      ```bash
-      echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-      echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-      echo 'eval "$(pyenv init - bash)"' >> ~/.bashrc
-      ```
-  2. Then, if you have `~/.profile`, `~/.bash_profile` or `~/.bash_login`, add the commands there as well.
-     If you have none of these, create a `~/.profile` and add the commands there.
+* If you installed Pyenv with Homebrew:
 
-     * to add to `~/.profile`:
-       ``` bash
-       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
-       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
-       echo 'eval "$(pyenv init - bash)"' >> ~/.profile
-       ```
-     * to add to `~/.bash_profile`:
-       ```bash
-       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
-       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
-       echo 'eval "$(pyenv init - bash)"' >> ~/.bash_profile
-       ```
+```sh
+pyenv init --install
+```
 
-   **Bash warning**: There are some systems where the `BASH_ENV` variable is configured
-   to point to `.bashrc`. On such systems, you should almost certainly put the
-   `eval "$(pyenv init - bash)"` line into `.bash_profile`, and **not** into `.bashrc`. Otherwise, you
-   may observe strange behaviour, such as `pyenv` getting into an infinite loop.
-   See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
-   
-   </details>
-   
-#### Zsh
-  
-  <details>
-  Add Pyenv startup commands to `~/.zshrc` by running the following in your terminal:
-  
-  ```zsh
-  echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
-  echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
-  echo 'eval "$(pyenv init - zsh)"' >> ~/.zshrc
-  ```
-  
-  If you wish to get Pyenv in noninteractive login shells as well, also add the commands to `~/.zprofile` or `~/.zlogin`.
-  </details>
-
-#### Fish
-
-  <details>
-
-  1. If you have Fish 3.2.0 or newer, execute this interactively:
-     ```fish
-     set -Ux PYENV_ROOT $HOME/.pyenv
-     test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
-     ```
-
-  2. Otherwise, execute the snippet below:
-     ```fish
-     set -Ux PYENV_ROOT $HOME/.pyenv
-     test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
-     ```
-
-  3. Now, add this to `~/.config/fish/config.fish`:
-     ```fish
-     pyenv init - fish | source
-     ```
-  </details>
-
-#### Nushell
-
-  <details>
-
-  Add the following lines to your `config.nu` to add Pyenv and its shims to your `PATH`.
-  Shell integration (completions and subcommands changing the shell's state)
-  isn't currently supported.
-
-  ~~~ nu
-  $env.PYENV_ROOT = "~/.pyenv" | path expand
-  if (( $"($env.PYENV_ROOT)/bin" | path type ) == "dir") {
-    $env.PATH = $env.PATH | prepend $"($env.PYENV_ROOT)/bin" }
-  $env.PATH = $env.PATH | prepend $"(pyenv root)/shims"
-  ~~~
-
-  </details>
-
-#### Microsoft PowerShell
-
-  <details>
-
-  Add the commands to `$profile.CurrentUserAllHosts` by running the following in your terminal:
-
-  ~~~ pwsh
-  echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"' >> $profile.CurrentUserAllHosts
-  echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) { 
-    $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }' >> $profile.CurrentUserAllHosts
-  echo 'iex ((pyenv init -) -join "`n")' >> $profile.CurrentUserAllHosts
-  ~~~
-
-  </details>
+For Bash, avoid the automatic `--install` path if your `BASH_ENV` points to
+`.bashrc`; use the manual Bash instructions below so the `eval "$(pyenv init - bash)"`
+line only goes in your login startup file.
 
 ### C. Restart your shell
 ----
@@ -393,6 +309,7 @@ Though we don't actively maintain those patches, since existing releases never c
 it's safe to assume that they will continue working until there are further incompatible changes
 in a later version of those environments.
 
+* *3.10.x-3.14.x* : XCode 27
 * *3.7.8-3.7.15, 3.8.4-3.8.12, 3.9.0-3.9.7* : XCode 13.3
 * *3.5.10, 3.6.15* : MacOS 11+ and XCode 13.3
 * *2.7.18* : MacOS 10.15+ and Apple Silicon
@@ -758,7 +675,7 @@ to `PATH` in the `<command>`'s environment, the same as what e.g. RVM does.
 ### Running nested shells from Python-based programs
 
 In addition to altering `PATH`, `pyenv exec` sets `PYENV_VERSION` in the
-executed program's environment to ensure that it won't spontaneouly switch to
+executed program's environment to ensure that it won't spontaneously switch to
 using a different Python version.
 
 Some Python-based programs (e.g. Jupyter) can spawn nested shell sessions.
@@ -797,18 +714,136 @@ name | default | description
 See also [_Special environment variables_ in Python-Build's README](plugins/python-build/README.md#special-environment-variables)
 for environment variables that can be used to customize the build.
 
+
+### Manual shell setup
+
+Below is the suggested shell setup added to shell startup files by `pyenv init --install`.
+
+* To automatically install Pyenv for a shell different than the running shell, run
+
+```sh
+path/to/pyenv --install <shell executable name>
+```
+
+e.g. `~/.pyenv --install bash`.
+
+#### Bash
+  <details>
+
+  Stock Bash startup files vary widely between distributions in which of them source
+  which, under what circumstances, in what order and what additional configuration they perform.
+  As such, the most reliable way to get Pyenv in all environments is to append Pyenv
+  configuration commands to both `.bashrc` (for interactive shells)
+  and the profile file that Bash would use (for login shells).
+
+  1. First, add the commands to `~/.bashrc` by running the following in your terminal:
+
+      ```bash
+      echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+      echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+      echo 'eval "$(pyenv init - bash)"' >> ~/.bashrc
+      ```
+  2. Then, if you have `~/.profile`, `~/.bash_profile` or `~/.bash_login`, add the commands there as well.
+     If you have none of these, create a `~/.profile` and add the commands there.
+
+     * to add to `~/.profile`:
+       ``` bash
+       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.profile
+       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.profile
+       echo 'eval "$(pyenv init - bash)"' >> ~/.profile
+       ```
+     * to add to `~/.bash_profile`:
+       ```bash
+       echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
+       echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
+       echo 'eval "$(pyenv init - bash)"' >> ~/.bash_profile
+       ```
+
+   **Bash warning**: There are some systems where the `BASH_ENV` variable is configured
+   to point to `.bashrc`. On such systems, you should almost certainly put the
+   `eval "$(pyenv init - bash)"` line into `.bash_profile`, and **not** into `.bashrc`. Otherwise, you
+   may observe strange behaviour, such as `pyenv` getting into an infinite loop.
+   See [#264](https://github.com/pyenv/pyenv/issues/264) for details.
+   
+   </details>
+   
+#### Zsh
+  
+  <details>
+  Add Pyenv startup commands to `~/.zshrc` by running the following in your terminal:
+  
+  ```zsh
+  echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
+  echo '[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
+  echo 'eval "$(pyenv init - zsh)"' >> ~/.zshrc
+  ```
+  
+  If you wish to get Pyenv in noninteractive login shells as well, also add the commands to `~/.zprofile` or `~/.zlogin`.
+  </details>
+
+#### Fish
+
+  <details>
+
+  1. If you have Fish 3.2.0 or newer, execute this interactively:
+     ```fish
+     set -Ux PYENV_ROOT $HOME/.pyenv
+     test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
+     ```
+
+  2. Otherwise, execute the snippet below:
+     ```fish
+     set -Ux PYENV_ROOT $HOME/.pyenv
+     test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+     ```
+
+  3. Now, add this to `~/.config/fish/config.fish`:
+     ```fish
+     pyenv init - fish | source
+     ```
+  </details>
+
+#### Nushell
+
+  <details>
+
+  Add the following lines to your `config.nu` to add Pyenv and its shims to your `PATH`.
+  Shell integration (completions and subcommands changing the shell's state)
+  isn't currently supported.
+
+  ~~~ nu
+  $env.PYENV_ROOT = "~/.pyenv" | path expand
+  if (( $"($env.PYENV_ROOT)/bin" | path type ) == "dir") {
+    $env.PATH = $env.PATH | prepend $"($env.PYENV_ROOT)/bin" }
+  $env.PATH = $env.PATH | prepend $"(pyenv root)/shims"
+  ~~~
+
+  </details>
+
+#### Microsoft PowerShell
+
+  <details>
+
+  Add the commands to `$profile.CurrentUserAllHosts` by running the following in your terminal:
+
+  ~~~ pwsh
+  echo '$Env:PYENV_ROOT="$Env:HOME/.pyenv"' >> $profile.CurrentUserAllHosts
+  echo 'if (Test-Path -LP "$Env:PYENV_ROOT/bin" -PathType Container) { 
+    $Env:PATH="$Env:PYENV_ROOT/bin:$Env:PATH" }' >> $profile.CurrentUserAllHosts
+  echo 'iex ((pyenv init -) -join "`n")' >> $profile.CurrentUserAllHosts
+  ~~~
+
+  </details>
+
 ----
 
 ## Development
 
 The pyenv source code is [hosted on
-GitHub](https://github.com/pyenv/pyenv).  It's clean, modular,
-and easy to understand, even if you're not a shell hacker.
+GitHub](https://github.com/pyenv/pyenv).
 
-Tests are executed using [Bats](https://github.com/bats-core/bats-core):
-
-    bats test
-    bats/test/<file>.bats
+Tests are executed using [Bats](https://github.com/bats-core/bats-core).
+See the [tests README](test/README.md) for details.
 
 
 ### Contributing

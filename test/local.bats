@@ -19,6 +19,13 @@ _setup() {
   assert_success "1.2.3"
 }
 
+@test "version with glob characters is handled correctly" {
+  cd "$BATS_TEST_TMPDIR"; touch 1.1
+  echo "[1-9].?*" > .python-version
+  run pyenv-local
+  assert_success "[1-9].?*"
+}
+
 @test "discovers version file in parent directory" {
   echo "1.2.3" > .python-version
   mkdir -p "subdir" && cd "subdir"

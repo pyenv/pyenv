@@ -1,7 +1,7 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
   require_distro "Ubuntu 10.04" || true
-  install_package "pypy-2.2-linux" "https://downloads.python.org/pypy/pypy-2.2-linux.tar.bz2#2bdab70106f6b6d0dd97e42535ce73711c987887fb81fb821801f6fdcd92cdc4" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.2-linux" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-2.2-linux_i686-portable.tar.bz2#9ea0399720e5d06f664386cac7447797e7e281ed7036f461488a8a4e82e68b07" "pypy" verify_py27 ensurepip
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
@@ -17,7 +17,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 "linux64" )
   require_distro "Ubuntu 12.04" || true
-  install_package "pypy-2.2-linux64" "https://downloads.python.org/pypy/pypy-2.2-linux64.tar.bz2#1583af0122c6ccb0cb95f8c3732925551ce3ca6d5ea0657e21523f8bf97837a3" "pypy" verify_py27 ensurepip
+  install_package "pypy-2.2-linux64" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-2.2-linux_x86_64-portable.tar.bz2#005a5ede0e37f3127c565d6cdceb3761f5fa168551d9930aa448e539ed544865" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
   install_package "pypy-2.2-osx64" "https://downloads.python.org/pypy/pypy-2.2-osx64.tar.bz2#8aa943de7ec38f13fa836b6964dbf58b45142e4fe7b3fdd5fffe37fdcf974e01" "pypy" verify_py27 ensurepip

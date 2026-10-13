@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+#
+# Summary: Save an installed Python version as a relocatable archive
+#
+# Usage: pyenv binary save <version> [<output-dir>] [--name <name>] [--source-version <version>]
+#
+#   Packs an installed version into a relocatable .tar.xz (relative paths) and
+#   writes a metadata file listing the build platform and the system libraries
+#   it links against, so an installer can check compatibility before unpacking.
+#
+#   <version>      An installed version, as listed by `pyenv versions --bare'.
+#   <output-dir>   Where to write the archive and metadata (default: `.').
+#   --name <name>  Use <name> as the archive and metadata base name instead of
+#                  <version>-<platform>.
+#   --source-version <version>  Record the version used to build a renamed install.
+#
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
+
+# Provide pyenv completions
+if [ "${1:-}" = "--complete" ]; then
+  echo --name
+  echo --source-version
+  exec pyenv-versions --bare
+fi
+
+version=
+output_dir=
+package_name=
+source_version=
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+  --name )
+    [ $# -ge 2 ] && [ -n "$2" ] || { echo "pyenv-binary: --name needs a value" >&2; exit 1; }
+    package_name="$2"; shift 2 ;;
+  --source-version )
+    [ $# -ge 2 ] && [ -n "$2" ] && [ "${2#-}" = "$2" ] || { echo "pyenv-binary: --source-version needs a value" >&2; exit 1; }
+    source_version="$2"; shift 2 ;;
+  -* )
+    echo "pyenv-binary: unknown option \`$1'" >&2; exit 1 ;;
+  * )
+    if [ -z "$version" ]; then
+      version="$1"
+    elif [ -z "$output_dir" ]; then
+      output_dir="$1"
+    else
+      echo "pyenv-binary: unexpected argument \`$1'" >&2
+      exit 1
+    fi
+    shift ;;
+  esac
+done
+
+output_dir="${output_dir:-$PWD}"
+
+if [ -z "$version" ]; then
+  echo "Usage: pyenv binary save <version> [<output-dir>] [--name <name>] [--source-version <version>]" >&2
+  exit 1
+fi
+
+# A version is a single directory name under versions/. With no slash allowed,
+# the only remaining names that could point elsewhere are `.' and `..'.
+case "$version" in
+*/* | .. | . )
+  echo "pyenv-binary: invalid version name \`${version}'" >&2
+  exit 1
+  ;;
+esac
+
+case "$package_name" in
+*/* | .. | . | *[[:cntrl:]]* )
+  echo "pyenv-binary: invalid package name \`${package_name}'" >&2
+  exit 1
+  ;;
+esac
+
+source_version="${source_version:-$version}"
+case "$source_version" in
+*/* | .. | . | *[[:cntrl:]]* )
+  echo "pyenv-binary: invalid source version \`${source_version}'" >&2
+  exit 1
+  ;;
+esac
+
+prefix="${PYENV_ROOT}/versions/${version}"
+if [ ! -d "${prefix}/bin" ]; then
+  echo "pyenv-binary: version \`${version}' is not installed" >&2
+  exit 1
+fi
+
+os="$(uname -s)"
+arch="$(uname -m)"
+platform="$(printf '%s' "$os" | tr '[:upper:]' '[:lower:]')-${arch}"
+
+# Record the distro and libc version. Platform and arch alone are too coarse to
+# judge compatibility: a build is only portable to a matching libc (e.g. a
+# glibc 2.36 build will not load on an older glibc, nor on musl at all).
+distro=
+libc=
+if [ -r /etc/os-release ]; then
+  distro="$( . /etc/os-release && printf '%s %s' "${ID:-}" "${VERSION_ID:-}" )"
+elif [ "$os" = "Darwin" ]; then
+  distro="macos $(sw_vers -productVersion 2>/dev/null)"
+fi
+if [ "$os" = "Linux" ]; then
+  libc="$(getconf GNU_LIBC_VERSION 2>/dev/null || true)"
+fi
+if [ "$os" != "Darwin" ] && ! LC_ALL=C readelf --version &>/dev/null; then
+  echo "pyenv-binary: need readelf to inspect shared libraries" >&2
+  exit 1
+fi
+
+# List the external shared libraries the install links against: those that
+# resolve outside its own prefix, so they must already exist on the target.
+# The interpreter plus every bundled shared object are inspected.
+system_deps() {
+  local f needed
+  {
+    for f in "${prefix}"/bin/python*; do
+      [ -e "$f" ] && printf '%s\n' "$f"
+    done
+    # CPython ships its extension modules as *.so (and *.dylib on macOS). A
+    # bare *.so.* is unusual for CPython itself, but the odd build carries a
+    # versioned copy alongside, so match it too rather than miss a dependency.
+    find "${prefix}" -type f \( -name '*.so' -o -name '*.so.*' -o -name '*.dylib' \)
+  } | sort -u | while IFS= read -r f; do
+    if [ "$os" = "Darwin" ]; then
+      otool -L "$f" 2>/dev/null | tail -n +2 | awk -v pfx="${prefix}/" \
+        '$1 !~ /^@/ && substr($1, 1, length(pfx)) != pfx { print $1 }'
+    else
+      # GNU binutils 2.44 writes "(NEEDED) ... [name]"; FreeBSD 15.1 writes
+      # "NEEDED ... [name]". readelf(1) documents -d, not its text format.
+      needed="$(LC_ALL=C readelf -dW "$f" 2>/dev/null | awk \
+        '$2 == "(NEEDED)" || $2 == "NEEDED" { sub(/^.*\[/, ""); sub(/\].*$/, ""); print }' | tr '\n' ' ')"
+      # Linux and FreeBSD ldd write resolved libraries as
+      # "name => /absolute/path (address)"; entries without "=>" are ignored.
+      LC_ALL=C ldd "$f" 2>/dev/null | awk -v needed="$needed" -v pfx="${prefix}/" '
+        BEGIN {
+          split(needed, deps, " ")
+          for (i in deps) direct[deps[i]] = 1
+        }
+        $1 in direct && $2 == "=>" && $3 ~ /^\// && substr($3, 1, length(pfx)) != pfx { print $1 }
+      '
+    fi
+  done | sort -u
+}
+
+mkdir -p "$output_dir"
+package_name="${package_name:-${version}-${platform}}"
+archive="${package_name}.tar.xz"
+metadata="${package_name}.meta"
+
+tar -C "$(dirname "$prefix")" -cJf "${output_dir}/${archive}" "$(basename "$prefix")"
+
+{
+  echo "# pyenv-binary metadata"
+  echo "version=${version}"
+  echo "source_version=${source_version}"
+  echo "os=${os}"
+  echo "arch=${arch}"
+  echo "platform=${platform}"
+  [ -n "$distro" ] && echo "distro=${distro}"
+  [ -n "$libc" ] && echo "libc=${libc}"
+  echo "build_prefix=${prefix}"
+  echo "archive=${archive}"
+  system_deps | while IFS= read -r dep; do
+    [ -n "$dep" ] && echo "dep=${dep}"
+  done
+} > "${output_dir}/${metadata}"
+
+echo "Saved ${archive} and ${metadata} to ${output_dir}"

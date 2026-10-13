@@ -73,3 +73,15 @@ create_file() {
   run pyenv-version-file "$PWD"
   assert_failure ""
 }
+
+@test "walks up beyond cwd for a relative path" {
+  create_file ".python-version"
+  mkdir -p project/subdir
+  cd project
+  # Run with CPU-time limit because this used to loop forever
+  run bash -c 'ulimit -t 5; pyenv-version-file .'
+  assert_success "${PYENV_TEST_DIR}/.python-version"
+
+  run pyenv-version-file ./subdir
+  assert_success "${PYENV_TEST_DIR}/.python-version"
+}

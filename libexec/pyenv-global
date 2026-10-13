@@ -20,11 +20,11 @@
 #
 
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo system
   exec pyenv-versions --bare
 fi
@@ -32,16 +32,20 @@ fi
 versions=("$@")
 PYENV_VERSION_FILE="${PYENV_ROOT}/version"
 
-if [ -n "$versions" ]; then
+if ((${#versions[@]})); then
   pyenv-version-file-write "$PYENV_VERSION_FILE" "${versions[@]}"
 else
   OLDIFS="$IFS"
+  # VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
+  # which is undesired
+  set -f
   IFS=: versions=($(
     pyenv-version-file-read "$PYENV_VERSION_FILE" ||
     pyenv-version-file-read "${PYENV_ROOT}/global" ||
     pyenv-version-file-read "${PYENV_ROOT}/default" ||
     echo system
   ))
+  set +f
   IFS="$OLDIFS"
   for version in "${versions[@]}"; do
     echo "$version"

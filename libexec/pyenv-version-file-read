@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Usage: pyenv version-file-read <file>
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
-VERSION_FILE="$1"
+VERSION_FILE="${1:-}"
 
 function is_version_safe() {
   # As needed, check that the constructed path exists as a child path of PYENV_ROOT/versions
@@ -25,6 +25,7 @@ if [ -s "$VERSION_FILE" ]; then
   # Be careful not to load it whole in case there's something crazy in it.
   IFS="$IFS"$'\r'
   sep=
+  # `read` always assigns the vars, even when it fails
   while read -n 1024 -r version _ || [[ $version ]]; do
     if [[ -z "$version" || "$version" == \#* ]]; then
       # Skip empty lines and comments

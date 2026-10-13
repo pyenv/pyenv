@@ -1,3 +1,3 @@
 prefer_openssl11
 install_package "openssl-1.1.0j" "https://www.openssl.org/source/old/1.1.0/openssl-1.1.0j.tar.gz#31bec6c203ce1a8e93d5994f4ed304c63ccf07676118b6634edded12ad1b3246" mac_openssl --if has_broken_mac_openssl
-install_package "pypy-5.1.0-src" "https://downloads.python.org/pypy/pypy-5.1.0-src.tar.bz2#16bab9501e942c0704abbf9cd6c4e950c6a76dc226cf1e447ea084916aef4714" "pypy_builder" verify_py27 ensurepip
+install_git "pypy-5.1.0-src" https://github.com/pypy/pypy release-5.1:29c415e7a67051b4c6c2c6e814b8ce174cd69c42 "pypy_builder" verify_py27 ensurepip

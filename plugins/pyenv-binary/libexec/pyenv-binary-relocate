@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+#
+# Summary: Rewrite an unpacked Python's library paths so it runs from its prefix
+#
+# Usage: pyenv binary relocate <prefix> [<build-prefix>]
+#
+#   Rewrites the library paths of a Python tree that was unpacked into <prefix>
+#   so the interpreter and its extension modules load the bundled libraries from
+#   their new location rather than the path it was built at. Requires patchelf on
+#   Linux and FreeBSD, or otool and install_name_tool on macOS.
+#
+#   The definition that `pyenv binary generate-installer' produces calls this
+#   after `install_package ... copy' has laid the tree down.
+#
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
+
+if [ "${1:-}" = "--complete" ]; then
+  exit
+fi
+
+prefix="${1:-}"
+if [ -z "$prefix" ]; then
+  pyenv-help --usage binary-relocate >&2
+  exit 1
+fi
+
+if [ "$(uname -s)" = "Darwin" ]; then
+  build_prefix="${2:-}"
+  build_prefix="${build_prefix%/}"
+  if [ -z "$build_prefix" ]; then
+    echo "pyenv-binary: need the original build prefix to relocate a macOS binary" >&2
+    exit 1
+  fi
+  for tool in otool install_name_tool; do
+    if ! command -v "$tool" >/dev/null 2>&1; then
+      echo "pyenv-binary: need ${tool} to relocate the binary" >&2
+      exit 1
+    fi
+  done
+
+  relocate_macho() {
+    local file="$1" new_rpath="$2"
+    local load_commands install_ids rpaths dependency install_id rpath replacement
+
+    load_commands="$(otool -L "$file")"
+    install_ids="$(otool -D "$file" 2>/dev/null || true)"
+    rpaths="$(otool -l "$file")"
+    install_id="$(printf '%s\n' "$install_ids" | sed -n '2s/^[[:space:]]*//p')"
+
+    while IFS= read -r dependency; do
+      case "$dependency" in
+      "$build_prefix"/lib/* )
+        if [ "$dependency" != "$install_id" ]; then
+          replacement="@rpath/${dependency#"$build_prefix"/lib/}"
+          install_name_tool -change "$dependency" "$replacement" "$file"
+        fi
+        ;;
+      esac
+    done < <(printf '%s\n' "$load_commands" | tail -n +2 | sed -E \
+      's/^[[:space:]]*//; s/[[:space:]]+\(compatibility version.*$//')
+
+    case "$install_id" in
+    "$build_prefix"/lib/* )
+      replacement="@rpath/${install_id#"$build_prefix"/lib/}"
+      install_name_tool -id "$replacement" "$file"
+      ;;
+    esac
+
+    while IFS= read -r rpath; do
+      if [ "$rpath" = "$build_prefix/lib" ]; then
+        install_name_tool -rpath "$rpath" "$new_rpath" "$file"
+      fi
+    done < <(printf '%s\n' "$rpaths" | awk '
+      /cmd LC_RPATH/ { found = 1; next }
+      found && /^[[:space:]]*path / {
+        sub(/^[[:space:]]*path /, "")
+        sub(/ \(offset [0-9]+\)$/, "")
+        print
+        found = 0
+      }
+    ')
+  }
+
+  found=0
+  for file in "$prefix"/bin/*; do
+    [[ -f $file && -x $file && ! -L $file ]] || continue
+    otool -L "$file" >/dev/null 2>&1 || continue
+    relocate_macho "$file" '@executable_path/../lib'
+    found=1
+  done
+  if [ "$found" -eq 0 ]; then
+    echo "pyenv-binary: found no interpreter to relocate under \`${prefix}/bin'" >&2
+    exit 1
+  fi
+
+  for file in "$prefix"/lib/*.dylib; do
+    [[ -f $file && ! -L $file ]] || continue
+    relocate_macho "$file" '@loader_path'
+  done
+  while IFS= read -r so; do
+    relocate_macho "$so" '@loader_path/../..'
+  done < <(find "$prefix" -type f -path '*/lib/python*/lib-dynload/*.so')
+
+  # CPython records its installation prefix in generated scripts and build
+  # metadata. Bytecode can also retain source filenames from the build tree.
+  build_prefix_pattern="$(printf '%s\n' "$build_prefix" | sed 's/[][\\.^$*|]/\\&/g')"
+  prefix_replacement="$(printf '%s\n' "$prefix" | sed 's/[\\&|]/\\&/g')"
+  while IFS= read -r file; do
+    if LC_ALL=C grep -IqF "$build_prefix" "$file"; then
+      sed -i.bak "s|${build_prefix_pattern}|${prefix_replacement}|g" "$file"
+      rm -f "${file}.bak"
+    fi
+  done < <(find "$prefix" -type f ! -name '*.pyc' ! -name '*.pyo')
+  while IFS= read -r file; do
+    if LC_ALL=C grep -aqF "$build_prefix" "$file"; then
+      rm -f "$file"
+    fi
+  done < <(find "$prefix" -type f \( -name '*.pyc' -o -name '*.pyo' \))
+  exit
+fi
+
+# patchelf can add an rpath and write one of any length; chrpath can only shorten
+# an existing one, which is not enough to relocate every build, so require it.
+if ! command -v patchelf >/dev/null 2>&1; then
+  echo "pyenv-binary: need patchelf to relocate the binary" >&2
+  exit 1
+fi
+
+# The interpreter loads libpython from ../lib. Patch every ELF binary in bin/ so
+# this holds whatever the interpreter is named (python3, python2.7, ...); the
+# scripts alongside it (pip, idle) are not ELF, so `--print-rpath' fails on them
+# and they are skipped. A tree with no interpreter at all did not unpack the way
+# we expect, so treat that as an error rather than quietly relocating nothing.
+found=0
+for file in "$prefix"/bin/*; do
+  [[ -f $file && -x $file && ! -L $file ]] || continue
+  patchelf --print-rpath "$file" >/dev/null 2>&1 || continue
+  patchelf --set-rpath "$prefix/lib" "$file"
+  found=1
+done
+if [ "$found" -eq 0 ]; then
+  echo "pyenv-binary: found no interpreter to relocate under \`${prefix}/bin'" >&2
+  exit 1
+fi
+
+# The extension modules CPython built are the only other objects with an rpath
+# into the old prefix, so point them at lib/ as well. Anything a wheel installed
+# carries an rpath of its own, often into a bundled library directory beside it,
+# and would stop loading if we overwrote it. Each match is an ELF object we expect
+# to patch, so let a failure stop us rather than swallow it.
+while IFS= read -r so; do
+  patchelf --set-rpath "$prefix/lib" "$so"
+done < <(find "$prefix" -path '*/lib-dynload/*.so')

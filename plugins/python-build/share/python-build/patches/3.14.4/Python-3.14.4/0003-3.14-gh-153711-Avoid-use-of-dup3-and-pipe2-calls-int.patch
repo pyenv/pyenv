@@ -1,0 +1,101 @@
+From 0883623df9ba2ea83d2f9dc3031ac9d975824d98 Mon Sep 17 00:00:00 2001
+From: Ned Deily <nad@python.org>
+Date: Wed, 5 Aug 2026 00:27:28 -0700
+Subject: [PATCH] [3.14] gh-153711: Avoid use of dup3 and pipe2 calls
+ introduced in macOS 27 (#155206)
+
+---
+ ...-08-05-02-02-33.gh-issue-153711.pO9fFb.rst |  3 ++
+ configure                                     | 32 +++++++++++--------
+ configure.ac                                  |  8 ++++-
+ 3 files changed, 29 insertions(+), 14 deletions(-)
+ create mode 100644 Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
+
+diff --git a/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst b/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
+new file mode 100644
+index 00000000000..90804c179a4
+--- /dev/null
++++ b/Misc/NEWS.d/next/macOS/2026-08-05-02-02-33.gh-issue-153711.pO9fFb.rst
+@@ -0,0 +1,3 @@
++On macOS, do not attempt to use the :manpage:`dup3(2)` and
++:manpage:`pipe2(2)` system calls introduced in
++macOS 27 to prevent problems when running on older systems.
+diff --git a/configure b/configure
+index c3e9474bbec..89233599659 100755
+--- a/configure
++++ b/configure
+@@ -20440,13 +20440,7 @@ fi
+ # header definition prevents usage - autoconf doesn't use the headers), or
+ # raise an error if used at runtime. Force these symbols off.
+ if test "$ac_sys_system" != "iOS" ; then
+-  ac_fn_c_check_func "$LINENO" "dup3" "ac_cv_func_dup3"
+-if test "x$ac_cv_func_dup3" = xyes
+-then :
+-  printf "%s\n" "#define HAVE_DUP3 1" >>confdefs.h
+-
+-fi
+-ac_fn_c_check_func "$LINENO" "getentropy" "ac_cv_func_getentropy"
++  ac_fn_c_check_func "$LINENO" "getentropy" "ac_cv_func_getentropy"
+ if test "x$ac_cv_func_getentropy" = xyes
+ then :
+   printf "%s\n" "#define HAVE_GETENTROPY 1" >>confdefs.h
+@@ -20457,12 +20451,6 @@ if test "x$ac_cv_func_getgroups" = xyes
+ then :
+   printf "%s\n" "#define HAVE_GETGROUPS 1" >>confdefs.h
+ 
+-fi
+-ac_fn_c_check_func "$LINENO" "pipe2" "ac_cv_func_pipe2"
+-if test "x$ac_cv_func_pipe2" = xyes
+-then :
+-  printf "%s\n" "#define HAVE_PIPE2 1" >>confdefs.h
+-
+ fi
+ ac_fn_c_check_func "$LINENO" "system" "ac_cv_func_system"
+ if test "x$ac_cv_func_system" = xyes
+@@ -20471,6 +20459,24 @@ then :
+ 
+ fi
+ 
++fi
++# In addition, macOS introduced dup3 and pipe2 in macOS 27, late in the
++# lifetime of this version of Python. Rather than adding weaklinking
++# support for them, just continue to ignore them.
++if test "$ac_sys_system" != "iOS" -a "$ac_sys_system" != "Darwin"; then
++  ac_fn_c_check_func "$LINENO" "dup3" "ac_cv_func_dup3"
++if test "x$ac_cv_func_dup3" = xyes
++then :
++  printf "%s\n" "#define HAVE_DUP3 1" >>confdefs.h
++
++fi
++ac_fn_c_check_func "$LINENO" "pipe2" "ac_cv_func_pipe2"
++if test "x$ac_cv_func_pipe2" = xyes
++then :
++  printf "%s\n" "#define HAVE_PIPE2 1" >>confdefs.h
++
++fi
++
+ fi
+ 
+ { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CC options needed to detect all undeclared functions" >&5
+diff --git a/configure.ac b/configure.ac
+index 67128cc4ad0..c004fce7770 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5283,7 +5283,13 @@ fi
+ # header definition prevents usage - autoconf doesn't use the headers), or
+ # raise an error if used at runtime. Force these symbols off.
+ if test "$ac_sys_system" != "iOS" ; then
+-  AC_CHECK_FUNCS([dup3 getentropy getgroups pipe2 system])
++  AC_CHECK_FUNCS([getentropy getgroups system])
++fi
++# In addition, macOS introduced dup3 and pipe2 in macOS 27, late in the
++# lifetime of this version of Python. Rather than adding weaklinking
++# support for them, just continue to ignore them.
++if test "$ac_sys_system" != "iOS" -a "$ac_sys_system" != "Darwin"; then
++  AC_CHECK_FUNCS([dup3 pipe2])
+ fi
+ 
+ AC_CHECK_DECL([dirfd],
+-- 
+2.55.0.windows.3
+

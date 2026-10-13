@@ -1,0 +1,44 @@
+name: Build a Python version
+description: >
+  Install python-build's system dependencies for the current runner's OS, build
+  and check the requested version.
+inputs:
+  python-version:
+    description: A version as accepted by `pyenv install`.
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        #envvars
+        export PYENV_ROOT="$GITHUB_WORKSPACE"
+        echo "PYENV_ROOT=$PYENV_ROOT" >> $GITHUB_ENV
+        echo "$PYENV_ROOT/shims:$PYENV_ROOT/bin" >> $GITHUB_PATH
+    # The two OSes differ only in this step.
+    - if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        #prerequisites
+        brew install openssl readline sqlite3 xz tcl-tk@8 libb2 zstd gdbm
+    - if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        #prerequisites
+        pyenv install-prerequisites --all
+    - shell: bash
+      run: |
+        #build
+        pyenv --debug install ${{ inputs.python-version }} && rc=$? || rc=$?
+        if [[ $rc -ne 0 ]]; then echo config.log:; cat "${TMPDIR:-/tmp}"/python-build*/*/config.log; false; fi
+        pyenv global ${{ inputs.python-version }}
+        pyenv rehash
+    - shell: bash
+      run: |
+        #print version
+        python --version
+        python -m pip --version
+    - shell: python  # Prove that actual Python == expected Python
+      env:
+        EXPECTED_PYTHON: ${{ inputs.python-version }}
+      run: import os, sys ; assert sys.version.startswith(os.getenv("EXPECTED_PYTHON"))

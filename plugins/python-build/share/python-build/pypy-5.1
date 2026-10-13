@@ -1,10 +1,6 @@
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux" )
-  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy-5.1.0-linux" "https://downloads.python.org/pypy/pypy-5.1.0-linux.tar.bz2#2f6c521b5b3c1082eab58be78655aa01ec400d19baeec93c455864a7483b8744" "pypy" verify_py27 ensurepip
-  else
-    install_package "pypy-5.1-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.1-linux_i686-portable.tar.bz2#893507603a58b8983b69924e60591de39b8f71f70ba36d6e3894db8f7c49c3ea" "pypy" verify_py27 ensurepip
-  fi
+  install_package "pypy-5.1-linux_i686-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.1-linux_i686-portable.tar.bz2#893507603a58b8983b69924e60591de39b8f71f70ba36d6e3894db8f7c49c3ea" "pypy" verify_py27 ensurepip
   ;;
 "linux-armel" )
   require_distro "Ubuntu 12.04" || true
@@ -27,11 +23,7 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   install_package "pypy-5.1.0-ppc64le" "https://downloads.python.org/pypy/pypy-5.1.0-ppc64le.tar.bz2#303764f44154f81d7f0753258c89f8a14653658911a16ec2bcfee04055cbfab6" "pypy" verify_py27 ensurepip
   ;;
 "linux64" )
-  if require_distro "Ubuntu 12.04" "Ubuntu 12.10" "Ubuntu 13.04" "Ubuntu 13.10" "Ubuntu 14.04" 1>/dev/null 2>&1; then
-    install_package "pypy-5.1.0-linux64" "https://downloads.python.org/pypy/pypy-5.1.0-linux64.tar.bz2#0e8913351d043a50740b98cb89d99852b8bd6d11225a41c8abfc0baf7084cbf6" "pypy" verify_py27 ensurepip
-  else
-    install_package "pypy-5.1-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.1-linux_x86_64-portable.tar.bz2#b2df9b0127457d1c3cc0dc9b8f027a53569ccd3ba5a79012d641e576d9cc003a" "pypy" verify_py27 ensurepip
-  fi
+  install_package "pypy-5.1-linux_x86_64-portable" "https://bitbucket-archive.softwareheritage.org/static/14/140b7b14-aa94-424e-b191-9cd3438381f7/attachments/pypy-5.1-linux_x86_64-portable.tar.bz2#b2df9b0127457d1c3cc0dc9b8f027a53569ccd3ba5a79012d641e576d9cc003a" "pypy" verify_py27 ensurepip
   ;;
 "osx64" )
   install_package "pypy-5.1.0-osx64" "https://downloads.python.org/pypy/pypy-5.1.0-osx64.tar.bz2#7e270c66347158dd794c101c4817f742f760ed805aa0d10abe19ba4a78a75118" "pypy" verify_py27 ensurepip

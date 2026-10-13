@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Summary: Rehash pyenv shims (run this after installing executables)
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 SHIM_PATH="${PYENV_ROOT}/shims"
 PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
@@ -10,18 +10,37 @@ PROTOTYPE_SHIM_PATH="${SHIM_PATH}/.pyenv-shim"
 # Create the shims directory if it doesn't already exist.
 mkdir -p "$SHIM_PATH"
 
-declare last_acquire_error
+last_acquire_error=
+tested_for_other_write_errors=
 
 acquire_lock() {
-  # Ensure only one instance of pyenv-rehash is running at a time by
-  # setting the shell's `noclobber` option and attempting to write to
-  # the prototype shim file. If the file already exists, print a warning
-  # to stderr and exit with a non-zero status.
-  local ret
+  local ret=
+  # An old lock file is presumed stale. We assume no healthy rehash takes this long.
+  # The time is picked very small so that a killed rehash holds up new shell sessions
+  # for as little as possible
+  find "$PROTOTYPE_SHIM_PATH" -mmin +2 -exec rm -f {} \; 2>/dev/null || true
   set -o noclobber
-  last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" || ret=1
+  last_acquire_error="$( { ( echo -n > "$PROTOTYPE_SHIM_PATH"; ) 2>&1 1>&3 3>&1-; } 3>&1)" \
+    && trap release_lock EXIT \
+    || {
+      # Linux Landlock and MacOS Seatbelt sandbox subsystems return false information in access(),
+      # making -w "$SHIM_PATH" not catch the fact that the shims dir is not writable in this case.
+      # Bash doesn't provide access to errno to check for non-EEXIST error code in `echo >'.
+      # So check for writablity by trying to write to a different file,
+      # in a way that taxes the usual use case as little as possible.
+      if [[ -z $tested_for_other_write_errors ]]; then
+        # if lots of (50+) rehashes run concurrently, another concurrent rehash
+        # may delete the temporary file in remove_*_shims() before we do so
+        ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm -f "$t" ) \
+          && tested_for_other_write_errors=1 \
+          || { echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2
+               set +o noclobber
+               exit 1; }
+      fi
+      ret=1
+    }
   set +o noclobber
-  [ -z "${ret}" ]
+  [[ -z $ret ]]
 }
 
 remove_prototype_shim() {
@@ -30,6 +49,7 @@ remove_prototype_shim() {
 
 release_lock() {
   remove_prototype_shim
+  trap - EXIT
 }
 
 if [ ! -w "$SHIM_PATH" ]; then
@@ -37,48 +57,32 @@ if [ ! -w "$SHIM_PATH" ]; then
   exit 1
 fi
 
-declare acquired tested_for_other_write_errors
-declare start=$SECONDS
+acquired=
+start=$SECONDS
 PYENV_REHASH_TIMEOUT=${PYENV_REHASH_TIMEOUT:-60}
 while (( SECONDS <= start + PYENV_REHASH_TIMEOUT )); do
   if acquire_lock; then
     acquired=1
-
-    # If we were able to obtain a lock, register a trap to clean up the
-    # prototype shim when the process exits.
-    trap release_lock EXIT
-
     break
   else
-    #Landlock sandbox subsystem in the Linux kernel returns false information in access() as of 6.14.0,
-    # making -w "$SHIM_PATH" not catch the fact that the shims dir is not writable in this case.
-    #Bash doesn't provide access to errno to check for non-EEXIST error code in acquire_lock.
-    #So check for writablity by trying to write to a different file,
-    # in a way that taxes the usual use case as little as possible.
-    if [[ -z $tested_for_other_write_errors ]]; then
-      ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm "$t" ) && tested_for_other_write_errors=1 ||
-        { echo "pyenv: cannot rehash: $SHIM_PATH isn't writable" >&2; break; }
-    fi
     # POSIX sleep(1) doesn't provide subsecond precision, but many others do
     sleep 0.1 2>/dev/null || sleep 1
   fi
 done
 
 if [ -z "${acquired}" ]; then
-  if [[ -n $tested_for_other_write_errors ]]; then
+  if [[ -n "${tested_for_other_write_errors:-}" ]]; then
       echo "pyenv: cannot rehash: couldn't acquire lock"\
         "$PROTOTYPE_SHIM_PATH for $PYENV_REHASH_TIMEOUT seconds. Last error message:" >&2
       echo "$last_acquire_error" >&2
   fi
   exit 1
 fi
-unset tested_for_other_write_errors
+tested_for_other_write_errors=
 
 # The prototype shim file is a script that re-execs itself, passing
-# its filename and any arguments to `pyenv exec`. This file is
-# hard-linked for every executable and then removed. The linking
-# technique is fast, uses less disk space than unique files, and also
-# serves as a locking mechanism.
+# its filename and any arguments to `pyenv exec`. This file is copied
+# for every executable and then removed. It also serves as a lock.
 create_prototype_shim() {
   cat > "$PROTOTYPE_SHIM_PATH" <<SH
 #!/usr/bin/env bash
@@ -95,18 +99,30 @@ fi
 exec "$(command -v pyenv)" exec "\$program" "\$@"
 SH
   chmod +x "$PROTOTYPE_SHIM_PATH"
+  local LC_ALL=C
+  IFS= read -r -d '' PROTOTYPE_SHIM_CONTENTS < "$PROTOTYPE_SHIM_PATH" || true
+  PROTOTYPE_SHIM_READ_SIZE=$((${#PROTOTYPE_SHIM_CONTENTS} + 1))
 }
 
-# If the contents of the prototype shim file differ from the contents
-# of the first shim in the shims directory, assume pyenv has been
-# upgraded and the existing shims need to be removed.
-remove_outdated_shims() {
-  local shim
-  for shim in "$SHIM_PATH"/*; do
-    if ! diff "$PROTOTYPE_SHIM_PATH" "$shim" >/dev/null 2>&1; then
-      rm -f "$SHIM_PATH"/*
+# Install a shim when it is first registered, replacing an existing copy
+# if it was overwritten. Hooks can then customize it without a later
+# registration overwriting their changes.
+install_shims() {
+  local shim file shim_contents
+  # Count bytes consistently across Bash versions, including multibyte paths.
+  local LC_ALL=C
+  for shim; do
+    file="${SHIM_PATH}/${shim}"
+    if [[ -f "$file" || ( -L "$file" && ! -e "$file" ) ]]; then
+      shim_contents=
+      # Read with a builtin to avoid a subprocess per shim. A successful
+      # read means a NUL or extra character was found. Limit the read in
+      # case a large file was accidentally written over a shim.
+      if IFS= read -r -d '' -n "$PROTOTYPE_SHIM_READ_SIZE" shim_contents 2>/dev/null < "$file" || [[ $shim_contents != "$PROTOTYPE_SHIM_CONTENTS" ]]; then
+        rm -f "$file"
+      fi
     fi
-    break
+    [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
   done
 }
 
@@ -123,16 +139,21 @@ make_shims() {
 
 if ((${BASH_VERSINFO[0]} > 3)); then
 
-  declare -A registered_shims
+  declare -A registered_shims=()
 
   # Registers the name of a shim to be generated.
   register_shim() {
-    registered_shims["$1"]=1
+    if [[ ! ${registered_shims["$1"]:-} ]]; then
+      install_shims "$1"
+      registered_shims["$1"]=1
+    fi
   }
 
   # Install all shims registered via `make_shims` or `register_shim` directly.
   install_registered_shims() {
     local shim file
+    # The Bash < 4.4 bug treating empty arrays as unset
+    # does not affect "${!var[@]}"
     for shim in "${!registered_shims[@]}"; do
       file="${SHIM_PATH}/${shim}"
       [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
@@ -146,7 +167,7 @@ if ((${BASH_VERSINFO[0]} > 3)); then
   remove_stale_shims() {
     local shim
     for shim in "$SHIM_PATH"/*; do
-      if [[ ! ${registered_shims["${shim##*/}"]} ]]; then
+      if [[ ! ${registered_shims["${shim##*/}"]:-} ]]; then
         rm -f "$shim"
       fi
     done
@@ -157,7 +178,10 @@ else # Same for bash < 4.
     registered_shims=" "
 
     register_shim() {
-      registered_shims="${registered_shims}${1} "
+      if [[ "$registered_shims" != *" ${1} "* ]]; then
+        install_shims "$1"
+        registered_shims="${registered_shims}${1} "
+      fi
     }
 
     install_registered_shims() {
@@ -183,19 +207,21 @@ shopt -s nullglob
 # Create the prototype shim, then register shims for all known
 # executables.
 create_prototype_shim
-remove_outdated_shims
-# shellcheck disable=SC2046
+set -f
 make_shims $(pyenv-versions --executables)
-
+set +f
 
 # Allow plugins to register shims.
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks rehash`)
 IFS="$OLDIFS"
-
+# bash < 4.4 (incl. macOS's 3.2) treats an empty array as unbound under set -u,
+# and hooks are third-party code, so relax nounset while sourcing them
+set +u
 for script in "${scripts[@]}"; do
   source "$script"
 done
+set -u
 
 install_registered_shims
 remove_stale_shims

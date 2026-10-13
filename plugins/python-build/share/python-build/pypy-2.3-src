@@ -1,3 +1,3 @@
 prefer_openssl11
 install_package "openssl-1.1.0j" "https://www.openssl.org/source/old/1.1.0/openssl-1.1.0j.tar.gz#31bec6c203ce1a8e93d5994f4ed304c63ccf07676118b6634edded12ad1b3246" mac_openssl --if has_broken_mac_openssl
-install_package "pypy-pypy-394146e9bb67" "https://downloads.python.org/pypy/pypy-2.3-src.tar.bz2#be2c271e7f9d7c0059a551ba1501713c00336e551e7f13107f0f34c721d95b0c" "pypy_builder" verify_py27 ensurepip
+install_git "pypy-pypy-394146e9bb67" https://github.com/pypy/pypy release-2.3:3a6b704498a7dd87fb4416f927fbe68b17fd3483 "pypy_builder" verify_py27 ensurepip

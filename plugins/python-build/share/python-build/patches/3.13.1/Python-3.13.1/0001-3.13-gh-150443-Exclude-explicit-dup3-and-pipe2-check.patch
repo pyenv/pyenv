@@ -1,0 +1,105 @@
+From 389f221839f2b21fb8ce5faa50f97d7d6592394c Mon Sep 17 00:00:00 2001
+From: Russell Keith-Magee <russell@keith-magee.com>
+Date: Tue, 26 May 2026 13:07:20 +0800
+Subject: [PATCH] [3.13] gh-150443: Exclude explicit dup3 and pipe2 checks on
+ iOS builds. (GH-150444) (#150448)
+
+Exclude explicit dup3 and pipe2 checks on iOS builds.
+(cherry picked from commit 629da5c914b4407e01c1dc06cbcbd8dce825fef3)
+---
+ configure    | 26 +++++++++++++-------------
+ configure.ac |  6 +++---
+ 2 files changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/configure b/configure
+index ae70f02f70e..4c3965e3a62 100755
+--- a/configure
++++ b/configure
+@@ -17956,12 +17956,6 @@ if test "x$ac_cv_func_dup" = xyes
+ then :
+   printf "%s\n" "#define HAVE_DUP 1" >>confdefs.h
+ 
+-fi
+-ac_fn_c_check_func "$LINENO" "dup3" "ac_cv_func_dup3"
+-if test "x$ac_cv_func_dup3" = xyes
+-then :
+-  printf "%s\n" "#define HAVE_DUP3 1" >>confdefs.h
+-
+ fi
+ ac_fn_c_check_func "$LINENO" "execv" "ac_cv_func_execv"
+ if test "x$ac_cv_func_execv" = xyes
+@@ -18430,12 +18424,6 @@ if test "x$ac_cv_func_pipe" = xyes
+ then :
+   printf "%s\n" "#define HAVE_PIPE 1" >>confdefs.h
+ 
+-fi
+-ac_fn_c_check_func "$LINENO" "pipe2" "ac_cv_func_pipe2"
+-if test "x$ac_cv_func_pipe2" = xyes
+-then :
+-  printf "%s\n" "#define HAVE_PIPE2 1" >>confdefs.h
+-
+ fi
+ ac_fn_c_check_func "$LINENO" "plock" "ac_cv_func_plock"
+ if test "x$ac_cv_func_plock" = xyes
+@@ -19051,7 +19039,13 @@ fi
+ # header definition prevents usage - autoconf doesn't use the headers), or
+ # raise an error if used at runtime. Force these symbols off.
+ if test "$ac_sys_system" != "iOS" ; then
+-  ac_fn_c_check_func "$LINENO" "getentropy" "ac_cv_func_getentropy"
++  ac_fn_c_check_func "$LINENO" "dup3" "ac_cv_func_dup3"
++if test "x$ac_cv_func_dup3" = xyes
++then :
++  printf "%s\n" "#define HAVE_DUP3 1" >>confdefs.h
++
++fi
++ac_fn_c_check_func "$LINENO" "getentropy" "ac_cv_func_getentropy"
+ if test "x$ac_cv_func_getentropy" = xyes
+ then :
+   printf "%s\n" "#define HAVE_GETENTROPY 1" >>confdefs.h
+@@ -19062,6 +19056,12 @@ if test "x$ac_cv_func_getgroups" = xyes
+ then :
+   printf "%s\n" "#define HAVE_GETGROUPS 1" >>confdefs.h
+ 
++fi
++ac_fn_c_check_func "$LINENO" "pipe2" "ac_cv_func_pipe2"
++if test "x$ac_cv_func_pipe2" = xyes
++then :
++  printf "%s\n" "#define HAVE_PIPE2 1" >>confdefs.h
++
+ fi
+ ac_fn_c_check_func "$LINENO" "system" "ac_cv_func_system"
+ if test "x$ac_cv_func_system" = xyes
+diff --git a/configure.ac b/configure.ac
+index a764028e49f..1035134c48e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5091,7 +5091,7 @@ fi
+ # checks for library functions
+ AC_CHECK_FUNCS([ \
+   accept4 alarm bind_textdomain_codeset chmod chown clock closefrom close_range confstr \
+-  copy_file_range ctermid dup dup3 execv explicit_bzero explicit_memset \
++  copy_file_range ctermid dup execv explicit_bzero explicit_memset \
+   faccessat fchmod fchmodat fchown fchownat fdopendir fdwalk fexecve \
+   fork fork1 fpathconf fstatat ftime ftruncate futimens futimes futimesat \
+   gai_strerror getegid geteuid getgid getgrent getgrgid getgrgid_r \
+@@ -5101,7 +5101,7 @@ AC_CHECK_FUNCS([ \
+   getspnam getuid getwd grantpt if_nameindex initgroups kill killpg lchown linkat \
+   lockf lstat lutimes madvise mbrtowc memrchr mkdirat mkfifo mkfifoat \
+   mknod mknodat mktime mmap mremap nice openat opendir pathconf pause pipe \
+-  pipe2 plock poll posix_fadvise posix_fallocate posix_openpt posix_spawn posix_spawnp \
++  plock poll posix_fadvise posix_fallocate posix_openpt posix_spawn posix_spawnp \
+   posix_spawn_file_actions_addclosefrom_np \
+   pread preadv preadv2 process_vm_readv pthread_cond_timedwait_relative_np pthread_condattr_setclock pthread_init \
+   pthread_kill ptsname ptsname_r pwrite pwritev pwritev2 readlink readlinkat readv realpath renameat \
+@@ -5129,7 +5129,7 @@ fi
+ # header definition prevents usage - autoconf doesn't use the headers), or
+ # raise an error if used at runtime. Force these symbols off.
+ if test "$ac_sys_system" != "iOS" ; then
+-  AC_CHECK_FUNCS([getentropy getgroups system])
++  AC_CHECK_FUNCS([dup3 getentropy getgroups pipe2 system])
+ fi
+ 
+ AC_CHECK_DECL([dirfd],
+-- 
+2.55.0.windows.3
+

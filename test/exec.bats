@@ -34,6 +34,7 @@ EOF
   assert_success
   assert_output <<OUT
 --help
+--environment
 fab
 python
 OUT
@@ -137,5 +138,55 @@ _PYENV_SHIM_PATH=
   assert_output <<!
 $envvarname=/unusual/shim/location:/another/shim/location
 _PYENV_SHIM_PATH=
+!
+}
+
+@test "--environment sets envvars in Linux" {
+  export PYENV_VERSION="test"
+  create_alt_executable print_env <<!
+#!$BASH
+echo PYTHONHOME="\$PYTHONHOME"
+echo LD_LIBRARY_PATH="\$LD_LIBRARY_PATH"
+!
+  create_path_executable uname "echo Linux"
+
+  LD_LIBRARY_PATH= run pyenv-exec -N print_env
+  assert_output_glob <<!
+PYTHONHOME=*/test
+LD_LIBRARY_PATH=*/test/lib
+!
+
+  LD_LIBRARY_PATH=/foo/bar run pyenv-exec -N print_env
+  assert_output_glob <<!
+PYTHONHOME=*/test
+LD_LIBRARY_PATH=*/test/lib:/foo/bar
+!
+}
+
+@test "--environment sets envvars in macOS" {
+  if [[ $(uname -s) == "Darwin" && $BASH == "/bin/bash" \
+      && $(LC_ALL=C csrutil status) == *"enabled." ]]; then
+    skip "macOS with Bash covered by SIP"
+  fi
+  
+  export PYENV_VERSION="test"
+  create_alt_executable print_env <<!
+#!$BASH
+echo PYTHONHOME="\$PYTHONHOME"
+echo DYLD_LIBRARY_PATH="\$DYLD_LIBRARY_PATH"
+!
+  create_path_executable uname "echo Darwin"
+
+  DYLD_LIBRARY_PATH= run pyenv-exec -N print_env
+  assert_output_glob <<!
+PYTHONHOME=*/test
+DYLD_LIBRARY_PATH=*/test/lib
+!
+
+
+  DYLD_LIBRARY_PATH=/foo/bar run pyenv-exec -N print_env
+  assert_output_glob <<!
+PYTHONHOME=*/test
+DYLD_LIBRARY_PATH=*/test/lib:/foo/bar
 !
 }

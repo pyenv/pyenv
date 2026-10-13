@@ -22,6 +22,14 @@ _setup() {
   assert_success "system"
 }
 
+@test "version with glob characters is handled correctly" {
+  cd "$BATS_TEST_TMPDIR"; touch 1.1
+  PYENV_VERSION="[1-9].?*" run pyenv-version-name
+  assert_failure <<'!'
+pyenv: version `[1-9].?*' is not installed (set by PYENV_VERSION environment variable)
+!
+}
+
 @test "PYENV_VERSION can be overridden by hook" {
   create_version "2.7.11"
   create_version "3.5.1"

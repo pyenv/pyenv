@@ -54,8 +54,11 @@ Or, if you would like to install the latest development release:
 
 ## Usage
 
-Before you begin, you should ensure that your build environment has the proper
-system dependencies for compiling the wanted Python Version (see our [recommendations](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)).
+On Ubuntu, Debian, and Mint, install the recommended build dependencies with:
+
+    pyenv install-prerequisites
+
+For other environments, see our [build environment recommendations](https://github.com/pyenv/pyenv/wiki#suggested-build-environment).
 
 ### Using `pyenv install` with pyenv
 
@@ -66,6 +69,13 @@ exact name of the version you want to install. For example,
 
 Python versions will be installed into a directory of the same name under
 `~/.pyenv/versions`.
+
+To install a version under a different name -- for instance, to keep several
+builds of the same version side by side -- append `:<alias>` to the version:
+
+    pyenv install 3.12.0:3.12-custom
+
+This installs into `~/.pyenv/versions/3.12-custom`.
 
 To see a list of all available Python versions, run `pyenv install --list`. You
 may also tab-complete available Python versions if your pyenv installation is
@@ -172,13 +182,13 @@ You can set certain environment variables to control the build process.
   their original source URLs instead of using a mirror.
 * `PYTHON_BUILD_HTTP_CLIENT`, explicitly specify the HTTP client type to use. `aria2`, `curl` and `wget` are the supported values and by default, are searched in that order.
 * `PYTHON_BUILD_CURL_OPTS`, `PYTHON_BUILD_WGET_OPTS`, `PYTHON_BUILD_ARIA2_OPTS` pass additional parameters to the corresponding HTTP client.
-* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it would normally will.
-* `PYTHON_BUILD_USE_HOMEBREW`, if set, will search for libraries installed by Homebrew when it would normally not.
+* `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it normally would.
+* `PYTHON_BUILD_USE_HOMEBREW`, if set, will search for libraries installed by Homebrew when it normally wouldn't.
 * `PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA`, override the Homebrew OpenSSL formula to use.
 * `PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA`, override the MacPorts OpenSSL formula to use. The default is `openssl3 openssl`.
-* `PYTHON_BUILD_TCLTK_FORMULA`, override the Homebrew Tcl/Tk formula to use.
-* `PYTHON_BUILD_SKIP_MACPORTS`, if set, will not search for libraries installed by MacPorts when it would normally will.
-* `PYTHON_BUILD_USE_MACPORTS`, if set, will search for libraries installed by MacPorts when it would normally not.
+* `PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA`, override the Homebrew Tcl/Tk formula to use.
+* `PYTHON_BUILD_SKIP_MACPORTS`, if set, will not search for libraries installed by MacPorts when it normally would.
+* `PYTHON_BUILD_USE_MACPORTS`, if set, will search for libraries installed by MacPorts when it normally wouldn't.
 * `PYTHON_BUILD_ROOT` overrides the default location from where build definitions
   in `share/python-build/` are looked up.
 * `PYTHON_BUILD_DEFINITIONS` can be a list of colon-separated paths that get
@@ -262,7 +272,7 @@ would be to make symlinks at the mirror's root:
 ```
 
 The rationale is to abstract away difference between directory structures of sites
-of various Python flavors and their occasional changes as well as to accomodate
+of various Python flavors and their occasional changes as well as to accommodate
 people who only wish to cache some select downloads. This also allows to mirror multiple sites at once.
 
 If the mirror being used does not have the same checksum (*e.g.* with a
@@ -354,4 +364,3 @@ git diff --name-only master \
 - Filter out any which don't live where python-build keeps its build scripts
 - Look only at the file name (i.e. the python version name)
 - Run a new docker container for each, building that version
-

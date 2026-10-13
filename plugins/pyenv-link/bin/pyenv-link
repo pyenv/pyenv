@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#
+# Summary: Link a Python environment as a pyenv version
+#
+# Usage: pyenv link version [--dry] [--quiet] <path> [<name>]
+#
+# Link a virtual python environment to pyenvs version directory
+# so that the venv can be used like one created with *pyenv-virtualenv*.
+#
+# <path> should be a path to a Python installation or virtual environment.
+
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# Provide pyenv completions
+case "$1" in
+--complete)
+    if [ -z "$2" ]; then
+        echo version
+    else
+        shift 2
+        pyenv-link-version --complete "$@"
+    fi
+    ;;
+version)
+    shift
+    pyenv-link-version "$@"
+    exit $?
+    ;;
+*)
+    pyenv-help --usage link >&2
+    exit 1
+    ;;
+esac

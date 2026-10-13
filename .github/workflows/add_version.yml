@@ -4,7 +4,7 @@ on:
   workflow_dispatch: {}
   schedule:
     # Every N hours
-    - cron: '0 */4 * * *'
+    - cron: '25 */4 * * *'
 
 permissions:
   contents: write
@@ -12,10 +12,10 @@ permissions:
 
 jobs:
   add_cpython:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: 3
           cache: 'pip'
@@ -25,6 +25,8 @@ jobs:
       - name: check for a release
         run: |
           python plugins/python-build/scripts/add_cpython.py --verbose >added_versions.lst && rc=$? || rc=$?
+          #0 means new version found, 1 not found, 2 another error
+          [[ $rc -gt 1 ]] && false
           echo "rc=$rc" >> $GITHUB_ENV
       - name: set PR properties
         if: env.rc == 0
@@ -52,4 +54,5 @@ jobs:
         with:
           branch: ${{ env.branch_name }}
           title: ${{ env.pr_name }}
+          commit-message: ${{ env.pr_name }}
           token: ${{ steps.generate-token.outputs.token }}

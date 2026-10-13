@@ -16,6 +16,14 @@ load test_helper
   assert_output "1.2.3"
 }
 
+@test "version with glob characters is handled correctly" {
+  cd "$BATS_TEST_TMPDIR"; touch 1.1
+  mkdir -p "$PYENV_ROOT"
+  echo "[1-9].?*" > "$PYENV_ROOT/version"
+  run pyenv-global
+  assert_success "[1-9].?*"
+}
+
 @test "set PYENV_ROOT/version" {
   mkdir -p "$PYENV_ROOT/versions/1.2.3"
   run pyenv-global "1.2.3"

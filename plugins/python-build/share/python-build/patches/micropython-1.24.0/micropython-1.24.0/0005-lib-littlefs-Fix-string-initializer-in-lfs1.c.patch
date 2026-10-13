@@ -1,0 +1,34 @@
+From e4180843f881c3327c998630edad06a104976370 Mon Sep 17 00:00:00 2001
+From: Angus Gratton <angus@redyak.com.au>
+Date: Fri, 9 May 2025 14:34:09 +1000
+Subject: [PATCH 5/5] lib/littlefs: Fix string initializer in lfs1.c.
+
+Avoids the new Wunterminated-string-literal when compiled with gcc 15.1.
+
+It would be preferable to just disable this warning, but Clang
+-Wunknown-warning-option kicks in even when disabling warnings so this
+becomes fiddly to apply.
+
+This work was funded through GitHub Sponsors.
+
+Signed-off-by: Angus Gratton <angus@redyak.com.au>
+---
+ lib/littlefs/lfs1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/littlefs/lfs1.c b/lib/littlefs/lfs1.c
+index 6a3fd6700..ec18dc470 100644
+--- a/lib/littlefs/lfs1.c
++++ b/lib/littlefs/lfs1.c
+@@ -2141,7 +2141,7 @@ int lfs1_format(lfs1_t *lfs1, const struct lfs1_config *cfg) {
+             .d.elen = sizeof(superblock.d) - sizeof(superblock.d.magic) - 4,
+             .d.nlen = sizeof(superblock.d.magic),
+             .d.version = LFS1_DISK_VERSION,
+-            .d.magic = {"littlefs"},
++            .d.magic = {'l', 'i', 't', 't', 'l', 'e', 'f', 's'},
+             .d.block_size  = lfs1->cfg->block_size,
+             .d.block_count = lfs1->cfg->block_count,
+             .d.root = {lfs1->root[0], lfs1->root[1]},
+-- 
+2.46.2.windows.1
+

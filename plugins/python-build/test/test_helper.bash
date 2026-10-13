@@ -1,7 +1,10 @@
+source "${BATS_TEST_DIRNAME}/../../../test/test_helper.bash"
+
 setup() {
   export PYTHON_BUILD_CURL_OPTS=
   export PYTHON_BUILD_HTTP_CLIENT="curl"
 
+  export PYENV_TEST_DIR="${BATS_TEST_TMPDIR}/pyenv"
   export FIXTURE_ROOT="${BATS_TEST_DIRNAME}/fixtures"
   export INSTALL_ROOT="${BATS_TEST_TMPDIR}/install"
   PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -68,12 +71,6 @@ install_fixture() {
   run python-build $args "$FIXTURE_ROOT/$name" "$destination"
 }
 
-assert() {
-  if ! "$@"; then
-    flunk "failed: $@"
-  fi
-}
-
 refute() {
   if "$@"; then
     flunk "expected to fail: $@"
@@ -98,32 +95,6 @@ assert_success() {
   fi
 }
 
-assert_failure() {
-  if [ "$status" -eq 0 ]; then
-    flunk "expected failed exit status"
-  elif [ "$#" -gt 0 ]; then
-    assert_output "$1"
-  fi
-}
-
-assert_equal() {
-  if [ "$1" != "$2" ]; then
-    { echo "expected:"
-      echo "$1"
-      echo "actual:"
-      echo "$2"
-    } | flunk
-  fi
-}
-
-assert_output() {
-  local expected
-  if [ $# -eq 0 ]; then expected="$(cat -)"
-  else expected="$1"
-  fi
-  assert_equal "$expected" "$output"
-}
-
 assert_output_contains() {
   local expected="$1"
   if [ -z "$expected" ]; then
@@ -136,29 +107,3 @@ assert_output_contains() {
     } | flunk
   }
 }
-
-# Output a modified PATH that ensures that the given executable is not present,
-# but in which system utils necessary for pyenv operation are still available.
-path_without() {
-  local path=":${PATH}:"
-  for exe; do 
-    local found alt util
-    for found in $(PATH="$path" type -aP "$exe"); do
-      found="${found%/*}"
-      if [ "$found" != "${PYENV_ROOT}/shims" ]; then
-        alt="${PYENV_TEST_DIR}/$(echo "${found#/}" | tr '/' '-')"
-        mkdir -p "$alt"
-        for util in bash head cut readlink greadlink; do
-          if [ -x "${found}/$util" ]; then
-            ln -s "${found}/$util" "${alt}/$util"
-          fi
-        done
-        path="${path/:${found}:/:${alt}:}"
-      fi
-    done
-  done
-  path="${path#:}"
-  path="${path%:}"
-  echo "$path"
-}
-

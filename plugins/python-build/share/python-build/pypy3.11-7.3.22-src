@@ -1,0 +1,10 @@
+VERSION='7.3.22'
+PYVER='3.11'
+
+sha=a92d4f0ffca4f1108cedbe86c7a1de980c62d015
+
+### end of manual settings - following lines same for every download
+
+require_openssl3
+PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-tcl-tk tcl-tk@8}"
+install_git "pypy${PYVER}-v${VERSION}-src" https://github.com/pypy/pypy "release-pypy${PYVER}-v${VERSION}:$sha" pypy_builder "verify_py${PYVER//./}" ensurepip

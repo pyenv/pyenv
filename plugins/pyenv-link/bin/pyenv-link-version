@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+#
+# Summary: Link a Python environment as a pyenv version
+#
+# Usage: pyenv link version [--dry] [--quiet] <path> [<name>]
+#
+# Link a virtual python environment to pyenvs version directory
+# so that the venv can be used like one created with *pyenv-virtualenv*.
+#
+# <path> should be a path to a Python installation or virtual environment.
+# <name> should be string used as a version name it may not be present
+#        in the pyenv version directory yet.
+#        If not specified a matching name is guessed from pyvenv.cfg
+#        or directory name of the venv.
+set -e
+[ -n "$PYENV_DEBUG" ] && set -x
+
+# functions
+
+if ! {
+    enable -f "${BASH_SOURCE%/*}"/../../../libexec/pyenv-realpath.dylib realpath ||
+        type realpath # realpath available?
+} >/dev/null 2>&1; then
+    # realpath requires GNU coreutils to be installed. That's why its bundled with pyenv
+    echo realpath not available >&2
+
+    # work-around when realpath is unavailable
+    realpath() {
+        (cd "$1" && pwd)
+    }
+fi
+
+guess_name() {
+    local venv_dir=$1
+    local name
+
+    # guess venv name from pyvenv.cfg
+    local pyvenv_cfg_path=$venv_dir/pyvenv.cfg
+    if [ -f "$pyvenv_cfg_path" ]; then
+        # if `prompt` key wasn't found the var remains empty
+        name=$(cut -b 1-1024 "$pyvenv_cfg_path" | sed -n '/^ *prompt *= */s///p')
+        case "$name" in
+        \"*\" | \'*\')
+            name=${name:1:${#name}-2}
+            ;;
+        esac
+    fi
+
+    # guess venv name from name of venv directory
+    local venv_dir_name=${venv_dir##*/}
+    if [ -z "$name" ]; then
+        case "$venv_dir_name" in
+        venv | env | .venv | .env | ENV | VENV) ;;
+        *) name=$venv_dir_name ;;
+        esac
+    fi
+
+    # guess venv name from name of the parent directory of the venv directory
+    local venv_dir_parent=${venv_dir%/*}
+    local venv_dir_parent_name=${venv_dir_parent##*/}
+    if [ -z "$name" ]; then
+        name=$venv_dir_parent_name
+    fi
+
+    echo "$name"
+}
+
+# process args
+POSARGS=()
+# Provide pyenv completions
+if [ "$1" = "--complete" ]; then
+    echo --dry
+    echo --quiet
+    exit
+fi
+
+for arg in "$@"; do
+    case $arg in
+    --dry)
+        dry=true # any value
+        ;;
+    --quiet)
+        quiet=true # any value
+        ;;
+    -*)
+        pyenv-help --usage link-version >&2
+        exit 1
+        ;;
+    *)
+        POSARGS+=("$arg")
+        ;;
+    esac
+done
+
+if [ ! ${#POSARGS[@]} -le 2 ] || [ ! ${#POSARGS[@]} -ge 1 ]; then
+    pyenv-help --usage link-version >&2
+    exit 1
+fi
+
+venv_dir=${POSARGS[0]%/}
+venv_name=${POSARGS[1]}
+
+# Check venv exists
+if [ ! -d "$venv_dir" ]; then
+    echo "The virtual env you specified doesn't exist"
+    exit 2
+fi
+
+# make venv dir absolute
+venv_dir=$(realpath "$venv_dir")
+
+# determine venv name
+if [ -z "$venv_name" ]; then
+    venv_name=$(guess_name "$venv_dir")
+fi
+
+case "$venv_name" in
+"" | */* | . | .. | *:* | system | *[[:cntrl:]]* )
+    echo "pyenv-link: invalid version name \`${venv_name}'" >&2
+    exit 1
+    ;;
+esac
+
+versions_dir="$PYENV_ROOT/versions"
+pyenv_prefix_path="$versions_dir/$venv_name"
+
+if [ -e "$pyenv_prefix_path" ] || [ -L "$pyenv_prefix_path" ]; then
+    echo Version "$venv_name" already exists >&2
+    exit 3
+fi
+
+case "$venv_dir" in
+"$versions_dir"/*)
+    link_target=${venv_dir#"$versions_dir"/}
+    ;;
+*)
+    link_target=$venv_dir
+    ;;
+esac
+
+# link to pyenv version directory
+if [ -z "$dry" ]; then
+    mkdir -p "$versions_dir"
+    ln -s "$link_target" "$pyenv_prefix_path"
+fi
+
+# output
+if [ -z "$quiet" ]; then
+    echo "Linked new version named $venv_name"
+fi

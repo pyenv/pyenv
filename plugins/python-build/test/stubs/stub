@@ -25,6 +25,15 @@ eval "${_STUB_RESULT}"=0
 if test -e "${!_STUB_RUN}"; then source "${!_STUB_RUN}"; fi
 
 
+match_pattern() {
+  local argument="${1?}"
+  local pattern="${2:?}"
+  case "$argument" in
+    $pattern ) return 0;;
+    * ) return 1;;
+  esac
+}
+
 # Loop over each line in the plan.
 index=0
 while IFS= read -r line; do
@@ -53,14 +62,41 @@ while IFS= read -r line; do
 
     # Match the expected argument patterns to actual
     # arguments.
-    for (( i=0; i<${#patterns[@]}; i++ )); do
+    for (( i=0, j=0; i<${#patterns[@]}; i++, j++ )); do
       pattern="${patterns[$i]}"
-      argument="${arguments[$i]}"
 
-      case "$argument" in
-        $pattern ) ;;
-        * ) result=1 ;;
-      esac
+      # ** never backtracks to keep things simple -- so a command line
+      # may fail to match if the next pattern can match multiple times.
+      # Assuming that we won't have such cases
+      # since it's mostly intended to locate specific options
+      # and we do not have repeatable options as of this writing.
+      if [[ $pattern == "**" ]]; then
+        if ((i==${#patterns[@]}-1)); then
+          # no next pattern: ** and all patterns success
+          break;
+        fi
+        next_pattern="${patterns[i+1]}"
+        for (( fj=j; fj<${#arguments[@]}; fj++ )); do
+          if match_pattern "${arguments[fj]}" "$next_pattern"; then
+            # ** matched, the next pattern matched, too
+            # and they consumed arguments up to fj
+            i=$((i+1))
+            j=$fj
+            break
+          fi
+        done
+        if ((fj==${#arguments[@]})); then
+          # next pattern never matched
+          result=1; break
+        fi
+      else
+        if (( j<${#arguments[@]} )) && \
+            match_pattern "${arguments[j]}" "$pattern"; then
+          continue
+        else
+          result=1; break
+        fi
+      fi
     done
 
     # If the arguments matched, evaluate the command
