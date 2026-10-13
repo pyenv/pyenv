@@ -18,7 +18,7 @@ set -u
 
 if [[ -n ${PYENV_VERSION_ORIGIN:-} ]]; then
   echo "$PYENV_VERSION_ORIGIN"
-elif [[ -n "${PYENV_VERSION:-}" ]; then
+elif [[ -n ${PYENV_VERSION:-} ]]; then
   echo "PYENV_VERSION environment variable"
 else
   pyenv-version-file

@@ -15,7 +15,8 @@ set -f
 IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name)) || exitcode=$?
 set +f
 
-unset bare
+bare=
+
 for arg; do
     case "$arg" in
         --complete )
