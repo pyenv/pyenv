@@ -1105,7 +1105,7 @@ OUT
 }
 
 @test "tcl-tk is linked from Homebrew with PYTHON_BUILD_TCLTK_FORMULA" {
-  test_tcltk_var PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA
+  test_tcltk_var PYTHON_BUILD_TCLTK_FORMULA
 }
 
 @test "PYTHON_BUILD_TCLTK_FORMULA produces a deprecation warning" {
