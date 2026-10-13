@@ -6,22 +6,22 @@
 # separated by colons. If no version is given, `pyenv prefix' displays the
 # locations of the currently selected versions.
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo system
   exec pyenv-versions --bare
 fi
 
-if [ -n "$1" ]; then
+if [ -n "${1:-}" ]; then
   OLDIFS="$IFS"
   { IFS=:
     export PYENV_VERSION="$*"
   }
   IFS="$OLDIFS"
-elif [ -z "$PYENV_VERSION" ]; then
+elif [ -z "${PYENV_VERSION:-}" ]; then
   PYENV_VERSION="$(pyenv-version-name)"
 fi
 
@@ -31,7 +31,7 @@ OLDIFS="$IFS"
   # Unquoted $VAR does glob expansion (against the current dir's contents) after IFS-splitting
   # which is undesired
   set -f
-  for version in ${PYENV_VERSION}; do
+  for version in ${PYENV_VERSION:-}; do
     if [ "$version" = "system" ]; then
       if PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python --skip-advice 2>/dev/null)" || \
           PYTHON_PATH="$(PYENV_VERSION="${version}" pyenv-which python3 --skip-advice 2>/dev/null)" || \
@@ -49,7 +49,7 @@ OLDIFS="$IFS"
       PYENV_PREFIX_PATH="${PYENV_ROOT}/versions/${version}"
     fi
     if [ -d "$PYENV_PREFIX_PATH" ]; then
-      PYENV_PREFIX_PATHS=("${PYENV_PREFIX_PATHS[@]}" "$PYENV_PREFIX_PATH")
+      PYENV_PREFIX_PATHS+=("$PYENV_PREFIX_PATH")
     else
       echo "pyenv: version \`${version}' not installed" >&2
       exit 1
@@ -61,6 +61,6 @@ IFS="$OLDIFS"
 
 OLDIFS="$IFS"
 { IFS=:
-  echo "${PYENV_PREFIX_PATHS[*]}"
+  echo "${PYENV_PREFIX_PATHS[*]-}"
 }
 IFS="$OLDIFS"

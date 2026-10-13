@@ -22,7 +22,7 @@ use_manifest() {
 
 stub_downloads() {
   create_stub curl <<'STUB'
-output=""
+output=
 while [ "$#" -gt 0 ]; do
   case "$1" in
   -o ) output="$2"; shift ;;

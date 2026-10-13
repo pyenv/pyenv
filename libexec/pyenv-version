@@ -4,19 +4,19 @@
 #
 #     --bare    show just the version name. An alias to `pyenv version-name'
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 exitcode=0
-OLDIFS="$IFS"
+
 # VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
 # which is undesired
 set -f
 IFS=: PYENV_VERSION_NAMES=($(pyenv-version-name)) || exitcode=$?
 set +f
-IFS="$OLDIFS"
 
-unset bare
+bare=
+
 for arg; do
     case "$arg" in
         --complete )
@@ -29,12 +29,15 @@ for arg; do
           ;;
     esac
 done
-for PYENV_VERSION_NAME in "${PYENV_VERSION_NAMES[@]}"; do
-  if [[ -n $bare ]]; then
+# Bash < 4.4 treats "${v[@]}" as unset with -u for empty array
+if ((${#PYENV_VERSION_NAMES[@]})); then
+  for PYENV_VERSION_NAME in "${PYENV_VERSION_NAMES[@]}"; do
+    if [[ -n $bare ]]; then
       echo "$PYENV_VERSION_NAME"
-  else
+    else
       echo "$PYENV_VERSION_NAME (set by $(pyenv-version-origin))"
-  fi
-done
+    fi
+  done
+fi
 
 exit $exitcode

@@ -2622,7 +2622,7 @@ fi
 
 # Check if TMPDIR is accessible and can hold executables.
 tmp_executable="${TMP}/python-build-test.$$"
-noexec=""
+noexec=
 if mkdir -p "$TMP" && touch "$tmp_executable" 2>/dev/null; then
   cat > "$tmp_executable" <<-EOF
 	#!${BASH}

@@ -20,19 +20,19 @@
 #                         the package from.
 #   -o <output>           Write the definition here (default: stdout).
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --archive-url
   echo -o
   exit
 fi
 
-metadata=""
-archive_url=""
-output=""
+metadata=
+archive_url=
+output=
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -55,8 +55,8 @@ if [ -z "$metadata" ] || [ -z "$archive_url" ]; then
   exit 1
 fi
 
-version="" os="" arch="" distro="" libc="" build_prefix="" archive=""
-deps=""
+version= os= arch= distro= libc= build_prefix= archive=
+deps=
 while IFS='=' read -r key value; do
   case "$key" in
   version ) version="$value" ;;
@@ -159,21 +159,21 @@ esac
 # Required system libraries must already be present on the target. Linux lists
 # the soname first; FreeBSD lists it in the resolved path, so normalize that
 # path before matching exact names.
-cache=""
+cache=
 if command -v ldconfig &>/dev/null; then
   case "$os" in
   FreeBSD )
     cache="$(ldconfig -r 2>/dev/null)" &&
       cache="$(printf '%s\n' "$cache" | awk -F ' *=> *' '{ sub(/^.*\//, "", $2); print $2 }')" \
-      || cache=""
+      || cache=
     ;;
   * )
-    cache="$(ldconfig -p 2>/dev/null)" || cache=""
+    cache="$(ldconfig -p 2>/dev/null)" || cache=
     ;;
   esac
 fi
 if [ -n "$cache" ]; then
-  missing=""
+  missing=
   for dep in $DEPS; do
     printf '%s\n' "$cache" | awk -v d="$dep" '$1 == d { found = 1 } END { exit !found }' \
       || missing="${missing} ${dep}"

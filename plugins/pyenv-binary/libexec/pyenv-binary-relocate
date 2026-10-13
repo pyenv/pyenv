@@ -12,21 +12,22 @@
 #   The definition that `pyenv binary generate-installer' produces calls this
 #   after `install_package ... copy' has laid the tree down.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   exit
 fi
 
-prefix="$1"
+prefix="${1:-}"
 if [ -z "$prefix" ]; then
   pyenv-help --usage binary-relocate >&2
   exit 1
 fi
 
 if [ "$(uname -s)" = "Darwin" ]; then
-  build_prefix="${2%/}"
+  build_prefix="${2:-}"
+  build_prefix="${build_prefix%/}"
   if [ -z "$build_prefix" ]; then
     echo "pyenv-binary: need the original build prefix to relocate a macOS binary" >&2
     exit 1

@@ -14,20 +14,20 @@
 #                  <version>-<platform>.
 #   --source-version <version>  Record the version used to build a renamed install.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --name
   echo --source-version
   exec pyenv-versions --bare
 fi
 
-version=""
-output_dir=""
-package_name=""
-source_version=""
+version=
+output_dir=
+package_name=
+source_version=
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -96,8 +96,8 @@ platform="$(printf '%s' "$os" | tr '[:upper:]' '[:lower:]')-${arch}"
 # Record the distro and libc version. Platform and arch alone are too coarse to
 # judge compatibility: a build is only portable to a matching libc (e.g. a
 # glibc 2.36 build will not load on an older glibc, nor on musl at all).
-distro=""
-libc=""
+distro=
+libc=
 if [ -r /etc/os-release ]; then
   distro="$( . /etc/os-release && printf '%s %s' "${ID:-}" "${VERSION_ID:-}" )"
 elif [ "$os" = "Darwin" ]; then

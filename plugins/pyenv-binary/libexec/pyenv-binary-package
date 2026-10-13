@@ -18,19 +18,19 @@
 #                         Where the archive will be hosted; the definition
 #                         downloads it from <url>/<entry>.tar.xz.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --archive-base-url
   echo --verbose
   exec pyenv-install --list --bare
 fi
 
-spec=""
-archive_base_url=""
-verbose=""
+spec=
+archive_base_url=
+verbose=
 
 while [ $# -gt 0 ]; do
   case "$1" in
