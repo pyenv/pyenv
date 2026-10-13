@@ -32,7 +32,7 @@ fi
 versions=("$@")
 shell="$(basename "${PYENV_SHELL:-${SHELL:-}}")"
 
-if [ "$#" -eq 0 ]; then
+if ! ((${#versions[@]})); then
   if [ -z "${PYENV_VERSION:-}" ]; then
     echo "pyenv: no shell-specific version configured" >&2
     exit 1
@@ -42,7 +42,7 @@ if [ "$#" -eq 0 ]; then
   fi
 fi
 
-if [ "${versions[0]:-}" = "--unset" ]; then
+if [ "${versions[0]}" = "--unset" ]; then
   case "$shell" in
   fish )
     echo 'set -gu PYENV_VERSION_OLD "$PYENV_VERSION"'
@@ -59,7 +59,7 @@ if [ "${versions[0]:-}" = "--unset" ]; then
   exit
 fi
 
-if [ "${versions[0]:-}" = "-" ]; then
+if [ "${versions[0]}" = "-" ]; then
   case "$shell" in
   fish )
     cat <<EOS

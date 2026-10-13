@@ -31,8 +31,6 @@
 set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
-FORCE=
-
 # Provide pyenv completions
 if [ "${1:-}" = "--complete" ]; then
   echo --unset
@@ -40,9 +38,11 @@ if [ "${1:-}" = "--complete" ]; then
   exec pyenv-versions --bare
 fi
 
+FORCE=
+
 while [[ $# -gt 0 ]]
 do
-    case "${1:-}" in
+    case "$1" in
         -f|--force)
             FORCE=1
             shift

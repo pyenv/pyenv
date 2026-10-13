@@ -9,7 +9,7 @@ set -euo pipefail
 FORCE=
 while [[ $# -gt 0 ]]
 do
-    case "${1:-}" in
+    case "$1" in
         -f|--force)
             FORCE=1
             shift
@@ -37,7 +37,7 @@ for script in "${scripts[@]}"; do
 done
 set -u
 
-if [ -z "${PYENV_VERSION:-}" ] || [ "${PYENV_VERSION:-}" = "system" ]; then
+if [[ -z ${PYENV_VERSION:-} || $PYENV_VERSION == "system" ]]; then
   echo "system"
   exit
 fi
@@ -50,7 +50,7 @@ version_exists() {
 versions=()
 OLDIFS="$IFS"
 { IFS=:
-  any_not_installed=0
+  any_not_installed=
   normalization_done=
   # Unquoted $VAR does glob expansion (against the current dir's contents) after IFS-splitting
   # which is undesired
@@ -61,14 +61,14 @@ OLDIFS="$IFS"
     [[ $version != "${normalised_version}" ]] && normalization_done=1
     if [[ $version == "system" ]] || version_exists "${normalised_version}" ; then
       versions+=("${normalised_version}")
-    elif [[ -n ${normalization_done:-} ]] && version_exists "${version}"; then
+    elif [[ -n $normalization_done ]] && version_exists "${version}"; then
       versions+=("${version}")
     elif resolved_version="$(pyenv-latest -b "${normalised_version}")"; then
       versions+=("${resolved_version}")
-    elif [[ -n ${normalization_done:-} ]] && resolved_version="$(pyenv-latest -b "${version}")"; then
+    elif [[ -n $normalization_done ]] && resolved_version="$(pyenv-latest -b "${version}")"; then
       versions+=("${resolved_version}")
     else
-      if [[ -n ${FORCE:-} ]]; then
+      if [[ -n $FORCE ]]; then
         versions+=("${normalised_version}")
       else
         echo "pyenv: version \`$version' is not installed (set by $(pyenv-version-origin))" >&2
@@ -86,6 +86,6 @@ OLDIFS="$IFS"
 }
 IFS="$OLDIFS"
 
-if [ "${any_not_installed:-0}" = 1 ]; then
+if [[ -n $any_not_installed ]]; then
   exit 1
 fi

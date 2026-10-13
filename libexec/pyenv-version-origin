@@ -3,7 +3,7 @@
 set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
-unset PYENV_VERSION_ORIGIN
+PYENV_VERSION_ORIGIN=
 
 OLDIFS="$IFS"
 IFS=$'\n' scripts=(`pyenv-hooks version-origin`)
@@ -16,9 +16,9 @@ for script in "${scripts[@]}"; do
 done
 set -u
 
-if [ -n "${PYENV_VERSION_ORIGIN:-}" ]; then
+if [[ -n ${PYENV_VERSION_ORIGIN:-} ]]; then
   echo "$PYENV_VERSION_ORIGIN"
-elif [ -n "${PYENV_VERSION:-}" ]; then
+elif [[ -n "${PYENV_VERSION:-}" ]; then
   echo "PYENV_VERSION environment variable"
 else
   pyenv-version-file

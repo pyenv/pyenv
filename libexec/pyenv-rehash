@@ -13,9 +13,8 @@ mkdir -p "$SHIM_PATH"
 last_acquire_error=
 tested_for_other_write_errors=
 
-ret=
 acquire_lock() {
-  local ret
+  local ret=
   # An old lock file is presumed stale. We assume no healthy rehash takes this long.
   # The time is picked very small so that a killed rehash holds up new shell sessions
   # for as little as possible
@@ -29,7 +28,7 @@ acquire_lock() {
       # Bash doesn't provide access to errno to check for non-EEXIST error code in `echo >'.
       # So check for writablity by trying to write to a different file,
       # in a way that taxes the usual use case as little as possible.
-      if [[ -z "${tested_for_other_write_errors}" ]]; then
+      if [[ -z $tested_for_other_write_errors ]]; then
         # if lots of (50+) rehashes run concurrently, another concurrent rehash
         # may delete the temporary file in remove_*_shims() before we do so
         ( t="$(TMPDIR="$SHIM_PATH" mktemp)" && rm -f "$t" ) \
@@ -41,7 +40,7 @@ acquire_lock() {
       ret=1
     }
   set +o noclobber
-  [[ -z "${ret:-}" ]]
+  [[ -z $ret ]]
 }
 
 remove_prototype_shim() {
@@ -139,13 +138,8 @@ make_shims() {
 }
 
 if ((${BASH_VERSINFO[0]} > 3)); then
+
   declare -A registered_shims=()
-else
-  registered_shims=" "
-fi
-
-
-if ((${BASH_VERSINFO[0]} > 3)); then
 
   # Registers the name of a shim to be generated.
   register_shim() {
@@ -156,15 +150,14 @@ if ((${BASH_VERSINFO[0]} > 3)); then
   }
 
   # Install all shims registered via `make_shims` or `register_shim` directly.
-
   install_registered_shims() {
     local shim file
-    if [ "${#registered_shims[@]}" -gt 0 ]; then
-      for shim in "${!registered_shims[@]}"; do
-        file="${SHIM_PATH}/${shim}"
-        [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
-      done
-    fi
+    # The Bash < 4.4 bug treating empty arrays as unset
+    # does not affect "${!var[@]}"
+    for shim in "${!registered_shims[@]}"; do
+      file="${SHIM_PATH}/${shim}"
+      [ -e "$file" ] || cp "$PROTOTYPE_SHIM_PATH" "$file"
+    done
   }
 
   # Once the registered shims have been installed, we make a second pass
@@ -181,6 +174,8 @@ if ((${BASH_VERSINFO[0]} > 3)); then
   }
 
 else # Same for bash < 4.
+
+    registered_shims=" "
 
     register_shim() {
       if [[ "$registered_shims" != *" ${1} "* ]]; then
@@ -213,7 +208,6 @@ shopt -s nullglob
 # executables.
 create_prototype_shim
 set -f
-# shellcheck disable=SC2046
 make_shims $(pyenv-versions --executables)
 set +f
 

@@ -52,7 +52,11 @@ IFS=$'\n'
         DEFINITION_CANDIDATES=( $(python-build --definitions ) )
     fi
     
-    if printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" 2>/dev/null | grep -xFe "$prefix" >/dev/null; then
+    # Avoid `grep -q' to prevent SIGPIPE that would fail the check with pipefail
+    # Bash < 4.4 treats empty arrays as unset with -u;
+    # "${v[@]:-}" produces "" for an empty array which is okay
+    # for `printf '%s\n'` as it prints an empty line for zero args anyway
+    if printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | grep -xFe "$prefix" >/dev/null; then
         echo "$prefix"
         exit $exitcode;
     fi
@@ -60,7 +64,7 @@ IFS=$'\n'
     suffix=
     if [[ $prefix =~ ^(.*[0-9])t$ ]]; then
         suffix="t"
-        prefix="${BASH_REMATCH[1]:-}"
+        prefix="${BASH_REMATCH[1]}"
     fi
     
     # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
@@ -74,7 +78,7 @@ IFS=$'\n'
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
           sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+$/d' \
-            $(if [[ -z "${suffix:-}" ]]; then echo "-e /[0-9]t\$/d"; fi)
+            $(if [[ -z $suffix ]]; then echo "-e /[0-9]t\$/d"; fi)
         ));
 
     # Compose a sorting key, followed by | and original value
@@ -93,15 +97,15 @@ IFS=$'\n'
         || true))
     DEFINITION="${DEFINITION_CANDIDATES[0]:-}"
 
-    if [[ -n "${DEFINITION:-}" ]]; then
+    if [[ -n $DEFINITION ]]; then
         echo "$DEFINITION"
     else
-        if [[ -z "$BYPASS" ]]; then
-            echo "pyenv: no $([[ -z "$FROM_KNOWN" ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
+        if [[ -z $BYPASS ]]; then
+            echo "pyenv: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
         else
             echo "$prefix"
         fi
-        if [[ -z "$FORCE" ]]; then
+        if [[ -z $FORCE ]]; then
             exitcode=1
         fi
     fi

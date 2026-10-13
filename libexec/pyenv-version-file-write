@@ -10,7 +10,7 @@ FORCE=
 
 while [[ $# -gt 0 ]]
 do
-    case "${1:-}" in
+    case "$1" in
         -f|--force)
             FORCE=1
             shift
@@ -26,7 +26,7 @@ PYENV_VERSION_FILE="${1:-}"
 shift || true
 versions=("$@")
 
-if [ ${#versions[@]} -eq 0 ] || [ -z "${PYENV_VERSION_FILE:-}" ] || [ -z "${versions[0]:-}" ]; then
+if [ ${#versions[@]} -eq 0 ] || [ -z "$PYENV_VERSION_FILE" ]; then
   pyenv-help --usage version-file-write >&2
   exit 1
 fi

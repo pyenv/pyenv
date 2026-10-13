@@ -7,7 +7,7 @@ set -euo pipefail
 target_dir="${1:-}"
 
 find_local_version_file() {
-  local root="${1:-}"
+  local root="${1:?}"
   # Nonexistent paths are UB as of this writing.
   # Relative ones cause a failure but absolute ones don't
   [[ $root != /* ]] && root=$(CDPATH= cd -- "$root" && pwd)

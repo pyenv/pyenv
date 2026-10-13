@@ -26,12 +26,12 @@ if conda_exists; then
     done
 
     eval \
-    "conda_shim() {
-      case \"\${1##*/}\" in
-        ${shims[@]:-}
-        *) return 1;;
-      esac
-    }"
+      "conda_shim() {
+        case \"\${1##*/}\" in
+          ${shims[@]:-}
+          *) return 1;;
+        esac
+      }"
   }
 
   # override `make_shims` to avoid conflict between pyenv-virtualenv's `envs.bash`
@@ -50,15 +50,14 @@ if conda_exists; then
   }
 
   deregister_conda_shims() {
-    # adapted for Bash 4.x's associative array (#1749)
     if declare -p registered_shims 2> /dev/null | grep -Eq '^(declare|typeset) -A'; then
-      if [ "${#registered_shims[@]}" -gt 0 ]; then
-        for shim in "${!registered_shims[@]}"; do
-          if conda_shim "${shim}" 1>&2; then
-            unset "registered_shims[$shim]"
-          fi
-        done
-      fi
+      # The Bash < 4.4 bug treating empty arrays as unset
+      # does not affect "${!var[@]}"
+      for shim in "${!registered_shims[@]}"; do
+        if conda_shim "${shim}" 1>&2; then
+          unset registered_shims[$shim]
+        fi
+      done
     else
       local shim
       local shims=()
