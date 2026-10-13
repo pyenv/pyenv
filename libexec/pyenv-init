@@ -543,7 +543,7 @@ end'
   pwsh )
     cat <<EOS
 function pyenv {
-  \$command=
+  \$command=""
   if ( \$args.Count -gt 0 ) {
     \$command, \$args = \$args
   }
