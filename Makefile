@@ -28,7 +28,7 @@ $(TEST_UNIT_DOCKER_TARGETS): DOCKER_IMAGE = $(TEST_BATS_IMAGE_PREFIX)
 $(TEST_UNIT_DOCKER_TARGETS): GNU = $(if $(findstring -gnu-,$@),True,False)
 $(TEST_UNIT_DOCKER_TARGETS): BASH = $(filter $(TEST_BASH_VERSIONS),$(subst -, ,$@))
 $(TEST_UNIT_DOCKER_TARGETS): DOCKER_TAG = bash-$(BASH)-gnu-$(GNU)
-$(TEST_UNIT_DOCKER_TARGETS): INTERACTIVE = $(if $(findstring true,$(CI)),,-ti)
+$(TEST_UNIT_DOCKER_TARGETS): INTERACTIVE = $(if $(findstring true,$(CI)),,-t)
 $(TEST_UNIT_DOCKER_TARGETS): $(TEST_UNIT_DOCKER_PREFIX)-% : $(TEST_BATS_IMAGE_PREFIX)-%
 	$(info Running test with docker image '$(DOCKER_IMAGE):$(DOCKER_TAG)')
 	docker run \
@@ -53,7 +53,7 @@ $(TEST_PYTHON_BUILD_DOCKER_TARGETS): DOCKER_IMAGE = $(TEST_BATS_IMAGE_PREFIX)
 $(TEST_PYTHON_BUILD_DOCKER_TARGETS): GNU = $(if $(findstring -gnu-,$@),True,False)
 $(TEST_PYTHON_BUILD_DOCKER_TARGETS): BASH = $(filter $(TEST_BASH_VERSIONS),$(subst -, ,$@))
 $(TEST_PYTHON_BUILD_DOCKER_TARGETS): DOCKER_TAG = bash-$(BASH)-gnu-$(GNU)
-$(TEST_PYTHON_BUILD_DOCKER_TARGETS): INTERACTIVE = $(if $(findstring true,$(CI)),,-ti)
+$(TEST_PYTHON_BUILD_DOCKER_TARGETS): INTERACTIVE = $(if $(findstring true,$(CI)),,-t)
 $(TEST_PYTHON_BUILD_DOCKER_TARGETS): $(TEST_PYTHON_BUILD_DOCKER_PREFIX)-% : $(TEST_BATS_IMAGE_PREFIX)-%
 	$(info Running test with docker image '$(DOCKER_IMAGE):$(DOCKER_TAG)')
 	docker run \
@@ -76,7 +76,7 @@ $(TEST_BINARY_DOCKER_TARGETS): DOCKER_IMAGE = $(TEST_BATS_IMAGE_PREFIX)
 $(TEST_BINARY_DOCKER_TARGETS): GNU = $(if $(findstring -gnu-,$@),True,False)
 $(TEST_BINARY_DOCKER_TARGETS): BASH = $(filter $(TEST_BASH_VERSIONS),$(subst -, ,$@))
 $(TEST_BINARY_DOCKER_TARGETS): DOCKER_TAG = bash-$(BASH)-gnu-$(GNU)
-$(TEST_BINARY_DOCKER_TARGETS): INTERACTIVE = $(if $(findstring true,$(CI)),,-ti)
+$(TEST_BINARY_DOCKER_TARGETS): INTERACTIVE = $(if $(findstring true,$(CI)),,-t)
 $(TEST_BINARY_DOCKER_TARGETS): $(TEST_BINARY_DOCKER_PREFIX)-% : $(TEST_BATS_IMAGE_PREFIX)-%
 	$(info Running test with docker image '$(DOCKER_IMAGE):$(DOCKER_TAG)')
 	docker run \
@@ -99,7 +99,7 @@ $(TEST_LINK_DOCKER_TARGETS): DOCKER_IMAGE = $(TEST_BATS_IMAGE_PREFIX)
 $(TEST_LINK_DOCKER_TARGETS): GNU = $(if $(findstring -gnu-,$@),True,False)
 $(TEST_LINK_DOCKER_TARGETS): BASH = $(filter $(TEST_BASH_VERSIONS),$(subst -, ,$@))
 $(TEST_LINK_DOCKER_TARGETS): DOCKER_TAG = bash-$(BASH)-gnu-$(GNU)
-$(TEST_LINK_DOCKER_TARGETS): INTERACTIVE = $(if $(findstring true,$(CI)),,-ti)
+$(TEST_LINK_DOCKER_TARGETS): INTERACTIVE = $(if $(findstring true,$(CI)),,-t)
 $(TEST_LINK_DOCKER_TARGETS): $(TEST_LINK_DOCKER_PREFIX)-% : $(TEST_BATS_IMAGE_PREFIX)-%
 	$(info Running test with docker image '$(DOCKER_IMAGE):$(DOCKER_TAG)')
 	docker run \

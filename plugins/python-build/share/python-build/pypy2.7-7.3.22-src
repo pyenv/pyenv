@@ -1,14 +1,10 @@
 VERSION='7.3.22'
 PYVER='2.7'
 
-# https://www.pypy.org/checksums.html
-hash=f4445c1a835effe4d3b26521e73a7780893dec02520aa6799a377c9a0fcdd8ad
+sha=6d3a19754055f79f607b5c3f4373fb4fd4a0e6f1
 
 ### end of manual settings - following lines same for every download
 
-ver="pypy${PYVER}-v${VERSION}-src"
-url="https://downloads.python.org/pypy/${ver}.tar.bz2"
-
-prefer_openssl11
-install_package "openssl-1.1.1f" "https://www.openssl.org/source/openssl-1.1.1f.tar.gz#186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35" mac_openssl --if has_broken_mac_openssl
-install_package "${ver}" "${url}#${hash}" 'pypy_builder' "verify_py${PYVER//./}" 'ensurepip_lt21'
+require_openssl3
+PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-tcl-tk tcl-tk@8}"
+install_git "pypy${PYVER}-v${VERSION}-src" https://github.com/pypy/pypy "release-pypy${PYVER}-v${VERSION}:$sha" pypy_builder "verify_py${PYVER//./}" 'ensurepip_lt21'
