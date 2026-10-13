@@ -34,9 +34,12 @@ fi
 # Make sure the specified version is installed.
 [[ -z "${FORCE:-}" ]] && pyenv-prefix "${versions[@]}" >/dev/null
 
+payload=\
+$(for version in "${versions[@]}"; do
+  [[ -z $version ]] && { echo "pyenv: invalid empty version argument" >&2; exit 1; }
+  echo "$version"
+done)
+
 # Write the version out to disk.
-# Create an empty file. Using "rm" might cause a permission error.
-> "$PYENV_VERSION_FILE"
-for version in "${versions[@]}"; do
-  echo "$version" >> "$PYENV_VERSION_FILE"
-done
+# (Over)write the file. Using "rm" might cause a permission error.
+echo "$payload" > "$PYENV_VERSION_FILE"
