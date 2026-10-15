@@ -8,7 +8,7 @@ _setup() {
   libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev \
   liblzma-dev libzstd-dev"
   
-  optional="libgdbm-dev"
+  optional="libgdbm-dev libmpdec-dev"
 }
 
 @test "completions" {
