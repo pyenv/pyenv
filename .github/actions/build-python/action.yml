@@ -20,7 +20,7 @@ runs:
       shell: bash
       run: |
         #prerequisites
-        brew install openssl readline sqlite3 xz tcl-tk@8 libb2 zstd gdbm
+        brew install openssl readline sqlite3 xz tcl-tk@8 libb2 zstd gdbm mpdecimal
     - if: runner.os == 'Linux'
       shell: bash
       run: |
