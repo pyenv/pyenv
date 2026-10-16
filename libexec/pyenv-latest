@@ -49,7 +49,7 @@ IFS=$'\n'
         fi
         DEFINITION_CANDIDATES=( $(pyenv-versions --bare --skip-envs) )
     else
-        DEFINITION_CANDIDATES=( $(python-build --definitions ) )
+        DEFINITION_CANDIDATES=( $(pyenv-install --list --bare) )
     fi
     
     # Avoid `grep -q' to prevent SIGPIPE that would fail the check with pipefail
