@@ -193,7 +193,7 @@ echo "python \$@" >> "${INSTALL_ROOT}/build.log"
 OUT
   chmod +x "${INSTALL_ROOT}/bin/python"
 
-  PYTHON_MAKE_INSTALL_TARGET="" TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  PYTHON_MAKE_INSTALL_TARGET= TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
 build_package_ensurepip
 OUT
   assert_success

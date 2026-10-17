@@ -71,10 +71,13 @@ platform() {
   assert_failure "pyenv-binary: --source-version needs a value"
 }
 
-@test "rejects control characters in the default source version" {
-  run pyenv-binary-save $'3.12.7\nsource_version=other'
-  assert_failure
-  [[ "$output" == "pyenv-binary: invalid source version"* ]]
+@test "rejects control characters in the installed version before saving" {
+  local version=$'3.12.7\nsource_version=other'
+  create_version "$version"
+
+  run pyenv-binary-save "$version" "$BATS_TEST_TMPDIR/dist" --source-version 3.12.7
+  assert_failure "pyenv-binary: invalid version name \`$version'"
+  [ ! -e "$BATS_TEST_TMPDIR/dist" ]
 }
 
 @test "fails when --name has no value" {

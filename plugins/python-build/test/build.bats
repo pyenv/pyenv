@@ -32,7 +32,7 @@ tarball() {
   shift
   local path="$PWD/$name"
   local configure="$1"
-  if [[ ${configure:0:1} == "-" ]]; then configure=""; fi
+  if [[ ${configure:0:1} == "-" ]]; then configure=; fi
   configure="$path/${configure:-configure}"
   shift || true
   local extra_vars var_name
@@ -1105,7 +1105,7 @@ OUT
 }
 
 @test "tcl-tk is linked from Homebrew with PYTHON_BUILD_TCLTK_FORMULA" {
-  test_tcltk_var PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA
+  test_tcltk_var PYTHON_BUILD_TCLTK_FORMULA
 }
 
 @test "PYTHON_BUILD_TCLTK_FORMULA produces a deprecation warning" {

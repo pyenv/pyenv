@@ -19,19 +19,19 @@
 #                         Where the archive will be hosted; the definition
 #                         downloads it from <url>/<entry>.tar.xz.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo --archive-base-url
   echo --verbose
   exec pyenv-install --list --bare
 fi
 
-spec=""
-archive_base_url=""
-verbose=""
+spec=
+archive_base_url=
+verbose=
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -67,14 +67,14 @@ latest )
   echo "pyenv-binary: \`latest' cannot be used as an entry name" >&2
   exit 1
   ;;
-# The entry becomes a directory name under versions/. `pyenv install' does not
-# validate the alias, and `save' only checks once the build is done, so refuse
-# a name that could point elsewhere before compiling anything.
-*/* | .. | . )
+esac
+
+# `pyenv install' does not validate aliases before starting the build.
+source "${BASH_SOURCE%/*}/../share/pyenv-binary/common.bash"
+if ! is_name_safe "$entry"; then
   echo "pyenv-binary: invalid entry name \`${entry}'" >&2
   exit 1
-  ;;
-esac
+fi
 
 # `pyenv install' puts a `<version>:<alias>' build under versions/<alias>.
 pyenv-install ${verbose:+--verbose} "$spec"

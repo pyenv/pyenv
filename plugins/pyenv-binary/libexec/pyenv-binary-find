@@ -7,10 +7,10 @@
 #   Prints the definition name, package entry and definition checksum, separated
 #   by tabs. Takes an exact name; does not resolve, download or install it.
 #
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   exit
 fi
 
@@ -30,7 +30,9 @@ source "${BASH_SOURCE%/*}/../share/pyenv-binary/platform.bash"
 target=""
 case "$os" in
 Linux | Darwin )
-  target="$(package_suffix "$os" "$distro" "$arch" 2>/dev/null)" || target=""
+  if [ -n "$distro" ] && [[ "$distro" != *" " ]]; then
+    target="$(package_suffix "$os" "$distro" "$arch")"
+  fi
   ;;
 esac
 

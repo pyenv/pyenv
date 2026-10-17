@@ -13,12 +13,13 @@ slug() {
 
 package_suffix() {
   local distro="$2" arch="$3" distro_version
-  distro_version="$(slug "${distro##* }")"
+  # Bash 3.2 does not preserve errexit inside command substitutions.
+  distro_version="$(slug "${distro##* }")" || return
   if [ "$1" = "Darwin" ]; then
     distro_version="${distro_version%%.*}"
   fi
-  distro="$(slug "${distro% *}")"
-  arch="$(slug "$arch")"
+  distro="$(slug "${distro% *}")" || return
+  arch="$(slug "$arch")" || return
 
   if [ -z "$distro" ] || [ -z "$distro_version" ] || [ -z "$arch" ]; then
     echo "pyenv-binary: could not determine the package platform" >&2

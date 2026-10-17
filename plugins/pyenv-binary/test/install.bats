@@ -13,7 +13,7 @@ _setup() {
 
 stub_downloads() {
   create_stub curl <<'STUB'
-output=""
+output=
 while [ "$#" -gt 0 ]; do
   case "$1" in
   -o ) output="$2"; shift ;;
@@ -48,7 +48,7 @@ STUB
 @test "rejects a modified published definition before executing it" {
   printf 'ubuntu-24.04-x86_64\t%064d\n' 0 > "$records/3.14.7"
   stub_downloads
-  create_stub pyenv-install '[ "$1" = --list ] && exit; touch "$BATS_TEST_TMPDIR/installed"'
+  create_stub pyenv-install 'touch "$BATS_TEST_TMPDIR/installed"'
 
   run pyenv-binary-install 3.14.7
   assert_failure "pyenv-binary: checksum mismatch for 3.14.7-ubuntu-24.04-x86_64"
@@ -56,15 +56,15 @@ STUB
   assert_equal "" "$(find "$TMPDIR" -mindepth 1 -maxdepth 1)"
 }
 
-@test "a plugin definition overrides a published binary without its checksum" {
+@test "a plugin binary definition overrides a published binary without its checksum" {
   local entry="3.14.7-ubuntu-24.04-x86_64"
   printf 'ubuntu-24.04-x86_64\t\n' > "$records/3.14.7"
   create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
   PATH="${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
-  mkdir -p "$PYENV_ROOT/plugins/first/share/python-build" "$PYENV_ROOT/plugins/second/share/python-build"
+  mkdir -p "$PYENV_ROOT/plugins/first/share/pyenv-binary/definitions" "$PYENV_ROOT/plugins/second/share/pyenv-binary/definitions"
   printf '%s\n' 'mkdir -p "$PREFIX_PATH"; echo first > "$PREFIX_PATH/marker"' \
-    > "$PYENV_ROOT/plugins/first/share/python-build/$entry"
-  echo 'exit 1' > "$PYENV_ROOT/plugins/second/share/python-build/$entry"
+    > "$PYENV_ROOT/plugins/first/share/pyenv-binary/definitions/$entry"
+  echo 'exit 1' > "$PYENV_ROOT/plugins/second/share/pyenv-binary/definitions/$entry"
 
   run pyenv-binary-install 3.14.7
   assert_success ""
@@ -73,21 +73,23 @@ STUB
   assert_equal "" "$(find "$TMPDIR" -mindepth 1 -maxdepth 1 -type d)"
 }
 
-@test "an explicit definition path takes precedence over a plugin definition" {
+@test "source definition directories do not override a published binary" {
   local entry="3.14.7-ubuntu-24.04-x86_64"
-  printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
-  create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
+  printf 'ubuntu-24.04-x86_64\t%s\n' \
+    cff275fca6f9076c33577ef1f9dc33c50e01b57b2ee43570ab494d671bc94c68 > "$records/3.14.7"
+  create_stub curl <<'STUB'
+[ "$4" = https://pyenv.github.io/pythons/binaries/3.14.7-ubuntu-24.04-x86_64 ] || exit 1
+printf '%s\n' 'mkdir -p "$PREFIX_PATH"; echo binary > "$PREFIX_PATH/marker"' > "$3"
+STUB
   PATH="${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
   export PYTHON_BUILD_DEFINITIONS="$BATS_TEST_TMPDIR/custom definitions"
   mkdir -p "$PYTHON_BUILD_DEFINITIONS" "$PYENV_ROOT/plugins/custom/share/python-build"
-  printf '%s\n' 'mkdir -p "$PREFIX_PATH"; echo custom > "$PREFIX_PATH/marker"' \
-    > "$PYTHON_BUILD_DEFINITIONS/$entry"
+  echo 'exit 1' > "$PYTHON_BUILD_DEFINITIONS/$entry"
   echo 'exit 1' > "$PYENV_ROOT/plugins/custom/share/python-build/$entry"
 
   run pyenv-binary-install 3.14.7
   assert_success ""
-  assert_equal custom "$(cat "$PYENV_ROOT/versions/3.14.7/marker")"
-  [ ! -e "$BATS_TEST_TMPDIR/downloaded" ]
+  assert_equal binary "$(cat "$PYENV_ROOT/versions/3.14.7/marker")"
 }
 
 @test "installs a matching published binary with an uppercase checksum" {
@@ -95,7 +97,6 @@ STUB
   printf 'ubuntu-24.04-x86_64\t%s\n' "$uppercase_sha" > "$records/3.14.7"
   stub_downloads
   create_stub pyenv-install <<'STUB'
-[ "$1" = --list ] && exit
 definition="${1%:*}"
 printf '%s:%s\n' "${definition##*/}" "${1##*:}"
 cat "$definition"
@@ -112,35 +113,40 @@ definition"
   printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
   printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.10"
   stub_downloads
-  create_stub pyenv-install '[ "$1" = --list ] && exit; echo "${1##*:}"'
+  create_stub pyenv-install 'echo "${1##*:}"'
 
   run pyenv-binary-install 3.14
   assert_success "3.14.7"
 }
 
-@test "binary install resolves plugin versions like ordinary install" {
+@test "local binary definitions do not enter source version resolution" {
   rm "$BATS_TEST_TMPDIR/stubs/pyenv-latest"
   PATH="${_PYENV_INSTALL_PREFIX}/plugins/python-build/bin:$PATH"
   local definitions="$PYENV_ROOT/plugins/custom/share/python-build"
-  mkdir -p "$definitions"
+  local binaries="$PYENV_ROOT/plugins/custom/share/pyenv-binary/definitions"
+  mkdir -p "$definitions" "$binaries"
   printf '%s\n' 'mkdir -p "$PREFIX_PATH"; echo source > "$PREFIX_PATH/marker"' \
     > "$definitions/custom-1.0"
+  printf '%s\n' 'mkdir -p "$PREFIX_PATH"; echo binary > "$PREFIX_PATH/marker"' \
+    > "$binaries/custom-1.0-ubuntu-24.04-x86_64"
+
+  run pyenv-install --list --bare
+  assert_success
+  assert_line custom-1.0
+  refute_line custom-1.0-ubuntu-24.04-x86_64
 
   run pyenv-install custom
   assert_success ""
   assert_equal source "$(cat "$PYENV_ROOT/versions/custom-1.0/marker")"
   mv "$PYENV_ROOT/versions/custom-1.0" "$BATS_TEST_TMPDIR/source-install"
 
-  printf 'ubuntu-24.04-x86_64\t%s\n' \
-    cff275fca6f9076c33577ef1f9dc33c50e01b57b2ee43570ab494d671bc94c68 > "$records/custom-1.0"
-  create_stub curl <<'STUB'
-[ "$4" = https://pyenv.github.io/pythons/binaries/custom-1.0-ubuntu-24.04-x86_64 ] || exit 1
-printf '%s\n' 'mkdir -p "$PREFIX_PATH"; echo binary > "$PREFIX_PATH/marker"' > "$3"
-STUB
+  printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/custom-1.0"
+  create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
 
   run pyenv-binary-install custom
   assert_success ""
   assert_equal binary "$(cat "$PYENV_ROOT/versions/custom-1.0/marker")"
+  [ ! -e "$BATS_TEST_TMPDIR/downloaded" ]
 }
 
 @test "does not fall back to an older binary when the resolved version has none" {
@@ -151,7 +157,8 @@ STUB
   assert_failure "pyenv-binary: no binary available for 3.14.10 on Linux/x86_64"
 }
 
-@test "a failed definition listing does not download or execute the stock definition" {
+@test "a failed source listing does not download or install a binary" {
+  rm "$BATS_TEST_TMPDIR/stubs/pyenv-latest"
   printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
   create_stub pyenv-install 'echo "listing failed" >&2; exit 1'
   create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
@@ -164,7 +171,7 @@ STUB
 
 @test "a failed download leaves no temporary definition or installation" {
   printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
-  create_stub pyenv-install '[ "$1" = --list ] && exit; touch "$BATS_TEST_TMPDIR/installed"'
+  create_stub pyenv-install 'touch "$BATS_TEST_TMPDIR/installed"'
   create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
 
   run pyenv-binary-install 3.14.7
@@ -176,18 +183,19 @@ STUB
 
 @test "an empty stock checksum cannot install a downloaded definition" {
   printf 'ubuntu-24.04-x86_64\t\n' > "$records/3.14.7"
-  stub_downloads
-  create_stub pyenv-install '[ "$1" = --list ] && exit; touch "$BATS_TEST_TMPDIR/installed"'
+  create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"'
+  create_stub pyenv-install 'touch "$BATS_TEST_TMPDIR/installed"'
 
   run pyenv-binary-install 3.14.7
-  assert_failure "pyenv-binary: checksum mismatch for 3.14.7-ubuntu-24.04-x86_64"
+  assert_failure "pyenv-binary: invalid checksum for 3.14.7-ubuntu-24.04-x86_64"
+  [ ! -e "$BATS_TEST_TMPDIR/downloaded" ]
   [ ! -e "$BATS_TEST_TMPDIR/installed" ]
 }
 
 @test "stock installation requires a SHA256 tool" {
   printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
   stub_downloads
-  create_stub pyenv-install '[ "$1" = --list ] && exit; touch "$BATS_TEST_TMPDIR/installed"'
+  create_stub pyenv-install 'touch "$BATS_TEST_TMPDIR/installed"'
   local bin="$BATS_TEST_TMPDIR/bin" command
   mkdir -p "$bin"
   for command in bash tr grep mktemp rm; do

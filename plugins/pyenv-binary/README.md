@@ -57,9 +57,11 @@ pyenv binary install 3.14.7
 ```
 
 A definition with the selected package entry's name in a plugin's
-`share/python-build` directory overrides the published definition. The normal
-Python-Build search order applies, including `PYTHON_BUILD_DEFINITIONS`.
-Local definitions are installed without downloading the stock definition.
+`share/pyenv-binary/definitions` directory overrides the published definition.
+Plugins are searched in filename order; the first match is installed without
+downloading the stock definition. Move existing binary overrides here from
+`share/python-build` or `PYTHON_BUILD_DEFINITIONS`, so they do not enter normal
+source-version resolution.
 
 ### `pyenv binary package [-v|--verbose] <version>[:<entry>] --archive-base-url <url>`
 
@@ -82,8 +84,8 @@ pyenv binary package 3.12.7:company-python \
 ```
 
 The archive, metadata and definition land in the current directory, named after
-the entry. Host the archive under `<url>` and drop the definition into
-python-build's definition directory.
+the entry. Host the archive under `<url>` and install the definition by file path,
+as shown below, rather than adding it to the source-definition search path.
 
 ### `pyenv binary package-name <version>`
 
@@ -111,10 +113,9 @@ pyenv binary save 3.12.7 ./dist
 
 ### `pyenv binary generate-installer <metadata-file> --archive-url <url> [-o <output>]`
 
-Reads a `.meta` file and emits a python-build definition. Drop it into
-python-build's definition directory and `pyenv install <name>` installs the
-archive like any other version. The archive location is a parameter, so you can
-host it anywhere (it does not have to be a pyenv location); the archive itself
+Reads a `.meta` file and emits a python-build definition. Pass its file path to
+`pyenv install` to install the archive. The archive location is a parameter, so
+you can host it anywhere (it does not have to be a pyenv location); the archive itself
 must sit next to the `.meta` file so its checksum can be baked into the
 definition.
 
@@ -125,9 +126,9 @@ needs are present.
 ```sh
 pyenv binary generate-installer ./dist/3.12.7-linux-x86_64.meta \
   --archive-url https://example.com/3.12.7-linux-x86_64.tar.xz \
-  -o "$(pyenv root)/plugins/python-build/share/python-build/3.12.7-linux-x86_64"
+  -o ./dist/3.12.7-linux-x86_64
 
-pyenv install 3.12.7-linux-x86_64
+pyenv install ./dist/3.12.7-linux-x86_64
 ```
 
 ### `pyenv binary relocate <prefix> [<build-prefix>]`

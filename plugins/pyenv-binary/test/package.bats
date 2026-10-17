@@ -88,9 +88,14 @@ pyenv-install --list --bare
   assert_success "source_version=custom-python"
 }
 
-@test "rejects an entry name containing a slash" {
-  run pyenv-binary-package "3.12.7:foo/bar" --archive-base-url http://x/b
-  assert_failure "pyenv-binary: invalid entry name \`foo/bar'"
+@test "rejects unsafe entry names before building" {
+  create_stub pyenv-install 'touch "$BATS_TEST_TMPDIR/built"; exit 1'
+  local entry
+  for entry in foo/bar . .. $'bad\nentry'; do
+    run pyenv-binary-package "3.12.7:$entry" --archive-base-url http://x/b
+    assert_failure "pyenv-binary: invalid entry name \`$entry'"
+    [ ! -e "$BATS_TEST_TMPDIR/built" ]
+  done
 }
 
 @test "rejects \`latest' as an entry name" {

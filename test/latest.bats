@@ -24,6 +24,16 @@ echo 4.5.6
 !
 }
 
+@test "known versions include plugin definitions" {
+  PATH="${_PYENV_INSTALL_PREFIX}/plugins/python-build/bin:$PATH"
+  local definitions="$PYENV_ROOT/plugins/custom/share/python-build"
+  mkdir -p "$definitions"
+  touch "$definitions/custom-1.0" "$definitions/custom-2.0"
+
+  run pyenv-latest -k custom
+  assert_success "custom-2.0"
+}
+
 @test "installed version not found" {
   create_stub pyenv-versions <<!
 echo 3.5.6
@@ -49,7 +59,6 @@ pyenv: no known versions match the prefix \`3.8'
 }
 
 @test "a failed known-version listing is not bypassed by --force" {
-  PATH="$PATH:${_PYENV_INSTALL_PREFIX}/plugins/python-build/bin"
   create_stub pyenv-install 'echo "listing failed" >&2; exit 1'
 
   run pyenv-latest -f -k 3.14

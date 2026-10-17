@@ -79,7 +79,7 @@ _setup() {
 }
 
 @test "find does not select a different Linux distribution or release" {
-  printf 'debian-12-x86_64\t%s\nubuntu-22.04-x86_64\t%s\n' \
+  printf 'pop-24.04-x86_64\t%s\nubuntu-22.04-x86_64\t%s\n' \
     "$definition_sha" "$definition_sha" > "$records/3.14.7"
 
   run pyenv-binary-find 3.14.7
@@ -135,6 +135,28 @@ _setup() {
 
   run pyenv-binary-find 3.14.7
   assert_failure "pyenv-binary: multiple binaries available for 3.14.7 on Linux/x86_64"
+}
+
+@test "find propagates package normalization failures" {
+  printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
+  export real_tr="$(command -v tr)"
+  create_stub tr <<'STUB'
+value="$(cat)"
+if [ "$1" = '[:upper:] ' ] && [ "$value" = "$failing_value" ]; then
+  printf '%s' "$value"
+  echo "normalization failed" >&2
+  exit 9
+fi
+printf '%s' "$value" | "$real_tr" "$@"
+STUB
+  local value
+  for value in 24.04 ubuntu x86_64; do
+    export failing_value="$value"
+
+    run pyenv-binary-find 3.14.7
+    assert_failure "normalization failed"
+    assert_equal 9 "$status"
+  done
 }
 
 @test "find rejects malformed rows and unsafe build suffixes" {

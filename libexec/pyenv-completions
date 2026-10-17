@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Usage: pyenv completions <command> [arg1 arg2...]
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
-COMMAND="$1"
+COMMAND="${1:-}"
 if [ -z "$COMMAND" ]; then
   pyenv-help --usage completions >&2
   exit 1

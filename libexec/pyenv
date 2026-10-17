@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-if [ "$1" = "--debug" ]; then
+if [ "${1:-}" = "--debug" ]; then
   export PYENV_DEBUG=1
   shift
 fi
 
-if [ -n "$PYENV_DEBUG" ]; then
+if [ -n "${PYENV_DEBUG:-}" ]; then
   # https://wiki-dev.bash-hackers.org/scripting/debuggingtips#making_xtrace_more_useful
   export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
   set -x
@@ -27,13 +27,13 @@ if enable -f "${BASH_SOURCE%/*}"/../libexec/pyenv-realpath.dylib realpath 2>/dev
     echo "${path%/*}"
   }
 else
-  [ -z "$PYENV_NATIVE_EXT" ] || abort "failed to load \`realpath' builtin"
+  [ -z "${PYENV_NATIVE_EXT:-}" ] || abort "failed to load \`realpath' builtin"
 
-  READLINK=$(type -P readlink)
+  READLINK="$(type -P readlink || true)"
   [ -n "$READLINK" ] || abort "cannot find readlink - are you missing GNU coreutils?"
 
   resolve_link() {
-    $READLINK "$1"
+    "$READLINK" "$1"
   }
 
   abs_dirname() {
@@ -55,14 +55,14 @@ else
   }
 fi
 
-if [ -z "${PYENV_ROOT}" ]; then
+if [ -z "${PYENV_ROOT:-}" ]; then
   PYENV_ROOT="${HOME}/.pyenv"
 else
   PYENV_ROOT="${PYENV_ROOT%/}"
 fi
 export PYENV_ROOT
 
-if [ -z "${PYENV_DIR}" ]; then
+if [ -z "${PYENV_DIR:-}" ]; then
   PYENV_DIR="$PWD"
 fi
 
@@ -93,7 +93,7 @@ if [ "${_PYENV_INSTALL_PREFIX}" != "$PYENV_ROOT" ]; then
 fi
 export PATH="${_PYENV_INSTALL_PREFIX}/libexec:${PATH}"
 
-PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${PYENV_ROOT}/pyenv.d"
+PYENV_HOOK_PATH="${PYENV_HOOK_PATH:+${PYENV_HOOK_PATH}:}${PYENV_ROOT}/pyenv.d"
 if [ "${_PYENV_INSTALL_PREFIX}" != "$PYENV_ROOT" ]; then
   # Add pyenv's own `pyenv.d` unless pyenv was cloned to PYENV_ROOT
   PYENV_HOOK_PATH="${PYENV_HOOK_PATH}:${_PYENV_INSTALL_PREFIX}/pyenv.d"
@@ -108,7 +108,7 @@ export PYENV_HOOK_PATH
 shopt -u nullglob
 
 
-command="$1"
+command="${1:-}"
 case "$command" in
 "" )
   { pyenv---version
@@ -132,7 +132,7 @@ case "$command" in
   fi
 
   shift 1
-  if [ "$1" = --help ]; then
+  if [ "${1:-}" = --help ]; then
     if [[ "$command" == "sh-"* ]]; then
       echo "pyenv help \"$command\""
     else

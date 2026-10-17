@@ -4,11 +4,11 @@
 #        pyenv init --install [<shell>]
 #        pyenv init --detect-shell [<shell>]
 
-set -e
-[ -n "$PYENV_DEBUG" ] && set -x
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
 
 # Provide pyenv completions
-if [ "$1" = "--complete" ]; then
+if [ "${1:-}" = "--complete" ]; then
   echo -
   echo --path
   echo --install
@@ -24,6 +24,9 @@ if [ "$1" = "--complete" ]; then
 fi
 
 mode="help"
+no_push_path=
+no_rehash=
+shell=
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -61,10 +64,15 @@ if [ -z "$shell" ]; then
   fi
   shell="${shell%% *}"
   shell="${shell##-}"
-  shell="${shell:-$SHELL}"
+  shell="${shell:-${SHELL:-}}"
   shell="${shell##*/}"
   shell="${shell%%-*}"
 fi
+
+profile=
+rc=
+profile_explain=
+rc_explain=
 
 function main() {
   case "$mode" in
@@ -191,7 +199,7 @@ function help_() {
 
 # True when tips/install should keep the portable default root form.
 function pyenv_root_is_default() {
-  [[ ${PYENV_ROOT} == "${HOME}/.pyenv" ]]
+  [[ -n ${HOME:-} && ${PYENV_ROOT} == "${HOME}/.pyenv" ]]
 }
 
 # Escape a value for inclusion inside double quotes in a POSIX shell script.
@@ -289,7 +297,7 @@ function expand_home_path() {
 }
 
 function install_shell_startup_files() {
-  if [[ -z $HOME ]]; then
+  if [[ -z "${HOME:-}" ]]; then
     echo "pyenv: HOME must be set to configure shell startup files" >&2
     return 1
   fi
