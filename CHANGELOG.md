@@ -1,5 +1,11 @@
 # Version History
 
+## Release v2.8.10
+* python-build: honor SDKROOT when selecting Xcode SDK for zlib by @danglduy in https://github.com/pyenv/pyenv/pull/3591
+* version-file-write: fix not detecting an empty version argument beyond the first by @native-api in https://github.com/pyenv/pyenv/pull/3592
+* Harden source scripts with `set -euo pipefail` and `set -f` by @saloni-eng in https://github.com/pyenv/pyenv/pull/3581
+* Add CPython 3.16.0a1 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3593
+
 ## Release v2.8.9
 * Rename PYTHON_BUILD_TCLTK_FORMULA to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA; deprecate the old name by @native-api in https://github.com/pyenv/pyenv/pull/3580
 * python-build: install_git: Support verifying the checkout by SHA-1 by @native-api in https://github.com/pyenv/pyenv/pull/3586
