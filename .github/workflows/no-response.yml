@@ -12,7 +12,7 @@ on:
 permissions: {}
 jobs:
   noResponse:
-    if: github.repository == 'pyenv/pyenv'
+    if: github.repository_owner == 'pyenv'
     permissions:
       issues: write  #  to update issues (lee-dohm/no-response)
 
