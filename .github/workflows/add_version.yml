@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   add_cpython:
+    if: github.repository == 'pyenv/pyenv'
     runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v7
