@@ -1,7 +1,6 @@
 # Copyright (c) 2025, Oracle and/or its affiliates.
 
 VERSION='25.0.1'
-BUILD=''
 
 graalpy_arch="$(graalpy_architecture 2>/dev/null || true)"
 
@@ -28,10 +27,4 @@ case "$graalpy_arch" in
   ;;
 esac
 
-if [ -n "${BUILD}" ]; then
-  url="https://github.com/graalvm/graalvm-ce-dev-builds/releases/download/${VERSION}-dev-${BUILD}/graalpy-community-dev-${graalpy_arch}.tar.gz"
-else
-  url="https://github.com/oracle/graalpython/releases/download/graal-${VERSION}/graalpy-community-${VERSION}-${graalpy_arch}.tar.gz#${checksum}"
-fi
-
-install_package "graalpy-community-${VERSION}${BUILD}" "${url}" "copy" ensurepip
+install_package "graalpy-community-${VERSION}" "https://github.com/oracle/graalpython/releases/download/graal-${VERSION}/graalpy-community-${VERSION}-${graalpy_arch}.tar.gz#${checksum}" copy ensurepip

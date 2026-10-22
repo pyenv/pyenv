@@ -31,6 +31,4 @@ case "$graalpy_arch" in
   ;;
 esac
 
-url="${base_url}/graalpy-${version}-${graalpy_arch}.tar.gz"
-
-install_package "graalpy-${version}" "${url}" "copy" ensurepip
+install_package "graalpy-${version}" "${base_url}/graalpy-${version}-${graalpy_arch}.tar.gz" copy ensurepip

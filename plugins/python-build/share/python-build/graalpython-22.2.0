@@ -1,7 +1,6 @@
 # Copyright (c) 2022, Oracle and/or its affiliates.
 
 VERSION='22.2.0'
-BUILD=''
 
 case "$(pypy_architecture 2>/dev/null || true)" in
 "linux64" )
@@ -22,10 +21,4 @@ case "$(pypy_architecture 2>/dev/null || true)" in
   ;;
 esac
 
-if [ -n "${BUILD}" ]; then
-  urlprefix="https://github.com/graalvm/graalvm-ce-dev-builds/releases/download/${VERSION}-${BUILD}"
-else
-  urlprefix="https://github.com/oracle/graalpython/releases/download/vm-${VERSION}"
-fi
-
-install_package "graalpython-${VERSION}${BUILD}" "${urlprefix}/graalpython-${VERSION}-${graalpython_arch}-amd64.tar.gz#${checksum}" "graalpython" ensurepip
+install_package "graalpython-${VERSION}" "https://github.com/oracle/graalpython/releases/download/vm-${VERSION}/graalpython-${VERSION}-${graalpython_arch}-amd64.tar.gz#${checksum}" graalpython ensurepip
