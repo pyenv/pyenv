@@ -1,9 +1,6 @@
 # Version History
 
 ## Release v2.8.13
-* Fix erroneously placed tag by @native-api
-
-## Release v2.8.12
 * Add CPython 3.13.17 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3601
 
 ## Release v2.8.11
