@@ -1,5 +1,8 @@
 # Version History
 
+## Release v2.8.12
+* Add CPython 3.13.17 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3601
+
 ## Release v2.8.11
 * pyenv-latest: include plugin definitions in known-version lookup by @macayu17 in https://github.com/pyenv/pyenv/pull/3596
 * Add PyPy v8.0.1 by @jsirois in https://github.com/pyenv/pyenv/pull/3597
