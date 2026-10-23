@@ -48,7 +48,7 @@ prerequisites=(
   tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev libzstd-dev
 )
 optional=(
-  libgdbm-dev
+  libgdbm-dev libmpdec-dev
 )
 
 if [ "$(id -u)" -eq 0 ]; then
