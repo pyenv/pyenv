@@ -184,7 +184,7 @@ See [Advanced configuration](#advanced-configuration)
 and specifically [Manual shell setup](#manual-shell-setup) for details and more configuration options.
 
 To add the suggested setup code to the startup files of the running shell,
-run `<path/to/pyenv> --install`.
+run `<path/to/pyenv> init --install`.
 Specifically:
 
 * If you installed Pyenv with the installer script:
@@ -722,10 +722,10 @@ Below is the suggested shell setup added to shell startup files by `pyenv init -
 * To automatically install Pyenv for a shell different than the running shell, run
 
 ```sh
-path/to/pyenv --install <shell executable name>
+path/to/pyenv init --install <shell executable name>
 ```
 
-e.g. `~/.pyenv --install bash`.
+e.g. `~/.pyenv/bin/pyenv init --install bash`.
 
 #### Bash
   <details>
