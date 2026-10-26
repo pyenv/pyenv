@@ -2047,7 +2047,7 @@ use_macports_zlib() {
 }
 
 prefer_tcltk_9() {
-  export PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:- tcl-tk@9 tcl-tk@8 tcl-tk}"
+  export PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-${PYTHON_BUILD_TCLTK_FORMULA:- tcl-tk@9 tcl-tk@8 tcl-tk}}"
 }
 
 use_homebrew_tcltk() {
