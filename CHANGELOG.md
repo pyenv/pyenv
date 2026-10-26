@@ -1,5 +1,12 @@
 # Version History
 
+## Release v2.8.14
+* README: fix `pyenv init --install` usage in suggested shell setup by @dcadolph in https://github.com/pyenv/pyenv/pull/3603
+* Graalpy cleanup by @native-api in https://github.com/pyenv/pyenv/pull/3602
+* Add CPython 3.11.18 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3605
+* Add CPython 3.12.16, 3.13.18, 3.14.10, 3.15.2 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3604
+* Prefer Tcl/Tk 9 for 3.15+ by @native-api in https://github.com/pyenv/pyenv/pull/3606
+
 ## Release v2.8.13
 * Add CPython 3.13.17 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3601
 
