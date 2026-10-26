@@ -2046,13 +2046,18 @@ use_macports_zlib() {
   fi
 }
 
+prefer_tcltk_9() {
+  export PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:- tcl-tk@9 tcl-tk@8 tcl-tk}"
+}
+
 use_homebrew_tcltk() {
   can_use_homebrew || return 1
   local tcltk_formula
   # Since https://github.com/Homebrew/homebrew-core/commit/f10e88617b41555193c22fdcba6109fe82155ee2 (10.11.2024),
-  # tcl-tk is 9.0. It's supported in CPython since 3.14.0a1 (gh-124111) but is not officially supported as of 3.14.0,
-  # as of 3.15.0rc3, there are still test failures.
-  # So we prefer 8.
+  # tcl-tk is 9.0.
+  # It's supported in CPython since 3.14.0a1 (gh-124111). As of 3.16.0a1, there are still test failures.
+  # Despite this, the support is official (it's bundled with MacOS/windows builds) since 3.15.0 (gh-124111).
+  # We prefer 8 by default (for the park of older versions).
   if [[ -n $PYTHON_BUILD_TCLTK_FORMULA ]]; then
     export PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA="${PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA:-$PYTHON_BUILD_TCLTK_FORMULA}"
     echo "warning: the PYTHON_BUILD_TCLTK_FORMULA envvar has been renamed to PYTHON_BUILD_HOMEBREW_TCLTK_FORMULA" >&2
