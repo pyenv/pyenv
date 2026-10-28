@@ -375,3 +375,34 @@ OUT
   run head "$(command -v pyenv-uninstall)"
   assert_output_contains 'Usage: pyenv uninstall'
 }
+
+@test "pyenv-uninstall lists installed versions matching a missing version's prefix" {
+  mkdir -p "${PYENV_ROOT}/versions/3.7.1"
+  mkdir -p "${PYENV_ROOT}/versions/3.7.14"
+  mkdir -p "${PYENV_ROOT}/versions/3.7-dev"
+  mkdir -p "${PYENV_ROOT}/versions/3.70.0"
+  mkdir -p "${PYENV_ROOT}/versions/3.8.1"
+  ln -s "${PYENV_ROOT}/versions/3.7.14" "${PYENV_ROOT}/versions/3.7.alias"
+
+  run pyenv-uninstall 3.7
+
+  assert_failure
+  assert_output <<OUT
+pyenv: version \`3.7' not installed
+pyenv: installed versions starting with \`3.7':
+  3.7.1
+  3.7.14
+  3.7-dev
+OUT
+  assert [ -d "${PYENV_ROOT}/versions/3.7.1" ]
+  assert [ -d "${PYENV_ROOT}/versions/3.7.14" ]
+  assert [ -d "${PYENV_ROOT}/versions/3.7-dev" ]
+}
+
+@test "pyenv-uninstall reports a missing version without suggestions when nothing matches" {
+  mkdir -p "${PYENV_ROOT}/versions/3.8.1"
+
+  run pyenv-uninstall 3.7
+
+  assert_failure "pyenv: version \`3.7' not installed"
+}

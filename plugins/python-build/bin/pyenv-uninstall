@@ -63,6 +63,22 @@ IFS=$'\n' scripts=(`pyenv-hooks uninstall`)
 IFS="$OLDIFS"
 for script in "${scripts[@]}"; do source "$script"; done
 
+# List installed versions that the given name is a prefix of
+# (e.g. 3.7 -> 3.7.14, 3.7-dev) without resolving it, so that the user
+# can choose the exact version to remove.
+suggest-installed-versions() {
+  local name="$1"
+  local path candidates=()
+  for path in "${PYENV_ROOT}/versions/${name}".* "${PYENV_ROOT}/versions/${name}"-*; do
+    [ -d "$path" ] && [ ! -L "$path" ] || continue
+    candidates["${#candidates[@]}"]="${path##*/}"
+  done
+  [ "${#candidates[@]}" -gt 0 ] || return 0
+
+  echo "pyenv: installed versions starting with \`$name':"
+  printf '  %s\n' "${candidates[@]}"
+}
+
 uninstall-python() {
   local DEFINITION="$1"
 
@@ -72,6 +88,7 @@ uninstall-python() {
   if [ -z "$FORCE" ]; then
     if [ ! -d "$PREFIX" ]; then
       echo "pyenv: version \`$VERSION_NAME' not installed" >&2
+      suggest-installed-versions "$VERSION_NAME" >&2
       exit 1
     fi
 
