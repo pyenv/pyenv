@@ -93,6 +93,21 @@ echo 3.10.6
 !
 }
 
+@test "sort versions of a flavor whose name has a version" {
+  create_stub pyenv-install <<!
+echo pypy2.7-5.10.0
+echo pypy2.7-7.3.23
+echo pypy2.7-8.0.1
+echo pypy2.7-8.0.0
+echo pypy3.10-7.3.12
+!
+  run pyenv-latest -k pypy2.7
+  assert_success
+  assert_output <<!
+pypy2.7-8.0.1
+!
+}
+
 @test "ignores rolling releases, branch tips, alternative srcs, prereleases, virtualenvs; 't' versions if prefix without 't'" {
   create_stub pyenv-versions <<!
 echo 3.8.5-dev
