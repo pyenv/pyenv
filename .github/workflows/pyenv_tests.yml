@@ -27,7 +27,7 @@ jobs:
       - name: Install prerequisites
         run: |
           if test "$RUNNER_OS" == "macOS"; then
-            brew install coreutils fish
+            brew install coreutils fish parallel
           fi
       - name: Run tests
         run: |
