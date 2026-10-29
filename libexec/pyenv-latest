@@ -85,14 +85,14 @@ IFS=$'\n'
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
           awk \
-            '{ if (match($0,"^[[:alnum:]]+-"))
+            '{ if (match($0,"^[[:alnum:].]+-"))
                { print substr($0,0,RLENGTH-1) "." substr($0,RLENGTH+1) "..|" $0; }
              else
                { print $0 "...|" $0; }
              }'))
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" \
-          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr \
+          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr -k5,5nr -k6,6nr \
           | cut -f2 -d $'|' \
         || true))
     DEFINITION="${DEFINITION_CANDIDATES[0]:-}"
