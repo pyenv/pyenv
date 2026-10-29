@@ -148,16 +148,16 @@ test-unit: bats
 	PATH="./bats/bin:$$PATH" test/run
 	
 test-python-build: bats
-	cd plugins/python-build && $(PWD)/bats/bin/bats $${CI:+-F "$(PWD)/test/libexec/bats-format-tap-suite"} \
-		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
+	cd plugins/python-build && $(PWD)/bats/bin/bats $${CI:+-j $$(($$(getconf _NPROCESSORS_ONLN)*2)) -F "$(PWD)/test/libexec/bats-format-tap-suite"} \
+		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} $${BATS_ARGS} test/$${BATS_FILE_FILTER}
 
 test-binary: bats
-	cd plugins/pyenv-binary && $(PWD)/bats/bin/bats $${CI:+-F "$(PWD)/test/libexec/bats-format-tap-suite"} \
-		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
+	cd plugins/pyenv-binary && $(PWD)/bats/bin/bats $${CI:+-j $$(($$(getconf _NPROCESSORS_ONLN)*2)) -F "$(PWD)/test/libexec/bats-format-tap-suite"} \
+		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} $${BATS_ARGS} test/$${BATS_FILE_FILTER}
 
 test-link: bats
-	cd plugins/pyenv-link && $(PWD)/bats/bin/bats $${CI:+-F "$(PWD)/test/libexec/bats-format-tap-suite"} \
-		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} test/$${BATS_FILE_FILTER}
+	cd plugins/pyenv-link && $(PWD)/bats/bin/bats $${CI:+-j $$(($$(getconf _NPROCESSORS_ONLN)*2)) -F "$(PWD)/test/libexec/bats-format-tap-suite"} \
+		$${BATS_TEST_FILTER:+--filter "$${BATS_TEST_FILTER}"} $${BATS_ARGS} test/$${BATS_FILE_FILTER}
 
 .SECONDARY: bats-$(TEST_BATS_VERSION)
 bats-$(TEST_BATS_VERSION):
