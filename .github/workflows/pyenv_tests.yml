@@ -36,7 +36,7 @@ jobs:
           PYENV_NATIVE_EXT: 1
         run: |
           (cd src; ./configure; make)
-          bats/bin/bats test/{pyenv,hooks,versions}.bats
+          make test
   pyenv_tests_docker:
     runs-on: ubuntu-latest
     steps:
