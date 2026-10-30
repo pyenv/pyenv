@@ -542,6 +542,11 @@ reading it from the following sources, in this order:
    If the global version file is not present, pyenv assumes you want to use the "system"
    Python (see below).
 
+A version name may optionally include the `python-` prefix. For example,
+`python-3.12` is resolved using `3.12`, selecting the latest installed version
+that matches that prefix. If no unprefixed match is found, pyenv also checks for
+an exact installation named `python-3.12`.
+
 A special version name "`system`" means to use whatever Python is found on `PATH`
 after the shims `PATH` entry (in other words, whatever would be run if Pyenv
 shims weren't on `PATH`). Note that Pyenv considers those installations outside
