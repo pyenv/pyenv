@@ -108,7 +108,7 @@ pypy2.7-8.0.1
 !
 }
 
-@test "ignores rolling releases, branch tips, alternative srcs, prereleases, virtualenvs; 't' versions if prefix without 't'" {
+create_prereleases_stub() {
   create_stub pyenv-versions <<!
 echo 3.8.5-dev
 echo 3.8.5-src
@@ -116,16 +116,30 @@ echo 3.8.5-latest
 echo 3.8.5a2
 echo 3.8.5b3
 echo 3.8.5rc2
-echo 3.8.5t
-echo 3.8.5b3t
+echo 3.8.1t
+echo 3.8.6b3t
 echo 3.8.5rc2t
 echo 3.8.1
 echo 3.8.1/envs/foo
+echo 3.8.5t/envs/foo
 !
+}
+
+@test "ignores rolling releases, branch tips, alternative srcs, prereleases, virtualenvs, including 't' ones (prefix without 't')" {
+  create_prereleases_stub
   run pyenv-latest 3.8
   assert_success
   assert_output <<!
 3.8.1
+!
+}
+
+@test "ignores rolling releases, branch tips, alternative srcs, prereleases, virtualenvs, including 't' ones (prefix with 't')" {
+  create_prereleases_stub
+  run pyenv-latest 3.8t
+  assert_success
+  assert_output <<!
+3.8.1t
 !
 }
 
@@ -150,35 +164,6 @@ echo 3.14.6
   assert_output <<!
 nonexistent
 !
-}
-
-@test "ignores free-threaded prereleases when resolving an installed prefix" {
-  create_stub pyenv-versions <<!
-echo 3.13.5t
-echo 3.14.0a1t
-echo 3.14.0b2t
-echo 3.14.0rc3t
-!
-  run pyenv-latest 3t
-  assert_success "3.13.5t"
-}
-
-@test "known free-threaded prereleases alone do not resolve a prefix" {
-  create_stub pyenv-install <<!
-echo 3.14.0a1t
-echo 3.14.0b2t
-echo 3.14.0rc3t
-!
-  run pyenv-latest -k 3.14t
-  assert_failure "pyenv: no known versions match the prefix \`3.14'"
-}
-
-@test "an exact free-threaded prerelease resolves to itself" {
-  create_stub pyenv-versions <<!
-echo 3.14.0rc3t
-!
-  run pyenv-latest 3.14.0rc3t
-  assert_success "3.14.0rc3t"
 }
 
 @test "falls back to argument and succeeds with -f" {
