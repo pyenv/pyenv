@@ -110,6 +110,7 @@ pypy2.7-8.0.1
 
 create_prereleases_stub() {
   create_stub pyenv-versions <<!
+[[ " $* " == *" --skip-envs "* ]] || exit 1
 echo 3.8.5-dev
 echo 3.8.5-src
 echo 3.8.5-latest
@@ -120,8 +121,6 @@ echo 3.8.1t
 echo 3.8.6b3t
 echo 3.8.5rc2t
 echo 3.8.1
-echo 3.8.1/envs/foo
-echo 3.8.5t/envs/foo
 !
 }
 
