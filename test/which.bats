@@ -175,7 +175,7 @@ EOF
 
 @test "resolves pyenv-latest prefixes" {
   create_alt_executable_in_version "3.4.2" "python"
-  
+
   PYENV_VERSION=3.4 run pyenv-which python
   assert_success "${PYENV_ROOT}/versions/3.4.2/bin/python"
 }
@@ -217,7 +217,7 @@ OUT
     PATH="$dir_:$PATH"
   done
   create_executable "$dir_" "normal_program"
-  
+
   run pyenv-which "$progname"
   assert_success
   assert_output <<!

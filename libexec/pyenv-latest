@@ -51,7 +51,7 @@ IFS=$'\n'
     else
         DEFINITION_CANDIDATES=( $(pyenv-install --list --bare) )
     fi
-    
+
     # Avoid `grep -q' to prevent SIGPIPE that would fail the check with pipefail
     # Bash < 4.4 treats empty arrays as unset with -u;
     # "${v[@]:-}" produces "" for an empty array which is okay
@@ -60,14 +60,14 @@ IFS=$'\n'
         echo "$prefix"
         exit $exitcode;
     fi
-    
+
     suffix=
     if [[ $prefix =~ ^(.*[0-9])t$ ]]; then
         suffix="t"
         prefix="${BASH_REMATCH[1]}"
     fi
-    
-    # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
+
+    # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807
     prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
     suffix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$suffix")"
     # FIXME: more reliable and readable would probably be to loop over them and transform in pure Bash

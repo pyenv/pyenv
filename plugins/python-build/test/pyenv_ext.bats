@@ -258,7 +258,7 @@ build_package_pyston
 verify_python 3.8
 OUT
   assert_success
-  
+
   for name in python python3 python3.8; do
     assert_equal "$(resolve_link "${INSTALL_ROOT}/bin/$name")" "real_interpreter_name"
   done
@@ -277,7 +277,7 @@ build_package_pypy
 build_package_verify_py311
 OUT
   assert_success
-  
+
   for name in pypy pypy3 pypy3.11 python python3 python3.11; do
     assert_equal "$(resolve_link "${INSTALL_ROOT}/bin/$name")" "pypywhatever"
   done
@@ -286,7 +286,7 @@ OUT
 @test "enable framework" {
   framework_path="${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin"
   mkdir -p "$framework_path"
-  for executable in python3{,.4}{,-config}; do 
+  for executable in python3{,.4}{,-config}; do
     touch "$framework_path/$executable"
     chmod +x "$framework_path/$executable"
   done
@@ -313,7 +313,7 @@ EOS
 }
 
 @test "enable universalsdk" {
-  
+
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
   stub arch "echo x86_64"

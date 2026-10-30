@@ -18,7 +18,7 @@ stub_build_environment() {
   create_stub pyenv-binary-save true
   create_stub pyenv-binary-generate-installer true
 
-  for opt in "" -v --verbose; do 
+  for opt in "" -v --verbose; do
     run pyenv-binary-package $opt 3.12.7:3.12.7-test \
       --archive-base-url http://example.com/binaries
     assert_success "pyenv-install ${opt:+--verbose }3.12.7:3.12.7-test"

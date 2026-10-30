@@ -29,7 +29,7 @@ set +f
 
 shopt -s nullglob
 
-{ 
+{
   if [[ -n $sh ]]; then
     for path in "${paths[@]}"; do
       for command in "${path}"/pyenv-sh-*; do
