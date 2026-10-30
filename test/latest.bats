@@ -110,8 +110,8 @@ pypy2.7-8.0.1
 
 create_prereleases_stub() {
   create_stub pyenv-versions <<!
-[[ " $* " == *" --skip-envs "* ]] || {
-  echo "unexpected command line: $@" >&2;
+[[ " \$* " == *" --skip-envs "* ]] || {
+  echo "unexpected command line: \$@" >&2;
   exit 1
 }
 echo 3.8.5-dev
