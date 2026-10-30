@@ -136,6 +136,18 @@ $(TEST_BATS_IMAGE_TARGETS):
 		./ ; \
 	fi
 
+CHECK_WHITESPACE_EXCLUDE = \
+	':!*.patch' \
+	':!*.diff' \
+	':!*.md'
+
+.PHONY: check-whitespace
+# incomplete-line (missing final newline) requires git >= 2.53, covered by CI.
+# Known limitation: only tracked files are checked, new files need to be staged first.
+check-whitespace:
+	git -c core.whitespace=incomplete-line diff --check \
+		$$(git hash-object -t tree /dev/null) -- $(CHECK_WHITESPACE_EXCLUDE)
+
 .PHONY: test test-unit test-python-build test-binary test-link
 
 # Do not pass in user flags to build tests.
