@@ -256,7 +256,6 @@ OUT
   run pyenv-install 3.4.2
   assert_success
   assert_output <<OUT
-
 ${PYENV_ROOT}/plugins/bar/share/python-build
 ${PYENV_ROOT}/plugins/foo/share/python-build
 OUT
@@ -274,7 +273,6 @@ OUT
   assert_success
   assert_output <<OUT
 Available versions:
-  
   ${PYENV_ROOT}/plugins/bar/share/python-build
   ${PYENV_ROOT}/plugins/foo/share/python-build
 OUT
@@ -299,7 +297,6 @@ OUT
 --verbose
 --version
 --debug
-
 ${PYENV_ROOT}/plugins/bar/share/python-build
 ${PYENV_ROOT}/plugins/foo/share/python-build
 OUT
