@@ -14,6 +14,40 @@ load test_helper
   assert_failure "pyenv: no such command \`hello'"
 }
 
+@test "summary of commands skips undocumented command" {
+  mkdir -p "${PYENV_TEST_DIR}/bin"
+  cat > "${PYENV_TEST_DIR}/bin/pyenv-hello" <<SH
+#!shebang
+echo hello
+SH
+
+  run pyenv-help
+  assert_success
+  [[ $output != *hello* ]]
+}
+
+@test "undocumented command" {
+  mkdir -p "${PYENV_TEST_DIR}/bin"
+  cat > "${PYENV_TEST_DIR}/bin/pyenv-hello" <<SH
+#!shebang
+echo hello
+SH
+
+  run pyenv-help hello
+  assert_failure "Sorry, this command isn't documented yet."
+}
+
+@test "usage of undocumented command" {
+  mkdir -p "${PYENV_TEST_DIR}/bin"
+  cat > "${PYENV_TEST_DIR}/bin/pyenv-hello" <<SH
+#!shebang
+echo hello
+SH
+
+  run pyenv-help --usage hello
+  assert_success ""
+}
+
 @test "shows help for a specific command" {
   mkdir -p "${PYENV_TEST_DIR}/bin"
   cat > "${PYENV_TEST_DIR}/bin/pyenv-hello" <<SH
