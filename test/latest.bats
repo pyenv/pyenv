@@ -152,6 +152,35 @@ nonexistent
 !
 }
 
+@test "ignores free-threaded prereleases when resolving an installed prefix" {
+  create_stub pyenv-versions <<!
+echo 3.13.5t
+echo 3.14.0a1t
+echo 3.14.0b2t
+echo 3.14.0rc3t
+!
+  run pyenv-latest 3t
+  assert_success "3.13.5t"
+}
+
+@test "known free-threaded prereleases alone do not resolve a prefix" {
+  create_stub pyenv-install <<!
+echo 3.14.0a1t
+echo 3.14.0b2t
+echo 3.14.0rc3t
+!
+  run pyenv-latest -k 3.14t
+  assert_failure "pyenv: no known versions match the prefix \`3.14'"
+}
+
+@test "an exact free-threaded prerelease resolves to itself" {
+  create_stub pyenv-versions <<!
+echo 3.14.0rc3t
+!
+  run pyenv-latest 3.14.0rc3t
+  assert_success "3.14.0rc3t"
+}
+
 @test "falls back to argument and succeeds with -f" {
   create_stub pyenv-versions
   run pyenv-latest -f nonexistent
