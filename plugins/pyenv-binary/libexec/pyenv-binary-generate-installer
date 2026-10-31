@@ -5,10 +5,9 @@
 # Usage: pyenv binary generate-installer <metadata-file> --archive-url <url> [-o <output>]
 #
 #   Reads a metadata file written by `pyenv binary save' and emits a python-build
-#   definition. Dropped into python-build's definition directory, it installs the
-#   archive like any other version: `pyenv install' downloads it from <url>,
-#   checks the platform and the required system libraries, unpacks it, then
-#   rewrites rpaths so the copy runs from its prefix.
+#   definition. Pass its file path to `pyenv install', which downloads the archive
+#   from <url>, checks the platform and required system libraries, unpacks it,
+#   then rewrites rpaths so the copy runs from its prefix.
 #
 #   The archive must sit next to the metadata file so its checksum can be baked
 #   into the definition; `pyenv binary save' writes the two together.
