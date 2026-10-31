@@ -51,9 +51,34 @@ lib() {
     done
   }
 
+  detect_platform() {
+    os="$(uname -s)" || return
+    arch="$(uname -m)" || return
+    distro=""
+
+    case "$os" in
+    Linux )
+      if [ -r /etc/os-release ]; then
+        distro="$(. /etc/os-release && printf '%s %s' "${ID:-}" "${VERSION_ID:-}")" || return
+      elif type -p lsb_release >/dev/null; then
+        distro="$(lsb_release -si)" || return
+        distro="$distro $(lsb_release -sr)" || return
+      fi
+      ;;
+    Darwin )
+      distro="macos $(sw_vers -productVersion)" || return
+      ;;
+    * )
+      distro="$os $(uname -r)" || return
+      ;;
+    esac
+
+    distro="$(printf '%s' "$distro" | tr '[:upper:]' '[:lower:]')"
+  }
+
   if [ "$1" == "--$FUNCNAME" ]; then
     declare -f "$FUNCNAME"
-    echo "$FUNCNAME \"\$1\";"
+    echo "$FUNCNAME \"\${1:-}\";"
     exit
   fi
 }
