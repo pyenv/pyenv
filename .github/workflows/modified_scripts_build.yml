@@ -91,7 +91,6 @@ jobs:
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions)}}
         os:
-          - macos-14
           - macos-15
           - macos-15-intel
           - macos-26
@@ -160,7 +159,6 @@ jobs:
       matrix:
         python-version: ${{fromJson(needs.discover_modified_scripts.outputs.versions_cpython_only)}}
         os:
-          - macos-14
           - macos-15
           - macos-15-intel
           - macos-26
