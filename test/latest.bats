@@ -108,24 +108,40 @@ pypy2.7-8.0.1
 !
 }
 
-@test "ignores rolling releases, branch tips, alternative srcs, prereleases, virtualenvs; 't' versions if prefix without 't'" {
+create_prereleases_stub() {
   create_stub pyenv-versions <<!
+[[ " \$* " == *" --skip-envs "* ]] || {
+  echo "unexpected command line: \$@" >&2;
+  exit 1
+}
 echo 3.8.5-dev
 echo 3.8.5-src
 echo 3.8.5-latest
 echo 3.8.5a2
 echo 3.8.5b3
 echo 3.8.5rc2
-echo 3.8.5t
-echo 3.8.5b3t
+echo 3.8.1t
+echo 3.8.6b3t
 echo 3.8.5rc2t
 echo 3.8.1
-echo 3.8.1/envs/foo
 !
+}
+
+@test "ignores rolling releases, branch tips, alternative srcs, prereleases, virtualenvs, including 't' ones (prefix without 't')" {
+  create_prereleases_stub
   run pyenv-latest 3.8
   assert_success
   assert_output <<!
 3.8.1
+!
+}
+
+@test "ignores rolling releases, branch tips, alternative srcs, prereleases, virtualenvs, including 't' ones (prefix with 't')" {
+  create_prereleases_stub
+  run pyenv-latest 3.8t
+  assert_success
+  assert_output <<!
+3.8.1t
 !
 }
 
