@@ -38,7 +38,7 @@ set -e
 # paths where build definitions are looked up.
 shopt -s nullglob
 for plugin_path in "$PYENV_ROOT"/plugins/*/share/python-build; do
-  PYTHON_BUILD_DEFINITIONS="${PYTHON_BUILD_DEFINITIONS}:${plugin_path}"
+  PYTHON_BUILD_DEFINITIONS="${PYTHON_BUILD_DEFINITIONS:+${PYTHON_BUILD_DEFINITIONS}:}${plugin_path}"
 done
 export PYTHON_BUILD_DEFINITIONS
 shopt -u nullglob

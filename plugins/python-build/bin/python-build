@@ -145,7 +145,7 @@ can_use_homebrew() {
     brew_prefix="$(brew --prefix || true)" && [[ -n "$brew_prefix" ]] && \
     [[ $(abs_dirname "${BASH_SOURCE}") == "$(abs_dirname "${brew_prefix}")"/* ]] && \
   { lock_in homebrew; return 0; }
-  
+
   # do not check the same stuff multiple times
   PYTHON_BUILD_SKIP_HOMEBREW=1; return 1
 }
@@ -470,7 +470,7 @@ http_get_aria2c() {
   [ -t 3 ] && aria2c_progress="--summary-interval=5"
   local cmd
   cmd=(aria2c --allow-overwrite=true --no-conf=true -d "${dir_out}" -o "${out}" ${aria2c_progress} ${ARIA2_OPTS} "$1")
- 
+
   if [ -t 3 ]; then
     "${cmd[@]}" 2>&1 | interactive_output
     ret=${PIPESTATUS[0]}
@@ -682,7 +682,7 @@ fetch_git() {
   local git_url="$2"
   local git_ref="$3"
   local git_sha=
-  
+
   # Checking the ref's SHA-1 is enough to ensure its authenticity according to Linus Torvalds
   # https://security.stackexchange.com/questions/67920/how-safe-are-signed-git-tags-only-as-safe-as-sha-1-or-somehow-safer
   # ":" is illegal in ref names, see git-check-ref-format(1) manpage
@@ -723,7 +723,7 @@ fetch_git() {
     echo "error: please install \`git\` and try again" >&2
     exit 1
   fi
-  
+
   if [[ -n $git_sha ]]; then
     #If the tag is annotated, its underlying ("peeled") commit is checked out instead
     #In this case, we accept either commit's SHA or tag's SHA for convenience
@@ -1101,7 +1101,7 @@ make_python_symlinks() {
   local -a interpreter_names
   seeder_basename="${1:?}"; shift
   (($#)) && interpreter_names=("$@") || interpreter_names=(python)
-  
+
   local real_interpreter
   real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/$seeder_basename" || echo $seeder_basename)
   # Use syntax accepted in both Py2 and Py3. Even though current Py2 holdouts (e.g. PyPy) support e.g. print()
@@ -1241,8 +1241,8 @@ build_package_pypy_builder() {
   use_homebrew_tcltk || true
   use_homebrew_ncurses || use_macports_ncurses || true
   use_homebrew || use_macports || true
-  
-  
+
+
   if [ -f "rpython/bin/rpython" ]; then # pypy 2.x
     if [ -z "${PYPY_OPTS}" ]; then
       local PYPY_OPTS="--opt=jit --batch --make-jobs=$(num_cpu_cores)"
@@ -1786,7 +1786,7 @@ prefer_openssl11() {
 prefer_openssl3() {
   PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@3.5 openssl@3.0 openssl@1.1 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
-  
+
   PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3 openssl openssl11}"
   export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
 }
@@ -1794,7 +1794,7 @@ prefer_openssl3() {
 prefer_openssl3_to_4() {
   PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@3.5 openssl@3.0 openssl@4 openssl@1.1 openssl}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
-  
+
   PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3 openssl4 openssl openssl11}"
   export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
 }
@@ -1802,7 +1802,7 @@ prefer_openssl3_to_4() {
 require_openssl3() {
   PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA="${PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA:-openssl@3 openssl@3.5 openssl@3.0}"
   export PYTHON_BUILD_HOMEBREW_OPENSSL_FORMULA
-  
+
   PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA="${PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA:-openssl3}"
   export PYTHON_BUILD_MACPORTS_OPENSSL_FORMULA
 }
@@ -1873,7 +1873,7 @@ use_homebrew_openssl() {
       export CPPFLAGS="-I${ssldir}/include ${CPPFLAGS:+ $CPPFLAGS}"
       export LDFLAGS="-L${ssldir}/lib -Wl,-rpath,${ssldir}/lib${LDFLAGS:+ $LDFLAGS}"
 
-      
+
       export PKG_CONFIG_PATH="$ssldir/lib/pkgconfig/:${PKG_CONFIG_PATH}"
       lock_in homebrew
       return 0
@@ -1929,11 +1929,11 @@ build_package_mac_openssl() {
 
   local nokerberos
   [[ "$1" != openssl-1.0.* ]] || nokerberos=1
-  
+
   # switches introduced in OpenSSL 1.1.1
   local notests
   [[ $(openssl_version $1) -ge 10101 ]] && notests=1
-  
+
   # switches introduced in OpenSSL 3.2
   local extra_no_features
   [[ $(openssl_version $1) -ge 30200 ]] && extra_no_features=1
@@ -2023,7 +2023,7 @@ use_xcode_sdk_zlib() {
   # when searching in the SDK
   # Since 2.7.4 and 3.2.1 (issue #7724), setup.py and distutils can search in the MacOS SDK when
   # it's explicitly specified with -isysroot
-  
+
   #distutils.unixcompiler and setup.py specifically search CFLAGS for "-isysroot"
   export CFLAGS="${CFLAGS:+$CFLAGS }-isysroot ${sdkroot}"
   #while one can get away with adding it just to CFLAGS, this may cause linker failures
@@ -2247,7 +2247,7 @@ build_package_symlink_version_suffix() {
 
 verify_python() {
   build_package_symlink_version_suffix
-  
+
   local python_bin="${PYTHON_BIN%/*}/python${1:?}"
 
   if [ ! -x "${python_bin}" ]; then
@@ -2507,7 +2507,7 @@ build_package_ensurepip() {
   fi
   local python_opts="-I"
   if [[ $mode == "lt21" ]]; then python_opts="-s"; fi
-  
+
   # FIXME: `--altinstall` with `get-pip.py`
   "$PYTHON_BIN" $python_opts -m ensurepip ${ensurepip_opts} 1>/dev/null 2>&1 || build_package_get_pip "$@" || return 1
   build_package_symlink_version_suffix
@@ -2733,7 +2733,7 @@ if [[ "$CONFIGURE_OPTS $PYTHON_CONFIGURE_OPTS" == *"--enable-framework"* ]]; the
   create_framework_dirs "${DEFINITION_PATH##*/}"
   # the `/Library/Frameworks` suffix makes CPython build install apps under prefix rather than into /Applications (#1003)
   package_option python configure --enable-framework="${PREFIX_PATH}/Library/Frameworks"
-  
+
   #FIXME: doesn't properly handle paths with spaces. Fix by parsing *OPTS into arrays.
   CONFIGURE_OPTS="${CONFIGURE_OPTS//--enable-framework?(=*([^ ]))?( )/}";
   CONFIGURE_OPTS="${CONFIGURE_OPTS% }"

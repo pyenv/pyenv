@@ -43,3 +43,11 @@ jobs:
       - uses: actions/checkout@v7
       - run: |
           make test-docker
+  check_whitespace:
+    # Checking for missing newlines at the end of files requires git >= 2.53,
+    # which Ubuntu 26.04 provides.
+    # TODO: switch to ubuntu-latest after Nov 19 2026, when it finishes migrating to 26.04.
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+      - run: make check-whitespace

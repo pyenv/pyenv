@@ -168,7 +168,7 @@ LD_LIBRARY_PATH=*/test/lib:/foo/bar
       && $(LC_ALL=C csrutil status) == *"enabled." ]]; then
     skip "macOS with Bash covered by SIP"
   fi
-  
+
   export PYENV_VERSION="test"
   create_alt_executable print_env <<!
 #!$BASH

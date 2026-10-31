@@ -24,7 +24,7 @@ jobs:
           echo "versions<<$EOF" >> $GITHUB_ENV;
           echo "$versions" >> $GITHUB_ENV;
           echo "$EOF" >> $GITHUB_ENV;
-          
+
           versions_cpython_only=$(grep -Ee '^[[:digit:]]' <<<"$versions")
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64);
           echo "versions_cpython_only<<$EOF" >> $GITHUB_ENV;
@@ -39,45 +39,45 @@ jobs:
           import random
           import re
           import subprocess
-          
+
           import packaging.version
-          
+
           result=[]
           def exclude_macos_intel(result, python_version):
             result.append({'os':'macos-15-intel','python-version':python_version})
-            result.append({'os':'macos-26-intel','python-version':python_version})          
-          
-          
+            result.append({'os':'macos-26-intel','python-version':python_version})
+
+
           for line in os.environ['versions'].splitlines():
             if m:=re.match(r'miniconda3-\d+\.\d+-(\d+\.\d+\.\d+)', line):
               version = packaging.version.Version(m.group(1))
-              
+
               # Miniconda dropped MacOS x64 support
               if version >= packaging.version.Version('25.9.1'):
                 exclude_macos_intel(result, line)
-            
+
             if m:=re.match(r'anaconda3-(\d+\.\d+)', line):
               version = packaging.version.Version(m.group(1))
-              
+
               # Anaconda dropped MacOS x64 support
               if version >= packaging.version.Version('2025.12'):
                 exclude_macos_intel(result, line)
-          
+
             if m:=re.match(r'graalpy[^-]*-(community-)?(\d+\.\d+\.\d+)', line):
               version = packaging.version.Version(m.group(2))
-              
+
               # GraalPy dropped MacOS x64 support
               if version >= packaging.version.Version('25.0.2'):
                 exclude_macos_intel(result, line)
-              
-          
+
+
           EOF = str(random.getrandbits(15*8))
-          
+
           with open(os.environ['GITHUB_ENV'],'w') as f:
             f.write(f"versions_macos_build_exclude_json<<{EOF}\n")
             json.dump(result, f)
             f.write(f'\n{EOF}\n')
-          
+
       - id: modified-versions
         run: |
           echo "versions=`echo "${{ env.versions }}" | jq -R . | jq -sc .`" >> $GITHUB_OUTPUT
@@ -150,7 +150,7 @@ jobs:
       - run: |
           pyenv global system
           rm -f "$(pyenv root)"/shims/*
-          
+
 
   macos_build_bundled_dependencies:
     needs: discover_modified_scripts
