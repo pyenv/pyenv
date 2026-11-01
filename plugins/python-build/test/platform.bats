@@ -29,7 +29,6 @@ VERSION_ID=99.99
 !
   export _PYTHON_BUILD_FAKE_OS_RELEASE="${BATS_TEST_TMPDIR}/os-release"
   local expected
-  expected="$(. /etc/os-release && printf '%s %s' "${ID:-}" "${VERSION_ID:-}")"
   stub uname '-s : echo YetAnotherBSD' '-m : echo hal_9000'
   stub lsb_release
 
@@ -81,7 +80,7 @@ ubuntu 24.04
 @test "platform detection falls back to uname -r" {
   export _PYTHON_BUILD_SKIP_OS_RELEASE=1
   stub uname '-s : echo Linux' '-m : echo x86_64' '-r : echo 99.99-whatever'
-  
+
   PATH=$(path_without lsb_release) run read_platform
   assert_success <<!
 Linux
