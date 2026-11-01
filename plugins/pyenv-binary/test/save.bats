@@ -100,6 +100,7 @@ platform() {
 @test "records the platform in the metadata" {
   create_version "3.12.7"
   set_platform FreeBSD amd64 'freebsd 14.2'
+  create_stub readelf true
   local out="${BATS_TEST_TMPDIR}/dist"
   pyenv-binary-save "3.12.7" "$out" >/dev/null
 
