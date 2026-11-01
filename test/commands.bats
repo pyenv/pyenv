@@ -31,6 +31,18 @@ load test_helper
   assert_line "hello"
 }
 
+@test "commands excludes .dylib files" {
+  path="${PYENV_TEST_DIR}/commands"
+  mkdir -p "$path"
+  touch "${path}/pyenv-hello" "${path}/pyenv-realpath.dylib"
+  chmod +x "${path}/pyenv-hello" "${path}/pyenv-realpath.dylib"
+
+  PATH="${path}:$PATH" run pyenv-commands
+  assert_success
+  assert_line "hello"
+  refute_line "realpath.dylib"
+}
+
 @test "commands --no-sh" {
   run pyenv-commands --no-sh
   assert_success

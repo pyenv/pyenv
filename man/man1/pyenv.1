@@ -21,25 +21,25 @@ fi
 .RS 3
 .P
 .nh
-Appending this line enables shims. Please make sure this line is placed toward the end of the shell configuration file since it manipulates \fBPATH\fR during the initialization\. 
+Appending this line enables shims. Please make sure this line is placed toward the end of the shell configuration file since it manipulates \fBPATH\fR during the initialization\.
 .hy
 .TP 13
 .B Debian note:
-Modify only your \fB~/\.bashrc\fR file instead of creating 
+Modify only your \fB~/\.bashrc\fR file instead of creating
 .br
 \fB~/\.bash_profile\fR
 .P
 .RS 0
 \fBZsh note\fR: Modify your \fB~/\.zshrc\fR file instead of  \fB~/\.bashrc\fR
 .P
-\fBWarning\fR: If you configured your system so  that \fBBASH_ENV\fR variable  points to \fB\.bashrc\fR\. You should almost certainly put the above mentioned line  into \fB\.bash_profile\fR, and \fBnot\fR into \fB\.bashrc\fR. Otherwise you may observe strange behaviour, such as \fBpyenv\fR getting into an infinite loop. See #264 
+\fBWarning\fR: If you configured your system so  that \fBBASH_ENV\fR variable  points to \fB\.bashrc\fR\. You should almost certainly put the above mentioned line  into \fB\.bash_profile\fR, and \fBnot\fR into \fB\.bashrc\fR. Otherwise you may observe strange behaviour, such as \fBpyenv\fR getting into an infinite loop. See #264
 .UR https://github\.com/pyenv/pyenv/issues/264
 .UE
 for details.
 .RE
 .RE
 .IP "2." 3
-\fBRestart your shell so the path changes take effect\.\fR You can now begin using pyenv\. 
+\fBRestart your shell so the path changes take effect\.\fR You can now begin using pyenv\.
 .P
 .RS 15
 exec "$SHELL"\fR
@@ -48,7 +48,7 @@ exec "$SHELL"\fR
 \fBInstall Python versions into \fB$(pyenv root)/versions\fR\.\fR For example, to download and install Python 3\.6\.12, run:
 .P
 .RS 15
-.B pyenv install 3.6.12\fR 
+.B pyenv install 3.6.12\fR
 .RE
 .P
 \fBNOTE:\fR If you need to pass configure option to build, please use \fBCONFIGURE_OPTS\fR environment variable. If you are having trouble installing a python version, please visit the wiki page about Common Build Problems
@@ -132,7 +132,7 @@ List all Python versions that contain the given executable
 Display the full path to an executable
 .PP
 See `pyenv help <command>' for information on a specific command.
-For full documentation, see \fBCOMMAND REFERENCE\fR section 
+For full documentation, see \fBCOMMAND REFERENCE\fR section
 .SH OPTIONS
 .TP
 .B \-h, \-\-help
@@ -180,7 +180,7 @@ $(pyenv root)/shims:/usr/local/bin:/usr/bin:/bin
 .fi
 .IP "" 0
 .P
-Through a process called \fIrehashing\fR, pyenv maintains shims in that directory to match every Python command (\fBpython\fR,\fBpip\fR,etc...) across every installed version of Python 
+Through a process called \fIrehashing\fR, pyenv maintains shims in that directory to match every Python command (\fBpython\fR,\fBpip\fR,etc...) across every installed version of Python
 .P
 Shims are lightweight executables that simply pass your command along to pyenv\. So with pyenv installed, when you run, say, \fBpip\fR, your operating system will do the following:
 .IP \(bu 4
@@ -208,7 +208,7 @@ hy
 .SS "Locating the Python Installation"
 Once pyenv has determined which version of Python your application has specified, it passes the command along to the corresponding Python installation\.
 .P
-Each Python version is installed into its own directory under 
+Each Python version is installed into its own directory under
 .nf
 \fB$(pyenv root)/versions\fR\.
 .fi
@@ -245,7 +245,7 @@ As time goes on, you will accumulate Python versions in your \fB$(pyenv root)/ve
 .P
 To remove old Python versions, \fBpyenv uninstall\fR command to automate the removal process\.
 .P
-Alternatively, simply \fBrm \-rf\fR the directory of the version you want to remove\. You can find the directory of a particular Python version with the \fBpyenv prefix\fR command, 
+Alternatively, simply \fBrm \-rf\fR the directory of the version you want to remove\. You can find the directory of a particular Python version with the \fBpyenv prefix\fR command,
 .P
 e\.g\. \fBpyenv prefix 2\.6\.8\fR\.
 .SH "Command Reference"
@@ -413,7 +413,7 @@ Python 3\.3\.3
 .fi
 .IP "" 0
 .SS "pyenv install"
-Install a Python version 
+Install a Python version
 .IP "" 4
 .nf
 Usage: pyenv install [\-f] [\-kvp] <version>
@@ -421,10 +421,10 @@ Usage: pyenv install [\-f] [\-kvp] <version>
        pyenv install \-l|\-\-list
 
   \-l, \-\-list             List all available versions
-  \-f, \-\-force            Install even if the version appears to be installed 
-  					already
+  \-f, \-\-force            Install even if the version appears to be installed
+					already
   \-s, \-\-skip\-existing    Skip the installation if the version appears to be
-  					installed already
+					installed already
 
   python\-build options:
 
@@ -524,7 +524,7 @@ Specifies the Python version to be used. Also see \fBpyenv shell\fR
 Defines the directory under which Python versions and shims reside. Also see \fBpyenv root\fR
 .TP
 .B PYENV_DEBUG
-Outputs debug information. 
+Outputs debug information.
 .br
 Also as: \fBpyenv --debug <subcommand>\fR
 .TP
@@ -541,7 +541,7 @@ Proxy Variables
 Pass configure options to build.
 .TP
 .B PYTHON_BUILD_ARIA2_OPTS
-Used to pass additional parameters to \fBaria2\fR 
+Used to pass additional parameters to \fBaria2\fR
 .UR https://aria2\.github\.io/
 .UE
 If the \fBaria2c\fR binary is available on PATH, pyenv uses \fBaria2c\fR instead of \fBcurl\fR or \fBwget\fR to download the Python Source code\. If you have an unstable internet connection, you can use this variable to instruct \fBaria2\fR to accelerate the download\.

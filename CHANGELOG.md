@@ -1,5 +1,21 @@
 # Version History
 
+## Release v2.8.14
+* README: fix `pyenv init --install` usage in suggested shell setup by @dcadolph in https://github.com/pyenv/pyenv/pull/3603
+* Graalpy cleanup by @native-api in https://github.com/pyenv/pyenv/pull/3602
+* Add CPython 3.11.18 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3605
+* Add CPython 3.12.16, 3.13.18, 3.14.10, 3.15.2 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3604
+* Prefer Tcl/Tk 9 for 3.15+ by @native-api in https://github.com/pyenv/pyenv/pull/3606
+
+## Release v2.8.13
+* Add CPython 3.13.17 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3601
+
+## Release v2.8.11
+* pyenv-latest: include plugin definitions in known-version lookup by @macayu17 in https://github.com/pyenv/pyenv/pull/3596
+* Add PyPy v8.0.1 by @jsirois in https://github.com/pyenv/pyenv/pull/3597
+* CI: add_version, no_response: don't run in forks by @native-api in https://github.com/pyenv/pyenv/pull/3600
+* Add CPython 3.14.9, 3.15.1 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3599
+
 ## Release v2.8.10
 * python-build: honor SDKROOT when selecting Xcode SDK for zlib by @danglduy in https://github.com/pyenv/pyenv/pull/3591
 * version-file-write: fix not detecting an empty version argument beyond the first by @native-api in https://github.com/pyenv/pyenv/pull/3592

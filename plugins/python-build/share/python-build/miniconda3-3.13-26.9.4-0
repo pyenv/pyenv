@@ -1,0 +1,20 @@
+export CONDA_PLUGINS_AUTO_ACCEPT_TOS=true
+case "$(anaconda_architecture 2>/dev/null || true)" in
+"Linux-aarch64" )
+  install_script "Miniconda3-py313_26.9.4-0-Linux-aarch64" "https://repo.anaconda.com/miniconda/Miniconda3-py313_26.9.4-0-Linux-aarch64.sh#e154b748ee0dbfdc276d5279108ca8e89b1aaf2fbe923614537d338170de01fd" "miniconda" verify_py313
+  ;;
+"Linux-x86_64" )
+  install_script "Miniconda3-py313_26.9.4-0-Linux-x86_64" "https://repo.anaconda.com/miniconda/Miniconda3-py313_26.9.4-0-Linux-x86_64.sh#bc244e697ac4201db36f201274596989af7ac4f07610184b2a3dc62ed883010c" "miniconda" verify_py313
+  ;;
+"MacOSX-arm64" )
+  install_script "Miniconda3-py313_26.9.4-0-MacOSX-arm64" "https://repo.anaconda.com/miniconda/Miniconda3-py313_26.9.4-0-MacOSX-arm64.sh#c7dc72827efcbbf73991db4535b15c64f68bc9edf5a4a828049293c097eb75f0" "miniconda" verify_py313
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of Miniconda is not available for $(anaconda_architecture 2>/dev/null || true)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac

@@ -2,7 +2,7 @@ pyenv_install_resolve_latest() {
   local DEFINITION_PREFIX DEFINITION_TYPE
   local -a DEFINITION_CANDIDATES
   local DEFINITION="$1"
-  
+
   DEFINITION_PREFIX="${DEFINITION%%:*}"
   DEFINITION_TYPE="${DEFINITION_PREFIX%%-*}" # TODO: support non-CPython versions
   if [[ "${DEFINITION}" != "${DEFINITION_PREFIX}" ]]; then

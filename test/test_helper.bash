@@ -170,7 +170,7 @@ assert() {
 # but in which system utils necessary for pyenv operation are still available.
 path_without() {
   local path=":${PATH}:"
-  for exe; do 
+  for exe; do
     local found alt util
     for found in $(PATH="$path" type -aP "$exe"); do
       found="${found%/*}"

@@ -89,9 +89,9 @@ as shown below, rather than adding it to the source-definition search path.
 
 ### `pyenv binary package-name <version>`
 
-Prints the automatically generated entry name without building anything. Linux
-uses the distribution name and version, macOS uses the major version, and other
-systems use the name and release reported by `uname`. All names include the
+Prints the automatically generated entry name without building anything. Names
+use the detected distribution and release, falling back to the system name and
+release reported by `uname`. macOS uses the major version. All names include the
 architecture.
 
 ```sh

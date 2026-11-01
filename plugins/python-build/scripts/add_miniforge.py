@@ -113,7 +113,7 @@ def add_version(release, distributions):
     shas = dict([download_sha(url) for (name, url) in download_urls.items()
         if name.endswith('.sha256') and supported(os.path.splitext(name)[0]) and tag_name in name])
     specs = [create_spec(filename, sha, download_urls[filename]) for (filename, sha) in shas.items() if supported(filename)]
-    
+
 
     for distribution in distributions:
         distribution_specs = [spec for spec in specs if distribution in spec['flavor'].lower()]
@@ -165,7 +165,7 @@ if __name__ == '__main__':
         help="Increase verbosity of logging",
     )
     parsed = parser.parse_args()
-    
+
     if parsed.verbose: logging.getLogger.setLevel(logging.DEBUG)
-    
+
     main()

@@ -51,7 +51,7 @@ IFS=$'\n'
     else
         DEFINITION_CANDIDATES=( $(pyenv-install --list --bare) )
     fi
-    
+
     # Avoid `grep -q' to prevent SIGPIPE that would fail the check with pipefail
     # Bash < 4.4 treats empty arrays as unset with -u;
     # "${v[@]:-}" produces "" for an empty array which is okay
@@ -60,14 +60,14 @@ IFS=$'\n'
         echo "$prefix"
         exit $exitcode;
     fi
-    
+
     suffix=
     if [[ $prefix =~ ^(.*[0-9])t$ ]]; then
         suffix="t"
         prefix="${BASH_REMATCH[1]}"
     fi
-    
-    # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807 
+
+    # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807
     prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
     suffix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$suffix")"
     # FIXME: more reliable and readable would probably be to loop over them and transform in pure Bash
@@ -77,7 +77,7 @@ IFS=$'\n'
 
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
-          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+$/d' \
+          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+t?$/d' \
             $(if [[ -z $suffix ]]; then echo "-e /[0-9]t\$/d"; fi)
         ));
 
@@ -85,14 +85,14 @@ IFS=$'\n'
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
           awk \
-            '{ if (match($0,"^[[:alnum:]]+-"))
+            '{ if (match($0,"^[[:alnum:].]+-"))
                { print substr($0,0,RLENGTH-1) "." substr($0,RLENGTH+1) "..|" $0; }
              else
                { print $0 "...|" $0; }
              }'))
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" \
-          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr \
+          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr -k5,5nr -k6,6nr \
           | cut -f2 -d $'|' \
         || true))
     DEFINITION="${DEFINITION_CANDIDATES[0]:-}"

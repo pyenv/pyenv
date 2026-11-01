@@ -70,6 +70,11 @@ _setup() {
   assert_failure "pyenv-binary: no binary available for 3.14.10 on Linux/x86_64"
 }
 
+@test "find does not treat a definition name as a library option" {
+  run pyenv-binary-find --lib
+  assert_failure "pyenv-binary: no binary available for --lib on Linux/x86_64"
+}
+
 @test "find picks the matching target rather than the first row" {
   printf 'macos-15-arm64\t%064d\nubuntu-24.04-x86_64\t%s\nubuntu-22.04-x86_64\t%064d\n' \
     0 "$definition_sha" 0 > "$records/3.14.7"

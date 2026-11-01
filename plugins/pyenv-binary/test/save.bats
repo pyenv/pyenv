@@ -1,6 +1,11 @@
 #!/usr/bin/env bats
 
 load test_helper
+load binary_helper
+
+_setup() {
+  PATH="$BATS_TEST_TMPDIR/stubs:${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
+}
 
 create_version() {
   mkdir -p "${PYENV_ROOT}/versions/$1/bin"
@@ -94,14 +99,16 @@ platform() {
 
 @test "records the platform in the metadata" {
   create_version "3.12.7"
+  set_platform FreeBSD amd64 'freebsd 14.2'
   local out="${BATS_TEST_TMPDIR}/dist"
   pyenv-binary-save "3.12.7" "$out" >/dev/null
 
-  run cat "${out}/3.12.7-$(platform).meta"
+  run cat "${out}/3.12.7-freebsd-amd64.meta"
   assert_success
   assert_line "version=3.12.7"
-  assert_line "platform=$(platform)"
-  assert_line "archive=3.12.7-$(platform).tar.xz"
+  assert_line "platform=freebsd-amd64"
+  assert_line "distro=freebsd 14.2"
+  assert_line "archive=3.12.7-freebsd-amd64.tar.xz"
 }
 
 @test "records the original installation prefix" {

@@ -15,7 +15,7 @@ stub_python_build_lib() {
 stub_python_build_no_latest() {
   stub python-build "${@:-echo python-build \"\$@\"}"
 }
-  
+
 stub_python_build() {
   stub_python_build_no_latest "$@"
   stub pyenv-latest '-f -k * : shift 2; echo "$@"'
@@ -111,7 +111,7 @@ OUT
   stub_python_build_lib
   for i in {1..2}; do stub_python_build '--definitions : echo -e 3.4.2\\n3.5.1\\n3.5.2'; done
   for i in {1..2}; do stub_python_build; done
-  
+
   pyenv-hooks install; unstub pyenv-hooks
   PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
   export PYENV_HOOK_PATH="$PYENV_INSTALL_ROOT/pyenv.d"
@@ -243,7 +243,7 @@ OUT
 
   run pyenv-install 3.4.2
   assert_success ""
-  
+
   unstub python-build
 }
 
@@ -256,7 +256,6 @@ OUT
   run pyenv-install 3.4.2
   assert_success
   assert_output <<OUT
-
 ${PYENV_ROOT}/plugins/bar/share/python-build
 ${PYENV_ROOT}/plugins/foo/share/python-build
 OUT
@@ -274,7 +273,6 @@ OUT
   assert_success
   assert_output <<OUT
 Available versions:
-  
   ${PYENV_ROOT}/plugins/bar/share/python-build
   ${PYENV_ROOT}/plugins/foo/share/python-build
 OUT
@@ -299,7 +297,6 @@ OUT
 --verbose
 --version
 --debug
-
 ${PYENV_ROOT}/plugins/bar/share/python-build
 ${PYENV_ROOT}/plugins/foo/share/python-build
 OUT
@@ -374,4 +371,35 @@ OUT
 @test "pyenv-uninstall has usage help preface" {
   run head "$(command -v pyenv-uninstall)"
   assert_output_contains 'Usage: pyenv uninstall'
+}
+
+@test "pyenv-uninstall lists installed versions matching a missing version's prefix" {
+  mkdir -p "${PYENV_ROOT}/versions/3.7.1"
+  mkdir -p "${PYENV_ROOT}/versions/3.7.14"
+  mkdir -p "${PYENV_ROOT}/versions/3.7-dev"
+  mkdir -p "${PYENV_ROOT}/versions/3.70.0"
+  mkdir -p "${PYENV_ROOT}/versions/3.8.1"
+  ln -s "${PYENV_ROOT}/versions/3.7.14" "${PYENV_ROOT}/versions/3.7.alias"
+
+  run pyenv-uninstall 3.7
+
+  assert_failure
+  assert_output <<OUT
+pyenv: version \`3.7' not installed
+pyenv: installed versions starting with \`3.7':
+  3.7.1
+  3.7.14
+  3.7-dev
+OUT
+  assert [ -d "${PYENV_ROOT}/versions/3.7.1" ]
+  assert [ -d "${PYENV_ROOT}/versions/3.7.14" ]
+  assert [ -d "${PYENV_ROOT}/versions/3.7-dev" ]
+}
+
+@test "pyenv-uninstall reports a missing version without suggestions when nothing matches" {
+  mkdir -p "${PYENV_ROOT}/versions/3.8.1"
+
+  run pyenv-uninstall 3.7
+
+  assert_failure "pyenv: version \`3.7' not installed"
 }

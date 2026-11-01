@@ -4,8 +4,17 @@ root = true
 [*]
 end_of_line = lf
 charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
 
 # Makefiles always use tabs for indentation
 [Makefile]
 indent_style = tab
 indent_size = unset # Allow user-defined tab width
+
+# Keep in sync with CHECK_WHITESPACE_EXCLUDE in Makefile.
+[*.{patch,diff,md}]
+trim_trailing_whitespace = false
+# `false` here actually means "ensure no newline",
+# while `unset` means "leave it as-is".
+insert_final_newline = unset

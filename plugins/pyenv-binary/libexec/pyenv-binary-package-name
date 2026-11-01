@@ -20,6 +20,7 @@ if [ $# -ne 1 ]; then
 fi
 
 version="$1"
+shift
 source "${BASH_SOURCE%/*}/../share/pyenv-binary/common.bash"
 if ! is_name_safe "$version"; then
   echo "pyenv-binary: invalid version name \`${version}'" >&2
@@ -32,6 +33,7 @@ if ! is_name_safe "$version"; then
   exit 1
 fi
 
-source "${BASH_SOURCE%/*}/../share/pyenv-binary/platform.bash"
+eval "$(python-build --lib)"
+detect_platform
 suffix="$(package_suffix "$os" "$distro" "$arch")"
 printf '%s-%s\n' "$version" "$suffix"

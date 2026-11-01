@@ -86,7 +86,7 @@ if ( Get-Item -Path Env:\PYENV_VERSION* ) {
 } else {
   Write-Error "pyenv: Env:PYENV_VERSION_OLD is not set"
   return \$false
-} 
+}
 EOS
     ;;
   * )

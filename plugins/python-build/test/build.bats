@@ -132,7 +132,7 @@ OUT
   stub brew false
   stub_make_install
   stub_make_install "$PYTHON_MAKE_INSTALL_TARGET"
-  
+
 
   install_fixture definitions/needs-yaml
   assert_success
@@ -1069,7 +1069,7 @@ OUT
 test_tcltk_var() {
   local var="${1:?}"
   cached_tarball "Python-3.6.2"
-  
+
   stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
 
   stub uname '-s : echo Darwin'

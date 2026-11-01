@@ -2,6 +2,10 @@
 
 load test_helper
 
+_setup() {
+  PATH="$BATS_TEST_TMPDIR/stubs:${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
+}
+
 # Make the build deterministic: `pyenv-install' just creates the prefix, and
 # the platform tools report a fixed Linux target so the real `save' and
 # `generate-installer' behave the same on any test host.
@@ -18,7 +22,7 @@ stub_build_environment() {
   create_stub pyenv-binary-save true
   create_stub pyenv-binary-generate-installer true
 
-  for opt in "" -v --verbose; do 
+  for opt in "" -v --verbose; do
     run pyenv-binary-package $opt 3.12.7:3.12.7-test \
       --archive-base-url http://example.com/binaries
     assert_success "pyenv-install ${opt:+--verbose }3.12.7:3.12.7-test"

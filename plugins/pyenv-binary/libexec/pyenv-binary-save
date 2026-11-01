@@ -81,7 +81,8 @@ if [ ! -d "${prefix}/bin" ]; then
   exit 1
 fi
 
-source "${BASH_SOURCE%/*}/../share/pyenv-binary/platform.bash"
+eval "$(python-build --lib)"
+detect_platform
 platform="$(printf '%s' "$os" | tr '[:upper:]' '[:lower:]')-${arch}"
 
 # Record the distro and libc version. Platform and arch alone are too coarse to

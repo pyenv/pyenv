@@ -7,4 +7,3 @@ if has_tar_xz_support; then
 else
     install_package "Python-3.9.0" "https://www.python.org/ftp/python/3.9.0/Python-3.9.0.tgz#df796b2dc8ef085edae2597a41c1c0a63625ebd92487adaef2fed22b567873e8" standard verify_py39 copy_python_gdb ensurepip
 fi
-

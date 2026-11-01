@@ -1,6 +1,6 @@
 $scriptblock = {
     param($wordToComplete, $commandAst, $cursorPosition)
-        $words = $commandAst.ToString() 
+        $words = $commandAst.ToString()
         if ( $wordToComplete ) {
           $matches = (($words[0..$cursorPosition] -join '') | Select-String -Pattern "\s+" -AllMatches).Matches
           if ( $matches ) {

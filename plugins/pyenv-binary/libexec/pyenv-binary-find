@@ -20,13 +20,15 @@ if [ "$#" -ne 1 ]; then
 fi
 
 version="$1"
+shift
 source "${BASH_SOURCE%/*}/../share/pyenv-binary/common.bash"
 if ! is_name_safe "$version" || [[ "$version" = *[!A-Za-z0-9._-]* ]]; then
   echo "pyenv-binary: invalid version name \`$version'" >&2
   exit 1
 fi
 
-source "${BASH_SOURCE%/*}/../share/pyenv-binary/platform.bash"
+eval "$(python-build --lib)"
+detect_platform
 target=""
 case "$os" in
 Linux | Darwin )

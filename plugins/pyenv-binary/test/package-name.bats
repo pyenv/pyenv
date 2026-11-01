@@ -4,6 +4,7 @@ load test_helper
 load binary_helper
 
 _setup() {
+  PATH="$BATS_TEST_TMPDIR/stubs:${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
   create_stub pyenv-latest '[ "$1" = "-f" ] && [ "$2" = "-k" ] && shift 2 && echo "$*"'
 }
 
@@ -30,15 +31,20 @@ _setup() {
 }
 
 @test "generates a package name for Linux" {
-  use_records
   set_platform Linux x86_64 'Debian 12'
 
   run pyenv-binary-package-name 3.13.14
   assert_success "3.13.14-debian-12-x86_64"
 }
 
+@test "does not treat a version name as a library option" {
+  set_platform Linux x86_64 'ubuntu 24.04'
+
+  run pyenv-binary-package-name --lib
+  assert_success "--lib-ubuntu-24.04-x86_64"
+}
+
 @test "fails to name a Linux package without a distribution release" {
-  use_records
   set_platform Linux x86_64 'arch '
 
   run pyenv-binary-package-name 3.13.14
@@ -63,8 +69,7 @@ _setup() {
 
 @test "resolves a version prefix when generating a package name" {
   create_stub pyenv-latest '[ "$*" = "-f -k 3" ] && echo 3.14.7'
-  create_stub uname \
-    'case "$1" in -s) echo FreeBSD;; -m) echo amd64;; -r) echo 14.2-RELEASE-p3;; esac'
+  set_platform FreeBSD amd64 'freebsd 14.2-release-p3'
 
   run pyenv-binary-package-name 3
   assert_success "3.14.7-freebsd-14.2-release-p3-amd64"

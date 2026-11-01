@@ -303,7 +303,7 @@ hash -r 2>/dev/null || true"
 }
 
 @test "sh-rehash in fish (integration)" {
-  command -v fish >/dev/null || skip "-- fish not installed" 
+  command -v fish >/dev/null || skip "-- fish not installed"
   create_alt_executable_in_version "3.4" "python"
   PYENV_SHELL=fish fish -Nc "source (pyenv-sh-rehash | psub)"
   assert_success
@@ -317,7 +317,7 @@ hash -r 2>/dev/null || true"
 }
 
 @test "sh-rehash in pwsh (integration)" {
-  command -v pwsh >/dev/null || skip "-- pwsh not installed" 
+  command -v pwsh >/dev/null || skip "-- pwsh not installed"
   assert [ ! -x "${PYENV_ROOT}/shims/python" ]
   create_alt_executable_in_version "3.4" "python"
   run pwsh -nop -c -<<'!'
@@ -341,7 +341,7 @@ echo _PYENV_SHIM_PATH="\$_PYENV_SHIM_PATH"
   pyenv-rehash
   mkdir -p "${PYENV_TEST_DIR}/alt-shim"
   ln -s "${PYENV_ROOT}/shims/python3" "${PYENV_TEST_DIR}/alt-shim/python3"
-  
+
   run "${PYENV_TEST_DIR}/alt-shim/python3"
   assert_success
   assert_output <<!

@@ -5,7 +5,7 @@ _python_build_dir=$(cd "${BASH_SOURCE%/*}/.."; pwd -P)
 
 backport() {
   [[ $# -lt 2 ]] && { echo "usage: $FUNCNAME <commit_hash> <CPython version>..." >&2; return 1; }
-  
+
   (set -euxo pipefail
   sha="${1:?}"
   shift

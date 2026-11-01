@@ -58,9 +58,9 @@ done
 # If shell is not provided, detect it.
 if [ -z "$shell" ]; then
   if shell=$(tr '\0' ' ' 2>/dev/null </proc/"$PPID"/cmdline);then
-  	  :
+	  :
   else
-  	  shell=$(ps p "$PPID" -o 'args=' 2>/dev/null || true)
+	  shell=$(ps p "$PPID" -o 'args=' 2>/dev/null || true)
   fi
   shell="${shell%% *}"
   shell="${shell##-}"
@@ -570,7 +570,7 @@ EOS
   local command=${1:-}'
     ;;
   esac
-  
+
   if [ "$shell" != "fish" ] && [ "$shell" != "pwsh" ]; then
     IFS="|"
     echo \

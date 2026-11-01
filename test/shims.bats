@@ -50,7 +50,7 @@ echo "convoluted call success!"
   mkdir -p "$real_path"
   ln -s "${PYENV_ROOT}/versions/custom/bin/$progname" "$real_path/$progname"
   PATH="$PATH:$real_path"
-  
+
   run "$progname"
   assert_success
   assert_output <<!

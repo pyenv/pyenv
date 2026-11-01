@@ -242,7 +242,7 @@ class CondaVersion(NamedTuple):
             return PyVersion.PY36
 
         raise ValueError(self.flavor)
-        
+
     def requires_tos_accept(self):
         """
         requires to accept TOS for installation
