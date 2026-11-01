@@ -77,6 +77,19 @@ ubuntu 24.04
   unstub lsb_release
 }
 
+@test "platform detection propagates lsb_release ID query failures" {
+  export _PYTHON_BUILD_SKIP_OS_RELEASE=1
+  stub uname '-s : echo Linux' '-m : echo x86_64'
+  stub lsb_release '-si : echo "distro query failed" >&2; exit 9'
+
+  run read_platform
+  assert_failure "distro query failed"
+  assert_equal 9 "$status"
+
+  unstub uname
+  unstub lsb_release
+}
+
 @test "platform detection falls back to uname -r" {
   export _PYTHON_BUILD_SKIP_OS_RELEASE=1
   stub uname '-s : echo Linux' '-m : echo x86_64' '-r : echo 99.99-whatever'
