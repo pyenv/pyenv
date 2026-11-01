@@ -51,9 +51,33 @@ lib() {
     done
   }
 
+  detect_platform() {
+    os="$(uname -s)" || return
+    arch="$(uname -m)" || return
+    distro=""
+
+    case "$os" in
+    Darwin )
+      distro="macos $(sw_vers -productVersion)" || return
+      ;;
+    * )
+      if [[ -n ${_PYTHON_BUILD_FAKE_OS_RELEASE-} || \
+          ( -z ${_PYTHON_BUILD_SKIP_OS_RELEASE-} && -r /etc/os-release ) ]]; then
+        distro=$(. "${_PYTHON_BUILD_FAKE_OS_RELEASE:-/etc/os-release}" && printf '%s %s' "${ID:-}" "${VERSION_ID:-}") || return
+      elif type -p lsb_release >/dev/null; then
+        distro="$(lsb_release -si) $(lsb_release -sr)" || return
+      else
+        distro="$os $(uname -r)" || return
+      fi
+      ;;
+    esac
+
+    distro=$(printf '%s' "$distro" | tr '[:upper:]' '[:lower:]')
+  }
+
   if [ "$1" == "--$FUNCNAME" ]; then
     declare -f "$FUNCNAME"
-    echo "$FUNCNAME \"\$1\";"
+    echo "$FUNCNAME \"\${1:-}\";"
     exit
   fi
 }
