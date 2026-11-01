@@ -91,6 +91,7 @@ platform() {
 
 @test "records the platform in the metadata" {
   create_version "3.12.7"
+  create_stub readelf true
   local out="${BATS_TEST_TMPDIR}/dist"
   pyenv-binary-save "3.12.7" "$out" >/dev/null
 
