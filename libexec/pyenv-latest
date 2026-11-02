@@ -62,13 +62,14 @@ IFS=$'\n'
     fi
 
     suffix=
+    base_prefix="$prefix"
     if [[ $prefix =~ ^(.*[0-9])t$ ]]; then
         suffix="t"
-        prefix="${BASH_REMATCH[1]}"
+        base_prefix="${BASH_REMATCH[1]}"
     fi
 
     # https://stackoverflow.com/questions/11856054/is-there-an-easy-way-to-pass-a-raw-string-to-grep/63483807#63483807
-    prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$prefix")"
+    prefix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$base_prefix")"
     suffix_re="$(sed 's/[^\^]/[&]/g;s/[\^]/\\&/g' <<< "$suffix")"
     # FIXME: more reliable and readable would probably be to loop over them and transform in pure Bash
     DEFINITION_CANDIDATES=(\
