@@ -680,6 +680,12 @@ download_tarball() {
   local package_filename="$2"
   local checksum="$3"
 
+  # Only the mirror may be used (#1648)
+  if [ -n "$PYTHON_BUILD_MIRROR_ONLY" ] && [[ $package_url != "$PYTHON_BUILD_MIRROR_URL"/* ]]; then
+    echo "error: PYTHON_BUILD_MIRROR_URL_NO_FALLBACK is set, not downloading $package_filename from $package_url (not on the mirror)" >&2
+    return 1
+  fi
+
   echo "-> $package_url" >&2
 
   if http get "$package_url" "$package_filename" >&4 2>&1; then
@@ -2710,7 +2716,20 @@ if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ]; then
   unset PYTHON_BUILD_MIRROR_URL
 fi
 
+PYTHON_BUILD_MIRROR_ONLY=
+if [ -n "$PYTHON_BUILD_MIRROR_URL_NO_FALLBACK" ]; then
+  if [ -n "$PYTHON_BUILD_MIRROR_URL" ] && [ -z "$PYTHON_BUILD_DEFAULT_MIRROR" ]; then
+    PYTHON_BUILD_MIRROR_ONLY=1
+  else
+    echo "python-build: warning: PYTHON_BUILD_MIRROR_URL_NO_FALLBACK has no effect with the default mirror or with PYTHON_BUILD_SKIP_MIRROR" >&2
+  fi
+fi
+
 if ! has_checksum_support compute_sha2 && ! [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ] ; then
+  if [ -n "$PYTHON_BUILD_MIRROR_ONLY" ]; then
+    echo "python-build: PYTHON_BUILD_MIRROR_URL_NO_FALLBACK is set, but the mirror can't be used without a SHA2 program (shasum, openssl or sha256sum)" >&2
+    exit 1
+  fi
   unset PYTHON_BUILD_MIRROR_URL
 fi
 

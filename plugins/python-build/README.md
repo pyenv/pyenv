@@ -180,6 +180,9 @@ You can set certain environment variables to control the build process.
   to a regular mirror of https://www.python.org/ftp/python or of a different site specified in `URL_BASE`.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
+* `PYTHON_BUILD_MIRROR_URL_NO_FALLBACK`, if set together with a custom
+  `PYTHON_BUILD_MIRROR_URL`, makes python-build fail instead of falling back to
+  the original source URLs when a package can't be fetched from the mirror.
 * `PYTHON_BUILD_HTTP_CLIENT`, explicitly specify the HTTP client type to use. `aria2`, `curl` and `wget` are the supported values and by default, are searched in that order.
 * `PYTHON_BUILD_CURL_OPTS`, `PYTHON_BUILD_WGET_OPTS`, `PYTHON_BUILD_ARIA2_OPTS` pass additional parameters to the corresponding HTTP client.
 * `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it normally would.
@@ -284,6 +287,21 @@ This feature is considered for deprecation in favor of a [better solution](https
 If you don't have an SHA2 program installed, python-build will skip the download
 mirror and use official URLs instead. You can force python-build to bypass the
 mirror by setting the `PYTHON_BUILD_SKIP_MIRROR` environment variable.
+
+If python-build must never download from the official URLs (*e.g.* on a network
+that can only reach an internal mirror), set the
+`PYTHON_BUILD_MIRROR_URL_NO_FALLBACK` environment variable together with
+`PYTHON_BUILD_MIRROR_URL`. A package that can't be fetched from the mirror then
+fails the build instead of being downloaded from its official URL. This also
+applies when the mirror would be skipped: for a package without a checksum in
+the definition, or for every package if no SHA2 program is installed (unless
+`PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` is set). The setting has no effect with
+the default mirror or with `PYTHON_BUILD_SKIP_MIRROR`. It doesn't cover downloads
+that never go through the mirror: packages fetched with git, Mercurial or
+Subversion, the `get-pip.py` download (the fallback when `ensurepip` is missing
+or fails, and the pyston definitions that install pip with it directly), the
+`ez_setup.py` download in `jython-dev` (point `GET_PIP` and `EZ_SETUP` at local
+files instead), and the version lookup in `graalpy-dev`.
 
 The official python-build download mirror is provided by
 [GitHub Pages](http://yyuu.github.io/pythons/).
