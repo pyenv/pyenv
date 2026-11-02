@@ -294,7 +294,8 @@ that can only reach an internal mirror), set the
 `PYTHON_BUILD_MIRROR_URL`. A package that can't be fetched from the mirror then
 fails the build instead of being downloaded from its official URL. This also
 applies when the mirror would be skipped: for a package without a checksum in
-the definition, or for every package if no SHA2 program is installed (unless
+the definition (unless `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` maps its source
+URL to the mirror), or for every package if no SHA2 program is installed (unless
 `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` is set). The setting has no effect with
 the default mirror or with `PYTHON_BUILD_SKIP_MIRROR`. It doesn't cover downloads
 that never go through the mirror: packages fetched with git, Mercurial or
