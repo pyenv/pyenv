@@ -101,9 +101,9 @@ IFS=$'\n'
         echo "$DEFINITION"
     else
         if [[ -z $BYPASS ]]; then
-            echo "pyenv: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix'" >&2
+            echo "pyenv: no $([[ -z $FROM_KNOWN ]] && echo installed || echo known) versions match the prefix \`$prefix$suffix'" >&2
         else
-            echo "$prefix"
+            echo "$prefix$suffix"
         fi
         if [[ -z $FORCE ]]; then
             exitcode=1

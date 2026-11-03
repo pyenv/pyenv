@@ -176,3 +176,14 @@ nonexistent
 nonexistent
 !
 }
+
+@test "falls back to a 't' argument unchanged" {
+  create_stub pyenv-versions <<!
+echo 3.14.2
+!
+  run pyenv-latest -f 3.14.2t
+  assert_success
+  assert_output <<!
+3.14.2t
+!
+}
