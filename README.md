@@ -578,7 +578,7 @@ Effectively, this means that `system` is always implicitly present at
 the end of the selected versions list.
 
 *DEPRECATED:* A version name may optionally include the `python-` prefix. For example,
-`python-3.12.1` is equivalent to `3.12.1` and `python-3.12` would be resolved like `3.12`,
+"`python-3.12.1`" is equivalent to "`3.12.1`" and "`python-3.12`" would be resolved like "`3.12`",
 selecting the latest installed version that matches that prefix
 (unless a version named exactly "`python-3.12`" or "`3.12`" is present).
 
