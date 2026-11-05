@@ -511,7 +511,7 @@ directory to match every Python command across every Pyenv-managed version
 of Python—`python`, `pip`, and so on.
 
 Shims are lightweight executables that simply pass your command along
-to Pyenv. So with Pyenv installed, when you run, say, `pip`, your
+to pyenv. So with pyenv installed, when you run, say, `pip`, your
 operating system will do the following:
 
 * Search your `PATH` for an executable file named `pip`
@@ -522,7 +522,7 @@ operating system will do the following:
 
 ### Understanding Python version selection
 
-When you execute a shim, Pyenv determines which Python version to use by
+When you execute a shim, pyenv determines which Python version to use by
 reading it from the following sources, in this order:
 
 1. The `PYENV_VERSION` environment variable (if specified). You can use
