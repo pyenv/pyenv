@@ -507,11 +507,11 @@ pyenv works by inserting a directory of _shims_ at the front of your
     $(pyenv root)/shims:/usr/local/bin:/usr/bin:/bin
 
 Through a process called _rehashing_, pyenv maintains shims in that
-directory to match every Python command across every installed version
+directory to match every Python command across every Pyenv-managed version
 of Python—`python`, `pip`, and so on.
 
 Shims are lightweight executables that simply pass your command along
-to pyenv. So with pyenv installed, when you run, say, `pip`, your
+to Pyenv. So with Pyenv installed, when you run, say, `pip`, your
 operating system will do the following:
 
 * Search your `PATH` for an executable file named `pip`
@@ -522,7 +522,7 @@ operating system will do the following:
 
 ### Understanding Python version selection
 
-When you execute a shim, pyenv determines which Python version to use by
+When you execute a shim, Pyenv determines which Python version to use by
 reading it from the following sources, in this order:
 
 1. The `PYENV_VERSION` environment variable (if specified). You can use
@@ -542,11 +542,6 @@ reading it from the following sources, in this order:
    If the global version file is not present, pyenv assumes you want to use the "system"
    Python (see below).
 
-A version name may optionally include the `python-` prefix. For example,
-`python-3.12` is resolved using `3.12`, selecting the latest installed version
-that matches that prefix. If no unprefixed match is found, pyenv also checks for
-an exact installation named `python-3.12`.
-
 A special version name "`system`" means to use whatever Python is found on `PATH`
 after the shims `PATH` entry (in other words, whatever would be run if Pyenv
 shims weren't on `PATH`). Note that Pyenv considers those installations outside
@@ -556,7 +551,7 @@ Python 3.9.12 and 3.10.2 -- for Pyenv, this is still a single "`system`" version
 and whichever of those is first on `PATH` under the executable name you
 specified will be run.
 
-**NOTE:** You can activate multiple versions at the same time, including multiple
+You can activate multiple versions at the same time, including multiple
 versions of Python2 or Python3 simultaneously. This allows for parallel usage of
 Python2 and Python3, and is required with tools like `tox`. For example, to instruct
 Pyenv to first use your system Python and Python3 (which are e.g. 2.7.9 and 3.4.2)
@@ -579,6 +574,13 @@ Shims also fall through to anything further on `PATH` if the corresponding execu
 not present in any of the selected Python installations.
 This allows you to use any programs installed elsewhere on the system as long as
 they are not shadowed by a selected Python installation.
+Effectively, this means that `system` is always implicitly present at
+the end of the selected versions list.
+
+*DEPRECATED:* A version name may optionally include the `python-` prefix. For example,
+`python-3.12.1` is equivalent to `3.12.1` and `python-3.12` would be resolved like `3.12`,
+selecting the latest installed version that matches that prefix
+(unless a version named exactly "`python-3.12`" or "`3.12`" is present).
 
 
 ### Locating Pyenv-provided Python installations
