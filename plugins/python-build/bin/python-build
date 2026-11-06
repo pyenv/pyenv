@@ -65,7 +65,8 @@ lib() {
           ( -z ${_PYTHON_BUILD_SKIP_OS_RELEASE-} && -r /etc/os-release ) ]]; then
         distro=$(. "${_PYTHON_BUILD_FAKE_OS_RELEASE:-/etc/os-release}" && printf '%s %s' "${ID:-}" "${VERSION_ID:-}") || return
       elif type -p lsb_release >/dev/null; then
-        distro="$(lsb_release -si) $(lsb_release -sr)" || return
+        distro="$(lsb_release -si)" || return
+        distro="$distro $(lsb_release -sr)" || return
       else
         distro="$os $(uname -r)" || return
       fi
