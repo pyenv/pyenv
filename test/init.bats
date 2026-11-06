@@ -292,6 +292,18 @@ echo "\$Env:PATH"
   assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH//${PYENV_ROOT}\/shims:/}"
 }
 
+@test "removes existing shims from PATH (zsh)" {
+  command -v zsh >/dev/null || skip "-- zsh not installed"
+  OLDPATH="$PATH"
+  export PATH="${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:$PATH"
+  run zsh -df - <<!
+eval "\$(pyenv-init -)"
+echo "\$PATH"
+!
+  assert_success
+  assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH//${PYENV_ROOT}\/shims:/}"
+}
+
 @test "adds shims to PATH with --no-push-path if they're not on PATH" {
   export PATH="${BATS_TEST_DIRNAME}/../libexec:/usr/bin:/bin:/usr/local/bin"
   run bash -e <<!

@@ -449,6 +449,10 @@ function print_path() {
         echo '$Env:PATH="$(($Env:PATH -split '"':'"' | where { -not ($_ -match '"'${PYENV_ROOT}/shims'"') }) -join '"':'"')"'
         print_path_prepend_shims
         ;;
+      zsh )
+        echo 'path=("${(@)path:#"'"${PYENV_ROOT}/shims"'"}")'
+        print_path_prepend_shims
+        ;;
       * )
         # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
         # that makes it source `bashrc` under SSH even when not interactive.
