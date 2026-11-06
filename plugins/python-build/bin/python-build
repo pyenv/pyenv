@@ -606,9 +606,7 @@ fetch_tarball() {
   if ! reuse_existing_tarball "$package_filename" "$checksum"; then
     # Report the cached file name -- sometimes, it's useful to know (#1743)
     echo "Downloading ${package_filename}..." >&2
-    http head "$mirror_url" &&
-    download_tarball "$mirror_url" "$package_filename" "$checksum" ||
-    download_tarball "$package_url" "$package_filename" "$checksum"
+    download_package "$mirror_url" "$package_url" "$package_filename" "$checksum"
   fi
 
   { if tar $tar_args "$package_filename"; then
@@ -680,12 +678,6 @@ download_tarball() {
   local package_filename="$2"
   local checksum="$3"
 
-  # Only the mirror may be used (#1648)
-  if [ -n "$PYTHON_BUILD_MIRROR_ONLY" ] && [[ $package_url != "$PYTHON_BUILD_MIRROR_URL"/* ]]; then
-    echo "error: PYTHON_BUILD_MIRROR_URL_NO_FALLBACK is set, not downloading $package_filename from $package_url (not on the mirror)" >&2
-    return 1
-  fi
-
   echo "-> $package_url" >&2
 
   if http get "$package_url" "$package_filename" >&4 2>&1; then
@@ -701,6 +693,29 @@ download_tarball() {
       ln -s "$cached_package_filename" "$package_filename"
     } >&4 2>&1 || return 1
   fi
+}
+
+# Download a package from the mirror, falling back to its original URL.
+# With PYTHON_BUILD_MIRROR_URL_NO_FALLBACK, there is no fallback after the
+# mirror failed, unless PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM maps the
+# original URL to the mirror too (#1648)
+download_package() {
+  local mirror_url="$1"
+  local package_url="$2"
+  local package_filename="$3"
+  local checksum="$4"
+
+  if http head "$mirror_url" && download_tarball "$mirror_url" "$package_filename" "$checksum"; then
+    return 0
+  fi
+
+  if [ -n "$mirror_url" ] && [ -n "$PYTHON_BUILD_MIRROR_ONLY" ] &&
+    ! { [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ] && [[ $package_url == *//"${URL_BASE:-www.python.org/ftp/python}"* ]]; }; then
+    echo "error: failed to download $package_filename from the mirror, not falling back to $package_url (PYTHON_BUILD_MIRROR_URL_NO_FALLBACK is set)" >&2
+    return 1
+  fi
+
+  download_tarball "$package_url" "$package_filename" "$checksum"
 }
 
 has_tar_xz_support() {
@@ -842,9 +857,7 @@ fetch_jar() {
 
   if ! reuse_existing_tarball "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
-    http head "$mirror_url" &&
-    download_tarball "$mirror_url" "$package_filename" "$checksum" ||
-    download_tarball "$package_url" "$package_filename" "$checksum"
+    download_package "$mirror_url" "$package_url" "$package_filename" "$checksum"
   fi
 
   # Must use full path to jar and destination directory:
@@ -878,9 +891,7 @@ fetch_zip() {
 
   if ! reuse_existing_tarball "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
-    http head "$mirror_url" &&
-    download_tarball "$mirror_url" "$package_filename" "$checksum" ||
-    download_tarball "$package_url" "$package_filename" "$checksum"
+    download_package "$mirror_url" "$package_url" "$package_filename" "$checksum"
   fi
 
   { if unzip "$package_filename"; then
@@ -912,9 +923,7 @@ fetch_script() {
 
   if ! reuse_existing_tarball "$package_filename" "$checksum"; then
     echo "Downloading ${package_filename}..." >&2
-    http head "$mirror_url" &&
-    download_tarball "$mirror_url" "$package_filename" "$checksum" ||
-    download_tarball "$package_url" "$package_filename" "$checksum"
+    download_package "$mirror_url" "$package_url" "$package_filename" "$checksum"
   fi
 
   mkdir -p "$(dirname "${package_name}/${package_filename}")"
@@ -2726,10 +2735,6 @@ if [ -n "$PYTHON_BUILD_MIRROR_URL_NO_FALLBACK" ]; then
 fi
 
 if ! has_checksum_support compute_sha2 && ! [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ] ; then
-  if [ -n "$PYTHON_BUILD_MIRROR_ONLY" ]; then
-    echo "python-build: PYTHON_BUILD_MIRROR_URL_NO_FALLBACK is set, but the mirror can't be used without a SHA2 program (shasum, openssl or sha256sum)" >&2
-    exit 1
-  fi
   unset PYTHON_BUILD_MIRROR_URL
 fi
 

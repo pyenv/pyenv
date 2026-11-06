@@ -288,21 +288,16 @@ If you don't have an SHA2 program installed, python-build will skip the download
 mirror and use official URLs instead. You can force python-build to bypass the
 mirror by setting the `PYTHON_BUILD_SKIP_MIRROR` environment variable.
 
-If python-build must never download from the official URLs (*e.g.* on a network
-that can only reach an internal mirror), set the
+If python-build must not fall back to the official URLs when the mirror fails
+(*e.g.* on a network that can only reach an internal mirror), set the
 `PYTHON_BUILD_MIRROR_URL_NO_FALLBACK` environment variable together with
-`PYTHON_BUILD_MIRROR_URL`. A package that can't be fetched from the mirror then
-fails the build instead of being downloaded from its official URL. This also
-applies when the mirror would be skipped: for a package without a checksum in
-the definition (unless `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` maps its source
-URL to the mirror), or for every package if no SHA2 program is installed (unless
-`PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` is set). The setting has no effect with
-the default mirror or with `PYTHON_BUILD_SKIP_MIRROR`. It doesn't cover downloads
-that never go through the mirror: packages fetched with git, Mercurial or
-Subversion, the `get-pip.py` download (the fallback when `ensurepip` is missing
-or fails, and the pyston definitions that install pip with it directly), the
-`ez_setup.py` download in `jython-dev` (point `GET_PIP` and `EZ_SETUP` at local
-files instead), and the version lookup in `graalpy-dev`.
+`PYTHON_BUILD_MIRROR_URL`. If python-build tries to fetch a package from the
+mirror and that fails, the build then fails instead of downloading the package
+from its official URL (with `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM`, a URL that
+it maps to the mirror is still tried). Downloads that don't go through the
+mirror (*e.g.* a package without a checksum in the definition, or every package
+if no SHA2 program is installed) are not affected. The setting has no effect
+with the default mirror or with `PYTHON_BUILD_SKIP_MIRROR`.
 
 The official python-build download mirror is provided by
 [GitHub Pages](http://yyuu.github.io/pythons/).
