@@ -169,7 +169,7 @@ DEF
 }
 
 
-@test "package is not fetched from original URL if mirror download fails and NO_FALLBACK set" {
+@test "package is not fetched from original URL if mirror is unreachable and NO_FALLBACK set" {
   export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
@@ -181,61 +181,119 @@ DEF
 
   assert_failure
   refute [ -f "${INSTALL_ROOT}/bin/package" ]
-  assert_output_contains "PYTHON_BUILD_MIRROR_URL_NO_FALLBACK is set, not downloading package-1.0.0.tar.gz from http://example.com/"
+  assert_output_contains "failed to download package-1.0.0.tar.gz from the mirror, not falling back to http://example.com/"
 
   unstub curl
   unstub shasum
 }
 
 
-@test "package URL without checksum fails if NO_FALLBACK set" {
+@test "package is not fetched from original URL if mirror download fails and NO_FALLBACK set" {
   export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
+  local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
   stub shasum true
-  stub curl
-
-  install_fixture definitions/without-checksum
-
-  assert_failure
-  refute [ -f "${INSTALL_ROOT}/bin/package" ]
-  assert_output_contains "PYTHON_BUILD_MIRROR_URL_NO_FALLBACK is set, not downloading package-1.0.0.tar.gz from http://example.com/"
-
-  unstub curl
-  unstub shasum
-}
-
-
-@test "no shasum support fails if NO_FALLBACK set" {
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
-
-  stub shasum false
-  stub curl
+  stub curl "-*I* $mirror_url : true" \
+    "-q -o * -*S* $mirror_url : false"
 
   install_fixture definitions/with-checksum
 
   assert_failure
   refute [ -f "${INSTALL_ROOT}/bin/package" ]
-  assert_output_contains "the mirror can't be used without a SHA2 program"
+  assert_output_contains "failed to download package-1.0.0.tar.gz from the mirror, not falling back to http://example.com/"
 
   unstub curl
   unstub shasum
 }
 
 
-@test "package is fetched from mirror without shasum support if SKIP_CHECKSUM and NO_FALLBACK set" {
+@test "package is not fetched from original URL if mirror download checksum is invalid and NO_FALLBACK set" {
+  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
+  local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
+
+  stub shasum true "echo invalid"
+  stub curl "-*I* $mirror_url : true" \
+    "-q -o * -*S* $mirror_url : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
+
+  install_fixture definitions/with-checksum
+
+  assert_failure
+  refute [ -f "${INSTALL_ROOT}/bin/package" ]
+  assert_output_contains "failed to download package-1.0.0.tar.gz from the mirror, not falling back to http://example.com/"
+
+  unstub curl
+  unstub shasum
+}
+
+
+@test "package URL without checksum still bypasses mirror if NO_FALLBACK set" {
+  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+
+  stub shasum true
+  stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
+
+  install_fixture definitions/without-checksum
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  unstub curl
+  unstub shasum
+}
+
+
+@test "no shasum support still bypasses mirror if NO_FALLBACK set" {
+  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+
+  stub shasum false
+  stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
+
+  install_fixture definitions/with-checksum
+
+  assert_success
+  assert [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  unstub curl
+  unstub shasum
+}
+
+
+@test "package is fetched from mirror path if checksum is not on mirror and SKIP_CHECKSUM and NO_FALLBACK set" {
   export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
   export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
   export PYTHON_BUILD_MIRROR_URL=https://custom.mirror.org
   export URL_BASE=example.com
 
   stub shasum false
-  stub curl "-*I* : true" \
+  stub curl "-*I* : false" \
     "-q -o * -*S* https://custom.mirror.org/* : cp $FIXTURE_ROOT/package-1.0.0.tar.gz \$3"
 
   install_fixture definitions/with-checksum
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
+
+  unstub curl
+  unstub shasum
+}
+
+
+@test "package outside URL_BASE is not fetched from original URL if SKIP_CHECKSUM and NO_FALLBACK set" {
+  export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
+  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_URL=https://custom.mirror.org
+  export URL_BASE=other.example.org
+
+  stub shasum false
+  stub curl "-*I* : false"
+
+  install_fixture definitions/with-checksum
+
+  assert_failure
+  refute [ -f "${INSTALL_ROOT}/bin/package" ]
+  assert_output_contains "failed to download package-1.0.0.tar.gz from the mirror, not falling back to http://example.com/"
 
   unstub curl
   unstub shasum
