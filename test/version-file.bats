@@ -85,3 +85,10 @@ create_file() {
   run pyenv-version-file ./subdir
   assert_success "${PYENV_TEST_DIR}/.python-version"
 }
+
+@test "does not loop when PWD is relative" {
+  cd "$PYENV_TEST_DIR"
+  # Run with CPU-time limit because this used to loop forever
+  run bash -c 'ulimit -t 5; PWD=. pyenv-version-file'
+  assert_success "${PYENV_ROOT}/version"
+}
