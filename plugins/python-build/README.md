@@ -294,7 +294,12 @@ mirror and that fails, the build then fails instead of downloading the package
 from its official URL (with `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM`, a URL that
 it maps to the mirror is still tried). Downloads that don't go through the
 mirror (*e.g.* a package without a checksum in the definition, or every package
-if no SHA2 program is installed) are not affected. The setting has no effect
+if no SHA2 program is installed) are not affected. Neither are downloads that
+never use the mirror: packages fetched with git, Mercurial or Subversion, the
+`get-pip.py` download (the fallback when `ensurepip` is missing or fails, and
+the pyston definitions that install pip with it directly), the `ez_setup.py`
+download in `jython-dev` (point `GET_PIP` and `EZ_SETUP` at local files
+instead), and the version lookup in `graalpy-dev`. The setting has no effect
 with the default mirror or with `PYTHON_BUILD_SKIP_MIRROR`.
 
 The official python-build download mirror is provided by
