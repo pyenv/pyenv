@@ -74,12 +74,13 @@ export PYENV_ROOT
 
 if [ -z "${PYENV_DIR:-}" ]; then
   PYENV_DIR="$PWD"
-else
-  if [ ! -d "$PYENV_DIR" ]; then
-    abort "cannot change working directory to \`$PYENV_DIR'"
-  fi
-  PYENV_DIR=$(cd "$PYENV_DIR" && echo "$PWD")
 fi
+
+if [ ! -d "$PYENV_DIR" ]; then
+  abort "cannot change working directory to \`$PYENV_DIR'"
+fi
+
+PYENV_DIR=$(cd "$PYENV_DIR" && echo "$PWD")
 export PYENV_DIR
 
 
