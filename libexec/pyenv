@@ -69,15 +69,16 @@ export PYENV_ROOT
 # which causes path walking code in some subcommands to malfunction (e.g. enter an infinite loop).
 # `unset PWD` or subshells don't help, only a new Bash launch without the bad PWD value does.
 # `--norc` guards against running redundant logic in Bash compiled with SSH_SOURCE_BASHRC.
-[[ $PWD != /* ]] && PWD=$(unset PWD; "$BASH" --norc -c pwd)
+[[ $PWD != /* ]] && PWD=$(unset PWD BASH_ENV; "$BASH" --norc -c pwd)
 
 
 if [ -z "${PYENV_DIR:-}" ]; then
   PYENV_DIR="$PWD"
-fi
-
-if [ ! -d "$PYENV_DIR" ]; then
-  abort "cannot change working directory to \`$PYENV_DIR'"
+else
+  if [ ! -d "$PYENV_DIR" ]; then
+    abort "cannot change working directory to \`$PYENV_DIR'"
+  fi
+  PYENV_DIR=$(cd "$PYENV_DIR" && echo "$PWD")
 fi
 export PYENV_DIR
 
