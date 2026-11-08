@@ -30,8 +30,6 @@ find_local_version_file() {
       return 0
     fi
     [[ -n $root ]] || break
-    # Stop when the path stops shrinking (e.g. `PWD=.`), or the loop never ends.
-    [[ $root == "${root%/*}" ]] && break
     root="${root%/*}"
   done
   return 1
