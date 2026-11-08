@@ -198,7 +198,7 @@ definition"
   create_stub pyenv-install 'touch "$BATS_TEST_TMPDIR/installed"'
   local bin="$BATS_TEST_TMPDIR/bin" command
   mkdir -p "$bin"
-  for command in bash python-build tr grep mktemp rm; do
+  for command in bash python-build tr mktemp rm; do
     ln -s "$(command -v "$command")" "$bin/$command"
   done
 

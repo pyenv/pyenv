@@ -32,9 +32,7 @@ detect_platform
 target=""
 case "$os" in
 Linux | Darwin )
-  if [ -n "$distro" ] && [[ "$distro" != *" " ]]; then
-    target="$(package_suffix "$os" "$distro" "$arch")"
-  fi
+  target="$(package_suffix "$os" "$distro" "$arch")"
   ;;
 esac
 

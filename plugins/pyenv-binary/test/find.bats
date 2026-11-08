@@ -123,15 +123,11 @@ _setup() {
   assert_failure "pyenv-binary: no binary available for 3.14.7 on FreeBSD/amd64"
 }
 
-@test "find reports a Linux distribution without a release as unavailable" {
+@test "find fails when the Linux distribution has no release" {
   set_platform Linux x86_64 'arch '
 
   run pyenv-binary-find 3.14.7
-  assert_failure "pyenv-binary: no binary available for 3.14.7 on Linux/x86_64"
-
-  printf 'arch--x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
-  run pyenv-binary-find 3.14.7
-  assert_failure "pyenv-binary: no binary available for 3.14.7 on Linux/x86_64"
+  assert_failure "pyenv-binary: could not determine the package platform"
 }
 
 @test "find rejects duplicate matching targets" {
