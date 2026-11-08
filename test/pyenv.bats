@@ -70,3 +70,12 @@ load test_helper
   run pyenv echo "PYENV_HOOK_PATH"
   assert_success "${PYENV_ROOT}/pyenv.d:${BATS_TEST_DIRNAME%/*}/pyenv.d:/usr/etc/pyenv.d:/usr/local/etc/pyenv.d:/etc/pyenv.d:/usr/lib/pyenv/hooks"
 }
+
+@test "fixes invalid PWD values in Bash <4.4" {
+[[ ${BASH_VERSINFO[0]} -gt 4 || ( ${BASH_VERSINFO[0]} -eq 4 && ${BASH_VERSINFO[1]} -ge 4 ) ]] \
+    && skip "only relevant to Bash <4.4"
+
+    cd "$BATS_TEST_TMPDIR"
+    PWD=. run pyenv echo PWD
+    assert_success "$BATS_TEST_TMPDIR"
+}

@@ -62,11 +62,21 @@ else
 fi
 export PYENV_ROOT
 
+
+# In Bash <4.4, if PWD is manually set in the environment to a relative path
+# that technically points to the current directory (e.g. "." or "./."), Bash does not fix it
+# (as per the manpage, PWD is supposed to always contain an absolute path),
+# which causes path walking code in some subcommands to malfunction (e.g. enter an infinite loop).
+# `unset PWD` or subshells don't help, only a new Bash launch without the bad PWD value does.
+# `--norc` guards against running redundant logic in Bash compiled with SSH_SOURCE_BASHRC.
+[[ $PWD != /* ]] && PWD=$(unset PWD BASH_ENV; "$BASH" --norc -c pwd)
+
+
 if [ -z "${PYENV_DIR:-}" ]; then
   PYENV_DIR="$PWD"
 fi
 
-if [ ! -d "$PYENV_DIR" ] || [ ! -e "$PYENV_DIR" ]; then
+if [ ! -d "$PYENV_DIR" ]; then
   abort "cannot change working directory to \`$PYENV_DIR'"
 fi
 
