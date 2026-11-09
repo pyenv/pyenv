@@ -696,7 +696,7 @@ download_tarball() {
 }
 
 # Download a package from the mirror, falling back to its original URL.
-# With PYTHON_BUILD_MIRROR_URL_NO_FALLBACK, there is no fallback after the
+# With PYTHON_BUILD_MIRROR_NO_FALLBACK, there is no fallback after the
 # mirror failed, unless PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM maps the
 # original URL to the mirror too (#1648)
 download_package() {
@@ -711,7 +711,7 @@ download_package() {
 
   if [ -n "$mirror_url" ] && [ -n "$PYTHON_BUILD_MIRROR_ONLY" ] &&
     ! { [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ] && [[ $package_url == *//"${URL_BASE:-www.python.org/ftp/python}"* ]]; }; then
-    echo "error: failed to download $package_filename from the mirror, not falling back to $package_url (PYTHON_BUILD_MIRROR_URL_NO_FALLBACK is set)" >&2
+    echo "error: failed to download $package_filename from the mirror, not falling back to $package_url (PYTHON_BUILD_MIRROR_NO_FALLBACK is set)" >&2
     return 1
   fi
 
@@ -2726,11 +2726,11 @@ if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ]; then
 fi
 
 PYTHON_BUILD_MIRROR_ONLY=
-if [ -n "$PYTHON_BUILD_MIRROR_URL_NO_FALLBACK" ]; then
+if [ -n "$PYTHON_BUILD_MIRROR_NO_FALLBACK" ]; then
   if [ -n "$PYTHON_BUILD_MIRROR_URL" ] && [ -z "$PYTHON_BUILD_DEFAULT_MIRROR" ]; then
     PYTHON_BUILD_MIRROR_ONLY=1
   else
-    echo "python-build: warning: PYTHON_BUILD_MIRROR_URL_NO_FALLBACK has no effect with the default mirror or with PYTHON_BUILD_SKIP_MIRROR" >&2
+    echo "python-build: warning: PYTHON_BUILD_MIRROR_NO_FALLBACK has no effect with the default mirror or with PYTHON_BUILD_SKIP_MIRROR" >&2
   fi
 fi
 

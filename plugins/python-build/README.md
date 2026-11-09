@@ -180,7 +180,7 @@ You can set certain environment variables to control the build process.
   to a regular mirror of https://www.python.org/ftp/python or of a different site specified in `URL_BASE`.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
-* `PYTHON_BUILD_MIRROR_URL_NO_FALLBACK`, if set together with a custom
+* `PYTHON_BUILD_MIRROR_NO_FALLBACK`, if set together with a custom
   `PYTHON_BUILD_MIRROR_URL`, makes python-build fail instead of falling back to
   the original source URLs when a package can't be fetched from the mirror.
 * `PYTHON_BUILD_HTTP_CLIENT`, explicitly specify the HTTP client type to use. `aria2`, `curl` and `wget` are the supported values and by default, are searched in that order.
@@ -290,7 +290,7 @@ mirror by setting the `PYTHON_BUILD_SKIP_MIRROR` environment variable.
 
 If python-build must not fall back to the official URLs when the mirror fails
 (*e.g.* on a network that can only reach an internal mirror), set the
-`PYTHON_BUILD_MIRROR_URL_NO_FALLBACK` environment variable together with
+`PYTHON_BUILD_MIRROR_NO_FALLBACK` environment variable together with
 `PYTHON_BUILD_MIRROR_URL`. If python-build tries to fetch a package from the
 mirror and that fails, the build then fails instead of downloading the package
 from its official URL (with `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM`, a URL that

@@ -151,7 +151,7 @@ DEF
 
 
 @test "package URL with checksum hits mirror if NO_FALLBACK set" {
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
@@ -170,7 +170,7 @@ DEF
 
 
 @test "package is not fetched from original URL if mirror is unreachable and NO_FALLBACK set" {
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
@@ -189,7 +189,7 @@ DEF
 
 
 @test "package is not fetched from original URL if mirror download fails and NO_FALLBACK set" {
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
@@ -209,7 +209,7 @@ DEF
 
 
 @test "package is not fetched from original URL if mirror download checksum is invalid and NO_FALLBACK set" {
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
   local mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
 
@@ -229,7 +229,7 @@ DEF
 
 
 @test "package URL without checksum still bypasses mirror if NO_FALLBACK set" {
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
 
   stub shasum true
   stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
@@ -245,7 +245,7 @@ DEF
 
 
 @test "no shasum support still bypasses mirror if NO_FALLBACK set" {
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
 
   stub shasum false
   stub curl "-q -o * -*S* http://example.com/* : cp $FIXTURE_ROOT/\${5##*/} \$3"
@@ -262,7 +262,7 @@ DEF
 
 @test "package is fetched from mirror path if checksum is not on mirror and SKIP_CHECKSUM and NO_FALLBACK set" {
   export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
   export PYTHON_BUILD_MIRROR_URL=https://custom.mirror.org
   export URL_BASE=example.com
 
@@ -282,7 +282,7 @@ DEF
 
 @test "package outside URL_BASE is not fetched from original URL if SKIP_CHECKSUM and NO_FALLBACK set" {
   export PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM=1
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
   export PYTHON_BUILD_MIRROR_URL=https://custom.mirror.org
   export URL_BASE=other.example.org
 
@@ -302,7 +302,7 @@ DEF
 
 @test "NO_FALLBACK has no effect with default mirror URL" {
   export PYTHON_BUILD_MIRROR_URL=
-  export PYTHON_BUILD_MIRROR_URL_NO_FALLBACK=1
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
   local checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
 
   stub shasum true "echo $checksum"
@@ -314,7 +314,7 @@ DEF
 
   assert_success
   assert [ -x "${INSTALL_ROOT}/bin/package" ]
-  assert_output_contains "PYTHON_BUILD_MIRROR_URL_NO_FALLBACK has no effect"
+  assert_output_contains "PYTHON_BUILD_MIRROR_NO_FALLBACK has no effect"
 
   unstub curl
   unstub shasum
