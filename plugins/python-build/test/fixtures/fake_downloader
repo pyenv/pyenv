@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+hash_mode=
 aria2c=
 wget=
 src=
@@ -7,10 +8,12 @@ dest=
 dir_=
 
 case "$1" in
+  hash)
+    hash_mode=1; shift;;
   aria2c)
-    aria2c=1;;
+    aria2c=1; shift;;
   wget)
-    wget=1;;
+    wget=1; shift;;
 esac
 while (($#)); do
   case "$1" in
@@ -40,4 +43,5 @@ while (($#)); do
   esac
   shift
 done
+[[ -n $hash_mode ]] && src="${src%/*}/$dest"
 cp "$src" "${dir_}${dest}"
