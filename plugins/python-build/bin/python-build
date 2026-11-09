@@ -374,28 +374,12 @@ compute_md5() {
   fi
 }
 
-has_checksum_support() {
-  local checksum_command="$1"
-  local has_checksum_var="HAS_CHECKSUM_SUPPORT_${checksum_command}"
-
-  if [ -z "${!has_checksum_var+defined}" ]; then
-    printf -v "$has_checksum_var" "$(echo test | "$checksum_command" >/dev/null; echo $?)"
-  fi
-  return "${!has_checksum_var}"
-}
-
-verify_checksum() {
-  local checksum_command
-  local filename="$1"
-  local expected_checksum="$(echo "$2" | tr [A-Z] [a-z])"
-
-  # If the specified filename doesn't exist, return success
-  [ -e "$filename" ] || return 0
-
+get_checksum_command() {
+  local expected_checksum="${1?}"
   case "${#expected_checksum}" in
-  0) return 0 ;; # empty checksum; return success
-  32) checksum_command="compute_md5" ;;
-  64) checksum_command="compute_sha2" ;;
+  0) echo true ;;
+  32) echo compute_md5 ;;
+  64) echo compute_sha2 ;;
   *)
     { echo
       echo "unexpected checksum length: ${#expected_checksum} (${expected_checksum})"
@@ -404,22 +388,53 @@ verify_checksum() {
     } >&4
     return 1 ;;
   esac
+}
 
+# exit code 2 -- checksum is malformed, 1 -- no support
+has_checksum_support() {
+  local checksum_command;
+  checksum_command=$(get_checksum_command "$1") || return 2
+  local has_checksum_var="HAS_CHECKSUM_SUPPORT_${checksum_command}"
+
+  if [[ -z ${!has_checksum_var+defined} ]]; then
+    # convert any nonzero exit code to 1 because 2 has special meaning
+    printf -v "$has_checksum_var" "$(echo test | "$checksum_command" >/dev/null; echo $(($?!=0)))"
+  fi
+  return "${!has_checksum_var}"
+}
+
+verify_checksum() {
+  local checksum_command
+  local filename="$1"
+  local expected_checksum="$2"
+
+  [[ -z $expected_checksum ]] && return 0
+
+  # XXX: At least produce a warning?
   # If chosen provided checksum algorithm isn't supported, return success
-  has_checksum_support "$checksum_command" || return 0
+  has_checksum_support "$expected_checksum" || \
+  case $? in
+    1) return 0;;
+    *) return 1;;
+  esac
 
+  local computed_checksum
+  computed_checksum=$($(get_checksum_command "$expected_checksum") < "$filename")
+  # XXX: when could this happen? Is this needed?
   # If the computed checksum is empty, return failure
-  local computed_checksum=`echo "$($checksum_command < "$filename")" | tr [A-Z] [a-z]`
   [ -n "$computed_checksum" ] || return 1
 
-  if [ "$expected_checksum" != "$computed_checksum" ]; then
-    { echo
+  shopt -s nocasematch
+  if [[ $expected_checksum != "$computed_checksum" ]]; then
+    { shopt -u nocasematch
+      echo
       echo "checksum mismatch: ${filename} (file is corrupt)"
       echo "expected $expected_checksum, got $computed_checksum"
       echo
     } >&4
     return 1
   fi
+  shopt -u nocasematch
 }
 
 http() {
@@ -569,57 +584,38 @@ http_get_wget() {
 fetch_tarball() {
   local package_name="$1"
   local package_url="$2"
-  local mirror_url
   local checksum
   local extracted_dir
 
-  if [ "$package_url" != "${package_url/\#}" ]; then
-    checksum="${package_url#*#}"
-    package_url="${package_url%%#*}"
+  url_split_checksum "$package_url" package_url checksum
 
-    if [ -n "$PYTHON_BUILD_MIRROR_URL" ]; then
-      if [[ -z "$PYTHON_BUILD_DEFAULT_MIRROR" || $package_url != */www.python.org/* ]]; then
-        mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
-      fi
-    fi
-  fi
-
-  local tar_args="xzf"
-  local package_filename="${package_name}.tar.gz"
-
-  if [ "$package_url" != "${package_url%bz2}" ]; then
+  local package_filename
+  local tar_arg_filetype
+  if [[ $package_url == *bz2 ]]; then
     if ! type -p bzip2 >/dev/null; then
       echo "warning: bzip2 not found; consider installing \`bzip2\` package" >&4
     fi
-    package_filename="${package_filename%.gz}.bz2"
-    tar_args="${tar_args/z/j}"
-  fi
-
-   if [ "$package_url" != "${package_url%xz}" ]; then
+    package_filename="${package_name}.tar.bz2"
+    tar_arg_filetype="j"
+  elif [[ $package_url == *xz ]]; then
      if ! type -p xz >/dev/null; then
       echo "warning: xz not found; consider installing \`xz\` package" >&4
      fi
-     package_filename="${package_filename%.gz}.xz"
-     tar_args="${tar_args/z/J}"
-   fi
-
-  if ! reuse_existing_tarball "$package_filename" "$checksum"; then
-    # Report the cached file name -- sometimes, it's useful to know (#1743)
-    echo "Downloading ${package_filename}..." >&2
-    download_package "$mirror_url" "$package_url" "$package_filename" "$checksum"
+     package_filename="${package_name}.tar.xz"
+     tar_arg_filetype="J"
+  else
+    local tar_arg_filetype="z"
+    local package_filename="${package_name}.tar.gz"
   fi
 
-  { if tar $tar_args "$package_filename"; then
+  download_package "$package_url" "$package_filename" "$checksum"
+
+  { if tar "x${tar_arg_filetype}f" "$package_filename"; then
       if [ ! -d "$package_name" ]; then
         extracted_dir="$(find_extracted_directory)"
         mv "$extracted_dir" "$package_name"
       fi
-
-      if [ -z "$KEEP_BUILD_PATH" ]; then
-        rm -f "$package_filename"
-      else
-        true
-      fi
+      cleanup_package "$package_filename"
     fi
   } >&4 2>&1
 }
@@ -667,14 +663,7 @@ reuse_existing_tarball() {
 }
 
 download_tarball() {
-  local official_source="www.python.org/ftp/python"
-  if [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ]; then
-      local package_url="$(echo "$1" | sed -e "s|.*//${URL_BASE:-$official_source}|$PYTHON_BUILD_MIRROR_URL|g")"
-  else
-      local package_url="$1"
-  fi
-  [ -n "$package_url" ] || return 1
-
+  local package_url="${1:?}"
   local package_filename="$2"
   local checksum="$3"
 
@@ -695,27 +684,76 @@ download_tarball() {
   fi
 }
 
-# Download a package from the mirror, falling back to its original URL.
-# With PYTHON_BUILD_MIRROR_NO_FALLBACK, there is no fallback after the
-# mirror failed, unless PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM maps the
-# original URL to the mirror too (#1648)
-download_package() {
-  local mirror_url="$1"
-  local package_url="$2"
-  local package_filename="$3"
-  local checksum="$4"
+# Parse <url>#<checksum> into specified variables
+url_split_checksum() {
+  local url="${1:?}"
+  local var_url="${2:?}"
+  local var_checksum="${3-}"
 
-  if http head "$mirror_url" && download_tarball "$mirror_url" "$package_filename" "$checksum"; then
-    return 0
+  if [[ $url =~ ^([^#]+)#([^#]*)$ ]]; then
+    printf -v "$var_url" '%s' "${BASH_REMATCH[1]}"
+    [[ -n $var_checksum ]] && printf -v "$var_checksum" '%s' "${BASH_REMATCH[2]}"
+  else
+    printf -v "$var_url" '%s' "$url"
+    # don't leave it unset
+    [[ -n $var_checksum ]] && printf -v "$var_checksum" ''
+  fi
+}
+
+# Download a package from the mirror if applicable, falling back to its original URL if applicable.
+download_package() {
+  local package_url="${1:?}"
+  local package_filename="${2:?}"
+
+  local checksum
+  #Don't parse redundantly if we are explicitly passed an empty checksum.
+  # Assume the caller already parsed the URL and found none
+  # https://stackoverflow.com/questions/13361658/how-can-i-test-whether-a-positional-parameter-is-set-in-bash/13365252#13365252
+  if [[ -z "${3+set}" ]]; then
+    url_split_checksum "$package_url" package_url checksum
+  else
+    checksum="$3"
   fi
 
-  if [ -n "$mirror_url" ] && [ -n "$PYTHON_BUILD_MIRROR_ONLY" ] &&
-    ! { [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ] && [[ $package_url == *//"${URL_BASE:-www.python.org/ftp/python}"* ]]; }; then
-    echo "error: failed to download $package_filename from the mirror, not falling back to $package_url (PYTHON_BUILD_MIRROR_NO_FALLBACK is set)" >&2
-    return 1
+  reuse_existing_tarball "$package_filename" "$checksum" && return 0
+
+  echo "Downloading ${package_filename}..." >&2
+
+  local mirror_url=
+  if [[ -z $PYTHON_BUILD_SKIP_MIRROR ]]; then
+    local official_source="www.python.org/ftp/python"
+    if [[ -n $PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM ]]; then
+      if [[ -z $PYTHON_BUILD_DEFAULT_MIRROR ]]; then
+        mirror_url="$(echo "$package_url" | sed -e "s|.*//${URL_BASE:-$official_source}|$PYTHON_BUILD_MIRROR_URL|g")"
+      fi
+    # CPython is excluded from the default mirror search as heritage from Rbenv
+    # because MRI uses a CDN for its downloads.
+    # There hasn't been much need to go for the trouble to change that.
+    elif [[ -n $checksum && \
+        ! ( -n $PYTHON_BUILD_DEFAULT_MIRROR && $package_url == *://"$official_source"* ) ]] \
+        && has_checksum_support "$checksum"; then
+      mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
+    fi
+  fi
+
+  if [[ -n $mirror_url ]]; then
+    http head "$mirror_url" && download_tarball "$mirror_url" "$package_filename" "$checksum" && return 0
+
+    if [[ -n $PYTHON_BUILD_MIRROR_NO_FALLBACK && -z $PYTHON_BUILD_DEFAULT_MIRROR ]]; then
+      echo "error: failed to download $package_filename from the mirror, not falling back to $package_url (PYTHON_BUILD_MIRROR_NO_FALLBACK is set)" >&2
+      return 1
+    fi
   fi
 
   download_tarball "$package_url" "$package_filename" "$checksum"
+}
+
+cleanup_package() {
+  if [ -z "$KEEP_BUILD_PATH" ]; then
+    rm -f "${1:?}"
+  else
+    true
+  fi
 }
 
 has_tar_xz_support() {
@@ -841,33 +879,15 @@ fetch_svn() {
 fetch_jar() {
   local package_name="$1"
   local package_url="$2"
-  local mirror_url
-  local checksum
-
-  if [ "$package_url" != "${package_url/\#}" ]; then
-    checksum="${package_url#*#}"
-    package_url="${package_url%%#*}"
-
-    if [ -n "$PYTHON_BUILD_MIRROR_URL" ]; then
-      mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
-    fi
-  fi
 
   local package_filename="${package_name}.jar"
 
-  if ! reuse_existing_tarball "$package_filename" "$checksum"; then
-    echo "Downloading ${package_filename}..." >&2
-    download_package "$mirror_url" "$package_url" "$package_filename" "$checksum"
-  fi
+  download_package "$package_url" "$package_filename"
 
   # Must use full path to jar and destination directory:
   #   http://bugs.jython.org/issue2350
-  { if $JAVA -jar "$PWD/${package_name}.jar" -s -d "$PWD/${package_name}"; then
-      if [ -z "$KEEP_BUILD_PATH" ]; then
-        rm -f "$package_filename"
-      else
-        true
-      fi
+  { if $JAVA -jar "$PWD/$package_filename" -s -d "$PWD/${package_name}"; then
+      cleanup_package "$package_filename"
     fi
   } >&4 2>&1
 }
@@ -875,31 +895,13 @@ fetch_jar() {
 fetch_zip() {
   local package_name="$1"
   local package_url="$2"
-  local mirror_url
-  local checksum
-
-  if [ "$package_url" != "${package_url/\#}" ]; then
-    checksum="${package_url#*#}"
-    package_url="${package_url%%#*}"
-
-    if [ -n "$PYTHON_BUILD_MIRROR_URL" ]; then
-      mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
-    fi
-  fi
 
   local package_filename="${package_name}.zip"
 
-  if ! reuse_existing_tarball "$package_filename" "$checksum"; then
-    echo "Downloading ${package_filename}..." >&2
-    download_package "$mirror_url" "$package_url" "$package_filename" "$checksum"
-  fi
+  download_package "$package_url" "$package_filename"
 
   { if unzip "$package_filename"; then
-      if [ -z "$KEEP_BUILD_PATH" ]; then
-        rm -f "$package_filename"
-      else
-        true
-      fi
+      cleanup_package "$package_filename"
     fi
   } >&4 2>&1
 }
@@ -907,24 +909,10 @@ fetch_zip() {
 fetch_script() {
   local package_name="$1"
   local package_url="$2"
-  local mirror_url
-  local checksum
 
-  if [ "$package_url" != "${package_url/\#}" ]; then
-    checksum="${package_url#*#}"
-    package_url="${package_url%%#*}"
+  local package_filename="${package_name}.sh"
 
-    if [ -n "$PYTHON_BUILD_MIRROR_URL" ]; then
-      mirror_url="${PYTHON_BUILD_MIRROR_URL}/$checksum"
-    fi
-  fi
-
-  local package_filename="${package_name}.sh" # TODO: extract suffix from ${package_url}
-
-  if ! reuse_existing_tarball "$package_filename" "$checksum"; then
-    echo "Downloading ${package_filename}..." >&2
-    download_package "$mirror_url" "$package_url" "$package_filename" "$checksum"
-  fi
+  download_package "$package_url" "$package_filename"
 
   mkdir -p "$(dirname "${package_name}/${package_filename}")"
   mv -f "${package_filename}" "${package_name}/${package_filename}"
@@ -2721,21 +2709,9 @@ else
   PYTHON_BUILD_DEFAULT_MIRROR=
 fi
 
-if [ -n "$PYTHON_BUILD_SKIP_MIRROR" ]; then
-  unset PYTHON_BUILD_MIRROR_URL
-fi
-
-PYTHON_BUILD_MIRROR_ONLY=
-if [ -n "$PYTHON_BUILD_MIRROR_NO_FALLBACK" ]; then
-  if [ -n "$PYTHON_BUILD_MIRROR_URL" ] && [ -z "$PYTHON_BUILD_DEFAULT_MIRROR" ]; then
-    PYTHON_BUILD_MIRROR_ONLY=1
-  else
-    echo "python-build: warning: PYTHON_BUILD_MIRROR_NO_FALLBACK has no effect with the default mirror or with PYTHON_BUILD_SKIP_MIRROR" >&2
-  fi
-fi
-
-if ! has_checksum_support compute_sha2 && ! [ -n "$PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM" ] ; then
-  unset PYTHON_BUILD_MIRROR_URL
+if [[ -n $PYTHON_BUILD_MIRROR_NO_FALLBACK \
+    && ( -n $PYTHON_BUILD_DEFAULT_MIRROR || -n $PYTHON_BUILD_SKIP_MIRROR ) ]]; then
+  echo "python-build: warning: PYTHON_BUILD_MIRROR_NO_FALLBACK has no effect with the default mirror or with PYTHON_BUILD_SKIP_MIRROR" >&2
 fi
 
 ARIA2_OPTS="${PYTHON_BUILD_ARIA2_OPTS} ${IPV4+--disable-ipv6=true} ${IPV6+--disable-ipv6=false}"
