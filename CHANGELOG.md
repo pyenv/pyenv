@@ -1,5 +1,24 @@
 # Version History
 
+## Release v2.8.15
+* Add miniconda3 26.9.3, 26.9.4 by @native-api in https://github.com/pyenv/pyenv/pull/3607
+* Add miniforge3 26.7.2-1, 26.9.4-0, 26.9.4-1 by @native-api in https://github.com/pyenv/pyenv/pull/3608
+* pyenv-uninstall: list installed versions matching a missing version's prefix by @eda-ai-bot in https://github.com/pyenv/pyenv/pull/3611
+* pyenv-latest: sort flavors with a dotted name (e.g. pypy2.7) by version by @vulragrag-star in https://github.com/pyenv/pyenv/pull/3613
+* Run CI tests in parallel; allow to pass Bats options by @native-api in https://github.com/pyenv/pyenv/pull/3615
+* Fix broken `pyenv --help` when `.dylib` was compiled by @Andrej730 in https://github.com/pyenv/pyenv/pull/3614
+* pyenv-latest: exclude free-threaded prereleases from prefix resolution by @nk-batman21 in https://github.com/pyenv/pyenv/pull/3617
+* Add check for whitespace issues by @Andrej730 in https://github.com/pyenv/pyenv/pull/3616
+* CI: remove macos-14 by @native-api in https://github.com/pyenv/pyenv/pull/3619
+* python-build: share platform detection by @macayu17 in https://github.com/pyenv/pyenv/pull/3618
+* pyenv-latest: keep the 't' suffix when printing an unresolved prefix back by @nk-batman21 in https://github.com/pyenv/pyenv/pull/3621
+* Add GraalPy 25.5.5 by @msimacek in https://github.com/pyenv/pyenv/pull/3622
+* docs: explain the python- version prefix by @Blues-berry in https://github.com/pyenv/pyenv/pull/3610
+* version-file: fix infinite loop in Bash <4.4 with some invalid PWD values inherited from environment by @RollingAI in https://github.com/pyenv/pyenv/pull/3624
+* Add CPython 3.16.0a2 by @pyenv-bot[bot] in https://github.com/pyenv/pyenv/pull/3626
+* Add miniconda3 26.9.4-1 by @native-api in https://github.com/pyenv/pyenv/pull/3627
+* Add miniforge3 26.9.4-2 by @native-api in https://github.com/pyenv/pyenv/pull/3628
+
 ## Release v2.8.14
 * README: fix `pyenv init --install` usage in suggested shell setup by @dcadolph in https://github.com/pyenv/pyenv/pull/3603
 * Graalpy cleanup by @native-api in https://github.com/pyenv/pyenv/pull/3602
