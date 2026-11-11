@@ -1962,8 +1962,13 @@ build_package_mac_openssl() {
   local extra_no_features
   [[ $(openssl_version $1) -ge 30200 ]] && extra_no_features=1
 
+  # Since 3.0.0 (https://github.com/openssl/openssl/commit/74b7f339aa58af57c0e71b7efca66e6f2db5ae2e),
+  # OpenSSL source build unconditionally puts libraries into "lib<hardcoded_multilib_suffix>"
+  # which there's no way to reliably find out (https://github.com/openssl/openssl/discussions/32044)
+  [[ $(openssl_version $1) -ge 30000 ]] && no_multilib_suffix=1
+
   # Compile a shared lib with zlib dynamically linked.
-  package_option openssl configure --openssldir="$OPENSSLDIR" zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5} ${extra_no_features:+no-docs no-apps} ${notests:+no-tests}
+  package_option openssl configure --openssldir="$OPENSSLDIR" ${no_multilib_suffix:+--libdir=lib} zlib-dynamic no-ssl3 shared ${nokerberos:+no-ssl2 no-krb5} ${extra_no_features:+no-docs no-apps} ${notests:+no-tests}
 
   build_package_standard "$@"
 
