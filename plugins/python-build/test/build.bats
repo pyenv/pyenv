@@ -1001,11 +1001,11 @@ make install
 OUT
 }
 
-assert_custom_readline_flags() {
+assert_custom_header_flags() {
   local flags_source="$1"
-  local custom_prefix="$BATS_TEST_TMPDIR/custom-readline"
-  mkdir -p "$custom_prefix/include/readline"
-  touch "$custom_prefix/include/readline/rlconf.h"
+  local custom_prefix="$BATS_TEST_TMPDIR/custom-dependency"
+  mkdir -p "$custom_prefix/include/dependency"
+  touch "$custom_prefix/include/dependency/header.h"
 
   run_inline_definition <<DEF
 case "$flags_source" in
@@ -1016,37 +1016,37 @@ case "$flags_source" in
   configure-array) package_option python configure "CPPFLAGS=-I$custom_prefix/include -DOTHER" ;;
   make-array) package_option python make "CPPFLAGS=-I$custom_prefix/include" ;;
 esac
-configured_with_package_dir python readline/rlconf.h
+configured_with_package_dir python dependency/header.h
 DEF
 }
 
-@test "custom readline headers are found in global CPPFLAGS" {
-  assert_custom_readline_flags global
+@test "custom dependency headers are found in global CPPFLAGS" {
+  assert_custom_header_flags global
   assert_success
 }
 
-@test "custom readline headers are found in package CPPFLAGS" {
-  assert_custom_readline_flags package
+@test "custom dependency headers are found in package CPPFLAGS" {
+  assert_custom_header_flags package
   assert_success
 }
 
-@test "custom readline headers are found in global configure options" {
-  assert_custom_readline_flags configure
+@test "custom dependency headers are found in global configure options" {
+  assert_custom_header_flags configure
   assert_success
 }
 
-@test "custom readline headers are found in package configure options" {
-  assert_custom_readline_flags package-configure
+@test "custom dependency headers are found in package configure options" {
+  assert_custom_header_flags package-configure
   assert_success
 }
 
-@test "custom readline headers are found in configure option arrays" {
-  assert_custom_readline_flags configure-array
+@test "custom dependency headers are found in configure option arrays" {
+  assert_custom_header_flags configure-array
   assert_success
 }
 
-@test "make option arrays do not configure custom readline headers" {
-  assert_custom_readline_flags make-array
+@test "make option arrays do not configure custom dependency headers" {
+  assert_custom_header_flags make-array
   assert_failure
 }
 
@@ -1054,17 +1054,17 @@ DEF
   mkdir -p "$BATS_TEST_TMPDIR/custom/include"
   run_inline_definition <<DEF
 CPPFLAGS="-I$BATS_TEST_TMPDIR/custom/include"
-configured_with_package_dir python readline/rlconf.h
+configured_with_package_dir python dependency/header.h
 DEF
   assert_failure
 }
 
 @test "custom header detection uses the requested package" {
   mkdir -p "$BATS_TEST_TMPDIR/custom/include"
-  touch "$BATS_TEST_TMPDIR/custom/include/yaml.h"
+  touch "$BATS_TEST_TMPDIR/custom/include/dependency.h"
   run_inline_definition <<DEF
-package_option yaml configure "CPPFLAGS=-I$BATS_TEST_TMPDIR/custom/include"
-configured_with_package_dir yaml yaml.h
+package_option dependency configure "CPPFLAGS=-I$BATS_TEST_TMPDIR/custom/include"
+configured_with_package_dir dependency dependency.h
 DEF
   assert_success
 }
