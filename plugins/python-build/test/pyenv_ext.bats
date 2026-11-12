@@ -117,7 +117,7 @@ run_inline_definition_with_name() {
   stub uname '-s : echo Linux'
   stub uname '-s : echo Linux'
 
-  TMPDIR="$BATS_TEST_TMPDIR" install_tmp_fixture definitions/vanilla-python < /dev/null
+  install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
 
   assert_build_log <<OUT
@@ -145,7 +145,7 @@ OUT
 
   stub uname '-s : echo Linux'
 
-  TMPDIR="$BATS_TEST_TMPDIR" install_tmp_fixture definitions/vanilla-python < /dev/null
+  install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
 
   assert_build_log <<OUT
@@ -172,7 +172,7 @@ OUT
 
   stub uname '-s : echo Darwin'
 
-  PYTHON_MAKE_INSTALL_TARGET="altinstall" TMPDIR="$BATS_TEST_TMPDIR" install_tmp_fixture definitions/vanilla-python < /dev/null
+  PYTHON_MAKE_INSTALL_TARGET="altinstall" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
 
   assert_build_log <<OUT
@@ -193,7 +193,7 @@ echo "python \$@" >> "${INSTALL_ROOT}/build.log"
 OUT
   chmod +x "${INSTALL_ROOT}/bin/python"
 
-  PYTHON_MAKE_INSTALL_TARGET= TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  PYTHON_MAKE_INSTALL_TARGET= run_inline_definition <<OUT
 build_package_ensurepip
 OUT
   assert_success
@@ -211,7 +211,7 @@ echo "python \$@" >> "${INSTALL_ROOT}/build.log"
 OUT
   chmod +x "${INSTALL_ROOT}/bin/python"
 
-  PYTHON_MAKE_INSTALL_TARGET="altinstall" TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  PYTHON_MAKE_INSTALL_TARGET="altinstall" run_inline_definition <<OUT
 build_package_ensurepip
 OUT
   assert_success
@@ -232,7 +232,7 @@ OUT
   touch "${INSTALL_ROOT}/bin/python3.4-config"
   chmod +x "${INSTALL_ROOT}/bin/python3.4-config"
 
-  TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  run_inline_definition <<OUT
 verify_python 3.4
 OUT
   assert_success
@@ -253,7 +253,7 @@ OUT
   ln -s real_interpreter_name bin/pyston
   ln -s real_interpreter_name bin/pyston3
 
-  TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  run_inline_definition <<OUT
 build_package_pyston
 verify_python 3.8
 OUT
@@ -272,7 +272,7 @@ OUT
 echo 3.11
 OUT
 
-  TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  run_inline_definition <<OUT
 build_package_pypy
 build_package_verify_py311
 OUT
@@ -295,7 +295,7 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
 
-  PYTHON_CONFIGURE_OPTS="--enable-framework" TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  PYTHON_CONFIGURE_OPTS="--enable-framework" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 echo "PYTHON_CONFIGURE_OPTS=(\${PYTHON_CONFIGURE_OPTS})"
 echo "CONFIGURE_OPTS=(\${CONFIGURE_OPTS})"
@@ -318,7 +318,7 @@ EOS
   stub sw_vers '-productVersion : echo 10.10'
   stub arch "echo x86_64"
 
-  PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  PYTHON_CONFIGURE_OPTS="--enable-universalsdk" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 echo "PYTHON_CONFIGURE_OPTS=(\${PYTHON_CONFIGURE_OPTS})"
 echo "CONFIGURE_OPTS=(\${CONFIGURE_OPTS})"
@@ -337,7 +337,7 @@ EOS
   stub sw_vers '-productVersion : echo 11.7'
   stub arch "echo arm64"
 
-  PYTHON_CONFIGURE_OPTS="--enable-universalsdk" TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  PYTHON_CONFIGURE_OPTS="--enable-universalsdk" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 echo "PYTHON_CONFIGURE_OPTS=(\${PYTHON_CONFIGURE_OPTS})"
 echo "CONFIGURE_OPTS=(\${CONFIGURE_OPTS})"
@@ -355,7 +355,7 @@ EOS
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 11.7'
 
-  PYTHON_CONFIGURE_OPTS="--enable-universalsdk --with-universal-archs=foo" TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  PYTHON_CONFIGURE_OPTS="--enable-universalsdk --with-universal-archs=foo" run_inline_definition <<OUT
 echo "PYTHON_CONFIGURE_OPTS_ARRAY=(\${PYTHON_CONFIGURE_OPTS_ARRAY[@]})"
 OUT
   assert_success
@@ -373,7 +373,7 @@ EOS
     " : echo \"$MAKE \$@\" >> build.log" \
     " : echo \"$MAKE \$@\" >> build.log && cat build.log >> '$INSTALL_ROOT/build.log'"
 
-  PYTHON_CONFIGURE_OPTS="--enable-unicode=ucs2" TMPDIR="$BATS_TEST_TMPDIR" install_tmp_fixture definitions/vanilla-python < /dev/null
+  PYTHON_CONFIGURE_OPTS="--enable-unicode=ucs2" install_tmp_fixture definitions/vanilla-python < /dev/null
   assert_success
 
   assert_build_log <<OUT
@@ -392,7 +392,7 @@ OUT
   stub uname '-s : echo Darwin'
   stub sw_vers '-productVersion : echo 10.10'
 
-  TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  run_inline_definition <<OUT
 echo "\${MACOSX_DEPLOYMENT_TARGET}"
 OUT
   assert_success
@@ -405,7 +405,7 @@ OUT
 
   stub uname '-s : echo Darwin'
 
-  MACOSX_DEPLOYMENT_TARGET="10.4" TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+  MACOSX_DEPLOYMENT_TARGET="10.4" run_inline_definition <<OUT
 echo "\${MACOSX_DEPLOYMENT_TARGET}"
 OUT
   assert_success
