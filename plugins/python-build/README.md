@@ -276,7 +276,7 @@ of various Python flavors and their occasional changes as well as to accommodate
 people who only wish to cache some select downloads. This also allows to mirror multiple sites at once.
 
 As a workaround, with `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` set, the expected mirror structure
-changes to a regular mirror of https://www.python.org/ftp/python , or of a different site specified by `URL_BASE`.
+changes to a regular mirror of https://www.python.org/ftp/python, or of a different site specified by `URL_BASE`.
 The name is a historical misnomer, coming from the idea that with it,
 file hash is not appended to the mirror download URL.
 This feature is considered for deprecation in favor of a [better solution](https://github.com/pyenv/pyenv/issues/3348).
