@@ -1608,11 +1608,12 @@ configured_with_package_dir() {
   local package_var_name="$(capitalize "$1")"
   shift 1
   local PACKAGE_CONFIGURE_OPTS="${package_var_name}_CONFIGURE_OPTS"
-  local PACKAGE_CONFIGURE_OPTS_ARRAY="${package_var_name}_MAKE_OPTS_ARRAY[@]"
+  local PACKAGE_CONFIGURE_OPTS_ARRAY="${package_var_name}_CONFIGURE_OPTS_ARRAY[@]"
+  local PACKAGE_CPPFLAGS="${package_var_name}_CPPFLAGS"
   local arg flag
-  for arg in ${CONFIGURE_OPTS} ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}"; do
+  for arg in "CPPFLAGS=$CPPFLAGS ${!PACKAGE_CPPFLAGS}" ${CONFIGURE_OPTS} ${!PACKAGE_CONFIGURE_OPTS} "${!PACKAGE_CONFIGURE_OPTS_ARRAY}"; do
     if [[ "$arg" == "CPPFLAGS="* ]]; then
-      for flag in ${CPPFLAGS} ${arg##CPPFLAGS=}; do
+      for flag in ${arg##CPPFLAGS=}; do
         if [[ "$flag" == "-I"* ]]; then
           local header
           for header in "$@"; do
