@@ -176,8 +176,8 @@ You can set certain environment variables to control the build process.
   downloaded package files.
 * `PYTHON_BUILD_MIRROR_URL` overrides the default mirror URL root to one of your
   choosing.
-* `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM`, if set, does not append the SHA2
-  checksum of the file to the mirror URL.
+* `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM`, if set, changes the expected mirror structure
+  to a regular mirror of https://www.python.org/ftp/python or of a different site specified in `URL_BASE`.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
 * `PYTHON_BUILD_HTTP_CLIENT`, explicitly specify the HTTP client type to use. `aria2`, `curl` and `wget` are the supported values and by default, are searched in that order.
@@ -275,9 +275,11 @@ The rationale is to abstract away difference between directory structures of sit
 of various Python flavors and their occasional changes as well as to accommodate
 people who only wish to cache some select downloads. This also allows to mirror multiple sites at once.
 
-If the mirror being used does not have the same checksum (*e.g.* with a
-pull-through cache like Artifactory), you can set the
-`PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` environment variable.
+As a workaround, with `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` set, the expected mirror structure
+changes to a regular mirror of https://www.python.org/ftp/python, or of a different site specified by `URL_BASE`.
+The name is a historical misnomer, coming from the idea that with it,
+file hash is not appended to the mirror download URL.
+This feature is considered for deprecation in favor of a [better solution](https://github.com/pyenv/pyenv/issues/3348).
 
 If you don't have an SHA2 program installed, python-build will skip the download
 mirror and use official URLs instead. You can force python-build to bypass the
