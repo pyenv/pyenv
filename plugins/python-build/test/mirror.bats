@@ -7,6 +7,7 @@ _setup() {
   export PYTHON_BUILD_CACHE_PATH=
   export PYTHON_BUILD_MIRROR_URL=http://mirror.example.com
   export checksum="ba988b1bb4250dee0b9dd3d4d722f9c64b2bacfc805d1b6eba7426bda72dd3c5"
+  export PATH="$FIXTURE_ROOT:$PATH"
 }
 
 assert_package_success() {
@@ -20,7 +21,7 @@ assert_package_failure() {
 }
 
 @test "package URL without checksum bypasses mirror" {
-  stub curl '** -o * ** http://example.com/* : "$FIXTURE_ROOT/fake_downloader" "$@"'
+  stub curl '** -o * ** http://example.com/* : fake_downloader "$@"'
 
   install_fixture definitions/without-checksum
 
@@ -32,7 +33,7 @@ assert_package_failure() {
 
 @test "package URL with checksum but no shasum support bypasses mirror" {
   stub shasum false
-  stub curl '** -o * ** http://example.com/* : "$FIXTURE_ROOT/fake_downloader" "$@"'
+  stub curl '** -o * ** http://example.com/* : fake_downloader "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -45,7 +46,7 @@ assert_package_failure() {
 
 @test "package URL with MD5 checksum but no md5 support bypasses mirror" {
   stub md5 false
-  stub curl '** -o * ** http://example.com/* : "$FIXTURE_ROOT/fake_downloader" "$@"'
+  stub curl '** -o * ** http://example.com/* : fake_downloader "$@"'
 
   install_fixture definitions/with-md5-checksum
 
@@ -60,7 +61,7 @@ assert_package_failure() {
   export PYTHON_BUILD_SKIP_MIRROR=1
 
   stub shasum true "echo $checksum"
-  stub curl '** -o * ** http://example.com/* : "$FIXTURE_ROOT/fake_downloader" "$@"'
+  stub curl '** -o * ** http://example.com/* : fake_downloader "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -76,7 +77,7 @@ assert_package_failure() {
 
   stub shasum true "echo $checksum"
   stub curl "-*I* $mirror_url : true" \
-    "** -o * ** $mirror_url : "'"$FIXTURE_ROOT/fake_downloader" hash "$@"'
+    "** -o * ** $mirror_url : "'fake_downloader hash "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -92,7 +93,7 @@ assert_package_failure() {
 
   stub shasum true "echo $checksum"
   stub curl "-*I* $mirror_url : false" \
-    '** -o * ** http://example.com/* : "$FIXTURE_ROOT/fake_downloader" "$@"'
+    '** -o * ** http://example.com/* : fake_downloader "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -109,7 +110,7 @@ assert_package_failure() {
   stub shasum true "echo $checksum"
   stub curl "-*I* $mirror_url : true" \
     "** -o * ** $mirror_url : false" \
-    '** -o * ** http://example.com/* : "$FIXTURE_ROOT/fake_downloader" "$@"'
+    '** -o * ** http://example.com/* : fake_downloader "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -125,8 +126,8 @@ assert_package_failure() {
 
   stub shasum true "echo invalid" "echo $checksum"
   stub curl "-*I* $mirror_url : true" \
-    "** -o * ** $mirror_url : "'"$FIXTURE_ROOT/fake_downloader" hash "$@"' \
-    '** -o * ** http://example.com/* : "$FIXTURE_ROOT/fake_downloader" "$@"'
+    "** -o * ** $mirror_url : "'fake_downloader hash "$@"' \
+    '** -o * ** http://example.com/* : fake_downloader "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -144,7 +145,7 @@ assert_package_failure() {
 
   stub shasum true "echo $checksum"
   stub curl "-*I* : true" \
-    '** -o * ** https://custom.mirror.org/packages/package-1.0.0.tar.gz : "$FIXTURE_ROOT/fake_downloader" "$@"'
+    '** -o * ** https://custom.mirror.org/packages/package-1.0.0.tar.gz : fake_downloader "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -160,7 +161,7 @@ assert_package_failure() {
 
   stub shasum true "echo $checksum"
   stub curl "-*I* : true" \
-    "** -o * ** https://?*/$checksum : "'"$FIXTURE_ROOT/fake_downloader" hash "$@"'
+    "** -o * ** https://?*/$checksum : "'fake_downloader hash "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -175,7 +176,7 @@ assert_package_failure() {
   export PYTHON_BUILD_MIRROR_URL=
 
   stub shasum true "echo $checksum"
-  stub curl '** -o * ** https://www.python.org/ftp/python* : "$FIXTURE_ROOT/fake_downloader" "$@"'
+  stub curl '** -o * ** https://www.python.org/ftp/python* : fake_downloader "$@"'
 
   run_inline_definition <<DEF
 install_package "package-1.0.0" "https://www.python.org/ftp/python/packages/package-1.0.0.tar.gz#$checksum" copy
@@ -229,7 +230,7 @@ DEF
 
   stub shasum true "echo invalid"
   stub curl "-*I* $mirror_url : true" \
-    "** -o * ** $mirror_url : "'"$FIXTURE_ROOT/fake_downloader" hash "$@"'
+    "** -o * ** $mirror_url : "'fake_downloader hash "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -244,7 +245,7 @@ DEF
 @test "package URL without checksum still bypasses a flat mirror if NO_FALLBACK set" {
   export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
 
-  stub curl "** -o * ** http://example.com/* : "'"$FIXTURE_ROOT/fake_downloader" "$@"'
+  stub curl "** -o * ** http://example.com/* : "'fake_downloader "$@"'
 
   install_fixture definitions/without-checksum
 
@@ -258,7 +259,7 @@ DEF
   export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
 
   stub shasum false
-  stub curl "** -o * ** http://example.com/* : "'"$FIXTURE_ROOT/fake_downloader" "$@"'
+  stub curl "** -o * ** http://example.com/* : "'fake_downloader "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -276,7 +277,7 @@ DEF
   export URL_BASE=other.example.org
 
   stub shasum true "echo $checksum"
-  stub curl "** -o ** http://example.com/* : "'"$FIXTURE_ROOT/fake_downloader" "$@"'
+  stub curl "** -o ** http://example.com/* : "'fake_downloader "$@"'
 
   install_fixture definitions/with-checksum
 
@@ -293,7 +294,7 @@ DEF
 
   stub shasum true "echo $checksum"
   stub curl "-*I* https://pyenv.github.io/pythons/* : false" \
-    "** -o * ** https://www.python.org/* : "'"$FIXTURE_ROOT/fake_downloader" hash "$@"'
+    "** -o * ** https://www.python.org/* : "'fake_downloader hash "$@"'
 
   run_inline_definition <<DEF
 install_package "package-1.0.0" "https://www.python.org/packages/package-1.0.0.tar.gz#$checksum" copy
