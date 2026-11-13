@@ -279,7 +279,7 @@ As a workaround, with `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` set, the expected 
 changes to a regular mirror of https://www.python.org/ftp/python , or of a different site specified by `URL_BASE`.
 The name is a historical misnomer, coming from the idea that with it,
 file hash is not appended to the mirror download URL.
-This feature is considered for deprecation in favor of a better solution.
+This feature is considered for deprecation in favor of a [better solution](https://github.com/pyenv/pyenv/issues/3348).
 
 If you don't have an SHA2 program installed, python-build will skip the download
 mirror and use official URLs instead. You can force python-build to bypass the
