@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 # Summary: List all Python versions available to pyenv
 # Usage: pyenv versions [--bare] [--skip-aliases] [--skip-envs] [--executables]
+#        pyenv versions -k|--known [--bare]
 #
 # Lists all Python versions found in `$PYENV_ROOT/versions/*'.
 #
 #   --bare            List just the names, omit `system'
 #   --skip-aliases    Skip symlinks to other versions and to virtual environments
 #   --skip-envs       Skip virtual environments (under <version>/envs)
+#   -k/--known        List all versions known to `pyenv install' instead
+#                     An alias to `pyenv install --list'
 #   --executables     Internal. Overrides other options.
 #                     Optimally get a deduplicated list of all executable names in Pyenv-managed
 #                     versions and environments for `pyenv rehash'
@@ -19,6 +22,7 @@ bare=
 skip_aliases=
 skip_envs=
 executables=
+known=
 
 # Provide pyenv completions
 for arg; do
@@ -27,8 +31,10 @@ for arg; do
     echo --bare
     echo --skip-aliases
     echo --skip-envs
+    echo --known
     exit ;;
   --executables ) executables=1; break ;;
+  -k | --known ) known=1 ;;
   --bare ) bare=1 ;;
   --skip-aliases ) skip_aliases=1 ;;
   --skip-envs ) skip_envs=1 ;;
@@ -52,6 +58,11 @@ if [[ -n "$executables" ]]; then
     shopt -u dotglob nullglob
   fi
   exit 0
+fi
+
+# An alias to `pyenv-install --list'
+if [[ -n "$known" ]]; then
+  exec pyenv-install --list ${bare:+--bare}
 fi
 
 if ! enable -f "${BASH_SOURCE%/*}"/pyenv-realpath.dylib realpath 2>/dev/null; then

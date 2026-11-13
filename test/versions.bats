@@ -219,6 +219,27 @@ python_foo
 OUT
 }
 
+@test "--known is an alias to pyenv-install --list" {
+  create_version "3.3.3"
+  create_stub pyenv-install 'echo "pyenv-install $*"'
+
+  run pyenv-versions --known
+  assert_success "pyenv-install --list"
+
+  run pyenv-versions -k
+  assert_success "pyenv-install --list"
+}
+
+@test "--known passes --bare through to pyenv-install --list" {
+  create_stub pyenv-install 'echo "pyenv-install $*"'
+
+  run pyenv-versions --bare -k
+  assert_success "pyenv-install --list --bare"
+
+  run pyenv-versions --known --bare
+  assert_success "pyenv-install --list --bare"
+}
+
 @test "lists dot directories under versions" {
   create_version ".venv"
 

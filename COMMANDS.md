@@ -292,6 +292,9 @@ the currently active version.
       jython-2.5.3
       pypy-2.2.1
 
+With `-k/--known`, lists all versions known to `pyenv install` instead.
+This is an alias to [`pyenv install --list`](#pyenv-install); `--bare` is passed through.
+
 
 ## `pyenv which`
 
