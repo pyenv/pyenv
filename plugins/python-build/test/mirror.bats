@@ -276,8 +276,7 @@ DEF
   export URL_BASE=other.example.org
 
   stub shasum true "echo $checksum"
-  stub curl "-*I* http://example.com/* : true" \
-    "** -o ** http://example.com/* : "'"$FIXTURE_ROOT/fake_downloader" "$@"'
+  stub curl "** -o ** http://example.com/* : "'"$FIXTURE_ROOT/fake_downloader" "$@"'
 
   install_fixture definitions/with-checksum
 
