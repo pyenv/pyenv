@@ -24,6 +24,20 @@ pyenv: nonexistent: command not found
 EOF
 }
 
+@test "computes the version name once" {
+  create_hook version-name count.bash <<!
+echo call >> "${PYENV_TEST_DIR}/version-name-calls"
+!
+  mkdir -p "$PYENV_ROOT"
+  echo 3.4 > "${PYENV_ROOT}/version"
+  create_alt_executable_in_version "3.4" "python" "echo ok"
+
+  run pyenv-exec python
+  assert_success "ok"
+  run cat "${PYENV_TEST_DIR}/version-name-calls"
+  assert_success "call"
+}
+
 @test "completes with names of executables" {
   export PYENV_VERSION="3.4"
   create_alt_executable "fab"
