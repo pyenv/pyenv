@@ -180,6 +180,9 @@ You can set certain environment variables to control the build process.
   to a regular mirror of https://www.python.org/ftp/python or of a different site specified in `URL_BASE`.
 * `PYTHON_BUILD_SKIP_MIRROR`, if set, forces python-build to download packages from
   their original source URLs instead of using a mirror.
+* `PYTHON_BUILD_MIRROR_NO_FALLBACK`, if set together with a custom
+  `PYTHON_BUILD_MIRROR_URL`, makes python-build fail instead of falling back to
+  the original source URLs when a package can't be fetched from the mirror.
 * `PYTHON_BUILD_HTTP_CLIENT`, explicitly specify the HTTP client type to use. `aria2`, `curl` and `wget` are the supported values and by default, are searched in that order.
 * `PYTHON_BUILD_CURL_OPTS`, `PYTHON_BUILD_WGET_OPTS`, `PYTHON_BUILD_ARIA2_OPTS` pass additional parameters to the corresponding HTTP client.
 * `PYTHON_BUILD_SKIP_HOMEBREW`, if set, will not search for libraries installed by Homebrew when it normally would.
@@ -249,12 +252,14 @@ definition. (All bundled definitions include checksums.)
 
 ### Package download mirrors
 
-python-build will first attempt to download package files from a mirror hosted on
-GitHub Pages. If this fails, it will fall back to the
-official URL specified in the definition file.
+Python-build will first attempt to download package files from
+[a mirror hosted on GitHub Pages](http://pyenv.github.io/pythons/).
+If this fails, it will fall back to the official URL specified in the definition file.
 
 You can point python-build to another mirror by specifying the
 `PYTHON_BUILD_MIRROR_URL` environment variable.
+
+#### Mirror structure
 
 Package mirror URLs are constructed by joining
 `$PYTHON_BUILD_MIRROR_URL` with the SHA2 checksum of the package file as specified in the URL
@@ -264,7 +269,7 @@ in the installation script (the part after the hash sign). E.g.:
 https://mycache.example.com/0419e9085bf51b7a672009b3f50dbf1859acdf18ba725d0ec19aa5c8503f0ea3
 ```
 
-If you have replicated the directory structure of an official site, the easiest way to adapt
+If you have replicated the directory structure of an official site, the easiest way to set up
 would be to make symlinks at the mirror's root:
 
 ```
@@ -281,12 +286,23 @@ The name is a historical misnomer, coming from the idea that with it,
 file hash is not appended to the mirror download URL.
 This feature is considered for deprecation in favor of a [better solution](https://github.com/pyenv/pyenv/issues/3348).
 
-If you don't have an SHA2 program installed, python-build will skip the download
-mirror and use official URLs instead. You can force python-build to bypass the
-mirror by setting the `PYTHON_BUILD_SKIP_MIRROR` environment variable.
+#### Mirroring logic details
 
-The official python-build download mirror is provided by
-[GitHub Pages](http://yyuu.github.io/pythons/).
+Python-build will skip the download mirror and use official URLs
+if the `PYTHON_BUILD_SKIP_MIRROR` environment variable is set,
+or if you don't have a supported hash program for the corresponding
+hash type installed (`shasum`, `openssl` or `sha256sum` for SHA-256;
+`md5`, `openssl` or `md5sum` for MD5).
+
+Python-build will not fall back to official URLs after trying a mirror if the
+`PYTHON_BUILD_MIRROR_NO_FALLBACK` environment variable is set together with
+a custom `PYTHON_BUILD_MIRROR_URL`.
+
+The mirroring logic doesn't apply to code fetched from version control repositories,
+any downloads made by the package's internal build logic as well as some small rolling-release auxiliary downloads.
+As of this writing, the latter include `get-pip.py` (used as fallback if `ensurepip` fails or is missing),
+`ez_setup.py` (used very rarely, look for "`ez_setup`" in the build script)
+(point `GET_PIP` and `EZ_SETUP` at local files if need to redirect them) and version lookup logic in `graalpy-dev`.
 
 ### Package download cache
 
