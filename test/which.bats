@@ -180,6 +180,26 @@ EOF
   assert_success "${PYENV_ROOT}/versions/3.4.2/bin/python"
 }
 
+@test "finds an installed version without running pyenv-prefix" {
+  create_alt_executable_in_version "3.4" "python"
+  create_stub pyenv-prefix "exit 1"
+
+  PYENV_VERSION=3.4 run pyenv-which python
+  assert_success "${PYENV_ROOT}/versions/3.4/bin/python"
+}
+
+@test "uses _PYENV_VERSION_NAME instead of computing the version name" {
+  create_alt_executable_in_version "3.4" "python"
+  create_alt_executable_in_version "3.5" "python"
+  create_stub pyenv-version-name "exit 1"
+
+  _PYENV_VERSION_NAME=3.4 run pyenv-which python
+  assert_success "${PYENV_ROOT}/versions/3.4/bin/python"
+
+  PYENV_VERSION=3.5 _PYENV_VERSION_NAME=3.4 run pyenv-which python
+  assert_success "${PYENV_ROOT}/versions/3.5/bin/python"
+}
+
 @test "hooks get resolved version name" {
   create_hook which echo.bash <<!
 echo version=\$version

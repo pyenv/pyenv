@@ -10,6 +10,8 @@
 # system environment.
 # Internal switch --skip-advice used to skip printing an error message on a
 # failed search.
+# Internal envvar _PYENV_VERSION_NAME, if PYENV_VERSION is not set, is used
+# instead of the output of `pyenv-version-name -f` (pyenv-exec has it already).
 
 set -euo pipefail
 [ -n "${PYENV_DEBUG:-}" ] && set -x
@@ -66,9 +68,10 @@ OLDIFS="$IFS"
 # Unquoted $VAR or VAR=() of unquoted value does glob expansion (against the current dir's contents)
 # after IFS-splitting which is undesired
 set -f
-IFS=: versions=(${PYENV_VERSION:-$(pyenv-version-name -f)})
+IFS=: versions=(${PYENV_VERSION:-${_PYENV_VERSION_NAME:-$(pyenv-version-name -f)}})
 set +f
 IFS="$OLDIFS"
+unset _PYENV_VERSION_NAME
 
 nonexistent_versions=()
 PYENV_COMMAND_PATH=
@@ -84,9 +87,14 @@ for version in ${versions[@]+"${versions[@]}"} "$system"; do
     SEARCH_PATH="$(remove_from_path "${PYENV_ROOT}/shims${custom_shims}")"
     PYENV_COMMAND_PATH="$(PATH="$SEARCH_PATH" command -v "$PYENV_COMMAND" || true)"
   else
-    # $version may be a prefix to be resolved by pyenv-latest
-    version_path="$(pyenv-prefix "${version}" 2>/dev/null)" || \
-        { nonexistent_versions+=("$version"); continue; }
+    if [[ -n $version && -d ${PYENV_ROOT}/versions/${version} ]]; then
+      # An installed version: this is what pyenv-prefix would print
+      version_path="${PYENV_ROOT}/versions/${version}"
+    else
+      # $version may be a prefix to be resolved by pyenv-latest
+      version_path="$(pyenv-prefix "${version}" 2>/dev/null)" || \
+          { nonexistent_versions+=("$version"); continue; }
+    fi
     # resolve $version for hooks
     version="$(basename "$version_path")"
     PYENV_COMMAND_PATH="$version_path/bin/${PYENV_COMMAND}"

@@ -54,7 +54,10 @@ if [[ -n ${_PYENV_SHIM_PATH:-} ]]; then
   unset _PYENV_SHIM_PATH
 fi
 
-PYENV_COMMAND_PATH="$(pyenv-which "$PYENV_COMMAND")"
+# Not exporting PYENV_VERSION yet so that pyenv-which reports the right origin
+# for a version that is not installed; pass the version name we already have
+# so that it doesn't compute it again
+PYENV_COMMAND_PATH="$(_PYENV_VERSION_NAME="$PYENV_VERSION" pyenv-which "$PYENV_COMMAND")"
 PYENV_BIN_PATH="${PYENV_COMMAND_PATH%/*}"
 
 export PYENV_VERSION
