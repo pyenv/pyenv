@@ -398,7 +398,7 @@ has_checksum_support() {
 
   if [[ -z ${!has_checksum_var+defined} ]]; then
     # convert any nonzero exit code to 1 because 2 has special meaning
-    printf -v "$has_checksum_var" "$(echo test | "$checksum_command" >/dev/null; echo $(($?!=0)))"
+    printf -v "$has_checksum_var" "$(echo test | "$checksum_command" >/dev/null && rc=$? || rc=$?; echo $(( $rc!=0 )))"
   fi
   return "${!has_checksum_var}"
 }
@@ -546,7 +546,9 @@ http_get_curl() {
     curl_progress="--no-silent"
   fi
   local cmd
+  set -f
   cmd=(curl -q -o "${out:--}" -sSLf ${CURL_OPTS} ${curl_progress} "$1")
+  set +f
   if [ -t 3 ]; then
     exec 5>&1
     "${cmd[@]}" 3>&1 1>&5 2>&3 3>&- | interactive_output
