@@ -288,13 +288,31 @@ DEF
 }
 
 
-@test "NO_FALLBACK has no effect with default mirror URL" {
+@test "NO_FALLBACK has no effect with default mirror URL and produces a warning" {
   export PYTHON_BUILD_MIRROR_URL=
   export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
 
   stub shasum true "echo $checksum"
   stub curl "-*I* https://pyenv.github.io/pythons/* : false" \
     "** -o * ** https://www.python.org/* : "'fake_downloader hash "$@"'
+
+  run_inline_definition <<DEF
+install_package "package-1.0.0" "https://www.python.org/packages/package-1.0.0.tar.gz#$checksum" copy
+DEF
+
+  assert_package_success
+  assert_output_contains "PYTHON_BUILD_MIRROR_NO_FALLBACK has no effect"
+
+  unstub curl
+  unstub shasum
+}
+
+@test "NO_FALLBACK has no effect with SKIP_MIRROR and produces a warning" {
+  export PYTHON_BUILD_MIRROR_NO_FALLBACK=1
+  export PYTHON_BUILD_SKIP_MIRROR=1
+
+  stub shasum true "echo $checksum"
+  stub curl "** -o * ** https://www.python.org/* : "'fake_downloader hash "$@"'
 
   run_inline_definition <<DEF
 install_package "package-1.0.0" "https://www.python.org/packages/package-1.0.0.tar.gz#$checksum" copy
