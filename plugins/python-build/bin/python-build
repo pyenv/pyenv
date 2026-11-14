@@ -724,7 +724,7 @@ download_package() {
     local official_source="www.python.org/ftp/python"
     if [[ -n $PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM ]]; then
       if [[ -z $PYTHON_BUILD_DEFAULT_MIRROR && \
-          $package_url =~ ^([a-z]://)?${URL_BASE:-$official_source}(.*)$ ]]; then
+          $package_url =~ ^([a-z]+://)?${URL_BASE:-$official_source}(.*)$ ]]; then
         mirror_url="${PYTHON_BUILD_MIRROR_URL}${BASH_REMATCH[2]}"
       fi
     # CPython is excluded from the default mirror search as heritage from Rbenv
