@@ -1,6 +1,11 @@
 #!/usr/bin/env bats
 
 load test_helper
+load binary_helper
+
+_setup() {
+  PATH="$BATS_TEST_TMPDIR/stubs:${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
+}
 
 create_version() {
   mkdir -p "${PYENV_ROOT}/versions/$1/bin"
@@ -71,10 +76,13 @@ platform() {
   assert_failure "pyenv-binary: --source-version needs a value"
 }
 
-@test "rejects control characters in the default source version" {
-  run pyenv-binary-save $'3.12.7\nsource_version=other'
-  assert_failure
-  [[ "$output" == "pyenv-binary: invalid source version"* ]]
+@test "rejects control characters in the installed version before saving" {
+  local version=$'3.12.7\nsource_version=other'
+  create_version "$version"
+
+  run pyenv-binary-save "$version" "$BATS_TEST_TMPDIR/dist" --source-version 3.12.7
+  assert_failure "pyenv-binary: invalid version name \`$version'"
+  [ ! -e "$BATS_TEST_TMPDIR/dist" ]
 }
 
 @test "fails when --name has no value" {
@@ -91,14 +99,17 @@ platform() {
 
 @test "records the platform in the metadata" {
   create_version "3.12.7"
+  set_platform FreeBSD amd64 'freebsd 14.2'
+  create_stub readelf true
   local out="${BATS_TEST_TMPDIR}/dist"
   pyenv-binary-save "3.12.7" "$out" >/dev/null
 
-  run cat "${out}/3.12.7-$(platform).meta"
+  run cat "${out}/3.12.7-freebsd-amd64.meta"
   assert_success
   assert_line "version=3.12.7"
-  assert_line "platform=$(platform)"
-  assert_line "archive=3.12.7-$(platform).tar.xz"
+  assert_line "platform=freebsd-amd64"
+  assert_line "distro=freebsd 14.2"
+  assert_line "archive=3.12.7-freebsd-amd64.tar.xz"
 }
 
 @test "records the original installation prefix" {
@@ -108,6 +119,17 @@ platform() {
 
   run grep '^build_prefix=' "${out}/3.12.7-$(platform).meta"
   assert_success "build_prefix=${PYENV_ROOT}/versions/3.12.7"
+}
+
+@test "records macOS distribution metadata" {
+  create_version "3.12.7"
+  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
+  create_stub sw_vers 'echo 15.5'
+
+  run pyenv-binary-save 3.12.7 "$BATS_TEST_TMPDIR/dist"
+  assert_success
+  run grep '^distro=' "$BATS_TEST_TMPDIR/dist/3.12.7-darwin-arm64.meta"
+  assert_success "distro=macos 15.5"
 }
 
 @test "fails when readelf is not available" {
@@ -153,6 +175,7 @@ STUB
 
 @test "records only the libraries otool resolves outside the prefix" {
   create_version "3.12.7"
+  create_stub sw_vers 'echo 15.5'
   touch "${PYENV_ROOT}/versions/3.12.7/bin/python3.12"
   create_path_executable uname <<'STUB'
 case "$1" in
