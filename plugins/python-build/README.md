@@ -253,7 +253,7 @@ definition. (All bundled definitions include checksums.)
 ### Package download mirrors
 
 Python-build will first attempt to download package files from
-[a mirror hosted on GitHub Pages](http://pyenv.github.io/pythons/).
+[a mirror hosted on GitHub Pages](https://pyenv.github.io/pythons/).
 If this fails, it will fall back to the official URL specified in the definition file.
 
 You can point python-build to another mirror by specifying the
@@ -290,9 +290,8 @@ This feature is considered for deprecation in favor of a [better solution](https
 
 Python-build will skip the download mirror and use official URLs
 if the `PYTHON_BUILD_SKIP_MIRROR` environment variable is set,
-or if you don't have a supported hash program for the corresponding
-hash type installed (`shasum`, `openssl` or `sha256sum` for SHA-256;
-`md5`, `openssl` or `md5sum` for MD5).
+or if no supported SHA-256 implementation is available
+(`shasum`, `openssl` or `sha256sum`; `PYTHON_BUILD_MIRROR_URL_SKIP_CHECKSUM` bypasses this check).
 
 Python-build will not fall back to official URLs after trying a mirror if the
 `PYTHON_BUILD_MIRROR_NO_FALLBACK` environment variable is set together with
