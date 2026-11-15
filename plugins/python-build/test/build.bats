@@ -1001,6 +1001,116 @@ make install
 OUT
 }
 
+assert_custom_header_flags() {
+  local flags_source="$1"
+  local custom_prefix="$BATS_TEST_TMPDIR/custom-dependency"
+  mkdir -p "$custom_prefix/include/dependency"
+  touch "$custom_prefix/include/dependency/header.h"
+
+  run_inline_definition <<DEF
+case "$flags_source" in
+  global) CPPFLAGS="-DOTHER -I$custom_prefix/include" ;;
+  package) PYTHON_CPPFLAGS="-DOTHER -I$custom_prefix/include" ;;
+  configure) CONFIGURE_OPTS="CPPFLAGS=-I$custom_prefix/include" ;;
+  package-configure) PYTHON_CONFIGURE_OPTS="CPPFLAGS=-I$custom_prefix/include" ;;
+  configure-array) package_option python configure "CPPFLAGS=-I$custom_prefix/include -DOTHER" ;;
+  make-array) package_option python make "CPPFLAGS=-I$custom_prefix/include" ;;
+esac
+configured_with_package_dir python dependency/header.h
+DEF
+}
+
+@test "custom dependency headers are found in global CPPFLAGS" {
+  assert_custom_header_flags global
+  assert_success
+}
+
+@test "custom dependency headers are found in package CPPFLAGS" {
+  assert_custom_header_flags package
+  assert_success
+}
+
+@test "custom dependency headers are found in global configure options" {
+  assert_custom_header_flags configure
+  assert_success
+}
+
+@test "custom dependency headers are found in package configure options" {
+  assert_custom_header_flags package-configure
+  assert_success
+}
+
+@test "custom dependency headers are found in configure option arrays" {
+  assert_custom_header_flags configure-array
+  assert_success
+}
+
+@test "make option arrays do not configure custom dependency headers" {
+  assert_custom_header_flags make-array
+  assert_failure
+}
+
+@test "custom include directories without the requested header do not bypass detection" {
+  mkdir -p "$BATS_TEST_TMPDIR/custom/include"
+  run_inline_definition <<DEF
+CPPFLAGS="-I$BATS_TEST_TMPDIR/custom/include"
+configured_with_package_dir python dependency/header.h
+DEF
+  assert_failure
+}
+
+@test "custom header detection uses the requested package" {
+  mkdir -p "$BATS_TEST_TMPDIR/custom/include"
+  touch "$BATS_TEST_TMPDIR/custom/include/dependency.h"
+  run_inline_definition <<DEF
+package_option dependency configure "CPPFLAGS=-I$BATS_TEST_TMPDIR/custom/include"
+configured_with_package_dir dependency dependency.h
+DEF
+  assert_success
+}
+
+@test "global custom readline flags are not overridden by Homebrew" {
+  local custom_prefix="$BATS_TEST_TMPDIR/custom-readline"
+  local brew_prefix="$BATS_TEST_TMPDIR/homebrew-readline"
+  mkdir -p "$custom_prefix/include/readline" "$brew_prefix/include"
+  touch "$custom_prefix/include/readline/rlconf.h"
+  stub brew "--prefix readline : echo '$brew_prefix'"
+  export CPPFLAGS="-I$custom_prefix/include"
+  export LDFLAGS="-L$custom_prefix/lib"
+
+  run_inline_definition <<'DEF'
+can_use_homebrew() { return 0; }
+use_homebrew_readline
+printf '%s\n' "$CPPFLAGS" "$LDFLAGS"
+DEF
+  assert_success
+  assert_output <<OUT
+-I${INSTALL_ROOT}/include -I$custom_prefix/include
+-L${INSTALL_ROOT}/lib -Wl,-rpath,${INSTALL_ROOT}/lib -L$custom_prefix/lib
+OUT
+  [ ! -e "$BREW_STUB_LOG" ]
+}
+
+@test "Homebrew readline is still selected when custom headers are absent" {
+  local custom_prefix="$BATS_TEST_TMPDIR/custom-readline"
+  local brew_prefix="$BATS_TEST_TMPDIR/homebrew-readline"
+  mkdir -p "$custom_prefix/include" "$brew_prefix/include"
+  stub brew "--prefix readline : echo '$brew_prefix'"
+  export CPPFLAGS="-I$custom_prefix/include"
+
+  run_inline_definition <<'DEF'
+can_use_homebrew() { return 0; }
+use_homebrew_readline
+printf '%s\n' "$CPPFLAGS"
+DEF
+  assert_success
+  assert_output <<OUT
+python-build: use readline from homebrew
+-I$brew_prefix/include -I${INSTALL_ROOT}/include -I$custom_prefix/include
+OUT
+  unstub brew
+}
+
 @test "tcl-tk is linked from Homebrew via --with-tcl-*" {
   cached_tarball "Python-3.6.2"
   stub_tcltk "${tcl_tk_libdir:=$BATS_TEST_TMPDIR/homebrew-tcl-tk}"
