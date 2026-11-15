@@ -450,7 +450,7 @@ function print_path() {
         print_path_prepend_shims
         ;;
       zsh )
-        echo 'path=("${(@)path:#"'"${PYENV_ROOT}/shims"'"}")'
+        echo 'path=("${(@)path:#"${PYENV_ROOT}/shims"}")'
         print_path_prepend_shims
         ;;
       * )
