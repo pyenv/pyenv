@@ -18,6 +18,7 @@ The most common subcommands are:
 * [`pyenv which`](#pyenv-which)
 * [`pyenv whence`](#pyenv-whence)
 * [`pyenv exec`](#pyenv-exec)
+* [`pyenv do`](#pyenv-do)
 * [`pyenv root`](#pyenv-root)
 * [`pyenv prefix`](#pyenv-prefix)
 * [`pyenv latest`](#pyenv-latest)
@@ -341,6 +342,15 @@ upon `exec` (not `fork`) if the executable being run is protected. The protectio
 (including preinstalled shells) and does not cover user-installed apps and 3rd-party software. See
 [About System Integrity Protection on your Mac - Apple Support](https://support.apple.com/en-us/102149)
 for details.
+
+## `pyenv do`
+
+    Usage: pyenv do <version> <command> [arg1 arg2...]
+
+Runs an executable with the given Python version without changing the selected one.
+This is an alias to `PYENV_VERSION=<version> pyenv exec <command> [arg1 arg2...]`.
+
+    pyenv do 3.12 pip list
 
 ## `pyenv root`
 
