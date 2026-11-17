@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Summary: Run an executable with the given Python version
+#
+# Usage: pyenv do <version> <command> [arg1 arg2...]
+#
+# An alias to `PYENV_VERSION=<version> pyenv exec <command> [arg1 arg2...]'
+
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
+
+# Provide pyenv completions
+if [ "${1:-}" = "--complete" ]; then
+  if [ $# -eq 1 ]; then
+    echo system
+    exec pyenv-versions --bare
+  fi
+  exec pyenv-exec --complete
+fi
+
+if [ $# -lt 2 ]; then
+  pyenv-help --usage do >&2
+  exit 1
+fi
+
+export PYENV_VERSION="$1"
+shift
+exec pyenv-exec "$@"
