@@ -190,7 +190,7 @@ OUT
   run grep -F "./configure --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib configure_opt1" <<<"$log"
   assert_success
   assert_output_contains "CC=cc "
-  [[ "$output" != *CFLAGS=* ]]
+  refute grep -qF "CFLAGS=" <<<"$output"
 
   run grep -F " make -j 2" <<<"$log"
   assert_success
