@@ -979,6 +979,22 @@ build_package_warn_unsupported() {
   } >&3
 }
 
+# Write a command to stdout (the build log) together with the build-related
+# environment variables that are set, so the line can be copy-pasted and rerun
+# by hand from the build directory. Then run the command.
+log_and_run() {
+  local var line=""
+  for var in CC CFLAGS CPPFLAGS LDFLAGS LIBS PKG_CONFIG_PATH \
+    MACOSX_DEPLOYMENT_TARGET KERNEL_BITS TCLTK_CFLAGS TCLTK_LIBS; do
+    if [ -n "${!var}" ]; then
+      line="${line}${var}=$(printf '%q' "${!var}") "
+    fi
+  done
+  line="${line}$(printf '%q ' "$@")"
+  echo "python-build: running: ${line% }"
+  "$@"
+}
+
 build_package_standard_build() {
   local package_name="$1"
 
@@ -1055,11 +1071,11 @@ build_package_standard_build() {
     if [ -z "$CC" ] && is_mac -ge 1010; then
       export CC=clang
     fi
-    ${!PACKAGE_CONFIGURE:-./configure} --prefix="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}" \
+    log_and_run ${!PACKAGE_CONFIGURE:-./configure} --prefix="${!PACKAGE_PREFIX_PATH:-$PREFIX_PATH}" \
       "${!PACKAGE_CONFIGURE_OPTS_ARRAY}" $CONFIGURE_OPTS ${!PACKAGE_CONFIGURE_OPTS} || return 1
   ) >&4 2>&1
 
-  { "$MAKE" "${!PACKAGE_MAKE_OPTS_ARRAY}" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS}
+  { log_and_run "$MAKE" "${!PACKAGE_MAKE_OPTS_ARRAY}" $MAKE_OPTS ${!PACKAGE_MAKE_OPTS}
   } >&4 2>&1
 }
 
@@ -1071,7 +1087,7 @@ build_package_standard_install() {
   local PACKAGE_MAKE_INSTALL_OPTS_ARRAY="${package_var_name}_MAKE_INSTALL_OPTS_ARRAY[@]"
   local PACKAGE_MAKE_INSTALL_TARGET="${package_var_name}_MAKE_INSTALL_TARGET"
 
-  { "$MAKE" "${!PACKAGE_MAKE_INSTALL_TARGET:-install}" $MAKE_INSTALL_OPTS ${!PACKAGE_MAKE_INSTALL_OPTS} "${!PACKAGE_MAKE_INSTALL_OPTS_ARRAY}"
+  { log_and_run "$MAKE" "${!PACKAGE_MAKE_INSTALL_TARGET:-install}" $MAKE_INSTALL_OPTS ${!PACKAGE_MAKE_INSTALL_OPTS} "${!PACKAGE_MAKE_INSTALL_OPTS_ARRAY}"
   } >&4 2>&1
 }
 

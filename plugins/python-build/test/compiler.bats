@@ -140,11 +140,15 @@ exec 4<&1
 build_package_standard python
 DEF
   assert_success
+  local flags="CPPFLAGS=-I${BATS_TEST_TMPDIR}/install/include LDFLAGS=-L${BATS_TEST_TMPDIR}/install/lib\ -Wl\,-rpath\,${BATS_TEST_TMPDIR}/install/lib LIBS=-L${BATS_TEST_TMPDIR}/install/lib\ -Wl\,-rpath\,${BATS_TEST_TMPDIR}/install/lib MACOSX_DEPLOYMENT_TARGET=10.10"
   assert_output <<OUT
+python-build: running: CC=clang $flags ./configure --prefix=$INSTALL_ROOT --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib
 ./configure --prefix=$INSTALL_ROOT --enable-shared --libdir=${BATS_TEST_TMPDIR}/install/lib
 CC=clang
 CFLAGS=no
+python-build: running: $flags make -j 2
 make -j 2
+python-build: running: $flags make install
 make install
 OUT
 

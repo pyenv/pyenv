@@ -152,6 +152,52 @@ make python_make_install_target make_install_opt1 make_install_opt2 python_make_
 OUT
 }
 
+@test "configure and make commands are written to the build log with the build variables" {
+  export TMPDIR="$BATS_TEST_TMPDIR"
+  export YAML_CFLAGS="yaml_cflag1 yaml_cflag2"
+  export CONFIGURE_OPTS="configure_opt1"
+
+  cached_tarball "yaml-0.1.6"
+  cached_tarball "Python-3.6.2"
+
+  stub uname '-s : echo Linux'
+  stub brew false
+  stub_make_install
+  stub_make_install
+
+  install_fixture definitions/needs-yaml
+  assert_success
+
+  unstub uname
+  unstub make
+
+  local log
+  log="$(cat "$BATS_TEST_TMPDIR"/python-build.*.log)"
+
+  run grep -F "python-build: running: " <<<"$log"
+  assert_success
+  # 2 packages x (configure, make, make install)
+  [ "${#lines[@]}" -eq 6 ]
+
+  # yaml: package flags are shown on its configure line, quoted so it can be pasted back
+  run grep -F "./configure --prefix=$INSTALL_ROOT configure_opt1" <<<"$log"
+  assert_success
+  assert_output_contains "CC=cc "
+  assert_output_contains "CFLAGS=yaml_cflag1\\ yaml_cflag2 "
+  assert_output_contains "CPPFLAGS=-I${BATS_TEST_TMPDIR}/install/include "
+
+  # Python: no package flags of its own, so no CFLAGS
+  run grep -F "./configure --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib configure_opt1" <<<"$log"
+  assert_success
+  assert_output_contains "CC=cc "
+  refute grep -qF "CFLAGS=" <<<"$output"
+
+  run grep -F " make -j 2" <<<"$log"
+  assert_success
+  run grep -F " make install" <<<"$log"
+  assert_success
+}
+
 @test "apply python patch before building" {
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
