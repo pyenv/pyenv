@@ -127,6 +127,28 @@ python-build 3.5.2 ${PYENV_ROOT}/versions/3.5.2
   unstub python-build
 }
 
+@test "install :latest ignores prereleases, rolling releases, alternative srcs, and 't' versions" {
+  stub_python_build_lib
+  for i in {1..2}; do stub_python_build_no_latest '--definitions : echo -e 3.4.2\\n3.5.1\\n3.5.2\\n3.5.3-dev\\n3.5.3-src\\n3.5.3a1\\n3.5.3b1\\n3.5.3rc1\\n3.5.3t\\n3.6.0a2\\n3.6.0a2t'; done
+  for i in {1..2}; do stub_python_build; done
+
+  pyenv-hooks install; unstub pyenv-hooks
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  export PYENV_HOOK_PATH="$PYENV_INSTALL_ROOT/pyenv.d"
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
+
+  run pyenv-install 3.5:latest 3:latest
+  assert_success
+  assert_output <<!
+python-build 3.5.2 ${PYENV_ROOT}/versions/3.5.2
+python-build 3.5.2 ${PYENV_ROOT}/versions/3.5.2
+!
+
+  unstub python-build
+  unstub pyenv-latest
+}
+
 @test "install installs local versions by default" {
   stub_python_build_lib
   stub_python_build
