@@ -99,10 +99,10 @@ OUT
 
   run pyenv-init --install
   assert_success
-  assert_output <<'OUT'
+  assert_output <<OUT
 pyenv: shell detected as bash
-pyenv: adding configuration to ~/.bashrc
-pyenv: adding configuration to ~/.profile
+pyenv: adding configuration to $HOME/.bashrc
+pyenv: adding configuration to $HOME/.profile
 OUT
 
   expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
@@ -130,10 +130,10 @@ OUT
 
   run pyenv-init --install zsh
   assert_success
-  assert_output <<'OUT'
+  assert_output <<OUT
 pyenv: configuring for zsh
-pyenv: adding configuration to ~/.zshrc
-pyenv: adding configuration to ~/.zprofile
+pyenv: adding configuration to $HOME/.zshrc
+pyenv: adding configuration to $HOME/.zprofile
 OUT
 
   expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - zsh)"'
@@ -150,10 +150,10 @@ OUT
 
   run pyenv-init --install fish
   assert_success
-  assert_output <<'OUT'
+  assert_output <<OUT
 pyenv: configuring for fish
 pyenv: setting fish universal variables for PYENV_ROOT and PATH
-pyenv: adding configuration to ~/.config/fish/config.fish
+pyenv: adding configuration to $HOME/.config/fish/config.fish
 OUT
 
   expected_fish_script=$'set -Ux PYENV_ROOT $HOME/.pyenv\nif functions -q fish_add_path\n  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin\nelse\n  test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths\nend'
@@ -271,16 +271,30 @@ OUT
   assert [ ! -s "$HOME/.config" ]
 }
 
-@test "install refuses a broken symlink as a startup file" {
+@test "install treats a broken symlink as a missing startup file" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT" "$HOME/dotfiles"
+  ln -s "$HOME/dotfiles/profile" "$HOME/.profile"
+
+  run pyenv-init --install bash
+  assert_success
+
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
+  assert [ -L "$HOME/.profile" ]
+  assert_equal "$expected_setup" "$(cat "$HOME/dotfiles/profile")"
+}
+
+@test "install refuses a broken symlink whose target directory is missing" {
   mkdir -p "$HOME"
   ln -s "$HOME/missing/profile" "$HOME/.profile"
 
   run pyenv-init --install bash
   assert_failure
-  assert_line "pyenv: $HOME/.profile is a broken symbolic link"
+  assert_line "pyenv: cannot create $HOME/.profile"
   assert_line "pyenv: no files were changed."
 
   assert [ ! -e "$HOME/.bashrc" ]
+  assert [ ! -e "$HOME/missing" ]
 }
 
 @test "install treats PYENV_ROOT as pyenv-related code" {

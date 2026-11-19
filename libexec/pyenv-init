@@ -27,7 +27,6 @@ mode="help"
 no_push_path=
 no_rehash=
 shell=
-shell_explicit=
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -51,7 +50,6 @@ while [ "$#" -gt 0 ]; do
       ;;
     *)
       shell="$1"
-      shell_explicit=1
       ;;
   esac
   shift
@@ -59,7 +57,6 @@ done
 
 # If shell is not provided, detect it.
 if [ -z "$shell" ]; then
-  shell_explicit=
   if shell=$(tr '\0' ' ' 2>/dev/null </proc/"$PPID"/cmdline);then
 	  :
   else
@@ -70,6 +67,11 @@ if [ -z "$shell" ]; then
   shell="${shell:-${SHELL:-}}"
   shell="${shell##*/}"
   shell="${shell%%-*}"
+  if [ "$mode" = "install" ]; then
+    echo "pyenv: shell detected as $shell" >&2
+  fi
+elif [ "$mode" = "install" ]; then
+  echo "pyenv: configuring for $shell" >&2
 fi
 
 profile=
@@ -305,16 +307,9 @@ function install_shell_startup_files() {
     return 1
   fi
 
-  if [[ -n $shell_explicit ]]; then
-    echo "pyenv: configuring for $shell" >&2
-  else
-    echo "pyenv: shell detected as $shell" >&2
-  fi
-
   detect_profile
 
   local files=()
-  local names=()
   local lines=()
   local profile_path rc_path setup
 
@@ -324,24 +319,20 @@ function install_shell_startup_files() {
     profile_path="$(expand_home_path "$profile")"
     setup="$(print_posix_shell_setup)"
     files=("$rc_path")
-    names=("$rc")
     lines=("$setup")
     if [[ $profile_path != "$rc_path" ]]; then
       files+=("$profile_path")
-      names+=("$profile")
       lines+=("$setup")
     fi
     ;;
   fish )
     rc_path="$(expand_home_path "$rc")"
     files=("$rc_path")
-    names=("$rc")
     lines=("$(print_fish_shell_setup)")
     ;;
   pwsh )
     rc_path="$(expand_home_path "$rc")"
     files=("$rc_path")
-    names=("$rc")
     lines=("$(print_pwsh_shell_setup)")
     ;;
   * )
@@ -368,7 +359,7 @@ function install_shell_startup_files() {
   fi
 
   for ((index = 0; index < ${#files[@]}; index++)); do
-    echo "pyenv: adding configuration to ${names[$index]}" >&2
+    echo "pyenv: adding configuration to ${files[$index]}" >&2
     append_lines "${files[$index]}" "${lines[$index]}"
   done
 }
@@ -378,24 +369,10 @@ function check_startup_file() {
   local file="$1"
   local grep_status
 
-  if [[ -L $file && ! -e $file ]]; then
-    echo "pyenv: $file is a broken symbolic link" >&2
-    return 1
-  fi
-
+  # A broken symbolic link is the same as a missing file.
   if [[ ! -e $file ]]; then
     check_startup_file_creatable "$file"
     return
-  fi
-
-  if [[ ! -f $file || ! -r $file ]]; then
-    echo "pyenv: failed to inspect $file" >&2
-    return 1
-  fi
-
-  if [[ ! -w $file ]]; then
-    echo "pyenv: cannot write to $file" >&2
-    return 1
   fi
 
   if grep -Fi pyenv "$file" >/dev/null; then
@@ -403,32 +380,57 @@ function check_startup_file() {
     return 1
   else
     grep_status=$?
-    if [[ $grep_status == 1 ]]; then
-      return 0
+    # Some greps report no match for a directory instead of an error.
+    if [[ $grep_status != 1 || ! -f $file ]]; then
+      echo "pyenv: failed to inspect $file" >&2
+      return "$grep_status"
     fi
-    echo "pyenv: failed to inspect $file" >&2
-    return "$grep_status"
+  fi
+
+  if [[ ! -w $file ]]; then
+    echo "pyenv: cannot write to $file" >&2
+    return 1
   fi
 }
 
 # A missing file is created by `append_lines` with `mkdir -p` and `>>`,
 # so its closest existing parent directory must be writable.
+# Through a broken symbolic link, `>>` creates the file the link points to,
+# but not that file's directory, so that directory must already exist.
 function check_startup_file_creatable() {
   local file="$1"
-  local dir="$file"
+  local target="$1"
+  local dir link depth=0
 
-  while [[ $dir == */* ]]; do
-    dir="${dir%/*}"
-    dir="${dir:-/}"
-    if [[ -e $dir || -L $dir ]]; then
-      break
+  while [[ -L $target ]] && (( depth++ < 40 )); do
+    link="$(readlink "$target")" || break
+    if [[ $link != /* && $target == */* ]]; then
+      link="${target%/*}/$link"
     fi
+    target="$link"
   done
-  if [[ ! -e $dir && ! -L $dir ]]; then
+
+  if [[ $target != "$file" ]]; then
     dir=.
+    if [[ $target == */* ]]; then
+      dir="${target%/*}"
+      dir="${dir:-/}"
+    fi
+  else
+    dir="$file"
+    while [[ $dir == */* ]]; do
+      dir="${dir%/*}"
+      dir="${dir:-/}"
+      if [[ -e $dir || -L $dir ]]; then
+        break
+      fi
+    done
+    if [[ ! -e $dir && ! -L $dir ]]; then
+      dir=.
+    fi
   fi
 
-  if [[ ! -d $dir || ! -w $dir || ! -x $dir ]]; then
+  if [[ -L $target || ! -d $dir || ! -w $dir || ! -x $dir ]]; then
     echo "pyenv: cannot create $file" >&2
     return 1
   fi
