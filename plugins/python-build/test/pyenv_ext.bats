@@ -283,6 +283,28 @@ OUT
   done
 }
 
+@test "rustpython: install stdlib and create python* symlinks" {
+  mkdir -p "${BATS_TEST_TMPDIR}/rustpython/target/release" "${BATS_TEST_TMPDIR}/rustpython/Lib"
+  cd "${BATS_TEST_TMPDIR}/rustpython"
+  executable target/release/rustpython <<OUT
+#!$BASH
+echo 3.15
+OUT
+  touch Lib/os.py
+  stub cargo "build --release --locked --target-dir target : true"
+
+  TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+build_package_rustpython
+OUT
+  assert_success
+  unstub cargo
+
+  [ -f "${INSTALL_ROOT}/lib/python3.15/os.py" ]
+  for name in python python3 python3.15; do
+    assert_equal "$(resolve_link "${INSTALL_ROOT}/bin/$name")" "rustpython"
+  done
+}
+
 @test "enable framework" {
   framework_path="${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin"
   mkdir -p "$framework_path"

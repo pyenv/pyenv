@@ -1203,6 +1203,20 @@ build_package_micropython() {
   }>&4 2>&1
 }
 
+build_package_rustpython() {
+  local version_suffix
+  { cargo build --release --locked --target-dir target
+    mkdir -p "${PREFIX_PATH}/bin"
+    cp target/release/rustpython "${PREFIX_PATH}/bin/rustpython"
+    # RustPython finds its stdlib through a CPython-style landmark search
+    # for `lib/pythonX.Y/os.py` under the prefix
+    version_suffix=$(target/release/rustpython -c 'import sys; sys.stdout.write("%d.%d\n" % sys.version_info[:2])')
+    mkdir -p "${PREFIX_PATH}/lib/python${version_suffix}"
+    cp -R Lib/. "${PREFIX_PATH}/lib/python${version_suffix}"
+  } >&4 2>&1
+  make_python_symlinks rustpython
+}
+
 pypy_architecture() {
   case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
@@ -1596,6 +1610,19 @@ require_java() {
   fi
 
   export JAVA="$java"
+}
+
+require_cargo() {
+  if ! command -v cargo 1>/dev/null 2>&1; then
+    { echo
+      colorize 1 "ERROR"
+      echo ": This package must be built with Cargo, but python-build couldn't"
+      echo "find a \`cargo\` executable on your system. Please install Rust"
+      echo "(e.g. via https://rustup.rs) and try again."
+      echo
+    } >&3
+    return 1
+  fi
 }
 
 # Let Jython installer to generate shell script instead of python script even if there's `python2.7` available in `$PATH` (#800)
