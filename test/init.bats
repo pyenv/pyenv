@@ -99,6 +99,11 @@ OUT
 
   run pyenv-init --install
   assert_success
+  assert_output <<OUT
+pyenv: shell detected as bash
+pyenv: adding configuration to $HOME/.bashrc
+pyenv: adding configuration to $HOME/.profile
+OUT
 
   expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
   assert_equal "$expected_setup" "$(cat "$HOME/.bashrc")"
@@ -125,6 +130,11 @@ OUT
 
   run pyenv-init --install zsh
   assert_success
+  assert_output <<OUT
+pyenv: configuring for zsh
+pyenv: adding configuration to $HOME/.zshrc
+pyenv: adding configuration to $HOME/.zprofile
+OUT
 
   expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - zsh)"'
   assert_equal "$expected_setup" "$(cat "$HOME/.zshrc")"
@@ -140,6 +150,11 @@ OUT
 
   run pyenv-init --install fish
   assert_success
+  assert_output <<OUT
+pyenv: configuring for fish
+pyenv: setting fish universal variables for PYENV_ROOT and PATH
+pyenv: adding configuration to $HOME/.config/fish/config.fish
+OUT
 
   expected_fish_script=$'set -Ux PYENV_ROOT $HOME/.pyenv\nif functions -q fish_add_path\n  test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin\nelse\n  test -d $PYENV_ROOT/bin; and set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths\nend'
   expected_setup='pyenv init - fish | source'
@@ -180,12 +195,135 @@ OUT
 
   run pyenv-init --install bash
   assert_failure
-  assert_line "pyenv: cannot automatically apply changes to $HOME/.bashrc: it appears to already contain Pyenv-related code."
-  assert_line "pyenv: review the file's contents and apply changes manually if necessary."
-  assert_line "pyenv: run \`pyenv init bash\` to see the suggested setup."
+  assert_output <<OUT
+pyenv: configuring for bash
+pyenv: cannot automatically apply changes to $HOME/.bashrc: it appears to already contain Pyenv-related code.
+pyenv: no files were changed.
+pyenv: review the files listed above and apply changes manually if necessary.
+pyenv: run \`pyenv init bash\` to see the suggested setup.
+OUT
 
   assert_equal 'eval "$(pyenv init -)"' "$(cat "$HOME/.bashrc")"
   assert [ ! -e "$HOME/.profile" ]
+}
+
+@test "install checks the second startup file before changing the first" {
+  mkdir -p "$HOME"
+  echo 'eval "$(pyenv init -)"' > "$HOME/.profile"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: cannot automatically apply changes to $HOME/.profile: it appears to already contain Pyenv-related code."
+  assert_line "pyenv: no files were changed."
+
+  assert [ ! -e "$HOME/.bashrc" ]
+  assert_equal 'eval "$(pyenv init -)"' "$(cat "$HOME/.profile")"
+}
+
+@test "install lists every startup file with pyenv-related code" {
+  mkdir -p "$HOME"
+  echo 'eval "$(pyenv init -)"' > "$HOME/.zshrc"
+  echo 'export PYENV_ROOT="$HOME/.pyenv"' > "$HOME/.zprofile"
+
+  run pyenv-init --install zsh
+  assert_failure
+  assert_output <<OUT
+pyenv: configuring for zsh
+pyenv: cannot automatically apply changes to $HOME/.zshrc: it appears to already contain Pyenv-related code.
+pyenv: cannot automatically apply changes to $HOME/.zprofile: it appears to already contain Pyenv-related code.
+pyenv: no files were changed.
+pyenv: review the files listed above and apply changes manually if necessary.
+pyenv: run \`pyenv init zsh\` to see the suggested setup.
+OUT
+
+  assert_equal 'eval "$(pyenv init -)"' "$(cat "$HOME/.zshrc")"
+  assert_equal 'export PYENV_ROOT="$HOME/.pyenv"' "$(cat "$HOME/.zprofile")"
+}
+
+@test "install refuses a non-regular file without partial writes" {
+  mkdir -p "$HOME"
+  mkfifo "$HOME/.profile"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: $HOME/.profile is not a regular file"
+  assert_line "pyenv: no files were changed."
+
+  assert [ ! -e "$HOME/.bashrc" ]
+  assert [ -p "$HOME/.profile" ]
+}
+
+@test "install refuses unreadable startup file without partial writes" {
+  mkdir -p "$HOME"
+  touch "$HOME/.bashrc"
+  chmod a-r "$HOME/.bashrc"
+  skip_if_nonposix_security -r "$HOME/.bashrc"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: failed to inspect $HOME/.bashrc"
+
+  assert [ ! -e "$HOME/.profile" ]
+  assert [ ! -s "$HOME/.bashrc" ]
+}
+
+@test "install refuses a non-writable startup file without partial writes" {
+  mkdir -p "$HOME"
+  touch "$HOME/.profile"
+  chmod a-w "$HOME/.profile"
+  skip_if_nonposix_security -w "$HOME/.profile"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: $HOME/.profile is not writable"
+  assert_line "pyenv: no files were changed."
+
+  assert [ ! -e "$HOME/.bashrc" ]
+  assert [ ! -s "$HOME/.profile" ]
+}
+
+@test "install refuses a startup file it cannot create, before setting fish variables" {
+  mkdir -p "$HOME"
+  touch "$HOME/.config"
+  create_stub fish <<OUT
+touch "$PYENV_TEST_DIR/fish-called"
+OUT
+
+  run pyenv-init --install fish
+  assert_failure
+  assert_line "pyenv: cannot create $HOME/.config/fish/config.fish"
+  assert_line "pyenv: no files were changed."
+
+  assert [ ! -e "$PYENV_TEST_DIR/fish-called" ]
+  assert [ ! -s "$HOME/.config" ]
+}
+
+@test "install treats a broken symlink as a missing startup file" {
+  export PYENV_ROOT="$HOME/.pyenv"
+  mkdir -p "$PYENV_ROOT" "$HOME/dotfiles"
+  ln -s "$HOME/dotfiles/profile" "$HOME/.profile"
+
+  run pyenv-init --install bash
+  assert_success
+
+  expected_setup=$'export PYENV_ROOT="$HOME/.pyenv"\n[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"\neval "$(pyenv init - bash)"'
+  assert [ -L "$HOME/.profile" ]
+  assert_equal "$expected_setup" "$(cat "$HOME/dotfiles/profile")"
+}
+
+@test "install refuses a broken symlink whose target directory is missing" {
+  mkdir -p "$HOME"
+  ln -s "$HOME/missing/profile" "$HOME/.profile"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: cannot create $HOME/.profile"
+  assert_line "pyenv: no files were changed."
+
+  assert [ ! -e "$HOME/.bashrc" ]
+  assert [ ! -e "$HOME/missing" ]
+  #assert the symlink is untouched
+  assert_equal "$HOME/missing/profile" "$(readlink "$HOME/.profile")"
 }
 
 @test "install treats PYENV_ROOT as pyenv-related code" {
@@ -195,16 +333,6 @@ OUT
   run pyenv-init --install bash
   assert_failure
   assert_line "pyenv: cannot automatically apply changes to $HOME/.bashrc: it appears to already contain Pyenv-related code."
-}
-
-@test "install refuses unreadable startup file without partial writes" {
-  mkdir -p "$HOME/.bashrc"
-
-  run pyenv-init --install bash
-  assert_failure
-  assert_line "pyenv: failed to inspect $HOME/.bashrc"
-
-  assert [ ! -e "$HOME/.profile" ]
 }
 
 @test "install setup keeps fish block intact when generic lines already exist" {
@@ -225,7 +353,11 @@ OUT
   mkdir -p "$HOME"
 
   run pyenv-init --install nu
-  assert_failure "pyenv: cannot automatically configure startup files for nu"
+  assert_failure
+  assert_output <<'OUT'
+pyenv: configuring for nu
+pyenv: cannot automatically configure startup files for nu
+OUT
 }
 
 @test "option to skip rehash" {

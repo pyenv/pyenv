@@ -67,6 +67,11 @@ if [ -z "$shell" ]; then
   shell="${shell:-${SHELL:-}}"
   shell="${shell##*/}"
   shell="${shell%%-*}"
+  if [ "$mode" = "install" ]; then
+    echo "pyenv: shell detected as $shell" >&2
+  fi
+elif [ "$mode" = "install" ]; then
+  echo "pyenv: configuring for $shell" >&2
 fi
 
 profile=
@@ -336,45 +341,106 @@ function install_shell_startup_files() {
     ;;
   esac
 
-  local index
+  # Check every file before changing any of them, and report all problems at once.
+  local index failed=
   for ((index = 0; index < ${#files[@]}; index++)); do
-    check_startup_file "${files[$index]}" || return 1
+    check_startup_file "${files[$index]}" || failed=1
   done
+  if [[ -n $failed ]]; then
+    echo "pyenv: no files were changed." >&2
+    echo "pyenv: review the files listed above and apply changes manually if necessary." >&2
+    echo "pyenv: run \`pyenv init $shell\` to see the suggested setup." >&2
+    return 1
+  fi
 
   if [[ $shell == fish ]]; then
+    echo "pyenv: setting fish universal variables for PYENV_ROOT and PATH" >&2
     install_fish_user_paths || return 1
   fi
 
   for ((index = 0; index < ${#files[@]}; index++)); do
+    echo "pyenv: adding configuration to ${files[$index]}" >&2
     append_lines "${files[$index]}" "${lines[$index]}"
   done
 }
 
+# Report (and return non-zero) if a startup file can't be safely appended to.
 function check_startup_file() {
   local file="$1"
   local grep_status
 
+  # A broken symbolic link is the same as a missing file.
   if [[ ! -e $file ]]; then
-    return 0
+    check_startup_file_creatable "$file"
+    return
   fi
 
-  if [[ ! -f $file || ! -r $file ]]; then
-    echo "pyenv: failed to inspect $file" >&2
+  # Some unusual file types (e.g. a pipe) can cause grep to hang;
+  # Busybox grep reports no match for a directory instead of an error.
+  # So need to check the file type before reading.
+  # A symlink to a regular file also passes `[[ -f ]]`.
+  if [[ ! -f $file ]]; then
+    echo "pyenv: $file is not a regular file" >&2
     return 1
-  fi
-
-  if grep -Fi pyenv "$file" >/dev/null; then
+  elif grep -qFi pyenv "$file"; then
     echo "pyenv: cannot automatically apply changes to $file: it appears to already contain Pyenv-related code." >&2
-    echo "pyenv: review the file's contents and apply changes manually if necessary." >&2
-    echo "pyenv: run \`pyenv init $shell\` to see the suggested setup." >&2
     return 1
   else
     grep_status=$?
-    if [[ $grep_status == 1 ]]; then
-      return 0
+    # Some greps report no match for a directory instead of an error.
+    if [[ $grep_status != 1 ]]; then
+      # assuming grep has printed its own message about the underlying problem
+      echo "pyenv: failed to inspect $file" >&2
+      return "$grep_status"
     fi
-    echo "pyenv: failed to inspect $file" >&2
-    return "$grep_status"
+  fi
+
+  if [[ ! -w $file ]]; then
+    echo "pyenv: $file is not writable" >&2
+    return 1
+  fi
+}
+
+# A missing file is created by `append_lines` with `mkdir -p` and `>>`,
+# so its closest existing parent directory must be writable.
+# Through a broken symbolic link, `>>` creates the file the link points to,
+# but not that file's directory, so that directory must already exist.
+function check_startup_file_creatable() {
+  local file="$1"
+  local target="$1"
+  local dir link depth=0
+
+  while [[ -L $target ]] && (( depth++ < 40 )); do
+    link="$(readlink "$target")" || break
+    if [[ $link != /* && $target == */* ]]; then
+      link="${target%/*}/$link"
+    fi
+    target="$link"
+  done
+
+  if [[ $target != "$file" ]]; then
+    dir=.
+    if [[ $target == */* ]]; then
+      dir="${target%/*}"
+      dir="${dir:-/}"
+    fi
+  else
+    dir="$file"
+    while [[ $dir == */* ]]; do
+      dir="${dir%/*}"
+      dir="${dir:-/}"
+      if [[ -e $dir || -L $dir ]]; then
+        break
+      fi
+    done
+    if [[ ! -e $dir && ! -L $dir ]]; then
+      dir=.
+    fi
+  fi
+
+  if [[ -L $target || ! -d $dir || ! -w $dir || ! -x $dir ]]; then
+    echo "pyenv: cannot create $file" >&2
+    return 1
   fi
 }
 
