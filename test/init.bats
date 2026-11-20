@@ -264,6 +264,7 @@ OUT
   assert_line "pyenv: failed to inspect $HOME/.bashrc"
 
   assert [ ! -e "$HOME/.profile" ]
+  assert [ ! -s "$HOME/.bashrc" ]
 }
 
 @test "install refuses a non-writable startup file without partial writes" {
