@@ -240,15 +240,41 @@ OUT
   assert_equal 'export PYENV_ROOT="$HOME/.pyenv"' "$(cat "$HOME/.zprofile")"
 }
 
-@test "install refuses a read-only startup file without partial writes" {
-  [ "$(id -u)" -ne 0 ] || skip "-- root can write to read-only files"
+@test "install refuses a non-regular file without partial writes" {
   mkdir -p "$HOME"
-  touch "$HOME/.profile"
-  chmod a-w "$HOME/.profile"
+  mkfifo "$HOME/.profile"
 
   run pyenv-init --install bash
   assert_failure
-  assert_line "pyenv: cannot write to $HOME/.profile"
+  assert_line "pyenv: $HOME/.profile is not a regular file"
+  assert_line "pyenv: no files were changed."
+
+  assert [ ! -e "$HOME/.bashrc" ]
+  assert [ -p "$HOME/.profile" ]
+}
+
+@test "install refuses unreadable startup file without partial writes" {
+  mkdir -p "$HOME"
+  touch "$HOME/.bashrc"
+  chmod a-r "$HOME/.bashrc"
+  skip_if_nonposix_security -r "$HOME/.bashrc"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: failed to inspect $HOME/.bashrc"
+
+  assert [ ! -e "$HOME/.profile" ]
+}
+
+@test "install refuses a non-writable startup file without partial writes" {
+  mkdir -p "$HOME"
+  touch "$HOME/.profile"
+  chmod a-w "$HOME/.profile"
+  skip_if_nonposix_security -w "$HOME/.profile"
+
+  run pyenv-init --install bash
+  assert_failure
+  assert_line "pyenv: $HOME/.profile is not writable"
   assert_line "pyenv: no files were changed."
 
   assert [ ! -e "$HOME/.bashrc" ]
@@ -295,6 +321,8 @@ OUT
 
   assert [ ! -e "$HOME/.bashrc" ]
   assert [ ! -e "$HOME/missing" ]
+  #assert the symlink is untouched
+  assert_equal "$HOME/missing/profile" "$(readlink "$HOME/.profile")"
 }
 
 @test "install treats PYENV_ROOT as pyenv-related code" {
@@ -304,16 +332,6 @@ OUT
   run pyenv-init --install bash
   assert_failure
   assert_line "pyenv: cannot automatically apply changes to $HOME/.bashrc: it appears to already contain Pyenv-related code."
-}
-
-@test "install refuses unreadable startup file without partial writes" {
-  mkdir -p "$HOME/.bashrc"
-
-  run pyenv-init --install bash
-  assert_failure
-  assert_line "pyenv: failed to inspect $HOME/.bashrc"
-
-  assert [ ! -e "$HOME/.profile" ]
 }
 
 @test "install setup keeps fish block intact when generic lines already exist" {

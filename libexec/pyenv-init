@@ -375,20 +375,28 @@ function check_startup_file() {
     return
   fi
 
-  if grep -Fi pyenv "$file" >/dev/null; then
+  # Some unusual file types (e.g. a pipe) can cause grep to hang;
+  # Busybox grep reports no match for a directory instead of an error.
+  # So need to check the file type before reading.
+  # A symlink to a regular file also passes `[[ -f ]]`.
+  if [[ ! -f $file ]]; then
+    echo "pyenv: $file is not a regular file" >&2
+    return 1
+  elif grep -qFi pyenv "$file"; then
     echo "pyenv: cannot automatically apply changes to $file: it appears to already contain Pyenv-related code." >&2
     return 1
   else
     grep_status=$?
     # Some greps report no match for a directory instead of an error.
-    if [[ $grep_status != 1 || ! -f $file ]]; then
+    if [[ $grep_status != 1 ]]; then
+      # assuming grep has printed its own message about the underlying problem
       echo "pyenv: failed to inspect $file" >&2
       return "$grep_status"
     fi
   fi
 
   if [[ ! -w $file ]]; then
-    echo "pyenv: cannot write to $file" >&2
+    echo "pyenv: $file is not writable" >&2
     return 1
   fi
 }
