@@ -519,6 +519,19 @@ function print_path() {
         echo 'path=("${(@)path:#"${PYENV_ROOT}/shims"}")'
         print_path_prepend_shims
         ;;
+      bash )
+        local q="'" rep="'\\''"
+        local shims_pat="':${PYENV_ROOT//${q}/${rep}}/shims:'"
+        echo "if [[ \":\${PATH:-}:\" == *${shims_pat}* ]]; then"
+        echo '  PATH=":${PATH}:"'
+        echo "  while [[ \$PATH == *${shims_pat}* ]]; do"
+        echo "    PATH=\${PATH//${shims_pat}/:}"
+        echo '  done'
+        echo '  PATH="${PATH#:}"'
+        echo '  PATH="${PATH%:}"'
+        echo 'fi'
+        print_path_prepend_shims
+        ;;
       * )
         # Some distros (notably Debian-based) set Bash's SSH_SOURCE_BASHRC compilation option
         # that makes it source `bashrc` under SSH even when not interactive.
