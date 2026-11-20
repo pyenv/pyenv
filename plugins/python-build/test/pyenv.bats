@@ -86,6 +86,19 @@ OUT
   unstub python-build
 }
 
+@test "install multiple versions, a failed one is removed after an existing one is skipped" {
+  stub_python_build_lib
+  stub_python_build 'mkdir -p "$2/bin"; false'
+  stub pyenv-latest '-f -k * : shift 2; echo "$@"'
+  mkdir -p "${PYENV_ROOT}/versions/3.4.1/bin"
+
+  run pyenv-install -s 3.4.1 3.4.2
+  assert_failure
+  refute [ -d "${PYENV_ROOT}/versions/3.4.2" ]
+
+  unstub python-build
+}
+
 
 @test "install resolves a prefix" {
   stub_python_build_lib

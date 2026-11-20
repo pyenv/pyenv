@@ -205,6 +205,7 @@ for i in "${!DEFINITIONS[@]}"; do
   [ -n "$DEBUG" ] && VERSION_NAME="${VERSION_NAME}-debug"
   PREFIX="${PYENV_ROOT}/versions/${VERSION_ALIAS:-$VERSION_NAME}"
 
+  unset PREFIX_EXISTS
   [ -d "${PREFIX}" ] && PREFIX_EXISTS=1
 
   # If the installation prefix exists, prompt for confirmation unless
