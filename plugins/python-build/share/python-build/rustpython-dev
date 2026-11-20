@@ -1,0 +1,2 @@
+require_cargo
+install_git "rustpython-dev" "https://github.com/RustPython/RustPython" "main" rustpython ensurepip

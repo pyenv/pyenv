@@ -1150,6 +1150,12 @@ build_package_pyston() {
   make_python_symlinks pyston
 }
 
+# Print the `X.Y' version of the given interpreter.
+interpreter_version_suffix() {
+  # Use syntax accepted in both Py2 and Py3. Even though current Py2 holdouts (e.g. PyPy) support e.g. print()
+  "${1:?}" -c 'import sys; sys.stdout.write("%d.%d\n" % sys.version_info[:2])'
+}
+
 # Add missing `python', `pythonX' and `pythonX.Y' symlinks as per PEP 394.
 make_python_symlinks() {
   local seeder_basename version_suffix real_interpreter
@@ -1159,8 +1165,7 @@ make_python_symlinks() {
 
   local real_interpreter
   real_interpreter=$(resolve_link "${PREFIX_PATH}/bin/$seeder_basename" || echo $seeder_basename)
-  # Use syntax accepted in both Py2 and Py3. Even though current Py2 holdouts (e.g. PyPy) support e.g. print()
-  version_suffix=$("${PREFIX_PATH}/bin/$seeder_basename" -c 'import sys; sys.stdout.write("%d.%d\n" % sys.version_info[:2])')
+  version_suffix=$(interpreter_version_suffix "${PREFIX_PATH}/bin/$seeder_basename")
   for interpreter_name in "${interpreter_names[@]}"; do
     for name in "$interpreter_name" "$interpreter_name${version_suffix%.*}" "$interpreter_name${version_suffix}"; do
       [[ -e "${PREFIX_PATH}/bin/$name" ]] || ln -fs "${real_interpreter}" "${PREFIX_PATH}/bin/$name"
@@ -1201,6 +1206,21 @@ build_package_micropython() {
     ln -fs micropython "${PREFIX_PATH}/bin/python"
     mkdir -p "${PREFIX_PATH}/lib/micropython"
   }>&4 2>&1
+}
+
+build_package_rustpython() {
+  local version_suffix
+  # `--target-dir target` keeps the binary at a known path even if CARGO_TARGET_DIR is set
+  { cargo build --release --locked --target-dir target
+    mkdir -p "${PREFIX_PATH}/bin"
+    cp target/release/rustpython "${PREFIX_PATH}/bin/rustpython"
+    # RustPython finds its stdlib through a CPython-style landmark search
+    # for `lib/pythonX.Y/os.py` under the prefix
+    version_suffix=$(interpreter_version_suffix target/release/rustpython)
+    mkdir -p "${PREFIX_PATH}/lib/python${version_suffix}"
+    cp -R Lib/. "${PREFIX_PATH}/lib/python${version_suffix}"
+  } >&4 2>&1
+  make_python_symlinks rustpython
 }
 
 pypy_architecture() {
@@ -1596,6 +1616,19 @@ require_java() {
   fi
 
   export JAVA="$java"
+}
+
+require_cargo() {
+  if ! command -v cargo 1>/dev/null 2>&1; then
+    { echo
+      colorize 1 "ERROR"
+      echo ": This package must be built with Cargo, but python-build couldn't"
+      echo "find a \`cargo\` executable on your system. Please install Rust"
+      echo "(e.g. via https://rustup.rs) and try again."
+      echo
+    } >&3
+    return 1
+  fi
 }
 
 # Let Jython installer to generate shell script instead of python script even if there's `python2.7` available in `$PATH` (#800)
