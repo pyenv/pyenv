@@ -34,7 +34,6 @@ run_with_script() {
 
 @test "interactive download progress is both shown and logged" {
   check_script_available
-  export TMPDIR="$BATS_TEST_TMPDIR"
   stub curl '** -o * ** --no-silent ** http://example.com/* : "'"$BASH"'" -ec '\''echo download-progress >&2; "$FIXTURE_ROOT/fake_downloader" "$@"'\'' "$@"'
 
   run run_with_script python-build "$FIXTURE_ROOT/definitions/without-checksum" "$INSTALL_ROOT"
@@ -65,7 +64,6 @@ OUT
 
 @test "interactive aria2c output is emulated by printing summaries" {
   check_script_available
-  export TMPDIR="$BATS_TEST_TMPDIR"
   export PYTHON_BUILD_ARIA2_OPTS=
   export -n PYTHON_BUILD_HTTP_CLIENT
   stub aria2c '** --summary-interval=* ** http://example.com/* : "'"$BASH"'" -ec '\''echo download-progress; "$FIXTURE_ROOT/fake_downloader" aria2c "$@"'\'' "$@"'
