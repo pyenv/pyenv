@@ -981,17 +981,23 @@ build_package_warn_unsupported() {
 
 # Write a command to stdout (the build log) together with the build-related
 # environment variables that are set, so the line can be copy-pasted and rerun
-# by hand from the build directory. Then run the command.
+# by hand from the build directory. Unless in verbose mode (where the log is
+# already shown), also print the command without the variables to the console.
+# Then run the command.
 log_and_run() {
-  local var line=""
+  local var vars="" cmd
   for var in CC CFLAGS CPPFLAGS LDFLAGS LIBS PKG_CONFIG_PATH \
     MACOSX_DEPLOYMENT_TARGET KERNEL_BITS TCLTK_CFLAGS TCLTK_LIBS; do
     if [ -n "${!var}" ]; then
-      line="${line}${var}=$(printf '%q' "${!var}") "
+      vars="${vars}${var}=$(printf '%q' "${!var}") "
     fi
   done
-  line="${line}$(printf '%q ' "$@")"
-  echo "python-build: running: ${line% }"
+  cmd="$(printf '%q ' "$@")"
+  cmd="${cmd% }"
+  echo "python-build: running: ${vars}${cmd}"
+  if [ -z "$VERBOSE" ]; then
+    echo "python-build: running: ${cmd}" >&3
+  fi
   "$@"
 }
 
