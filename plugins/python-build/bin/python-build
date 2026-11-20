@@ -1235,6 +1235,18 @@ pypy_architecture() {
   esac
 }
 
+pypy_binary_unavailable() {
+  local archmsg="$1"
+  local source_archive="$2"
+  { echo
+    colorize 1 "ERROR"
+    echo ": The binary distribution of PyPy is not available for ${archmsg}."
+    echo "try 'https://downloads.python.org/pypy/${source_archive}' to build from source."
+    echo
+  } >&2
+  exit 1
+}
+
 graalpy_architecture() {
   case "${_PYTHON_BUILD_CACHE_UNAME_S:=$(uname -s)}" in
   "Darwin" )
