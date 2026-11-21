@@ -5,9 +5,24 @@ set -euo pipefail
 
 PYENV_VERSION_ORIGIN=
 
-OLDIFS="$IFS"
-IFS=$'\n' scripts=(`pyenv-hooks version-origin`)
-IFS="$OLDIFS"
+# Hook scripts are listed by a separate process, `pyenv-hooks'.
+# Don't launch it when no hook path has a directory for the command.
+hook_dirs_exist() {
+  local hook_path
+  local -a hook_paths
+  IFS=: read -r -a hook_paths <<< "${PYENV_HOOK_PATH:-}"
+  for hook_path in ${hook_paths[@]+"${hook_paths[@]}"}; do
+    [[ -d $hook_path/$1 ]] && return 0
+  done
+  return 1
+}
+
+scripts=()
+if hook_dirs_exist version-origin; then
+  OLDIFS="$IFS"
+  IFS=$'\n' scripts=(`pyenv-hooks version-origin`)
+  IFS="$OLDIFS"
+fi
 # bash < 4.4 (incl. macOS's 3.2) treats an empty array as unbound under set -u,
 # and hooks are third-party code, so relax nounset while sourcing them
 set +u
