@@ -96,8 +96,10 @@ for version in ${versions[@]+"${versions[@]}"} "$system"; do
       version_path="$(pyenv-prefix "${version}" 2>/dev/null)" || \
           { nonexistent_versions+=("$version"); continue; }
     fi
-    # resolve $version for hooks
-    version="$(basename "$version_path")"
+    # resolve $version for hooks: what `basename "$version_path"' would print
+    version="$version_path"
+    while [[ $version == */ ]]; do version="${version%/}"; done
+    version="${version##*/}"
     PYENV_COMMAND_PATH="$version_path/bin/${PYENV_COMMAND}"
     unset version_path
   fi
@@ -106,9 +108,24 @@ for version in ${versions[@]+"${versions[@]}"} "$system"; do
   fi
 done
 
-OLDIFS="$IFS"
-IFS=$'\n' scripts=(`pyenv-hooks which`)
-IFS="$OLDIFS"
+# Hook scripts are listed by a separate process, `pyenv-hooks'.
+# Don't launch it when no hook path has a directory for the command.
+hook_dirs_exist() {
+  local hook_path
+  local -a hook_paths
+  IFS=: read -r -a hook_paths <<< "${PYENV_HOOK_PATH:-}"
+  for hook_path in ${hook_paths[@]+"${hook_paths[@]}"}; do
+    [[ -d $hook_path/$1 ]] && return 0
+  done
+  return 1
+}
+
+scripts=()
+if hook_dirs_exist which; then
+  OLDIFS="$IFS"
+  IFS=$'\n' scripts=(`pyenv-hooks which`)
+  IFS="$OLDIFS"
+fi
 # bash < 4.4 (incl. macOS's 3.2) treats an empty array as unbound under set -u,
 # and hooks are third-party code, so relax nounset while sourcing them
 set +u
