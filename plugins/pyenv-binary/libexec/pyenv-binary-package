@@ -66,14 +66,16 @@ latest )
   echo "pyenv-binary: \`latest' cannot be used as an entry name" >&2
   exit 1
   ;;
+esac
+
+source "${BASH_SOURCE%/*}/../lib/common.bash"
 # The entry becomes a directory name under versions/. `pyenv install' does not
 # validate the alias, and `save' only checks once the build is done, so refuse
 # a name that could point elsewhere before compiling anything.
-*/* | .. | . )
+if ! is_name_safe "$entry"; then
   echo "pyenv-binary: invalid entry name \`${entry}'" >&2
   exit 1
-  ;;
-esac
+fi
 
 # `pyenv install' puts a `<version>:<alias>' build under versions/<alias>.
 pyenv-install ${verbose:+--verbose} "$spec"

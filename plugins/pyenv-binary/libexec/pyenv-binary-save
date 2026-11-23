@@ -59,29 +59,22 @@ if [ -z "$version" ]; then
   exit 1
 fi
 
-# A version is a single directory name under versions/. With no slash allowed,
-# the only remaining names that could point elsewhere are `.' and `..'.
-case "$version" in
-*/* | .. | . )
+source "${BASH_SOURCE%/*}/../lib/common.bash"
+if ! is_name_safe "$version"; then
   echo "pyenv-binary: invalid version name \`${version}'" >&2
   exit 1
-  ;;
-esac
+fi
 
-case "$package_name" in
-*/* | .. | . | *[[:cntrl:]]* )
+if [ -n "$package_name" ] && ! is_name_safe "$package_name"; then
   echo "pyenv-binary: invalid package name \`${package_name}'" >&2
   exit 1
-  ;;
-esac
+fi
 
 source_version="${source_version:-$version}"
-case "$source_version" in
-*/* | .. | . | *[[:cntrl:]]* )
+if ! is_name_safe "$source_version"; then
   echo "pyenv-binary: invalid source version \`${source_version}'" >&2
   exit 1
-  ;;
-esac
+fi
 
 prefix="${PYENV_ROOT}/versions/${version}"
 if [ ! -d "${prefix}/bin" ]; then

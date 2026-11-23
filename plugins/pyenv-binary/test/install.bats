@@ -57,6 +57,14 @@ STUB
   assert_success ""
 }
 
+@test "rejects unsafe version names" {
+  local name
+  for name in '' . .. ../3.14.7 $'3.14.7\nother'; do
+    run pyenv-binary-install "$name"
+    assert_failure "pyenv-binary: invalid version name \`$name'"
+  done
+}
+
 @test "a plugin definition overrides a published binary without its checksum" {
   create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
   use_manifest

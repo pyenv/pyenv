@@ -19,12 +19,11 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
-case "$1" in
-*/* | .. | . | *[[:cntrl:]]* )
+source "${BASH_SOURCE%/*}/../lib/common.bash"
+if ! is_name_safe "$1"; then
   echo "pyenv-binary: invalid version name \`$1'" >&2
   exit 1
-  ;;
-esac
+fi
 
 requested="$1"
 os="$(uname -s)"

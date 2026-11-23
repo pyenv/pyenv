@@ -21,12 +21,11 @@ fi
 
 version="$1"
 
-case "$version" in
-*/* | .. | . | *[[:cntrl:]]* )
+source "${BASH_SOURCE%/*}/../lib/common.bash"
+if ! is_name_safe "$version"; then
   echo "pyenv-binary: invalid version name \`${version}'" >&2
   exit 1
-  ;;
-esac
+fi
 
 version="$(pyenv-latest -f -k "$version")"
 
