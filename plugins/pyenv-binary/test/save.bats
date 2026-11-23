@@ -1,6 +1,11 @@
 #!/usr/bin/env bats
 
 load test_helper
+load binary_helper
+
+_setup() {
+  PATH="${BATS_TEST_TMPDIR}/stubs:${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
+}
 
 create_version() {
   mkdir -p "${PYENV_ROOT}/versions/$1/bin"
@@ -120,6 +125,16 @@ platform() {
   assert_success "build_prefix=${PYENV_ROOT}/versions/3.12.7"
 }
 
+@test "records the detected distribution" {
+  create_version "3.12.7"
+  set_platform Darwin arm64 'macos 15.5'
+
+  run pyenv-binary-save "3.12.7" "${BATS_TEST_TMPDIR}/dist"
+  assert_success
+  run grep '^distro=' "${BATS_TEST_TMPDIR}/dist/3.12.7-darwin-arm64.meta"
+  assert_success "distro=macos 15.5"
+}
+
 @test "fails when readelf is not available" {
   create_version "3.12.7"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
@@ -170,6 +185,7 @@ case "$1" in
   -m) echo arm64 ;;
 esac
 STUB
+  create_stub sw_vers 'echo 15.5'
   create_path_executable otool <<'STUB'
 prefix="${PYENV_ROOT}/versions/3.12.7"
 cat <<EOF
