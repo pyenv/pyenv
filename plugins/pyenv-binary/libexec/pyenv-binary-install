@@ -100,11 +100,11 @@ if [ -z "$entry" ]; then
   echo "pyenv-binary: no binary available for $requested on $os/$arch" >&2
   exit 1
 fi
-definitions="$(pyenv-install --list --bare)"
-if grep -qxF -- "$entry" <<< "$definitions"; then
-  pyenv-install "$entry:$version"
+for definition in "$PYENV_ROOT"/plugins/*/share/pyenv-binary/definitions/"$entry"; do
+  [ -f "$definition" ] || continue
+  pyenv-install "$definition:$version"
   exit
-fi
+done
 
 if ! [[ "$expected_sha" =~ ^[0-9a-fA-F]{64}$ ]]; then
   echo "pyenv-binary: invalid checksum for $entry" >&2
