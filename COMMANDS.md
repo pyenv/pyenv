@@ -94,6 +94,15 @@ or, if you prefer 3.3.3 over 2.7.6,
 You can use the `-f/--force` flag to force setting versions even if some aren't installed.
 This is mainly useful in special cases like provisioning scripts.
 
+You can use `--add` to add one or more versions to the existing `.python-version` file without
+replacing previously configured versions. By default (or with `--append`), new versions are
+appended to the end; pass `--prepend` to insert them at the beginning (promoting an already-listed
+version to the top without creating duplicates):
+
+    $ pyenv local --add 3.12.0
+    $ pyenv local --add --append 3.13.0
+    $ pyenv local --add --prepend 3.14.0
+
 
 ## `pyenv global`
 
