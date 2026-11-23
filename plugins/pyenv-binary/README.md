@@ -19,15 +19,31 @@ by the `xz` package).
 
 ## Commands
 
+### `pyenv binary find <version>`
+
+Prints the published package entry for the current platform and the checksum
+of its definition, separated by a tab. `<version>` is an exact definition name;
+prefixes are not resolved.
+
+Published packages are recorded in `share/pyenv-binary/versions/<version>`, one
+file per definition name. Each line holds the platform part of an entry name,
+as `package-name` generates it, and the definition's SHA256, separated by a
+tab. Add a line when publishing a package. For example, `versions/3.14.7`
+contains:
+
+```text
+ubuntu-24.04-x86_64	e63dbcb981ec9ba83a2bc9b4d8b369620cec4aa45394559d719c5606ee9ff718
+```
+
+A package is used only on the distribution release (macOS major version) and
+architecture it was built for.
+
 ### `pyenv binary install <version>`
 
-Installs a matching published package from pyenv.github.io under `<version>`.
-The command selects by OS, architecture and distribution; on macOS, an archive
-built on an older major release can also be used. Available packages and their
-definition checksums are recorded in `share/pyenv-binary/versions`. Add an entry
-there when publishing a new package. The definition checks its system-library
-requirements when an `ldconfig` cache is available; otherwise, it warns and
-proceeds.
+Resolves `<version>` like `pyenv install` does, then installs the package that
+`find` reports for it from pyenv.github.io under that name. It doesn't fall back
+to an older version. The definition checks its system-library requirements
+when an `ldconfig` cache is available; otherwise, it warns and proceeds.
 
 ```sh
 pyenv binary install 3.14.7

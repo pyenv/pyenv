@@ -1,3 +1,9 @@
+use_records() {
+  records="$BATS_TEST_TMPDIR/versions"
+  mkdir -p "$records"
+  export _PYENV_BINARY_VERSIONS_DIR="$records"
+}
+
 # set_platform <uname -s> <uname -m> "<distribution> <release>"
 set_platform() {
   create_stub uname \

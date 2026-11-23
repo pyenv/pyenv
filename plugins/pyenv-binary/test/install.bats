@@ -1,21 +1,14 @@
 #!/usr/bin/env bats
 
 load test_helper
+load binary_helper
 
-host_distro() {
-  if [ -r /etc/os-release ]; then
-    . /etc/os-release
-    printf '%s %s' "$ID" "$VERSION_ID" | tr '[:upper:]' '[:lower:]'
-  else
-    printf '%s %s' "$(lsb_release -si)" "$(lsb_release -sr)" | tr '[:upper:]' '[:lower:]'
-  fi
-}
-
-use_manifest() {
-  export _PYENV_BINARY_VERSIONS_DIR="${BATS_TEST_TMPDIR}/versions"
-  mkdir -p "$_PYENV_BINARY_VERSIONS_DIR"
-  manifest="$_PYENV_BINARY_VERSIONS_DIR/3.14"
-  printf 'source_version\tentry\tos\tarch\tdistro\tsha256\n' > "$manifest"
+_setup() {
+  PATH="${BATS_TEST_TMPDIR}/stubs:${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
+  use_records
+  set_platform Linux x86_64 'ubuntu 24.04'
+  create_stub pyenv-latest '[ "$1 $2" = "-f -k" ] && echo "$3"'
+  # The checksum of the definition that `stub_downloads' serves
   definition_sha="4c4ed1afbfdaa1e4c3bf7bbb82d730cecb7e384da91eea4f3cc093fd545524d6"
 }
 
@@ -30,24 +23,19 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 case "$url" in
-*/3.14.7-ubuntu-24.04-x86_64 | */3.14.7-macos-15-arm64 | */3.14.10-ubuntu-24.04-x86_64 ) printf definition > "$output" ;;
+*/3.14.7-ubuntu-24.04-x86_64 ) printf definition > "$output" ;;
 * ) exit 1 ;;
 esac
 STUB
 }
 
 @test "rejects a modified published definition" {
-  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
-  use_manifest
-  printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%064d\n' \
-    "$(host_distro)" 0 >> "$manifest"
+  printf 'ubuntu-24.04-x86_64\t%064d\n' 0 > "$records/3.14.7"
   stub_downloads
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub pyenv-install 'echo installed'
 
   run pyenv-binary-install 3.14.7
-  assert_failure
-  [[ "$output" == *'checksum mismatch'* ]]
+  assert_failure "pyenv-binary: checksum mismatch for 3.14.7-ubuntu-24.04-x86_64"
 }
 
 @test "completion does not offer source-only versions" {
@@ -66,22 +54,17 @@ STUB
 }
 
 @test "a plugin binary definition overrides a published binary without its checksum" {
-  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
-  use_manifest
   export TMPDIR="$BATS_TEST_TMPDIR/temp"
   mkdir -p "$TMPDIR"
   local entry="3.14.7-ubuntu-24.04-x86_64"
-  printf '3.14.7\t%s\tLinux\tx86_64\t%s\t%s\n' "$entry" \
-    "$(host_distro)" "" >> "$manifest"
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
+  printf 'ubuntu-24.04-x86_64\t\n' > "$records/3.14.7"
   create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
-  PATH="${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
   mkdir -p "$PYENV_ROOT/plugins/first/share/pyenv-binary/definitions" "$PYENV_ROOT/plugins/second/share/pyenv-binary/definitions"
   printf '%s\n' 'mkdir -p "$PREFIX_PATH"; echo first > "$PREFIX_PATH/marker"' \
     > "$PYENV_ROOT/plugins/first/share/pyenv-binary/definitions/$entry"
   echo 'exit 1' > "$PYENV_ROOT/plugins/second/share/pyenv-binary/definitions/$entry"
 
-  run pyenv-binary-install 3.14
+  run pyenv-binary-install 3.14.7
   assert_success ""
   assert_equal first "$(cat "$PYENV_ROOT/versions/3.14.7/marker")"
   [ ! -e "$BATS_TEST_TMPDIR/downloaded" ]
@@ -89,17 +72,13 @@ STUB
 }
 
 @test "source definition directories do not override a published binary" {
-  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
-  use_manifest
   local entry="3.14.7-ubuntu-24.04-x86_64"
-  printf '3.14.7\t%s\tLinux\tx86_64\t%s\t%s\n' "$entry" "$(host_distro)" \
-    cff275fca6f9076c33577ef1f9dc33c50e01b57b2ee43570ab494d671bc94c68 >> "$manifest"
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
+  printf 'ubuntu-24.04-x86_64\t%s\n' \
+    cff275fca6f9076c33577ef1f9dc33c50e01b57b2ee43570ab494d671bc94c68 > "$records/3.14.7"
   create_stub curl <<'STUB'
 [ "$4" = https://pyenv.github.io/pythons/binaries/3.14.7-ubuntu-24.04-x86_64 ] || exit 1
 printf '%s\n' 'mkdir -p "$PREFIX_PATH"; echo binary > "$PREFIX_PATH/marker"' > "$3"
 STUB
-  PATH="${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
   export PYTHON_BUILD_DEFINITIONS="$BATS_TEST_TMPDIR/custom definitions"
   mkdir -p "$PYTHON_BUILD_DEFINITIONS" "$PYENV_ROOT/plugins/custom/share/python-build"
   echo 'exit 1' > "$PYTHON_BUILD_DEFINITIONS/$entry"
@@ -111,86 +90,66 @@ STUB
 }
 
 @test "installs a matching published binary with an uppercase checksum" {
-  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
-  use_manifest
   local uppercase_sha="$(printf '%s' "$definition_sha" | tr '[:lower:]' '[:upper:]')"
-  printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
-    "$definition_sha" >> "$manifest"
-  printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
-    "$(host_distro | tr '[:lower:]' '[:upper:]')" "$uppercase_sha" \
-    >> "$manifest"
+  printf 'ubuntu-24.04-x86_64\t%s\n' "$uppercase_sha" > "$records/3.14.7"
   stub_downloads
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub pyenv-install <<'STUB'
 definition="${1%:*}"
 printf '%s:%s\n' "${definition##*/}" "${1##*:}"
 cat "$definition"
 STUB
 
-  run pyenv-binary-install 3.14
+  run pyenv-binary-install 3.14.7
   assert_success "3.14.7-ubuntu-24.04-x86_64:3.14.7
 definition"
 }
 
-@test "a version prefix selects the latest published binary" {
-  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
-  use_manifest
-  printf '3.14.10\t3.14.10-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
-    "$(host_distro)" "$definition_sha" >> "$manifest"
-  printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
-    "$(host_distro)" "$definition_sha" >> "$manifest"
+@test "resolves a version prefix before looking up a binary" {
+  create_stub pyenv-latest '[ "$*" = "-f -k 3.14" ] && echo 3.14.7'
+  printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
+  printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.10"
   stub_downloads
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub pyenv-install 'echo "${1##*:}"'
 
   run pyenv-binary-install 3.14
-  assert_success "3.14.10"
-}
-
-@test "fails when no published binary matches the host" {
-  use_manifest
-  printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
-    "$definition_sha" >> "$manifest"
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
-
-  run pyenv-binary-install 3.14.7
-  assert_failure "pyenv-binary: no binary available for 3.14.7 on Linux/x86_64"
-}
-
-@test "does not select a package for another Linux release" {
-  create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 22.04;; esac'
-  use_manifest
-  local other_release="ubuntu 24.04"
-  [ "$(host_distro)" = "$other_release" ] && other_release="ubuntu 22.04"
-  printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
-    "$other_release" "$definition_sha" >> "$manifest"
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
-
-  run pyenv-binary-install 3.14.7
-  assert_failure "pyenv-binary: no binary available for 3.14.7 on Linux/x86_64"
-}
-
-@test "uses a macOS binary built on an older release" {
-  use_manifest
-  printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
-    "$definition_sha" >> "$manifest"
-  stub_downloads
-  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
-  create_stub sw_vers 'echo 26.6.2'
-  create_stub pyenv-install 'echo "${1##*:}"'
-
-  run pyenv-binary-install 3.14.7
   assert_success "3.14.7"
 }
 
-@test "rejects a macOS binary built on a newer patch release" {
-  use_manifest
-  printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
-    "$definition_sha" >> "$manifest"
-  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
-  create_stub sw_vers 'echo 15.7.8'
-  create_stub pyenv-install 'echo installed'
+@test "does not fall back to an older binary when the resolved version has none" {
+  create_stub pyenv-latest '[ "$*" = "-f -k 3.14" ] && echo 3.14.10'
+  printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
+
+  run pyenv-binary-install 3.14
+  assert_failure "pyenv-binary: no binary available for 3.14.10 on Linux/x86_64"
+}
+
+@test "a failed source listing does not download or install a binary" {
+  rm "$BATS_TEST_TMPDIR/stubs/pyenv-latest"
+  printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
+  create_stub pyenv-install 'echo "listing failed" >&2; exit 1'
+  create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
 
   run pyenv-binary-install 3.14.7
-  assert_failure "pyenv-binary: no binary available for 3.14.7 on Darwin/arm64"
+  assert_failure "listing failed"
+  [ ! -e "$BATS_TEST_TMPDIR/downloaded" ]
+}
+
+@test "an empty published checksum is refused before downloading" {
+  printf 'ubuntu-24.04-x86_64\t\n' > "$records/3.14.7"
+  create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"'
+
+  run pyenv-binary-install 3.14.7
+  assert_failure "pyenv-binary: invalid checksum for 3.14.7-ubuntu-24.04-x86_64"
+  [ ! -e "$BATS_TEST_TMPDIR/downloaded" ]
+}
+
+@test "a failed download leaves no temporary files" {
+  export TMPDIR="$BATS_TEST_TMPDIR/temp"
+  mkdir -p "$TMPDIR"
+  printf 'ubuntu-24.04-x86_64\t%s\n' "$definition_sha" > "$records/3.14.7"
+  create_stub curl 'exit 1'
+
+  run pyenv-binary-install 3.14.7
+  assert_failure
+  assert_equal "" "$(find "$TMPDIR" -mindepth 1)"
 }
