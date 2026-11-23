@@ -66,7 +66,7 @@ python-build's definition directory.
 
 Prints the automatically generated entry name without building anything. It
 uses the distribution and release detected by Python-Build, which falls back to
-the system name and release reported by `uname`; macOS uses the macOS version.
+the system name and release reported by `uname`; macOS uses the major version.
 All names include the architecture.
 
 ```sh

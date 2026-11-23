@@ -18,6 +18,10 @@ package_suffix() {
   distro="$(slug "${1% *}")" || return
   release="$(slug "${1##* }")" || return
   arch="$(slug "$2")" || return
+  # Builds are made for each macOS major version.
+  if [ "$distro" = macos ]; then
+    release="${release%%.*}"
+  fi
 
   if [ -z "$distro" ] || [ -z "$release" ] || [ -z "$arch" ]; then
     echo "pyenv-binary: could not determine the package platform" >&2

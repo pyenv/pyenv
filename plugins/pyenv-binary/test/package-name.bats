@@ -37,11 +37,11 @@ _setup() {
   assert_success "3.13.14-debian-12-x86_64"
 }
 
-@test "generates a package name for macOS" {
+@test "generates a package name for the macOS major version" {
   set_platform Darwin arm64 'macos 15.5'
 
   run pyenv-binary-package-name 3.13.14
-  assert_success "3.13.14-macos-15.5-arm64"
+  assert_success "3.13.14-macos-15-arm64"
 }
 
 @test "fails without a distribution release" {
