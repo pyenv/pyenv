@@ -48,7 +48,7 @@ esac
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 base_url="https://pyenv.github.io/pythons/binaries"
-manifest_dir="$(dirname "${BASH_SOURCE[0]}")/../share/pyenv-binary/versions"
+manifest_dir="${_PYENV_BINARY_VERSIONS_DIR:-$(dirname "${BASH_SOURCE[0]}")/../share/pyenv-binary/versions}"
 case "$requested" in
 *.*.* ) manifests=( "$manifest_dir/${requested%.*}" ) ;;
 *.* ) manifests=( "$manifest_dir/$requested" ) ;;

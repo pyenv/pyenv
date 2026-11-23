@@ -12,11 +12,10 @@ host_distro() {
 }
 
 use_manifest() {
-  local plugin="${BATS_TEST_TMPDIR}/plugin"
-  mkdir -p "$plugin/libexec" "$plugin/share/pyenv-binary/versions"
-  cp "${BATS_TEST_DIRNAME}/../libexec/pyenv-binary-install" "$plugin/libexec/"
-  PATH="$plugin/libexec:$PATH"
-  printf 'source_version\tentry\tos\tarch\tdistro\tsha256\n' > "$plugin/share/pyenv-binary/versions/3.14"
+  export _PYENV_BINARY_VERSIONS_DIR="${BATS_TEST_TMPDIR}/versions"
+  mkdir -p "$_PYENV_BINARY_VERSIONS_DIR"
+  manifest="$_PYENV_BINARY_VERSIONS_DIR/3.14"
+  printf 'source_version\tentry\tos\tarch\tdistro\tsha256\n' > "$manifest"
   definition_sha="4c4ed1afbfdaa1e4c3bf7bbb82d730cecb7e384da91eea4f3cc093fd545524d6"
 }
 
@@ -41,7 +40,7 @@ STUB
   create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
   use_manifest
   printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%064d\n' \
-    "$(host_distro)" 0 >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$(host_distro)" 0 >> "$manifest"
   stub_downloads
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub pyenv-install '[ "$1" = --list ] && exit; echo installed'
@@ -65,7 +64,7 @@ STUB
   mkdir -p "$TMPDIR"
   local entry="3.14.7-ubuntu-24.04-x86_64"
   printf '3.14.7\t%s\tLinux\tx86_64\t%s\t%s\n' "$entry" \
-    "$(host_distro)" "" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$(host_distro)" "" >> "$manifest"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
   PATH="${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
@@ -86,7 +85,7 @@ STUB
   use_manifest
   local entry="3.14.7-ubuntu-24.04-x86_64"
   printf '3.14.7\t%s\tLinux\tx86_64\t%s\t%s\n' "$entry" \
-    "$(host_distro)" "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$(host_distro)" "$definition_sha" >> "$manifest"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub curl 'touch "$BATS_TEST_TMPDIR/downloaded"; exit 1'
   PATH="${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
@@ -107,10 +106,10 @@ STUB
   use_manifest
   local uppercase_sha="$(printf '%s' "$definition_sha" | tr '[:lower:]' '[:upper:]')"
   printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
-    "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$definition_sha" >> "$manifest"
   printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
     "$(host_distro | tr '[:lower:]' '[:upper:]')" "$uppercase_sha" \
-    >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    >> "$manifest"
   stub_downloads
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub pyenv-install <<'STUB'
@@ -129,9 +128,9 @@ definition"
   create_stub lsb_release 'case "$1" in -si) echo Ubuntu;; -sr) echo 24.04;; esac'
   use_manifest
   printf '3.14.10\t3.14.10-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
-    "$(host_distro)" "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$(host_distro)" "$definition_sha" >> "$manifest"
   printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
-    "$(host_distro)" "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$(host_distro)" "$definition_sha" >> "$manifest"
   stub_downloads
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
   create_stub pyenv-install '[ "$1" = --list ] && exit; echo "${1##*:}"'
@@ -143,7 +142,7 @@ definition"
 @test "fails when no published binary matches the host" {
   use_manifest
   printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
-    "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$definition_sha" >> "$manifest"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
 
   run pyenv-binary-install 3.14.7
@@ -156,7 +155,7 @@ definition"
   local other_release="ubuntu 24.04"
   [ "$(host_distro)" = "$other_release" ] && other_release="ubuntu 22.04"
   printf '3.14.7\t3.14.7-ubuntu-24.04-x86_64\tLinux\tx86_64\t%s\t%s\n' \
-    "$other_release" "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$other_release" "$definition_sha" >> "$manifest"
   create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
 
   run pyenv-binary-install 3.14.7
@@ -166,7 +165,7 @@ definition"
 @test "uses a macOS binary built on an older release" {
   use_manifest
   printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
-    "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$definition_sha" >> "$manifest"
   stub_downloads
   create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
   create_stub sw_vers 'echo 26.6.2'
@@ -179,7 +178,7 @@ definition"
 @test "rejects a macOS binary built on a newer patch release" {
   use_manifest
   printf '3.14.7\t3.14.7-macos-15-arm64\tDarwin\tarm64\tmacos 15.7.9\t%s\n' \
-    "$definition_sha" >> "$BATS_TEST_TMPDIR/plugin/share/pyenv-binary/versions/3.14"
+    "$definition_sha" >> "$manifest"
   create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
   create_stub sw_vers 'echo 15.7.8'
   create_stub pyenv-install '[ "$1" = --list ] && exit; echo installed'
