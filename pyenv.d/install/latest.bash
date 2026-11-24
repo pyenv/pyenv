@@ -15,9 +15,13 @@ pyenv_install_resolve_latest() {
           -e '/[0-9]+t$/d' | \
         awk '{
           orig = $0
-          flavor = orig
-          sub(/[0-9].*$/, "", flavor)
-          v = substr(orig, length(flavor) + 1)
+          flavor = ""
+          v = $0
+          if (match(v, "^[[:alnum:].]+-")) {
+            flavor = substr(v, 1, RLENGTH - 1) "."
+            v = substr(v, RLENGTH + 1)
+          }
+          sub(/t$/, "", v)
           pre_type = 4
           pre_num = 0
           if (match(v, "(rc|a|b|c)[0-9]+$")) {

@@ -190,6 +190,28 @@ python-build 3.14.0rc1 ${PYENV_ROOT}/versions/3.14.0rc1
   unstub pyenv-latest
 }
 
+@test "install :latest sorts dotted flavor versions correctly" {
+  stub_python_build_lib
+  stub_python_build_no_latest '--definitions : echo -e pypy2.7-7.3.23\\npypy2.7-8.0.1\\npypy2.7-8.0.2'
+  stub_python_build_no_latest
+  stub pyenv-latest '-f -k * : shift 2; echo "$@"'
+
+  pyenv-hooks install; unstub pyenv-hooks
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  export PYENV_HOOK_PATH="$PYENV_INSTALL_ROOT/pyenv.d"
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
+
+  run pyenv-install pypy2.7:latest
+  assert_success
+  assert_output <<!
+python-build pypy2.7-8.0.2 ${PYENV_ROOT}/versions/pypy2.7-8.0.2
+!
+
+  unstub python-build
+  unstub pyenv-latest
+}
+
 @test "install installs local versions by default" {
   stub_python_build_lib
   stub_python_build
