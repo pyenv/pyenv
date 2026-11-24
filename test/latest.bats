@@ -290,3 +290,15 @@ echo pypy2.7-8.0.1rc2
 pypy2.7-8.0.1rc2
 !
 }
+
+@test "3-component version outranks 2-component version when minor matches" {
+  create_stub pyenv-versions <<!
+echo 3.14
+echo 3.14.0
+!
+  run pyenv-latest 3
+  assert_success
+  assert_output <<!
+3.14.0
+!
+}

@@ -114,11 +114,11 @@ IFS=$'\n'
                }
                n = split(v, p, ".")
                v_pad = (n >= 1 ? p[1] : 0) "." (n >= 2 ? p[2] : 0) "." (n >= 3 ? p[3] : 0) "." (n >= 4 ? p[4] : 0)
-               print flavor v_pad "." pre_type "." pre_num "...|" orig
+               print flavor v_pad "." pre_type "." pre_num "." n "...|" orig
              }'))
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" \
-          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr -k5,5nr -k6,6nr -k7,7nr -k8,8nr -k9,9nr \
+          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr -k5,5nr -k6,6nr -k7,7nr -k8,8nr -k9,9nr -k10,10nr \
           | cut -f2 -d '|' \
         || true))
     DEFINITION="${DEFINITION_CANDIDATES[0]:-}"

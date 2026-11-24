@@ -168,6 +168,28 @@ python-build 3.14.0rc1 ${PYENV_ROOT}/versions/3.14.0rc1
   unstub python-build
 }
 
+@test "install :latest with --prerelease resolves to latest prerelease" {
+  stub_python_build_lib
+  stub_python_build_no_latest '--definitions : echo -e 3.14.0a1\\n3.14.0rc1'
+  stub_python_build_no_latest
+  stub pyenv-latest '-f -k --prerelease * : shift 3; echo "$@"'
+
+  pyenv-hooks install; unstub pyenv-hooks
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  export PYENV_HOOK_PATH="$PYENV_INSTALL_ROOT/pyenv.d"
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
+
+  run pyenv-install --prerelease 3.14:latest
+  assert_success
+  assert_output <<!
+python-build 3.14.0rc1 ${PYENV_ROOT}/versions/3.14.0rc1
+!
+
+  unstub python-build
+  unstub pyenv-latest
+}
+
 @test "install installs local versions by default" {
   stub_python_build_lib
   stub_python_build
