@@ -1,0 +1,30 @@
+# Copyright (c) 2026, Oracle and/or its affiliates.
+VERSION='25.0.5.1'
+RELEASE_TAG='graal-25.0.5.1'
+
+colorize 1 "GraalPy 23.1 and later installed by python-build use the faster Oracle GraalVM distribution" && echo
+colorize 1 "Oracle GraalVM uses the GFTC license, which is free for development and production use, see https://medium.com/graalvm/161527df3d76" && echo
+
+graalpy_arch="$(graalpy_architecture 2>/dev/null || true)"
+
+case "$graalpy_arch" in
+"linux-amd64" )
+  checksum="99277ddc99839650bb263cd57a81ade484d0e66d20b3edad5ff8ba0c4b7da36e"
+  ;;
+"linux-aarch64" )
+  checksum="66ef988cd50a6a657c33ff8c4955ad3608466c537338648dae8db6ea282faf03"
+  ;;
+"macos-aarch64" )
+  checksum="3367895543cf2c8414244ba4acea7c900f541f0a57d23efd45985333bad8ab54"
+  ;;
+* )
+  { echo
+    colorize 1 "ERROR"
+    echo ": No binary distribution of GraalPy is available for $(uname -sm)."
+    echo
+  } >&2
+  exit 1
+  ;;
+esac
+
+install_package "graalpy-${VERSION}" "https://github.com/oracle/graalpython/releases/download/${RELEASE_TAG}/graalpy-${VERSION}-${graalpy_arch}.tar.gz#${checksum}" copy ensurepip
