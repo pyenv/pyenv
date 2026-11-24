@@ -212,6 +212,28 @@ python-build pypy2.7-8.0.2 ${PYENV_ROOT}/versions/pypy2.7-8.0.2
   unstub pyenv-latest
 }
 
+@test "install :latest sorts graalpy versions correctly" {
+  stub_python_build_lib
+  stub_python_build_no_latest '--definitions : echo -e graalpython-22.2.0\\ngraalpy-community-25.0.3\\ngraalpy3.13-25.5.5'
+  stub_python_build_no_latest
+  stub pyenv-latest '-f -k * : shift 2; echo "$@"'
+
+  pyenv-hooks install; unstub pyenv-hooks
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  export PYENV_HOOK_PATH="$PYENV_INSTALL_ROOT/pyenv.d"
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
+
+  run pyenv-install graalpy:latest
+  assert_success
+  assert_output <<!
+python-build graalpy3.13-25.5.5 ${PYENV_ROOT}/versions/graalpy3.13-25.5.5
+!
+
+  unstub python-build
+  unstub pyenv-latest
+}
+
 @test "install installs local versions by default" {
   stub_python_build_lib
   stub_python_build
