@@ -10,7 +10,9 @@ pyenv_install_resolve_latest() {
       $(python-build --definitions | \
         grep -F "${DEFINITION_PREFIX}" | \
         grep "^${DEFINITION_TYPE}" | \
-        sed -E -e '/-dev$/d' -e '/-src$/d' -e '/(a|b|rc)[0-9]+$/d' -e '/[0-9]+t$/d' | \
+        sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' \
+          $(if [[ -z "${PRERELEASE:-}" ]]; then echo "-e /(a|b|rc|c)[0-9]+$/d"; fi) \
+          -e '/[0-9]+t$/d' | \
         sort -t. -k1,1r -k 2,2nr -k 3,3nr \
       || true))
     DEFINITION="${DEFINITION_CANDIDATES}"

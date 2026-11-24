@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # Summary: Print the latest installed or known version with the given prefix
-# Usage: pyenv latest [-k|--known] <prefix>
+# Usage: pyenv latest [-k|--known] [-p|--prerelease] <prefix>
 #
-#   -k/--known      Select from all known versions instead of installed
-#   -b/--bypass     (internal) On a resolution failure, do not print an error message
-#                   but rather print the argument unchanged
-#   -f/--force      (internal) Same as -b but also do not return a failure exit code
+#   -k/--known        Select from all known versions instead of installed
+#   -p/--prerelease   Include prerelease versions in resolution
+#   -b/--bypass       (internal) On a resolution failure, do not print an error message
+#                     but rather print the argument unchanged
+#   -f/--force        (internal) Same as -b but also do not return a failure exit code
 
 set -euo pipefail
 set -f
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
 FROM_KNOWN=
+PRERELEASE=
 BYPASS=
 FORCE=
 
@@ -20,6 +22,10 @@ do
     case "$1" in
         -k|--known)
             FROM_KNOWN=1
+            shift
+            ;;
+        -p|--prerelease)
+            PRERELEASE=1
             shift
             ;;
         -b|--bypass)
@@ -77,7 +83,8 @@ IFS=$'\n'
 
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
-          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+t?$/d' \
+          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' \
+            $(if [[ -z $PRERELEASE ]]; then echo "-e /(a|b|rc|c)[0-9]+t?$/d"; fi) \
             $(if [[ -z $suffix ]]; then echo "-e /[0-9]t\$/d"; fi)
         ));
 
@@ -85,15 +92,34 @@ IFS=$'\n'
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
           awk \
-            '{ if (match($0,"^[[:alnum:].]+-"))
-               { print substr($0,0,RLENGTH-1) "." substr($0,RLENGTH+1) "..|" $0; }
-             else
-               { print $0 "...|" $0; }
+            '{
+               orig = $0
+               flavor = ""
+               v = $0
+               if (match(v, "^[[:alnum:].]+-")) {
+                 flavor = substr(v, 1, RLENGTH - 1) "."
+                 v = substr(v, RLENGTH + 1)
+               }
+               sub(/t$/, "", v)
+               pre_type = 4
+               pre_num = 0
+               if (match(v, "(rc|a|b|c)[0-9]+$")) {
+                 tag = substr(v, RSTART)
+                 v = substr(v, 1, RSTART - 1)
+                 sub(/[.-]$/, "", v)
+                 if (tag ~ /^rc/) { pre_type = 3; sub(/^rc/, "", tag); pre_num = tag + 0; }
+                 else if (tag ~ /^c/) { pre_type = 3; sub(/^c/, "", tag); pre_num = tag + 0; }
+                 else if (tag ~ /^b/) { pre_type = 2; sub(/^b/, "", tag); pre_num = tag + 0; }
+                 else if (tag ~ /^a/) { pre_type = 1; sub(/^a/, "", tag); pre_num = tag + 0; }
+               }
+               n = split(v, p, ".")
+               v_pad = (n >= 1 ? p[1] : 0) "." (n >= 2 ? p[2] : 0) "." (n >= 3 ? p[3] : 0) "." (n >= 4 ? p[4] : 0)
+               print flavor v_pad "." pre_type "." pre_num "...|" orig
              }'))
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" \
-          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr -k5,5nr -k6,6nr \
-          | cut -f2 -d $'|' \
+          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr -k5,5nr -k6,6nr -k7,7nr -k8,8nr -k9,9nr \
+          | cut -f2 -d '|' \
         || true))
     DEFINITION="${DEFINITION_CANDIDATES[0]:-}"
 
