@@ -203,13 +203,14 @@ or, if you prefer 3.3.3 over 2.7.6,
 
 Install a Python version (using [`python-build`](https://github.com/pyenv/pyenv/tree/master/plugins/python-build)).
 
-    Usage: pyenv install [-f] [-kvp] <version>[:<alias>]
-           pyenv install [-f] [-kvp] <definition-file>[:<alias>]
+    Usage: pyenv install [-f] [-kvp] [--prerelease] <version>[:<alias>]
+           pyenv install [-f] [-kvp] [--prerelease] <definition-file>[:<alias>]
            pyenv install -l|--list
 
       -l/--list             List all available versions
       -f/--force            Install even if the version appears to be installed already
       -s/--skip-existing    Skip the installation if the version appears to be installed already
+      --prerelease          Include prerelease versions in prefix resolution
 
       python-build options:
 
@@ -372,13 +373,14 @@ locations of the currently selected versions.
 
 Displays the latest installed or known version with the given prefix
 
-    Usage: pyenv latest [-k|--known] <prefix>
+    Usage: pyenv latest [-k|--known] [-p|--prerelease] <prefix>
 
-     -k/--known      Select from all known versions instead of installed
+     -k/--known        Select from all known versions instead of installed
+     -p/--prerelease   Include prerelease versions in resolution
 
 Only full prefixes are searched: in the actual name, the given prefix must be followed by a dot or a dash.
 
-Prereleases and versions with specific suffixes (e.g. `-src`) are ignored.
+By default, prereleases and versions with specific suffixes (e.g. `-src`) are ignored. Pass `-p`/`--prerelease` to include prereleases.
 
 ## `pyenv hooks`
 

@@ -149,6 +149,91 @@ python-build 3.5.2 ${PYENV_ROOT}/versions/3.5.2
   unstub pyenv-latest
 }
 
+@test "install with --prerelease resolves to prerelease version" {
+  stub_python_build_lib
+  stub_python_build_lib
+  stub_python_build_no_latest '--definitions : echo -e 3.14.0a1\\n3.14.0rc1'
+  stub_python_build_no_latest
+
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
+
+  run pyenv-install --prerelease 3.14
+  assert_success
+  assert_output <<!
+python-build 3.14.0rc1 ${PYENV_ROOT}/versions/3.14.0rc1
+!
+
+  unstub python-build
+}
+
+@test "install :latest with --prerelease resolves to latest prerelease" {
+  stub_python_build_lib
+  stub_python_build_no_latest '--definitions : echo -e 3.14.0a1\\n3.14.0rc1'
+  stub_python_build_no_latest
+  stub pyenv-latest '-f -k --prerelease * : shift 3; echo "$@"'
+
+  pyenv-hooks install; unstub pyenv-hooks
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  export PYENV_HOOK_PATH="$PYENV_INSTALL_ROOT/pyenv.d"
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
+
+  run pyenv-install --prerelease 3.14:latest
+  assert_success
+  assert_output <<!
+python-build 3.14.0rc1 ${PYENV_ROOT}/versions/3.14.0rc1
+!
+
+  unstub python-build
+  unstub pyenv-latest
+}
+
+@test "install :latest sorts dotted flavor versions correctly" {
+  stub_python_build_lib
+  stub_python_build_no_latest '--definitions : echo -e pypy2.7-7.3.23\\npypy2.7-8.0.1\\npypy2.7-8.0.2'
+  stub_python_build_no_latest
+  stub pyenv-latest '-f -k * : shift 2; echo "$@"'
+
+  pyenv-hooks install; unstub pyenv-hooks
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  export PYENV_HOOK_PATH="$PYENV_INSTALL_ROOT/pyenv.d"
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
+
+  run pyenv-install pypy2.7:latest
+  assert_success
+  assert_output <<!
+python-build pypy2.7-8.0.2 ${PYENV_ROOT}/versions/pypy2.7-8.0.2
+!
+
+  unstub python-build
+  unstub pyenv-latest
+}
+
+@test "install :latest sorts graalpy versions correctly" {
+  stub_python_build_lib
+  stub_python_build_no_latest '--definitions : echo -e graalpython-22.2.0\\ngraalpy-community-25.0.3\\ngraalpy3.13-25.5.5'
+  stub_python_build_no_latest
+  stub pyenv-latest '-f -k * : shift 2; echo "$@"'
+
+  pyenv-hooks install; unstub pyenv-hooks
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  export PYENV_HOOK_PATH="$PYENV_INSTALL_ROOT/pyenv.d"
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
+
+  run pyenv-install graalpy:latest
+  assert_success
+  assert_output <<!
+python-build graalpy3.13-25.5.5 ${PYENV_ROOT}/versions/graalpy3.13-25.5.5
+!
+
+  unstub python-build
+  unstub pyenv-latest
+}
+
 @test "install installs local versions by default" {
   stub_python_build_lib
   stub_python_build
@@ -319,6 +404,7 @@ OUT
 --verbose
 --version
 --debug
+--prerelease
 ${PYENV_ROOT}/plugins/bar/share/python-build
 ${PYENV_ROOT}/plugins/foo/share/python-build
 OUT

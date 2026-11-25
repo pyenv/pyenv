@@ -187,3 +187,118 @@ echo 3.14.2
 3.14.2t
 !
 }
+
+@test "resolves to prerelease with -p" {
+  create_prereleases_stub
+  run pyenv-latest -p 3.8
+  assert_success
+  assert_output <<!
+3.8.5rc2
+!
+}
+
+@test "resolves to prerelease with --prerelease" {
+  create_prereleases_stub
+  run pyenv-latest --prerelease 3.8
+  assert_success
+  assert_output <<!
+3.8.5rc2
+!
+}
+
+@test "resolves to 't' prerelease with -p and 't' prefix" {
+  create_prereleases_stub
+  run pyenv-latest -p 3.8t
+  assert_success
+  assert_output <<!
+3.8.6b3t
+!
+}
+
+@test "resolves to stable when stable is newer than prereleases with -p" {
+  create_stub pyenv-versions <<!
+echo 3.14.0a1
+echo 3.14.0rc1
+echo 3.14.0
+echo 3.14.1
+!
+  run pyenv-latest -p 3.14
+  assert_success
+  assert_output <<!
+3.14.1
+!
+}
+
+@test "resolves to latest prerelease when no stable version exists with -p" {
+  create_stub pyenv-versions <<!
+echo 3.14.0a1
+echo 3.14.0a2
+echo 3.14.0b1
+echo 3.14.0rc1
+!
+  run pyenv-latest -p 3.14
+  assert_success
+  assert_output <<!
+3.14.0rc1
+!
+}
+
+@test "3-component version outranks 2-component version with identical prefix" {
+  create_stub pyenv-versions <<!
+echo custom-1.0
+echo custom-1.0.1
+!
+  run pyenv-latest custom
+  assert_success
+  assert_output <<!
+custom-1.0.1
+!
+}
+
+@test "orders prerelease numbers numerically" {
+  create_stub pyenv-versions <<!
+echo 3.14.0a2
+echo 3.14.0a10
+!
+  run pyenv-latest -p 3.14
+  assert_success
+  assert_output <<!
+3.14.0a10
+!
+}
+
+@test "stable outranks rc for hyphenated release names" {
+  create_stub pyenv-versions <<!
+echo jython-2.5.4-rc1
+echo jython-2.5.4
+!
+  run pyenv-latest -p jython-2.5
+  assert_success
+  assert_output <<!
+jython-2.5.4
+!
+}
+
+@test "orders prereleases for dotted flavor names" {
+  create_stub pyenv-versions <<!
+echo pypy2.7-8.0.1rc1
+echo pypy2.7-8.0.1rc2
+!
+  run pyenv-latest -p pypy2.7
+  assert_success
+  assert_output <<!
+pypy2.7-8.0.1rc2
+!
+}
+
+@test "3-component version outranks 2-component version when minor matches" {
+  create_stub pyenv-versions <<!
+echo 3.14
+echo 3.14.0
+!
+  run pyenv-latest 3
+  assert_success
+  assert_output <<!
+3.14.0
+!
+}
