@@ -113,6 +113,9 @@ jobs:
             echo "PYENV_BOOTSTRAP_VERSION=$PYENV_BOOTSTRAP_VERSION" >> $GITHUB_ENV
             pyenv install $PYENV_BOOTSTRAP_VERSION
           fi
+          if [[ "${{ matrix.python-version }}" == rustpython-* ]]; then
+            rustup update stable
+          fi
       - run: |
           #build
           pyenv --debug install ${{ matrix.python-version }} && rc=$? || rc=$?
@@ -227,6 +230,9 @@ jobs:
             export PYENV_BOOTSTRAP_VERSION=pypy2.7-7
             echo "PYENV_BOOTSTRAP_VERSION=$PYENV_BOOTSTRAP_VERSION" >> $GITHUB_ENV
             pyenv install $PYENV_BOOTSTRAP_VERSION
+          fi
+          if [[ "${{ matrix.python-version }}" == rustpython-* ]]; then
+            rustup update stable
           fi
       - run: |
           #build
