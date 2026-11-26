@@ -5,12 +5,11 @@ Lists the version tags of the RustPython repository,
 then writes a build script for any release which does not exist locally,
 saving it to plugins/python-build/share/python-build.
 
-RustPython doesn't publish release archives or checksums,
-so the source archive of each new tag is downloaded to compute one.
+RustPython doesn't publish release archives, so the scripts clone the tag
+and pin it to its commit SHA, which python-build verifies.
 """
 from pathlib import Path
 import argparse
-import hashlib
 import logging
 import os
 import re
@@ -18,9 +17,8 @@ import sys
 
 import requests
 
-REPO = "RustPython/RustPython"
-TAGS_URL = f"https://api.github.com/repos/{REPO}/tags"
-ARCHIVE_URL = f"https://github.com/{REPO}/archive/refs/tags/{{tag}}.tar.gz"
+REPO_URL = "https://github.com/RustPython/RustPython"
+TAGS_URL = "https://api.github.com/repos/RustPython/RustPython/tags"
 
 here = Path(__file__).resolve()
 OUT_DIR: Path = here.parent.parent / "share" / "python-build"
@@ -31,7 +29,7 @@ MIN_VERSION = (0, 5, 0)
 
 SCRIPT = """
 require_cargo
-install_package "rustpython-{version}" "{url}#{checksum}" rustpython ensurepip
+install_git "rustpython-{version}" "{url}" "{version}:{sha}" rustpython ensurepip
 """.lstrip()
 
 
@@ -45,14 +43,13 @@ def main() -> int:
         session.headers["Authorization"] = f"Bearer {token}"
 
     added = False
-    for version in list_versions(session):
+    for version, sha in list_versions(session):
         path = OUT_DIR / f"rustpython-{version}"
         if path.exists():
             logger.debug("%s already exists", path.name)
             continue
-        url = ARCHIVE_URL.format(tag=version)
         logger.info("Adding %s", path.name)
-        code = SCRIPT.format(version=version, url=url, checksum=sha256_url(session, url))
+        code = SCRIPT.format(version=version, url=REPO_URL, sha=sha)
         if args.dry_run:
             print(f"---- DRY RUN SCRIPT FOR {path} ----")
             print(code, end="")
@@ -62,8 +59,8 @@ def main() -> int:
     return 0 if added else 1
 
 
-def list_versions(session: requests.Session) -> list[str]:
-    """Gets the release versions from the repository tags, oldest first."""
+def list_versions(session: requests.Session) -> list[tuple[str, str]]:
+    """Gets the release versions and their commit SHAs from the repository tags, oldest first."""
     versions = []
     url = TAGS_URL
     params = {"per_page": 100}
@@ -75,20 +72,10 @@ def list_versions(session: requests.Session) -> list[str]:
             if not re.fullmatch(r"\d+\.\d+\.\d+", name):
                 continue
             if tuple(int(n) for n in name.split(".")) >= MIN_VERSION:
-                versions.append(name)
+                versions.append((name, tag["commit"]["sha"]))
         url = response.links.get("next", {}).get("url")
         params = None
-    return sorted(versions, key=lambda v: tuple(int(n) for n in v.split(".")))
-
-
-def sha256_url(session: requests.Session, url: str) -> str:
-    logger.debug("Downloading %s", url)
-    h = hashlib.sha256()
-    with session.get(url, stream=True, timeout=60) as response:
-        response.raise_for_status()
-        for chunk in response.iter_content(chunk_size=1 << 16):
-            h.update(chunk)
-    return h.hexdigest()
+    return sorted(versions, key=lambda v: tuple(int(n) for n in v[0].split(".")))
 
 
 if __name__ == "__main__":

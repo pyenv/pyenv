@@ -1,2 +1,2 @@
 require_cargo
-install_package "rustpython-0.5.0" "https://github.com/RustPython/RustPython/archive/refs/tags/0.5.0.tar.gz#040179f5e6a4b40947d5d8605e96b0e1132a3b42c68359afc1f1b22178f84be9" rustpython ensurepip
+install_git "rustpython-0.5.0" "https://github.com/RustPython/RustPython" "0.5.0:5a4a7e9b4ee23a34b88fad00bf9b189088842458" rustpython ensurepip
