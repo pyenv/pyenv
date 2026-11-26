@@ -996,7 +996,7 @@ log_and_run() {
   cmd="${cmd% }"
   echo "python-build: running: ${vars}${cmd}"
   if [ -z "$VERBOSE" ]; then
-    echo "python-build: running: ${cmd}" >&3
+    echo "=> ${cmd}" >&3
   fi
   "$@"
 }

@@ -213,10 +213,10 @@ OUT
 
   install_fixture definitions/needs-yaml
   assert_success
-  assert_line "python-build: running: ./configure --prefix=$INSTALL_ROOT configure_opt1"
-  assert_line "python-build: running: ./configure --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib configure_opt1"
-  assert_line "python-build: running: make -j 2"
-  assert_line "python-build: running: make install"
+  assert_line "=> ./configure --prefix=$INSTALL_ROOT configure_opt1"
+  assert_line "=> ./configure --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib configure_opt1"
+  assert_line "=> make -j 2"
+  assert_line "=> make install"
   refute grep -qF "CC=" <<<"$output"
 
   unstub uname
@@ -237,8 +237,8 @@ OUT
 
   install_fixture -v definitions/needs-yaml
   assert_success
-  refute_line "python-build: running: ./configure --prefix=$INSTALL_ROOT configure_opt1"
-  refute_line "python-build: running: make -j 2"
+  refute_line "=> ./configure --prefix=$INSTALL_ROOT configure_opt1"
+  refute_line "=> make -j 2"
 
   unstub uname
   unstub make
