@@ -198,6 +198,52 @@ OUT
   assert_success
 }
 
+@test "configure and make commands are printed to the console without the build variables" {
+  export TMPDIR="$BATS_TEST_TMPDIR"
+  export YAML_CFLAGS="yaml_cflag1 yaml_cflag2"
+  export CONFIGURE_OPTS="configure_opt1"
+
+  cached_tarball "yaml-0.1.6"
+  cached_tarball "Python-3.6.2"
+
+  stub uname '-s : echo Linux'
+  stub brew false
+  stub_make_install
+  stub_make_install
+
+  install_fixture definitions/needs-yaml
+  assert_success
+  assert_line "=> ./configure --prefix=$INSTALL_ROOT configure_opt1"
+  assert_line "=> ./configure --prefix=$INSTALL_ROOT --enable-shared --libdir=$INSTALL_ROOT/lib configure_opt1"
+  assert_line "=> make -j 2"
+  assert_line "=> make install"
+  refute grep -qF "CC=" <<<"$output"
+
+  unstub uname
+  unstub make
+}
+
+@test "configure and make commands are not printed to the console twice in verbose mode" {
+  export TMPDIR="$BATS_TEST_TMPDIR"
+  export CONFIGURE_OPTS="configure_opt1"
+
+  cached_tarball "yaml-0.1.6"
+  cached_tarball "Python-3.6.2"
+
+  stub uname '-s : echo Linux'
+  stub brew false
+  stub_make_install
+  stub_make_install
+
+  install_fixture -v definitions/needs-yaml
+  assert_success
+  refute_line "=> ./configure --prefix=$INSTALL_ROOT configure_opt1"
+  refute_line "=> make -j 2"
+
+  unstub uname
+  unstub make
+}
+
 @test "apply python patch before building" {
   cached_tarball "yaml-0.1.6"
   cached_tarball "Python-3.6.2"
