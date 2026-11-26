@@ -25,8 +25,9 @@ ARCHIVE_URL = f"https://github.com/{REPO}/archive/refs/tags/{{tag}}.tar.gz"
 here = Path(__file__).resolve()
 OUT_DIR: Path = here.parent.parent / "share" / "python-build"
 
-# Releases before this don't build with a current Rust toolchain
-MIN_VERSION = (0, 3, 0)
+# Older releases don't build with a current Rust toolchain
+# or can't install a current pip
+MIN_VERSION = (0, 5, 0)
 
 SCRIPT = """
 require_cargo
