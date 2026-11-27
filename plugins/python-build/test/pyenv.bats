@@ -106,6 +106,45 @@ OUT
   unstub python-build
 }
 
+@test "install --prerelease forwards flag to pyenv-latest" {
+  stub_python_build_lib
+  for i in {1..2}; do stub_python_build_no_latest; done
+  stub pyenv-latest \
+      '-f -k --prerelease 3.11 : echo 3.11.9' \
+      '-f -k --prerelease 3.12 : echo 3.12.0a5'
+
+  run pyenv-install --prerelease 3.11 3.12
+  assert_success
+  assert_output <<OUT
+python-build 3.11.9 ${PYENV_ROOT}/versions/3.11.9
+python-build 3.12.0a5 ${PYENV_ROOT}/versions/3.12.0a5
+OUT
+
+  unstub python-build
+  unstub pyenv-latest
+}
+
+@test "install --prerelease resolves prerelease prefixes via pyenv-latest" {
+  stub_python_build_lib
+  stub_python_build_lib '--definitions : printf "%s\n" 3.11.9 3.12-dev 3.12.0a2 3.12.0a10 3.12.0a10t'
+  stub_python_build_no_latest
+  stub_python_build_lib '--definitions : printf "%s\n" 3.11.9 3.12-dev 3.12.0a2 3.12.0a10 3.12.0a10t'
+  stub_python_build_no_latest
+
+  PYENV_INSTALL_ROOT="$BATS_TEST_DIRNAME/../../.."
+  [[ -d "$PYENV_INSTALL_ROOT/libexec" ]] || skip "python-build is installed separately from pyenv"
+  export PATH="$PATH:$PYENV_INSTALL_ROOT/libexec"
+
+  run pyenv-install --prerelease 3.11 3.12:my-3.12
+  assert_success
+  assert_output <<OUT
+python-build 3.11.9 ${PYENV_ROOT}/versions/3.11.9
+python-build 3.12.0a10 ${PYENV_ROOT}/versions/my-3.12
+OUT
+
+  unstub python-build
+}
+
 
 @test "install resolves :latest" {
   stub_python_build_lib
@@ -314,6 +353,7 @@ OUT
 --list
 --force
 --skip-existing
+--prerelease
 --keep
 --patch
 --verbose
