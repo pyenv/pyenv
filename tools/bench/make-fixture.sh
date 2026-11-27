@@ -149,8 +149,8 @@ done
 version_count=$(ls -1d "${VERSIONS_DIR}"/*/  2>/dev/null | wc -l | tr -d ' ')
 symlink_count=$(find "${VERSIONS_DIR}" -maxdepth 1 -type l | wc -l | tr -d ' ')
 real_count=$((version_count - symlink_count))
-venv_count=$(find "${VERSIONS_DIR}" -path "*/envs/*" -maxdepth 4 -mindepth 4 -type d | wc -l | tr -d ' ')
-total_bins=$(find "${VERSIONS_DIR}" -path "*/bin/*" -type f | wc -l | tr -d ' ')
+venv_count=$(find "${VERSIONS_DIR}" -maxdepth 4 -mindepth 4 -type d -path "*/envs/*" | wc -l | tr -d ' ')
+total_bins=$(find "${VERSIONS_DIR}" -type f -path "*/bin/*" | wc -l | tr -d ' ')
 
 echo "Fixture created in ${VERSIONS_DIR}/"
 echo "  Real versions:  ${real_count}"
