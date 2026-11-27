@@ -398,6 +398,36 @@ echo "\$PATH"
   assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH//${PYENV_ROOT}\/shims:/}"
 }
 
+@test "removes existing shims from PATH without spawning bash (bash)" {
+  OLDPATH="$PATH"
+  export PATH="${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:${PYENV_ROOT}/shims:${PYENV_ROOT}/shims-extra:$PATH:${PYENV_ROOT}/shims"
+  run bash -eu <<!
+init_code="\$(pyenv-init - --no-rehash bash)"
+bash() {
+  echo "unexpected bash subprocess" >&2
+  return 1
+}
+eval "\$init_code"
+echo "\$PATH"
+!
+  assert_success
+  assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims-extra:${OLDPATH//${PYENV_ROOT}\/shims:/}"
+}
+
+@test "removes existing shims from PATH with special characters (bash)" {
+  export PYENV_ROOT="${BATS_TEST_TMPDIR}/root's *?[dir]"
+  OLDPATH="$PATH"
+  export PATH="${BATS_TEST_DIRNAME}/nonexistent:${PYENV_ROOT}/shims:$PATH"
+  run bash -e <<'!'
+init_code="$(pyenv-init --path --no-rehash bash)"
+unset PYENV_ROOT
+eval "$init_code"
+echo "$PATH"
+!
+  assert_success
+  assert_output "${PYENV_ROOT}/shims:${BATS_TEST_DIRNAME}/nonexistent:${OLDPATH}"
+}
+
 @test "removes existing shims from PATH (fish)" {
   command -v fish >/dev/null || skip "-- fish not installed"
   OLDPATH="$PATH"
