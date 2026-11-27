@@ -316,6 +316,26 @@ OUT
   assert_equal "$(resolve_link "${INSTALL_ROOT}/lib/python3.15t")" "python3.15"
 }
 
+@test "rustpython: no ABI-tagged stdlib link without abiflags" {
+  mkdir -p "${BATS_TEST_TMPDIR}/rustpython/target/release" "${BATS_TEST_TMPDIR}/rustpython/Lib"
+  cd "${BATS_TEST_TMPDIR}/rustpython"
+  executable target/release/rustpython <<OUT
+#!$BASH
+[[ \$* == *abiflags* ]] || echo 3.15
+OUT
+  touch Lib/os.py
+  stub cargo "build --release --locked --target-dir target : true"
+
+  TMPDIR="$BATS_TEST_TMPDIR" run_inline_definition <<OUT
+build_package_rustpython
+OUT
+  assert_success
+  unstub cargo
+
+  [ -f "${INSTALL_ROOT}/lib/python3.15/os.py" ]
+  assert_equal "$(ls "${INSTALL_ROOT}/lib")" "python3.15"
+}
+
 @test "enable framework" {
   framework_path="${INSTALL_ROOT}/Library/Frameworks/Python.framework/Versions/Current/bin"
   mkdir -p "$framework_path"
