@@ -1105,14 +1105,14 @@ build_package_standard() {
 }
 
 build_package_autoconf() {
-  { autoreconf
+  { log_and_run autoreconf
   } >&4 2>&1
 }
 
 build_package_python() {
   local package_name="$1"
 
-  { "$PYTHON_BIN" setup.py install
+  { log_and_run "$PYTHON_BIN" setup.py install
   } >&4 2>&1
 }
 
@@ -1146,7 +1146,7 @@ fix_jython_shebangs() {
 }
 
 build_package_jython_builder() {
-  ant >&4 2>&1
+  log_and_run ant >&4 2>&1
   ( cd "dist" && build_package_jython )
 }
 
@@ -1188,7 +1188,7 @@ build_package_ironpython() {
 }
 
 build_package_ironpython_builder() {
-  xbuild Build.proj /t:Stage "/p:Mono=true;BaseConfiguration=Release" >&4 2>&1
+  log_and_run xbuild Build.proj /t:Stage "/p:Mono=true;BaseConfiguration=Release" >&4 2>&1
   ( cd "Stage/Release/IronPython-"* && build_package_ironpython )
 }
 
@@ -1205,11 +1205,11 @@ build_package_micropython() {
     MAKE_OPTS="-j $(num_cpu_cores)"
   fi
   { cd mpy-cross
-    "$MAKE" $MAKE_OPTS
+    log_and_run "$MAKE" $MAKE_OPTS
     cd ../ports/unix
-    [ "$1" = "with_axtls" ] && "$MAKE" $MAKE_OPTS axtls
-    "$MAKE" $MAKE_OPTS CFLAGS_EXTRA="-DMICROPY_PY_SYS_PATH_DEFAULT='\".frozen:${PREFIX_PATH}/lib/micropython\"' $CFLAGS_EXTRA"
-    "$MAKE" install $MAKE_INSTALL_OPTS PREFIX="${PREFIX_PATH}"
+    [ "$1" = "with_axtls" ] && log_and_run "$MAKE" $MAKE_OPTS axtls
+    log_and_run "$MAKE" $MAKE_OPTS CFLAGS_EXTRA="-DMICROPY_PY_SYS_PATH_DEFAULT='\".frozen:${PREFIX_PATH}/lib/micropython\"' $CFLAGS_EXTRA"
+    log_and_run "$MAKE" install $MAKE_INSTALL_OPTS PREFIX="${PREFIX_PATH}"
     ln -fs micropython "${PREFIX_PATH}/bin/python"
     mkdir -p "${PREFIX_PATH}/lib/micropython"
   }>&4 2>&1
@@ -1218,7 +1218,7 @@ build_package_micropython() {
 build_package_rustpython() {
   local version_suffix
   # `--target-dir target` keeps the binary at a known path even if CARGO_TARGET_DIR is set
-  { cargo build --release --locked --target-dir target
+  { log_and_run cargo build --release --locked --target-dir target
     mkdir -p "${PREFIX_PATH}/bin"
     cp target/release/rustpython "${PREFIX_PATH}/bin/rustpython"
     # RustPython finds its stdlib through a CPython-style landmark search
@@ -1329,12 +1329,12 @@ build_package_pypy_builder() {
     if [ -z "${PYPY_OPTS}" ]; then
       local PYPY_OPTS="--opt=jit --batch --make-jobs=$(num_cpu_cores)"
     fi
-    python "rpython/bin/rpython" ${PYPY_OPTS} "pypy/goal/targetpypystandalone.py" >&4 2>&1
+    log_and_run python "rpython/bin/rpython" ${PYPY_OPTS} "pypy/goal/targetpypystandalone.py" >&4 2>&1
   elif [ -f "pypy/translator/goal/translate.py" ]; then # pypy 1.x
     if [ -z "${PYPY_OPTS}" ]; then
       local PYPY_OPTS="--opt=jit"
     fi
-    ( cd "pypy/translator/goal" && python "translate.py" ${PYPY_OPTS} "targetpypystandalone.py" ) 1>&4 2>&1
+    ( cd "pypy/translator/goal" && log_and_run python "translate.py" ${PYPY_OPTS} "targetpypystandalone.py" ) 1>&4 2>&1
   else
     echo "not a pypy source tree" 1>&3
     return 1
@@ -1372,7 +1372,7 @@ activepython_architecture() {
 
 build_package_activepython() {
   local package_name="$1"
-  { bash "install.sh" --install-dir "${PREFIX_PATH}"
+  { log_and_run bash "install.sh" --install-dir "${PREFIX_PATH}"
   } >&4 2>&1
 }
 
@@ -1401,7 +1401,7 @@ anaconda_architecture() {
 
 build_package_anaconda() {
   local package_name="$1"
-  { bash "${package_name}.sh" -f -b -p "${PREFIX_PATH}"
+  { log_and_run bash "${package_name}.sh" -f -b -p "${PREFIX_PATH}"
   } >&4 2>&1
 }
 
@@ -2568,7 +2568,7 @@ build_package_ez_setup() {
       http get "${EZ_SETUP_URL}"
     fi
   } 1> "${ez_setup}"
-  "${PYTHON_BIN}" "${ez_setup}" ${EZ_SETUP_OPTS} 1>&4 2>&1 || {
+  log_and_run "${PYTHON_BIN}" "${ez_setup}" ${EZ_SETUP_OPTS} 1>&4 2>&1 || {
     echo "error: failed to install setuptools via ez_setup.py" >&2
     return 1
   }
@@ -2587,7 +2587,7 @@ build_package_get_pip() {
       http get "${GET_PIP_URL}"
     fi
   } 1> "${get_pip}"
-  "${PYTHON_BIN}" -s "${get_pip}" ${GET_PIP_OPTS} 1>&4 2>&1 || {
+  log_and_run "${PYTHON_BIN}" -s "${get_pip}" ${GET_PIP_OPTS} 1>&4 2>&1 || {
     echo "error: failed to install pip via get-pip.py" >&2
     return 1
   }

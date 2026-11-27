@@ -175,7 +175,9 @@ CFLAGS_EXTRA='-Wno-floating-conversion' build_package_micropython
 DEF
 
     assert_success
-    assert_output <<OUT
-CFLAGS_EXTRA=-DMICROPY_PY_SYS_PATH_DEFAULT='".frozen:${BATS_TEST_TMPDIR}/install/lib/micropython"' -Wno-floating-conversion
-OUT
+    assert_line "CFLAGS_EXTRA=-DMICROPY_PY_SYS_PATH_DEFAULT='\".frozen:${BATS_TEST_TMPDIR}/install/lib/micropython\"' -Wno-floating-conversion"
+    # each make is written to the log and printed to the console
+    [ "$(grep -c '^python-build: running: ' <<<"$output")" -eq 3 ]
+    assert_line "=> make -j 2"
+    assert_line "=> make install PREFIX=${INSTALL_ROOT}"
 }

@@ -297,6 +297,7 @@ OUT
 build_package_rustpython
 OUT
   assert_success
+  assert_line "=> cargo build --release --locked --target-dir target"
   unstub cargo
 
   [ -f "${INSTALL_ROOT}/lib/python3.15/os.py" ]
