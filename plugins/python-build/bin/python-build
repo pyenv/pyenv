@@ -1216,16 +1216,21 @@ build_package_micropython() {
 }
 
 build_package_rustpython() {
-  local version_suffix
+  local version_suffix abiflags
   # `--target-dir target` keeps the binary at a known path even if CARGO_TARGET_DIR is set
   { log_and_run cargo build --release --locked --target-dir target
     mkdir -p "${PREFIX_PATH}/bin"
     cp target/release/rustpython "${PREFIX_PATH}/bin/rustpython"
     # RustPython finds its stdlib through a CPython-style landmark search
-    # for `lib/pythonX.Y/os.py` under the prefix
+    # for `lib/pythonX.Y/os.py` under the prefix. Since RustPython/RustPython#9974,
+    # the directory name includes `sys.abiflags` (`lib/pythonX.Yt`), so link that too.
     version_suffix=$(interpreter_version_suffix target/release/rustpython)
+    abiflags=$(target/release/rustpython -c 'import sys; sys.stdout.write(getattr(sys, "abiflags", ""))')
     mkdir -p "${PREFIX_PATH}/lib/python${version_suffix}"
     cp -R Lib/. "${PREFIX_PATH}/lib/python${version_suffix}"
+    if [ -n "$abiflags" ]; then
+      ln -fns "python${version_suffix}" "${PREFIX_PATH}/lib/python${version_suffix}${abiflags}"
+    fi
   } >&4 2>&1
   make_python_symlinks rustpython
 }
