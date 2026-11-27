@@ -90,10 +90,10 @@ IFS=$'\n'
 
     sed_args=(-E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d')
     if [[ -z $PRERELEASE ]]; then
-        sed_args+=(-e '/(a|b|rc)[0-9]+t?$/d' -e '/-(alpha|beta)[0-9]*$/d')
+        sed_args+=(-e '/(a|b|rc)[0-9]+t?$/d' -e '/-(alpha|beta|rc)[0-9]*t?$/d')
     fi
     if [[ -z $suffix ]]; then
-        sed_args+=(-e '/[0-9]t$/d')
+        sed_args+=(-e '/([0-9]|-(alpha|beta|rc))t$/d')
     fi
 
     DEFINITION_CANDIDATES=(\
@@ -111,7 +111,7 @@ IFS=$'\n'
                if ($0 == "") next;
                orig = $0;
                s = $0;
-               if (match(s, /[0-9]t$/)) {
+               if (match(s, /([0-9]|-(alpha|beta|rc))t$/)) {
                  s = substr(s, 1, length(s) - 1);
                }
                stage = 4;
@@ -119,9 +119,9 @@ IFS=$'\n'
                if (match(s, /-(alpha|beta|rc)[0-9]*$/)) {
                  pre = substr(s, RSTART + 1, RLENGTH - 1);
                  s = substr(s, 1, RSTART - 1);
-                 if (substr(pre, 1, 5) == "alpha") { stage = 1; pre_num = substr(pre, 6) + 0; }
-                 else if (substr(pre, 1, 4) == "beta") { stage = 2; pre_num = substr(pre, 5) + 0; }
-                 else { stage = 3; pre_num = substr(pre, 3) + 0; }
+                 if (pre ~ /^alpha/) { stage = 1; pre_num = (length(pre) > 5 ? substr(pre, 6) + 0 : 0); }
+                 else if (pre ~ /^beta/) { stage = 2; pre_num = (length(pre) > 4 ? substr(pre, 5) + 0 : 0); }
+                 else { stage = 3; pre_num = (length(pre) > 2 ? substr(pre, 3) + 0 : 0); }
                } else if (match(s, /([0-9]|-)(a|b|rc)[0-9]+$/)) {
                  pre = substr(s, RSTART + 1, RLENGTH - 1);
                  if (substr(s, RSTART, 1) == "-") {
@@ -129,12 +129,12 @@ IFS=$'\n'
                  } else {
                    s = substr(s, 1, RSTART);
                  }
-                 if (substr(pre, 1, 1) == "a") { stage = 1; pre_num = substr(pre, 2) + 0; }
-                 else if (substr(pre, 1, 1) == "b") { stage = 2; pre_num = substr(pre, 2) + 0; }
+                 if (pre ~ /^a/) { stage = 1; pre_num = substr(pre, 2) + 0; }
+                 else if (pre ~ /^b/) { stage = 2; pre_num = substr(pre, 2) + 0; }
                  else { stage = 3; pre_num = substr(pre, 3) + 0; }
                }
                if (match(s, /^[[:alnum:].]+-/)) {
-                 s = substr(s, 1, RLENGTH - 1) "." substr(s, RLENGTH + 1);
+                 s = substr(s, 1, RLENGTH - 1) "." (RLENGTH < length(s) ? substr(s, RLENGTH + 1) : "");
                }
                n = split(s, parts, ".");
                out = parts[1];

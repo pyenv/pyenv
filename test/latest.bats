@@ -338,3 +338,38 @@ echo 3.17-dev
   run pyenv-latest -f -k --prerelease 3.17
   assert_success "3.17"
 }
+
+@test "excludes unnumbered -rc and hyphenated free-threaded prereleases unless --prerelease is set" {
+  create_stub pyenv-install <<!
+echo 3.11.0
+echo 3.12.0-rc
+echo 3.12.0-alpha1t
+echo 3.12.0-beta1t
+echo 3.12.0-rct
+!
+  run pyenv-latest -k 3
+  assert_success "3.11.0"
+
+  run pyenv-latest -k --prerelease 3
+  assert_success "3.12.0-rc"
+
+  run pyenv-latest -k 3.12t
+  assert_failure "pyenv: no known versions match the prefix \`3.12t'"
+
+  run pyenv-latest -k --prerelease 3.12t
+  assert_success "3.12.0-rct"
+
+  create_stub pyenv-install <<!
+echo 3.12.0-alpha1t
+echo 3.12.0-beta1t
+!
+  run pyenv-latest -k --prerelease 3.12t
+  assert_success "3.12.0-beta1t"
+
+  create_stub pyenv-install <<!
+echo 3.12.0-rc
+echo 3.12.0-rc1
+!
+  run pyenv-latest -k --prerelease 3.12
+  assert_success "3.12.0-rc1"
+}
