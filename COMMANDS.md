@@ -91,6 +91,11 @@ or, if you prefer 3.3.3 over 2.7.6,
     Python 3.3.3
 
 
+You can also add version(s) to an existing `.python-version` file without replacing it using `--add` (which appends by default, or use `--append` / `--prepend` to control placement):
+
+    $ pyenv local --add 3.12.0
+    $ pyenv local --add --prepend 3.13.0
+
 You can use the `-f/--force` flag to force setting versions even if some aren't installed.
 This is mainly useful in special cases like provisioning scripts.
 
