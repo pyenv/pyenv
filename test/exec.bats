@@ -38,6 +38,16 @@ echo call >> "${PYENV_TEST_DIR}/version-name-calls"
   assert_success "call"
 }
 
+@test "doesn't launch pyenv-hooks if there are no hook directories" {
+  create_stub pyenv-hooks "exit 1"
+  mkdir -p "$PYENV_ROOT"
+  echo 3.4 > "${PYENV_ROOT}/version"
+  create_alt_executable_in_version "3.4" "python" "echo ok"
+
+  run pyenv-exec python
+  assert_success "ok"
+}
+
 @test "completes with names of executables" {
   export PYENV_VERSION="3.4"
   create_alt_executable "fab"

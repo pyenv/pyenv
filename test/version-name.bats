@@ -39,6 +39,15 @@ pyenv: version `[1-9].?*' is not installed (set by PYENV_VERSION environment var
   assert_success "3.5.1"
 }
 
+@test "finds hooks in any hook path" {
+  create_version "2.7.11"
+  create_version "3.5.1"
+  create_hook version-name test.bash <<<"PYENV_VERSION=3.5.1"
+
+  PYENV_HOOK_PATH="${PYENV_TEST_DIR}/nonexistent:${PYENV_HOOK_PATH}" PYENV_VERSION=2.7.11 run pyenv-version-name
+  assert_success "3.5.1"
+}
+
 @test "carries original IFS within hooks" {
   create_hook version-name hello.bash <<SH
 hellos=(\$(printf "hello\\tugly world\\nagain"))
