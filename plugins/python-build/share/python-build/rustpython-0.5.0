@@ -1,0 +1,2 @@
+require_cargo
+install_git "rustpython-0.5.0" "https://github.com/RustPython/RustPython" "0.5.0:5a4a7e9b4ee23a34b88fad00bf9b189088842458" rustpython ensurepip
