@@ -3,9 +3,15 @@
 # Summary: Set or show the local application-specific Python version(s)
 #
 # Usage: pyenv local [-f|--force] [<version> [...]]
+#        pyenv local [-f|--force] --add [--append|--prepend] <version> [...]
 #        pyenv local --unset
 #
 #   -f/--force    Do not verify that the versions being set exist
+#   --add         Add version(s) to the existing local `.python-version' file
+#                 instead of replacing it (appends by default)
+#   --append      Append version(s) to the end (default with --add)
+#   --prepend     Prepend version(s) to the beginning (requires --add)
+#   --unset       Remove the local `.python-version' file
 #
 # Sets the local application-specific Python version(s) by writing the
 # version name to a file named `.python-version'.
@@ -33,18 +39,41 @@ set -euo pipefail
 
 # Provide pyenv completions
 if [ "${1:-}" = "--complete" ]; then
+  echo --add
+  echo --append
+  echo --prepend
   echo --unset
   echo system
   exec pyenv-versions --bare
 fi
 
 FORCE=
+ADD=
+APPEND=
+PREPEND=
+UNSET=
 
 while [[ $# -gt 0 ]]
 do
     case "$1" in
         -f|--force)
             FORCE=1
+            shift
+            ;;
+        --add)
+            ADD=1
+            shift
+            ;;
+        --append)
+            APPEND=1
+            shift
+            ;;
+        --prepend)
+            PREPEND=1
+            shift
+            ;;
+        --unset)
+            UNSET=1
             shift
             ;;
         *)
@@ -55,9 +84,66 @@ done
 
 versions=("$@")
 
-if [ "${versions:-}" = "--unset" ]; then
+if [ -n "$ADD" ] && [ -n "$UNSET" ]; then
+  echo "pyenv: cannot specify both \`--add' and \`--unset'" >&2
+  exit 1
+fi
+
+if [ -n "$APPEND" ] && [ -n "$PREPEND" ]; then
+  echo "pyenv: cannot specify both \`--append' and \`--prepend'" >&2
+  exit 1
+fi
+
+if [ -z "$ADD" ] && { [ -n "$APPEND" ] || [ -n "$PREPEND" ]; }; then
+  echo "pyenv: \`${PREPEND:+--prepend}${APPEND:+--append}' can only be used with \`--add'" >&2
+  exit 1
+fi
+
+if [ -n "$UNSET" ]; then
+  if [ "${#versions[@]}" -gt 0 ]; then
+    echo "pyenv: \`--unset' does not accept version arguments" >&2
+    exit 1
+  fi
   rm -f .python-version
-elif [ -n "${versions:-}" ]; then
+elif [ -n "$ADD" ]; then
+  if [ "${#versions[@]}" -eq 0 ]; then
+    echo "pyenv: \`--add' requires at least one version" >&2
+    exit 1
+  fi
+
+  existing=()
+  if version_file="$(pyenv-version-file "$PWD")"; then
+    OLDIFS="$IFS"
+    # VAR=() of unquoted value does glob expansion (against the current dir's contents) after IFS-splitting
+    # which is undesired
+    set -f
+    IFS=: existing=($(pyenv-version-file-read "$version_file" || true))
+    set +f
+    IFS="$OLDIFS"
+  fi
+
+  if [ -n "$PREPEND" ]; then
+    combined=("${versions[@]}" ${existing[@]+"${existing[@]}"})
+  else
+    combined=(${existing[@]+"${existing[@]}"} "${versions[@]}")
+  fi
+
+  deduped=()
+  for candidate in "${combined[@]}"; do
+    seen=
+    for item in ${deduped[@]+"${deduped[@]}"}; do
+      if [ "$item" = "$candidate" ]; then
+        seen=1
+        break
+      fi
+    done
+    if [ -z "$seen" ]; then
+      deduped+=("$candidate")
+    fi
+  done
+
+  pyenv-version-file-write ${FORCE:+-f }.python-version "${deduped[@]}"
+elif [ "${#versions[@]}" -gt 0 ]; then
   pyenv-version-file-write ${FORCE:+-f }.python-version "${versions[@]}"
 else
   if version_file="$(pyenv-version-file "$PWD")"; then
