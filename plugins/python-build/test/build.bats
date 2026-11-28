@@ -254,7 +254,7 @@ OUT
   stub_make_install
   stub patch ' : echo patch "$@" | sed -E "s/\.[[:alnum:]]+$/.XXX/" >> build.log'
 
-  TMPDIR="$BATS_TEST_TMPDIR" install_fixture --patch definitions/needs-yaml <<<""
+  install_fixture --patch definitions/needs-yaml <<<""
   assert_success
 
   unstub uname
@@ -284,7 +284,7 @@ OUT
   stub_make_install
   stub patch ' : echo patch "$@" | sed -E "s/\.[[:alnum:]]+$/.XXX/" >> build.log'
 
-  TMPDIR="$BATS_TEST_TMPDIR" install_fixture --patch definitions/needs-yaml <<<"diff --git a/script.py"
+  install_fixture --patch definitions/needs-yaml <<<"diff --git a/script.py"
   assert_success
 
   unstub uname
