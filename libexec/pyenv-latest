@@ -61,6 +61,7 @@ IFS=$'\n'
     # Filtered in Bash since this runs on every shim call if a prefix is selected
     prerelease_re='(a|b|rc)[0-9]+t?$'
     matches=()
+    # For up to well over 1000 entries, loop is faster than `grep'
     # Bash < 4.4 treats empty arrays as unset with -u
     for candidate in "${DEFINITION_CANDIDATES[@]:-}"; do
         if [[ $candidate == "$prefix$suffix" ]]; then
@@ -68,6 +69,7 @@ IFS=$'\n'
             exit $exitcode;
         fi
         [[ $candidate == "$prefix"[-.]*"$suffix" ]] || continue
+        # A few ms faster than incorporating them into the regex
         [[ $candidate == *-dev || $candidate == *-src || $candidate == *-latest ]] && continue
         [[ $candidate =~ $prerelease_re ]] && continue
         [[ -z $suffix && $candidate == *[0-9]t ]] && continue
