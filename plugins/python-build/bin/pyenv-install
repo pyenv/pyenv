@@ -2,7 +2,7 @@
 #
 # Summary: Install a Python version using python-build
 #
-# Usage: pyenv install [-f] [-kvp] <version>[:<alias>]...
+# Usage: pyenv install [-f] [-kvp] [--prerelease] <version>[:<alias>]...
 #        pyenv install [-f] [-kvp] <definition-file>[:<alias>]
 #        pyenv install -l|--list [--bare]
 #        pyenv install --version
@@ -10,6 +10,7 @@
 #   -l/--list          List all available versions
 #   -f/--force         Install even if the version appears to be installed already
 #   -s/--skip-existing Skip if the version appears to be installed already
+#   --prerelease       Include prereleases when resolving version prefixes
 #
 #   python-build options:
 #
@@ -49,6 +50,7 @@ if [ "$1" = "--complete" ]; then
   echo --list
   echo --force
   echo --skip-existing
+  echo --prerelease
   echo --keep
   echo --patch
   echo --verbose
@@ -76,6 +78,7 @@ indent() {
 
 unset FORCE
 unset SKIP_EXISTING
+unset PRERELEASE
 unset KEEP
 unset VERBOSE
 unset HAS_PATCH
@@ -102,6 +105,9 @@ for option in "${OPTIONS[@]}"; do
     ;;
   "s" | "skip-existing" )
     SKIP_EXISTING=true
+    ;;
+  "prerelease" )
+    PRERELEASE="--prerelease"
     ;;
   "k" | "keep" )
     [ -n "${PYENV_BUILD_ROOT}" ] || PYENV_BUILD_ROOT="${PYENV_ROOT}/sources"
@@ -195,7 +201,7 @@ for i in "${!DEFINITIONS[@]}"; do
   # Try to resolve a prefix if user indeed gave a prefix.
   # We install the version under the resolved name
   # and hooks also see the resolved name
-  DEFINITION="$(pyenv-latest -f -k "$DEFINITION")"
+  DEFINITION="$(pyenv-latest -f -k ${PRERELEASE:+"$PRERELEASE"} "$DEFINITION")"
 
   # Set VERSION_NAME from $DEFINITION. Then compute the installation prefix.
   # With a `<version>:<alias>` argument, install under the alias instead;

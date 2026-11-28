@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Summary: Print the latest installed or known version with the given prefix
-# Usage: pyenv latest [-k|--known] <prefix>
+# Usage: pyenv latest [-k|--known] [--prerelease] <prefix>
 #
 #   -k/--known      Select from all known versions instead of installed
+#   --prerelease    Include prerelease versions (alpha, beta, rc)
 #   -b/--bypass     (internal) On a resolution failure, do not print an error message
 #                   but rather print the argument unchanged
 #   -f/--force      (internal) Same as -b but also do not return a failure exit code
@@ -11,7 +12,15 @@ set -euo pipefail
 set -f
 [ -n "${PYENV_DEBUG:-}" ] && set -x
 
+# Provide pyenv completions
+if [ "${1:-}" = "--complete" ]; then
+  echo --known
+  echo --prerelease
+  exit
+fi
+
 FROM_KNOWN=
+PRERELEASE=
 BYPASS=
 FORCE=
 
@@ -20,6 +29,10 @@ do
     case "$1" in
         -k|--known)
             FROM_KNOWN=1
+            shift
+            ;;
+        --prerelease)
+            PRERELEASE=1
             shift
             ;;
         -b|--bypass)
@@ -75,24 +88,64 @@ IFS=$'\n'
       $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
       grep -Ee "^$prefix_re[-.].*$suffix_re\$" || true))
 
+    sed_args=(-E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d')
+    if [[ -z $PRERELEASE ]]; then
+        sed_args+=(-e '/(a|b|rc)[0-9]+t?$/d' -e '/-(alpha|beta|rc)[0-9]*t?$/d')
+    fi
+    if [[ -z $suffix ]]; then
+        sed_args+=(-e '/([0-9]|-(alpha|beta|rc))t$/d')
+    fi
+
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
-          sed -E -e '/-dev$/d' -e '/-src$/d' -e '/-latest$/d' -e '/(a|b|rc)[0-9]+t?$/d' \
-            $(if [[ -z $suffix ]]; then echo "-e /[0-9]t\$/d"; fi)
+          sed "${sed_args[@]}"
         ));
 
-    # Compose a sorting key, followed by | and original value
+    # Compose a sorting key, followed by | and original value.
+    # Normalize to 6 dot-separated base fields plus prerelease stage and number:
+    # alpha/a=1, beta/b=2, rc=3, final=4.
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" | \
           awk \
-            '{ if (match($0,"^[[:alnum:].]+-"))
-               { print substr($0,0,RLENGTH-1) "." substr($0,RLENGTH+1) "..|" $0; }
-             else
-               { print $0 "...|" $0; }
+            '{
+               if ($0 == "") next;
+               orig = $0;
+               s = $0;
+               if (match(s, /([0-9]|-(alpha|beta|rc))t$/)) {
+                 s = substr(s, 1, length(s) - 1);
+               }
+               stage = 4;
+               pre_num = 0;
+               if (match(s, /-(alpha|beta|rc)[0-9]*$/)) {
+                 pre = substr(s, RSTART + 1, RLENGTH - 1);
+                 s = substr(s, 1, RSTART - 1);
+                 if (pre ~ /^alpha/) { stage = 1; pre_num = (length(pre) > 5 ? substr(pre, 6) + 0 : 0); }
+                 else if (pre ~ /^beta/) { stage = 2; pre_num = (length(pre) > 4 ? substr(pre, 5) + 0 : 0); }
+                 else { stage = 3; pre_num = (length(pre) > 2 ? substr(pre, 3) + 0 : 0); }
+               } else if (match(s, /([0-9]|-)(a|b|rc)[0-9]+$/)) {
+                 pre = substr(s, RSTART + 1, RLENGTH - 1);
+                 if (substr(s, RSTART, 1) == "-") {
+                   s = substr(s, 1, RSTART - 1);
+                 } else {
+                   s = substr(s, 1, RSTART);
+                 }
+                 if (pre ~ /^a/) { stage = 1; pre_num = substr(pre, 2) + 0; }
+                 else if (pre ~ /^b/) { stage = 2; pre_num = substr(pre, 2) + 0; }
+                 else { stage = 3; pre_num = substr(pre, 3) + 0; }
+               }
+               if (match(s, /^[[:alnum:].]+-/)) {
+                 s = substr(s, 1, RLENGTH - 1) "." (RLENGTH < length(s) ? substr(s, RLENGTH + 1) : "");
+               }
+               n = split(s, parts, ".");
+               out = parts[1];
+               for (i = 2; i <= 6; i++) {
+                 out = out "." (i <= n ? parts[i] : "0");
+               }
+               print out "." stage "." pre_num ".|" orig;
              }'))
     DEFINITION_CANDIDATES=(\
         $(printf '%s\n' "${DEFINITION_CANDIDATES[@]:-}" \
-          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr -k5,5nr -k6,6nr \
+          | sort -t. -k1,1r -k 2,2nr -k 3,3nr -k4,4nr -k5,5nr -k6,6nr -k7,7nr -k8,8nr \
           | cut -f2 -d $'|' \
         || true))
     DEFINITION="${DEFINITION_CANDIDATES[0]:-}"
