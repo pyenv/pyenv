@@ -42,22 +42,10 @@ osx64_hash={checksum_osx64}
 
 ### end of manual settings - following lines same for every download
 
-function err_no_binary {{
-    local archmsg="${{1}}"
-    local ver="pypy${{PYVER}}-v${{VERSION}}-src"
-    local url="https://downloads.python.org/pypy/${{ver}}.tar.{file_ext}"
-    {{ echo
-      colorize 1 "ERROR"
-      echo ": The binary distribution of PyPy is not available for ${{archmsg}}."
-      echo "try '${{url}}' to build from source."
-      echo
-    }} >&2
-    exit 1
-}}
-
 function pypy_pkg_data {{
     # pypy architecture tag
     local ARCH="${{1}}"
+    local basever="pypy${{PYVER}}-v${{VERSION}}"
 
     # defaults
     local cmd='install_package'  # use {file_ext}
@@ -87,15 +75,14 @@ function pypy_pkg_data {{
         hash="${{osx64_hash}}"
         pkg='macos_x86_64'
       else
-        err_no_binary "${{ARCH}}, OS X < 10.15"
+        pypy_binary_unavailable "${{ARCH}}, OS X < 10.15" "${{BASH_SOURCE[0]##*/}}-src"
       fi
       ;;
     * )
-      err_no_binary "${{ARCH}}"
+      pypy_binary_unavailable "${{ARCH}}" "${{BASH_SOURCE[0]##*/}}-src"
       ;;
     esac
 
-    local basever="pypy${{PYVER}}-v${{VERSION}}"
     local baseurl="https://downloads.python.org/pypy/${{basever}}"
 
     # result - command, package dir, url+hash
