@@ -1237,11 +1237,11 @@ pypy_architecture() {
 
 pypy_binary_unavailable() {
   local archmsg="$1"
-  local source_archive="$2"
+  local source_version="$2"
   { echo
     colorize 1 "ERROR"
     echo ": The binary distribution of PyPy is not available for ${archmsg}."
-    echo "try 'https://downloads.python.org/pypy/${source_archive}' to build from source."
+    echo "try '${source_version}' to build from source."
     echo
   } >&2
   exit 1

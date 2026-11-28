@@ -75,11 +75,11 @@ function pypy_pkg_data {{
         hash="${{osx64_hash}}"
         pkg='macos_x86_64'
       else
-        pypy_binary_unavailable "${{ARCH}}, OS X < 10.15" "${{basever}}-src.tar.{file_ext}"
+        pypy_binary_unavailable "${{ARCH}}, OS X < 10.15" "${{BASH_SOURCE[0]##*/}}-src"
       fi
       ;;
     * )
-      pypy_binary_unavailable "${{ARCH}}" "${{basever}}-src.tar.{file_ext}"
+      pypy_binary_unavailable "${{ARCH}}" "${{BASH_SOURCE[0]##*/}}-src"
       ;;
     esac
 
