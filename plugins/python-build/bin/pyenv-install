@@ -191,6 +191,7 @@ for i in "${!DEFINITIONS[@]}"; do
   DEFINITION="${DEFINITIONS[$i]}"
   VERSION_ALIAS="${ALIASES[$i]}"
   STATUS=0
+  PREFIX_EXISTS=
 
   # Try to resolve a prefix if user indeed gave a prefix.
   # We install the version under the resolved name
@@ -205,7 +206,6 @@ for i in "${!DEFINITIONS[@]}"; do
   [ -n "$DEBUG" ] && VERSION_NAME="${VERSION_NAME}-debug"
   PREFIX="${PYENV_ROOT}/versions/${VERSION_ALIAS:-$VERSION_NAME}"
 
-  unset PREFIX_EXISTS
   [ -d "${PREFIX}" ] && PREFIX_EXISTS=1
 
   # If the installation prefix exists, prompt for confirmation unless
