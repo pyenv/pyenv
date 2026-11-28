@@ -159,6 +159,19 @@ echo 3.14.6
 !
 }
 
+@test "resolves a single match without sorting" {
+  create_stub pyenv-versions <<!
+echo 3.11.9
+echo 3.12.4
+!
+  create_stub sort 'echo "unexpected sort call" >&2; exit 1'
+  run pyenv-latest 3.12
+  assert_success
+  assert_output <<!
+3.12.4
+!
+}
+
 @test "falls back to argument with -b" {
   create_stub pyenv-versions
   run pyenv-latest -b nonexistent
