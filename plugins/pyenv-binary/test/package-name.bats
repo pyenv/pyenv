@@ -1,8 +1,10 @@
 #!/usr/bin/env bats
 
 load test_helper
+load binary_helper
 
 _setup() {
+  PATH="${BATS_TEST_TMPDIR}/stubs:${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
   create_stub pyenv-latest '[ "$1" = "-f" ] && [ "$2" = "-k" ] && shift 2 && echo "$*"'
 }
 
@@ -29,28 +31,39 @@ _setup() {
 }
 
 @test "generates a package name for Linux" {
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
-  create_stub lsb_release 'case "$1" in -si) echo Debian;; -sr) echo 12;; esac'
+  set_platform Linux x86_64 'debian 12'
 
   run pyenv-binary-package-name 3.13.14
   assert_success "3.13.14-debian-12-x86_64"
 }
 
-@test "generates a package name for macOS" {
-  create_stub uname 'case "$1" in -s) echo Darwin;; -m) echo arm64;; esac'
-  create_stub sw_vers 'echo 15.5'
+@test "generates a package name for the macOS major version" {
+  set_platform Darwin arm64 'macos 15.5'
 
   run pyenv-binary-package-name 3.13.14
-  assert_success "3.13.14-macos-15.5-arm64"
+  assert_success "3.13.14-macos-15-arm64"
+}
+
+@test "fails without a distribution release" {
+  set_platform Linux x86_64 'arch '
+
+  run pyenv-binary-package-name 3.13.14
+  assert_failure "pyenv-binary: could not determine the package platform"
+}
+
+@test "does not pass the version to the Python-Build library loader" {
+  set_platform Linux x86_64 'debian 12'
+
+  run pyenv-binary-package-name --lib
+  assert_success "--lib-debian-12-x86_64"
 }
 
 @test "resolves a version prefix when generating a package name" {
   create_stub pyenv-latest '[ "$*" = "-f -k 3" ] && echo 3.14.7'
-  create_stub uname \
-    'case "$1" in -s) echo FreeBSD;; -m) echo amd64;; -r) echo 14.2-RELEASE-p3;; esac'
+  set_platform FreeBSD amd64 'freebsd 14.2'
 
   run pyenv-binary-package-name 3
-  assert_success "3.14.7-freebsd-14.2-release-p3-amd64"
+  assert_success "3.14.7-freebsd-14.2-amd64"
 }
 
 @test "rejects an invalid version name" {

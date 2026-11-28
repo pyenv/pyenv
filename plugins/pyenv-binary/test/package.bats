@@ -1,6 +1,11 @@
 #!/usr/bin/env bats
 
 load test_helper
+load binary_helper
+
+_setup() {
+  PATH="${BATS_TEST_TMPDIR}/stubs:${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
+}
 
 # Make the build deterministic: `pyenv-install' just creates the prefix, and
 # the platform tools report a fixed Linux target so the real `save' and
@@ -8,7 +13,7 @@ load test_helper
 stub_build_environment() {
   create_stub pyenv-install 'echo "${0##*/} $*"; mkdir -p "${PYENV_ROOT}/versions/${1##*:}/bin"'
   create_stub pyenv-latest 'while (($#)); do case "$1" in -f|-k);; *)break;; esac; shift; done; echo "$*"'
-  create_stub uname 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac'
+  set_platform Linux x86_64 'debian 12'
   create_stub getconf 'echo "glibc 2.17"'
   create_stub readelf true
 }
@@ -60,7 +65,6 @@ pyenv-install --list --bare
 
 @test "generates an entry name for a bare version" {
   stub_build_environment
-  create_stub lsb_release 'case "$1" in -si) echo Debian;; -sr) echo 12;; esac'
   cd "${BATS_TEST_TMPDIR}"
 
   run pyenv-binary-package 3.12.7 --archive-base-url http://example.com/binaries
@@ -86,9 +90,14 @@ pyenv-install --list --bare
   assert_success "source_version=custom-python"
 }
 
-@test "rejects an entry name containing a slash" {
-  run pyenv-binary-package "3.12.7:foo/bar" --archive-base-url http://x/b
-  assert_failure "pyenv-binary: invalid entry name \`foo/bar'"
+@test "rejects unsafe entry names before building" {
+  create_stub pyenv-install 'touch "$BATS_TEST_TMPDIR/built"'
+  local entry
+  for entry in foo/bar . .. $'bad\nentry'; do
+    run pyenv-binary-package "3.12.7:$entry" --archive-base-url http://x/b
+    assert_failure "pyenv-binary: invalid entry name \`$entry'"
+  done
+  [ ! -e "$BATS_TEST_TMPDIR/built" ]
 }
 
 @test "rejects \`latest' as an entry name" {

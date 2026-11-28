@@ -1,6 +1,11 @@
 #!/usr/bin/env bats
 
 load test_helper
+load binary_helper
+
+_setup() {
+  PATH="${BATS_TEST_TMPDIR}/stubs:${BATS_TEST_DIRNAME}/../../python-build/bin:$PATH"
+}
 
 create_version() {
   mkdir -p "${PYENV_ROOT}/versions/$1/bin"
@@ -71,10 +76,20 @@ platform() {
   assert_failure "pyenv-binary: --source-version needs a value"
 }
 
-@test "rejects control characters in the default source version" {
-  run pyenv-binary-save $'3.12.7\nsource_version=other'
-  assert_failure
-  [[ "$output" == "pyenv-binary: invalid source version"* ]]
+@test "rejects control characters in the version" {
+  local version=$'3.12.7\nsource_version=other'
+  create_version "$version"
+
+  run pyenv-binary-save "$version" "$BATS_TEST_TMPDIR/dist" --source-version 3.12.7
+  assert_failure "pyenv-binary: invalid version name \`$version'"
+  [ ! -e "$BATS_TEST_TMPDIR/dist" ]
+}
+
+@test "rejects control characters in the source version" {
+  create_version 3.12.7
+
+  run pyenv-binary-save 3.12.7 --source-version $'3.12.7\nother'
+  assert_failure "pyenv-binary: invalid source version \`3.12.7"$'\n'"other'"
 }
 
 @test "fails when --name has no value" {
@@ -109,6 +124,16 @@ platform() {
 
   run grep '^build_prefix=' "${out}/3.12.7-$(platform).meta"
   assert_success "build_prefix=${PYENV_ROOT}/versions/3.12.7"
+}
+
+@test "records the detected distribution" {
+  create_version "3.12.7"
+  set_platform Darwin arm64 'macos 15.5'
+
+  run pyenv-binary-save "3.12.7" "${BATS_TEST_TMPDIR}/dist"
+  assert_success
+  run grep '^distro=' "${BATS_TEST_TMPDIR}/dist/3.12.7-darwin-arm64.meta"
+  assert_success "distro=macos 15.5"
 }
 
 @test "fails when readelf is not available" {
@@ -161,6 +186,7 @@ case "$1" in
   -m) echo arm64 ;;
 esac
 STUB
+  create_stub sw_vers 'echo 15.5'
   create_path_executable otool <<'STUB'
 prefix="${PYENV_ROOT}/versions/3.12.7"
 cat <<EOF

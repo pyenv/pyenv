@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#
+# Summary: Find the published binary package of a version
+#
+# Usage: pyenv binary find <version>
+#
+#   Prints the package entry built for the current platform and the checksum of
+#   its definition, separated by a tab. <version> is an exact definition name;
+#   prefixes are not resolved.
+#
+set -euo pipefail
+[ -n "${PYENV_DEBUG:-}" ] && set -x
+
+if [ "${1:-}" = "--complete" ]; then
+  exit
+fi
+
+if [ "$#" -ne 1 ]; then
+  pyenv-help --usage binary-find >&2
+  exit 1
+fi
+
+version="$1"
+source "${BASH_SOURCE%/*}/../lib/common.bash"
+# The name is also a part of the download URL.
+if ! is_name_safe "$version" || [[ "$version" = *[!A-Za-z0-9._-]* ]]; then
+  echo "pyenv-binary: invalid version name \`$version'" >&2
+  exit 1
+fi
+
+# The loaded code calls `lib "$1"', so don't leave the version there.
+shift
+eval "$(python-build --lib)"
+detect_platform
+target="$(package_suffix "$distro" "$arch")"
+
+record="${_PYENV_BINARY_VERSIONS_DIR:-${BASH_SOURCE%/*}/../share/pyenv-binary/versions}/$version"
+if [ -f "$record" ]; then
+  while IFS=$'\t' read -r suffix sha256; do
+    if [ "$suffix" = "$target" ]; then
+      printf '%s-%s\t%s\n' "$version" "$suffix" "$sha256"
+      exit
+    fi
+  done < "$record"
+fi
+
+echo "pyenv-binary: no binary available for $version on $os/$arch" >&2
+exit 1

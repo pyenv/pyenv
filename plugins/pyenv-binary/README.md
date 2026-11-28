@@ -19,24 +19,42 @@ by the `xz` package).
 
 ## Commands
 
+### `pyenv binary find <version>`
+
+Prints the published package entry for the current platform and the checksum
+of its definition, separated by a tab. `<version>` is an exact definition name;
+prefixes are not resolved.
+
+Published packages are recorded in `share/pyenv-binary/versions/<version>`, one
+file per definition name. Each line holds the platform part of an entry name,
+as `package-name` generates it, and the definition's SHA256, separated by a
+tab. Add a line when publishing a package. For example, `versions/3.14.7`
+contains:
+
+```text
+ubuntu-24.04-x86_64	e63dbcb981ec9ba83a2bc9b4d8b369620cec4aa45394559d719c5606ee9ff718
+```
+
+A package is used only on the distribution release (macOS major version) and
+architecture it was built for.
+
 ### `pyenv binary install <version>`
 
-Installs a matching published package from pyenv.github.io under `<version>`.
-The command selects by OS, architecture and distribution; on macOS, an archive
-built on an older major release can also be used. Available packages and their
-definition checksums are recorded in `share/pyenv-binary/versions`. Add an entry
-there when publishing a new package. The definition checks its system-library
-requirements when an `ldconfig` cache is available; otherwise, it warns and
-proceeds.
+Resolves `<version>` like `pyenv install` does, then installs the package that
+`find` reports for it from pyenv.github.io under that name. It doesn't fall back
+to an older version. The definition checks its system-library requirements
+when an `ldconfig` cache is available; otherwise, it warns and proceeds.
 
 ```sh
 pyenv binary install 3.14.7
 ```
 
 A definition with the selected package entry's name in a plugin's
-`share/python-build` directory overrides the published definition. The normal
-Python-Build search order applies, including `PYTHON_BUILD_DEFINITIONS`.
-Local definitions are installed without downloading the stock definition.
+`share/pyenv-binary/definitions` directory overrides the published definition.
+Plugins are searched in name order, and the first match is installed without
+downloading the stock definition. Binary definitions don't belong in
+Python-Build's definition directories, where `pyenv install` would offer them
+as source versions.
 
 ### `pyenv binary package [-v|--verbose] <version>[:<entry>] --archive-base-url <url>`
 
@@ -59,15 +77,15 @@ pyenv binary package 3.12.7:company-python \
 ```
 
 The archive, metadata and definition land in the current directory, named after
-the entry. Host the archive under `<url>` and drop the definition into
-python-build's definition directory.
+the entry. Host the archive under `<url>` and pass the definition's path to
+`pyenv install`.
 
 ### `pyenv binary package-name <version>`
 
-Prints the automatically generated entry name without building anything. Linux
-uses the distribution name and version, macOS uses the macOS version, and other
-systems use the name and release reported by `uname`. All names include the
-architecture.
+Prints the automatically generated entry name without building anything. It
+uses the distribution and release detected by Python-Build, which falls back to
+the system name and release reported by `uname`; macOS uses the major version.
+All names include the architecture.
 
 ```sh
 pyenv binary package-name 3.12.7
@@ -88,11 +106,10 @@ pyenv binary save 3.12.7 ./dist
 
 ### `pyenv binary generate-installer <metadata-file> --archive-url <url> [-o <output>]`
 
-Reads a `.meta` file and emits a python-build definition. Drop it into
-python-build's definition directory and `pyenv install <name>` installs the
-archive like any other version. The archive location is a parameter, so you can
-host it anywhere (it does not have to be a pyenv location); the archive itself
-must sit next to the `.meta` file so its checksum can be baked into the
+Reads a `.meta` file and emits a python-build definition. Pass its path to
+`pyenv install` to install the archive. The archive location is a parameter, so
+you can host it anywhere (it does not have to be a pyenv location); the archive
+itself must sit next to the `.meta` file so its checksum can be baked into the
 definition.
 
 The definition refuses to install on a different OS/architecture, or an older
@@ -102,9 +119,9 @@ needs are present.
 ```sh
 pyenv binary generate-installer ./dist/3.12.7-linux-x86_64.meta \
   --archive-url https://example.com/3.12.7-linux-x86_64.tar.xz \
-  -o "$(pyenv root)/plugins/python-build/share/python-build/3.12.7-linux-x86_64"
+  -o ./dist/3.12.7-linux-x86_64
 
-pyenv install 3.12.7-linux-x86_64
+pyenv install ./dist/3.12.7-linux-x86_64
 ```
 
 ### `pyenv binary relocate <prefix> [<build-prefix>]`
